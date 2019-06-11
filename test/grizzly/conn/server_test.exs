@@ -6,7 +6,7 @@ defmodule Grizzly.Conn.Server.Test do
 
   setup do
     config =
-      :zip_gateway
+      :grizzly
       |> Application.get_env(Grizzly.Controller)
       |> Keyword.put(:heart_beat_timer, 2_000)
       |> Config.new()

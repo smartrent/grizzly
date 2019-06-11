@@ -1,9 +1,9 @@
-defmodule ZipGateway.UnsolicitedServer do
+defmodule Grizzly.UnsolicitedServer do
   use GenServer
   require Logger
 
-  alias ZipGateway.UnsolicitedServer.Config
-  alias ZipGateway.UnsolicitedServer.Socket.Supervisor, as: SocketSupervisor
+  alias Grizzly.UnsolicitedServer.Config
+  alias Grizzly.UnsolicitedServer.Socket.Supervisor, as: SocketSupervisor
 
   defmodule State do
     defstruct config: nil, socket: nil

@@ -1,11 +1,11 @@
 use Mix.Config
 
 config :grizzly,
-  run_zipgateway: false
+  run_grizzly: false
 
-config :grizzly, ZipGateway.Controller,
+config :grizzly, Grizzly.Controller,
   ip: {0, 0, 0, 0},
   port: 5000,
-  client: ZipGateway.Test.Client
+  client: Grizzly.Test.Client
 
 config :logger, level: :error
