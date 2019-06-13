@@ -15,6 +15,8 @@ defmodule Grizzly do
   """
   @type connected :: Conn.t() | Controller | Node.t()
 
+  @conn_opts [:owner]
+
   @spec config() :: Config.t()
   def config() do
     case Application.get_env(:grizzly, Grizzly.Controller) do
@@ -42,9 +44,13 @@ defmodule Grizzly do
           :ok | {:ok, any} | {:error, any}
   def send_command(connected, command_module, command_opts \\ [])
 
-  def send_command(%Conn{} = conn, command_module, command_opts) do
+  def send_command(%Conn{} = conn, command_module, opts) do
+    # an option in opts is either a command or connection option
+    command_opts = Keyword.drop(opts, @conn_opts)
+    conn_opts = opts -- command_opts
+
     with {:ok, command} <- Command.start(command_module, command_opts) do
-      Conn.send_command(conn, command)
+      Conn.send_command(conn, command, conn_opts)
     else
       {:error, reason} ->
         {:error, reason}

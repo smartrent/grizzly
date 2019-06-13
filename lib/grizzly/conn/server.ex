@@ -24,6 +24,8 @@ defmodule Grizzly.Conn.Server do
 
     @type command :: %{
             from: GenServer.from(),
+            # the owner of queued commands, to which responses are to be sent
+            owner: pid,
             command: Command.t(),
             mode: Config.mode(),
             status: :active | :queued,
@@ -44,8 +46,15 @@ defmodule Grizzly.Conn.Server do
               heart_beat_interval: nil,
               commands: []
 
-    def build_command(command, from, mode) do
-      %{command: command, from: from, mode: mode, status: :active, queued_ref: nil}
+    def build_command(command, from, mode, opts) do
+      %{
+        command: command,
+        from: from,
+        owner: opts[:owner],
+        mode: mode,
+        status: :active,
+        queued_ref: nil
+      }
     end
   end
 
@@ -66,9 +75,9 @@ defmodule Grizzly.Conn.Server do
     GenServer.call(conn, :connected?)
   end
 
-  @spec send_command(Conn.t(), Command.t()) :: :ok | {:ok, any} | {:error, any}
-  def send_command(%Conn{conn: conn_server, mode: mode}, command) do
-    GenServer.call(conn_server, {:send_command, command, mode}, 120_000)
+  @spec send_command(Conn.t(), Command.t(), Keyword.t()) :: :ok | {:ok, any} | {:error, any}
+  def send_command(%Conn{conn: conn_server, mode: mode}, command, opts) do
+    GenServer.call(conn_server, {:send_command, command, mode, opts}, 120_000)
   end
 
   @doc """
@@ -97,23 +106,23 @@ defmodule Grizzly.Conn.Server do
   end
 
   def handle_call(
-        {:send_command, command, :sync},
+        {:send_command, command, :sync, opts},
         from,
         %State{commands: commands} = state
       ) do
     :ok = do_send_command(command, state)
-    command = State.build_command(command, from, :sync)
+    command = State.build_command(command, from, :sync, opts)
 
     {:noreply, %{state | commands: commands ++ [command]}}
   end
 
   def handle_call(
-        {:send_command, command, :async},
+        {:send_command, command, :async, opts},
         from,
         %State{commands: commands} = state
       ) do
     :ok = do_send_command(command, state)
-    command = State.build_command(command, from, :async)
+    command = State.build_command(command, from, :async, opts)
 
     {:reply, :ok, %{state | commands: commands ++ [command]}}
   end
@@ -248,8 +257,19 @@ defmodule Grizzly.Conn.Server do
     %{cmd | status: :queued, queued_ref: ref}
   end
 
-  defp send_response(%{status: :queued, queued_ref: ref, from: {pid, _}}, response) do
-    send(pid, {Grizzly, :queued_response, ref, response})
+  defp send_response(
+         %{status: :queued, queued_ref: ref, from: {pid, _}, owner: owner},
+         response
+       ) do
+    message = {ZipGateway, :queued_response, ref, response}
+    receiver = owner || pid
+
+    _ =
+      Logger.info(
+        "[ZIPGATEWAY] Sending queued response #{inspect(message)} to #{inspect(receiver)}"
+      )
+
+    send(receiver, {ZipGateway, :queued_response, ref, response})
   end
 
   defp send_response(%{status: :active, from: {pid, _}, mode: :async}, response) do
