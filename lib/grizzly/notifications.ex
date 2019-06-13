@@ -18,7 +18,7 @@ defmodule Grizzly.Notifications do
           | :unsolicited_message
           | :node_added
           | :node_removed
-          | :node_update
+          | :node_updated
 
   def child_spec(_) do
     %{
