@@ -48,7 +48,8 @@ defmodule Grizzly.MixProject do
   defp package do
     [
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/smartrent/grizzly"}
+      links: %{"GitHub" => "https://github.com/smartrent/grizzly"},
+      organization: "smartrent"
     ]
   end
 end

@@ -4,3 +4,13 @@
 
 An Elixir library for Z-Wave
 
+## Installation
+
+```elixir
+def deps do
+  [
+    {:zip_gateway, "~> 0.1", organization: "smartrent"}
+  ]
+end
+```
+
