@@ -9,7 +9,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:zip_gateway, "~> 0.1", organization: "smartrent"}
+    {:grizzly, "~> 0.1", organization: "smartrent"}
   ]
 end
 ```
