@@ -50,7 +50,7 @@ defmodule Grizzly.Network.Server do
   """
   @spec update_command_class_versions(Node.t(), :sync | :async) :: :ok
   def update_command_class_versions(zw_node, mode) do
-    GenServer.call(__MODULE__, {:update_command_class_versions, zw_node, mode})
+    GenServer.call(__MODULE__, {:update_command_class_versions, zw_node, mode}, 30_000)
   end
 
   @doc """

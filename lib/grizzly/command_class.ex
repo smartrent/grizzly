@@ -1,6 +1,6 @@
 defmodule Grizzly.CommandClass do
   @moduledoc """
-    Identifies a command class by name and version
+  Identifies a command class by name and version
   """
 
   alias __MODULE__
@@ -21,8 +21,12 @@ defmodule Grizzly.CommandClass do
     version != :no_version_number
   end
 
-  @spec set_version(t, non_neg_integer) :: t
+  @spec set_version(t, non_neg_integer | :no_version_number) :: t
   def set_version(%CommandClass{} = command_class, version) when is_integer(version) do
     %CommandClass{command_class | version: version}
+  end
+
+  def set_version(%CommandClass{} = command_class, :no_version_number) do
+    command_class
   end
 end
