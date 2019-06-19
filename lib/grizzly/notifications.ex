@@ -31,6 +31,7 @@ defmodule Grizzly.Notifications do
   end
 
   def start_link() do
+    _ = Logger.info("[GRIZZLY] Starting registry #{@registry_name}")
     Registry.start_link(keys: :duplicate, name: @registry_name)
   end
 

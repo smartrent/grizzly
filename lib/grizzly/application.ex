@@ -1,7 +1,10 @@
 defmodule Grizzly.Application do
   use Application
+  require Logger
 
   def start(_type, _args) do
+    _ = Logger.info("Starting Grizzly")
+
     children =
       [
         Grizzly.Notifications,

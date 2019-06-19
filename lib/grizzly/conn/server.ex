@@ -17,6 +17,8 @@ defmodule Grizzly.Conn.Server do
   alias Grizzly.{Notifications, Command, Conn}
   alias Grizzly.Conn.Config
 
+  @retry_connect_delay 1_000
+
   @type t :: pid
 
   defmodule State do
@@ -136,6 +138,15 @@ defmodule Grizzly.Conn.Server do
         {:noreply, %{state | socket: socket, heart_beat_interval: heart_beat_timer}}
 
       :noop ->
+        {:noreply, state}
+
+      {:error, :timeout} ->
+        _ =
+          Logger.warn(
+            "[GRIZZLY] Setup autoconnect timed out. Retrying in #{@retry_connect_delay}"
+          )
+
+        Process.send_after(self(), :setup, @retry_connect_delay)
         {:noreply, state}
     end
   end
@@ -261,15 +272,13 @@ defmodule Grizzly.Conn.Server do
          %{status: :queued, queued_ref: ref, from: {pid, _}, owner: owner},
          response
        ) do
-    message = {ZipGateway, :queued_response, ref, response}
+    message = {Grizzly, :queued_response, ref, response}
     receiver = owner || pid
 
     _ =
-      Logger.info(
-        "[ZIPGATEWAY] Sending queued response #{inspect(message)} to #{inspect(receiver)}"
-      )
+      Logger.info("[GRIZZLY] Sending queued response #{inspect(message)} to #{inspect(receiver)}")
 
-    send(receiver, {ZipGateway, :queued_response, ref, response})
+    send(receiver, {Grizzly, :queued_response, ref, response})
   end
 
   defp send_response(%{status: :active, from: {pid, _}, mode: :async}, response) do

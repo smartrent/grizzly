@@ -25,14 +25,14 @@ defmodule Grizzly.UnsolicitedServer do
       ) do
     case :ssl.listen(41230, opts(ip_address, ip_version)) do
       {:ok, listensocket} ->
-        _ = Logger.info("[ZIPGATEWAY]: unsolicited server waiting for connections")
+        _ = Logger.info("[GRIZZLY]: unsolicited server waiting for connections")
         start_accepting_sockets(listensocket)
         {:noreply, %{state | socket: nil}}
 
       error ->
         _ =
           Logger.warn(
-            "[ZIPGATEWAY]: Unable to bind unsolicited messages server. Error: #{inspect(error)}"
+            "[GRIZZLY]: Unable to bind unsolicited messages server. Error: #{inspect(error)}"
           )
 
         Process.send_after(self(), :listen, 2_000)

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# This script brings the tuntap interface up and routes the
+# Z-Wave PAN via the Z-Wave gateway's IP address.
+
+ROUTING_PID="/tmp/zipgateway.routing.pid"
+
+case "$1" in
+  up)
+    ip link set dev $TUNDEV up
+    ip addr add fd00:aaaa::2 dev $TUNDEV
+
+    if [ -f $ROUTING_PID ]; then
+      kill -9 $(cat $ROUTING_PID)
+      rm -f $ROUTING_PID
+    fi
+
+    sh -c "while true; do
+               pidof zipgateway || break;
+               ip -6 route del $HANPREFIX > /dev/null 2>&1
+               ip -6 route add $HANPREFIX via $LANIP dev $TUNDEV > /dev/null 2>&1
+               if [ \$? -eq 2 ]; then
+                   sleep 5;
+                   continue;
+               else
+                   break;
+               fi;
+               done;" &
+
+    echo $! > $ROUTING_PID
+
+    exit 0
+    ;;
+  down)
+    ip -6 route del $HANPREFIX via $LANIP
+    ;;
+esac
