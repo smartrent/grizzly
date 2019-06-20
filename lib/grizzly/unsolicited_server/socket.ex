@@ -53,13 +53,13 @@ defmodule Grizzly.UnsolicitedServer.Socket do
       |> :binary.list_to_bin()
       |> Packet.decode()
 
-    _ = Logger.debug("[ZIPGATEWAY]: unsolicited message received: #{inspect(parsed_data)}")
+    _ = Logger.debug("[GRIZZLY]: unsolicited message received: #{inspect(parsed_data)}")
     Notifications.broadcast(:unsolicited_message, prepare_message(parsed_data, node_id))
     {:noreply, state}
   end
 
   def handle_info({:ssl_closed, {:sslsocket, {_, {_, {{_ip, _}, _}}, _}, _}}, state) do
-    _ = Logger.info("[ZIPGATEWAY]: unsolicated messages closed")
+    _ = Logger.info("[GRIZZLY]: unsolicated messages closed")
     {:stop, :normal, state}
   end
 
