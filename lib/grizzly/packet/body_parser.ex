@@ -563,6 +563,60 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(
+        <<0x8A, 0x02, _rtc_failure::size(1), _reserved::size(2), hour::size(5), minute::size(8),
+          second::size(8), _other::binary>>
+      ) do
+    %{
+      command_class: :time,
+      command: :time_report,
+      value: %{
+        hour: hour,
+        minute: minute,
+        second: second
+      }
+    }
+  end
+
+  def parse(<<0x8A, 0x04, year::size(16), month::size(8), day::size(8), _other::binary>>) do
+    %{
+      command_class: :time,
+      command: :date_report,
+      value: %{
+        year: year,
+        month: month,
+        day: day
+      }
+    }
+  end
+
+  def parse(
+        <<0x8A, 0x07, sign_tzo::size(1), hour_tzo::size(7), minute_tzo, sign_offset_dst::size(1),
+          minute_offset_dst::size(7), month_start_dst, day_start_dst, hour_start_dst,
+          month_end_dst, day_end_dst, hour_end_dst>>
+      ) do
+    %{
+      command_class: :time,
+      command: :time_offset_report,
+      value: %{
+        sign_tzo: sign_tzo,
+        # deviation from UTC
+        hour_tzo: hour_tzo,
+        minute_tzo: minute_tzo,
+        sign_offset_dst: sign_offset_dst,
+        minute_offset_dst: minute_offset_dst,
+        # start of DST
+        month_start_dst: month_start_dst,
+        day_start_dst: day_start_dst,
+        # end of DST
+        hour_start_dst: hour_start_dst,
+        month_end_dst: month_end_dst,
+        day_end_dst: day_end_dst,
+        hour_end_dst: hour_end_dst
+      }
+    }
+  end
+
   def parse(<<command_class, command, rest_of_body::binary>> = packet) do
     _ = Logger.info("Default parsing of packet body #{inspect(packet)}")
     parsed_command_class = Mappings.from_byte(command_class)

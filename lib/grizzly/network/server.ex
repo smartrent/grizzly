@@ -95,7 +95,9 @@ defmodule Grizzly.Network.Server do
   def handle_call({:update_command_class_versions, zw_node, :async}, _from, state) do
     _ = Logger.info("Updating command class version of node #{zw_node.id}")
     # spawn unlinked to be unaffected by command timeouts
-    spawn(fn -> update_cc_versions(zw_node) end)
+    spawn(fn ->
+      update_cc_versions(zw_node)
+    end)
 
     {:reply, :ok, state}
   end
@@ -223,7 +225,9 @@ defmodule Grizzly.Network.Server do
   # Update the command class versions of a node. This can take a while.
   defp do_update_command_class_versions(%Node{id: id, command_classes: command_classes} = zw_node) do
     _ =
-      Logger.info("Getting #{Enum.count(command_classes)} command class versions for node #{id}")
+      Logger.info(
+        "[GRIZZLY] Getting #{Enum.count(command_classes)} command class versions for node #{id}"
+      )
 
     updated_command_classes =
       Enum.map(
@@ -236,7 +240,7 @@ defmodule Grizzly.Network.Server do
             {:error, reason} ->
               _ =
                 Logger.warn(
-                  "Failed to get version of command class #{inspect(command_class)} in node #{
+                  "[GRIZZLY] Failed to get version of command class #{inspect(command_class)} in node #{
                     inspect(zw_node)
                   }: #{inspect(reason)}. Keeping default version #{inspect(default_version)}"
                 )
