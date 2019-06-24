@@ -93,7 +93,11 @@ defmodule Grizzly.Network.Server do
   end
 
   def handle_call({:update_command_class_versions, zw_node, :async}, _from, state) do
-    _ = Logger.info("Updating command class version of node #{zw_node.id}")
+    _ =
+      Logger.info(
+        "[GRIZZLY] Updating asynchronously command class versions of node #{zw_node.id}"
+      )
+
     # spawn unlinked to be unaffected by command timeouts
     spawn(fn ->
       update_cc_versions(zw_node)
@@ -103,6 +107,9 @@ defmodule Grizzly.Network.Server do
   end
 
   def handle_call({:update_command_class_versions, zw_node, :sync}, _from, state) do
+    _ =
+      Logger.info("[GRIZZLY] Updating synchronously command class versions of node #{zw_node.id}")
+
     update_cc_versions(zw_node)
     {:reply, :ok, state}
   end
@@ -128,7 +135,9 @@ defmodule Grizzly.Network.Server do
         {:error, reason} ->
           _ =
             Logger.warn(
-              "Failed to get version of command_class #{name} of node #{zw_node.id}: #{reason}"
+              "[GRIZZLY] Failed to get version of command_class #{name} of node #{zw_node.id}: #{
+                reason
+              }"
             )
 
           {:reply, {:error, reason}, state}
@@ -216,7 +225,6 @@ defmodule Grizzly.Network.Server do
   end
 
   defp update_cc_versions(zw_node) do
-    _ = Logger.info("Updating command class version of node #{zw_node.id}")
     updated_zw_node = do_update_command_class_versions(zw_node)
     GenServer.cast(__MODULE__, {:node_updated, updated_zw_node})
     Notifications.broadcast(:node_updated, updated_zw_node)
@@ -241,7 +249,7 @@ defmodule Grizzly.Network.Server do
               _ =
                 Logger.warn(
                   "[GRIZZLY] Failed to get version of command class #{inspect(command_class)} in node #{
-                    inspect(zw_node)
+                    zw_node.id
                   }: #{inspect(reason)}. Keeping default version #{inspect(default_version)}"
                 )
 
@@ -255,14 +263,35 @@ defmodule Grizzly.Network.Server do
   end
 
   defp get_command_class_version(zw_node, command_class_name) do
-    seq_number = SeqNumber.get_and_inc()
+    task =
+      Task.async(fn ->
+        seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(
-      zw_node,
-      CommandClassVersion.Get,
-      seq_number: seq_number,
-      command_class: command_class_name
-    )
+        Grizzly.send_command(
+          zw_node,
+          CommandClassVersion.Get,
+          seq_number: seq_number,
+          command_class: command_class_name
+        )
+      end)
+
+    try do
+      # wait 5 secs
+      Task.await(task)
+    catch
+      :exit, error ->
+        # Task needs to be killed explicitly because we are trapping exits
+        _ = Task.shutdown(task, :brutal_kill)
+
+        _ =
+          Logger.error(
+            "[GRIZZLY] Exit trapped when getting version of command class #{command_class_name} of node #{
+              zw_node.id
+            }: #{inspect(error)}"
+          )
+
+        {:error, :failed}
+    end
   end
 
   defp update_node_list(zw_node, nodes) do
