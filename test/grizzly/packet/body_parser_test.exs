@@ -669,6 +669,63 @@ defmodule Grizzly.Packet.BodyParser.Test do
     end
   end
 
+  describe "parses time reports" do
+    test "parse a time report" do
+      time_report = <<0x8A, 0x02, 1, 2, 3>>
+      parsed = BodyParser.parse(time_report)
+
+      assert parsed == %{
+               command_class: :time,
+               command: :time_report,
+               value: %{
+                 hour: 1,
+                 minute: 2,
+                 second: 3
+               }
+             }
+    end
+
+    test "parse a date report" do
+      date_report = <<0x8A, 0x04, 0x07, 0xE3, 0x0C, 0x19>>
+      parsed = BodyParser.parse(date_report)
+
+      assert parsed == %{
+               command_class: :time,
+               command: :date_report,
+               value: %{
+                 year: 2019,
+                 month: 12,
+                 day: 25
+               }
+             }
+    end
+
+    test "parse a time offset report" do
+      time_report =
+        <<0x8A, 0x07, 0x1::size(1), 4::size(7), 0, 0x0::size(1), 60::size(7), 3, 10, 2, 11, 3, 2>>
+
+      parsed = BodyParser.parse(time_report)
+
+      assert parsed == %{
+               command_class: :time,
+               command: :time_offset_report,
+               value: %{
+                 sign_tzo: 1,
+                 hour_tzo: 4,
+                 minute_tzo: 0,
+                 sign_offset_dst: 0,
+                 minute_offset_dst: 60,
+                 month_start_dst: 3,
+                 day_start_dst: 10,
+                 hour_start_dst: 2,
+                 month_end_dst: 11,
+                 day_end_dst: 3,
+                 hour_end_dst: 2
+               }
+             }
+    end
+  end
+
   describe "parse power management report for switching ac power" do
     test "disconnected AC" do
       bytes = <<0x71, 0x05, 0x00, 0x00, 0x00, 0xFF, 0x08, 0x02, 0x00>>
