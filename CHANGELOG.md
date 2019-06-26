@@ -1,5 +1,12 @@
 ## Changelog
 
+## v0.2.1
+
+* Updates
+  * Support for the time command class
+* Fixes
+  * Time-boxing of getting a command class version
+
 ## v0.2.0
 
 * Fixes
