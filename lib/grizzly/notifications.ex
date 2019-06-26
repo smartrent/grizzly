@@ -70,7 +70,7 @@ defmodule Grizzly.Notifications do
   """
   @spec broadcast(topic, data :: any) :: :ok
   def broadcast(topic, data) do
-    _ = Logger.debug("BROADCASTING #{inspect(topic)} :: #{inspect(data)}")
+    _ = Logger.debug("[GRIZZLY] BROADCASTING #{inspect(topic)} :: #{inspect(data)}")
 
     Registry.dispatch(@registry_name, topic, fn listeners ->
       for {pid, _} <- listeners, do: send(pid, {topic, data})
