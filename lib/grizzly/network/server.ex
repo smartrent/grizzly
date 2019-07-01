@@ -63,9 +63,7 @@ defmodule Grizzly.Network.Server do
   end
 
   def init(_) do
-    :ok = Notifications.subscribe(:controller_connected)
-    :ok = Notifications.subscribe(:node_added)
-    :ok = Notifications.subscribe(:node_removed)
+    :ok = Notifications.subscribe_all([:controller_connected, :node_added, :node_removed])
     {:ok, %State{}}
   end
 

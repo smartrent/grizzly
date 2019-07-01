@@ -26,4 +26,14 @@ defmodule Grizzly.Notifications.Test do
 
     refute_receive :controller_connected
   end
+
+  test "subscribe to many topics at once" do
+    :ok = Notifications.subscribe_all([:controller_connected, :node_removed])
+
+    Notifications.broadcast(:controller_connected)
+
+    assert_receive :controller_connected
+
+    Notifications.broadcast(:node_removed)
+  end
 end
