@@ -6,6 +6,7 @@ defmodule Grizzly.UnsolicitedServer do
   alias Grizzly.UnsolicitedServer.Socket.Supervisor, as: SocketSupervisor
 
   defmodule State do
+    @moduledoc false
     defstruct config: nil, socket: nil
   end
 

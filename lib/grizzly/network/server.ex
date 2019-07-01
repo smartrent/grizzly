@@ -1,4 +1,5 @@
 defmodule Grizzly.Network.Server do
+  @moduledoc false
   use GenServer
 
   require Logger
@@ -8,6 +9,7 @@ defmodule Grizzly.Network.Server do
   alias Grizzly.CommandClass.CommandClassVersion
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             nodes: [Node.t()]
           }

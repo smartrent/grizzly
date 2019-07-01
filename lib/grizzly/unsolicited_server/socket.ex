@@ -1,4 +1,6 @@
 defmodule Grizzly.UnsolicitedServer.Socket do
+  @moduledoc false
+
   use GenServer
 
   require Logger
@@ -6,6 +8,7 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   alias Grizzly.UnsolicitedServer.Socket.Supervisor, as: SocketSupervisor
 
   defmodule State do
+    @moduledoc false
     defstruct listen_socket: nil
   end
 
