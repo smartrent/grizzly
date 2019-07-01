@@ -36,6 +36,14 @@ defmodule Grizzly.Notifications do
   end
 
   @doc """
+  Subscribe to a list of topics
+  """
+  @spec subscribe_all([topic]) :: :ok
+  def subscribe_all(topics) do
+    Enum.each(topics, &subscribe/1)
+  end
+
+  @doc """
   Subscribe to a topic to receive messages
   """
   @spec subscribe(topic) :: :ok | {:error, :already_subscribed}
