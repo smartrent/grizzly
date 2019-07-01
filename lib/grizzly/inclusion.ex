@@ -182,6 +182,7 @@ defmodule Grizzly.Inclusion do
   @type invalid_opts_reason :: :pin_required_for_s2_authentication | :pin_size_invalid
 
   defmodule State do
+    @moduledoc false
     alias Grizzly.Conn
 
     @type t :: %__MODULE__{

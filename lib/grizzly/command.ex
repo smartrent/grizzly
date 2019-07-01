@@ -41,6 +41,7 @@ defmodule Grizzly.Command do
   @callback handle_response(command :: any, Packet.t()) :: handle_instruction
 
   defmodule State do
+    @moduledoc false
     @type t :: %__MODULE__{
             command_module: module(),
             command: any,
