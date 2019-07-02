@@ -15,11 +15,13 @@ defmodule Grizzly.UnsolicitedServer do
     GenServer.start_link(__MODULE__, config, name: __MODULE__)
   end
 
+  @impl true
   def init(config) do
     send(self(), :listen)
     {:ok, %State{config: config}}
   end
 
+  @impl true
   def handle_info(
         :listen,
         %State{config: %Config{ip_address: ip_address, ip_version: ip_version}} = state

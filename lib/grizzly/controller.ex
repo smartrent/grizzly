@@ -44,12 +44,14 @@ defmodule Grizzly.Controller do
     GenServer.call(__MODULE__, {:conn, mode})
   end
 
+  @impl true
   def init(conn_config) do
     _ = Notifications.subscribe(:connection_established)
     conn = Conn.open(conn_config)
     {:ok, %State{conn: conn}}
   end
 
+  @impl true
   def handle_call(:connected?, _from, %State{conn: conn} = state) when conn in [nil, false] do
     {:reply, false, state}
   end
@@ -66,6 +68,7 @@ defmodule Grizzly.Controller do
     {:reply, Conn.override_mode(conn, mode), state}
   end
 
+  @impl true
   def handle_info(
         {:connection_established, %Config{ip: ip}},
         %State{conn: %Conn{ip_address: ip}} = state

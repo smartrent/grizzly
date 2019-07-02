@@ -89,11 +89,13 @@ defmodule Grizzly.Conn.Server do
     GenServer.call(conn, :close)
   end
 
+  @impl true
   def init(config) do
     Kernel.send(self(), :setup)
     {:ok, %State{config: config}}
   end
 
+  @impl true
   def handle_call(:connected?, _from, %State{socket: nil} = state) do
     {:reply, false, state}
   end
@@ -129,6 +131,7 @@ defmodule Grizzly.Conn.Server do
     {:reply, :ok, %{state | commands: commands ++ [command]}}
   end
 
+  @impl true
   def handle_info(:setup, %State{config: config} = state) do
     case maybe_autoconnect(config) do
       {:ok, socket} ->

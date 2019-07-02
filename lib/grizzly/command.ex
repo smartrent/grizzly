@@ -102,6 +102,7 @@ defmodule Grizzly.Command do
     GenServer.call(command, :complete)
   end
 
+  @impl true
   def init(
         command_module: command_module,
         command: command,
@@ -120,6 +121,7 @@ defmodule Grizzly.Command do
     }
   end
 
+  @impl true
   def terminate(:normal, _state) do
     :ok
   end
@@ -136,6 +138,7 @@ defmodule Grizzly.Command do
 
   # Upon command completion, clear any timeout and
   # set the network state to what the command specifies (defaults to :idle).
+  @impl true
   def handle_call(:complete, _from, %State{command: command, timeout_ref: timeout_ref} = state) do
     _ = clear_timeout(timeout_ref)
 
@@ -178,6 +181,7 @@ defmodule Grizzly.Command do
     end
   end
 
+  @impl true
   def handle_info(:timeout, %State{starter: starter, command_module: command_module} = state) do
     send(starter, {:timeout, command_module})
     {:stop, :normal, %State{state | timeout_ref: nil}}

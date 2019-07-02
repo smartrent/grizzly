@@ -267,6 +267,7 @@ defmodule Grizzly.Inclusion do
     GenServer.cast(__MODULE__, {:learn_mode_stop, opts})
   end
 
+  @impl true
   def init(_) do
     :ok = Notifications.subscribe(:controller_connected)
     {:ok, %State{}}
@@ -293,6 +294,7 @@ defmodule Grizzly.Inclusion do
     {:noreply, %{state | inclusion_opts: opts}}
   end
 
+  @impl true
   def handle_cast(
         {:add_node_stop, opts},
         %State{conn: conn} = state
@@ -406,6 +408,7 @@ defmodule Grizzly.Inclusion do
     {:noreply, %{state | inclusion_opts: opts}}
   end
 
+  @impl true
   def handle_info(:controller_connected, %State{} = state) do
     # Checkout an async version of the controllers connection
     {:noreply, %{state | conn: Controller.conn(:async)}}
