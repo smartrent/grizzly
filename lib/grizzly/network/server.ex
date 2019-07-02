@@ -64,11 +64,13 @@ defmodule Grizzly.Network.Server do
     GenServer.call(__MODULE__, {:command_class_version, command_class, zw_node})
   end
 
+  @impl true
   def init(_) do
     :ok = Notifications.subscribe_all([:controller_connected, :node_added, :node_removed])
     {:ok, %State{}}
   end
 
+  @impl true
   def handle_call(:all, _from, %State{nodes: nodes} = state) do
     {:reply, nodes, state}
   end
@@ -145,11 +147,13 @@ defmodule Grizzly.Network.Server do
     end
   end
 
+  @impl true
   def handle_cast({:node_updated, zw_node}, %State{nodes: nodes} = state) do
     _ = Logger.debug("Updating list of nodes with updated node #{inspect(zw_node)}")
     {:noreply, %{state | nodes: update_node_list(zw_node, nodes)}}
   end
 
+  @impl true
   def handle_info(:controller_connected, %State{} = state) do
     case get_nodes(state) do
       {:ok, nodes} ->

@@ -1,6 +1,6 @@
 defmodule Grizzly.SeqNumber do
   @moduledoc """
-  Internal module used for managing sequence numbers.
+  Used for managing sequence numbers.
 
   According to Z-Wave Network documentation we have to
   have a global seq number between the values 0x00 and 0xFF (0 - 255).
@@ -21,10 +21,12 @@ defmodule Grizzly.SeqNumber do
     GenServer.call(__MODULE__, :get_and_inc)
   end
 
+  @impl true
   def init(start_number) do
     {:ok, start_number}
   end
 
+  @impl true
   def handle_call(:get_and_inc, _from, number) do
     {:reply, number, inc(number)}
   end

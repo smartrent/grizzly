@@ -71,10 +71,12 @@ defmodule Grizzly.Network.State do
     GenServer.call(__MODULE__, :ready?)
   end
 
+  @impl true
   def init(_) do
     {:ok, :not_ready}
   end
 
+  @impl true
   def handle_call({:set, new_state}, _from, _) do
     _ = Logger.debug("Network state set to #{inspect(new_state)}")
     {:reply, :ok, new_state}

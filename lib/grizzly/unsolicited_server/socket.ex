@@ -31,11 +31,13 @@ defmodule Grizzly.UnsolicitedServer.Socket do
     end
   end
 
+  @impl true
   def init(listen_socket) do
     send(self(), :accept)
     {:ok, %State{listen_socket: listen_socket}}
   end
 
+  @impl true
   def handle_info(:accept, %State{listen_socket: listen_socket} = state) do
     {:ok, transport_accept_sock} = :ssl.transport_accept(listen_socket)
 
