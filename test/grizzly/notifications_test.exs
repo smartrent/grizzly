@@ -33,7 +33,7 @@ defmodule Grizzly.Notifications.Test do
     Notifications.broadcast(:controller_connected)
 
     assert_receive :controller_connected
-
-    Notifications.broadcast(:node_removed)
+    # bogus node
+    Notifications.broadcast(:node_removed, 0)
   end
 end
