@@ -12,7 +12,7 @@ defmodule Grizzly.Application do
         {Grizzly.SeqNumber, Enum.random(0..255)},
         {DynamicSupervisor, name: Grizzly.Conn.Supervisor, strategy: :one_for_one},
         {Grizzly.UnsolicitedServer, unsolicited_server_config()},
-        Grizzly.Controller.Supervisor,
+        {Grizzly.Controller, get_grizzly_config()},
         Grizzly.UnsolicitedServer.Socket.Supervisor,
         Grizzly.Inclusion,
         Grizzly.Network.State
@@ -46,6 +46,13 @@ defmodule Grizzly.Application do
 
       false ->
         children_list
+    end
+  end
+
+  defp get_grizzly_config() do
+    case Application.get_env(:grizzly, Grizzly.Controller) do
+      nil -> Grizzly.config()
+      opts -> Grizzly.Conn.Config.new(opts)
     end
   end
 end

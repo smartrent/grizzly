@@ -42,7 +42,7 @@ defmodule Grizzly.CommandClass.CommandClassVersion.Get do
   @spec handle_response(t, Packet.t()) ::
           {:continue, t}
           | {:done, {:error, :nack_response}}
-          | {:done, non_neg_integer}
+          | {:done, {:ok, non_neg_integer}}
           | {:retry, t}
   def handle_response(%__MODULE__{seq_number: seq_number} = command, %Packet{
         seq_number: seq_number,
