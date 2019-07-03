@@ -23,7 +23,7 @@ defmodule Grizzly.Packet.BodyParser do
   import Bitwise
   require Logger
 
-  alias Grizzly.Security
+  alias Grizzly.{Security, CommandClass}
 
   alias Grizzly.CommandClass.{
     Battery,
@@ -688,7 +688,8 @@ defmodule Grizzly.Packet.BodyParser do
   defp parse_command_class(byte, cmd_classes) when byte in [0x00, 0xEF, 0xF1], do: cmd_classes
 
   defp parse_command_class(byte, cmd_classes) do
-    cmd_classes ++ [Mappings.from_byte(byte)]
+    command_class_name = Mappings.from_byte(byte)
+    cmd_classes ++ [CommandClass.new(name: command_class_name)]
   end
 
   defp unmask(mask) do

@@ -1,6 +1,7 @@
 defmodule Grizzly.Packet.BodyParser.Test do
   use ExUnit.Case, async: true
 
+  alias Grizzly.CommandClass
   alias Grizzly.Packet.BodyParser
 
   alias Grizzly.CommandClass.{
@@ -56,22 +57,24 @@ defmodule Grizzly.Packet.BodyParser.Test do
                basic_class: :routing_slave,
                generic_class: :switch_multilevel,
                specific_class: :power_switch_multilevel,
-               command_classes: [
-                 :zwaveplus_info,
-                 :command_class_version,
-                 :manufacturer_specific,
-                 :device_rest_locally,
-                 :association,
-                 :ip_association,
-                 :association_group_info,
-                 :powerlevel,
-                 :switch_multilevel,
-                 :switch_all,
-                 :configuration,
-                 :firmware_update_md,
-                 :zip_naming,
-                 :zip
-               ],
+               command_classes:
+                 [
+                   :zwaveplus_info,
+                   :command_class_version,
+                   :manufacturer_specific,
+                   :device_rest_locally,
+                   :association,
+                   :ip_association,
+                   :association_group_info,
+                   :powerlevel,
+                   :switch_multilevel,
+                   :switch_all,
+                   :configuration,
+                   :firmware_update_md,
+                   :zip_naming,
+                   :zip
+                 ]
+                 |> Enum.map(&CommandClass.new(name: &1)),
                secure: false,
                dsk: "",
                dsk_length: 0x00,
@@ -161,29 +164,31 @@ defmodule Grizzly.Packet.BodyParser.Test do
                basic_class: :routing_slave,
                generic_class: :entry_control,
                specific_class: :secure_keypad_door_lock,
-               command_classes: [
-                 :schedule,
-                 :manufacturer_specific,
-                 :security,
-                 :device_rest_locally,
-                 :powerlevel,
-                 :command_class_version,
-                 :zip_naming,
-                 :zip,
-                 :battery,
-                 :door_lock,
-                 :association,
-                 :ip_association,
-                 :association_group_info,
-                 :alarm,
-                 :configuration,
-                 :user_code,
-                 :time,
-                 :time_parameters,
-                 :door_lock_logging,
-                 :schedule_entry_lock,
-                 :firmware_update_md
-               ],
+               command_classes:
+                 [
+                   :schedule,
+                   :manufacturer_specific,
+                   :security,
+                   :device_rest_locally,
+                   :powerlevel,
+                   :command_class_version,
+                   :zip_naming,
+                   :zip,
+                   :battery,
+                   :door_lock,
+                   :association,
+                   :ip_association,
+                   :association_group_info,
+                   :alarm,
+                   :configuration,
+                   :user_code,
+                   :time,
+                   :time_parameters,
+                   :door_lock_logging,
+                   :schedule_entry_lock,
+                   :firmware_update_md
+                 ]
+                 |> Enum.map(&CommandClass.new(name: &1)),
                secure: true,
                keys_granted: [:s0],
                kex_fail_type: :none,
@@ -328,7 +333,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
                  generic_cmd_class: :thermostat,
                  specific_cmd_class: :thermostat_general_v2,
                  command_classes: [
-                   :thermostat_setpoint
+                   CommandClass.new(name: :thermostat_setpoint)
                  ],
                  listening?: false,
                  security: :none
@@ -348,7 +353,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
                  generic_cmd_class: :thermostat,
                  specific_cmd_class: :thermostat_general_v2,
                  command_classes: [
-                   :thermostat_setpoint
+                   CommandClass.new(name: :thermostat_setpoint)
                  ],
                  listening?: true,
                  security: :none

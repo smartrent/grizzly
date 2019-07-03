@@ -2,7 +2,7 @@ defmodule Grizzly.Client.DTLS.Test do
   use ExUnit.Case, async: true
 
   alias Grizzly.Client.DTLS
-  alias Grizzly.Packet
+  alias Grizzly.{Packet, CommandClass}
   alias Grizzly.Packet.HeaderExtension.EncapsulationFormatInfo
 
   test "handles response from heart beat" do
@@ -79,22 +79,24 @@ defmodule Grizzly.Client.DTLS.Test do
         basic_class: :routing_slave,
         generic_class: :switch_multilevel,
         specific_class: :power_switch_multilevel,
-        command_classes: [
-          :zwaveplus_info,
-          :command_class_version,
-          :manufacturer_specific,
-          :device_rest_locally,
-          :association,
-          :ip_association,
-          :association_group_info,
-          :powerlevel,
-          :switch_multilevel,
-          :switch_all,
-          :configuration,
-          :firmware_update_md,
-          :zip_naming,
-          :zip
-        ],
+        command_classes:
+          [
+            :zwaveplus_info,
+            :command_class_version,
+            :manufacturer_specific,
+            :device_rest_locally,
+            :association,
+            :ip_association,
+            :association_group_info,
+            :powerlevel,
+            :switch_multilevel,
+            :switch_all,
+            :configuration,
+            :firmware_update_md,
+            :zip_naming,
+            :zip
+          ]
+          |> Enum.map(&CommandClass.new(name: &1)),
         secure: false,
         dsk: "",
         keys_granted: [],
