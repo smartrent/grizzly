@@ -726,6 +726,26 @@ defmodule Grizzly.Packet.BodyParser.Test do
     end
   end
 
+  describe "parses time_parameters reports" do
+    test "parse a time report" do
+      time_report = <<0x8B, 0x03, 0x07, 0xE3, 0x07, 0x03, 0x11, 0x25, 0x01>>
+      parsed = BodyParser.parse(time_report)
+
+      assert parsed == %{
+               command_class: :time_parameters,
+               command: :report,
+               value: %{
+                 year: 2019,
+                 month: 7,
+                 day: 3,
+                 hour: 17,
+                 minute: 37,
+                 second: 1
+               }
+             }
+    end
+  end
+
   describe "parse power management report for switching ac power" do
     test "disconnected AC" do
       bytes = <<0x71, 0x05, 0x00, 0x00, 0x00, 0xFF, 0x08, 0x02, 0x00>>

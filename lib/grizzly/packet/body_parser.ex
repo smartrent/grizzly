@@ -617,6 +617,24 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(
+        <<0x8B, 0x03, year::size(16), month::size(8), day::size(8), hour::size(8),
+          minute::size(8), second::size(8), _other::binary>>
+      ) do
+    %{
+      command_class: :time_parameters,
+      command: :report,
+      value: %{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second
+      }
+    }
+  end
+
   def parse(<<command_class, command, rest_of_body::binary>> = packet) do
     _ = Logger.info("Default parsing of packet body #{inspect(packet)}")
     parsed_command_class = Mappings.from_byte(command_class)
