@@ -43,7 +43,8 @@ defmodule Grizzly.Packet.BodyParser do
     NetworkManagementInclusion,
     MultilevelSensor,
     FirmwareUpdateMD,
-    ManufacturerSpecific
+    ManufacturerSpecific,
+    ScheduleEntryLock
   }
 
   def parse(<<
@@ -631,6 +632,103 @@ defmodule Grizzly.Packet.BodyParser do
         hour: hour,
         minute: minute,
         second: second
+      }
+    }
+  end
+
+  def parse(<<0x4E, 0x0A, week_day_slots::size(8), year_day_slots::size(8)>>) do
+    %{
+      command_class: :schedule_entry_lock,
+      command: :supported_report,
+      value: %{
+        week_day_slots: week_day_slots,
+        year_day_slots: year_day_slots,
+        daily_repeating: 0
+      }
+    }
+  end
+
+  def parse(
+        <<0x4E, 0x0A, week_day_slots::size(8), year_day_slots::size(8), daily_repeating::size(8)>>
+      ) do
+    %{
+      command_class: :schedule_entry_lock,
+      command: :supported_report,
+      value: %{
+        week_day_slots: week_day_slots,
+        year_day_slots: year_day_slots,
+        daily_repeating: daily_repeating
+      }
+    }
+  end
+
+  def parse(
+        <<0x4E, 0x0F, user_id::size(8), slot_id::size(8), week_days_mask::size(8),
+          start_hour::size(8), start_minute::size(8), duration_hour::size(8),
+          duration_minute::size(8)>>
+      ) do
+    %{
+      command_class: :schedule_entry_lock,
+      command: :daily_repeating_report,
+      value: %{
+        user_id: user_id,
+        slot_id: slot_id,
+        week_days: ScheduleEntryLock.decode_weekdays(week_days_mask),
+        start_hour: start_hour,
+        start_minute: start_minute,
+        duration_hour: duration_hour,
+        duration_minute: duration_minute
+      }
+    }
+  end
+
+  # Deal with non-set entry
+  def parse(
+        <<0x4E, 0x08, user_id::size(8), slot_id::size(8), 255, 255, 255, 255, 255, 255, 255, 255,
+          255, 255>>
+      ) do
+    %{
+      command_class: :schedule_entry_lock,
+      command: :year_day_report,
+      value: %{
+        user_id: user_id,
+        slot_id: slot_id,
+        start_year: 0,
+        start_month: 0,
+        start_day: 0,
+        start_hour: 0,
+        start_minute: 0,
+        stop_year: 0,
+        stop_month: 0,
+        stop_day: 0,
+        stop_hour: 0,
+        stop_minute: 0
+      }
+    }
+  end
+
+  def parse(
+        <<0x4E, 0x08, user_id::size(8), slot_id::size(8), start_year::size(8),
+          start_month::size(8), start_day::size(8), start_hour::size(8), start_minute::size(8),
+          stop_year::size(8), stop_month::size(8), stop_day::size(8), stop_hour::size(8),
+          stop_minute::size(8)>>
+      ) do
+    %{
+      command_class: :schedule_entry_lock,
+      command: :year_day_report,
+      value: %{
+        user_id: user_id,
+        slot_id: slot_id,
+        start_year: ScheduleEntryLock.decode_year(start_year),
+        start_month: start_month,
+        start_day: start_day,
+        start_hour: start_hour,
+        start_minute: start_minute,
+        stop_year: ScheduleEntryLock.decode_year(stop_year),
+        stop_month: stop_month,
+        stop_day: stop_day,
+        stop_hour: stop_hour,
+        stop_minute: stop_minute
       }
     }
   end
