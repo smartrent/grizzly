@@ -63,7 +63,7 @@ defmodule Grizzly.Network do
   @doc """
   Get a list of nodes from the network
   """
-  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unabled_to_get_node_list}
+  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unable_to_get_node_list}
   def get_nodes() do
     seq_number = SeqNumber.get_and_inc()
 
