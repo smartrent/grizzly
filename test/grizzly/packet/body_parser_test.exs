@@ -8,7 +8,8 @@ defmodule Grizzly.Packet.BodyParser.Test do
     Configuration,
     NetworkManagementBasic,
     CommandClassVersion,
-    FirmwareUpdateMD
+    FirmwareUpdateMD,
+    ScheduleEntryLock
   }
 
   describe "Parsing inclusion and exclusion" do
@@ -746,6 +747,85 @@ defmodule Grizzly.Packet.BodyParser.Test do
                  hour: 17,
                  minute: 37,
                  second: 1
+               }
+             }
+    end
+  end
+
+  describe "parses schedule entry lock reports" do
+    test "parse a time report with daily repeating" do
+      time_report = <<0x4E, 0x0A, 0x00, 0x01, 0x07>>
+      parsed = BodyParser.parse(time_report)
+
+      assert parsed == %{
+               command_class: :schedule_entry_lock,
+               command: :supported_report,
+               value: %{
+                 week_day_slots: 0,
+                 year_day_slots: 1,
+                 daily_repeating: 7
+               }
+             }
+    end
+
+    test "parse a supported report without daily repeating" do
+      supported_report = <<0x4E, 0x0A, 0x07, 0x01>>
+      parsed = BodyParser.parse(supported_report)
+
+      assert parsed == %{
+               command_class: :schedule_entry_lock,
+               command: :supported_report,
+               value: %{
+                 week_day_slots: 7,
+                 year_day_slots: 1,
+                 daily_repeating: 0
+               }
+             }
+    end
+
+    test "parse a daily repeating report" do
+      weekday_mask = ScheduleEntryLock.encode_weekdays([:monday, :friday])
+
+      daily_repeating_report =
+        <<0x4E, 0x0F, 0x01, 0x02, weekday_mask::binary(), 0x09, 0x00, 0x01, 0x00>>
+
+      parsed = BodyParser.parse(daily_repeating_report)
+
+      assert parsed == %{
+               command_class: :schedule_entry_lock,
+               command: :daily_repeating_report,
+               value: %{
+                 user_id: 1,
+                 slot_id: 2,
+                 week_days: [:monday, :friday],
+                 start_hour: 9,
+                 start_minute: 0,
+                 duration_hour: 1,
+                 duration_minute: 0
+               }
+             }
+    end
+
+    test "parse a year day report" do
+      year_day_report = <<0x4E, 0x08, 0x01, 0x02, 19, 7, 10, 13, 45, 19, 8, 11, 14, 56>>
+      parsed = BodyParser.parse(year_day_report)
+
+      assert parsed == %{
+               command_class: :schedule_entry_lock,
+               command: :year_day_report,
+               value: %{
+                 user_id: 1,
+                 slot_id: 2,
+                 start_year: ScheduleEntryLock.decode_year(19),
+                 start_month: 7,
+                 start_day: 10,
+                 start_hour: 13,
+                 start_minute: 45,
+                 stop_year: ScheduleEntryLock.decode_year(19),
+                 stop_month: 8,
+                 stop_day: 11,
+                 stop_hour: 14,
+                 stop_minute: 56
                }
              }
     end

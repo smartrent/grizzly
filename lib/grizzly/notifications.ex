@@ -14,7 +14,6 @@ defmodule Grizzly.Notifications do
   @type topic ::
           :controller_connected
           | :connection_established
-          | :network_ready
           | :unsolicited_message
           | :node_added
           | :node_removed

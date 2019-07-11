@@ -85,7 +85,7 @@ defmodule Grizzly do
   @doc """
   List the nodes on the Z-Wave network
   """
-  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unabled_to_get_nodes}
+  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unable_to_get_nodes}
   defdelegate get_nodes(), to: Grizzly.Network
 
   @doc """
