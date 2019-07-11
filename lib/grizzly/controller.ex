@@ -13,6 +13,7 @@ defmodule Grizzly.Controller do
   alias Grizzly
   alias Grizzly.{Conn, Notifications}
   alias Grizzly.Conn.Config
+  alias Grizzly.Network.State, as: NetworkState
 
   defmodule State do
     @moduledoc false
@@ -73,6 +74,7 @@ defmodule Grizzly.Controller do
         {:connection_established, %Config{ip: ip}},
         %State{conn: %Conn{ip_address: ip}} = state
       ) do
+    NetworkState.set(:idle)
     Notifications.broadcast(:controller_connected)
     {:noreply, state}
   end

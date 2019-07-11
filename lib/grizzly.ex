@@ -85,8 +85,8 @@ defmodule Grizzly do
   @doc """
   List the nodes on the Z-Wave network
   """
-  @spec list_nodes() :: [Node.t()]
-  defdelegate list_nodes(), to: Grizzly.Network
+  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unable_to_get_nodes}
+  defdelegate get_nodes(), to: Grizzly.Network
 
   @doc """
   Check to see if the network is busy
@@ -134,8 +134,8 @@ defmodule Grizzly do
   @doc """
     Update the command class version of a node
   """
-  @spec update_command_class_versions(Node.t(), :sync | :async) :: :ok
-  defdelegate update_command_class_versions(zw_node, mode \\ :async), to: Node
+  @spec update_command_class_versions(Node.t()) :: Node.t()
+  defdelegate update_command_class_versions(zw_node), to: Node
 
   @doc """
     Put the controller in learn mode for a few seconds
@@ -144,10 +144,12 @@ defmodule Grizzly do
   defdelegate start_learn_mode(opts \\ []), to: Grizzly.Inclusion
 
   @doc """
-    Get the version of a node's command class, possibly sticking to the already cached version
+  Get the version of a node's command class, if the node does not have a version for
+  this command class this function will try to get it from the Z-Wave network.
   """
-  @spec command_class_version(Node.t(), atom, boolean) :: {:ok, non_neg_integer} | {:error, atom}
-  defdelegate command_class_version(node, command_class_name, use_cached \\ false), to: Node
+  @spec get_command_class_version(Node.t(), atom) ::
+          {:ok, non_neg_integer} | {:error, atom}
+  defdelegate get_command_class_version(node, command_class_name), to: Node
 
   @doc """
     Whether a node has a given command class

@@ -6,11 +6,11 @@ defmodule Grizzly.Node do
   require Logger
   alias Grizzly.{Conn, SeqNumber, Controller, CommandClass}
   alias Grizzly.Conn.Config
-  alias Grizzly.Network.Server
   alias Grizzly.Network.State, as: NetworkState
   alias Grizzly.Node.Association
   alias Grizzly.CommandClass.Association.Set, as: AssociationSet
   alias Grizzly.CommandClass.ZipNd.InvNodeSolicitation
+  alias Grizzly.CommandClass.CommandClassVersion
 
   @type node_id :: non_neg_integer()
 
@@ -19,17 +19,17 @@ defmodule Grizzly.Node do
   @type security :: :none | :failed | :s0 | :s2_unauthenticated | :s2_authenticated
 
   @type t :: %__MODULE__{
-          id: node_id,
+          id: node_id(),
           command_classes: [CommandClass.t()],
-          security: security,
-          basic_cmd_class: atom,
-          generic_cmd_class: atom,
-          specific_cmd_class: atom,
+          security: security(),
+          basic_cmd_class: atom() | nil,
+          generic_cmd_class: atom() | nil,
+          specific_cmd_class: atom() | nil,
           ip_address: :inet.ip_address() | nil,
-          conn: Conn.t(),
+          conn: Conn.t() | nil,
           associations: [Association.t()],
           listening?: boolean(),
-          security: security
+          security: security()
         }
 
   @enforce_keys [:id]
@@ -79,22 +79,16 @@ defmodule Grizzly.Node do
   If the node has the IP address already, then this
   function will return that address
   """
-  @spec get_ip(t) :: {:ok, :inet.ip_address()}
+  @spec get_ip(t() | node_id()) :: {:ok, :inet.ip_address()} | {:error, :nack_response}
   def get_ip(%__MODULE__{ip_address: nil, id: node_id}) do
-    seq_number = SeqNumber.get_and_inc()
-
-    {:ok, {:node_ip, _, ip_address}} =
-      Grizzly.send_command(
-        Controller.conn(),
-        InvNodeSolicitation,
-        seq_number: seq_number,
-        node_id: node_id
-      )
-
-    {:ok, ip_address}
+    do_get_ip(node_id)
   end
 
   def get_ip(%__MODULE__{ip_address: ip_address}), do: {:ok, ip_address}
+
+  def get_ip(node_id) when is_integer(node_id) do
+    do_get_ip(node_id)
+  end
 
   @doc """
   Establish a connection with a Node
@@ -178,30 +172,69 @@ defmodule Grizzly.Node do
   end
 
   @doc """
-    Update the command class versions of a node
+  Update the command class versions of a node
   """
-  @spec update_command_class_versions(t, :async | :sync) :: :ok
-  def update_command_class_versions(zw_node, mode) do
-    Server.update_command_class_versions(zw_node, mode)
+  @spec update_command_class_versions(t) :: t()
+  def update_command_class_versions(%__MODULE__{command_classes: command_classes} = zw_node) do
+    command_classes =
+      Enum.map(command_classes, fn command_class ->
+        command_class_name = CommandClass.name(command_class)
+
+        case get_command_class_version(zw_node, command_class_name) do
+          {:ok, version} ->
+            CommandClass.set_version(command_class, version)
+
+          {:error, :timeout_get_command_class_version} ->
+            _ =
+              Logger.warn(
+                "Timeout getting the command class version of #{inspect(command_class_name)} for node #{
+                  inspect(zw_node.id)
+                }"
+              )
+
+            command_class
+
+          {:error, :command_class_not_found} ->
+            _ =
+              Logger.warn(
+                "Unable to get command command class for #{inspect(command_class_name)} because the node (#{
+                  inspect(zw_node.id)
+                }) does not support that command class"
+              )
+
+            command_class
+        end
+      end)
+
+    %{zw_node | command_classes: command_classes}
   end
 
-  @doc "Get the version of a node's command class, possibly sticking to the cached version even if not known"
-  @spec command_class_version(t, atom, boolean) :: {:ok, non_neg_integer} | {:error, :not_found}
-  def command_class_version(node, command_class_name, use_cached) do
-    case command_class(node, command_class_name) do
+  @doc """
+  Get the version of a node's command class, if the node does not have a version for
+  this command class this function will try to get it from the Z-Wave network.
+  """
+  @spec get_command_class_version(t(), CommandClass.name()) ::
+          {:ok, CommandClass.version()}
+          | {:error, :command_class_not_found | :timeout_get_command_class_version}
+  def get_command_class_version(zw_node, command_class_name) do
+    with {:ok, cc} <- command_class(zw_node, command_class_name),
+         :no_version_number <- CommandClass.version(cc),
+         {:ok, %{version: version}} <- do_get_command_class_version(zw_node, command_class_name) do
+      {:ok, version}
+    else
       {:error, :not_found} ->
-        {:error, :not_found}
+        {:error, :command_class_not_found}
 
-      {:ok, %CommandClass{version: version} = command_class} ->
-        if version == :no_version_number do
-          if use_cached do
-            {:error, :not_found}
-          else
-            Server.command_class_version(node, command_class)
-          end
-        else
-          {:ok, version}
-        end
+      {:error, :timeout_get_command_class_version} = error ->
+        error
+
+      version when is_integer(version) ->
+        {:ok, version}
+
+      error ->
+        # This should nerve happen, and if it does something is
+        # really wrong in the system.
+        raise "Unmatch error when getting a command class version #{inspect(error)}"
     end
   end
 
@@ -306,5 +339,57 @@ defmodule Grizzly.Node do
 
   defp initialize_command_class_version(%CommandClass{} = command_class) do
     command_class
+  end
+
+  defp do_get_ip(node_id) do
+    seq_number = SeqNumber.get_and_inc()
+
+    command_result =
+      Grizzly.send_command(
+        Controller.conn(),
+        InvNodeSolicitation,
+        seq_number: seq_number,
+        node_id: node_id
+      )
+
+    case command_result do
+      {:ok, {:node_ip, _, ip_address}} ->
+        {:ok, ip_address}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp do_get_command_class_version(zw_node, command_class_name) do
+    task =
+      Task.async(fn ->
+        seq_number = SeqNumber.get_and_inc()
+
+        Grizzly.send_command(
+          zw_node,
+          CommandClassVersion.Get,
+          seq_number: seq_number,
+          command_class: command_class_name
+        )
+      end)
+
+    try do
+      # wait 5 secs
+      Task.await(task)
+    catch
+      :exit, error ->
+        # Task needs to be killed explicitly because we are trapping exits
+        _ = Task.shutdown(task, :brutal_kill)
+
+        _ =
+          Logger.error(
+            "[GRIZZLY] Exit trapped when getting version of command class #{command_class_name} of node #{
+              zw_node.id
+            }: #{inspect(error)}"
+          )
+
+        {:error, :timeout_get_command_class_version}
+    end
   end
 end
