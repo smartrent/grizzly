@@ -468,8 +468,8 @@ defmodule Grizzly.Packet.BodyParser.Test do
     end
   end
 
-  describe "parses sensor multilevel report" do
-    test "parse a sensor_multilevel report" do
+  describe "parses sensor multilevel reports" do
+    test "parse a sensor_multilevel supported sensor report" do
       sensor_multilevel_report = <<0x31, 0x05, 0x01, 0x01, 0x50>>
       parsed = BodyParser.parse(sensor_multilevel_report)
 
@@ -481,6 +481,21 @@ defmodule Grizzly.Packet.BodyParser.Test do
                  level: 80
                }
              }
+    end
+
+    test "parse a sensor_multilevel report" do
+      # bitmask1 =   00110010 [:illuminance, :power, :direction]
+      # bitmask2 =  00000000 []
+      # bitmask3 =  00010000 [:distance]
+      # bitmask4 =  00000101 [:loudness, :frequency]
+      sensor_multilevel_report = <<0x31, 0x02, 0b00110010, 0b00000000, 0b00010000, 0b00000101>>
+      parsed = BodyParser.parse(sensor_multilevel_report)
+
+      assert parsed[:command_class] == :sensor_multilevel
+      assert parsed[:command] == :supported_sensor_report
+
+      assert Enum.sort(parsed[:value]) ==
+               Enum.sort([:illuminance, :power, :direction, :distance, :loudness, :frequency])
     end
   end
 
