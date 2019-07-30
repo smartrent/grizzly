@@ -294,6 +294,18 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(<<
+        0x31,
+        0x02,
+        bitmasks::binary
+      >>) do
+    %{
+      command_class: :sensor_multilevel,
+      command: :supported_sensor_report,
+      value: MultilevelSensor.decode_sensor_types(bitmasks)
+    }
+  end
+
   def parse(<<0x45, 0x03, _reserved::size(4), state::size(4)>>) do
     %{
       command_class: :thermostat_fan_state,
