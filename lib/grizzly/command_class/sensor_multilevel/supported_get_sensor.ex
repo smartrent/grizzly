@@ -39,6 +39,7 @@ defmodule Grizzly.CommandClass.SensorMultilevel.SupportedGetSensor do
           | {:done, {:error, :nack_response}}
           | {:done, non_neg_integer}
           | {:retry, t}
+          | {:queued, t()}
   def handle_response(
         %__MODULE__{seq_number: seq_number} = command,
         %Packet{
@@ -80,6 +81,20 @@ defmodule Grizzly.CommandClass.SensorMultilevel.SupportedGetSensor do
         }
       ) do
     {:done, {:ok, value}}
+  end
+
+  def handle_response(
+        %__MODULE__{seq_number: seq_number} = command,
+        %Packet{
+          seq_number: seq_number,
+          types: [:nack_response, :nack_waiting]
+        } = packet
+      ) do
+    if Packet.sleeping_delay?(packet) do
+      {:queued, command}
+    else
+      {:continue, command}
+    end
   end
 
   def handle_response(command, _), do: {:continue, command}
