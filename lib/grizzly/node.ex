@@ -203,6 +203,16 @@ defmodule Grizzly.Node do
               )
 
             command_class
+
+          {:error, :command_queued} ->
+            _ =
+              Logger.warn(
+                "Unable to get command command class for #{inspect(command_class_name)} because the node (#{
+                  inspect(zw_node.id)
+                }) is asleep"
+              )
+
+            command_class
         end
       end)
 
@@ -215,13 +225,17 @@ defmodule Grizzly.Node do
   """
   @spec get_command_class_version(t(), CommandClass.name()) ::
           {:ok, CommandClass.version()}
-          | {:error, :command_class_not_found | :timeout_get_command_class_version}
+          | {:error,
+             :command_class_not_found | :timeout_get_command_class_version | :command_queued}
   def get_command_class_version(zw_node, command_class_name) do
     with {:ok, cc} <- command_class(zw_node, command_class_name),
          :no_version_number <- CommandClass.version(cc),
          {:ok, %{version: version}} <- do_get_command_class_version(zw_node, command_class_name) do
       {:ok, version}
     else
+      {:ok, :queued, _reference} ->
+        {:error, :command_queued}
+
       {:error, :not_found} ->
         {:error, :command_class_not_found}
 
