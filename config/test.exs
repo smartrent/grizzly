@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :grizzly,
-  run_grizzly: false
+  run_zipgateway_bin: false
 
 config :grizzly, Grizzly.Controller,
   ip: {0, 0, 0, 0},
