@@ -1,5 +1,10 @@
 ## Changelog
 
+## v0.3.1
+
+* Enhancements
+  * Implement multilevel sensor command to get supported sensor types
+
 ## v0.3.0
 
 The big change here is removing the in memory
