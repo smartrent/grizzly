@@ -4,8 +4,6 @@ defmodule Grizzly.Application do
   require Logger
 
   def start(_type, _args) do
-    _ = Logger.info("Starting Grizzly")
-
     children =
       [
         Grizzly.Notifications,
@@ -31,22 +29,58 @@ defmodule Grizzly.Application do
   end
 
   defp maybe_append_muontrap(children_list) do
-    case Application.get_env(:grizzly, :run_grizzly, true) do
-      true ->
-        priv_dir = :code.priv_dir(:grizzly) |> to_string()
+    with :ok <- get_run_zipgateway_bin(),
+         {:ok, serial_port} <- get_serial_port() do
+      priv_dir = :code.priv_dir(:grizzly) |> to_string()
+      _ = System.cmd("modprobe", ["tun"])
 
-        [
-          {MuonTrap.Daemon,
-           [
-             "zipgateway",
-             ["-c", Path.join(priv_dir, "zipgateway.cfg")],
-             [cd: priv_dir, log_output: :debug]
-           ]}
-        ] ++ children_list
+      [
+        {MuonTrap.Daemon,
+         [
+           "/usr/sbin/zipgateway",
+           ["-c", Path.join(priv_dir, "zipgateway.cfg"), "-s", serial_port],
+           [cd: priv_dir, log_output: :debug, env: [{"PIDOF", get_pidof_command()}]]
+         ]}
+      ] ++ children_list
+    else
+      {:error, :no_serial_port} ->
+        _ =
+          Logger.error("""
+          No serial port configured for Grizzly. Add :serial_port to the
+          config options in your config.exs file like. For example:
 
-      false ->
+          config :grizzly,
+            serial_port: "/dev/ttyACM0"
+
+          If you have questions about which serial port(s) your hardware
+          supports either see the documentation about the nerves system at
+          https://github.com/nerves-project or ask in the #nerves channel
+          in the Elixir lang slack.
+          """)
+
+        children_list
+
+      :no_run_zipgateway_bin ->
         children_list
     end
+  end
+
+  defp get_serial_port() do
+    case Application.get_env(:grizzly, :serial_port, {:error, :no_serial_port}) do
+      {:error, _} = error -> error
+      serial_port -> {:ok, serial_port}
+    end
+  end
+
+  defp get_run_zipgateway_bin() do
+    case Application.get_env(:grizzly, :run_zipgateway_bin, true) do
+      true -> :ok
+      false -> :no_run_zipgateway_bin
+    end
+  end
+
+  defp get_pidof_command() do
+    Application.get_env(:grizzly, :pidof_bin, "pidof")
   end
 
   defp get_grizzly_config() do
