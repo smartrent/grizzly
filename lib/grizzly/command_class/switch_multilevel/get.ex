@@ -1,4 +1,11 @@
 defmodule Grizzly.CommandClass.SwitchMultilevel.Get do
+  @moduledoc """
+  Command module for working with SWITCH_MULTILEVEL GET command.
+
+  command options:
+
+    * `:seq_number` - The sequence number for the Z/IP Packet
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

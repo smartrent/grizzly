@@ -1,4 +1,13 @@
 defmodule Grizzly.CommandClass.SwitchBinary.Set do
+  @moduledoc """
+  Command module for working with SWITCH_BINARY SET command.
+
+  command options:
+
+    * `:value` - either `:on` or `:off`
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number of times to resend the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

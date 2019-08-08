@@ -1,4 +1,12 @@
 defmodule Grizzly.CommandClass.SwitchMultilevel.Set do
+  @moduledoc """
+  Command module for working with SWITCH_MULTILEVEL SET command.
+
+  command options:
+
+    * `:value` - A number between 0 and 99 for the switch level
+    * `:seq_number` - The sequence number for the Z/IP Packet
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

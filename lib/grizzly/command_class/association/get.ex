@@ -1,4 +1,14 @@
 defmodule Grizzly.CommandClass.Association.Get do
+  @moduledoc """
+  Command module for working with ASSOCIATION GET command.
+
+  command options:
+
+    * `:group` - the group number
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number of times to resend the command (default 2)
+  """
+
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

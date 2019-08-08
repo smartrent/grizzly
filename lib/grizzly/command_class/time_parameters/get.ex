@@ -1,5 +1,14 @@
 defmodule Grizzly.CommandClass.TimeParameters.Get do
-  @moduledoc "Get command for the time parameters command class"
+  @moduledoc """
+  Command module for working with TIME_PARAMETERS GET command
+
+  Request the time parameters
+
+  command options:
+
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

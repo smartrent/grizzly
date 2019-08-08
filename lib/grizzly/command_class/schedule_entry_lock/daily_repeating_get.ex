@@ -1,4 +1,14 @@
 defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingGet do
+  @moduledoc """
+  Command for working with SCHEDULE_ENTRY_LOCK command class DAILY_REPEATING_GET command
+
+  Command Options:
+    
+    * `:user_id` - a number for the user id
+    * `:slot_id` - the slot id for the code
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

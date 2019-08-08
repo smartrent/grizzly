@@ -1,4 +1,15 @@
 defmodule Grizzly.CommandClass.ScheduleEntryLock.SupportedGet do
+  @moduledoc """
+  Command for working with SCHEDULE_ENTRY_LOCK command class SUPPORTED_GET command
+
+  This command is used to request the number of schedule slots each type of schedule
+  the device supports for each user.
+
+  Command Options:
+    
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

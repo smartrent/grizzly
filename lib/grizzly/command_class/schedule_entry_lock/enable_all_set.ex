@@ -1,4 +1,13 @@
 defmodule Grizzly.CommandClass.ScheduleEntryLock.EnableAllSet do
+  @moduledoc """
+  Command for working with SCHEDULE_ENTRY_LOCK command class ENABLE_ALL_SET command
+
+  Command Options:
+    
+    * `:value` - `:enable` or `:disable` all schedules for the EntryLock
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

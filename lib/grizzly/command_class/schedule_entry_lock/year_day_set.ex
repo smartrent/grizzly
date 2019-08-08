@@ -1,4 +1,25 @@
 defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet do
+  @moduledoc """
+  Command for working with SCHEDULE_ENTRY_LOCK command class YEAR_DAY_SET command
+
+  Command Options:
+    
+    * `:action` - The action either to erase or to modify the slot
+    * `:slot_id` - The schedule slot id
+    * `:user_id` - The schedule user id for the EntryLock
+    * `:start_year` - A value from 0 to 99 that represents the 2 year in the century 
+    * `:start_month` - A value from 1 to 12 that represents the month in a year
+    * `:start_day` - A value from 1 to 31 that represents the date of the month
+    * `:start_hour` - A value from 0 to 23 representing the starting hour of the time fence
+    * `:start_minute` - A value from 0 to 59 representing the starting minute of the time fence
+    * `:stop_year` - A value from 0 to 99 that represents the 2 year in the century
+    * `:stop_month` - A value from 1 to 12 that represents the month in a year
+    * `:stop_day` - A value from 1 to 31 that represents the date of the month
+    * `:stop_hour` - A value from 0 to 23 representing the starting hour of the time fence
+    * `:stop_minute` - A value from 0 to 59 representing the starting minute of the time fence
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

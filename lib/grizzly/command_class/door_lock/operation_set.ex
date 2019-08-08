@@ -1,4 +1,14 @@
 defmodule Grizzly.CommandClass.DoorLock.OperationSet do
+  @moduledoc """
+  Command for working with DOOR_LOCK command class OPERATION_GET command
+
+  Command Options:
+
+    * `:mode` - `:secured` for locked, `:unsecured` for unlocked
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
+
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

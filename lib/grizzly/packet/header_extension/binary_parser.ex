@@ -1,4 +1,5 @@
 defmodule Grizzly.Packet.HeaderExtension.BinaryParser do
+  @moduledoc false
   @opaque t :: %__MODULE__{}
 
   defstruct bin: <<>>

@@ -1,5 +1,33 @@
 defmodule Grizzly.CommandClass.Time.OffsetSet do
-  @moduledoc "Time offset set command for the time command class"
+  @moduledoc """
+  Command module for working with TIME OFFSET_SET command.
+
+  command options:
+
+    * `:sign_tzo` - his field is used to indicate the sign (plus or minus)
+       to apply to the Hour TZO and Minute TZO field
+    * `:hour_tzo` - This field is used to indicate the number of hours that
+       the originating time zone deviates from UTC
+    * `:minute_tzo` - This field is used to indicate the number of minutes
+       that the originating time zone deviates UTC
+    * `:sign_offset_dst` - This field is used to indicate the sign (plus or minus)
+       for the Minute Offset DST field to apply to the current time while in the
+       Daylight Saving Time
+    * `:minute_offset_dst` - This field MUST indicate the number of minutes by which
+       the current time is to be adjusted when Daylight Saving Time starts
+    * `:month_start_dst` - This field MUST indicate the month of the year when Daylight
+       Saving Time starts
+    * `:day_end_dst` - This field MUST indicate the day of the month when Daylight Saving
+       Time starts
+    * `:hour_start_dst` - This field MUST indicate the hour of the day when Daylight
+       Saving Time starts
+    * `:month_end_dst` - This field MUST indicate the month of the year when Daylight
+       Saving Time ends
+    * `:day_end_dst` - This field MUST indicate the day of the month when Daylight Saving
+       Time ends
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
