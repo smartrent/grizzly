@@ -1,22 +1,22 @@
 defmodule Grizzly.Command do
   @moduledoc """
-    Command is a server managing the overall lifecycle of the execution of a command,
-    from start to completion or timeout.
+  Command is a server managing the overall lifecycle of the execution of a command,
+  from start to completion or timeout.
 
-    When starting the execution of a command, the state of the network is checked to see if it is
-    in one of the allowed states for executing this particular command. The allowed states are listed
-    in the `pre_states` property of the command being started. If the property is absent, the default
-    allowed states are [:idle]. If the network is not in an allowed state, {:error, :network_busy} is returned.
+  When starting the execution of a command, the state of the network is checked to see if it is
+  in one of the allowed states for executing this particular command. The allowed states are listed
+  in the `pre_states` property of the command being started. If the property is absent, the default
+  allowed states are [:idle]. If the network is not in an allowed state, {:error, :network_busy} is returned.
 
-    If the started command has an `exec_state` property, the network state is set to its value for the duration
-    of the execution of the command. If there is none, the network state is unchanged.
+  If the started command has an `exec_state` property, the network state is set to its value for the duration
+  of the execution of the command. If there is none, the network state is unchanged.
 
-    If the started command has a `post_state` property, the network state is set to it after the command execution
-    completes or times out. If there is none, the network state is set to :idle.
+  If the started command has a `post_state` property, the network state is set to it after the command execution
+  completes or times out. If there is none, the network state is set to :idle.
 
-    If the started command has a `timeout` property, a timeout is set to its value. If the command does not complete
-    before the timeout expires, the command's execution is stopped and a {:timeout, <command module>} message is sent to
-    the process that started the execution of the command.
+  If the started command has a `timeout` property, a timeout is set to its value. If the command does not complete
+  before the timeout expires, the command's execution is stopped and a {:timeout, <command module>} message is sent to
+  the process that started the execution of the command.
   """
 
   use GenServer

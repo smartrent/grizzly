@@ -1,4 +1,12 @@
 defmodule Grizzly.CommandClass.WakeUp.IntervalCapabilitiesGet do
+  @moduledoc """
+  Command module for working with WAKE_UP INTERVAL_CAPABILITIES_GET command
+
+  command options:
+
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   @type t :: %__MODULE__{

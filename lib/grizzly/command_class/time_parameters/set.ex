@@ -1,5 +1,18 @@
 defmodule Grizzly.CommandClass.TimeParameters.Set do
-  @moduledoc "Set command for the time parameters command class"
+  @moduledoc """
+  Command module for working with TIME_PARAMETERS SET command
+
+  command options:
+
+    * `:year` - Year in the usual Gregorian calendar
+    * `:month` - Month of the year between 01 (January) and 12 (December) 
+    * `:day` - Day of the month between 01 and 31 
+    * `:hour` - Number of complete hours that have passed since midnight (00..23) in UTC
+    * `:minute` - Number of complete minutes that have passed since the start of the hour (00..59) in UTC
+    * `:second` - Number of complete seconds since the start of the minute (00..59) in UTC
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

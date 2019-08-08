@@ -1,5 +1,15 @@
 defmodule Grizzly.CommandClass.Time.TimeGet do
-  @moduledoc "Time get command for the time command class"
+  @moduledoc """
+  Command module for working with TIME TIME_GET command.
+
+  This command used to request the current time from a
+  supporting node.
+
+  command options:
+
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

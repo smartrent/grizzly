@@ -1,7 +1,6 @@
 defmodule Grizzly.Packet.Decode do
-  @moduledoc """
-  A module for decoding a Z/IP Gateway binary packet
-  """
+  @moduledoc false
+
   import Bitwise
 
   alias Grizzly.CommandClass.Mappings

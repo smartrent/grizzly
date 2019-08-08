@@ -1,4 +1,15 @@
 defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet do
+  @moduledoc """
+  Command module for working with NETWORK_MANAGEMENT_INCLUSION NODE_ADD_DSK_SET command.
+
+  command options:
+
+    * `:accept`: - Boolean that indicates if S2 requested keys should be granted
+    * `:input_dsk` - The 5 digit pin code found on the device
+    * `:input_dsk_length` - the lengh of the DSK
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number of times to resend the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   @typedoc """

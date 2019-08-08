@@ -1,4 +1,20 @@
 defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet do
+  @moduledoc """
+  Command for working with SCHEDULE_ENTRY_LOCK command class DAILY_REPEATING_SET command
+
+  Command Options:
+    
+    * `:user_id` - a number for the user id
+    * `:slot_id` - the slot id for the code
+    * `:action` - `:enable` or `:disable` the action
+    * `:weekdays` - List of weekdays to run schedule on
+    * `:start_hour` - The hour of the day to start
+    * `:start_minute` - The minute of the hour to start
+    * `:duration_hour` - The amount of hours to keep the schedule available
+    * `:duration_minute` - The number of minutes within the hour to keep the schedule available
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

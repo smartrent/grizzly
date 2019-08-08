@@ -1,4 +1,13 @@
 defmodule Grizzly.CommandClass.UserCode.Get do
+  @moduledoc """
+  Command module for working with USER_CODE GET command
+
+  command options:
+
+    * `:slot_id` - The slot id of the user code
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

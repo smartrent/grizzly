@@ -1,4 +1,13 @@
 defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation do
+  @moduledoc """
+  Command module for working with ZIP_ND INV_NODE_SOLICITATION command
+
+  Request the IPv6 address of a device on the Z/IP Gateway network
+
+  command options:
+
+    * `:node_id` - The node id for the request
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.{Node, Packet}

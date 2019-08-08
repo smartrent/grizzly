@@ -1,5 +1,12 @@
 defmodule Grizzly.CommandClass.Time.OffsetGet do
-  @moduledoc "Time offset get command for the time command class"
+  @moduledoc """
+  Command module for working with TIME OFFSET_GET command
+
+  command options:
+
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

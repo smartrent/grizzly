@@ -1,4 +1,14 @@
 defmodule Grizzly.CommandClass.UserCode.UsersNumberGet do
+  @moduledoc """
+  Command module for working with USER_CODE USER_NUMBER_GET command
+
+  Request the number of user codes available on device
+
+  command options:
+
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

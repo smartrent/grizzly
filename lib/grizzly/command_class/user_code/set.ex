@@ -1,4 +1,15 @@
 defmodule Grizzly.CommandClass.UserCode.Set do
+  @moduledoc """
+  Command module for working with USER_CODE SET command
+
+  command options:
+
+    * `:slot_id` - The slot id of the user code
+    * `:slot_status` - Either `:occupied` or `:available`
+    * `:user_code` - The user code
+    * `:seq_number` - The sequence number for the Z/IP Packet
+    * `:retries` - The number times to retry to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

@@ -1,15 +1,5 @@
 defmodule Grizzly.Conn.Server do
-  @moduledoc """
-  Module for starting a connection to the Z/IP Gateway
-
-  This module will connect to, manage the heart beat interval,
-  and provide an interface been a caller and the client.
-
-  If the socket closes, this will try to reconnect automatically.
-
-  If the connection cannot be established it will keep trying to
-  connect.
-  """
+  @moduledoc false
   use GenServer
 
   require Logger

@@ -1,4 +1,14 @@
 defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDayGet do
+  @moduledoc """
+  Command for working with SCHEDULE_ENTRY_LOCK command class YEAR_DAY_GET command
+
+  Command Options:
+    
+    * `:slot_id` - The schedule slot id
+    * `:user_id` - The schedule user id for the EntryLock
+    * `:seq_number` - The sequence number used in the Z/IP packet
+    * `:retries` - The number of attempts to send the command (default 2)
+  """
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet

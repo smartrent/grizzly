@@ -56,7 +56,8 @@ defmodule Grizzly.MixProject do
 
   defp docs() do
     [
-      main: "Grizzly",
+      extras: ["README.md"],
+      main: "readme",
       source_url: "https://github.com/smartrent/grizzly",
       groups_for_modules: [
         "Command Classes": [
@@ -76,6 +77,7 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.NetworkManagementInclusion,
           Grizzly.CommandClass.NetworkManagementProxy,
           Grizzly.CommandClass.Notification,
+          Grizzly.CommandClass.ScheduleEntryLock,
           Grizzly.CommandClass.SensorMultilevel,
           Grizzly.CommandClass.SwitchBinary,
           Grizzly.CommandClass.SwitchMultilevel,
@@ -115,7 +117,15 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.NetworkManagementInclusion.NodeRemove,
           Grizzly.CommandClass.NetworkManagementProxy.NodeInfoCache,
           Grizzly.CommandClass.NetworkManagementProxy.NodeListGet,
+          Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingGet,
+          Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet,
+          Grizzly.CommandClass.ScheduleEntryLock.EnableAllSet,
+          Grizzly.CommandClass.ScheduleEntryLock.EnableSet,
+          Grizzly.CommandClass.ScheduleEntryLock.SupportedGet,
+          Grizzly.CommandClass.ScheduleEntryLock.YearDayGet,
+          Grizzly.CommandClass.ScheduleEntryLock.YearDaySet,
           Grizzly.CommandClass.SensorMultilevel.Get,
+          Grizzly.CommandClass.SensorMultilevel.SupportedGetSensor,
           Grizzly.CommandClass.SwitchBinary.Get,
           Grizzly.CommandClass.SwitchBinary.Set,
           Grizzly.CommandClass.SwitchMultilevel.Get,
@@ -133,6 +143,8 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.Time.OffsetGet,
           Grizzly.CommandClass.Time.OffsetSet,
           Grizzly.CommandClass.Time.TimeGet,
+          Grizzly.CommandClass.TimeParameters.Get,
+          Grizzly.CommandClass.TimeParameters.Set,
           Grizzly.CommandClass.UserCode.Get,
           Grizzly.CommandClass.UserCode.Set,
           Grizzly.CommandClass.UserCode.UsersNumberGet,
