@@ -1,5 +1,35 @@
 ## Changelog
 
+### v0.4.0
+
+Changed how configuration works.
+
+Grizzly now requires the serial port to be configured:
+
+```elixir
+config :grizzly,
+  serial_port: "/dev/ttyACM0"
+```
+
+Also added the `pidof_bin` configuration option to allow official
+Nerves systems to work with some of the Grizzly scripts the call
+that utility by using the [busybox](https://hex.pm/packages/busybox) package and
+pointing to the executable of `pidof` that is compiled with `busybox`.
+
+If you are using a custom system you can add that utility to the
+busybox config, and not need to use this configuration option.
+
+```elixir
+config :grizzly,
+  pidof_bin: "/srv/erlang/lib/busybox-0.1.2/priv/bin/pidof"
+```
+
+Double check the version of busybox you are using and make sure that
+version matches the version in the `pidof_bin` path.
+
+Changed `run_grizzly_bin` to `run_zipgateway_bin`.
+
+
 ## v0.3.1
 
 * Enhancements
