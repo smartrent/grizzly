@@ -58,6 +58,7 @@ defmodule Grizzly.MixProject do
     [
       extras: ["README.md"],
       main: "readme",
+      logo: "./assets/grizzly-icon-yellow.png",
       source_url: "https://github.com/smartrent/grizzly",
       groups_for_modules: [
         "Command Classes": [
