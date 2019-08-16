@@ -1,4 +1,4 @@
-# 🐻 Grizzly
+![Grizzly Logo](assets/grizzly_main-md.png)
 
 [![CircleCI](https://circleci.com/gh/smartrent/grizzly.svg?style=svg)](https://circleci.com/gh/smartrent/grizzly)
 
