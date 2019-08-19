@@ -43,14 +43,13 @@ defmodule Grizzly.MixProject do
   end
 
   defp description do
-    "Z/IP gateway client"
+    "Z-Wave Z/IP gateway client"
   end
 
   defp package do
     [
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/smartrent/grizzly"},
-      organization: "smartrent"
+      links: %{"GitHub" => "https://github.com/smartrent/grizzly"}
     ]
   end
 

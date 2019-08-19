@@ -9,7 +9,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.4", organization: "smartrent"}
+    {:grizzly, "~> 0.4"}
   ]
 end
 ```
@@ -20,8 +20,8 @@ end
 - [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
 - [Silicon Labs zipgateway binary](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
 
-You will need to need to be able to compile the `zipgateway` binary for the target
-system. This can be really hard, so please contact us for help.
+
+See instructions for compiling the `zipgateway` binary.
 
 ## Usage
 
@@ -135,4 +135,15 @@ can configure `run_zipgateway_bin` to be `false`:
 config :grizzly,
   run_zipgateway_bin: false
 ```
+
+## Compiling zipgateway
+
+First download the [Z/IP GW SDK](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk) from Silicon Labs.
+
+For this you will need to make a free account with Silicon Labs. The default binaries that come
+with the download will not work by default in Nerves system, so you will need to compile the source
+for your target. The source code can befound in the `Source` directory.
+
+This can be tricky and the instructions are a work in progress, so for now please contact
+us if you any troubles.
 
