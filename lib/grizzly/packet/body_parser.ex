@@ -44,7 +44,8 @@ defmodule Grizzly.Packet.BodyParser do
     MultilevelSensor,
     FirmwareUpdateMD,
     ManufacturerSpecific,
-    ScheduleEntryLock
+    ScheduleEntryLock,
+    NetworkManagementInstallationMaintenance
   }
 
   def parse(<<
@@ -742,6 +743,49 @@ defmodule Grizzly.Packet.BodyParser do
         stop_hour: stop_hour,
         stop_minute: stop_minute
       }
+    }
+  end
+
+  def parse(
+        <<0x67, 0x03, node_id::size(8), type::size(8), repeater1::size(8), repeater2::size(8),
+          repeater3::size(8), repeater4::size(8), speed::size(8)>>
+      ) do
+    repeaters = Enum.filter([repeater1, repeater2, repeater3, repeater4], &(&1 != 0))
+
+    %{
+      command_class: :network_management_installation_maintenance,
+      command: :priority_route_report,
+      value: %{
+        node_id: node_id,
+        repeaters: repeaters,
+        type: NetworkManagementInstallationMaintenance.decode_route_type(type),
+        speed: NetworkManagementInstallationMaintenance.decode_speed(speed)
+      }
+    }
+  end
+
+  def parse(<<0x67, 0x05, node_id::size(8), statistics_data::binary()>>) do
+    statistics = NetworkManagementInstallationMaintenance.decode_statistics(statistics_data)
+
+    %{
+      command_class: :network_management_installation_maintenance,
+      command: :statistics_report,
+      value: %{
+        node_id: node_id,
+        statistics: statistics
+      }
+    }
+  end
+
+  def parse(<<0x67, 0x08, rssi1::size(8), rssi2::size(8), rssi3::size(8)>>) do
+    %{
+      command_class: :network_management_installation_maintenance,
+      command: :rssi_report,
+      value: [
+        NetworkManagementInstallationMaintenance.decode_rssi_value(rssi1),
+        NetworkManagementInstallationMaintenance.decode_rssi_value(rssi2),
+        NetworkManagementInstallationMaintenance.decode_rssi_value(rssi3)
+      ]
     }
   end
 

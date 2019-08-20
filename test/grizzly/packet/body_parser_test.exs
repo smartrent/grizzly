@@ -904,4 +904,99 @@ defmodule Grizzly.Packet.BodyParser.Test do
 
     assert BodyParser.parse(bytes) == expected_report
   end
+
+  describe "parse network management installation maintenance reports" do
+    test "parse priority route report" do
+      bytes = <<0x67, 0x03, 0x05, 0x01, 0x07, 0x08, 0x00, 0x00, 0x03>>
+
+      expected_report = %{
+        command_class: :network_management_installation_maintenance,
+        command: :priority_route_report,
+        value: %{node_id: 5, type: :last_working_route, repeaters: [7, 8], speed: :"100 kbit/sec"}
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+
+    test "parse statistics report" do
+      bytes = <<
+        0x67,
+        0x05,
+        # node 6
+        0x06,
+        # route_changes: 2
+        0x00,
+        0x01,
+        0x02,
+        # transmission_count: 3
+        0x01,
+        0x01,
+        0x03,
+        # packet_error_count: 4
+        0x03,
+        0x01,
+        0x04,
+        # neighbors: [
+        0x02,
+        0x04,
+        # %{node_id: 7, repeater: true, speed: :"40 kbit/sec"}
+        0x07,
+        0x01::size(1),
+        0x00::size(2),
+        0x02::size(5),
+        # %{node_id: 8, repeater: false, speed: :"100 kbit/sec"}]
+        0x08,
+        0x00::size(1),
+        0x00::size(2),
+        0x03::size(5),
+        # transmission_times_average: 10
+        0x04,
+        0x04,
+        0x08,
+        0x09,
+        0x0B,
+        0x0C,
+        # transmission_times_variance: 8
+        0x05,
+        0x04,
+        0x06,
+        0x07,
+        0x09,
+        0x0A
+      >>
+
+      expected_report = %{
+        command_class: :network_management_installation_maintenance,
+        command: :statistics_report,
+        value: %{
+          node_id: 6,
+          statistics: %{
+            route_changes: 2,
+            transmission_count: 3,
+            packet_error_count: 4,
+            neighbors: [
+              %{node_id: 7, repeater: true, speed: :"40 kbit/sec"},
+              %{node_id: 8, repeater: false, speed: :"100 kbit/sec"}
+            ],
+            transmission_times_average: 10,
+            transmission_times_variance: 8
+          }
+        }
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+
+    test "parse RSSI report" do
+      bytes = <<0x67, 0x08, 0x7E, 0xA2, 0x7F>>
+
+      expected_report = %{
+        command_class: :network_management_installation_maintenance,
+        command: :rssi_report,
+        value: [:max_power_saturated, :above_sensitivity, :not_available]
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+  end
 end
