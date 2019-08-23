@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.4.1
+
+* Enhancements
+  * Add support for Network Management Installation Maintenance
+  * Updates to docs and examples
+
 ### v0.4.0
 
 Changed how configuration works.
