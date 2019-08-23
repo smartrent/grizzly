@@ -4,7 +4,7 @@ defmodule Grizzly.MixProject do
   def project do
     [
       app: :grizzly,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -49,7 +49,8 @@ defmodule Grizzly.MixProject do
   defp package do
     [
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/smartrent/grizzly"}
+      links: %{"GitHub" => "https://github.com/smartrent/grizzly"},
+      organization: "smartrent"
     ]
   end
 
