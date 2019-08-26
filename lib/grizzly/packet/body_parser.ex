@@ -45,7 +45,8 @@ defmodule Grizzly.Packet.BodyParser do
     FirmwareUpdateMD,
     ManufacturerSpecific,
     ScheduleEntryLock,
-    NetworkManagementInstallationMaintenance
+    NetworkManagementInstallationMaintenance,
+    Powerlevel
   }
 
   def parse(<<
@@ -786,6 +787,26 @@ defmodule Grizzly.Packet.BodyParser do
         NetworkManagementInstallationMaintenance.decode_rssi_value(rssi2),
         NetworkManagementInstallationMaintenance.decode_rssi_value(rssi3)
       ]
+    }
+  end
+
+  def parse(<<0x73, 0x03, level::size(8), timeout::size(8)>>) do
+    %{
+      command_class: :powerlevel,
+      command: :power_level_report,
+      value: %{power_level: Powerlevel.decode_power_level(level), timeout: timeout}
+    }
+  end
+
+  def parse(<<0x73, 0x06, test_node_id::size(8), status::size(8), test_frame_count::size(16)>>) do
+    %{
+      command_class: :powerlevel,
+      command: :test_node_report,
+      value: %{
+        test_node_id: test_node_id,
+        status_of_operation: Powerlevel.decode_status_of_operation(status),
+        test_frame_count: test_frame_count
+      }
     }
   end
 

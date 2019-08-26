@@ -999,4 +999,30 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert BodyParser.parse(bytes) == expected_report
     end
   end
+
+  describe "test powerlevel reports" do
+    test "parse power level report" do
+      bytes = <<0x73, 0x03, 0x00, 0x0A>>
+
+      expected_report = %{
+        command_class: :powerlevel,
+        command: :power_level_report,
+        value: %{power_level: :normal_power, timeout: 10}
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+
+    test "parse test node report" do
+      bytes = <<0x73, 0x06, 0x05, 0x01, 0x00, 0x0A>>
+
+      expected_report = %{
+        command_class: :powerlevel,
+        command: :test_node_report,
+        value: %{test_node_id: 5, status_of_operation: :test_success, test_frame_count: 10}
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+  end
 end
