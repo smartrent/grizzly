@@ -1,5 +1,10 @@
 ## Changelog
 
+### v0.4.2
+
+* Enhancements
+  * Support NoOperation command class
+
 ### v0.4.1
 
 * Enhancements
