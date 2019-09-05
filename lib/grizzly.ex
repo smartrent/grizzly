@@ -7,25 +7,40 @@ defmodule Grizzly do
 
   The most fundamental function in `Grizzly` is `Grizzly.send_command/3`.
 
-  The way to use this function is to provide a `connected` thing, a
-  command, and the command arguments if needed.
+  There are two ways of using this function.
 
-  A connected thing is either `Grizzly.Conn.t()`, `Grizzly.Controller`, or
-  `Grizzly.Node.t()`.
+  First, by passing in a node id for a node on the network:
 
-  A command is a module that implements the `Grizzly.Command` behaviour.
+  ```elixir
+  Grizzly.send_command(10, Grizzly.CommandClass.SwitchBinary.Get)
+  {:ok, :on}
 
-  The args are a keyword list that are supported by the command, this argument
-  is optional so you can use `Grizzly.send_command/2`.
-
-  An example of getting a door lock state would look like:
-
-  ```
-  iex> Grizzly.send_command(door_lock, Grizzly.CommandClass.DoorLock.OperationGet)
-  {:ok, :unsecured}
+  Grizzly.send_command(10, Grizzly.CommandClass.SwitchBinary.Set, value: :off)
   ```
 
-  To know more commands and their arugments see the modules under the
+  This is useful for short lived deterministic communication like `iex`
+  and scripts. This is because there is the overhead of connecting and
+  disconnecting to the node for each call.
+
+  For long lived applications that have non-deterministic sending of
+  messages (some type of automated commands) and user expectations on
+  device action we recommend using this function by passing in a
+  `Grizzly.Node`, `Grizzly.Conn`, or `Grizzly.Controller`.
+
+  ```elixir
+  {:ok, zw_node} = Grizzly.get_node(10)
+  {:ok, zw_node} = Grizzly.Node.connect(zw_node)
+
+  {:ok, :on} = Grizzly.send_command(zw_node, Grizzly.CommandClass.SwitchBinary.Get)
+  :ok = Grizzly.send_command(zw_node, Grizzly.CommandClass.SwitchBinary.Set, value: :on)
+  ```
+  This is useful because we maintain a heart beat with the node and overhead
+  of establishing the connection is removed from `send_command`. 
+
+  In order for the consumer of Grizzly to use this in a long running application they
+  will need to hold on to a reference to the connected Z-Wave Node.
+
+  To know more commands and their arguments see the modules under the
   `Grizzly.CommandClass` name space.
 
   """
@@ -65,12 +80,13 @@ defmodule Grizzly do
   @doc """
   Send a command to the Z-Wave device, first checking if in inclusion/exclusion state.
 
-  Given a connected thing, Conn, Node, or Controller for example, a command module, and
-  opts to the command module send and process the command.
-
   See individual command modules for information about what options it takes.
   """
-  @spec send_command(connected, command_module :: module, command_opts :: keyword) ::
+  @spec send_command(
+          connected | Node.node_id(),
+          command_module :: module,
+          command_opts :: keyword
+        ) ::
           :ok | {:ok, any} | {:error, any}
   def send_command(connected, command_module, command_opts \\ [])
 
@@ -93,6 +109,17 @@ defmodule Grizzly do
 
   def send_command(%Node{conn: conn}, command_module, command_opts) do
     send_command(conn, command_module, command_opts)
+  end
+
+  def send_command(node_id, command_module, command_opts) when is_integer(node_id) do
+    with {:ok, zw_node} <- Grizzly.get_node(node_id),
+         {:ok, zw_node} <- Node.connect(zw_node) do
+      response = send_command(zw_node, command_module, command_opts)
+      :ok = Node.disconnect(zw_node)
+      response
+    else
+      error -> error
+    end
   end
 
   @doc """
