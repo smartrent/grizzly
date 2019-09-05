@@ -1,5 +1,13 @@
 ## Changelog
 
+### v0.4.3
+
+* Enhancements
+  * Support Powerlevel command class
+  * Doc clean up
+  * `Grizzly.send_command/2` and `Grizzly.send_command/3`
+     can be passed a node id instead of a node.
+
 ### v0.4.2
 
 * Enhancements
