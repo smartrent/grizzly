@@ -11,6 +11,7 @@ defmodule Grizzly.CommandClass.SwitchBinary.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.EncodeError
   alias Grizzly.CommandClass.SwitchBinary
 
   @type t :: %__MODULE__{
@@ -32,11 +33,20 @@ defmodule Grizzly.CommandClass.SwitchBinary.Set do
     {:ok, command}
   end
 
-  @spec encode(t) :: {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{value: nil}) do
+    {:error, EncodeError.new({:invalid_argument_value, :value, nil, __MODULE__})}
+  end
+
   def encode(%__MODULE__{value: value, seq_number: seq_number}) do
-    value = SwitchBinary.encode_switch_state(value)
-    binary = Packet.header(seq_number) <> <<0x25, 0x01, value>>
-    {:ok, binary}
+    case SwitchBinary.encode_switch_state(value) do
+      {:ok, value} ->
+        {:ok, Packet.header(seq_number) <> <<0x25, 0x01, value>>}
+
+      {:error, :invalid_arg, _} ->
+        error = EncodeError.new({:invalid_argument_value, :value, value, __MODULE__})
+        {:error, error}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

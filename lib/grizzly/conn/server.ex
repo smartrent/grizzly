@@ -4,6 +4,7 @@ defmodule Grizzly.Conn.Server do
 
   require Logger
   alias Grizzly.Packet
+  alias Grizzly.Command.EncodeError
   alias Grizzly.{Notifications, Command, Conn}
   alias Grizzly.Conn.Config
 
@@ -67,7 +68,8 @@ defmodule Grizzly.Conn.Server do
     GenServer.call(conn, :connected?)
   end
 
-  @spec send_command(Conn.t(), Command.t(), Keyword.t()) :: :ok | {:ok, any} | {:error, any}
+  @spec send_command(Conn.t(), Command.t(), Keyword.t()) ::
+          :ok | {:ok, any} | {:error, EncodeError.t() | any()}
   def send_command(%Conn{conn: conn_server, mode: mode}, command, opts) do
     GenServer.call(conn_server, {:send_command, command, mode, opts}, 120_000)
   end
@@ -104,10 +106,14 @@ defmodule Grizzly.Conn.Server do
         from,
         %State{commands: commands} = state
       ) do
-    :ok = do_send_command(command, state)
-    command = State.build_command(command, from, :sync, opts)
+    case do_send_command(command, state) do
+      :ok ->
+        command = State.build_command(command, from, :sync, opts)
+        {:noreply, %{state | commands: commands ++ [command]}}
 
-    {:noreply, %{state | commands: commands ++ [command]}}
+      {:error, _} = error ->
+        {:reply, error, state}
+    end
   end
 
   def handle_call(
@@ -193,8 +199,14 @@ defmodule Grizzly.Conn.Server do
   end
 
   defp do_send_command(command, %State{config: config, socket: socket}) do
-    client_opts = [ip_address: config.ip, port: config.port]
-    apply(config.client, :send, [socket, Command.encode(command), client_opts])
+    case Command.encode(command) do
+      {:ok, binary} ->
+        client_opts = [ip_address: config.ip, port: config.port]
+        apply(config.client, :send, [socket, binary, client_opts])
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   defp do_send_raw(binary, %State{config: config, socket: socket}) do

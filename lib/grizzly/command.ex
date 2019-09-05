@@ -23,6 +23,7 @@ defmodule Grizzly.Command do
 
   alias Grizzly.{Packet, SeqNumber}
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.Command.EncodeError
   require Logger
 
   @type t :: pid
@@ -36,7 +37,7 @@ defmodule Grizzly.Command do
 
   @callback init(args :: term) :: :ok | {:ok, command :: any}
 
-  @callback encode(command :: any) :: {:ok, binary} | {:error, reason :: any}
+  @callback encode(command :: any) :: {:ok, binary} | {:error, EncodeError.t() | any()}
 
   @callback handle_response(command :: any, Packet.t()) :: handle_instruction
 
@@ -82,7 +83,7 @@ defmodule Grizzly.Command do
     end
   end
 
-  @spec encode(t) :: binary
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
   def encode(command) do
     GenServer.call(command, :encode)
   end
@@ -153,9 +154,13 @@ defmodule Grizzly.Command do
         _,
         %State{command_module: command_module, command: command} = state
       ) do
-    {:ok, binary} = apply(command_module, :encode, [command])
+    case apply(command_module, :encode, [command]) do
+      {:ok, binary} ->
+        {:reply, {:ok, binary}, state}
 
-    {:reply, binary, state}
+      {:error, _} = error ->
+        {:stop, :normal, error, state}
+    end
   end
 
   def handle_call(

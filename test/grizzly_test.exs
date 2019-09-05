@@ -9,6 +9,7 @@ defmodule Grizzly.Test do
   alias Grizzly.CommandClass.ZipNd.InvNodeSolicitation
   alias Grizzly.CommandClass.ManufacturerSpecific.Get, as: ManufacturerSpecificGet
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.Command.EncodeError
 
   setup do
     config = Grizzly.config()
@@ -42,6 +43,13 @@ defmodule Grizzly.Test do
     test "send the manufacturer specific command", %{conn: conn} do
       {:ok, %{manufacturer_id: 335, product_id: 21558, product_type_id: 21570}} =
         Grizzly.send_command(conn, ManufacturerSpecificGet, seq_number: 0x01)
+    end
+  end
+
+  describe "sending bad stuff to grizzly" do
+    test "send values to switch binary set", %{conn: conn} do
+      {:error, %EncodeError{}} =
+        Grizzly.send_command(conn, SwitchBinarySet, seq_number: 0x08, value: :grizzly)
     end
   end
 end
