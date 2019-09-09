@@ -12,6 +12,7 @@ defmodule Grizzly.CommandClass.Association.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.{Node, Packet}
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.Network.State, as: NetworkState
 
   @type t :: %__MODULE__{
@@ -45,11 +46,13 @@ defmodule Grizzly.CommandClass.Association.Set do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{group: group, nodes: nodes, seq_number: seq_number}) do
-    binary = Packet.header(seq_number) <> <<0x85, 0x01, group>> <> :erlang.list_to_binary(nodes)
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{group: group, nodes: nodes, seq_number: seq_number} = command) do
+    with {:ok, _} <- Encoding.encode_and_validate_args(command, %{group: :byte, nodes: [:byte]}) do
+      binary = Packet.header(seq_number) <> <<0x85, 0x01, group>> <> :erlang.list_to_binary(nodes)
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

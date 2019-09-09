@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.Association.Set.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.Association.Set
+  alias Grizzly.Command.EncodeError
 
   describe "implements command behaviour" do
     test "initializes command state" do
@@ -14,6 +15,17 @@ defmodule Grizzly.CommandClass.Association.Set.Test do
       packet = <<35, 2, 128, 208, 1, 0, 0, 3, 2, 0, 0x85, 0x01, 0x01, 0x03, 0x05>>
 
       assert {:ok, packet} == Set.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = Set.init(group: 300, nodes: [4, "bla"], seq_number: 0x01)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :group, 300, Grizzly.CommandClass.Association.Set}
+        )
+
+      assert {:error, error} == Set.encode(command)
     end
 
     test "handles ack response" do
