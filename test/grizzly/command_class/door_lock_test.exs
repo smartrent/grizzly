@@ -4,8 +4,12 @@ defmodule Grizzly.CommandClass.DoorLock.Test do
   alias Grizzly.CommandClass.DoorLock
 
   test "encoding bytes correctly" do
-    assert 0x00 == DoorLock.encode_mode(:unsecured)
-    assert 0xFF == DoorLock.encode_mode(:secured)
+    assert {:ok, 0x00} == DoorLock.encode_mode(:unsecured)
+    assert {:ok, 0xFF} == DoorLock.encode_mode(:secured)
+  end
+
+  test "encoding bytes incorrectly" do
+    assert {:error, :invalid_arg, :wide_open} == DoorLock.encode_mode(:wide_open)
   end
 
   test "decode bytes correctly" do

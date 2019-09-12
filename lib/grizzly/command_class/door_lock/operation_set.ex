@@ -12,6 +12,7 @@ defmodule Grizzly.CommandClass.DoorLock.OperationSet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.DoorLock
 
   @type t :: %__MODULE__{
@@ -33,11 +34,15 @@ defmodule Grizzly.CommandClass.DoorLock.OperationSet do
     {:ok, command}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{mode: mode, seq_number: seq_number}) do
-    mode = DoorLock.encode_mode(mode)
-    binary = Packet.header(seq_number) <> <<0x62, 0x01, mode>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             mode: {:encode_with, DoorLock, :encode_mode}
+           }) do
+      binary = Packet.header(seq_number) <> <<0x62, 0x01, encoded.mode>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

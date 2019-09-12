@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.DoorLock.OperationSet.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.DoorLock.OperationSet
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command state" do
@@ -14,6 +15,17 @@ defmodule Grizzly.CommandClass.DoorLock.OperationSet.Test do
       binary = <<35, 2, 128, 208, 10, 0, 0, 3, 2, 0, 0x62, 0x01, 0xFF>>
 
       assert {:ok, binary} == OperationSet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = OperationSet.init(mode: :blue, seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :mode, :blue, Grizzly.CommandClass.DoorLock.OperationSet}
+        )
+
+      assert {:error, error} == OperationSet.encode(command)
     end
 
     test "handles ack response" do
