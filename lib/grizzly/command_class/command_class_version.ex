@@ -26,15 +26,15 @@ defmodule Grizzly.CommandClass.CommandClassVersion do
   @doc """
   Encode command class
   """
-  @spec encode_command_class(atom) :: byte
+  @spec encode_command_class(atom) :: {:ok, byte} | {:error, :invalid_arg, any()}
   def encode_command_class(command_class) do
     case Mappings.to_byte(command_class) do
       {:unk, _} ->
         _ = Logger.warn("Unknown command class #{inspect(command_class)}")
-        0x00
+        {:error, :invalid_arg, command_class}
 
       byte ->
-        byte
+        {:ok, byte}
     end
   end
 end
