@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.Configuration.Set.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.Configuration.Set
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command" do
@@ -23,6 +24,17 @@ defmodule Grizzly.CommandClass.Configuration.Set.Test do
       assert {:ok, binary} == Set.encode(command)
     end
 
+    test "encodes incorrectly for list of args" do
+      {:ok, command} = Set.init(size: 2, config_param: 1, arg: [3, :blue], seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :arg, [3, :blue], Grizzly.CommandClass.Configuration.Set}
+        )
+
+      assert {:error, error} == Set.encode(command)
+    end
+
     test "encodes for when arg is an integer" do
       {:ok, command} =
         Set.init(
@@ -35,6 +47,17 @@ defmodule Grizzly.CommandClass.Configuration.Set.Test do
       binary = <<35, 2, 128, 208, 10, 0, 0, 3, 2, 0, 0x70, 0x04, 85, 0x01, 214>>
 
       assert {:ok, binary} == Set.encode(command)
+    end
+
+    test "encodes incorrectly arg is an integer" do
+      {:ok, command} = Set.init(size: 2, config_param: 1, arg: :blue, seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :arg, :blue, Grizzly.CommandClass.Configuration.Set}
+        )
+
+      assert {:error, error} == Set.encode(command)
     end
 
     test "handles ack response" do

@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.Configuration.BulkGet.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.Configuration.BulkGet
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command correctly" do
     test "initializes to command" do
@@ -14,6 +15,17 @@ defmodule Grizzly.CommandClass.Configuration.BulkGet.Test do
       binary = <<35, 2, 128, 208, 10, 0, 0, 3, 2, 0, 0x70, 0x08, 0, 85, 10>>
 
       assert {:ok, binary} == BulkGet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = BulkGet.init(start: 1, number: :blue, seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :number, :blue, Grizzly.CommandClass.Configuration.BulkGet}
+        )
+
+      assert {:error, error} == BulkGet.encode(command)
     end
 
     test "handles nack respones" do

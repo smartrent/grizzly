@@ -4,6 +4,7 @@ defmodule Grizzly.CommandClass.Configuration.Get.Test do
   alias Grizzly.Packet
   alias Grizzly.CommandClass.Configuration
   alias Grizzly.CommandClass.Configuration.Get
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command correctly" do
     test "initializes to command" do
@@ -15,6 +16,18 @@ defmodule Grizzly.CommandClass.Configuration.Get.Test do
       binary = <<35, 2, 128, 208, 10, 0, 0, 3, 2, 0, 0x70, 0x05, 0x01>>
 
       assert {:ok, binary} == Get.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = Get.init(configuration_param: 1000, seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :configuration_param, 1000,
+           Grizzly.CommandClass.Configuration.Get}
+        )
+
+      assert {:error, error} == Get.encode(command)
     end
 
     test "handles ack responses" do

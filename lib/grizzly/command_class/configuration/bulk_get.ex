@@ -15,6 +15,7 @@ defmodule Grizzly.CommandClass.Configuration.BulkGet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   require Logger
 
   @type t :: %__MODULE__{
@@ -44,13 +45,19 @@ defmodule Grizzly.CommandClass.Configuration.BulkGet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{seq_number: seq_number, start: start, number: number}) do
-    binary =
-      Packet.header(seq_number) <>
-        <<0x70, 0x08, start::size(2)-big-integer-signed-unit(8), number>>
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number, start: start, number: number} = command) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             start: :double_byte,
+             number: :byte
+           }) do
+      binary =
+        Packet.header(seq_number) <>
+          <<0x70, 0x08, start::size(2)-big-integer-signed-unit(8), number>>
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t(), Packet.t()) ::
