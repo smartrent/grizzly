@@ -49,7 +49,7 @@ defmodule Grizzly.CommandClass.Configuration.BulkGet do
   def encode(%__MODULE__{seq_number: seq_number, start: start, number: number} = command) do
     with {:ok, _encoded} <-
            Encoding.encode_and_validate_args(command, %{
-             start: :double_byte,
+             start: {:bytes, 2},
              number: :byte
            }) do
       binary =

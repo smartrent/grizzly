@@ -17,6 +17,8 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddKeysSet do
   import Bitwise
 
   alias Grizzly.{Packet, Security}
+  alias Grizzly.Command.{EncodeError, Encoding}
+  alias Grizzly.CommandClass.NetworkManagementInclusion
 
   @type t :: %__MODULE__{
           seq_number: Grizzly.seq_number(),
@@ -40,20 +42,27 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddKeysSet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  def encode(%__MODULE__{
-        seq_number: seq_number,
-        grant_csa?: csa?,
-        accept_s2?: accept?,
-        granted_keys: keys
-      }) do
-    csa_byte = encode_csa(csa?)
-    accept_byte = encode_accept_s2_bootstrapping(accept?)
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          seq_number: seq_number,
+          granted_keys: keys
+        } = command
+      ) do
     header = Packet.header(seq_number)
     keys = Security.keys_to_byte(keys)
 
-    binary = header <> <<0x34, 0x12, seq_number, csa_byte ||| accept_byte, keys>>
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             accept_s2?:
+               {:encode_with, NetworkManagementInclusion, :encode_accept_s2_bootstrapping},
+             grant_csa?: {:encode_with, NetworkManagementInclusion, :encode_csa}
+           }) do
+      binary =
+        header <> <<0x34, 0x12, seq_number, encoded.grant_csa? ||| encoded.accept_s2?, keys>>
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) :: {:continue, t}
@@ -78,12 +87,4 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddKeysSet do
 
     {:continue, command}
   end
-
-  @spec encode_csa(boolean) :: 2 | 0
-  def encode_csa(true), do: 2
-  def encode_csa(false), do: 0
-
-  @spec encode_accept_s2_bootstrapping(boolean) :: 1 | 0
-  def encode_accept_s2_bootstrapping(true), do: 1
-  def encode_accept_s2_bootstrapping(false), do: 0
 end

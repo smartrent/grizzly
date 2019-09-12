@@ -16,6 +16,8 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
 
   alias Grizzly.{Node, Packet, Security}
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.Command.{EncodeError, Encoding}
+  alias Grizzly.CommandClass.NetworkManagementInclusion
 
   @typedoc """
   Mode for the controller to use during inclsion
@@ -24,13 +26,11 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
   - `:stop` - stop add mode
   - `:any_s2` - same as `:any`, but allow for S2 bootstrapping as well (v2)
   """
-  @type mode :: :any | :stop | :any_s2
-  @type mode_byte :: 0x01 | 0x05 | 0x07
 
   @type t :: %__MODULE__{
           seq_number: Grizzly.seq_number(),
           tx_opts: byte,
-          mode: mode | byte,
+          mode: NetworkManagementInclusion.add_mode() | byte,
           pre_states: [NetworkState.state()],
           exec_state: NetworkState.state(),
           timeout: non_neg_integer
@@ -47,10 +47,17 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  def encode(%__MODULE__{mode: mode, tx_opts: tx_opts, seq_number: seq_number}) do
-    mode = encode_mode(mode)
-    binary = Packet.header(seq_number) <> <<0x34, 0x01, seq_number, 0x00, mode, tx_opts>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number, tx_opts: tx_opts} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             mode: {:encode_with, NetworkManagementInclusion, :encode_add_mode}
+           }) do
+      binary =
+        Packet.header(seq_number) <> <<0x34, 0x01, seq_number, 0x00, encoded.mode, tx_opts>>
+
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
@@ -135,12 +142,6 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
   end
 
   def handle_response(command, _), do: {:continue, command}
-
-  @spec encode_mode(mode() | mode_byte()) :: mode_byte()
-  def encode_mode(:any), do: 0x01
-  def encode_mode(:stop), do: 0x05
-  def encode_mode(:any_s2), do: 0x07
-  def encode_mode(byte) when byte in [1, 5, 7], do: byte
 
   defp security_from_report(:security_failed, _), do: :failed
 

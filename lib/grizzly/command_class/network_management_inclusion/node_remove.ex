@@ -9,6 +9,8 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeRemove do
 
   alias Grizzly.{Packet, Node}
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.Command.{EncodeError, Encoding}
+  alias Grizzly.CommandClass.NetworkManagementInclusion
 
   @typedoc """
   Mode for the controller to use during exclusion
@@ -20,7 +22,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeRemove do
 
   @type t :: %__MODULE__{
           seq_number: Grizzly.seq_number(),
-          mode: mode | byte,
+          mode: NetworkManagementInclusion.remove_mode() | byte,
           pre_states: [NetworkState.state()],
           exec_state: NetworkState.state(),
           timeout: non_neg_integer
@@ -36,10 +38,15 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeRemove do
     {:ok, struct(__MODULE__, args)}
   end
 
-  def encode(%__MODULE__{mode: mode, seq_number: seq_number}) do
-    mode = encode_mode(mode)
-    binary = Packet.header(seq_number) <> <<0x34, 0x03, seq_number, 0x00, mode>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             mode: {:encode_with, NetworkManagementInclusion, :encode_remove_mode}
+           }) do
+      binary = Packet.header(seq_number) <> <<0x34, 0x03, seq_number, 0x00, encoded.mode>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
@@ -105,9 +112,4 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeRemove do
   end
 
   def handle_response(command, _), do: {:continue, command}
-
-  @spec encode_mode(mode) :: byte
-  def encode_mode(:any), do: 0x01
-  def encode_mode(:stop), do: 0x05
-  def encode_mode(mode) when mode in [0x01, 0x05], do: mode
 end

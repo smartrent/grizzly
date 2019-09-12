@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet
+  alias Grizzly.Command.EncodeError
 
   test "initializes the command options" do
     opts = [
@@ -28,6 +29,24 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet.Test do
       assert {:ok, expected_binary} == NodeAddDSKSet.encode(command)
     end
 
+    test "encodes incorrectly when no DSK is provided (Unauthenticated S2)" do
+      opts = [
+        seq_number: 0x01,
+        accept: :blue,
+        input_dsk_length: 0
+      ]
+
+      {:ok, command} = NodeAddDSKSet.init(opts)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :accept, :blue,
+           Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet}
+        )
+
+      assert {:error, error} == NodeAddDSKSet.encode(command)
+    end
+
     test "encodes when an DSK is provided" do
       opts = [
         seq_number: 0x01,
@@ -40,6 +59,25 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet.Test do
       expected_binary = Packet.header(0x01) <> <<0x34, 0x14, 0x01, 0x82, 0x81, 0xDB>>
 
       assert {:ok, expected_binary} == NodeAddDSKSet.encode(command)
+    end
+
+    test "encodes incorrectly when DSK is provided" do
+      opts = [
+        seq_number: 0x01,
+        accept: true,
+        input_dsk_length: 64,
+        input_dsk: 33243
+      ]
+
+      {:ok, command} = NodeAddDSKSet.init(opts)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :input_dsk_length, 64,
+           Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet}
+        )
+
+      assert {:error, error} == NodeAddDSKSet.encode(command)
     end
   end
 end

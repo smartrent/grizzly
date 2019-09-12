@@ -25,6 +25,8 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet do
         }
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
+  alias Grizzly.CommandClass.NetworkManagementInclusion
 
   defstruct seq_number: nil, accept: true, input_dsk_length: nil, input_dsk: "", retries: 2
 
@@ -32,24 +34,37 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  def encode(%__MODULE__{seq_number: seq_number, accept: accept, input_dsk_length: 0}) do
-    {:ok,
-     Packet.header(seq_number) <>
-       <<0x34, 0x14, seq_number, encode_accept(accept)::size(1), 0::size(7), 0>>}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number, input_dsk_length: 0} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             accept: {:encode_with, NetworkManagementInclusion, :encode_accept}
+           }) do
+      {:ok,
+       Packet.header(seq_number) <>
+         <<0x34, 0x14, seq_number, encoded.accept::size(1), 0::size(7), 0>>}
+    end
   end
 
-  def encode(%__MODULE__{
-        seq_number: seq_number,
-        accept: accept,
-        input_dsk_length: dsk_length,
-        input_dsk: dsk
-      }) do
-    dsk = <<dsk::size(dsk_length)-unit(8)>>
+  def encode(
+        %__MODULE__{
+          seq_number: seq_number,
+          input_dsk_length: input_dsk_length,
+          input_dsk: input_dsk
+        } = command
+      ) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             accept: {:encode_with, NetworkManagementInclusion, :encode_accept},
+             input_dsk_length: {:bits, 4}
+           }) do
+      dsk = <<input_dsk::size(input_dsk_length)-unit(8)>>
 
-    {:ok,
-     Packet.header(seq_number) <>
-       <<0x34, 0x14, seq_number, encode_accept(accept)::size(1), dsk_length::size(7),
-         dsk::binary>>}
+      {:ok,
+       Packet.header(seq_number) <>
+         <<0x34, 0x14, seq_number, encoded.accept::size(1), input_dsk_length::size(7),
+           dsk::binary>>}
+    end
   end
 
   def handle_response(%__MODULE__{seq_number: seq_number}, %Packet{
@@ -76,7 +91,4 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet do
   def handle_response(command, _packet) do
     {:continue, command}
   end
-
-  defp encode_accept(true), do: 1
-  defp encode_accept(false), do: 0
 end
