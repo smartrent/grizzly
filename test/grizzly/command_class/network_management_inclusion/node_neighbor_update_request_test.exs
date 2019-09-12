@@ -1,8 +1,9 @@
 defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeNeighborUpdateRequest.Test do
   use ExUnit.Case, async: true
 
-  alias Grizzly.{Node, Packet}
+  alias Grizzly.Packet
   alias Grizzly.CommandClass.NetworkManagementInclusion.NodeNeighborUpdateRequest
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes the command" do
@@ -15,6 +16,18 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeNeighborUpdateRequ
       binary = <<35, 2, 128, 208, 9, 0, 0, 3, 2, 0, 0x34, 0x0B, 0x09, 0x06>>
 
       assert {:ok, binary} == NodeNeighborUpdateRequest.encode(command)
+    end
+
+    test "encodes command incorrectly" do
+      {:ok, command} = NodeNeighborUpdateRequest.init(node_id: :blue, seq_number: 0x09)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :node_id, :blue,
+           Grizzly.CommandClass.NetworkManagementInclusion.NodeNeighborUpdateRequest}
+        )
+
+      assert {:error, error} == NodeNeighborUpdateRequest.encode(command)
     end
 
     test "handles ack response" do
@@ -41,7 +54,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeNeighborUpdateRequ
       packet = Packet.new(body: report)
 
       {:ok, command} = NodeNeighborUpdateRequest.init(node_id: 0x06, seq_number: 0x14)
-      assert {:done, {:ok, :done}} = NodeAdd.handle_response(command, packet)
+      assert {:continue, command} = NodeNeighborUpdateRequest.handle_response(command, packet)
     end
 
     test "handle respones" do
