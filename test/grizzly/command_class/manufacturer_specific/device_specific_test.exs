@@ -4,6 +4,7 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.DeviceSpecificGet.Test do
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ManufacturerSpecific.DeviceSpecificGet
   alias Grizzly.CommandClass.ManufacturerSpecific
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command" do
@@ -14,11 +15,25 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.DeviceSpecificGet.Test do
     test "encodes correctly" do
       {:ok, command} = DeviceSpecificGet.init(seq_number: 0xA0, device_id_type: :serial_number)
 
+      {:ok, encoded_device_id_type} = ManufacturerSpecific.encode_device_id_type(:serial_number)
+
       binary =
         <<35, 2, 128, 208, 160, 0, 0, 3, 2, 0, 0x72, 0x06, 0x00::size(5),
-          ManufacturerSpecific.encode_device_id_type(:serial_number)::size(3)>>
+          encoded_device_id_type::size(3)>>
 
       assert {:ok, binary} == DeviceSpecificGet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = DeviceSpecificGet.init(device_id_type: :blue, seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :device_id_type, :blue,
+           Grizzly.CommandClass.ManufacturerSpecific.DeviceSpecificGet}
+        )
+
+      assert {:error, error} == DeviceSpecificGet.encode(command)
     end
 
     test "handle ack response" do

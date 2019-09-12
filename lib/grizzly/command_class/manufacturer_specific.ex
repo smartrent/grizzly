@@ -7,12 +7,14 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific do
   @type device_id_data_format_byte :: 0 | 1
   @type device_specific_report :: %{device_id_type: device_id_type, device_id: binary}
 
-  @spec encode_device_id_type(device_id_type) :: device_id_type_byte
+  @spec encode_device_id_type(device_id_type) ::
+          {:ok, device_id_type_byte} | {:error, :invalid_arg, any()}
   def encode_device_id_type(device_id_type) do
     case device_id_type do
-      :oem_factory_default_device_id_type -> 0
-      :serial_number -> 1
-      :pseudo_random -> 2
+      :oem_factory_default_device_id_type -> {:ok, 0}
+      :serial_number -> {:ok, 1}
+      :pseudo_random -> {:ok, 2}
+      other -> {:error, :invalid_arg, other}
     end
   end
 

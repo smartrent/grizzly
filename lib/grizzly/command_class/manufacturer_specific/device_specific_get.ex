@@ -11,6 +11,7 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.DeviceSpecificGet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ManufacturerSpecific
 
   @type t :: %__MODULE__{}
@@ -27,14 +28,18 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.DeviceSpecificGet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{seq_number: seq_number, device_id_type: device_id_type}) do
-    binary =
-      Packet.header(seq_number) <>
-        <<0x72, 0x06, 0x00::size(5),
-          ManufacturerSpecific.encode_device_id_type(device_id_type)::size(3)>>
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             device_id_type: {:encode_with, ManufacturerSpecific, :encode_device_id_type}
+           }) do
+      binary =
+        Packet.header(seq_number) <>
+          <<0x72, 0x06, 0x00::size(5), encoded.device_id_type::size(3)>>
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
