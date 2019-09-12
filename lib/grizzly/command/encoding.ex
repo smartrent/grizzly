@@ -5,7 +5,7 @@ defmodule Grizzly.Command.Encoding do
   require Logger
 
   @type specs :: spec | [spec] | {:encode_with, atom} | {:encode_with, atom, atom}
-  @type spec :: :byte | :integer
+  @type spec :: :byte | :double_byte | :integer
 
   @spec encode_and_validate_args(struct(), %{required(atom()) => specs}) ::
           {:ok, struct()} | {:error, EncodeError.t()}
@@ -43,6 +43,10 @@ defmodule Grizzly.Command.Encoding do
   end
 
   defp validate_arg(:byte, value, _command_module) when value in 0..255 do
+    {:ok, value}
+  end
+
+  defp validate_arg(:double_byte, value, _command_module) when value in 0..65535 do
     {:ok, value}
   end
 

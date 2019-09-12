@@ -13,6 +13,7 @@ defmodule Grizzly.CommandClass.Configuration.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.Configuration
 
   @type t :: %__MODULE__{
@@ -37,24 +38,44 @@ defmodule Grizzly.CommandClass.Configuration.Set do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{arg: arg} = command) when is_list(arg) do
-    binary =
-      Packet.header(command.seq_number) <>
-        <<0x70, 0x04, command.config_param, command.size>> <> :erlang.list_to_binary(arg)
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{size: size, config_param: config_param, arg: arg, seq_number: seq_number} =
+          command
+      )
+      when is_list(arg) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             size: :byte,
+             config_param: :byte,
+             arg: [:byte]
+           }) do
+      binary =
+        Packet.header(seq_number) <>
+          <<0x70, 0x04, config_param, size>> <> :erlang.list_to_binary(arg)
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
-  def encode(%__MODULE__{arg: arg} = command) when is_integer(arg) do
-    size = command.size
-    arg_list = <<arg::signed-integer-size(size)-unit(8)>> |> :binary.bin_to_list()
+  def encode(
+        %__MODULE__{size: size, config_param: config_param, arg: arg, seq_number: seq_number} =
+          command
+      ) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             size: :byte,
+             config_param: :byte,
+             arg: :byte
+           }) do
+      arg_list = <<arg::signed-integer-size(size)-unit(8)>> |> :binary.bin_to_list()
 
-    binary =
-      Packet.header(command.seq_number) <>
-        <<0x70, 0x04, command.config_param, command.size>> <> :erlang.list_to_binary(arg_list)
+      binary =
+        Packet.header(seq_number) <>
+          <<0x70, 0x04, config_param, size>> <> :erlang.list_to_binary(arg_list)
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

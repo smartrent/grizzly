@@ -11,6 +11,7 @@ defmodule Grizzly.CommandClass.Configuration.Get do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.Configuration
 
   @type t :: %__MODULE__{
@@ -31,11 +32,17 @@ defmodule Grizzly.CommandClass.Configuration.Get do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{seq_number: seq_number, configuration_param: configuration_param}) do
-    binary = Packet.header(seq_number) <> <<0x70, 0x05, configuration_param>>
-
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{seq_number: seq_number, configuration_param: configuration_param} = command
+      ) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             configuration_param: :byte
+           }) do
+      binary = Packet.header(seq_number) <> <<0x70, 0x05, configuration_param>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
