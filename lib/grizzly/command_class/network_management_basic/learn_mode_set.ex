@@ -12,6 +12,8 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet do
 
   alias Grizzly.Packet
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.CommandClass.NetworkManagementBasic
+  alias Grizzly.Command.{EncodeError, Encoding}
 
   @type t :: %__MODULE__{
           seq_number: Grizzly.seq_number(),
@@ -38,9 +40,15 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  def encode(%__MODULE__{seq_number: seq_number, mode: mode}) do
-    binary = Packet.header(seq_number) <> <<0x4D, 0x01, seq_number, 0x00, learn_mode(mode)>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             mode: {:encode_with, NetworkManagementBasic, :encode_learn_mode}
+           }) do
+      binary = Packet.header(seq_number) <> <<0x4D, 0x01, seq_number, 0x00, encoded.mode>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
@@ -91,15 +99,4 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet do
   end
 
   def handle_response(command, _), do: {:continue, command}
-
-  defp learn_mode(mode) do
-    case mode do
-      # ZW_SET_LEARN_MODE_CLASSIC - accept inclusion in direct range only
-      :enable -> 0x01
-      # ZW_SET_LEARN_MODE_DISABLE - stop learn mode
-      :disable -> 0x00
-      # ZW_SET_LEARN_MODE_NWI - accept routed inclusion
-      :enable_routed -> 0x02
-    end
-  end
 end

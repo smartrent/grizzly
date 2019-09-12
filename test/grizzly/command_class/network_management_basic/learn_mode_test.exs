@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command state" do
@@ -10,10 +11,22 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet.Test do
     end
 
     test "encodes correctly" do
-      {:ok, command} = LearnModeSet.init(seq_number: 10)
+      {:ok, command} = LearnModeSet.init(mode: :enable, seq_number: 10)
       binary = <<35, 2, 128, 208, 10, 0, 0, 3, 2, 0, 0x4D, 0x01, 10, 0, 1>>
 
       assert {:ok, binary} == LearnModeSet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = LearnModeSet.init(mode: :blue, seq_number: 0x06)
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :mode, :blue,
+           Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet}
+        )
+
+      assert {:error, error} == LearnModeSet.encode(command)
     end
 
     test "handles ack response" do
