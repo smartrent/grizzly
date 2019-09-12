@@ -25,10 +25,11 @@ defmodule Grizzly.CommandClass.DoorLock do
 
   @modes [0x00, 0x01, 0x10, 0x11, 0x20, 0x21, 0xFF]
 
-  @spec encode_mode(door_lock_mode) :: door_lock_mode_byte()
-  def encode_mode(:secured), do: 0xFF
-  def encode_mode(:unsecured), do: 0x00
-  def encode_mode(door_lock_mode) when door_lock_mode in @modes, do: door_lock_mode
+  @spec encode_mode(door_lock_mode) :: door_lock_mode_byte() | {:error, :invalid_arg, any()}
+  def encode_mode(:secured), do: {:ok, 0xFF}
+  def encode_mode(:unsecured), do: {:ok, 0x00}
+  def encode_mode(door_lock_mode) when door_lock_mode in @modes, do: {:ok, door_lock_mode}
+  def encode_mode(arg), do: {:error, :invalid_arg, arg}
 
   @spec decode_mode(door_lock_mode_byte) :: decoded_mode()
   def decode_mode(0xFF), do: :secured
