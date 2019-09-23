@@ -6,7 +6,12 @@ defmodule Grizzly.Command.Encoding do
 
   @type size :: non_neg_integer | atom
   @type sizable :: :bits | :bytes
-  @type specs :: spec | [spec] | {:encode_with, atom} | {:encode_with, atom, atom}
+  @type specs ::
+          spec
+          | [spec]
+          | {:encode_with, atom}
+          | {:encode_with, atom, atom}
+          | {:range, integer, integer}
   @type spec ::
           :byte
           | :byte
@@ -126,6 +131,14 @@ defmodule Grizzly.Command.Encoding do
       error ->
         error
     end
+  end
+
+  defp validate_arg({:range, low, high}, value, _command) when is_number(value) do
+    if value >= low and value <= high, do: {:ok, value}, else: {:error, :invalid_arg, value}
+  end
+
+  defp validate_arg({:range, _low, _high}, value, _command) do
+    {:error, :invalid_arg, value}
   end
 
   defp validate_arg({:encode_with, encode_method}, value, command) do

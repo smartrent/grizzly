@@ -4,6 +4,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet.Test do
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet
   alias Grizzly.CommandClass.ScheduleEntryLock
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -45,14 +46,36 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet.Test do
           seq_number: 0x06
         )
 
-      action_byte = ScheduleEntryLock.encode_enable_action(:enable)
-      weekday_mask = ScheduleEntryLock.encode_weekdays([:monday, :friday])
+      {:ok, action_byte} = ScheduleEntryLock.encode_enable_action(:enable)
+      {:ok, weekday_mask} = ScheduleEntryLock.encode_weekdays([:monday, :friday])
 
       binary =
         <<35, 2, 128, 208, 6, 0, 0, 3, 2, 0, 0x4E, 0x10, action_byte::size(8), 0x01, 0x02,
           weekday_mask::binary(), 0x09, 0x00, 0x01, 0x00>>
 
       assert {:ok, binary} == DailyRepeatingSet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} =
+        DailyRepeatingSet.init(
+          user_id: 1,
+          slot_id: 2,
+          action: :enable,
+          weekdays: [:monday, :caturday],
+          start_hour: 9,
+          start_minute: 0,
+          duration_hour: 1,
+          duration_minute: 0,
+          seq_number: 0x06
+        )
+
+      error =
+        EncodeError.new(
+          {:invalid_argument_value, :weekdays, [:monday, :caturday], DailyRepeatingSet}
+        )
+
+      assert {:error, error} == DailyRepeatingSet.encode(command)
     end
 
     test "handles an ack response" do

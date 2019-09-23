@@ -34,41 +34,52 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock do
           stop_minute: non_neg_integer
         }
 
-  @spec encode_enabled_value(enabled_value) :: enabled_value_byte
-  def encode_enabled_value(:enabled), do: 0x01
-  def encode_enabled_value(:disabled), do: 0x00
+  @spec encode_enabled_value(enabled_value) ::
+          {:ok, enabled_value_byte} | {:error, :invalid_arg, any()}
+  def encode_enabled_value(:enabled), do: {:ok, 0x01}
+  def encode_enabled_value(:disabled), do: {:ok, 0x00}
+  def encode_enabled_value(other), do: {:error, :invalid_arg, other}
 
-  @spec encode_enable_action(enable_action) :: enabled_value_byte
-  def encode_enable_action(:enable), do: 0x01
-  def encode_enable_action(:disable), do: 0x00
+  @spec encode_enable_action(enable_action) ::
+          {:ok, enabled_value_byte} | {:error, :invalid_arg, any()}
+  def encode_enable_action(:enable), do: {:ok, 0x01}
+  def encode_enable_action(:disable), do: {:ok, 0x00}
+  def encode_enable_action(other), do: {:error, :invalid_arg, other}
 
-  @spec encode_weekdays(weekdays()) :: binary()
+  @spec encode_weekdays(weekdays()) :: {:ok, binary()} | {:error, :invalid_arg, any()}
   def encode_weekdays(weekdays) do
     days = [:saturday, :friday, :thursday, :wednesday, :tuesday, :monday, :sunday]
 
-    bits =
-      Enum.reduce(
-        days,
-        %{},
-        fn day, acc ->
-          if day in weekdays do
-            Map.put(acc, day, 1)
-          else
-            Map.put(acc, day, 0)
-          end
-        end
-      )
+    case Enum.find(weekdays, &(&1 not in days)) do
+      nil ->
+        bits =
+          Enum.reduce(
+            days,
+            %{},
+            fn day, acc ->
+              if day in weekdays do
+                Map.put(acc, day, 1)
+              else
+                Map.put(acc, day, 0)
+              end
+            end
+          )
 
-    <<
-      0::size(1),
-      Map.get(bits, :saturday)::size(1),
-      Map.get(bits, :friday)::size(1),
-      Map.get(bits, :thursday)::size(1),
-      Map.get(bits, :wednesday)::size(1),
-      Map.get(bits, :tuesday)::size(1),
-      Map.get(bits, :monday)::size(1),
-      Map.get(bits, :sunday)::size(1)
-    >>
+        {:ok,
+         <<
+           0::size(1),
+           Map.get(bits, :saturday)::size(1),
+           Map.get(bits, :friday)::size(1),
+           Map.get(bits, :thursday)::size(1),
+           Map.get(bits, :wednesday)::size(1),
+           Map.get(bits, :tuesday)::size(1),
+           Map.get(bits, :monday)::size(1),
+           Map.get(bits, :sunday)::size(1)
+         >>}
+
+      bad_day ->
+        {:error, :invalid_arg, bad_day}
+    end
   end
 
   @spec decode_weekdays(byte) :: weekdays()
@@ -101,13 +112,13 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock do
     0
   end
 
-  @spec encode_year(non_neg_integer) :: non_neg_integer
+  @spec encode_year(non_neg_integer) :: {:ok, non_neg_integer} | {:error, :invalid_arg, any()}
   @doc "Given a year, return the last two digits of it"
   def encode_year(year) when year in 2000..2099 do
-    year - 2000
+    {:ok, year - 2000}
   end
 
-  def encode_year(_year) do
-    0
+  def encode_year(year) do
+    {:error, :invalid_arg, year}
   end
 end

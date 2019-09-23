@@ -4,6 +4,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet.Test do
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ScheduleEntryLock.YearDaySet
   alias Grizzly.CommandClass.ScheduleEntryLock
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -60,7 +61,8 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet.Test do
           seq_number: 0x06
         )
 
-      action_byte = ScheduleEntryLock.encode_enable_action(:enable)
+      {:ok, action_byte} = ScheduleEntryLock.encode_enable_action(:enable)
+      {:ok, year} = ScheduleEntryLock.encode_year(2019)
 
       binary = <<
         35,
@@ -78,12 +80,12 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet.Test do
         action_byte::size(8),
         0x02,
         0x01,
-        ScheduleEntryLock.encode_year(2019),
+        year,
         7,
         10,
         13,
         45,
-        ScheduleEntryLock.encode_year(2019),
+        year,
         8,
         11,
         14,
@@ -91,6 +93,30 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet.Test do
       >>
 
       assert {:ok, binary} == YearDaySet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} =
+        YearDaySet.init(
+          user_id: 2,
+          slot_id: 1,
+          action: :enable,
+          start_year: 1066,
+          start_month: 7,
+          start_day: 10,
+          start_hour: 13,
+          start_minute: 45,
+          stop_year: 2019,
+          stop_month: 8,
+          stop_day: 11,
+          stop_hour: 14,
+          stop_minute: 46,
+          seq_number: 0x06
+        )
+
+      error = EncodeError.new({:invalid_argument_value, :start_year, 1066, YearDaySet})
+
+      assert {:error, error} == YearDaySet.encode(command)
     end
 
     test "handles an ack response" do

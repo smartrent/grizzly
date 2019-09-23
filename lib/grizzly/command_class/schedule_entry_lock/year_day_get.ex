@@ -12,6 +12,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDayGet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ScheduleEntryLock
 
   @type t :: %__MODULE__{
@@ -34,10 +35,16 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDayGet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{seq_number: seq_number, user_id: user_id, slot_id: slot_id}) do
-    binary = Packet.header(seq_number) <> <<0x4E, 0x07, user_id, slot_id>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number, user_id: user_id, slot_id: slot_id} = command) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             user_id: :byte,
+             slot_id: :byte
+           }) do
+      binary = Packet.header(seq_number) <> <<0x4E, 0x07, user_id, slot_id>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

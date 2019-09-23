@@ -18,6 +18,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ScheduleEntryLock
 
   @type t :: %__MODULE__{
@@ -61,37 +62,48 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingSet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{
-        user_id: user_id,
-        slot_id: slot_id,
-        action: action,
-        weekdays: weekdays,
-        start_hour: start_hour,
-        start_minute: start_minute,
-        duration_hour: duration_hour,
-        duration_minute: duration_minute,
-        seq_number: seq_number
-      }) do
-    weekdays_mask = ScheduleEntryLock.encode_weekdays(weekdays)
-    encoded_action = ScheduleEntryLock.encode_enable_action(action)
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          user_id: user_id,
+          slot_id: slot_id,
+          action: _action,
+          weekdays: _weekdays,
+          start_hour: start_hour,
+          start_minute: start_minute,
+          duration_hour: duration_hour,
+          duration_minute: duration_minute,
+          seq_number: seq_number
+        } = command
+      ) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             weekdays: {:encode_with, ScheduleEntryLock, :encode_weekdays},
+             action: {:encode_with, ScheduleEntryLock, :encode_enable_action},
+             user_id: :byte,
+             slot_id: :byte,
+             start_hour: {:range, 0, 23},
+             start_minute: {:range, 0, 59},
+             duration_hour: {:range, 0, 23},
+             duration_minute: {:range, 0, 59}
+           }) do
+      binary =
+        Packet.header(seq_number) <>
+          <<
+            0x4E,
+            0x10,
+            encoded.action::size(8),
+            user_id,
+            slot_id,
+            encoded.weekdays::binary(),
+            start_hour,
+            start_minute,
+            duration_hour,
+            duration_minute
+          >>
 
-    binary =
-      Packet.header(seq_number) <>
-        <<
-          0x4E,
-          0x10,
-          encoded_action::size(8),
-          user_id,
-          slot_id,
-          weekdays_mask::binary(),
-          start_hour,
-          start_minute,
-          duration_hour,
-          duration_minute
-        >>
-
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

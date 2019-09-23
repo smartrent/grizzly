@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingGetTest do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingGet
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes to the correct command state" do
@@ -14,6 +15,14 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.DailyRepeatingGetTest do
       binary = <<35, 2, 128, 208, 8, 0, 0, 3, 2, 0, 0x4E, 0x0E, 0x02, 0x01>>
 
       assert {:ok, binary} == DailyRepeatingGet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = DailyRepeatingGet.init(user_id: 2, slot_id: 1024, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :slot_id, 1024, DailyRepeatingGet})
+
+      assert {:error, error} == DailyRepeatingGet.encode(command)
     end
 
     test "handles ack response" do
