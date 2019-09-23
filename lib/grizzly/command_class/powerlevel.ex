@@ -34,22 +34,19 @@ defmodule Grizzly.CommandClass.Powerlevel do
   def decode_power_level(0x08), do: :minus8dBm
   def decode_power_level(0x09), do: :minus9dBm
 
-  @spec encode_power_level(power_level_description) :: power_level_value
-  def encode_power_level(:normal_power), do: 0x00
-  def encode_power_level(:minus1dBm), do: 0x01
-  def encode_power_level(:minus2dBm), do: 0x02
-  def encode_power_level(:minus3dBm), do: 0x03
-  def encode_power_level(:minus4dBm), do: 0x04
-  def encode_power_level(:minus5dBm), do: 0x05
-  def encode_power_level(:minus6dBm), do: 0x06
-  def encode_power_level(:minus7dBm), do: 0x07
-  def encode_power_level(:minus8dBm), do: 0x08
-  def encode_power_level(:minus9dBm), do: 0x09
-
-  def encode_power_level(other) do
-    _ = Logger.warn("Unknown power level #{inspect(other)}. Encoding to 0x00")
-    0x00
-  end
+  @spec encode_power_level(power_level_description) ::
+          {:ok, power_level_value} | {:error, :invalid_arg, any()}
+  def encode_power_level(:normal_power), do: {:ok, 0x00}
+  def encode_power_level(:minus1dBm), do: {:ok, 0x01}
+  def encode_power_level(:minus2dBm), do: {:ok, 0x02}
+  def encode_power_level(:minus3dBm), do: {:ok, 0x03}
+  def encode_power_level(:minus4dBm), do: {:ok, 0x04}
+  def encode_power_level(:minus5dBm), do: {:ok, 0x05}
+  def encode_power_level(:minus6dBm), do: {:ok, 0x06}
+  def encode_power_level(:minus7dBm), do: {:ok, 0x07}
+  def encode_power_level(:minus8dBm), do: {:ok, 0x08}
+  def encode_power_level(:minus9dBm), do: {:ok, 0x09}
+  def encode_power_level(other), do: {:error, :invalid_arg, other}
 
   @spec decode_status_of_operation(status_of_operation_value) :: status_of_operation_description
   def decode_status_of_operation(0x00), do: :test_failed
