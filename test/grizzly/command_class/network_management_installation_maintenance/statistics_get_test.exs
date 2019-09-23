@@ -2,6 +2,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInstallationMaintenance.Statisti
   use ExUnit.Case, async: true
 
   alias Grizzly.Packet
+  alias Grizzly.Command.EncodeError
   alias Grizzly.CommandClass.NetworkManagementInstallationMaintenance.StatisticsGet
 
   describe "implements Grizzly.Command behaviour" do
@@ -15,6 +16,14 @@ defmodule Grizzly.CommandClass.NetworkManagementInstallationMaintenance.Statisti
       binary = <<35, 2, 128, 208, 8, 0, 0, 3, 2, 0, 0x67, 0x04, node_id>>
 
       assert {:ok, binary} == StatisticsGet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = StatisticsGet.init(node_id: :blue, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :node_id, :blue, StatisticsGet})
+
+      assert {:error, error} == StatisticsGet.encode(command)
     end
 
     test "handles ack response" do

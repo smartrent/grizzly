@@ -2,6 +2,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInstallationMaintenance.Statisti
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.NetworkManagementInstallationMaintenance
 
   @type t :: %__MODULE__{
@@ -23,10 +24,15 @@ defmodule Grizzly.CommandClass.NetworkManagementInstallationMaintenance.Statisti
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{seq_number: seq_number, node_id: node_id}) do
-    binary = Packet.header(seq_number) <> <<0x67, 0x04, node_id>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number, node_id: node_id} = command) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             node_id: :byte
+           }) do
+      binary = Packet.header(seq_number) <> <<0x67, 0x04, node_id>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
