@@ -5,19 +5,19 @@ defmodule Grizzly.CommandClass.ThermostatFanMode.Test do
 
   describe "encode thermostat fan mod" do
     test "auto_low" do
-      assert 0x00 == ThermostatFanMode.encode_thermostat_fan_mode(:auto_low)
+      assert {:ok, 0x00} == ThermostatFanMode.encode_thermostat_fan_mode(:auto_low)
     end
 
     test "low" do
-      assert 0x01 == ThermostatFanMode.encode_thermostat_fan_mode(:low)
+      assert {:ok, 0x01} == ThermostatFanMode.encode_thermostat_fan_mode(:low)
     end
 
     test "auto high" do
-      assert 0x02 == ThermostatFanMode.encode_thermostat_fan_mode(:auto_high)
+      assert {:ok, 0x02} == ThermostatFanMode.encode_thermostat_fan_mode(:auto_high)
     end
 
     test "high" do
-      assert 0x03 == ThermostatFanMode.encode_thermostat_fan_mode(:high)
+      assert {:ok, 0x03} == ThermostatFanMode.encode_thermostat_fan_mode(:high)
     end
   end
 

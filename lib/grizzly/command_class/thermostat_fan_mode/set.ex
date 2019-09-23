@@ -13,6 +13,7 @@ defmodule Grizzly.CommandClass.ThermostatFanMode.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ThermostatFanMode
 
   @type t :: %__MODULE__{
@@ -32,10 +33,15 @@ defmodule Grizzly.CommandClass.ThermostatFanMode.Set do
     {:ok, struct(__MODULE__, args)}
   end
 
-  def encode(%__MODULE__{mode: mode, seq_number: seq_number}) do
-    mode = ThermostatFanMode.encode_thermostat_fan_mode(mode)
-    binary = Packet.header(seq_number) <> <<0x44, 0x01, mode>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{mode: _mode, seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             mode: {:encode_with, ThermostatFanMode, :encode_thermostat_fan_mode}
+           }) do
+      binary = Packet.header(seq_number) <> <<0x44, 0x01, encoded.mode>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
