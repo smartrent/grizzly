@@ -23,6 +23,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ScheduleEntryLock
 
   @type t :: %__MODULE__{
@@ -81,46 +82,63 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.YearDaySet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{
-        user_id: user_id,
-        slot_id: slot_id,
-        action: action,
-        start_year: start_year,
-        start_month: start_month,
-        start_day: start_day,
-        start_hour: start_hour,
-        start_minute: start_minute,
-        stop_year: stop_year,
-        stop_month: stop_month,
-        stop_day: stop_day,
-        stop_hour: stop_hour,
-        stop_minute: stop_minute,
-        seq_number: seq_number
-      }) do
-    encoded_action = ScheduleEntryLock.encode_enable_action(action)
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          user_id: user_id,
+          slot_id: slot_id,
+          action: _action,
+          start_year: _start_year,
+          start_month: start_month,
+          start_day: start_day,
+          start_hour: start_hour,
+          start_minute: start_minute,
+          stop_year: _stop_year,
+          stop_month: stop_month,
+          stop_day: stop_day,
+          stop_hour: stop_hour,
+          stop_minute: stop_minute,
+          seq_number: seq_number
+        } = command
+      ) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             user_id: :byte,
+             slot_id: :byte,
+             action: {:encode_with, ScheduleEntryLock, :encode_enable_action},
+             start_year: {:encode_with, ScheduleEntryLock, :encode_year},
+             start_month: {:range, 1, 12},
+             start_day: {:range, 1, 31},
+             start_hour: {:range, 0, 23},
+             start_minute: {:range, 0, 59},
+             stop_year: {:encode_with, ScheduleEntryLock, :encode_year},
+             stop_month: {:range, 1, 12},
+             stop_day: {:range, 1, 31},
+             stop_hour: {:range, 0, 23},
+             stop_minute: {:range, 0, 59}
+           }) do
+      binary =
+        Packet.header(seq_number) <>
+          <<
+            0x4E,
+            0x06,
+            encoded.action::size(8),
+            user_id,
+            slot_id,
+            encoded.start_year,
+            start_month,
+            start_day,
+            start_hour,
+            start_minute,
+            encoded.stop_year,
+            stop_month,
+            stop_day,
+            stop_hour,
+            stop_minute
+          >>
 
-    binary =
-      Packet.header(seq_number) <>
-        <<
-          0x4E,
-          0x06,
-          encoded_action::size(8),
-          user_id,
-          slot_id,
-          ScheduleEntryLock.encode_year(start_year),
-          start_month,
-          start_day,
-          start_hour,
-          start_minute,
-          ScheduleEntryLock.encode_year(stop_year),
-          stop_month,
-          stop_day,
-          stop_hour,
-          stop_minute
-        >>
-
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

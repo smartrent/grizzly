@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.EnableSet.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ScheduleEntryLock.EnableSet
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -16,6 +17,14 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.EnableSet.Test do
       binary = <<35, 2, 128, 208, 6, 0, 0, 3, 2, 0, 0x4E, 0x01, 0x02, 0x01>>
 
       assert {:ok, binary} == EnableSet.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = EnableSet.init(user_id: 2, value: :blue, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :value, :blue, EnableSet})
+
+      assert {:error, error} == EnableSet.encode(command)
     end
 
     test "handles an ack response" do

@@ -12,6 +12,7 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.EnableSet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ScheduleEntryLock
 
   @type t :: %__MODULE__{
@@ -34,11 +35,19 @@ defmodule Grizzly.CommandClass.ScheduleEntryLock.EnableSet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{user_id: user_id, value: value, seq_number: seq_number}) do
-    encoded_value = ScheduleEntryLock.encode_enabled_value(value)
-    binary = Packet.header(seq_number) <> <<0x4E, 0x01, user_id, encoded_value>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{user_id: user_id, value: _value, seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(
+             command,
+             %{
+               user_id: :byte,
+               value: {:encode_with, ScheduleEntryLock, :encode_enabled_value}
+             }
+           ) do
+      binary = Packet.header(seq_number) <> <<0x4E, 0x01, user_id, encoded.value>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

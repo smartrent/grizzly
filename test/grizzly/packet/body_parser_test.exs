@@ -799,7 +799,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
     end
 
     test "parse a daily repeating report" do
-      weekday_mask = ScheduleEntryLock.encode_weekdays([:monday, :friday])
+      {:ok, weekday_mask} = ScheduleEntryLock.encode_weekdays([:monday, :friday])
 
       daily_repeating_report =
         <<0x4E, 0x0F, 0x01, 0x02, weekday_mask::binary(), 0x09, 0x00, 0x01, 0x00>>
