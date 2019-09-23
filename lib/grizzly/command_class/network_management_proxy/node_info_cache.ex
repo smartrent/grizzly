@@ -13,6 +13,7 @@ defmodule Grizzly.CommandClass.NetworkManagementProxy.NodeInfoCache do
 
   alias Grizzly.{Node, Packet}
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.Command.{EncodeError, Encoding}
 
   @type t :: %__MODULE__{
           cached_minutes_passed: 0..15,
@@ -40,16 +41,24 @@ defmodule Grizzly.CommandClass.NetworkManagementProxy.NodeInfoCache do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{
-        cached_minutes_passed: cached_minutes_passed,
-        node_id: node_id,
-        seq_number: seq_number
-      }) do
-    binary =
-      Packet.header(seq_number) <> <<0x52, 0x03, seq_number, cached_minutes_passed, node_id>>
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          cached_minutes_passed: cached_minutes_passed,
+          node_id: node_id,
+          seq_number: seq_number
+        } = command
+      ) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             node_id: :byte,
+             cached_minutes_passed: {:bytes, 4}
+           }) do
+      binary =
+        Packet.header(seq_number) <> <<0x52, 0x03, seq_number, cached_minutes_passed, node_id>>
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
