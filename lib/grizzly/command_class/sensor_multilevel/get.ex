@@ -10,6 +10,7 @@ defmodule Grizzly.CommandClass.SensorMultilevel.Get do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.MultilevelSensor
 
   @type t :: %__MODULE__{
@@ -28,28 +29,40 @@ defmodule Grizzly.CommandClass.SensorMultilevel.Get do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
   def encode(%__MODULE__{
         seq_number: seq_number,
-        sensor_type: sensor_type,
-        sensor_scale: sensor_scale
+        sensor_type: nil,
+        sensor_scale: _sensor_scale
       }) do
-    binary =
-      if sensor_type == nil do
-        Packet.header(seq_number) <> <<0x31, 0x04>>
-      else
+    {:ok, Packet.header(seq_number) <> <<0x31, 0x04>>}
+  end
+
+  def encode(
+        %__MODULE__{
+          seq_number: seq_number,
+          sensor_type: _sensor_type,
+          sensor_scale: sensor_scale
+        } = command
+      ) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             sensor_type: {:encode_with, MultilevelSensor, :encode_type},
+             sensor_scale: {:bytes, 2}
+           }) do
+      binary =
         Packet.header(seq_number) <>
           <<
             0x31,
             0x04,
-            MultilevelSensor.encode_type(sensor_type),
+            encoded.sensor_type,
             0x00::size(3),
             sensor_scale || 1::size(2),
             0x00::size(3)
           >>
-      end
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

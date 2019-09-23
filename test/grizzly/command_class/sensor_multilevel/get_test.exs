@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.SensorMultilevel.Get.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.SensorMultilevel.Get
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly.Command behaviour" do
     test "initializes command" do
@@ -24,6 +25,14 @@ defmodule Grizzly.CommandClass.SensorMultilevel.Get.Test do
           0x00::size(3)>>
 
       assert {:ok, binary} == Get.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = Get.init(sensor_type: :vibes, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :sensor_type, :vibes, Get})
+
+      assert {:error, error} == Get.encode(command)
     end
 
     test "handles ack response" do

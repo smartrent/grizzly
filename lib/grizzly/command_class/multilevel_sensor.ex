@@ -139,13 +139,14 @@ defmodule Grizzly.CommandClass.MultilevelSensor do
     end
   end
 
-  @spec encode_type(level_type) :: 1 | 3 | 4 | 5
+  @spec encode_type(level_type) :: {:ok, 1 | 3 | 4 | 5} | {:error, :invalid_arg, any()}
   def encode_type(type) do
     case type do
-      :temperature -> 0x1
-      :illuminance -> 0x3
-      :power -> 0x4
-      :humidity -> 0x5
+      :temperature -> {:ok, 0x01}
+      :illuminance -> {:ok, 0x03}
+      :power -> {:ok, 0x04}
+      :humidity -> {:ok, 0x05}
+      other -> {:error, :invalid_arg, other}
     end
   end
 
