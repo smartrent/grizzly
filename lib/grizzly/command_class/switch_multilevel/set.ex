@@ -10,6 +10,7 @@ defmodule Grizzly.CommandClass.SwitchMultilevel.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.SwitchMultilevel
 
   @type t :: %__MODULE__{
@@ -27,11 +28,15 @@ defmodule Grizzly.CommandClass.SwitchMultilevel.Set do
     {:ok, command}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{value: value, seq_number: seq_number}) do
-    value = SwitchMultilevel.encode_switch_state(value)
-    binary = Packet.header(seq_number) <> <<0x26, 0x01, value>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{value: _value, seq_number: seq_number} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             value: {:encode_with, SwitchMultilevel, :encode_switch_state}
+           }) do
+      binary = Packet.header(seq_number) <> <<0x26, 0x01, encoded.value>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
