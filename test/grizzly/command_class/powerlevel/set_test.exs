@@ -4,6 +4,7 @@ defmodule Grizzly.CommandClass.Powerlevel.Set.Test do
   alias Grizzly.Packet
   alias Grizzly.CommandClass.Powerlevel.Set
   alias Grizzly.CommandClass.Powerlevel
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -14,10 +15,18 @@ defmodule Grizzly.CommandClass.Powerlevel.Set.Test do
 
     test "encodes correctly" do
       {:ok, command} = Set.init(power_level: :normal_power, timeout: 1, seq_number: 0x06)
-      level = Powerlevel.encode_power_level(:normal_power)
+      {:ok, level} = Powerlevel.encode_power_level(:normal_power)
       binary = <<35, 2, 128, 208, 6, 0, 0, 3, 2, 0, 0x73, 0x01, level, 1>>
 
       assert {:ok, binary} == Set.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = Set.init(power_level: :blue, timeout: 0xFF, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :power_level, :blue, Set})
+
+      assert {:error, error} == Set.encode(command)
     end
 
     test "handles an ack response" do
