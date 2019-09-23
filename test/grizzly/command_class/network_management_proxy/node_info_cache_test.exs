@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.NetworkManagmentProxy.NodeInfoCache.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.NetworkManagementProxy.NodeInfoCache
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command state" do
@@ -13,6 +14,17 @@ defmodule Grizzly.CommandClass.NetworkManagmentProxy.NodeInfoCache.Test do
       {:ok, command} = NodeInfoCache.init(cached_minutes_passed: 15, node_id: 1, seq_number: 0x01)
       binary = <<35, 2, 128, 208, 1, 0, 0, 3, 2, 0, 0x52, 0x03, 0x01, 15, 1>>
       assert {:ok, binary} == NodeInfoCache.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} =
+        NodeInfoCache.init(cached_minutes_passed: 0xFFFFF, node_id: 1, seq_number: 0x06)
+
+      # More than 4 bytes
+      error =
+        EncodeError.new({:invalid_argument_value, :cached_minutes_passed, 0xFFFFF, NodeInfoCache})
+
+      assert {:error, error} == NodeInfoCache.encode(command)
     end
 
     test "handles ack_responses" do
