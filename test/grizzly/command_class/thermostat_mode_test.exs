@@ -5,37 +5,37 @@ defmodule Grizzly.CommandClass.ThermostatMode.Test do
 
   describe "mode to byte" do
     test "off" do
-      assert 0x00 == ThermostatMode.mode_to_byte(:off)
+      assert {:ok, 0x00} == ThermostatMode.encode_mode(:off)
     end
 
     test "heat" do
-      assert 0x01 == ThermostatMode.mode_to_byte(:heat)
+      assert {:ok, 0x01} == ThermostatMode.encode_mode(:heat)
     end
 
     test "cool" do
-      assert 0x02 == ThermostatMode.mode_to_byte(:cool)
+      assert {:ok, 0x02} == ThermostatMode.encode_mode(:cool)
     end
 
     test "auto" do
-      assert 0x03 == ThermostatMode.mode_to_byte(:auto)
+      assert {:ok, 0x03} == ThermostatMode.encode_mode(:auto)
     end
   end
 
   describe "mode from byte" do
     test "off" do
-      assert :off == ThermostatMode.mode_from_byte(0x00)
+      assert :off == ThermostatMode.decode_mode(0x00)
     end
 
     test "heat" do
-      assert :heat == ThermostatMode.mode_from_byte(0x01)
+      assert :heat == ThermostatMode.decode_mode(0x01)
     end
 
     test "cool" do
-      assert :cool == ThermostatMode.mode_from_byte(0x02)
+      assert :cool == ThermostatMode.decode_mode(0x02)
     end
 
     test "auto" do
-      assert :auto == ThermostatMode.mode_from_byte(0x03)
+      assert :auto == ThermostatMode.decode_mode(0x03)
     end
   end
 end

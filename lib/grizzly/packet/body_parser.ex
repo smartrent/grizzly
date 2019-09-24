@@ -324,7 +324,7 @@ defmodule Grizzly.Packet.BodyParser do
     %{
       command_class: :thermostat_mode,
       command: :report,
-      value: ThermostatMode.mode_from_byte(thermostat_mode)
+      value: ThermostatMode.decode_mode(thermostat_mode)
     }
   end
 
