@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.ThermostatSetback.Set.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ThermostatSetback.Set
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -18,6 +19,14 @@ defmodule Grizzly.CommandClass.ThermostatSetback.Set.Test do
         <<35, 2, 128, 208, 6, 0, 0, 3, 2, 0, 0x47, 0x01, 0x00::size(6), 0x01::size(2), 0x80>>
 
       assert {:ok, binary} == Set.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = Set.init(type: :blue, state: -128, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :type, :blue, Set})
+
+      assert {:error, error} == Set.encode(command)
     end
 
     test "handles an ack response" do
