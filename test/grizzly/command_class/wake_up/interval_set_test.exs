@@ -3,17 +3,26 @@ defmodule Grizzly.CommandClass.WakeUp.IntervalSetTest do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.WakeUp.IntervalSet
+  alias Grizzly.Command.EncodeError
 
   test "initializes correctly" do
     assert {:ok, %IntervalSet{}} = IntervalSet.init(seconds: 10, node_id: 1)
   end
 
-  test "ecodes correctly" do
+  test "encodes correctly" do
     {:ok, command} = IntervalSet.init(seconds: 1, seq_number: 0x01, node_id: 0x01)
 
     binary = <<35, 2, 128, 208, 1, 0, 0, 3, 2, 0, 0x84, 0x04, 0x00, 0x00, 0x01, 0x01>>
 
     assert {:ok, binary} == IntervalSet.encode(command)
+  end
+
+  test "encodes incorrectly" do
+    {:ok, command} = IntervalSet.init(seconds: :blue, seq_number: 0x01, node_id: 0x01)
+
+    error = EncodeError.new({:invalid_argument_value, :seconds, :blue, IntervalSet})
+
+    assert {:error, error} == IntervalSet.encode(command)
   end
 
   test "handles ack response" do
