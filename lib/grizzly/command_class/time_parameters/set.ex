@@ -16,6 +16,7 @@ defmodule Grizzly.CommandClass.TimeParameters.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.TimeParameters
 
   @type t :: %__MODULE__{
@@ -36,32 +37,48 @@ defmodule Grizzly.CommandClass.TimeParameters.Set do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{
-        value: %{
-          year: year,
-          month: month,
-          day: day,
-          hour: hour,
-          minute: minute,
-          second: second
-        },
-        seq_number: seq_number
-      }) do
-    binary =
-      Packet.header(seq_number) <>
-        <<
-          0x8B,
-          0x01,
-          year::size(16),
-          month::size(8),
-          day::size(8),
-          hour::size(8),
-          minute::size(8),
-          second::size(8)
-        >>
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          value: %{
+            year: year,
+            month: month,
+            day: day,
+            hour: hour,
+            minute: minute,
+            second: second
+          },
+          seq_number: seq_number
+        } = command
+      ) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(
+             command,
+             %{
+               year: {:bytes, 2},
+               month: {:range, 1, 12},
+               day: {:range, 1, 31},
+               hour: {:range, 0, 24},
+               minute: {:range, 0, 59},
+               second: {:range, 0, 59}
+             },
+             [:value]
+           ) do
+      binary =
+        Packet.header(seq_number) <>
+          <<
+            0x8B,
+            0x01,
+            year::size(16),
+            month::size(8),
+            day::size(8),
+            hour::size(8),
+            minute::size(8),
+            second::size(8)
+          >>
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

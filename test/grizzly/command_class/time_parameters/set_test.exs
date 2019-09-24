@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.TimeParameters.Set.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.TimeParameters.Set
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -67,6 +68,25 @@ defmodule Grizzly.CommandClass.TimeParameters.Set.Test do
       >>
 
       assert {:ok, binary} == Set.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} =
+        Set.init(
+          value: %{
+            year: 2019,
+            month: 17,
+            day: 3,
+            hour: 1,
+            minute: 2,
+            second: 3
+          },
+          seq_number: 0x06
+        )
+
+      error = EncodeError.new({:invalid_argument_value, :month, 17, Set})
+
+      assert {:error, error} == Set.encode(command)
     end
 
     test "handles an ack response" do
