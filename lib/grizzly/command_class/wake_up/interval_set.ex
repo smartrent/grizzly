@@ -11,6 +11,7 @@ defmodule Grizzly.CommandClass.WakeUp.IntervalSet do
   @behaviour Grizzly.Command
 
   alias Grizzly.{Packet, Node}
+  alias Grizzly.Command.{EncodeError, Encoding}
 
   @type t :: %__MODULE__{
           seq_number: Grizzly.seq_number(),
@@ -35,10 +36,16 @@ defmodule Grizzly.CommandClass.WakeUp.IntervalSet do
   end
 
   @impl true
-  @spec encode(t()) :: {:ok, binary()}
-  def encode(%__MODULE__{seq_number: seq_number, seconds: seconds, node_id: node_id}) do
-    packet = Packet.header(seq_number) <> <<0x084, 0x04, seconds::size(24), node_id>>
-    {:ok, packet}
+  @spec encode(t()) :: {:ok, binary()} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{seq_number: seq_number, seconds: seconds, node_id: node_id} = command) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             node_id: :byte,
+             seconds: {:bits, 24}
+           }) do
+      packet = Packet.header(seq_number) <> <<0x084, 0x04, seconds::size(24), node_id>>
+      {:ok, packet}
+    end
   end
 
   @impl true
