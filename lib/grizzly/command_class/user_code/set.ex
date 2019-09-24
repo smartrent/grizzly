@@ -13,6 +13,7 @@ defmodule Grizzly.CommandClass.UserCode.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.UserCode
 
   @type t :: %__MODULE__{
@@ -37,16 +38,20 @@ defmodule Grizzly.CommandClass.UserCode.Set do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{} = command) do
-    user_code = UserCode.encode_user_code(command.user_code)
-    status = UserCode.status_to_hex(command.slot_status)
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{user_code: _user_code, slot_status: _slot_status} = command) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             user_code: {:encode_with, UserCode, :encode_user_code},
+             slot_status: {:encode_with, UserCode, :encode_status}
+           }) do
+      binary =
+        Packet.header(command.seq_number) <>
+          <<0x63, 0x01, command.slot_id, encoded.slot_status>> <>
+          :erlang.list_to_binary(encoded.user_code)
 
-    binary =
-      Packet.header(command.seq_number) <>
-        <<0x63, 0x01, command.slot_id, status>> <> :erlang.list_to_binary(user_code)
-
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

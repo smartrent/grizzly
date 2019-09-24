@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.UserCode.Set.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.UserCode.Set
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command" do
@@ -22,6 +23,20 @@ defmodule Grizzly.CommandClass.UserCode.Set.Test do
         <<35, 2, 128, 208, 10, 0, 0, 3, 2, 0, 0x63, 0x01, 0x01, 0x01, 0x31, 0x32, 0x33, 0x34>>
 
       assert {:ok, binary} == Set.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} =
+        Set.init(
+          slot_id: 1,
+          slot_status: :occupied,
+          user_code: [1, 2, 3, 4, :blue],
+          seq_number: 10
+        )
+
+      error = EncodeError.new({:invalid_argument_value, :user_code, [1, 2, 3, 4, :blue], Set})
+
+      assert {:error, error} == Set.encode(command)
     end
 
     test "handles ack response" do

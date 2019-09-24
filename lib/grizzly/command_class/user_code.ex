@@ -14,18 +14,26 @@ defmodule Grizzly.CommandClass.UserCode do
     [0, 0, 0, 0, 0, 0, 0, 0]
   end
 
-  @spec status_to_hex(slot_status) :: 0x01 | 0x00
-  def status_to_hex(:occupied), do: 0x01
-  def status_to_hex(:available), do: 0x00
+  @spec encode_status(slot_status) :: {:ok, 0x01 | 0x00} | {:error, :invalid_arg, any()}
+  def encode_status(:occupied), do: {:ok, 0x01}
+  def encode_status(:available), do: {:ok, 0x00}
+  def encode_status(other), do: {:error, :invalid_arg, other}
 
   @spec decode_slot_status(0x01 | 0x00) :: slot_status
   def decode_slot_status(0x01), do: :occupied
   def decode_slot_status(0x00), do: :available
 
-  @spec encode_user_code(user_code) :: [0x30..0x39]
+  @spec encode_user_code(user_code) :: {:ok, [0x30..0x39]} | {:error, :invalid_arg, any()}
   def encode_user_code(user_code) do
-    user_code
-    |> Enum.map(&digit_to_acsii/1)
+    if Enum.all?(user_code, &(&1 in 0..9)) do
+      encoded =
+        user_code
+        |> Enum.map(&digit_to_acsii/1)
+
+      {:ok, encoded}
+    else
+      {:error, :invalid_arg, user_code}
+    end
   end
 
   defp digit_to_acsii(0), do: 0x30

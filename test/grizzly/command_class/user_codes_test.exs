@@ -8,11 +8,11 @@ defmodule Grizzly.CommandClass.UserCode.Test do
   end
 
   test "occupied slot status to hex" do
-    assert 0x01 == UserCode.status_to_hex(:occupied)
+    assert {:ok, 0x01} == UserCode.encode_status(:occupied)
   end
 
   test "available slot status to hex" do
-    assert 0x00 == UserCode.status_to_hex(:available)
+    assert {:ok, 0x00} == UserCode.encode_status(:available)
   end
 
   test "hex to occupied slot status" do
@@ -24,6 +24,6 @@ defmodule Grizzly.CommandClass.UserCode.Test do
   end
 
   test "encodes a user code" do
-    assert [0x31, 0x34, 0x36, 0x39] == UserCode.encode_user_code([1, 4, 6, 9])
+    assert {:ok, [0x31, 0x34, 0x36, 0x39]} == UserCode.encode_user_code([1, 4, 6, 9])
   end
 end
