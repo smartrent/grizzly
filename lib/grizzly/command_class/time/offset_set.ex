@@ -4,7 +4,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet do
 
   command options:
 
-    * `:sign_tzo` - his field is used to indicate the sign (plus or minus)
+    * `:sign_tzo` - This field is used to indicate the sign (plus or minus)
        to apply to the Hour TZO and Minute TZO field
     * `:hour_tzo` - This field is used to indicate the number of hours that
        the originating time zone deviates from UTC
@@ -31,6 +31,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.Time
 
   @type t :: %__MODULE__{
@@ -51,45 +52,66 @@ defmodule Grizzly.CommandClass.Time.OffsetSet do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{
-        value: %{
-          sign_tzo: sign_tzo,
-          # deviation from UTC
-          hour_tzo: hour_tzo,
-          minute_tzo: minute_tzo,
-          sign_offset_dst: sign_offset_dst,
-          minute_offset_dst: minute_offset_dst,
-          # start of DST
-          month_start_dst: month_start_dst,
-          day_start_dst: day_start_dst,
-          # end of DST
-          hour_start_dst: hour_start_dst,
-          month_end_dst: month_end_dst,
-          day_end_dst: day_end_dst,
-          hour_end_dst: hour_end_dst
-        },
-        seq_number: seq_number
-      }) do
-    binary =
-      Packet.header(seq_number) <>
-        <<
-          0x8A,
-          0x05,
-          sign_tzo::size(1),
-          hour_tzo::size(7),
-          minute_tzo,
-          sign_offset_dst::size(1),
-          minute_offset_dst::size(7),
-          month_start_dst,
-          day_start_dst,
-          hour_start_dst,
-          month_end_dst,
-          day_end_dst,
-          hour_end_dst
-        >>
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          value: %{
+            sign_tzo: sign_tzo,
+            # deviation from UTC
+            hour_tzo: hour_tzo,
+            minute_tzo: minute_tzo,
+            sign_offset_dst: sign_offset_dst,
+            minute_offset_dst: minute_offset_dst,
+            # start of DST
+            month_start_dst: month_start_dst,
+            day_start_dst: day_start_dst,
+            # end of DST
+            hour_start_dst: hour_start_dst,
+            month_end_dst: month_end_dst,
+            day_end_dst: day_end_dst,
+            hour_end_dst: hour_end_dst
+          },
+          seq_number: seq_number
+        } = command
+      ) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(
+             command,
+             %{
+               sign_tzo: :bit,
+               hour_tzo: {:range, 0, 14},
+               minute_tzo: {:range, 0, 59},
+               sign_offset_dst: :bit,
+               minute_offset_dst: {:range, 0, 59},
+               month_start_dst: {:range, 1, 12},
+               day_start_dst: {:range, 1, 31},
+               hour_start_dst: {:range, 0, 59},
+               month_end_dst: {:range, 1, 12},
+               day_end_dst: {:range, 1, 31},
+               hour_end_dst: {:range, 0, 59}
+             },
+             [:value]
+           ) do
+      binary =
+        Packet.header(seq_number) <>
+          <<
+            0x8A,
+            0x05,
+            sign_tzo::size(1),
+            hour_tzo::size(7),
+            minute_tzo,
+            sign_offset_dst::size(1),
+            minute_offset_dst::size(7),
+            month_start_dst,
+            day_start_dst,
+            hour_start_dst,
+            month_end_dst,
+            day_end_dst,
+            hour_end_dst
+          >>
 
-    {:ok, binary}
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

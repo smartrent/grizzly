@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.Time.OffsetSet
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly command behaviour" do
     test "initializes the command state" do
@@ -13,7 +14,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
             hour_tzo: 4,
             minute_tzo: 0,
             sign_offset_dst: 0,
-            minute_offset_dst: 60,
+            minute_offset_dst: 59,
             month_start_dst: 3,
             day_start_dst: 10,
             hour_start_dst: 2,
@@ -29,7 +30,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
                  hour_tzo: 4,
                  minute_tzo: 0,
                  sign_offset_dst: 0,
-                 minute_offset_dst: 60,
+                 minute_offset_dst: 59,
                  month_start_dst: 3,
                  day_start_dst: 10,
                  hour_start_dst: 2,
@@ -48,7 +49,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
             hour_tzo: 4,
             minute_tzo: 0,
             sign_offset_dst: 0,
-            minute_offset_dst: 60,
+            minute_offset_dst: 59,
             month_start_dst: 3,
             day_start_dst: 10,
             hour_start_dst: 2,
@@ -76,7 +77,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
         4::size(7),
         0,
         0x0::size(1),
-        60::size(7),
+        59::size(7),
         3,
         10,
         2,
@@ -88,6 +89,30 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
       assert {:ok, binary} == OffsetSet.encode(command)
     end
 
+    test "encodes incorrectly" do
+      {:ok, command} =
+        OffsetSet.init(
+          value: %{
+            sign_tzo: 2,
+            hour_tzo: 4,
+            minute_tzo: 0,
+            sign_offset_dst: 0,
+            minute_offset_dst: 59,
+            month_start_dst: 3,
+            day_start_dst: 10,
+            hour_start_dst: 2,
+            month_end_dst: 11,
+            day_end_dst: 3,
+            hour_end_dst: 2
+          },
+          seq_number: 0x06
+        )
+
+      error = EncodeError.new({:invalid_argument_value, :sign_tzo, 2, OffsetSet})
+
+      assert {:error, error} == OffsetSet.encode(command)
+    end
+
     test "handles an ack response" do
       {:ok, command} =
         OffsetSet.init(
@@ -96,7 +121,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
             hour_tzo: 4,
             minute_tzo: 0,
             sign_offset_dst: 0,
-            minute_offset_dst: 60,
+            minute_offset_dst: 59,
             month_start_dst: 3,
             day_start_dst: 10,
             hour_start_dst: 2,
@@ -120,7 +145,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
             hour_tzo: 4,
             minute_tzo: 0,
             sign_offset_dst: 0,
-            minute_offset_dst: 60,
+            minute_offset_dst: 59,
             month_start_dst: 3,
             day_start_dst: 10,
             hour_start_dst: 2,
@@ -145,7 +170,7 @@ defmodule Grizzly.CommandClass.Time.OffsetSet.Test do
             hour_tzo: 4,
             minute_tzo: 0,
             sign_offset_dst: 0,
-            minute_offset_dst: 60,
+            minute_offset_dst: 59,
             month_start_dst: 3,
             day_start_dst: 10,
             hour_start_dst: 2,
