@@ -85,7 +85,7 @@ defmodule Grizzly.Command.Encoding do
 
   defp validate_arg({:bytes, n}, value, _command)
        when is_integer(n) and is_integer(value) do
-    max = round(:math.pow(16, n)) - 1
+    max = round(:math.pow(2, n * 8)) - 1
 
     if value in 0..max do
       {:ok, value}
