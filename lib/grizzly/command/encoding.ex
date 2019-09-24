@@ -19,17 +19,17 @@ defmodule Grizzly.Command.Encoding do
           | :binary
           | :bit
           | {sizable, size}
-  @spec encode_and_validate_args(struct(), %{required(atom()) => specs}) ::
+  @spec encode_and_validate_args(struct(), %{required(atom()) => specs}, [atom()]) ::
           {:ok, struct()} | {:error, EncodeError.t()}
-  @doc "Verifies that the arguments of a command, possibly after encoding, meet the given type specs"
-  def encode_and_validate_args(command, type_specs) do
+  @doc "Verifies that the (sub)arguments of a command, possibly after encoding, meet the given type specs"
+  def encode_and_validate_args(command, type_specs, sub_arguments_path \\ []) do
     command_module = command.__struct__
 
     Enum.reduce_while(
       type_specs,
       {:ok, command},
       fn {arg_name, specs}, {:ok, acc} ->
-        case Map.get(command, arg_name) do
+        case arg_value(command, sub_arguments_path, arg_name) do
           nil ->
             _ =
               Logger.warn(
@@ -54,6 +54,14 @@ defmodule Grizzly.Command.Encoding do
         end
       end
     )
+  end
+
+  defp arg_value(args, [], arg_name) do
+    Map.get(args, arg_name)
+  end
+
+  defp arg_value(args, [sub | rest], arg_name) do
+    Map.get(args, sub) |> arg_value(rest, arg_name)
   end
 
   defp validate_arg(:bit, value, _command) when value in 0..1 do
@@ -85,7 +93,7 @@ defmodule Grizzly.Command.Encoding do
 
   defp validate_arg({:bytes, n}, value, _command)
        when is_integer(n) and is_integer(value) do
-    max = round(:math.pow(16, n)) - 1
+    max = round(:math.pow(2, n * 8)) - 1
 
     if value in 0..max do
       {:ok, value}

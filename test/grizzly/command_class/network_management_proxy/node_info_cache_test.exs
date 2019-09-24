@@ -18,11 +18,13 @@ defmodule Grizzly.CommandClass.NetworkManagmentProxy.NodeInfoCache.Test do
 
     test "encodes incorrectly" do
       {:ok, command} =
-        NodeInfoCache.init(cached_minutes_passed: 0xFFFFF, node_id: 1, seq_number: 0x06)
+        NodeInfoCache.init(cached_minutes_passed: 0xFFFFFFFF1, node_id: 1, seq_number: 0x06)
 
       # More than 4 bytes
       error =
-        EncodeError.new({:invalid_argument_value, :cached_minutes_passed, 0xFFFFF, NodeInfoCache})
+        EncodeError.new(
+          {:invalid_argument_value, :cached_minutes_passed, 0xFFFFFFFF1, NodeInfoCache}
+        )
 
       assert {:error, error} == NodeInfoCache.encode(command)
     end
