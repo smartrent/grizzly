@@ -13,6 +13,7 @@ defmodule Grizzly.CommandClass.ThermostatSetpoint.Set do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.Command.{EncodeError, Encoding}
   alias Grizzly.CommandClass.ThermostatSetpoint
 
   @type t :: %__MODULE__{
@@ -41,12 +42,24 @@ defmodule Grizzly.CommandClass.ThermostatSetpoint.Set do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{value: value, type: type, opts: opts, seq_number: seq_number}) do
-    opts_mask = ThermostatSetpoint.mask_opts(opts)
-    type = ThermostatSetpoint.encode_setpoint_type(type)
-    binary = Packet.header(seq_number) <> <<0x43, 0x01, type, opts_mask, value>>
-    {:ok, binary}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(
+        %__MODULE__{
+          value: value,
+          type: _type,
+          opts: [precision: _precision, scale: _scale, size: size],
+          seq_number: seq_number
+        } = command
+      ) do
+    with {:ok, encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             type: {:encode_with, ThermostatSetpoint, :encode_setpoint_type},
+             opts: {:encode_with, ThermostatSetpoint, :encode_opts},
+             value: {:bytes, size}
+           }) do
+      binary = Packet.header(seq_number) <> <<0x43, 0x01, encoded.type, encoded.opts, value>>
+      {:ok, binary}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::

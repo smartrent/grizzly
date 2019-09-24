@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.ThermostatSetpoint.Get.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ThermostatSetpoint.Get
+  alias Grizzly.Command.EncodeError
 
   describe "implements the Grizzly.Command behaviour" do
     test "initializes command" do
@@ -14,6 +15,14 @@ defmodule Grizzly.CommandClass.ThermostatSetpoint.Get.Test do
       binary = <<35, 2, 128, 208, 8, 0, 0, 3, 2, 0, 0x43, 0x02, 0x02>>
 
       assert {:ok, binary} == Get.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = Get.init(type: :blue, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :type, :blue, Get})
+
+      assert {:error, error} == Get.encode(command)
     end
 
     test "handles ack response" do

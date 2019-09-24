@@ -4,11 +4,11 @@ defmodule Grizzly.CommandClass.ThermostatSetpoint.Test do
   alias Grizzly.CommandClass.ThermostatSetpoint
 
   test "encode cooling setpoint type" do
-    assert 0x02 == ThermostatSetpoint.encode_setpoint_type(:cooling)
+    assert {:ok, 0x02} == ThermostatSetpoint.encode_setpoint_type(:cooling)
   end
 
   test "encode heating setpoint type" do
-    assert 0x01 == ThermostatSetpoint.encode_setpoint_type(:heating)
+    assert {:ok, 0x01} == ThermostatSetpoint.encode_setpoint_type(:heating)
   end
 
   test "decode cooling setpoint type" do
