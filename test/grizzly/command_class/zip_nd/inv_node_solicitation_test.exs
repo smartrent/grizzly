@@ -3,6 +3,7 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation.Test do
 
   alias Grizzly.Packet
   alias Grizzly.CommandClass.ZipNd.InvNodeSolicitation
+  alias Grizzly.Command.EncodeError
 
   describe "implements Grizzly.Command behaviour" do
     test "initializes command state" do
@@ -12,6 +13,14 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation.Test do
     test "encodes correctly" do
       {:ok, command} = InvNodeSolicitation.init(node_id: 2)
       assert {:ok, <<0x58, 0x04, 0x00, 0x02>>} = InvNodeSolicitation.encode(command)
+    end
+
+    test "encodes incorrectly" do
+      {:ok, command} = InvNodeSolicitation.init(node_id: :blue, seq_number: 0x06)
+
+      error = EncodeError.new({:invalid_argument_value, :node_id, :blue, InvNodeSolicitation})
+
+      assert {:error, error} == InvNodeSolicitation.encode(command)
     end
 
     test "handle zip node advertisement response" do
