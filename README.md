@@ -83,7 +83,7 @@ When you use a `GenServer` to manage exclusion you can handle messages via
 See `Grizzly.Inclusion` module for more information about removing Z-Wave devices
 from the network.
 
-Addtional Z-Wave docs can be found at [Silicon Labs](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk).
+Additional Z-Wave docs can be found at [Silicon Labs](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk).
 
 ### Controlling a Z-Wave Device
 
@@ -97,6 +97,18 @@ iex> {:ok, lock} = Grizzly.Node.connect(lock)
 iex> Grizzly.send_command(lock, Grizzly.CommandClass.DoorLock.OperationSet, mode: :unsecured)
 :ok
 ```
+
+If you are just trying things out in an iex session can you use `send_command`
+with the node id:
+
+```elixir
+iex> Grizzly.send_command(12, Grizzly.CommandClass.DoorLock.OperationSet, mode: :unsecured)
+```
+
+However, this is slower in general and is only recommended for quick one off
+command sending. If you're building a long running application the first
+example is recommend along with storing the connected device to keep the
+connection alive for faster response times.
 
 see the `Grizzly` module docs for more details about `Grizzly.send_command`
 
@@ -142,8 +154,12 @@ First download the [Z/IP GW SDK](https://www.silabs.com/products/development-too
 
 For this you will need to make a free account with Silicon Labs. The default binaries that come
 with the download will not work by default in Nerves system, so you will need to compile the source
-for your target. The source code can befound in the `Source` directory.
+for your target. The source code can be found in the `Source` directory.
 
 This can be tricky and the instructions are a work in progress, so for now please contact
 us if you any troubles.
+
+## Resources
+
+* [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)
 
