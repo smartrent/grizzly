@@ -2,20 +2,20 @@
 
 ### v0.5.0
 
-Introduces `Grizzly.Command.EncodeError` expection and updates encoding and
+Introduces `Grizzly.Command.EncodeError` exception and updates encoding and
 decoding functions to return tagged tuples. We now use these things when trying
 to send a command via `Grizzly.send_command/3` so if you have invalid command
 arguments we can provide useful error handling with
 `{:error, Grizzly.Command.EncodeError.t()}`. The `EncodeError.t()` implements
-Elixir's exeception behaviour so you can leverage the stand library to
-work with the exeception.
+Elixir's exception behaviour so you can leverage the standard library to
+work with the exception.
 
 Unless you have implemented custom commands or used one of the many command
-encoders or decodes explictly this update should not effect you too much. If
-you have used the encoder/decoders explictly please see the documentation for
+encoders or decodes explicitly this update should not affect you too much. If
+you have used the encoder/decoders explicitly please see the documentation for
 the ones you have used to see the updated API. If you have written a command we
-encourage you to valid the arguments and return the `{:error, EncodeError.t()}`
-to improve usability of and robustness  your command. The new
+encourage you to validate the arguments and return the `{:error, EncodeError.t()}`
+to improve the usability of and robustness your command. The new
 `Grizzly.Command.Encoding` module provides some useful functionality for
 validating specs for command arguments.
 
@@ -27,7 +27,7 @@ validating specs for command arguments.
   * Introduces new `Grizzly.Command.Encoding` modules for helping
     validate command arugment specifications
 * Fixes
-  * Crashes when providing invalid command arugments
+  * Crashes when providing invalid command arguments
 
 ### v0.4.3
 
