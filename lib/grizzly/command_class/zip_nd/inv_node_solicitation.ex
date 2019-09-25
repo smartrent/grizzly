@@ -12,6 +12,7 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation do
 
   alias Grizzly.{Node, Packet}
   alias Grizzly.Network.State, as: NetworkState
+  alias Grizzly.Command.{EncodeError, Encoding}
 
   @type t :: %__MODULE__{
           node_id: Node.node_id(),
@@ -28,9 +29,14 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation do
     {:ok, struct(__MODULE__, opts)}
   end
 
-  @spec encode(t) :: {:ok, binary}
-  def encode(%__MODULE__{node_id: node_id}) do
-    {:ok, <<0x58, 0x04, 0x00, node_id>>}
+  @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
+  def encode(%__MODULE__{node_id: node_id} = command) do
+    with {:ok, _encoded} <-
+           Encoding.encode_and_validate_args(command, %{
+             node_id: :byte
+           }) do
+      {:ok, <<0x58, 0x04, 0x00, node_id>>}
+    end
   end
 
   @spec handle_response(t, Packet.t()) ::
