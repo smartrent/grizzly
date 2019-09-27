@@ -8,10 +8,11 @@ defmodule Grizzly.Command.Encoding do
   @type sizable :: :bits | :bytes
   @type specs ::
           spec
-          | [spec]
+          | [specs]
           | {:encode_with, atom}
           | {:encode_with, atom, atom}
           | {:range, integer, integer}
+          | %{required(atom) => specs}
   @type spec ::
           :byte
           | :byte
@@ -19,6 +20,7 @@ defmodule Grizzly.Command.Encoding do
           | :binary
           | :bit
           | {sizable, size}
+          | {[specs], size}
   @spec encode_and_validate_args(struct(), %{required(atom()) => specs}, [atom()]) ::
           {:ok, struct()} | {:error, EncodeError.t()}
   @doc "Verifies that the (sub)arguments of a command, possibly after encoding, meet the given type specs"
@@ -102,8 +104,16 @@ defmodule Grizzly.Command.Encoding do
     end
   end
 
+  defp validate_arg({[spec], n}, value, command) when is_integer(n) and is_list(value) do
+    if Enum.count(value) == n do
+      validate_arg([spec], value, command)
+    else
+      {:error, :invalid_arg, value}
+    end
+  end
+
   defp validate_arg({sizable, field}, value, command)
-       when sizable in [:bits, :bytes, :binary] and is_atom(field) and is_integer(value) do
+       when sizable in [:bits, :bytes] and is_atom(field) and is_integer(value) do
     case Map.get(command, field) do
       nil ->
         {:error, :invalid_arg, value}
@@ -139,6 +149,28 @@ defmodule Grizzly.Command.Encoding do
       error ->
         error
     end
+  end
+
+  defp validate_arg(specs_map, value_map, command) when is_map(specs_map) and is_map(value_map) do
+    Enum.reduce_while(
+      value_map,
+      {:ok, %{}},
+      fn {key, val}, {:ok, acc} ->
+        case Map.get(specs_map, key) do
+          nil ->
+            {:halt, {:error, :invalid_arg, value_map}}
+
+          specs ->
+            case validate_arg(specs, val, command) do
+              {:ok, maybe_encoded_val} ->
+                {:cont, {:ok, Map.put(acc, key, maybe_encoded_val)}}
+
+              {:error, :invalid_arg, _} ->
+                {:halt, {:error, :invalid_arg, value_map}}
+            end
+        end
+      end
+    )
   end
 
   defp validate_arg({:range, low, high}, value, _command) when is_number(value) do

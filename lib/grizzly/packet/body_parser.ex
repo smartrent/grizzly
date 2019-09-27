@@ -46,7 +46,8 @@ defmodule Grizzly.Packet.BodyParser do
     ManufacturerSpecific,
     ScheduleEntryLock,
     NetworkManagementInstallationMaintenance,
-    Powerlevel
+    Powerlevel,
+    MultiChannelAssociation
   }
 
   def parse(<<
@@ -807,6 +808,33 @@ defmodule Grizzly.Packet.BodyParser do
         status_of_operation: Powerlevel.decode_status_of_operation(status),
         test_frame_count: test_frame_count
       }
+    }
+  end
+
+  def parse(
+        <<0x8E, 0x03, group::size(8), max_nodes_supported::size(8), reports_to_follow::size(8),
+          nodes_and_endpoints::binary>>
+      ) do
+    {nodes, endpoints} = MultiChannelAssociation.decode_nodes_and_endpoints(nodes_and_endpoints)
+
+    %{
+      command_class: :multi_channel_association,
+      command: :multi_channel_association_report,
+      value: %{
+        group: group,
+        max_nodes_supported: max_nodes_supported,
+        nodes: nodes,
+        endpoints: endpoints,
+        reports_to_follow: reports_to_follow
+      }
+    }
+  end
+
+  def parse(<<0x8E, 0x06, supported_groupings::size(8)>>) do
+    %{
+      command_class: :multi_channel_association,
+      command: :multi_channel_association_groupings_report,
+      value: supported_groupings
     }
   end
 
