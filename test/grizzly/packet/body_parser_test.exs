@@ -1025,4 +1025,36 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert BodyParser.parse(bytes) == expected_report
     end
   end
+
+  describe "test multi channel association reports" do
+    test "parse groupings report" do
+      bytes = <<0x8E, 0x06, 0x05>>
+
+      expected_report = %{
+        command_class: :multi_channel_association,
+        command: :multi_channel_association_groupings_report,
+        value: 5
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+
+    test "parse nodes and endpoints report" do
+      bytes = <<0x8E, 0x03, 0x02, 0x05, 0x00, 0x06, 0x07, 0x00, 0x06, 0x01>>
+
+      expected_report = %{
+        command_class: :multi_channel_association,
+        command: :multi_channel_association_report,
+        value: %{
+          group: 2,
+          max_nodes_supported: 5,
+          nodes: [6, 7],
+          endpoints: [%{node_id: 6, endpoint: 1}],
+          reports_to_follow: 0
+        }
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+  end
 end
