@@ -1057,4 +1057,24 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert BodyParser.parse(bytes) == expected_report
     end
   end
+
+  describe "test zwave plus info report" do
+    test "parse zwave plus info report" do
+      bytes = <<0x5E, 0x02, 0x01, 0x00, 0x02, 0x00, 0x0A, 0x00, 0x0B>>
+
+      expected_report = %{
+        command_class: :zwaveplus_info,
+        command: :report,
+        value: %{
+          version: 1,
+          role_type: :controller_central_static,
+          node_type: :ip_gateway,
+          installer_icon_type: 10,
+          user_icon_type: 11
+        }
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+  end
 end

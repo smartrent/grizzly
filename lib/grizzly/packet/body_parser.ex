@@ -48,7 +48,8 @@ defmodule Grizzly.Packet.BodyParser do
     ScheduleEntryLock,
     NetworkManagementInstallationMaintenance,
     Powerlevel,
-    MultiChannelAssociation
+    MultiChannelAssociation,
+    ZwaveplusInfo
   }
 
   def parse(<<
@@ -854,6 +855,23 @@ defmodule Grizzly.Packet.BodyParser do
       command_class: :multi_channel_association,
       command: :multi_channel_association_groupings_report,
       value: supported_groupings
+    }
+  end
+
+  def parse(
+        <<0x5E, 0x02, version::size(8), role_type::size(8), node_type::size(8),
+          installer_icon_type::size(16), user_icon_type::size(16)>>
+      ) do
+    %{
+      command_class: :zwaveplus_info,
+      command: :report,
+      value: %{
+        version: version,
+        role_type: ZwaveplusInfo.decode_role_type(role_type),
+        node_type: ZwaveplusInfo.decode_node_type(node_type),
+        installer_icon_type: installer_icon_type,
+        user_icon_type: user_icon_type
+      }
     }
   end
 
