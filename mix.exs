@@ -91,7 +91,8 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.ThermostatSetback,
           Grizzly.CommandClass.ThermostatSetpoint,
           Grizzly.CommandClass.UserCode,
-          Grizzly.CommandClass.WakeUp
+          Grizzly.CommandClass.WakeUp,
+          Grizzly.CommandClass.ZwaveplusInfo
         ],
         Commands: [
           Grizzly.Command,
@@ -171,7 +172,8 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.WakeUp.IntervalGet,
           Grizzly.CommandClass.WakeUp.IntervalSet,
           Grizzly.CommandClass.WakeUp.NoMoreInformation,
-          Grizzly.CommandClass.ZipNd.InvNodeSolicitation
+          Grizzly.CommandClass.ZipNd.InvNodeSolicitation,
+          Grizzly.CommandClass.ZwaveplusInfo.Get
         ]
       ]
     ]

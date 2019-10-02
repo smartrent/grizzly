@@ -107,6 +107,10 @@ defmodule Grizzly do
     send_command(Controller.conn(), command_module, command_opts)
   end
 
+  def send_command(%Node{conn: nil, id: 1}, command_module, command_opts) do
+    send_command(Controller, command_module, command_opts)
+  end
+
   def send_command(%Node{conn: conn}, command_module, command_opts) do
     send_command(conn, command_module, command_opts)
   end
