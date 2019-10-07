@@ -168,6 +168,7 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.WakeUp.IntervalCapabilitiesGet,
           Grizzly.CommandClass.WakeUp.IntervalGet,
           Grizzly.CommandClass.WakeUp.IntervalSet,
+          Grizzly.CommandClass.WakeUp.NoMoreInformation,
           Grizzly.CommandClass.ZipNd.InvNodeSolicitation
         ]
       ]
