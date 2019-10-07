@@ -10,7 +10,7 @@ defmodule Grizzly.Node do
   alias Grizzly.Node.Association
   alias Grizzly.CommandClass.Association.Set, as: AssociationSet
   alias Grizzly.CommandClass.ZipNd.InvNodeSolicitation
-  alias Grizzly.CommandClass.CommandClassVersion
+  alias Grizzly.CommandClass.Version.CommandClassGet
 
   @type node_id :: non_neg_integer()
 
@@ -382,7 +382,7 @@ defmodule Grizzly.Node do
 
         Grizzly.send_command(
           zw_node,
-          CommandClassVersion.Get,
+          CommandClassGet,
           seq_number: seq_number,
           command_class: command_class_name
         )

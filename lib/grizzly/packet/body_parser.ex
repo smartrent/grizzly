@@ -39,7 +39,7 @@ defmodule Grizzly.Packet.BodyParser do
     ThermostatSetpoint,
     ThermostatSetback,
     UserCode,
-    CommandClassVersion,
+    Version,
     SwitchMultilevel,
     NetworkManagementInclusion,
     MultilevelSensor,
@@ -468,10 +468,10 @@ defmodule Grizzly.Packet.BodyParser do
   end
 
   def parse(<<0x86, 0x14, report_data::binary>>) do
-    value = CommandClassVersion.decode_report_data(report_data)
+    value = Version.decode_report_data(report_data)
 
     %{
-      command_class: CommandClassVersion,
+      command_class: Version,
       command: :report,
       value: value
     }

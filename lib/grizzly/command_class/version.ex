@@ -1,6 +1,7 @@
-defmodule Grizzly.CommandClass.CommandClassVersion do
+defmodule Grizzly.CommandClass.Version do
   @moduledoc """
-    Module for generating the correct command for getting command versions
+
+  Helpers for working with the command class VERSION
   """
 
   alias Grizzly.CommandClass.Mappings

@@ -7,7 +7,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
   alias Grizzly.CommandClass.{
     Configuration,
     NetworkManagementBasic,
-    CommandClassVersion,
+    Version,
     FirmwareUpdateMD,
     ScheduleEntryLock
   }
@@ -661,7 +661,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
       parsed = BodyParser.parse(version_report)
 
       assert parsed == %{
-               command_class: CommandClassVersion,
+               command_class: Version,
                command: :report,
                value: %{
                  command_class: :configuration,
