@@ -1,6 +1,7 @@
-defmodule Grizzly.CommandClass.CommandClassVersion.Get do
+defmodule Grizzly.CommandClass.Version.CommandClassGet do
   @moduledoc """
-  Command module for working with CommandClassVersion command class GET command
+  Command module for working with `VERSION_COMMAND_CLASS` command class
+  `COMMAND_CLASS_GET` command
 
   Command Options:
 
@@ -12,7 +13,7 @@ defmodule Grizzly.CommandClass.CommandClassVersion.Get do
 
   alias Grizzly.Packet
   alias Grizzly.Command.{EncodeError, Encoding}
-  alias Grizzly.CommandClass.CommandClassVersion
+  alias Grizzly.CommandClass.Version
 
   @type t :: %__MODULE__{
           seq_number: Grizzly.seq_number(),
@@ -36,7 +37,7 @@ defmodule Grizzly.CommandClass.CommandClassVersion.Get do
   def encode(%__MODULE__{seq_number: seq_number} = command) do
     with {:ok, encoded} <-
            Encoding.encode_and_validate_args(command, %{
-             command_class: {:encode_with, CommandClassVersion, :encode_command_class}
+             command_class: {:encode_with, Version, :encode_command_class}
            }) do
       binary = Packet.header(seq_number) <> <<0x86, 0x13, encoded.command_class>>
 
@@ -72,7 +73,7 @@ defmodule Grizzly.CommandClass.CommandClassVersion.Get do
 
   def handle_response(_command, %Packet{
         body: %{
-          command_class: CommandClassVersion,
+          command_class: Version,
           command: :report,
           value: value
         }
