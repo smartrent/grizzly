@@ -26,6 +26,7 @@ defmodule Grizzly.Packet.BodyParser do
   alias Grizzly.{Security, CommandClass}
 
   alias Grizzly.CommandClass.{
+    Association,
     Battery,
     Configuration,
     DoorLock,
@@ -571,14 +572,6 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
-  def parse(<<0x85, 0x03, _group, _max_nodes, _reports_to_follow, nodes::binary>>) do
-    %{
-      command_class: Mappings.from_byte(0x85),
-      command: Mappings.command_from_byte(0x85, 0x06),
-      nodes: :erlang.binary_to_list(nodes)
-    }
-  end
-
   def parse(
         <<0x8A, 0x02, _rtc_failure::size(1), _reserved::size(2), hour::size(5), minute::size(8),
           second::size(8), _other::binary>>
@@ -808,6 +801,32 @@ defmodule Grizzly.Packet.BodyParser do
         status_of_operation: Powerlevel.decode_status_of_operation(status),
         test_frame_count: test_frame_count
       }
+    }
+  end
+
+  def parse(
+        <<0x85, 0x03, group::size(8), max_nodes_supported::size(8), reports_to_follow::size(8),
+          nodes::binary>>
+      ) do
+    node_ids = Association.decode_nodes(nodes)
+
+    %{
+      command_class: :association,
+      command: :report,
+      value: %{
+        group: group,
+        max_nodes_supported: max_nodes_supported,
+        nodes: node_ids,
+        reports_to_follow: reports_to_follow
+      }
+    }
+  end
+
+  def parse(<<0x85, 0x06, supported_groupings::size(8)>>) do
+    %{
+      command_class: :association,
+      command: :association_groupings_report,
+      value: supported_groupings
     }
   end
 

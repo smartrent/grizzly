@@ -53,18 +53,55 @@ defmodule Grizzly.CommandClass.Association.GetTest do
     assert {:continue, command} == Get.handle_response(command, packet)
   end
 
-  test "handles association report" do
-    command = make_command(1)
+  test "handles incomplete report responses" do
+    report = %{
+      command_class: :association,
+      command: :report,
+      value: %{
+        group: 0x03,
+        max_nodes_supported: 0x08,
+        nodes: [2, 3],
+        reports_to_follow: 1
+      }
+    }
+
+    {:ok, command} = Get.init(group: 0x03)
+    packet = Packet.new(body: report)
+
+    buffered_command = %Get{
+      command
+      | buffer: %{
+          nodes: [2, 3]
+        }
+    }
+
+    assert {:continue, buffered_command} ==
+             Get.handle_response(command, packet)
+  end
+
+  test "handles completing association report" do
+    command = %Get{make_command(1) | buffer: %{nodes: [2]}}
 
     body = %{
       command_class: :association,
       command: :report,
-      nodes: [1]
+      value: %{
+        group: 2,
+        max_nodes_supported: 8,
+        nodes: [1],
+        reports_to_follow: 0
+      }
     }
 
     packet = Packet.new(body: body)
 
-    assert {:done, {:ok, [1]}} == Get.handle_response(command, packet)
+    assert {:done,
+            {:ok,
+             %{
+               group: 2,
+               max_nodes_supported: 8,
+               nodes: [1, 2]
+             }}} == Get.handle_response(command, packet)
   end
 
   test "handles other types of packets" do
