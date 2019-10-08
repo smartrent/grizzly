@@ -478,6 +478,14 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(<<0x86, 0x12, report::binary>>) do
+    {:ok, report_body} = Version.decode_version_report(report)
+
+    report_body
+    |> Map.put(:command_class, Version)
+    |> Map.put(:command, :version_report)
+  end
+
   def parse(
         <<0x7A, 0x02, manufacturer_id::size(2)-integer-unsigned-unit(8),
           firmware_id::size(2)-integer-unsigned-unit(8), checksum::size(2)-binary-unit(8),
