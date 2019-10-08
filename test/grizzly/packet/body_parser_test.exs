@@ -649,8 +649,8 @@ defmodule Grizzly.Packet.BodyParser.Test do
     end
   end
 
-  describe "parses version report" do
-    test "parse a version report" do
+  describe "parses version command class reports" do
+    test "parse a command class version report" do
       version_report = <<
         0x86,
         0x14,
@@ -667,6 +667,22 @@ defmodule Grizzly.Packet.BodyParser.Test do
                  command_class: :configuration,
                  version: 1
                }
+             }
+    end
+
+    test "parse a version report" do
+      version_report = <<0x86, 0x12, 0x02, 0x01, 0x01, 0x01, 0x01>>
+
+      parsed = BodyParser.parse(version_report)
+
+      assert parsed == %{
+               command_class: Version,
+               command: :version_report,
+               protocol_library: :controller,
+               protocol_version: 1,
+               protocol_sub_version: 1,
+               firmware_version: 1,
+               firmware_sub_version: 1
              }
     end
   end
