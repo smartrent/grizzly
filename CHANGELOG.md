@@ -1,5 +1,27 @@
 ## Changelog
 
+### v0.6.0
+
+Changed `Grizzly.CommandClass.CommandClassVersion` to `Grizzly.CommandClass.Version`
+and changed `Grizzly.ComamndClass.CommandClassVersion.Get` to
+`Grizzly.CommandClass.Version.CommandClassGet` as these names reflect the Z-Wave
+specification better.
+
+If you only have used `Grizzly.get_command_class_version/2` and the related function
+in `Grizzly.Node` module this change should not effect you.
+
+* Enhancements
+  * Add support for:
+    * MultiChannelAssociation Command Class
+    * WakeUp Command Class NoMoreInformation command
+    * Complete Association Command Class
+    * ZwaveplusInfo Command Class
+    * Version Get Command
+  * Clean up docs
+  * Renamed `Grizzly.CommandClass.CommandClassVersion` to `Grizzly.CommandClass.Version`
+  * Renamed `Grizzly.CommandClass.CommandClassVersion.Get` to
+    `Grizzly.CommandClass.Version.CommandClassGet`
+
 ### v0.5.0
 
 Introduces `Grizzly.Command.EncodeError` exception and updates encoding and
