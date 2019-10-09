@@ -10,6 +10,7 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.Get do
   @behaviour Grizzly.Command
 
   alias Grizzly.Packet
+  alias Grizzly.CommandClass.ManufacturerSpecific
 
   @type t :: %__MODULE__{}
 
@@ -31,7 +32,7 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.Get do
   @spec handle_response(t, Packet.t()) ::
           {:continue, t()}
           | {:done, {:error, :nack_response}}
-          | {:done, map()}
+          | {:done, {:done, ManufacturerSpecific.manufacturer_report()}}
           | {:retry, t()}
           | {:queued, t()}
   def handle_response(%__MODULE__{seq_number: seq_number} = command, %Packet{
@@ -56,11 +57,13 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.Get do
   end
 
   def handle_response(_command, %Packet{
-        body:
-          %{command_class: :manufacturer_specific, command: :manufacturer_specific_report} =
-            report
+        body: %{
+          command_class: :manufacturer_specific,
+          command: :manufacturer_specific_report,
+          value: report
+        }
       }) do
-    {:done, {:ok, Map.drop(report, [:command_class, :command])}}
+    {:done, {:ok, report}}
   end
 
   def handle_response(

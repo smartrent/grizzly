@@ -61,9 +61,7 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific.GetTest do
       report = %{
         command_class: :manufacturer_specific,
         command: :manufacturer_specific_report,
-        manufacturer_id: 0x1234,
-        product_type_id: 0x5678,
-        product_id: 0x01
+        value: %{manufacturer_id: 0x1234, product_type_id: 0x5678, product_id: 0x01}
       }
 
       packet = Packet.new(body: report)

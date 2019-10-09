@@ -6,6 +6,11 @@ defmodule Grizzly.CommandClass.ManufacturerSpecific do
   @type device_id_data_format :: :utf8 | :binary
   @type device_id_data_format_byte :: 0 | 1
   @type device_specific_report :: %{device_id_type: device_id_type, device_id: binary}
+  @type manufacturer_report :: %{
+          manufacturer_id: non_neg_integer,
+          product_type_id: non_neg_integer,
+          product_id: non_neg_integer
+        }
 
   @spec encode_device_id_type(device_id_type) ::
           {:ok, device_id_type_byte} | {:error, :invalid_arg, any()}

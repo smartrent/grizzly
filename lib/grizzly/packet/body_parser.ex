@@ -500,17 +500,32 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(
+        <<0x72, 0x05, manufacturer_id::size(16), product_type_id::size(16), product_id::size(16)>>
+      ) do
+    report = %{
+      manufacturer_id: manufacturer_id,
+      product_type_id: product_type_id,
+      product_id: product_id
+    }
+
+    %{
+      command_class: :manufacturer_specific,
+      command: :manufacturer_specific_report,
+      value: report
+    }
+  end
+
   def parse(<<
         0x72,
         0x07,
         _reserved::size(5),
-        device_id_type_byte::size(3),
         # UTF-8
         0x00::size(3),
         device_id_data_length::size(5),
         device_id_data::size(device_id_data_length)-binary-unit(8)
       >>) do
-    device_id_type = ManufacturerSpecific.decode_device_id_type(device_id_type_byte)
+    device_id_type = ManufacturerSpecific.decode_device_id_type(0x00)
 
     %{
       command_class: :manufacturer_specific,
@@ -523,13 +538,12 @@ defmodule Grizzly.Packet.BodyParser do
         0x72,
         0x07,
         _reserved::size(5),
-        device_id_type_byte::size(3),
         # Binary (hex)
         0x01::size(3),
         device_id_data_length::size(5),
         device_id_data_as_integer::size(device_id_data_length)-unit(8)
       >>) do
-    device_id_type = ManufacturerSpecific.decode_device_id_type(device_id_type_byte)
+    device_id_type = ManufacturerSpecific.decode_device_id_type(0x01)
     device_id_data = "h'" <> Integer.to_string(device_id_data_as_integer, 16)
 
     %{
@@ -900,20 +914,6 @@ defmodule Grizzly.Packet.BodyParser do
       command_class: command_class,
       command: command,
       value: body
-    }
-  end
-
-  defp make_parsed_body(
-         :manufacturer_specific,
-         :manufacturer_specific_report,
-         <<man_id::size(16), prod_type_id::size(16), prod_id::size(16)>>
-       ) do
-    %{
-      command_class: :manufacturer_specific,
-      command: :manufacturer_specific_report,
-      manufacturer_id: man_id,
-      product_type_id: prod_type_id,
-      product_id: prod_id
     }
   end
 
