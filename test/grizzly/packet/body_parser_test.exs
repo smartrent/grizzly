@@ -233,21 +233,41 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert parsed == %{
                command_class: :manufacturer_specific,
                command: :manufacturer_specific_report,
-               manufacturer_id: 0x1234,
-               product_type_id: 0x5678,
-               product_id: 0x01
+               value: %{manufacturer_id: 0x1234, product_type_id: 0x5678, product_id: 0x01}
              }
     end
 
-    test "parses device specific report" do
+    test "parses hex device specific report" do
       device_specific_report = <<
         0x72,
         0x07,
         # reserved
         0x00::size(5),
-        # device id type is serial number
+        # device id type is Hex
         0x01::size(3),
-        # device id data format is utf-8
+        # device id data length is 2
+        0x02::size(5),
+        # device id data is "PQ"
+        0x50,
+        0x51
+      >>
+
+      parsed = BodyParser.parse(device_specific_report)
+
+      assert parsed == %{
+               command_class: :manufacturer_specific,
+               command: :device_specific_report,
+               value: %{device_id_type: :serial_number, device_id: "h'5051"}
+             }
+    end
+
+    test "parses utf device specific report" do
+      device_specific_report = <<
+        0x72,
+        0x07,
+        # reserved
+        0x00::size(5),
+        # device id type is UTF
         0x00::size(3),
         # device id data length is 2
         0x02::size(5),
@@ -261,7 +281,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert parsed == %{
                command_class: :manufacturer_specific,
                command: :device_specific_report,
-               value: %{device_id_type: :serial_number, device_id: "PQ"}
+               value: %{device_id_type: :oem_factory_default_device_id_type, device_id: "PQ"}
              }
     end
   end

@@ -41,8 +41,8 @@ defmodule Grizzly.Test do
     end
 
     test "send the manufacturer specific command", %{conn: conn} do
-      {:ok, %{manufacturer_id: 335, product_id: 21558, product_type_id: 21570}} =
-        Grizzly.send_command(conn, ManufacturerSpecificGet, seq_number: 0x01)
+      assert {:ok, %{manufacturer_id: 335, product_id: 21558, product_type_id: 21570}} ==
+               Grizzly.send_command(conn, ManufacturerSpecificGet, seq_number: 0x01)
     end
   end
 
