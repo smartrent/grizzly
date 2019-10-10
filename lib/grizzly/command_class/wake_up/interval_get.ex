@@ -80,7 +80,7 @@ defmodule Grizzly.CommandClass.WakeUp.IntervalGet do
           value: %{seconds: seconds, node_id: node_id}
         }
       }) do
-    {:done, %{seconds: seconds, node_id: node_id}}
+    {:done, {:ok, %{seconds: seconds, node_id: node_id}}}
   end
 
   def handle_response(command, _) do

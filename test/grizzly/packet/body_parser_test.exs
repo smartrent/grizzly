@@ -243,7 +243,9 @@ defmodule Grizzly.Packet.BodyParser.Test do
         0x07,
         # reserved
         0x00::size(5),
-        # device id type is Hex
+        # device_id_type
+        0x01::size(3),
+        # Hex format
         0x01::size(3),
         # device id data length is 2
         0x02::size(5),
@@ -267,6 +269,8 @@ defmodule Grizzly.Packet.BodyParser.Test do
         0x07,
         # reserved
         0x00::size(5),
+        # device_id_type
+        0x01::size(3),
         # device id type is UTF
         0x00::size(3),
         # device id data length is 2
@@ -281,7 +285,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert parsed == %{
                command_class: :manufacturer_specific,
                command: :device_specific_report,
-               value: %{device_id_type: :oem_factory_default_device_id_type, device_id: "PQ"}
+               value: %{device_id_type: :serial_number, device_id: "PQ"}
              }
     end
   end
