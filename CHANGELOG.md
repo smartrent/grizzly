@@ -1,5 +1,13 @@
 ## Changelog
 
+### v0.6.1
+
+* Enhancements
+  * Update commands `IntervalGet` and `ManufacturerSpecificGet` to be more
+    consistent 
+  * Better handling of invalid `ManufacturerSpecific` info received from
+    devices
+
 ### v0.6.0
 
 Changed `Grizzly.CommandClass.CommandClassVersion` to `Grizzly.CommandClass.Version`
