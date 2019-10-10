@@ -44,7 +44,7 @@ defmodule Grizzly.CommandClass.WakeUp.IntervalGetTest do
     {:ok, command} = IntervalGet.init([])
     packet = Packet.new(body: report)
 
-    assert {:done, %{seconds: 1, node_id: 10}} ==
+    assert {:done, {:ok, %{seconds: 1, node_id: 10}}} ==
              IntervalGet.handle_response(command, packet)
   end
 
