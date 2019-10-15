@@ -15,19 +15,12 @@ case "$1" in
       rm -f $ROUTING_PID
     fi
 
-    sh -c "for i in 1 2 3 4 5 6; do
-               if [ \$i -gt 5 ]; then
-                 echo \"Failed to start tunnel script\"
-                 kill -9 \$PPID
-                 exit -1
-               fi;
-
+    sh -c "while true; do
+               $PIDOF zipgateway || break;
                ip -6 route del $HANPREFIX > /dev/null 2>&1
                ip -6 route add $HANPREFIX via $LANIP dev $TUNDEV > /dev/null 2>&1
-
                if [ \$? -eq 2 ]; then
-                   echo \"Failed adding tunnel routes. Attempt \$i\"
-                   sleep 2;
+                   sleep 5;
                    continue;
                else
                    break;
