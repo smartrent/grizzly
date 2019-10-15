@@ -3,6 +3,8 @@
 # This script brings the tuntap interface up and routes the
 # Z-Wave PAN via the Z-Wave gateway's IP address.
 
+ZIPGATEWAY_PID=$PPID
+
 ROUTING_PID="/tmp/zipgateway.routing.pid"
 
 case "$1" in
@@ -18,8 +20,8 @@ case "$1" in
     sh -c "for i in 1 2 3 4 5 6; do
                if [ \$i -gt 5 ]; then
                  echo \"Failed to start tunnel script\"
-                 kill -9 \$PPID
-                 exit -1
+                 kill -9 \$ZIPGATEWAY_PID
+                 exit 1
                fi;
 
                ip -6 route del $HANPREFIX > /dev/null 2>&1
