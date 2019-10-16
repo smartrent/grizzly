@@ -1,5 +1,11 @@
 ## Changelog
 
+## v0.6.2
+
+* Enhancements
+  * Remove the dependence on `pidof` allowing `grizzly` to work on any nerves
+    device without the need of `busybox`
+
 ### v0.6.1
 
 * Enhancements
