@@ -39,7 +39,7 @@ defmodule Grizzly.Application do
          [
            "/usr/sbin/zipgateway",
            ["-c", Path.join(priv_dir, "zipgateway.cfg"), "-s", serial_port],
-           [cd: priv_dir, log_output: :debug, env: [{"PIDOF", get_pidof_command()}]]
+           [cd: priv_dir, log_output: :debug]
          ]}
       ] ++ children_list
     else
@@ -77,10 +77,6 @@ defmodule Grizzly.Application do
       true -> :ok
       false -> :no_run_zipgateway_bin
     end
-  end
-
-  defp get_pidof_command() do
-    Application.get_env(:grizzly, :pidof_bin, "pidof")
   end
 
   defp get_grizzly_config() do
