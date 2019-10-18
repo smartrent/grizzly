@@ -277,6 +277,7 @@ defmodule Grizzly.CommandClass.Mappings do
           command_class_name() | command_class_unk()
   def command_from_byte(0x25, 0x01), do: :set
   def command_from_byte(0x25, 0x02), do: :get
+  def command_from_byte(0x25, 0x03), do: :switch_binary_report
   def command_from_byte(0x31, 0x05), do: :sensor_multilevel_report
   def command_from_byte(0x32, 0x02), do: :meter_report
   def command_from_byte(0x34, 0x02), do: :node_add_status
@@ -284,7 +285,9 @@ defmodule Grizzly.CommandClass.Mappings do
   def command_from_byte(0x43, 0x03), do: :thermostat_setpoint_report
   def command_from_byte(0x52, 0x01), do: :node_list_get
   def command_from_byte(0x52, 0x03), do: :node_info_cache
+  def command_from_byte(0x5A, 0x01), do: :device_rest_locally_notification
   def command_from_byte(0x69, 0x03), do: :mailbox_configuration_report
+  def command_from_byte(0x71, 0x05), do: :zwave_alarm_event
   def command_from_byte(0x72, 0x04), do: :manufacturer_specific_get
   def command_from_byte(0x72, 0x05), do: :manufacturer_specific_report
   def command_from_byte(0x80, 0x02), do: :get

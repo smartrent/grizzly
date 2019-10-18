@@ -1117,4 +1117,65 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert BodyParser.parse(bytes) == expected_report
     end
   end
+
+  describe "test association group information reports" do
+    test "parse group name report" do
+      bytes =
+        <<0x59, 0x02, 0x02, 0x23, 0x4F, 0x6E, 0x2F, 0x4F, 0x66, 0x66, 0x20, 0x63, 0x6F, 0x6E,
+          0x74, 0x72, 0x6F, 0x6C, 0x20, 0x28, 0x49, 0x6E, 0x64, 0x6F, 0x6F, 0x72, 0x20, 0x74,
+          0x65, 0x6D, 0x70, 0x65, 0x72, 0x61, 0x74, 0x75, 0x72, 0x65, 0x29>>
+
+      expected_report = %{
+        command_class: :association_group_info,
+        command: :group_name_report,
+        value: %{
+          group: 2,
+          name: "On/Off control (Indoor temperature)"
+        }
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+
+    test "parse groups info report" do
+      bytes =
+        <<0x59, 0x04, 0x01::size(1), 0x01::size(1), 0x02::size(6), 0x01, 0x00, 0x00, 0x01, 0x00,
+          0x00, 0x00, 0x02, 0x00, 0x20, 0x01, 0x00, 0x00, 0x00>>
+
+      expected_report = %{
+        command_class: :association_group_info,
+        command: :groups_info_report,
+        value: %{
+          dynamic: true,
+          groups_info: [
+            %{group: 1, profile: :general_lifeline},
+            %{group: 2, profile: :control_key_1}
+          ]
+        }
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+
+    #     left:  value: %{group: 2, command_list: [%{command_class: :association, command: :unknown}, %{command_class: :battery, command: :zensor_net}, %{command: :unknown, command_class: :unknown}]}}
+    #     right: value: %{group: 2, command_list: [%{command_class: :association, command: :set}, %{command_class: :battery, command: :get}, %{command: :unknown, command_class: :unknown}]}}
+    test "parse group command class report" do
+      bytes = <<0x59, 0x06, 0x02, 0x03, 0x85, 0x01, 0x80, 0x02, 0xF1, 0x10, 0x01>>
+
+      expected_report = %{
+        command_class: :association_group_info,
+        command: :group_command_list_report,
+        value: %{
+          group: 2,
+          command_list: [
+            %{command_class: :association, command: :set},
+            %{command_class: :battery, command: :get},
+            %{command_class: :F1, command: :"10"}
+          ]
+        }
+      }
+
+      assert BodyParser.parse(bytes) == expected_report
+    end
+  end
 end

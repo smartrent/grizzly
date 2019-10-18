@@ -63,6 +63,7 @@ defmodule Grizzly.MixProject do
         "Command Classes": [
           Grizzly.CommandClass,
           Grizzly.CommandClass.Association,
+          Grizzly.CommandClass.AssociationGroupInfo,
           Grizzly.CommandClass.Basic,
           Grizzly.CommandClass.Battery,
           Grizzly.CommandClass.CommandClassVersion,
@@ -101,6 +102,9 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.Association.Remove,
           Grizzly.CommandClass.Association.Set,
           Grizzly.CommandClass.Association.SupportedGroupingsGet,
+          Grizzly.CommandClass.AssociationGroupInfo.GroupNameGet,
+          Grizzly.CommandClass.AssociationGroupInfo.GroupInfoGet,
+          Grizzly.CommandClass.AssociationGroupInfo.GroupCommandListGet,
           Grizzly.CommandClass.Basic.Get,
           Grizzly.CommandClass.Basic.Set,
           Grizzly.CommandClass.Battery.Get,
