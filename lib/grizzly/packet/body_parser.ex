@@ -27,6 +27,7 @@ defmodule Grizzly.Packet.BodyParser do
 
   alias Grizzly.CommandClass.{
     Association,
+    AssociationGroupInfo,
     Battery,
     Configuration,
     DoorLock,
@@ -879,6 +880,40 @@ defmodule Grizzly.Packet.BodyParser do
       command_class: :multi_channel_association,
       command: :multi_channel_association_groupings_report,
       value: supported_groupings
+    }
+  end
+
+  def parse(<<0x59, 0x02, group::size(8), name_length::size(8), name_bytes::binary>>) do
+    name = AssociationGroupInfo.decode_group_name(name_length, name_bytes)
+
+    %{
+      command_class: :association_group_info,
+      command: :group_name_report,
+      value: %{group: group, name: name}
+    }
+  end
+
+  def parse(
+        <<0x59, 0x04, _list_mode::size(1), dynamic_info::size(1), group_count::size(6),
+          encoded_groups_info::binary>>
+      ) do
+    groups_info = AssociationGroupInfo.decode_groups_info(group_count, encoded_groups_info)
+
+    %{
+      command_class: :association_group_info,
+      command: :groups_info_report,
+      value: %{groups_info: groups_info, dynamic: dynamic_info == 0x01}
+    }
+  end
+
+  def parse(<<0x59, 0x06, group::size(8), list_length::size(8), encoded_command_list::binary>>) do
+    group_command_list =
+      AssociationGroupInfo.decode_group_command_list(list_length, encoded_command_list)
+
+    %{
+      command_class: :association_group_info,
+      command: :group_command_list_report,
+      value: %{group: group, command_list: group_command_list}
     }
   end
 
