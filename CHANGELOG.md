@@ -1,5 +1,10 @@
 ## Changelog
 
+## v0.6.3
+
+* Enhancements
+  * Supports AssociationGroupInformation Command Class 
+
 ## v0.6.2
 
 * Enhancements
