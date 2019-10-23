@@ -28,3 +28,10 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 import_config "#{Mix.env()}.exs"
+
+
+config :grizzly,
+  serial_port: "/dev/tty.usbmodem2101"
+
+  config :grizzly,
+  zipgateway_path: "/Users/dave/Play/zip-gateway/Source/zipgateway-2.81.03-Source/usr/local/build/zipgateway"
