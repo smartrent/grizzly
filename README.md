@@ -155,10 +155,10 @@ please contact us if you any troubles.
 
 #### Connecting zipgateway to Grizzly
 
-`zipgateway` runs as a separate server, accessed over a TCP connection. Grizzly
-will automatically start this server. It assumes the executable is in
-`/usr/sbin/zipgateway`. If this is not the case, you can specify the actual
-location with
+`zipgateway` runs as a separate server, accessed over a DTLS (UDP over SSL)
+connection. Grizzly will automatically start this server. It assumes the
+executable is in `/usr/sbin/zipgateway`. If this is not the case, you can
+specify the actual location with
 
 ```elixir
 config :grizzly,

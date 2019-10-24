@@ -83,6 +83,11 @@ defmodule Grizzly.Application do
     )
   end
 
+  defp check_for_tuntap({:unix, _}) do
+    _unused = System.cmd("modprobe", ["tun"])
+  end
+
+
   defp find_zip_gateway do
     path = Application.get_env(:grizzly, :zipgateway_path, "/usr/sbin/zipgateway")
     case File.stat(path) do
@@ -101,10 +106,6 @@ defmodule Grizzly.Application do
         # could check the mode, but not really worth it
         path
     end
-  end
-
-  defp check_for_tuntap({:unix, _}) do
-    _unused = System.cmd("modprobe", ["tun"])
   end
 
   defp get_serial_port() do
