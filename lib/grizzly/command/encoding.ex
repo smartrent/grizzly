@@ -11,12 +11,14 @@ defmodule Grizzly.Command.Encoding do
           | [specs]
           | {:encode_with, atom}
           | {:encode_with, atom, atom}
+          | {:encode_in_context_with, atom, atom}
           | {:range, integer, integer}
           | %{required(atom) => specs}
   @type spec ::
           :byte
           | :byte
           | :integer
+          | :positive_integer
           | :binary
           | :bit
           | {sizable, size}
@@ -75,6 +77,10 @@ defmodule Grizzly.Command.Encoding do
   end
 
   defp validate_arg(:integer, value, _command) when is_integer(value) do
+    {:ok, value}
+  end
+
+  defp validate_arg(:positive_integer, value, _command) when is_integer(value) and value >= 0 do
     {:ok, value}
   end
 
@@ -188,6 +194,10 @@ defmodule Grizzly.Command.Encoding do
 
   defp validate_arg({:encode_with, module, encode_method}, value, _command) do
     apply(module, encode_method, [value])
+  end
+
+  defp validate_arg({:encode_in_context_with, module, encode_method}, value, command) do
+    apply(module, encode_method, [value, Map.from_struct(command)])
   end
 
   defp validate_arg(_spec, value, _command) do

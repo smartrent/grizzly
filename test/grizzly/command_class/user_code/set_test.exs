@@ -15,7 +15,7 @@ defmodule Grizzly.CommandClass.UserCode.Set.Test do
         Set.init(
           slot_id: 1,
           slot_status: :occupied,
-          user_code: [1, 2, 3, 4],
+          user_code: "1234",
           seq_number: 10
         )
 
@@ -30,11 +30,11 @@ defmodule Grizzly.CommandClass.UserCode.Set.Test do
         Set.init(
           slot_id: 1,
           slot_status: :occupied,
-          user_code: [1, 2, 3, 4, :blue],
+          user_code: "1234Z",
           seq_number: 10
         )
 
-      error = EncodeError.new({:invalid_argument_value, :user_code, [1, 2, 3, 4, :blue], Set})
+      error = EncodeError.new({:invalid_argument_value, :user_code, "1234Z", Set})
 
       assert {:error, error} == Set.encode(command)
     end
