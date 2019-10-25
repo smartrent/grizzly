@@ -18,9 +18,9 @@ defmodule Grizzly.CommandClass.UserCode.Get.Test do
     end
 
     test "encodes incorrectly" do
-      {:ok, command} = Get.init(seq_number: 10, slot_id: :blue)
+      {:ok, command} = Get.init(seq_number: 10, slot_id: 0)
 
-      error = EncodeError.new({:invalid_argument_value, :slot_id, :blue, Get})
+      error = EncodeError.new({:invalid_argument_value, :slot_id, 0, Get})
 
       assert {:error, error} == Get.encode(command)
     end

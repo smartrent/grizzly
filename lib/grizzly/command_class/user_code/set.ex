@@ -31,7 +31,7 @@ defmodule Grizzly.CommandClass.UserCode.Set do
           | {:seq_number, Grizzly.seq_number()}
           | {:retries, non_neg_integer()}
 
-  defstruct slot_id: nil, slot_status: nil, user_code: [], seq_number: nil, retries: 2
+  defstruct slot_id: nil, slot_status: nil, user_code: nil, seq_number: nil, retries: 2
 
   @spec init([opt]) :: {:ok, t}
   def init(opts) do
@@ -39,16 +39,18 @@ defmodule Grizzly.CommandClass.UserCode.Set do
   end
 
   @spec encode(t) :: {:ok, binary} | {:error, EncodeError.t()}
-  def encode(%__MODULE__{user_code: _user_code, slot_status: _slot_status} = command) do
+  def encode(
+        %__MODULE__{slot_id: _slot_id, user_code: _user_code, slot_status: _slot_status} = command
+      ) do
     with {:ok, encoded} <-
            Encoding.encode_and_validate_args(command, %{
-             user_code: {:encode_with, UserCode, :encode_user_code},
-             slot_status: {:encode_with, UserCode, :encode_status}
+             slot_id: :positive_integer,
+             user_code: {:encode_in_context_with, UserCode, :encode_user_code},
+             slot_status: {:encode_in_context_with, UserCode, :encode_status}
            }) do
       binary =
         Packet.header(command.seq_number) <>
-          <<0x63, 0x01, command.slot_id, encoded.slot_status>> <>
-          :erlang.list_to_binary(encoded.user_code)
+          <<0x63, 0x01, command.slot_id, encoded.slot_status>> <> encoded.user_code
 
       {:ok, binary}
     end
