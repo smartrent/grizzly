@@ -43,7 +43,7 @@ user manual.
 
 However, if your device is using S2 security you will need to use `Grizzly.add_node/1`.
 
-If you are using `s2_unauthenticated` this is call you will want to make:
+If you are using `s2_unauthenticated` this is the call you will want to make:
 
 ```elixir
 iex> Grizzly.add_node(s2_keys: [:s2_unauthenticated])
@@ -107,10 +107,10 @@ iex> Grizzly.send_command(12, Grizzly.CommandClass.DoorLock.OperationSet, mode: 
 
 However, this is slower in general and is only recommended for quick one off
 command sending. If you're building a long running application the first
-example is recommend along with storing the connected device to keep the
+example is recommended along with storing the connected device to keep the
 connection alive for faster response times.
 
-see the `Grizzly` module docs for more details about `Grizzly.send_command`
+See the `Grizzly` module docs for more details about `Grizzly.send_command`
 
 ## Configuration
 
@@ -139,11 +139,11 @@ config :grizzly,
 First download the [Z/IP GW SDK](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk) from Silicon Labs.
 
 For this you will need to make a free account with Silicon Labs. The default binaries that come
-with the download will not work by default in Nerves system, so you will need to compile the source
+with the download will not work by default in a Nerves system, so you will need to compile the source
 for your target. The source code can be found in the `Source` directory.
 
 This can be tricky and the instructions are a work in progress, so for now please contact
-us if you any troubles.
+us if you have any issues.
 
 ## Resources
 
