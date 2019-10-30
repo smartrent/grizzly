@@ -124,6 +124,7 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.MultiChannelAssociation.Set,
           Grizzly.CommandClass.MultiChannelAssociation.SupportedGroupingsGet,
           Grizzly.CommandClass.NetworkManagementBasic.DefaultSet,
+          Grizzly.CommandClass.NetworkManagementBasic.DSKGet,
           Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet,
           Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd,
           Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet,

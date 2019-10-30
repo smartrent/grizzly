@@ -173,6 +173,15 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(<<0x4D, 0x09, seq_no, report::binary>>) do
+    %{
+      command_class: NetworkManagementBasic,
+      command: :dsk_report,
+      seq_no: seq_no,
+      report: NetworkManagementBasic.decode_dsk_report(report)
+    }
+  end
+
   def parse(<<0x52, 0x02, seq_no, status, _controller_id, node_list::binary>>) do
     %{
       command_class: :network_management_proxy,

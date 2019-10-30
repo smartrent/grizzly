@@ -316,6 +316,38 @@ defmodule Grizzly.Packet.BodyParser.Test do
              }
     end
 
+    test "parses the dsk report for add mode" do
+      dsk = <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>
+      binary = <<0x4D, 0x09, 0x00, 0x01>> <> dsk
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: NetworkManagementBasic,
+               command: :dsk_report,
+               seq_no: 0x00,
+               report: %{
+                 dsk: "00258-00772-01286-01800-02314-02828-03342-03856",
+                 add_mode: :add
+               }
+             }
+    end
+
+    test "parses the dsk report for learn mode" do
+      dsk = <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>
+      binary = <<0x4D, 0x09, 0x00, 0x00>> <> dsk
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: NetworkManagementBasic,
+               command: :dsk_report,
+               seq_no: 0x00,
+               report: %{
+                 dsk: "00258-00772-01286-01800-02314-02828-03342-03856",
+                 add_mode: :learn
+               }
+             }
+    end
+
     test "parses controller learn mode set with status done and new node id 10" do
       binary = <<0x4D, 0x02, 0x01, 0x06, 0x00, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0>>
       parsed = BodyParser.parse(binary)
