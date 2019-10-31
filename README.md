@@ -171,6 +171,58 @@ this is loaded as it starts.
 If you want to run tests without running the `zipgateway` binary provided by Silicon Labs you
 can configure `run_zipgateway_bin` to be `false`:
 
+
+```elixir
+config :grizzly,
+  run_zipgateway_bin: false
+```
+
+#### Configuring zipgateway
+
+The `zipgateway` binary is passed a configuration file named `zipgateway.cfg`.
+This has configuration parameters around networking and setting device specific
+information. Most of these configuration settings are static, so Grizzly can
+handle those for you in a reliable way. However, there are few exposed
+configuration options to allow some customization around device specific
+information, logging, and network interface set up.
+
+Supported configuration fields are:
+
+* `:tun_script` - a path to the `.tun` script (default priv dir of Grizzly)
+* `:manufacturer_id`: Id to set in the version report (default `0`)
+* `:hardware_version` - Hardware version to set in the version report (default `1`)
+* `:product_id` - Id to set in the version report (default `1`)
+* `:product_type` - Id to set in the version report (default `1`)
+* `:serial_log` - Log file for serial communication. Used for debugging. If this
+   option is not set the no logging is done (default none)
+
+For the most part if you are using Grizzly to run zipgateway the defaults should
+just work.
+
+When going through certification you will need provide some device specific
+information:
+
+```elixir
+config :grizzly,
+  zipgateway_cfg: %{
+    manufacturer_id: 0,
+    product_type: 1,
+    product_id: 1,
+    hardware_version: 1
+  }
+```
+
+The `manufacturer_id` will be given to you by Silicon Labs, and will default
+to `0`if not set (this is `zipgateway` level default). 
+
+The above fields have no impact on the Grizzly runtime, and are only useful for
+certification processes.
+
+When running `zipgateway` binary out side of Grizzly this configuration field is ignored
+and you will need to pass in the location to your configuration like so:
+
+`zipgateway -c /path/to/zipgateway.cfg`
+
 ## Resources
 
 * [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)

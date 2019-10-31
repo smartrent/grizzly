@@ -3,6 +3,8 @@ defmodule Grizzly.Application do
   use Application
   require Logger
 
+  alias Grizzly.ZipgatewayCfg
+
   def start(_type, _args) do
     children =
       [
@@ -30,7 +32,8 @@ defmodule Grizzly.Application do
 
   defp maybe_append_muontrap(children_list) do
     with :ok <- get_run_zipgateway_bin(),
-         {:ok, serial_port} <- get_serial_port() do
+         {:ok, serial_port} <- get_serial_port(),
+         {:ok, zipgateway_cfg_path} <- build_zipgateway_cfg() do
       priv_dir = :code.priv_dir(:grizzly) |> to_string()
       _ = check_for_tuntap(:os.type())
       zip_gateway_path = find_zip_gateway()
@@ -39,7 +42,7 @@ defmodule Grizzly.Application do
         {MuonTrap.Daemon,
          [
            zip_gateway_path,
-           ["-c", Path.join(priv_dir, "zipgateway.cfg"), "-s", serial_port],
+           ["-c", zipgateway_cfg_path, "-s", serial_port],
            [cd: priv_dir, log_output: :debug]
          ]}
       ] ++ children_list
@@ -135,5 +138,12 @@ defmodule Grizzly.Application do
       nil -> Grizzly.config()
       opts -> Grizzly.Conn.Config.new(opts)
     end
+  end
+
+  defp build_zipgateway_cfg() do
+    cfg_opts = Application.get_env(:grizzly, :zipgateway_cfg, %{})
+
+    ZipgatewayCfg.new(cfg_opts)
+    |> ZipgatewayCfg.write()
   end
 end
