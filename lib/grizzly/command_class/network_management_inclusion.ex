@@ -6,6 +6,8 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion do
   @type add_mode_byte :: 0x01 | 0x05 | 0x07
   @type remove_mode_byte :: 0x01 | 0x05
   @type csa_byte :: 0x00 | 0x02
+  @type failed_node_remove_report :: %{status: failed_node_remove_status, node_id: byte}
+  @type failed_node_remove_status :: :done | :failed_node_not_found | :failed_node_remove_fail
 
   @spec encode_add_mode(add_mode() | add_mode_byte()) ::
           {:ok, add_mode_byte()} | {:error, :invalid_arg, any()}
@@ -41,4 +43,9 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion do
   @spec decode_node_neighbor_update_status(0x22 | 0x23) :: node_neighbor_update_status
   def decode_node_neighbor_update_status(0x22), do: :done
   def decode_node_neighbor_update_status(0x23), do: :failed
+
+  @spec decode_failed_node_remove_status(0x00 | 0x01 | 0x02) :: failed_node_remove_status
+  def decode_failed_node_remove_status(0x00), do: :failed_node_not_found
+  def decode_failed_node_remove_status(0x01), do: :done
+  def decode_failed_node_remove_status(0x02), do: :failed_node_remove_fail
 end

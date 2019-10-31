@@ -225,6 +225,30 @@ defmodule Grizzly.Packet.BodyParser.Test do
            }
   end
 
+  test "failed node remove status failure" do
+    removal_failed = <<0x34, 0x08, 0x06, 0x00, 0x02>>
+
+    parsed = BodyParser.parse(removal_failed)
+
+    assert parsed == %{
+             command_class: :network_management_inclusion,
+             command: :failed_node_remove_status,
+             value: %{node_id: 2, status: :failed_node_not_found}
+           }
+  end
+
+  test "failed node remove status done" do
+    removal_failed = <<0x34, 0x08, 0x06, 0x01, 0x02>>
+
+    parsed = BodyParser.parse(removal_failed)
+
+    assert parsed == %{
+             command_class: :network_management_inclusion,
+             command: :failed_node_remove_status,
+             value: %{node_id: 2, status: :done}
+           }
+  end
+
   describe "parses manufacture reports" do
     test "parses manufacture specific report" do
       manufacture_specific_report = <<0x72, 0x05, 0x12, 0x34, 0x56, 0x78, 0x00, 0x01>>
