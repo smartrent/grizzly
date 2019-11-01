@@ -1,5 +1,11 @@
 ## Changelog
 
+## v0.6.4
+
+* Enhancements
+  * Validation of UserCode arguments to help ensure usage of Grizzly
+    follows the Z-Wave specification
+
 ## v0.6.3
 
 * Enhancements

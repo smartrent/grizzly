@@ -36,7 +36,7 @@ defmodule Grizzly.CommandClass.UserCode.Get do
   def encode(%__MODULE__{seq_number: seq_number, slot_id: slot_id} = command) do
     with {:ok, _encoded} <-
            Encoding.encode_and_validate_args(command, %{
-             slot_id: :byte
+             slot_id: {:range, 1, 255}
            }) do
       binary = Packet.header(seq_number) <> <<0x63, 0x02, slot_id>>
 

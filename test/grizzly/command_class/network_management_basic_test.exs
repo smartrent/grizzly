@@ -23,4 +23,42 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic.Test do
       assert :busy == NetworkManagementBasic.decode_default_set_status(0x07)
     end
   end
+
+  describe "decoding DSK report" do
+    test "decode full report when add mode is learn" do
+      dsk = <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>
+      report_binary = <<0x00>> <> dsk
+
+      expected_report = %{
+        add_mode: :learn,
+        dsk: "00258-00772-01286-01800-02314-02828-03342-03856"
+      }
+
+      assert expected_report == NetworkManagementBasic.decode_dsk_report(report_binary)
+    end
+
+    test "decode full report when add mode is add" do
+      dsk = <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>
+      report_binary = <<0x01>> <> dsk
+
+      expected_report = %{
+        add_mode: :add,
+        dsk: "00258-00772-01286-01800-02314-02828-03342-03856"
+      }
+
+      assert expected_report == NetworkManagementBasic.decode_dsk_report(report_binary)
+    end
+
+    test "decode add mode learn from byte" do
+      byte = 0b1101_1100
+
+      assert :learn == NetworkManagementBasic.add_mode_from_byte(byte)
+    end
+
+    test "decode add mode add from byte" do
+      byte = 0b1101_1101
+
+      assert :add == NetworkManagementBasic.add_mode_from_byte(byte)
+    end
+  end
 end

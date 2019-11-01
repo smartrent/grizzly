@@ -225,6 +225,30 @@ defmodule Grizzly.Packet.BodyParser.Test do
            }
   end
 
+  test "failed node remove status failure" do
+    removal_failed = <<0x34, 0x08, 0x06, 0x00, 0x02>>
+
+    parsed = BodyParser.parse(removal_failed)
+
+    assert parsed == %{
+             command_class: :network_management_inclusion,
+             command: :failed_node_remove_status,
+             value: %{node_id: 2, status: :failed_node_not_found}
+           }
+  end
+
+  test "failed node remove status done" do
+    removal_failed = <<0x34, 0x08, 0x06, 0x01, 0x02>>
+
+    parsed = BodyParser.parse(removal_failed)
+
+    assert parsed == %{
+             command_class: :network_management_inclusion,
+             command: :failed_node_remove_status,
+             value: %{node_id: 2, status: :done}
+           }
+  end
+
   describe "parses manufacture reports" do
     test "parses manufacture specific report" do
       manufacture_specific_report = <<0x72, 0x05, 0x12, 0x34, 0x56, 0x78, 0x00, 0x01>>
@@ -313,6 +337,38 @@ defmodule Grizzly.Packet.BodyParser.Test do
                command: :default_set_complete,
                seq_no: 0x01,
                status: :done
+             }
+    end
+
+    test "parses the dsk report for add mode" do
+      dsk = <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>
+      binary = <<0x4D, 0x09, 0x00, 0x01>> <> dsk
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: NetworkManagementBasic,
+               command: :dsk_report,
+               seq_no: 0x00,
+               report: %{
+                 dsk: "00258-00772-01286-01800-02314-02828-03342-03856",
+                 add_mode: :add
+               }
+             }
+    end
+
+    test "parses the dsk report for learn mode" do
+      dsk = <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>
+      binary = <<0x4D, 0x09, 0x00, 0x00>> <> dsk
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: NetworkManagementBasic,
+               command: :dsk_report,
+               seq_no: 0x00,
+               report: %{
+                 dsk: "00258-00772-01286-01800-02314-02828-03342-03856",
+                 add_mode: :learn
+               }
              }
     end
 

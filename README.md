@@ -43,7 +43,7 @@ user manual.
 
 However, if your device is using S2 security you will need to use `Grizzly.add_node/1`.
 
-If you are using `s2_unauthenticated` this is call you will want to make:
+If you are using `s2_unauthenticated` this is the call you will want to make:
 
 ```elixir
 iex> Grizzly.add_node(s2_keys: [:s2_unauthenticated])
@@ -107,10 +107,10 @@ iex> Grizzly.send_command(12, Grizzly.CommandClass.DoorLock.OperationSet, mode: 
 
 However, this is slower in general and is only recommended for quick one off
 command sending. If you're building a long running application the first
-example is recommend along with storing the connected device to keep the
+example is recommended along with storing the connected device to keep the
 connection alive for faster response times.
 
-see the `Grizzly` module docs for more details about `Grizzly.send_command`
+See the `Grizzly` module docs for more details about `Grizzly.send_command`
 
 ## Z-Wave Bridge Configuration
 
@@ -170,12 +170,6 @@ this is loaded as it starts.
 
 If you want to run tests without running the `zipgateway` binary provided by Silicon Labs you
 can configure `run_zipgateway_bin` to be `false`:
-
-```elixir
-config :grizzly,
-  run_zipgateway_bin: false
-```
-
 
 ## Resources
 

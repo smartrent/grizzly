@@ -4,7 +4,7 @@ defmodule Grizzly.MixProject do
   def project do
     [
       app: :grizzly,
-      version: "0.6.3",
+      version: "0.6.4",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -124,6 +124,7 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.MultiChannelAssociation.Set,
           Grizzly.CommandClass.MultiChannelAssociation.SupportedGroupingsGet,
           Grizzly.CommandClass.NetworkManagementBasic.DefaultSet,
+          Grizzly.CommandClass.NetworkManagementBasic.DSKGet,
           Grizzly.CommandClass.NetworkManagementBasic.LearnModeSet,
           Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd,
           Grizzly.CommandClass.NetworkManagementInclusion.NodeAddDSKSet,

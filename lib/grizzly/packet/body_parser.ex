@@ -155,6 +155,17 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(<<0x34, 0x08, _seq_no, status_byte, node_id>>) do
+    %{
+      command_class: :network_management_inclusion,
+      command: :failed_node_remove_status,
+      value: %{
+        node_id: node_id,
+        status: NetworkManagementInclusion.decode_failed_node_remove_status(status_byte)
+      }
+    }
+  end
+
   def parse(<<0x4D, 0x07, seq_no, status>>) do
     %{
       command_class: NetworkManagementBasic,
@@ -170,6 +181,15 @@ defmodule Grizzly.Packet.BodyParser do
       command: :learn_mode_set_status,
       seq_no: seq_no,
       report: NetworkManagementBasic.decode_learn_mode_set_status(status, new_node_id)
+    }
+  end
+
+  def parse(<<0x4D, 0x09, seq_no, report::binary>>) do
+    %{
+      command_class: NetworkManagementBasic,
+      command: :dsk_report,
+      seq_no: seq_no,
+      report: NetworkManagementBasic.decode_dsk_report(report)
     }
   end
 
