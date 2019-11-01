@@ -31,13 +31,14 @@ defmodule Grizzly.Application do
   defp maybe_append_muontrap(children_list) do
     with :ok <- get_run_zipgateway_bin(),
          {:ok, serial_port} <- get_serial_port() do
-      priv_dir = :code.priv_dir(:grizzly) |> to_string()
-      _ = System.cmd("modprobe", ["tun"])
 
+      priv_dir = :code.priv_dir(:grizzly) |> to_string()
+      check_for_tuntap(:os.type())
+      zip_gateway_path = find_zip_gateway()
       [
         {MuonTrap.Daemon,
          [
-           "/usr/sbin/zipgateway",
+           zip_gateway_path,
            ["-c", Path.join(priv_dir, "zipgateway.cfg"), "-s", serial_port],
            [cd: priv_dir, log_output: :debug]
          ]}
@@ -62,6 +63,48 @@ defmodule Grizzly.Application do
 
       :no_run_zipgateway_bin ->
         children_list
+    end
+  end
+
+  defp check_for_tuntap({:unix, :darwin}) do
+    System.cmd("kextstat", [ "-b", "net.sf.tuntaposx.tap" ])
+    |> elem(0)
+    |> String.contains?("net.sf.tuntaposx.tap")
+    |> case do: (
+      true ->
+        ; # all OK
+      _ ->
+        msg = """
+        The kernel extension tuntab does not appear to be loaded. You
+        can install it using `brew cask install tuntap`.
+        """
+        Logger.error(msg)
+        raise(msg)
+    )
+  end
+
+  defp check_for_tuntap({:unix, _}) do
+    _unused = System.cmd("modprobe", ["tun"])
+  end
+
+
+  defp find_zip_gateway do
+    path = Application.get_env(:grizzly, :zipgateway_path, "/usr/sbin/zipgateway")
+    case File.stat(path) do
+      { :error, posix } ->
+        msg = """
+        Cannot find the zipgateway executable (looked for it at #{inspect path}.
+
+        If it is located somewhere else, please update the config:
+
+            config :grizzly,
+              zipgateway_path: "«path»"
+        """
+        Logger.error(msg)
+        raise(msg)
+      { :ok, _stat } ->
+        # could check the mode, but not really worth it
+        path
     end
   end
 

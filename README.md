@@ -89,7 +89,7 @@ Additional Z-Wave docs can be found at [Silicon Labs](https://www.silabs.com/pro
 
 Say you have added a door lock to your Z-Wave controller that has the id of `12`, now
 you want to unlock it. There are three steps to this process: get the node from the
-Z-Wave network, connect to the node, and then send Z-Wave commands to it. 
+Z-Wave network, connect to the node, and then send Z-Wave commands to it.
 
 ```elixir
 iex> {:ok, lock} = Grizzly.get_node(12)
@@ -112,40 +112,65 @@ connection alive for faster response times.
 
 See the `Grizzly` module docs for more details about `Grizzly.send_command`
 
-## Configuration
+## Z-Wave Bridge Configuration
 
-Different systems will use different serial ports to talk to the Z-Wave controller.
-In order to configure this, there is a `serial_port` option. Below is an example
-for the Raspberry PI 3:
+Grizzly defers the low-level Z-Wave protocol handling to a combination of third
+party software and hardware. The software is silicon Labs' `zipgateway` and the
+hardware is a Silicon Labs Z-Wave bridge.
+
+This has a major advantage over using a regular Z-Wave stick such as the Aeon
+product: the Silicon Labs bridge contains the proprietary Z-Wave stack that
+properly handles the different security levels required by devices such as door
+locks. This makes Grizzly more responsive and reliable.
+
+### Configure the Z-Wave Bridge
+
+Different systems will use different serial ports to talk to the Z-Wave
+bridge. In order to configure this, there is a `serial_port` option. Below
+is an example for the Raspberry PI 3:
 
 ```elixir
 config :grizzly,
   serial_port: "/dev/ttyACM0"
 ```
 
-If you are using a base nerves system please see the documentation for your particular
-system at the [Nerves Project](https://github.com/nerves-project) github page.
+If you are using a base nerves system please see the documentation for your
+particular system at the [Nerves Project](https://github.com/nerves-project)
+github page.
+
+
+### Compile and Configure zipgateway
+
+First download the [Z/IP GW
+SDK](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
+from Silicon Labs. You'll need to create an account with them to do this, but
+the download is free.
+
+The default binaries that come with the download will not work by default in
+Nerves system, so you will need to compile the source for your target. The
+source code can be found in the `Source` directory.
+
+This can be tricky and the instructions are a work in progress, so for now
+please contact us if you any troubles.
+
+#### Connecting zipgateway to Grizzly
+
+`zipgateway` runs as a separate server, accessed over a DTLS (UDP over SSL)
+connection. Grizzly will automatically start this server. It assumes the
+executable is in `/usr/sbin/zipgateway`. If this is not the case, you can
+specify the actual location with
+
+```elixir
+config :grizzly,
+  zipgateway_path: "«path»"
+```
+
+Grizzly uses the `taptun` module to manage the TCP connection: it checks that
+this is loaded as it starts.
 
 If you want to run tests without running the `zipgateway` binary provided by Silicon Labs you
 can configure `run_zipgateway_bin` to be `false`:
 
-```elixir
-config :grizzly,
-  run_zipgateway_bin: false
-```
-
-## Compiling zipgateway
-
-First download the [Z/IP GW SDK](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk) from Silicon Labs.
-
-For this you will need to make a free account with Silicon Labs. The default binaries that come
-with the download will not work by default in a Nerves system, so you will need to compile the source
-for your target. The source code can be found in the `Source` directory.
-
-This can be tricky and the instructions are a work in progress, so for now please contact
-us if you have any issues.
-
 ## Resources
 
 * [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)
-
