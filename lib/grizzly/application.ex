@@ -31,10 +31,10 @@ defmodule Grizzly.Application do
   defp maybe_append_muontrap(children_list) do
     with :ok <- get_run_zipgateway_bin(),
          {:ok, serial_port} <- get_serial_port() do
-
       priv_dir = :code.priv_dir(:grizzly) |> to_string()
-      check_for_tuntap(:os.type())
+      _ = check_for_tuntap(:os.type())
       zip_gateway_path = find_zip_gateway()
+
       [
         {MuonTrap.Daemon,
          [
@@ -67,19 +67,25 @@ defmodule Grizzly.Application do
   end
 
   defp check_for_tuntap({:unix, :darwin}) do
-    System.cmd("kextstat", [ "-b", "net.sf.tuntaposx.tap" ])
+    System.cmd("kextstat", ["-b", "net.sf.tuntaposx.tap"])
     |> elem(0)
     |> String.contains?("net.sf.tuntaposx.tap")
-    |> case do: (
-      true ->
-        ; # all OK
-      _ ->
-        msg = """
-        The kernel extension tuntab does not appear to be loaded. You
-        can install it using `brew cask install tuntap`.
-        """
-        Logger.error(msg)
-        raise(msg)
+    |> case(
+      # all OK
+      do:
+        (
+          true ->
+            nil
+
+          _ ->
+            msg = """
+            The kernel extension tuntab does not appear to be loaded. You
+            can install it using `brew cask install tuntap`.
+            """
+
+            _ = Logger.error(msg)
+            raise(msg)
+        )
     )
   end
 
@@ -87,22 +93,24 @@ defmodule Grizzly.Application do
     _unused = System.cmd("modprobe", ["tun"])
   end
 
-
   defp find_zip_gateway do
     path = Application.get_env(:grizzly, :zipgateway_path, "/usr/sbin/zipgateway")
+
     case File.stat(path) do
-      { :error, posix } ->
+      {:error, _posix} ->
         msg = """
-        Cannot find the zipgateway executable (looked for it at #{inspect path}.
+        Cannot find the zipgateway executable (looked for it at #{inspect(path)}.
 
         If it is located somewhere else, please update the config:
 
             config :grizzly,
               zipgateway_path: "«path»"
         """
-        Logger.error(msg)
+
+        _ = Logger.error(msg)
         raise(msg)
-      { :ok, _stat } ->
+
+      {:ok, _stat} ->
         # could check the mode, but not really worth it
         path
     end

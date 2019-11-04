@@ -106,7 +106,7 @@ defmodule Example do
     with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
          {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
          {:ok, heating_setpoint} <-
-           Grizzly.send_command(lock, ThermostatSetpoint.Get, type: :heating) do
+           Grizzly.send_command(thermostat, ThermostatSetpoint.Get, type: :heating) do
       heating_setpoint
     else
       error -> error
@@ -117,7 +117,7 @@ defmodule Example do
     with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
          {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
          {:ok, heating_setpoint} <-
-           Grizzly.send_command(lock, ThermostatSetpoint.Set, type: :heating, value: 78) do
+           Grizzly.send_command(thermostat, ThermostatSetpoint.Set, type: :heating, value: 78) do
       heating_setpoint
     else
       error -> error
@@ -128,7 +128,7 @@ defmodule Example do
     with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
          {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
          {:ok, cooling_setpoint} <-
-           Grizzly.send_command(lock, ThermostatSetpoint.Get, type: :cooling) do
+           Grizzly.send_command(thermostat, ThermostatSetpoint.Get, type: :cooling) do
       cooling_setpoint
     else
       error -> error
@@ -139,7 +139,7 @@ defmodule Example do
     with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
          {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
          {:ok, cooling_setpoint} <-
-           Grizzly.send_command(lock, ThermostatSetpoint.Set, type: :cooling, value: 76) do
+           Grizzly.send_command(thermostat, ThermostatSetpoint.Set, type: :cooling, value: 76) do
       cooling_setpoint
     else
       error -> error
