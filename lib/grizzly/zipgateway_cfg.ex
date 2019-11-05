@@ -44,10 +44,10 @@ defmodule Grizzly.ZipgatewayCfg do
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
   """
-  @spec new(keyword) :: t()
-  def new(opts \\ []) do
+  @spec new(map()) :: t()
+  def new(opts \\ %{}) do
     opts =
-      Keyword.take(opts, [
+      Map.take(opts, [
         :manufacturer_id,
         :hardware_version,
         :product_id,
