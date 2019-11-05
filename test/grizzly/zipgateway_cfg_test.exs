@@ -41,7 +41,7 @@ defmodule Grizzly.ZipgatewayCfgTest do
     ZipProductID = 1
     """
 
-    cfg = Grizzly.ZipgatewayCfg.new(product_id: 1)
+    cfg = Grizzly.ZipgatewayCfg.new(%{product_id: 1})
 
     assert output == Grizzly.ZipgatewayCfg.to_string(cfg)
   end
