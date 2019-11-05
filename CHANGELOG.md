@@ -1,5 +1,12 @@
 ## Changelog
 
+## v0.6.6
+
+* Fixes
+  * Application start failure when providing the correct
+    data structure to the `zipgateway_cfg` configuration
+    field
+
 ## v0.6.5
 
 * Enhancements
