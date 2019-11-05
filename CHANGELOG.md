@@ -1,5 +1,14 @@
 ## Changelog
 
+## v0.6.5
+
+* Enhancements
+  * Support `GetDSK` command
+  * Support `FailedNodeRemove` command
+  * Allow `zipgateway_path` configuration
+  * Generate the `zipgateway.cfg` to allow device specific
+    information to be passed into the `zipgateway` runtime.
+
 ## v0.6.4
 
 * Enhancements
