@@ -103,11 +103,13 @@ defmodule Grizzly.Network do
   @spec get_node(Node.node_id()) :: {:ok, Node.t()} | {:error, :nack_response}
   def get_node(node_id) do
     with {:ok, node_info} <- get_node_info(node_id),
-         {:ok, ip_address} <- Node.get_ip(node_id) do
+         {:ok, %{ip_address: ip_address, home_id: home_id}} <-
+           Node.get_network_information(node_id) do
       zw_node =
         node_info
         |> Map.put(:id, node_id)
         |> Map.put(:ip_address, ip_address)
+        |> Map.put(:home_id, home_id)
         |> Map.to_list()
         |> Node.new()
 

@@ -29,7 +29,8 @@ defmodule Grizzly.Node do
           conn: Conn.t() | nil,
           associations: [Association.t()],
           listening?: boolean(),
-          security: security()
+          security: security(),
+          home_id: pos_integer()
         }
 
   @enforce_keys [:id]
@@ -43,7 +44,8 @@ defmodule Grizzly.Node do
             associations: [],
             conn: nil,
             listening?: false,
-            security: :none
+            security: :none,
+            home_id: nil
 
   @spec new(opts :: keyword) :: t
   def new(opts \\ []) do
@@ -339,6 +341,34 @@ defmodule Grizzly.Node do
   end
 
   @doc """
+  Get the node network information like ip address and Z-Wave network
+  home id
+  """
+  @spec get_network_information(t() | node_id()) ::
+          {:ok, InvNodeSolicitation.report()} | {:error, any()}
+  def get_network_information(%__MODULE__{id: id}), do: get_network_information(id)
+
+  def get_network_information(node_id) do
+    seq_number = SeqNumber.get_and_inc()
+
+    command_result =
+      Grizzly.send_command(
+        Controller.conn(),
+        InvNodeSolicitation,
+        seq_number: seq_number,
+        node_id: node_id
+      )
+
+    case command_result do
+      {:ok, _report} = result ->
+        result
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  @doc """
   Initialize a node's command classes with the default version
   """
   @spec initialize_command_versions(t()) :: t()
@@ -356,19 +386,9 @@ defmodule Grizzly.Node do
   end
 
   defp do_get_ip(node_id) do
-    seq_number = SeqNumber.get_and_inc()
-
-    command_result =
-      Grizzly.send_command(
-        Controller.conn(),
-        InvNodeSolicitation,
-        seq_number: seq_number,
-        node_id: node_id
-      )
-
-    case command_result do
-      {:ok, {:node_ip, _, ip_address}} ->
-        {:ok, ip_address}
+    case get_network_information(node_id) do
+      {:ok, report} ->
+        {:ok, report.ip_address}
 
       {:error, _} = error ->
         error

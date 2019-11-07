@@ -19,7 +19,7 @@ defmodule Grizzly.Packet.Decode.Test do
                command_class: :zip_nd,
                command: :zip_node_advertisement,
                ip_address: {0xFD00, 0xBBBB, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0006},
-               home_id: <<0xDA, 0x23, 0xFE, 0x52>>,
+               home_id: 3_659_791_954,
                node_id: 0x06
              }
     end
