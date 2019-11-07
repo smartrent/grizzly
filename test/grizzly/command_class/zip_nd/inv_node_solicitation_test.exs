@@ -28,13 +28,14 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation.Test do
         command_class: :zip_nd,
         command: :zip_node_advertisement,
         node_id: 0x02,
-        ip_address: {0, 0, 0, 0}
+        ip_address: {0, 0, 0, 0},
+        home_id: 123
       }
 
       {:ok, command} = InvNodeSolicitation.init(node_id: 0x02)
       packet = Packet.new(body: report)
 
-      assert {:done, {:ok, {:node_ip, 0x02, {0, 0, 0, 0}}}} ==
+      assert {:done, {:ok, Map.drop(report, [:command_class, :command])}} ==
                InvNodeSolicitation.handle_response(command, packet)
     end
 

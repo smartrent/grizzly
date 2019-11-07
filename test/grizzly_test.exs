@@ -36,8 +36,8 @@ defmodule Grizzly.Test do
     end
 
     test "send raw command class", %{conn: conn} do
-      {:ok, {:node_ip, 6, {64768, 48059, 0, 0, 0, 0, 0, 6}}} =
-        Grizzly.send_command(conn, InvNodeSolicitation, node_id: 0x06)
+      {:ok, %{home_id: 3_476_769_508, ip_address: {64768, 48059, 0, 0, 0, 0, 0, 6}, node_id: 6}}
+      Grizzly.send_command(conn, InvNodeSolicitation, node_id: 0x06)
     end
 
     test "send the manufacturer specific command", %{conn: conn} do

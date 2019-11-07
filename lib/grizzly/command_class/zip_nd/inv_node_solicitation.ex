@@ -19,6 +19,12 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation do
           pre_states: [NetworkState.state()]
         }
 
+  @type report :: %{
+          node_id: Node.node_id(),
+          home_id: pos_integer(),
+          ip_address: :inet.ip_address()
+        }
+
   @type opt :: {:node_id, Node.node_id()} | {:pre_states, [NetworkState.state()]}
 
   defstruct node_id: nil,
@@ -39,15 +45,20 @@ defmodule Grizzly.CommandClass.ZipNd.InvNodeSolicitation do
     end
   end
 
-  @spec handle_response(t, Packet.t()) ::
-          {:done, {:ok, {:node_ip, Node.node_id(), :inet.ip_address()}}}
+  @spec handle_response(t, Packet.t()) :: {:done, {:ok, report}}
   def handle_response(
         _,
         %Packet{
           body: %{command_class: :zip_nd, command: :zip_node_advertisement} = advertisement
         }
       ) do
-    {:done, {:ok, {:node_ip, advertisement.node_id, advertisement.ip_address}}}
+    {:done,
+     {:ok,
+      %{
+        ip_address: advertisement.ip_address,
+        node_id: advertisement.node_id,
+        home_id: advertisement.home_id
+      }}}
   end
 
   def handle_response(command, _), do: {:continue, command}

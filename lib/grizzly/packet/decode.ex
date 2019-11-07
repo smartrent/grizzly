@@ -106,7 +106,7 @@ defmodule Grizzly.Packet.Decode do
   @spec raw(<<_::16>>) :: map()
   def raw(<<command_class>>), do: %{command_class: Mappings.from_byte(command_class)}
 
-  def raw(<<0x58, 0x01, _, node_id, ip::binary-size(16), home_id::binary>>) do
+  def raw(<<0x58, 0x01, _, node_id, ip::binary-size(16), home_id::integer-size(32)>>) do
     %{
       command_class: :zip_nd,
       command: :zip_node_advertisement,
