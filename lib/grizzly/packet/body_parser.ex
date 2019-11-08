@@ -576,6 +576,24 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  def parse(<<0x78, 0x06, _seq, 0>>) do
+    %{
+      command_class: :node_provisioning,
+      command: :report,
+      dsk: :not_found
+    }
+  end
+
+  def parse(<<0x78, 0x06, _seq, _dsk_length, dsk::binary-size(16), _rest::binary>>) do
+    {:ok, dsk_string} = Grizzly.DSK.binary_to_string(dsk)
+
+    %{
+      command_class: :node_provisioning,
+      command: :report,
+      dsk: dsk_string
+    }
+  end
+
   def parse(
         <<0x69, 0x03, _reserved::size(3), proxy_support::size(1), service_support::size(1),
           mode::size(3), mail_box_capacity::integer-size(16), ip_address::binary-size(16),

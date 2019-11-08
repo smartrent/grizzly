@@ -138,6 +138,8 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.NetworkManagementInstallationMaintenance.StatisticsGet,
           Grizzly.CommandClass.NetworkManagementProxy.NodeInfoCache,
           Grizzly.CommandClass.NetworkManagementProxy.NodeListGet,
+          Grizzly.CommandClass.NodeProvisioning.Get,
+          Grizzly.CommandClass.NodeProvisioning.Set,
           Grizzly.CommandClass.Powerlevel.Get,
           Grizzly.CommandClass.Powerlevel.Set,
           Grizzly.CommandClass.Powerlevel.TestNodeGet,
