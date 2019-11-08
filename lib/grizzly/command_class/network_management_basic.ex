@@ -1,4 +1,6 @@
 defmodule Grizzly.CommandClass.NetworkManagementBasic do
+  alias Grizzly.DSK
+
   @type default_set_status :: :done | :busy
   @type learn_mode_status :: :done | :failed | :failed_security
   @type learn_mode :: :enable | :disable | :enable_routed
@@ -74,15 +76,11 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic do
   """
   @spec decode_dsk_report(binary()) :: dsk_get_report()
   def decode_dsk_report(<<add_mode, dsk::binary-size(16)>>) do
+    {:ok, dsk} = DSK.binary_to_string(dsk)
+
     %{
       add_mode: add_mode_from_byte(add_mode),
-      dsk: dsk_to_string(dsk)
+      dsk: dsk
     }
-  end
-
-  defp dsk_to_string(binary) do
-    for(<<b::16 <- binary>>, do: b)
-    |> Enum.map(fn b -> String.slice("00000" <> "#{b}", -5, 5) end)
-    |> Enum.join("-")
   end
 end
