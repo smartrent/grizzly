@@ -141,6 +141,7 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.NodeProvisioning.Get,
           Grizzly.CommandClass.NodeProvisioning.Set,
           Grizzly.CommandClass.NodeProvisioning.ListIterationGet,
+          Grizzly.CommandClass.NodeProvisioning.Delete,
           Grizzly.CommandClass.Powerlevel.Get,
           Grizzly.CommandClass.Powerlevel.Set,
           Grizzly.CommandClass.Powerlevel.TestNodeGet,
