@@ -2,10 +2,17 @@ defmodule Grizzly.CommandClass.Mappings do
   @type command_class_name :: atom
   @type command_class_type :: :raw | :network | :application | :management
 
+  @type basic_class_name :: :controller | :static_controller | :routing_slave | :slave
+
+  @type specific_type_name :: atom()
+
+  @type generic_type_name :: atom()
+
   @type command_class_byte :: byte()
 
-  @type command_class_unk :: {:unk, byte}
-  @type specific_cmd_class_unk :: {:unk, byte, byte}
+  @type command_class_unk :: {:unk, byte | command_class_name()}
+  @type specific_cmd_class_unk ::
+          {:unk, byte() | generic_type_name(), byte | specific_type_name()}
 
   @known_network_command_classes [0x34]
 
@@ -308,7 +315,7 @@ defmodule Grizzly.CommandClass.Mappings do
     {:unk, byte}
   end
 
-  @spec byte_to_basic_class(byte) :: command_class_name() | command_class_unk()
+  @spec byte_to_basic_class(byte()) :: basic_class_name() | command_class_unk()
   def byte_to_basic_class(0x01), do: :controller
   def byte_to_basic_class(0x02), do: :static_controller
   def byte_to_basic_class(0x03), do: :slave
@@ -319,7 +326,7 @@ defmodule Grizzly.CommandClass.Mappings do
     {:unk, byte}
   end
 
-  @spec byte_to_generic_class(byte) :: command_class_name() | command_class_unk()
+  @spec byte_to_generic_class(byte()) :: generic_type_name() | command_class_unk()
   def byte_to_generic_class(0x01), do: :generic_controller
   def byte_to_generic_class(0x02), do: :static_controller
   def byte_to_generic_class(0x03), do: :av_control_point
@@ -352,7 +359,40 @@ defmodule Grizzly.CommandClass.Mappings do
     {:unk, byte}
   end
 
-  @spec byte_to_specific_class(byte, byte) :: command_class_name() | specific_cmd_class_unk()
+  @spec generic_class_to_byte(generic_type_name()) :: byte() | command_class_unk()
+  def generic_class_to_byte(:generic_controller), do: 0x01
+  def generic_class_to_byte(:static_controller), do: 0x02
+  def generic_class_to_byte(:av_control_point), do: 0x03
+  def generic_class_to_byte(:display), do: 0x04
+  def generic_class_to_byte(:network_extender), do: 0x05
+  def generic_class_to_byte(:appliance), do: 0x06
+  def generic_class_to_byte(:sensor_notification), do: 0x07
+  def generic_class_to_byte(:thermostat), do: 0x08
+  def generic_class_to_byte(:window_covering), do: 0x09
+  def generic_class_to_byte(:repeater_slave), do: 0x0F
+  def generic_class_to_byte(:switch_binary), do: 0x10
+  def generic_class_to_byte(:switch_multilevel), do: 0x11
+  def generic_class_to_byte(:switch_remote), do: 0x12
+  def generic_class_to_byte(:switch_toggle), do: 0x13
+  def generic_class_to_byte(:zip_node), do: 0x15
+  def generic_class_to_byte(:ventilation), do: 0x16
+  def generic_class_to_byte(:security_panel), do: 0x17
+  def generic_class_to_byte(:wall_controller), do: 0x18
+  def generic_class_to_byte(:sensor_binary), do: 0x20
+  def generic_class_to_byte(:sensor_multilevel), do: 0x21
+  def generic_class_to_byte(:meter_pulse), do: 0x30
+  def generic_class_to_byte(:meter), do: 0x31
+  def generic_class_to_byte(:entry_control), do: 0x40
+  def generic_class_to_byte(:semi_interoperable), do: 0x50
+  def generic_class_to_byte(:sensor_alarm), do: 0xA1
+  def generic_class_to_byte(:non_interoperable), do: 0xFF
+
+  def generic_class_to_byte(generic_class) do
+    _ = Logger.warn("Unknown generic class #{inspect(generic_class)}")
+    {:unk, generic_class}
+  end
+
+  @spec byte_to_specific_class(byte(), byte()) :: specific_type_name() | specific_cmd_class_unk()
   def byte_to_specific_class(0x01, 0x00), do: :not_used
   def byte_to_specific_class(0x01, 0x01), do: :portable_remote_controller
   def byte_to_specific_class(0x01, 0x02), do: :portable_scene_controller
@@ -492,6 +532,147 @@ defmodule Grizzly.CommandClass.Mappings do
       )
 
     {:unk, gen_byte, spec_byte}
+  end
+
+  @spec specific_class_to_byte(generic_type_name(), specific_type_name()) ::
+          byte() | specific_cmd_class_unk()
+  def specific_class_to_byte(:generic_controller, :not_used), do: 0x00
+  def specific_class_to_byte(:generic_controller, :portable_remote_controller), do: 0x01
+  def specific_class_to_byte(:generic_controller, :portable_scene_controller), do: 0x02
+  def specific_class_to_byte(:generic_controller, :installer_tool), do: 0x03
+  def specific_class_to_byte(:generic_controller, :remote_control_av), do: 0x04
+  def specific_class_to_byte(:generic_controller, :remote_control_simple), do: 0x06
+
+  def specific_class_to_byte(:static_controller, :not_used), do: 0x00
+  def specific_class_to_byte(:static_controller, :pc_controller), do: 0x01
+  def specific_class_to_byte(:static_controller, :scene_controller), do: 0x02
+  def specific_class_to_byte(:static_controller, :static_installer_tool), do: 0x03
+  def specific_class_to_byte(:static_controller, :set_top_box), do: 0x04
+  def specific_class_to_byte(:static_controller, :sub_system_controller), do: 0x05
+  def specific_class_to_byte(:static_controller, :tv), do: 0x06
+  def specific_class_to_byte(:static_controller, :gateway), do: 0x07
+
+  def specific_class_to_byte(:av_control_point, :not_used), do: 0x00
+  def specific_class_to_byte(:av_control_point, :satellite_receiver), do: 0x04
+  def specific_class_to_byte(:av_control_point, :satellite_receiver_v2), do: 0x11
+  def specific_class_to_byte(:av_control_point, :doorbell), do: 0x12
+
+  def specific_class_to_byte(:display, :not_used), do: 0x00
+  def specific_class_to_byte(:display, :simple_display), do: 0x01
+
+  def specific_class_to_byte(:network_extender, :not_used), do: 0x00
+  def specific_class_to_byte(:network_extender, :secure_extender), do: 0x01
+
+  def specific_class_to_byte(:appliance, :not_used), do: 0x00
+  def specific_class_to_byte(:appliance, :general_appliance), do: 0x01
+  def specific_class_to_byte(:appliance, :kitchen_appliance), do: 0x02
+  def specific_class_to_byte(:appliance, :laundry_appliance), do: 0x03
+
+  def specific_class_to_byte(:sensor_notification, :not_used), do: 0x00
+  def specific_class_to_byte(:sensor_notification, :notification_sensor), do: 0x01
+
+  def specific_class_to_byte(:thermostat, :not_used), do: 0x00
+  def specific_class_to_byte(:thermostat, :thermostat_heating), do: 0x01
+  def specific_class_to_byte(:thermostat, :thermostat_general), do: 0x02
+  def specific_class_to_byte(:thermostat, :setback_schedule_thermostat), do: 0x03
+  def specific_class_to_byte(:thermostat, :setpoint_thermostat), do: 0x04
+  def specific_class_to_byte(:thermostat, :setback_thermostat), do: 0x05
+  def specific_class_to_byte(:thermostat, :thermostat_general_v2), do: 0x06
+
+  def specific_class_to_byte(:window_covering, :not_used), do: 0x00
+  def specific_class_to_byte(:window_covering, :simple_window_covering), do: 0x01
+
+  def specific_class_to_byte(:switch_binary, :not_used), do: 0x00
+  def specific_class_to_byte(:switch_binary, :power_switch_binary), do: 0x01
+  def specific_class_to_byte(:switch_binary, :color_tunable_binary), do: 0x02
+  def specific_class_to_byte(:switch_binary, :scene_switch_binary), do: 0x03
+  def specific_class_to_byte(:switch_binary, :power_strip), do: 0x04
+  def specific_class_to_byte(:switch_binary, :siren), do: 0x05
+  def specific_class_to_byte(:switch_binary, :valve_open_close), do: 0x06
+  def specific_class_to_byte(:switch_binary, :irrigation_controller), do: 0x07
+
+  def specific_class_to_byte(:switch_multilevel, :not_used), do: 0x00
+  def specific_class_to_byte(:switch_multilevel, :power_switch_multilevel), do: 0x01
+  def specific_class_to_byte(:switch_multilevel, :color_tunable_multilevel), do: 0x02
+  def specific_class_to_byte(:switch_multilevel, :motor_multipositions), do: 0x03
+  def specific_class_to_byte(:switch_multilevel, :scene_switch_multilevel), do: 0x04
+  def specific_class_to_byte(:switch_multilevel, :class_a_motor_control), do: 0x05
+  def specific_class_to_byte(:switch_multilevel, :class_b_motor_control), do: 0x06
+  def specific_class_to_byte(:switch_multilevel, :class_c_motor_control), do: 0x07
+  def specific_class_to_byte(:switch_multilevel, :fan_switch), do: 0x08
+
+  def specific_class_to_byte(:switch_remote, :not_used), do: 0x00
+  def specific_class_to_byte(:switch_remote, :switch_remote_binary), do: 0x01
+  def specific_class_to_byte(:switch_remote, :switch_remote_multilevel), do: 0x02
+  def specific_class_to_byte(:switch_remote, :switch_remote_toggle_binary), do: 0x03
+  def specific_class_to_byte(:switch_remote, :switch_remote_toggle_multilevel), do: 0x04
+
+  def specific_class_to_byte(:switch_toggle, :not_used), do: 0x00
+  def specific_class_to_byte(:switch_toggle, :switch_toggle_binary), do: 0x01
+  def specific_class_to_byte(:switch_toggle, :switch_toggle_multilevel), do: 0x02
+
+  def specific_class_to_byte(:zip_node, :not_used), do: 0x00
+  def specific_class_to_byte(:zip_node, :zip_adv_node), do: 0x01
+  def specific_class_to_byte(:zip_node, :zip_tun_node), do: 0x02
+
+  def specific_class_to_byte(:security_panel, :not_used), do: 0x00
+  def specific_class_to_byte(:security_panel, :zoned_security_panel), do: 0x01
+
+  def specific_class_to_byte(:wall_controller, :not_used), do: 0x00
+  def specific_class_to_byte(:wall_controller, :basic_wall_controller), do: 0x01
+
+  def specific_class_to_byte(:sensor_binary, :not_used), do: 0x00
+  def specific_class_to_byte(:sensor_binary, :routing_sensor_binary), do: 0x01
+
+  def specific_class_to_byte(:sensor_multilevel, :not_used), do: 0x00
+  def specific_class_to_byte(:sensor_multilevel, :routing_sensor_multilevel), do: 0x01
+  def specific_class_to_byte(:sensor_multilevel, :chimney_fan), do: 0x02
+
+  def specific_class_to_byte(:meter_pulse, :not_used), do: 0x00
+
+  def specific_class_to_byte(:meter, :not_used), do: 0x00
+  def specific_class_to_byte(:meter, :simple_meter), do: 0x01
+  def specific_class_to_byte(:meter, :adv_energy_control), do: 0x02
+  def specific_class_to_byte(:meter, :whole_home_meter_simple), do: 0x03
+
+  def specific_class_to_byte(:entry_control, :not_used), do: 0x00
+  def specific_class_to_byte(:entry_control, :door_lock), do: 0x01
+  def specific_class_to_byte(:entry_control, :advanced_door_lock), do: 0x02
+  def specific_class_to_byte(:entry_control, :secure_keypad_door_lock), do: 0x03
+  def specific_class_to_byte(:entry_control, :secure_keypad_door_lock_deadbolt), do: 0x04
+  def specific_class_to_byte(:entry_control, :secure_door), do: 0x05
+  def specific_class_to_byte(:entry_control, :secure_gate), do: 0x06
+  def specific_class_to_byte(:entry_control, :secure_barrier_addon), do: 0x07
+  def specific_class_to_byte(:entry_control, :secure_barrier_open_only), do: 0x08
+  def specific_class_to_byte(:entry_control, :secure_barrier_close_only), do: 0x09
+  def specific_class_to_byte(:entry_control, :secure_lockbox), do: 0x0A
+  def specific_class_to_byte(:entry_control, :secure_keypad), do: 0x0B
+
+  def specific_class_to_byte(:semi_interoperable, :not_used), do: 0x00
+  def specific_class_to_byte(:semi_interoperable, :energy_production), do: 0x01
+
+  def specific_class_to_byte(:sensor_alarm, :not_used), do: 0x00
+  def specific_class_to_byte(:sensor_alarm, :basic_routing_alarm_sensor), do: 0x01
+  def specific_class_to_byte(:sensor_alarm, :routing_alarm_sensor), do: 0x02
+  def specific_class_to_byte(:sensor_alarm, :basic_zensor_net_alarm_sensor), do: 0x03
+  def specific_class_to_byte(:sensor_alarm, :zensor_net_alarm_sensor), do: 0x04
+  def specific_class_to_byte(:sensor_alarm, :adv_zensor_net_alarm_sensor), do: 0x05
+  def specific_class_to_byte(:sensor_alarm, :basic_routing_smoke_sensor), do: 0x06
+  def specific_class_to_byte(:sensor_alarm, :routing_smoke_sensor), do: 0x07
+  def specific_class_to_byte(:sensor_alarm, :basic_zensor_net_smoke_sensor), do: 0x08
+  def specific_class_to_byte(:sensor_alarm, :zensor_net_smoke_sensor), do: 0x09
+  def specific_class_to_byte(:sensor_alarm, :adv_zensor_net_smoke_sensor), do: 0x0A
+  def specific_class_to_byte(:sensor_alarm, :alarm_sensor), do: 0x0B
+
+  def specific_class_to_byte(:non_interoperable, :not_used), do: 0x00
+
+  def specific_class_to_byte(gen_name, spec_name) do
+    _ =
+      Logger.warn(
+        "Unknown specific class #{inspect(spec_name)} for generic class #{inspect(gen_name)}"
+      )
+
+    {:unk, gen_name, spec_name}
   end
 
   @spec is_network_command_class(byte) :: boolean
