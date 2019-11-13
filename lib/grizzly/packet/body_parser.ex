@@ -23,7 +23,7 @@ defmodule Grizzly.Packet.BodyParser do
   import Bitwise
   require Logger
 
-  alias Grizzly.{Security, CommandClass}
+  alias Grizzly.{Security, CommandClass, DSK}
 
   alias Grizzly.CommandClass.{
     Association,
@@ -968,6 +968,25 @@ defmodule Grizzly.Packet.BodyParser do
         node_type: ZwaveplusInfo.decode_node_type(node_type),
         installer_icon_type: installer_icon_type,
         user_icon_type: user_icon_type
+      }
+    }
+  end
+
+  def parse(
+        <<0x78, 0x04, seq_number::size(8), remaining_count::size(8), _reserved::size(3),
+          dsk_length::size(5), rest::binary>>
+      ) do
+    size = dsk_length * 8
+    <<dsk_binary::binary-size(size), _meta::binary()>> = rest
+    {:ok, dsk_string} = DSK.binary_to_string(dsk_binary)
+
+    %{
+      command_class: :node_provisioning,
+      command: :list_iteration_report,
+      value: %{
+        seq_number: seq_number,
+        remaining_count: remaining_count,
+        dsk: dsk_string
       }
     }
   end
