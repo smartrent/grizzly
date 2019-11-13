@@ -413,6 +413,21 @@ defmodule Grizzly.Packet.BodyParser.Test do
              }
     end
 
+    test "parses node provisioning list iteration report" do
+      dsk_binary = <<196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
+      binary = <<0x78, 0x04, 0x08, 0x01, 0x02>> <> dsk_binary
+
+      {:ok, dsk_string} = Grizzly.DSK.binary_to_string(dsk_binary)
+
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: :node_provisioning,
+               command: :list_iteration_report,
+               value: %{seq_number: 8, remaining_count: 1, dsk: dsk_string}
+             }
+    end
+
     test "parses controller learn mode set with status failed and new node id 0" do
       binary = <<0x4D, 0x02, 0x01, 0x07, 0x00, 0x00>>
       parsed = BodyParser.parse(binary)
