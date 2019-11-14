@@ -140,6 +140,7 @@ defmodule Grizzly.MixProject do
           Grizzly.CommandClass.NetworkManagementProxy.NodeListGet,
           Grizzly.CommandClass.NodeProvisioning.Get,
           Grizzly.CommandClass.NodeProvisioning.Set,
+          Grizzly.CommandClass.NodeProvisioning.ListAll,
           Grizzly.CommandClass.NodeProvisioning.ListIterationGet,
           Grizzly.CommandClass.NodeProvisioning.Delete,
           Grizzly.CommandClass.Powerlevel.Get,

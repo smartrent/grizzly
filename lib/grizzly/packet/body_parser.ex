@@ -595,6 +595,24 @@ defmodule Grizzly.Packet.BodyParser do
   end
 
   def parse(
+        <<0x78, 0x04, seq_number::size(8), remaining_count::size(8), _reserved::size(3),
+          _dsk_length::size(5), rest::binary>>
+      ) do
+    <<dsk_binary::binary-size(16), _meta::binary()>> = rest
+    {:ok, dsk_string} = DSK.binary_to_string(dsk_binary)
+
+    %{
+      command_class: :node_provisioning,
+      command: :list_iteration_report,
+      value: %{
+        seq_number: seq_number,
+        remaining_count: remaining_count,
+        dsk: dsk_string
+      }
+    }
+  end
+
+  def parse(
         <<0x69, 0x03, _reserved::size(3), proxy_support::size(1), service_support::size(1),
           mode::size(3), mail_box_capacity::integer-size(16), ip_address::binary-size(16),
           udp_port::integer-size(16)>>
@@ -968,25 +986,6 @@ defmodule Grizzly.Packet.BodyParser do
         node_type: ZwaveplusInfo.decode_node_type(node_type),
         installer_icon_type: installer_icon_type,
         user_icon_type: user_icon_type
-      }
-    }
-  end
-
-  def parse(
-        <<0x78, 0x04, seq_number::size(8), remaining_count::size(8), _reserved::size(3),
-          dsk_length::size(5), rest::binary>>
-      ) do
-    size = dsk_length * 8
-    <<dsk_binary::binary-size(size), _meta::binary()>> = rest
-    {:ok, dsk_string} = DSK.binary_to_string(dsk_binary)
-
-    %{
-      command_class: :node_provisioning,
-      command: :list_iteration_report,
-      value: %{
-        seq_number: seq_number,
-        remaining_count: remaining_count,
-        dsk: dsk_string
       }
     }
   end
