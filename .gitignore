@@ -23,3 +23,6 @@ erl_crash.dump
 nerves_hub-*.tar
 
 /.idea/
+
+# Igonre Elixir LS VS code directory for VS code users
+.elixir_ls
