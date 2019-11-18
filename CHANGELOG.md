@@ -1,5 +1,41 @@
 ## Changelog
 
+## v0.7.0
+
+Introduces SmartStart support!
+
+SmartStart will allow you to pair a device to a Z-Wave controller with out
+turning the device on. Devices that support SmartStart will have a device
+specific key (DSK) that you can provide to the controller prior to turning on
+the device.
+
+```
+iex> Grizzly.send_command(Grizzly.Controller, Grizzly.CommandClass.NodeProvisioning.Set, dsk: dsk)
+:ok
+```
+
+After running the above command you can plug in your SmartStart device and the
+controller will try to join the Z-Wave network automatically.
+
+As a note, your controller might not have the necessary firmware to have SmartStart.
+
+To verify this you can use `RingLogger` to read `zipgateway` logs which at the start
+will log if the controller supports SmartStart.
+
+### Breaking Changes
+
+Breaking change to the return value of sending `Grizzly.CommandClass.ZipNd.InvNodeSolicitation`.
+
+When using that function `send_command` would return
+`{:ok, {:node_ip, node_id, ip_address}}` but now it returns
+`{:ok, %{ip_address: ip_address, node_id: node_id, home_id: home_id}}`.
+
+* Enhancements
+  * SmartStart support through the `NodeProvisioning` command class
+  * Added `home_id` field to `Grizzly.Node.t()`
+  * Support fetching `home_id` of the Z-Wave nodes when fetching
+    Z-Wave information about the node
+
 ## v0.6.6
 
 * Fixes
