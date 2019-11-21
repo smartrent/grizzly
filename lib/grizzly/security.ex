@@ -40,6 +40,14 @@ defmodule Grizzly.Security do
     end)
   end
 
+  @doc """
+  Get the list of available security keys
+  """
+  @spec keys() :: [key()]
+  def keys() do
+    [:s2_unauthenticated, :s2_authenticated, :s2_access_control, :s0]
+  end
+
   @spec keys_to_byte([key]) :: byte
   def keys_to_byte(keys) do
     Enum.reduce(keys, 0, fn key, byte -> byte ||| key_byte(key) end)
