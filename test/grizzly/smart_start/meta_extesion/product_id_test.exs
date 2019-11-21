@@ -1,6 +1,6 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.ProductIdTest do
+defmodule Grizzly.SmartStart.MetaExtension.ProductIdTest do
   use ExUnit.Case, async: true
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.ProductId
+  alias Grizzly.SmartStart.MetaExtension.ProductId
 
   describe "decode binary" do
     test "when all is okay" do

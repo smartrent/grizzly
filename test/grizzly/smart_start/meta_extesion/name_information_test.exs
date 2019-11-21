@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.NameInformationTest do
+defmodule Grizzly.SmartStart.MetaExtension.NameInformationTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.NameInformation
+  alias Grizzly.SmartStart.MetaExtension.NameInformation
 
   test "serialize when all okay" do
     name_info = %NameInformation{name: "my Z-Wave node"}

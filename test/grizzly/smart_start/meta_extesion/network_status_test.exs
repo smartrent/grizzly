@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.NetworkStatusTest do
+defmodule Grizzly.SmartStart.MetaExtension.NetworkStatusTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.NetworkStatus
+  alias Grizzly.SmartStart.MetaExtension.NetworkStatus
 
   describe "create a NetworkStatus.t()" do
     test "when network status is :not_in_network" do

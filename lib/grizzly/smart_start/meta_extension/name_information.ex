@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.NameInformation do
+defmodule Grizzly.SmartStart.MetaExtension.NameInformation do
   @moduledoc """
   This extension is used to advertise the name assigned to the supporting node
 

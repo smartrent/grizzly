@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.NetworkStatus do
+defmodule Grizzly.SmartStart.MetaExtension.NetworkStatus do
   @moduledoc """
   This extension is used to advertise if the node is in the network and its
   assigned node id

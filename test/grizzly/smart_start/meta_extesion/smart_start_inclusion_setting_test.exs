@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.SmartStartInclusionSettingTest do
+defmodule Grizzly.SmartStart.MetaExtension.SmartStartInclusionSettingTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.SmartStartInclusionSetting
+  alias Grizzly.SmartStart.MetaExtension.SmartStartInclusionSetting
 
   test "encode pending setting" do
     setting = %SmartStartInclusionSetting{setting: :pending}

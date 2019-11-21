@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.UUID16Test do
+defmodule Grizzly.SmartStart.MetaExtension.UUID16Test do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.UUID16
+  alias Grizzly.SmartStart.MetaExtension.UUID16
 
   describe "from binary" do
     test "when critical bit is set" do

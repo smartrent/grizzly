@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.UUID16 do
+defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
   @moduledoc """
   This is used to advertise 16 bytes of manufactured-defined information that
   is unique for a given product.

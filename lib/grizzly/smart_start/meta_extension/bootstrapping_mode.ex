@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.BootstrappingMode do
+defmodule Grizzly.SmartStart.MetaExtension.BootstrappingMode do
   @moduledoc """
   This extension is used to advertise the bootstrapping mode to use when
   including the node advertised in the provisioning list
