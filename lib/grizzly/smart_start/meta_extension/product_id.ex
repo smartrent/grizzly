@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.ProductId do
+defmodule Grizzly.SmartStart.MetaExtension.ProductId do
   @moduledoc """
   This Information Type is used to advertise the product identifying data of a supporting node.
   """

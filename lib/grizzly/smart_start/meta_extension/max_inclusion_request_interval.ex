@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.MaxInclusionRequestInterval do
+defmodule Grizzly.SmartStart.MetaExtension.MaxInclusionRequestInterval do
   @moduledoc """
   This is used to advertise if a power constrained Smart Start node will issue
   inclusion request at a higher interval value than the default 512 seconds.

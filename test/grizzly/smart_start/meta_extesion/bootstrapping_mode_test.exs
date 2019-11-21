@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.BootstrappingModeTest do
+defmodule Grizzly.SmartStart.MetaExtension.BootstrappingModeTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.BootstrappingMode
+  alias Grizzly.SmartStart.MetaExtension.BootstrappingMode
 
   describe "create a BootstrappingMode.t()" do
     test "when mode is :security_2" do

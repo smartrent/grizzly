@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.AdvancedJoiningTest do
+defmodule Grizzly.SmartStart.MetaExtension.AdvancedJoiningTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.AdvancedJoining
+  alias Grizzly.SmartStart.MetaExtension.AdvancedJoining
 
   describe "creating a AdvancedJoining.t()" do
     test "when all is okay" do

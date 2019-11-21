@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.LocationInformation do
+defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
   @moduledoc """
   This extension is used to advertise the location assigned to the supporting node
 

@@ -1,6 +1,6 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.MaxInclusionRequestIntervalTest do
+defmodule Grizzly.SmartStart.MetaExtension.MaxInclusionRequestIntervalTest do
   use ExUnit.Case, async: true
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.MaxInclusionRequestInterval
+  alias Grizzly.SmartStart.MetaExtension.MaxInclusionRequestInterval
 
   describe "decode binary" do
     test "when all is okay" do

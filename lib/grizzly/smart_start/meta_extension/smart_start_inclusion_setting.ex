@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.SmartStartInclusionSetting do
+defmodule Grizzly.SmartStart.MetaExtension.SmartStartInclusionSetting do
   @moduledoc """
   This extension is used to advertise the SmartStart inclusion setting of the
   provisioning list entry

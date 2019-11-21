@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.ProductType do
+defmodule Grizzly.SmartStart.MetaExtension.ProductType do
   @moduledoc """
   This Information Type is used to advertise the product type data of a
   supporting node
@@ -56,11 +56,11 @@ defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.ProductType do
   If there is invalid device classes or installer icon type with will return
   `{:error, reason}` where reason is:
 
-  * `:invalid_generic_device_class` - the generic device class could not be 
+  * `:invalid_generic_device_class` - the generic device class could not be
      encoded into its byte representation
   * `:invalid_specific_device_class` - the specific device class could nto be
      encoded into its byte representation
-  * `:unknown_icon_type` - the installer icon type cannot be encoded into its 
+  * `:unknown_icon_type` - the installer icon type cannot be encoded into its
      byte representation
   """
   @spec to_binary(t()) ::

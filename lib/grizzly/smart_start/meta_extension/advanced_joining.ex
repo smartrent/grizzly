@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.AdvancedJoining do
+defmodule Grizzly.SmartStart.MetaExtension.AdvancedJoining do
   @moduledoc """
   This extension is used to advertise the Security keys to grant during S2
   bootstrapping to a SmartStart node in the provisioning list

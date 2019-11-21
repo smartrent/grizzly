@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandClass.NodeProvisioning.MetaExtension.LocationInformationTest do
+defmodule Grizzly.SmartStart.MetaExtension.LocationInformationTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandClass.NodeProvisioning.MetaExtension.LocationInformation
+  alias Grizzly.SmartStart.MetaExtension.LocationInformation
 
   test "serialize when all okay" do
     location_info = %LocationInformation{location: "location12340"}
