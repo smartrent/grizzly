@@ -32,6 +32,8 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
   More information about RFC 4122 and the specification format can be
   found [here](https://tools.ietf.org/html/rfc4122#section-4.1.2).
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
+
   @type format :: :ascii | :hex | :rfc4122
 
   @type t :: %__MODULE__{
@@ -39,11 +41,24 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
           format: format()
         }
 
-  defstruct uuid: nil, format: nil
+  @enforce_keys [:uuid, :format]
+  defstruct uuid: nil, format: :hex
 
   defguardp is_format_hex(value) when value in [0, 2, 4]
   defguardp is_format_ascii(value) when value in [1, 3, 5]
   defguardp is_format_rfc4122(value) when value == 6
+
+  @doc """
+  Make a new `UUID16.t()`
+  """
+  @spec new(String.t(), format()) :: {:ok, t()} | {:error, :invalid_uuid_length | :invalid_format}
+  def new(uuid, format) do
+    with :ok <- validate_format(format),
+         uuid_no_prefix = remove_uuid_prefix(uuid),
+         :ok <- validate_uuid_length(uuid_no_prefix, format) do
+      {:ok, %__MODULE__{uuid: uuid, format: format}}
+    end
+  end
 
   @doc """
   Take a binary string and try to make a `UUID16.t()` from it
@@ -54,11 +69,13 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
   If the format in the binary is not part of the defined Z-Wave specification
   this will return `{:error, :invalid_format}`
   """
-  @spec from_binary(binary()) :: {:ok, t()} | {:error, :critical_bit_set | :invalid_format}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec from_binary(binary()) ::
+          {:ok, t()} | {:error, :critical_bit_set | :invalid_format | :invalid_binary}
   def from_binary(<<0x03::size(7), 0x00::size(1), 0x11, presentation_format, uuid::binary>>) do
     with {:ok, uuid_string} <- uuid_from_binary(presentation_format, uuid),
          {:ok, format} <- format_from_byte(presentation_format) do
-      {:ok, %__MODULE__{uuid: uuid_string, format: format}}
+      new(uuid_string, format)
     end
   end
 
@@ -66,25 +83,23 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
     {:error, :critical_bit_set}
   end
 
+  def from_binary(bin) when is_binary(bin), do: {:error, :invalid_binary}
+
   @doc """
   Make a binary string from a `UUID16.t()`
   """
-  @spec to_binary(t()) :: {:ok, binary()} | {:error, :invalid_uuid_length | :invalid_format}
-  def to_binary(%__MODULE__{uuid: uuid, format: format})
-      when format in [:hex, :ascii, :rfc4122] do
-    with {:ok, [format_prefix, uuid]} <- get_format_prefix_and_uuid(uuid),
-         {:ok, uuid_binary} <- uuid_to_binary(uuid, format) do
-      {:ok, <<0x06, 0x11, format_to_byte(format, format_prefix)>> <> uuid_binary}
-    end
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec to_binary(t()) :: {:ok, binary()}
+  def to_binary(%__MODULE__{uuid: uuid, format: format}) do
+    [format_prefix, uuid] = get_format_prefix_and_uuid(uuid)
+    uuid_binary = uuid_to_binary(uuid, format)
+    {:ok, <<0x06, 0x11, format_to_byte(format, format_prefix)>> <> uuid_binary}
   end
-
-  def to_binary(_uuid), do: {:error, :invalid_format}
 
   defp get_format_prefix_and_uuid(uuid_string) do
     case String.split(uuid_string, ":") do
-      [uuid] -> {:ok, [:none, uuid]}
-      [prefix, _uuid] = result when prefix in ["sn", "UUID"] -> {:ok, result}
-      _ -> {:error, :invalid_uuid_string}
+      [uuid] -> [:none, uuid]
+      [prefix, _uuid] = result when prefix in ["sn", "UUID"] -> result
     end
   end
 
@@ -102,38 +117,35 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
   defp format_to_byte(:ascii, "UUID"), do: 5
   defp format_to_byte(:rfc4122, :none), do: 6
 
-  defp uuid_to_binary(uuid, :hex) when byte_size(uuid) == 32 do
+  defp uuid_to_binary(uuid, :hex) do
     hex_uuid_to_binary(uuid, <<>>)
   end
 
-  defp uuid_to_binary(uuid, :ascii) when byte_size(uuid) == 16 do
+  defp uuid_to_binary(uuid, :ascii) do
     ascii_uuid_to_binary(uuid)
   end
 
-  defp uuid_to_binary(uuid, :rfc4122) when byte_size(uuid) == 36 do
+  defp uuid_to_binary(uuid, :rfc4122) do
     rfc4122_uuid_to_binary(uuid)
   end
 
   defp uuid_to_binary(_uuid, _format), do: {:error, :invalid_uuid_length}
 
   defp rfc4122_uuid_to_binary(uuid) do
-    binary_uuid =
-      uuid
-      |> String.split("-")
-      |> Enum.flat_map(&String.split(&1, "", trim: true))
-      |> Enum.chunk_every(2)
-      |> Enum.map(fn digits ->
-        digits
-        |> Enum.join("")
-        |> String.to_integer(16)
-      end)
-      |> :erlang.list_to_binary()
-
-    {:ok, binary_uuid}
+    uuid
+    |> String.split("-")
+    |> Enum.flat_map(&String.split(&1, "", trim: true))
+    |> Enum.chunk_every(2)
+    |> Enum.map(fn digits ->
+      digits
+      |> Enum.join("")
+      |> String.to_integer(16)
+    end)
+    |> :erlang.list_to_binary()
   end
 
   defp hex_uuid_to_binary("", binary) do
-    {:ok, binary}
+    binary
   end
 
   defp hex_uuid_to_binary(uuid, binary) do
@@ -144,12 +156,9 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
   end
 
   defp ascii_uuid_to_binary(uuid_string) do
-    uuid_binary =
-      uuid_string
-      |> String.split("", trim: true)
-      |> Enum.reduce(<<>>, &(&2 <> &1))
-
-    {:ok, uuid_binary}
+    uuid_string
+    |> String.split("", trim: true)
+    |> Enum.reduce(<<>>, &(&2 <> &1))
   end
 
   defp uuid_as_hex_digits(uuid) do
@@ -219,4 +228,16 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16 do
       end
     end)
   end
+
+  defp validate_format(format) when format in [:hex, :ascii, :rfc4122], do: :ok
+  defp validate_format(_format), do: {:error, :invalid_format}
+
+  defp remove_uuid_prefix("sn:" <> uuid), do: uuid
+  defp remove_uuid_prefix("UUID:" <> uuid), do: uuid
+  defp remove_uuid_prefix(uuid), do: uuid
+
+  defp validate_uuid_length(uuid, :hex) when byte_size(uuid) == 32, do: :ok
+  defp validate_uuid_length(uuid, :ascii) when byte_size(uuid) == 16, do: :ok
+  defp validate_uuid_length(uuid, :rfc4122) when byte_size(uuid) == 36, do: :ok
+  defp validate_uuid_length(_uuid, _format), do: {:error, :invalid_uuid_length}
 end

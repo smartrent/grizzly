@@ -3,35 +3,30 @@ defmodule Grizzly.SmartStart.MetaExtension.NameInformationTest do
 
   alias Grizzly.SmartStart.MetaExtension.NameInformation
 
+  test "creates a new name information when name is okay" do
+    expected_name = %NameInformation{name: "my lock"}
+
+    assert {:ok, expected_name} == NameInformation.new("my lock")
+  end
+
+  test "does not create a name information when the name is too long" do
+    name = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+    assert {:error, :name_too_long} == NameInformation.new(name)
+  end
+
+  test "does not create a name information when the name ends with a dash" do
+    assert {:error, :ends_with_dash} == NameInformation.new("this is a bad name-")
+  end
+
+  test "does not create a name information when the name contains underscores" do
+    assert {:error, :contains_underscore} == NameInformation.new("this_is_a_bad_name")
+  end
+
   test "serialize when all okay" do
     name_info = %NameInformation{name: "my Z-Wave node"}
 
     assert {:ok, <<0x64, 0x0E, 109, 121, 32, 90, 45, 87, 97, 118, 101, 32, 110, 111, 100, 101>>} ==
              NameInformation.to_binary(name_info)
-  end
-
-  test "does not serialize when there is a dash at the end" do
-    name_info = %NameInformation{
-      name: "this is a bad name-"
-    }
-
-    assert {:error, :ends_with_dash} == NameInformation.to_binary(name_info)
-  end
-
-  test "does not serialize when there is an underscore" do
-    name_info = %NameInformation{
-      name: "this_is_a_bad_name"
-    }
-
-    assert {:error, :contains_underscore} == NameInformation.to_binary(name_info)
-  end
-
-  test "does not serialize when the name is too long" do
-    name_info = %NameInformation{
-      name: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
-    }
-
-    assert {:error, :name_too_long} == NameInformation.to_binary(name_info)
   end
 
   test "encodes a dot (.) correctly" do

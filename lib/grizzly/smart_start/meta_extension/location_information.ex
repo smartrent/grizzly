@@ -13,9 +13,9 @@ defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
 
   The above location invalid. To make it valid remove the `-` before `.`.
 
-
   A node's location cannot be more than 62 bytes.
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
 
   @type t :: %__MODULE__{
           location: String.t()
@@ -24,7 +24,7 @@ defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
   defstruct location: nil
 
   @doc """
-  Make a `LocationInformation.t()` into a binary
+  Make a new `LocationInformation.t()` from a location string
 
   If the location contains characters that are not valid this function will return
   `{:error, reason}` where `reason` is:
@@ -34,18 +34,31 @@ defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
   - `:location_too_long`
   - `:sublocation_ends_with_dash`
   """
-  @spec to_binary(t()) ::
-          {:ok, binary()}
+  @spec new(String.t()) ::
+          {:ok, t()}
           | {:error,
              :contains_underscore
              | :ends_with_dash
              | :location_too_long
              | :sublocation_ends_with_dash}
-  def to_binary(%__MODULE__{location: location}) do
-    with :ok <- validate_location(location),
-         location_bin <- location_to_binary(location) do
-      {:ok, <<0x66, byte_size(location_bin)>> <> location_bin}
+  def new(location) do
+    case validate_location(location) do
+      :ok ->
+        {:ok, %__MODULE__{location: location}}
+
+      error ->
+        error
     end
+  end
+
+  @doc """
+  Make a `LocationInformation.t()` into a binary
+  """
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec to_binary(t()) :: {:ok, binary()}
+  def to_binary(%__MODULE__{location: location}) do
+    location_bin = location_to_binary(location)
+    {:ok, <<0x66, byte_size(location_bin)>> <> location_bin}
   end
 
   @doc """
@@ -62,6 +75,7 @@ defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
   If the critical bit set in the binary this function will return
   `{:error, :critical_bit_set}`
   """
+  @impl Grizzly.SmartStart.MetaExtension
   @spec from_binary(binary) ::
           {:ok, t()}
           | {:error,
@@ -69,7 +83,8 @@ defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
              | :ends_with_dash
              | :critical_bit_set
              | :location_too_long
-             | :sublocation_ends_with_dash}
+             | :sublocation_ends_with_dash
+             | :invalid_binary}
   def from_binary(<<0x33::size(7), 0x00::size(1), _length, location::binary>>) do
     location_string =
       location
@@ -84,6 +99,8 @@ defmodule Grizzly.SmartStart.MetaExtension.LocationInformation do
   def from_binary(<<0x33::size(7), 0x01::size(1), _rest::binary>>) do
     {:error, :critical_bit_set}
   end
+
+  def from_binary(_), do: {:error, :invalid_binary}
 
   defp validate_location(location) when byte_size(location) < 63 do
     with :ok <- contains_underscore?(location),

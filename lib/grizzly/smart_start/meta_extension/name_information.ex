@@ -6,6 +6,7 @@ defmodule Grizzly.SmartStart.MetaExtension.NameInformation do
 
   A node's name cannot be more than 62 bytes.
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
 
   @type t :: %__MODULE__{
           name: String.t()
@@ -13,23 +14,26 @@ defmodule Grizzly.SmartStart.MetaExtension.NameInformation do
 
   defstruct name: nil
 
+  @spec new(String.t()) ::
+          {:ok, t()} | {:error, :contains_underscore | :ends_with_dash | :name_too_long}
+  def new(name) do
+    case validate_name(name) do
+      :ok ->
+        {:ok, %__MODULE__{name: name}}
+
+      error ->
+        error
+    end
+  end
+
   @doc """
   Make a `NameInformation.t()` into a binary
-
-  If the name contains characters that are not valid this function will return
-  `{:error, reason}` where `reason` is:
-
-  - `:contains_underscore`
-  - `:ends_with_dash`
-  - `:name_too_long`
   """
-  @spec to_binary(t()) ::
-          {:ok, binary()} | {:error, :contains_underscore | :ends_with_dash | :name_too_long}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec to_binary(t()) :: {:ok, binary()}
   def to_binary(%__MODULE__{name: name}) do
-    with :ok <- validate_name(name),
-         name_bin <- name_to_binary(name) do
-      {:ok, <<0x64, byte_size(name_bin)>> <> name_bin}
-    end
+    name_bin = name_to_binary(name)
+    {:ok, <<0x64, byte_size(name_bin)>> <> name_bin}
   end
 
   @doc """
@@ -45,9 +49,15 @@ defmodule Grizzly.SmartStart.MetaExtension.NameInformation do
   If the critical bit set in the binary this function will return
   `{:error, :critical_bit_set}`
   """
+  @impl Grizzly.SmartStart.MetaExtension
   @spec from_binary(binary) ::
           {:ok, t()}
-          | {:error, :contains_underscore | :ends_with_dash | :critical_bit_set | :name_too_long}
+          | {:error,
+             :contains_underscore
+             | :ends_with_dash
+             | :critical_bit_set
+             | :name_too_long
+             | :invalid_binary}
   def from_binary(<<0x32::size(7), 0x00::size(1), _length, name::binary>>) do
     name_string =
       name
@@ -63,6 +73,8 @@ defmodule Grizzly.SmartStart.MetaExtension.NameInformation do
   def from_binary(<<0x32::size(7), 0x01::size(1), _rest::binary>>) do
     {:error, :critical_bit_set}
   end
+
+  def from_binary(_), do: {:error, :invalid_binary}
 
   defp validate_name(name) when byte_size(name) < 63 do
     with :ok <- contains_underscore?(name),

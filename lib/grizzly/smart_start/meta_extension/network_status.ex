@@ -3,6 +3,8 @@ defmodule Grizzly.SmartStart.MetaExtension.NetworkStatus do
   This extension is used to advertise if the node is in the network and its
   assigned node id
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
+
   alias Grizzly.Node
 
   @typedoc """
@@ -55,6 +57,7 @@ defmodule Grizzly.SmartStart.MetaExtension.NetworkStatus do
   @doc """
   Make a binary string from a `NetworkStatus.t()`
   """
+  @impl Grizzly.SmartStart.MetaExtension
   @spec to_binary(t()) :: {:ok, binary()}
   def to_binary(%__MODULE__{node_id: node_id, network_status: network_status}) do
     {:ok, <<0x37::size(7), 0::size(1), 0x02, node_id, network_status_to_byte(network_status)>>}
@@ -66,8 +69,9 @@ defmodule Grizzly.SmartStart.MetaExtension.NetworkStatus do
   The binary string's critical bit MUST not be set. If it is this function will
   return `{:error, :critical_bit_set}`
   """
+  @impl Grizzly.SmartStart.MetaExtension
   @spec from_binary(binary()) ::
-          {:ok, t()} | {:error, :invalid_network_status | :critical_bit_set}
+          {:ok, t()} | {:error, :invalid_network_status | :critical_bit_set | :invalid_binary}
   def from_binary(<<0x37::size(7), 0::size(1), 0x02, node_id, network_status_byte>>) do
     case network_status_from_byte(network_status_byte) do
       {:ok, network_status} ->
@@ -81,6 +85,8 @@ defmodule Grizzly.SmartStart.MetaExtension.NetworkStatus do
   def from_binary(<<0x37::size(7), 1::size(1), _rest::binary>>) do
     {:error, :critical_bit_set}
   end
+
+  def from_binary(_), do: {:error, :invalid_binary}
 
   defp network_status_to_byte(:not_in_network), do: 0x00
   defp network_status_to_byte(:included), do: 0x01

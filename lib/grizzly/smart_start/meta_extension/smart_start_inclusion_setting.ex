@@ -18,13 +18,26 @@ defmodule Grizzly.SmartStart.MetaExtension.SmartStartInclusionSetting do
   - `:ignored` - All SmartStart inclusion request are ignored from this node
     until updated via Z/IP Client (Grizzly) or a controlling node.
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
   @type setting :: :pending | :passive | :ignored
 
   @type t :: %__MODULE__{
           setting: setting()
         }
 
+  @enforce_keys [:setting]
   defstruct setting: nil
+
+  @spec new(setting()) :: {:ok, t()} | {:error, :invalid_setting}
+  def new(setting) do
+    case validate_setting(setting) do
+      :ok ->
+        {:ok, %__MODULE__{setting: setting}}
+
+      error ->
+        error
+    end
+  end
 
   @doc """
   Make a `SmartStartInclusionSetting.t()` from a binary
@@ -32,15 +45,11 @@ defmodule Grizzly.SmartStart.MetaExtension.SmartStartInclusionSetting do
   If the setting is invalid this function will return
   `{:error, :invalid_setting}`
   """
-  @spec to_binary(t()) :: {:ok, binary} | {:error, :invalid_setting}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec to_binary(t()) :: {:ok, binary}
   def to_binary(%__MODULE__{setting: setting}) do
-    case setting_to_byte(setting) do
-      {:ok, setting_byte} ->
-        {:ok, <<0x34::size(7), 0x01::size(1), 0x01, setting_byte>>}
-
-      error ->
-        error
-    end
+    setting_byte = setting_to_byte(setting)
+    {:ok, <<0x34::size(7), 0x01::size(1), 0x01, setting_byte>>}
   end
 
   @doc """
@@ -51,7 +60,9 @@ defmodule Grizzly.SmartStart.MetaExtension.SmartStartInclusionSetting do
   If the binary does not have the critical bit set then this function will
   return `{:error, :critical_bit_not_set}`
   """
-  @spec from_binary(binary()) :: {:ok, t()} | {:error, :invalid_setting | :critical_bit_not_set}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec from_binary(binary()) ::
+          {:ok, t()} | {:error, :invalid_setting | :critical_bit_not_set | :invalid_binary}
   def from_binary(<<0x34::size(7), 0x01::size(1), 0x01, setting_byte>>) do
     case setting_from_byte(setting_byte) do
       {:ok, setting} ->
@@ -66,10 +77,14 @@ defmodule Grizzly.SmartStart.MetaExtension.SmartStartInclusionSetting do
     {:error, :critical_bit_not_set}
   end
 
-  defp setting_to_byte(:pending), do: {:ok, 0x00}
-  defp setting_to_byte(:passive), do: {:ok, 0x02}
-  defp setting_to_byte(:ignored), do: {:ok, 0x03}
-  defp setting_to_byte(_), do: {:error, :invalid_setting}
+  def from_binary(_), do: {:error, :invalid_binary}
+
+  defp validate_setting(setting) when setting in [:pending, :passive, :ignored], do: :ok
+  defp validate_setting(_), do: {:error, :invalid_setting}
+
+  defp setting_to_byte(:pending), do: 0x00
+  defp setting_to_byte(:passive), do: 0x02
+  defp setting_to_byte(:ignored), do: 0x03
 
   defp setting_from_byte(0x00), do: {:ok, :pending}
   defp setting_from_byte(0x02), do: {:ok, :passive}
