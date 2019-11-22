@@ -12,6 +12,8 @@ defmodule Grizzly.SmartStart.MetaExtension.BootstrappingMode do
   - `:smart_start` - the node will use S2 bootstrapping automatically using the
     SmartStart functionality
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
+
   @type mode :: :security_2 | :smart_start
 
   @type t :: %__MODULE__{
@@ -34,6 +36,7 @@ defmodule Grizzly.SmartStart.MetaExtension.BootstrappingMode do
   @doc """
   Make a binary from a `BootstrappingMode.t()`
   """
+  @impl Grizzly.SmartStart.MetaExtension
   @spec to_binary(t()) :: {:ok, binary()}
   def to_binary(%__MODULE__{mode: mode}) do
     {:ok, <<0x36::size(7), 1::size(1), 0x01, mode_to_byte(mode)>>}
@@ -45,7 +48,8 @@ defmodule Grizzly.SmartStart.MetaExtension.BootstrappingMode do
   The binary string for this extension requires the critical bit to be set and
   if it is not this function will return `{:error, :critical_bit_not_set}`
   """
-  @spec from_binary(binary()) :: {:ok, t()} | {:error, :critical_bit_not_set}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec from_binary(binary()) :: {:ok, t()} | {:error, :critical_bit_not_set | :invalid_binary}
   def from_binary(<<0x36::size(7), 1::size(1), 0x01, mode_byte>>) do
     case mode_from_byte(mode_byte) do
       {:ok, mode} ->
@@ -59,6 +63,8 @@ defmodule Grizzly.SmartStart.MetaExtension.BootstrappingMode do
   def from_binary(<<0x36::size(7), 0::size(1), _rest::binary>>) do
     {:error, :critical_bit_not_set}
   end
+
+  def from_binary(_), do: {:error, :invalid_binary}
 
   defp mode_to_byte(:security_2), do: 0x00
   defp mode_to_byte(:smart_start), do: 0x01

@@ -3,6 +3,51 @@ defmodule Grizzly.SmartStart.MetaExtension.UUID16Test do
 
   alias Grizzly.SmartStart.MetaExtension.UUID16
 
+  test "make a new uuid with hex format" do
+    expected_uuid = %UUID16{format: :hex, uuid: "0102030405060708090A141516171819"}
+
+    assert {:ok, expected_uuid} == UUID16.new(expected_uuid.uuid, :hex)
+  end
+
+  test "make a new uuid with ascii format" do
+    expected_uuid = %UUID16{format: :ascii, uuid: "Hello Elixir!!!!"}
+
+    assert {:ok, expected_uuid} == UUID16.new("Hello Elixir!!!!", :ascii)
+  end
+
+  test "make a new uuid with rfc format" do
+    expected_uuid = %UUID16{format: :rfc4122, uuid: "58D5E212-165B-4CA0-909B-C86B9CEE0111"}
+
+    assert {:ok, expected_uuid} == UUID16.new(expected_uuid.uuid, :rfc4122)
+  end
+
+  test "cannot create when hex uuid is too short" do
+    assert {:error, :invalid_uuid_length} == UUID16.new("0123", :hex)
+  end
+
+  test "cannot create when hex uuid is too long" do
+    assert {:error, :invalid_uuid_length} ==
+             UUID16.new("0102030405060708090A1415161718190102030405060708090A141516171819", :hex)
+  end
+
+  test "cannot create when ascii uuid is too short" do
+    assert {:error, :invalid_uuid_length} == UUID16.new("Hello!!!", :ascii)
+  end
+
+  test "cannot create when ascii uuid is too long" do
+    assert {:error, :invalid_uuid_length} == UUID16.new("Hello Elixir!!!!!!!!!!!!", :ascii)
+  end
+
+  test "cannot create when rfc4122 is too long" do
+    assert {:error, :invalid_uuid_length} ==
+             UUID16.new("58D5E212-165B-4CA0-909B-C86B9CEE01111", :rfc4122)
+  end
+
+  test "cannot create when rfc4122 is too short" do
+    assert {:error, :invalid_uuid_length} ==
+             UUID16.new("58D5E212-165B-4CA0-09B-C86B9CEE0111", :rfc4122)
+  end
+
   describe "from binary" do
     test "when critical bit is set" do
       binary = <<0x07, 0x11, 0x00, 0x00>>

@@ -5,6 +5,8 @@ defmodule Grizzly.SmartStart.MetaExtension.AdvancedJoining do
 
   For more information about S2 security see the `Grizzly.Security` module
   """
+  @behaviour Grizzly.SmartStart.MetaExtension
+
   import Bitwise
 
   alias Grizzly.Security
@@ -39,10 +41,17 @@ defmodule Grizzly.SmartStart.MetaExtension.AdvancedJoining do
   @doc """
   Create a binary string from an `AdvancedJoining.t()`
   """
-  @spec from_binary(binary()) :: {:ok, t()}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec from_binary(binary()) :: {:ok, t()} | {:error, :invalid_binary | :critical_bit_not_set}
   def from_binary(<<0x35::size(7), 0x01::size(1), 0x01, keys>>) do
     {:ok, %__MODULE__{keys: unmask_keys(keys)}}
   end
+
+  def from_binary(<<0x35::size(7), 0x00::size(1), _rest::binary>>) do
+    {:error, :critical_bit_not_set}
+  end
+
+  def from_binary(_), do: {:error, :invalid_binary}
 
   @doc """
   Create an `AdvancedJoining.t()` from a binary string
@@ -50,7 +59,8 @@ defmodule Grizzly.SmartStart.MetaExtension.AdvancedJoining do
   If the binary string does not have the critical bit set then this function
   will return `{:error, :critical_bit_not_set}`
   """
-  @spec to_binary(t()) :: {:ok, binary()} | {:error, :critical_bit_not_set}
+  @impl Grizzly.SmartStart.MetaExtension
+  @spec to_binary(t()) :: {:ok, binary()}
   def to_binary(%__MODULE__{keys: keys}) do
     keys_byte =
       Enum.reduce(keys, 0, fn
@@ -61,10 +71,6 @@ defmodule Grizzly.SmartStart.MetaExtension.AdvancedJoining do
       end)
 
     {:ok, <<0x35::size(7), 0x01::size(1), 0x01, keys_byte>>}
-  end
-
-  def to_binary(<<0x35::size(7), 0x00::size(1), _rest::binary>>) do
-    {:error, :critical_bit_not_set}
   end
 
   defp unmask_keys(byte) do
