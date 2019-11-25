@@ -54,7 +54,8 @@ defmodule Grizzly.CommandClass.ThermostatSetpoint do
   def encode_setpoint_type(:full_power), do: {:ok, 0x0F}
   def encode_setpoint_type(0x00), do: {:error, :invalid_arg, 0x00}
   def encode_setpoint_type(byte) when byte in 0x03..0x06, do: {:error, :invalid_arg, byte}
-  def encode_setpoint_type(byte), do: byte
+  def encode_setpoint_type(byte) when byte in 0x00..0xFF, do: {:ok, byte}
+  def encode_setpoint_type(byte), do: {:error, :invalid_arg, byte}
 
   @spec decode_setpoint_type(byte) :: setpoint_type
   def decode_setpoint_type(0x01), do: :heating

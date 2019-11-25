@@ -49,11 +49,20 @@ defmodule Grizzly.Command.Encoding do
               {:ok, maybe_encoded_value} ->
                 {:cont, {:ok, Map.put(acc, arg_name, maybe_encoded_value)}}
 
-              _ ->
+              {:error, _} ->
                 error =
                   EncodeError.new({:invalid_argument_value, arg_name, value, command_module})
 
                 {:halt, {:error, error}}
+
+              {:error, _, _} ->
+                error =
+                  EncodeError.new({:invalid_argument_value, arg_name, value, command_module})
+
+                {:halt, {:error, error}}
+
+              maybe_encoded_value ->
+                {:cont, {:ok, Map.put(acc, arg_name, maybe_encoded_value)}}
             end
         end
       end

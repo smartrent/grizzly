@@ -5,12 +5,13 @@ defmodule Grizzly.CommandClass.NodeProvisioning.Get do
     * `:dsk` - A DSK string to look up the device in the provisioning
       list. See `Grizzly.DSK` for more information
     * `:seq_number` - The sequence number of the Z/IP Packet
-    * `:retries` - The number of times to try to send the command (default 2) 
+    * `:retries` - The number of times to try to send the command (default 2)
   """
   @behaviour Grizzly.Command
 
   alias Grizzly.{Packet, DSK}
   alias Grizzly.Command.{EncodeError, Encoding}
+  alias Grizzly.SmartStart.MetaExtension
 
   @type t :: %__MODULE__{
           dsk: DSK.dsk_string(),
@@ -45,7 +46,7 @@ defmodule Grizzly.CommandClass.NodeProvisioning.Get do
   @spec handle_response(t, Packet.t()) ::
           {:continue, t}
           | {:done, {:error, :nack_response | :not_found}}
-          | {:done, {:ok, String.t()}}
+          | {:done, {:ok, %{dsk: DSK.dsk_string(), meta_extensions: [MetaExtension.t()]}}}
   def handle_response(%__MODULE__{seq_number: seq_number} = command, %Packet{
         seq_number: seq_number,
         types: [:ack_response]
@@ -73,7 +74,8 @@ defmodule Grizzly.CommandClass.NodeProvisioning.Get do
           body: %{
             command_class: :node_provisioning,
             command: :report,
-            dsk: dsk
+            dsk: dsk,
+            meta_extensions: extensions
           }
         }
       ) do
@@ -82,7 +84,7 @@ defmodule Grizzly.CommandClass.NodeProvisioning.Get do
         {:done, {:error, :not_found}}
 
       _dsk ->
-        {:done, {:ok, dsk}}
+        {:done, {:ok, %{dsk: dsk, meta_extensions: extensions}}}
     end
   end
 

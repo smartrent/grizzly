@@ -4,26 +4,30 @@ defmodule Grizzly.CommandClass.NodeProvisioning.Set do
 
     * `:dsk` - A DSK string for the device see `Grizzly.DSK`
       for more details
+    * `:meta_extensions` - a list of `Grizzly.SmartStart.MetaExtension.t()`
     * `:seq_number` - The sequence number of the Z/IP Packet
-    * `:retries` - The number of times to try to send the command (default 2) 
+    * `:retries` - The number of times to try to send the command (default 2)
   """
   @behaviour Grizzly.Command
 
   alias Grizzly.{Packet, DSK}
   alias Grizzly.Command.{EncodeError, Encoding}
+  alias Grizzly.SmartStart.MetaExtension
 
   @type t :: %__MODULE__{
           dsk: DSK.dsk_string(),
+          meta_extensions: [MetaExtension.t()],
           seq_number: Grizzly.seq_number(),
           retries: non_neg_integer()
         }
 
   @type opt ::
           {:dsk, DSK.dsk_string()}
+          | {:meta_extensions, [Grizzly.SmartStart.MetaExtension.t()]}
           | {:seq_number, Grizzly.seq_number()}
           | {:retries, non_neg_integer()}
 
-  defstruct dsk: nil, seq_number: nil, retries: 2
+  defstruct dsk: nil, meta_extensions: [], seq_number: nil, retries: 2
 
   @spec init([opt]) :: {:ok, t}
   def init(opts) do
@@ -34,9 +38,12 @@ defmodule Grizzly.CommandClass.NodeProvisioning.Set do
   def encode(%__MODULE__{dsk: _dsk, seq_number: seq_number} = command) do
     with {:ok, encoded} <-
            Encoding.encode_and_validate_args(command, %{
-             dsk: {:encode_with, DSK, :string_to_binary}
+             dsk: {:encode_with, DSK, :string_to_binary},
+             meta_extensions: {:encode_with, MetaExtension, :extensions_to_binary}
            }) do
-      binary = Packet.header(seq_number) <> <<0x78, 0x01, seq_number, 0x10>> <> encoded.dsk
+      binary =
+        Packet.header(seq_number) <>
+          <<0x78, 0x01, seq_number, 0x10>> <> encoded.dsk <> encoded.meta_extensions
 
       {:ok, binary}
     end
