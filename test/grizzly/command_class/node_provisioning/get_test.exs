@@ -61,13 +61,15 @@ defmodule Grizzly.CommandClass.NodeProvisioning.GetTest do
       report = %{
         command_class: :node_provisioning,
         command: :report,
-        dsk: expected_dsk
+        dsk: expected_dsk,
+        meta_extensions: []
       }
 
       {:ok, command} = Get.init(seq_number: 0x01)
       packet = Packet.new(body: report)
 
-      assert {:done, {:ok, expected_dsk}} == Get.handle_response(command, packet)
+      assert {:done, {:ok, %{dsk: expected_dsk, meta_extensions: []}}} ==
+               Get.handle_response(command, packet)
     end
 
     test "handles other responses" do

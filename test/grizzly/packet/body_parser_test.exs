@@ -409,7 +409,28 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert parsed == %{
                command_class: :node_provisioning,
                command: :report,
-               dsk: dsk_string
+               dsk: dsk_string,
+               meta_extensions: []
+             }
+    end
+
+    test "parses node provisioning report with dsk and meta extensions" do
+      dsk_binary = <<196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
+      extension_binary = <<0x69, 0x01, 0x00>>
+      binary = <<0x78, 0x06, 0x01, 0x10>> <> dsk_binary <> extension_binary
+
+      {:ok, dsk_string} = Grizzly.DSK.binary_to_string(dsk_binary)
+
+      {:ok, extensions} =
+        Grizzly.SmartStart.MetaExtension.extensions_from_binary(extension_binary)
+
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: :node_provisioning,
+               command: :report,
+               dsk: dsk_string,
+               meta_extensions: extensions
              }
     end
 
@@ -424,7 +445,31 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert parsed == %{
                command_class: :node_provisioning,
                command: :list_iteration_report,
-               value: %{seq_number: 8, remaining_count: 1, dsk: dsk_string}
+               value: %{seq_number: 8, remaining_count: 1, dsk: dsk_string, meta_extensions: []}
+             }
+    end
+
+    test "parses node provisioning list iteration report and extensions" do
+      dsk_binary = <<196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
+      extensions_binary = <<0x69, 0x01, 0x00, 0x04, 0x01, 0x54>>
+      binary = <<0x78, 0x04, 0x08, 0x01, 0x02>> <> dsk_binary <> extensions_binary
+
+      {:ok, dsk_string} = Grizzly.DSK.binary_to_string(dsk_binary)
+
+      {:ok, extensions} =
+        Grizzly.SmartStart.MetaExtension.extensions_from_binary(extensions_binary)
+
+      parsed = BodyParser.parse(binary)
+
+      assert parsed == %{
+               command_class: :node_provisioning,
+               command: :list_iteration_report,
+               value: %{
+                 seq_number: 8,
+                 remaining_count: 1,
+                 dsk: dsk_string,
+                 meta_extensions: extensions
+               }
              }
     end
 
