@@ -394,7 +394,8 @@ defmodule Grizzly.Packet.BodyParser.Test do
       assert parsed == %{
                command_class: :node_provisioning,
                command: :report,
-               dsk: :not_found
+               dsk: :not_found,
+               meta_extensions: []
              }
     end
 
