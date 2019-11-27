@@ -82,13 +82,13 @@ defmodule Grizzly.CommandClass.Time.OffsetSet do
                hour_tzo: {:range, 0, 14},
                minute_tzo: {:range, 0, 59},
                sign_offset_dst: :bit,
-               minute_offset_dst: {:range, 0, 59},
+               minute_offset_dst: {:range, 0, 60},
                month_start_dst: {:range, 1, 12},
                day_start_dst: {:range, 1, 31},
-               hour_start_dst: {:range, 0, 59},
+               hour_start_dst: {:range, 0, 23},
                month_end_dst: {:range, 1, 12},
                day_end_dst: {:range, 1, 31},
-               hour_end_dst: {:range, 0, 59}
+               hour_end_dst: {:range, 0, 23}
              },
              [:value]
            ) do
