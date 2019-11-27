@@ -580,7 +580,8 @@ defmodule Grizzly.Packet.BodyParser do
     %{
       command_class: :node_provisioning,
       command: :report,
-      dsk: :not_found
+      dsk: :not_found,
+      meta_extensions: []
     }
   end
 
