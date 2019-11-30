@@ -29,7 +29,8 @@ defmodule Grizzly.Conn.Server do
             connected?: boolean,
             socket: :inet.socket(),
             config: Config.t(),
-            heart_beat_interval: pos_integer,
+            heart_beat_interval: reference,
+            last_command_at: pos_integer,
             commands: [command]
           }
 
@@ -37,6 +38,7 @@ defmodule Grizzly.Conn.Server do
               socket: nil,
               config: nil,
               heart_beat_interval: nil,
+              last_command_at: nil,
               commands: []
 
     def build_command(command, from, mode, opts) do
@@ -109,7 +111,7 @@ defmodule Grizzly.Conn.Server do
     case do_send_command(command, state) do
       :ok ->
         command = State.build_command(command, from, :sync, opts)
-        {:noreply, %{state | commands: commands ++ [command]}}
+        {:noreply, %{state | last_command_at: now(), commands: commands ++ [command]}}
 
       {:error, _} = error ->
         {:reply, error, state}
@@ -124,7 +126,7 @@ defmodule Grizzly.Conn.Server do
     :ok = do_send_command(command, state)
     command = State.build_command(command, from, :async, opts)
 
-    {:reply, :ok, %{state | commands: commands ++ [command]}}
+    {:reply, :ok, %{state | last_command_at: now(), commands: commands ++ [command]}}
   end
 
   @impl true
@@ -133,8 +135,7 @@ defmodule Grizzly.Conn.Server do
       {:ok, socket} ->
         _ = Logger.info("connected to: #{inspect(config.ip, base: :hex)}")
         heart_beat_timer = heart_beat(config)
-
-        {:noreply, %{state | socket: socket, heart_beat_interval: heart_beat_timer}}
+        {:noreply, %{state | socket: socket, last_command_at: now(), heart_beat_interval: heart_beat_timer}}
 
       :noop ->
         {:noreply, state}
@@ -151,9 +152,15 @@ defmodule Grizzly.Conn.Server do
   end
 
   def handle_info(:heart_beat, %State{config: config, socket: socket} = state) do
-    apply(config.client, :send_heart_beat, [socket, [port: config.port]])
-    heart_beat_timer = heart_beat(config)
-    {:noreply, %{state | heart_beat_interval: heart_beat_timer}}
+    now = now()
+    if now - state.last_command_at >= config.heart_beat_timer do
+      apply(config.client, :send_heart_beat, [socket, [port: config.port]])
+      heart_beat_timer = heart_beat(config)
+      {:noreply, %{state | last_command_at: now, heart_beat_interval: heart_beat_timer}}
+    else
+      heart_beat_timer = heart_beat(config)
+      {:noreply, %{state | heart_beat_interval: heart_beat_timer}}
+    end
   end
 
   def handle_info(
@@ -293,4 +300,6 @@ defmodule Grizzly.Conn.Server do
   defp send_response(%{status: :active, from: from, mode: :sync}, response) do
     GenServer.reply(from, response)
   end
+
+  defp now, do: :os.system_time(:millisecond)
 end
