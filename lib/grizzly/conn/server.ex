@@ -134,7 +134,7 @@ defmodule Grizzly.Conn.Server do
     case maybe_autoconnect(config) do
       {:ok, socket} ->
         _ = Logger.info("connected to: #{inspect(config.ip, base: :hex)}")
-        heart_beat_timer = heart_beat(config)
+        heart_beat_timer = heart_beat(config.heart_beat_timer)
         {:noreply, %{state | socket: socket, last_command_at: now(), heart_beat_interval: heart_beat_timer}}
 
       :noop ->
@@ -153,12 +153,13 @@ defmodule Grizzly.Conn.Server do
 
   def handle_info(:heart_beat, %State{config: config, socket: socket} = state) do
     now = now()
-    if now - state.last_command_at >= config.heart_beat_timer do
+    elapsed_time = now - state.last_command_at
+    if elapsed_time >= config.heart_beat_timer do
       apply(config.client, :send_heart_beat, [socket, [port: config.port]])
-      heart_beat_timer = heart_beat(config)
+      heart_beat_timer = heart_beat(config.heart_beat_timer)
       {:noreply, %{state | last_command_at: now, heart_beat_interval: heart_beat_timer}}
     else
-      heart_beat_timer = heart_beat(config)
+      heart_beat_timer = heart_beat(config.heart_beat_timer - elapsed_time)
       {:noreply, %{state | heart_beat_interval: heart_beat_timer}}
     end
   end
@@ -194,7 +195,7 @@ defmodule Grizzly.Conn.Server do
     end
   end
 
-  defp heart_beat(%Config{heart_beat_timer: timer}) do
+  defp heart_beat(timer) do
     Process.send_after(self(), :heart_beat, timer)
   end
 
