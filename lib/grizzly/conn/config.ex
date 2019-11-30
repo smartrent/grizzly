@@ -13,15 +13,19 @@ defmodule Grizzly.Conn.Config do
   alias Grizzly.Client.DTLS
 
   @typedoc """
-  The configuration is define as follows:
+  The configuration is defined as follows:
 
-  port: server port
-  ip: server ip address
-  client: the client that will hanlde connecting and message processing
-  heart_beat_timer: the interval bewtween heart beats
-  autoconnect: on start applcations should the connection automatically attempt to connect
-  mode: either send command sync or aysnc. If sync is set then this will block the calller,
-  async is set then messages with the connection will be pushed to the calling process.
+   * `:port` - the server port.
+   * `:ip` - the server IP address.
+   * `:client` - the client that will handle connecting and message processing.
+   * `:heart_beat_timer` - the interval (in milliseconds) between heart beats.
+     This SHOULD be between 25-55 seconds.
+   * `:autoconnect` - whether or not the connection should automatically attempt
+     to connect on application start.
+   * `:mode` - can be `:sync` or `:async`. If `:sync` is set then this will
+     block the caller. If `:async` is set then messages with the connection will
+     be pushed to the calling process.
+
   """
   @type t :: %__MODULE__{
           port: :inet.port_number(),
