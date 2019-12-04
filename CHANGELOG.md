@@ -1,5 +1,36 @@
 ## Changelog
 
+## v0.8.0
+
+Adds support for handling SmartStart meta extension fields.
+
+These fields give more information about the current status, inclusion methods,
+and product information for the SmartStart device.
+
+There are two breaking changes:
+
+1. All SmartStart meta extensions were moved from `Grizzly.CommandClass.NodeProvisioning`
+   namespace into the `Grizzly.SmartStart.MetaExtension` namespace.
+2. Upon finalizing the meta extension behaviour and API we made changes to how
+   previously supported meta extensions worked. Namely, we added a `new/1`
+   callback that does parameter validation, and returns `{:ok, MetaExtension.t()}`.
+   This breaks the pervious behaviour of `to_binary/1` functions in perviously
+   implemented meta extensions.
+
+* Enhancements
+  * Full support for SmartStart meta extensions
+  * Add `meta_extensions` field to `Grizzly.CommandClass.NodeProvisioning`
+    commands that can handle meta extensions
+  * Update `Grizzly.Conn.Server.Config` docs
+* Fixes
+  * Invalid keep alive (heart beat) interval
+  * Set correct constraints on `Time` command offset values
+
+Thank you to those who contributed to this release:
+
+* Jean-Francois Cloutier
+* Ryan Winchester
+
 ## v0.7.0
 
 Introduces SmartStart support!
@@ -61,7 +92,7 @@ When using that function `send_command` would return
 ## v0.6.3
 
 * Enhancements
-  * Supports AssociationGroupInformation Command Class 
+  * Supports AssociationGroupInformation Command Class
 
 ## v0.6.2
 
@@ -73,7 +104,7 @@ When using that function `send_command` would return
 
 * Enhancements
   * Update commands `IntervalGet` and `ManufacturerSpecificGet` to be more
-    consistent 
+    consistent
   * Better handling of invalid `ManufacturerSpecific` info received from
     devices
 
@@ -134,7 +165,7 @@ validating specs for command arguments.
   * Support Powerlevel command class
   * Doc clean up
   * `Grizzly.send_command/2` and `Grizzly.send_command/3`
-     can be passed a node id instead of a node.
+    can be passed a node id instead of a node.
 
 ### v0.4.2
 
@@ -175,7 +206,6 @@ Double check the version of busybox you are using and make sure that
 version matches the version in the `pidof_bin` path.
 
 Changed `run_grizzly_bin` to `run_zipgateway_bin`.
-
 
 ## v0.3.1
 
@@ -262,4 +292,3 @@ Same change found in `Grizzly.Node.get_command_class_version`
     to `{Grizzly, :queued_response, ref, response}`
   * Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
-
