@@ -35,7 +35,7 @@ defmodule Grizzly do
   :ok = Grizzly.send_command(zw_node, Grizzly.CommandClass.SwitchBinary.Set, value: :on)
   ```
   This is useful because we maintain a heart beat with the node and overhead
-  of establishing the connection is removed from `send_command`. 
+  of establishing the connection is removed from `send_command`.
 
   In order for the consumer of Grizzly to use this in a long running application they
   will need to hold on to a reference to the connected Z-Wave Node.
@@ -43,6 +43,33 @@ defmodule Grizzly do
   To know more commands and their arguments see the modules under the
   `Grizzly.CommandClass` name space.
 
+  ## Subscribing to Z-Wave messages
+
+  `Grizzly` has a pubsub module (`Grizzly.Notifications`) which is used for
+  sending or receiving notifications to and from `Grizzly`.
+
+  You can subscribe to notifications using:
+
+  ```elixir
+  Grizzly.subscribe(topic)
+  ```
+
+  This will subscribe the calling process to the supplied topic. So, if you
+  are using `iex` you can see recevied messages with `flush`, although it would
+  be most useful from a `GenServer` where you can use `handle_info` to handle
+  the notifications.
+
+  The available topics are:
+
+      :controller_connected,
+      :connection_established,
+      :unsolicited_message,
+      :node_added,
+      :node_removed,
+      :node_updated
+
+  You can also `Grizzly.Notifications` directly, where there are additional and
+  more useful functions available.
   """
   alias Grizzly.{Conn, Command, Node, Controller, Notifications}
   alias Grizzly.Conn.Config

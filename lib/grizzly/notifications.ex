@@ -2,6 +2,41 @@ defmodule Grizzly.Notifications do
   @moduledoc """
   A pubsub module for sending and receiving notifications to
   and from Grizzly.
+
+  ## Subscribing to Z-Wave messages
+
+  You can subscribe to notifications using:
+
+  ```elixir
+  Grizzly.Notifications.subscribe(topic)
+  ```
+
+  or
+
+  ```elixir
+  Grizzly.Notifications.subscribe_all([topic1, topic2])
+  ```
+
+  This will subscribe the calling process to the supplied topic(s). So, if you
+  are using `iex` you can see recevied messages with `flush`, although it would
+  be most useful from a `GenServer` where you can use `handle_info/2` to handle
+  the notifications.
+
+  The available topics are:
+
+      :controller_connected,
+      :connection_established,
+      :unsolicited_message,
+      :node_added,
+      :node_removed,
+      :node_updated
+
+  You can unsubscribe with:
+
+  ```elixir
+  Grizzly.Notifications.unsubscribe(topic)
+  ```
+
   """
 
   require Logger

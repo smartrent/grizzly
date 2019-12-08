@@ -113,6 +113,26 @@ connection alive for faster response times.
 
 See the `Grizzly` module docs for more details about `Grizzly.send_command`
 
+### Handling Z-Wave Notifications
+
+Grizzly has a pubsub module (`Grizzly.Notifications`) which is used for sending
+or receiving notifications.
+
+You can subscribe to notifications using:
+
+```elixir
+Grizzly.Notifications.subscribe(topic)
+```
+
+or
+
+```elixir
+Grizzly.Notifications.subscribe_all(topic_list)
+```
+
+See [`Grizzly.Notifications`](https://hexdocs.pm/grizzly/Grizzly.Notifications.html)
+docs for more info.
+
 ## Z-Wave Bridge Configuration
 
 Grizzly defers the low-level Z-Wave protocol handling to a combination of third
@@ -214,7 +234,7 @@ config :grizzly,
 ```
 
 The `manufacturer_id` will be given to you by Silicon Labs, and will default
-to `0`if not set (this is `zipgateway` level default). 
+to `0`if not set (this is `zipgateway` level default).
 
 The above fields have no impact on the Grizzly runtime, and are only useful for
 certification processes.
