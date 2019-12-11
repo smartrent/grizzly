@@ -248,3 +248,4 @@ and you will need to pass in the location to your configuration like so:
 
 * [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)
 * [Z-Wave Learning Resources](https://www.silabs.com/products/wireless/learning-center/mesh-networking/z-wave)
+* [Specific Z-Wave product information](https://products.z-wavealliance.org/regions)
