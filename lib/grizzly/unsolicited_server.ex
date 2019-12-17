@@ -26,7 +26,7 @@ defmodule Grizzly.UnsolicitedServer do
         :listen,
         %State{config: %Config{ip_address: ip_address, ip_version: ip_version}} = state
       ) do
-    case :ssl.listen(41230, opts(ip_address, ip_version)) do
+    case ssl_listen(ip_address, ip_version) do
       {:ok, listensocket} ->
         _ = Logger.info("[GRIZZLY]: unsolicited server waiting for connections")
         start_accepting_sockets(listensocket)
@@ -40,6 +40,14 @@ defmodule Grizzly.UnsolicitedServer do
 
         Process.send_after(self(), :listen, 2_000)
         {:noreply, state}
+    end
+  end
+
+  def ssl_listen(ip_address, ip_version) do
+    try do
+      :ssl.listen(41230, opts(ip_address, ip_version))
+    rescue
+      error -> error
     end
   end
 
