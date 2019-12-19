@@ -1,5 +1,17 @@
 ## Changelog
 
+## v0.8.1
+
+* Enhancements
+  * Update docs and resources
+* Fixes
+  * An issue when the unsolicited message server would cause a
+    no match error that propagated up the supervision tree
+
+Thank you to those who contributed to this release:
+
+* Ryan Winchester
+
 ## v0.8.0
 
 Adds support for handling SmartStart meta extension fields.
