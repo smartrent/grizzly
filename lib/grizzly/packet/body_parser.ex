@@ -41,6 +41,7 @@ defmodule Grizzly.Packet.BodyParser do
     ThermostatSetback,
     UserCode,
     Version,
+    SwitchBinary,
     SwitchMultilevel,
     NetworkManagementInclusion,
     MultilevelSensor,
@@ -270,11 +271,21 @@ defmodule Grizzly.Packet.BodyParser do
     alarm
   end
 
-  def parse(<<0x25, 0x03, switch_state>>) do
+  def parse(<<0x25, 0x03, value>>) do
     %{
       command_class: :switch_binary,
       command: :report,
-      value: encode_switch_state(switch_state)
+      value: SwitchBinary.decode_switch_state(value)
+    }
+  end
+
+  def parse(<<0x25, 0x03, value, target_value, duration>>) do
+    %{
+      command_class: :switch_binary,
+      command: :report,
+      value: SwitchBinary.decode_switch_state(value),
+      target_value: SwitchBinary.decode_switch_state(target_value),
+      duration: duration
     }
   end
 
@@ -1022,10 +1033,6 @@ defmodule Grizzly.Packet.BodyParser do
       value: body
     }
   end
-
-  defp encode_switch_state(0x00), do: :off
-  defp encode_switch_state(0xFF), do: :on
-  defp encode_switch_state(0xFE), do: :unknown
 
   defp encode_basic_value(0x00), do: :off
   defp encode_basic_value(0xFF), do: :on

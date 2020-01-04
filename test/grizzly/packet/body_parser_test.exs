@@ -563,6 +563,19 @@ defmodule Grizzly.Packet.BodyParser.Test do
                value: :unknown
              }
     end
+
+    test "when report is v2" do
+      binary_switch_report = <<0x025, 0x03, 0x00, 0xFF, 0x01>>
+      parsed = BodyParser.parse(binary_switch_report)
+
+      assert parsed == %{
+               command_class: :switch_binary,
+               command: :report,
+               value: :off,
+               target_value: :on,
+               duration: 0x01
+             }
+    end
   end
 
   describe "parses basic report" do
