@@ -1,5 +1,10 @@
 ## Changelog
 
+## v0.8.2
+
+* Enhancements
+  * Support SWITCH_BINARY_REPORT version 2
+
 ## v0.8.1
 
 * Enhancements
