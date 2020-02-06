@@ -1,5 +1,10 @@
 ## Changelog
 
+## v0.8.3
+
+* Enhancements
+  * Support Wake Up v2 and Multi Channel Association v3
+
 ## v0.8.2
 
 * Enhancements
