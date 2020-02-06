@@ -10,10 +10,33 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.8.8"}
+    {:grizzly, "~> 0.8"}
   ]
 end
 ```
+
+## NG Checklist
+
+### TODOs
+
+- Support Assigning association groups
+- CommandClassList
+- Command.decode_params should be {:ok, params} or error
+- Update code base to `Grizzly.ZWave` types
+- Associations on adding a node? - probably add an option to `Grizzly.Inclusions.add_node/1`??
+- Monitor commands - is this still needed?
+- Figure out messages from Grizzly format
+  - {Grizzly, command_name, command}
+  - {Grizzly, command_name, command_ref, command}
+- Add section about config options (make them consistent)
+- After excluding a node, ensure the connection process is stopped
+- Device classes and command classes from byte should use `DecodeError`
+
+### Testing
+
+- Queued Commands
+- SmartStart
+- Test inclusion timeout handling
 
 ## Requirements
 
