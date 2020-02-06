@@ -1,51 +1,44 @@
 defmodule Grizzly.UnsolicitedServer do
+  @moduledoc false
   use GenServer
+
   require Logger
 
-  alias Grizzly.UnsolicitedServer.Config
-  alias Grizzly.UnsolicitedServer.Socket.Supervisor, as: SocketSupervisor
+  alias Grizzly.ZIPGateway
+  alias Grizzly.UnsolicitedServer.SocketSupervisor
 
   defmodule State do
     @moduledoc false
-    defstruct config: nil, socket: nil
+    defstruct ip_address: nil, socket: nil
   end
 
-  @spec start_link(Config.t()) :: GenServer.on_start()
-  def start_link(%Config{} = config) do
-    GenServer.start_link(__MODULE__, config, name: __MODULE__)
-  end
-
-  @impl true
-  def init(config) do
-    send(self(), :listen)
-    {:ok, %State{config: config}}
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   @impl true
-  def handle_info(
-        :listen,
-        %State{config: %Config{ip_address: ip_address, ip_version: ip_version}} = state
-      ) do
-    case ssl_listen(ip_address, ip_version) do
+  def init(_) do
+    {:ok, %State{ip_address: ZIPGateway.unsolicited_server_ip()}, {:continue, :listen}}
+  end
+
+  @impl true
+  def handle_continue(:listen, state) do
+    case ssl_listen(state.ip_address) do
       {:ok, listensocket} ->
-        _ = Logger.info("[GRIZZLY]: unsolicited server waiting for connections")
         start_accepting_sockets(listensocket)
         {:noreply, %{state | socket: nil}}
 
-      error ->
-        _ =
-          Logger.warn(
-            "[GRIZZLY]: Unable to bind unsolicited messages server. Error: #{inspect(error)}"
-          )
-
-        Process.send_after(self(), :listen, 2_000)
-        {:noreply, state}
+      _error ->
+        # wait 2 seconds to try again
+        _ = Logger.warn("[Grizzly]: Unsolicited server unable to listen")
+        :timer.sleep(2_000)
+        {:noreply, state, {:continue, :listen}}
     end
   end
 
-  def ssl_listen(ip_address, ip_version) do
+  def ssl_listen(ip_address) do
     try do
-      :ssl.listen(41230, opts(ip_address, ip_version))
+      :ssl.listen(41230, opts(ip_address))
     rescue
       error -> error
     end
@@ -57,8 +50,9 @@ defmodule Grizzly.UnsolicitedServer do
 
   def user_lookup(:psk, _username, userstate), do: {:ok, userstate}
 
-  def opts(ip_address, ip_version) do
+  def opts(ip_address) do
     [
+      :binary,
       {:ssl_imp, :new},
       {:active, true},
       {:verify, :verify_none},
@@ -71,8 +65,12 @@ defmodule Grizzly.UnsolicitedServer do
         <<0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
           0x90, 0xAA>>}},
       {:cb_info, {:gen_udp, :udp, :udp_close, :udp_error}},
-      ip_version,
+      ip_version_from_address(ip_address),
       {:ifaddr, ip_address}
     ]
   end
+
+  # move to ZIPPacket
+  defp ip_version_from_address({_, _, _, _}), do: :inet
+  defp ip_version_from_address({_, _, _, _, _, _, _, _}), do: :inet6
 end

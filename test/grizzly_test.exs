@@ -1,55 +1,41 @@
 defmodule Grizzly.Test do
   use ExUnit.Case
 
-  alias Grizzly.Conn
-  alias Grizzly.CommandClass.SwitchBinary.Set, as: SwitchBinarySet
-  alias Grizzly.CommandClass.SwitchBinary.Get, as: SwitchBinaryGet
-  alias Grizzly.CommandClass.NetworkManagementProxy.NodeListGet
-  alias Grizzly.CommandClass.Battery.Get, as: BatteryGet
-  alias Grizzly.CommandClass.ZipNd.InvNodeSolicitation
-  alias Grizzly.CommandClass.ManufacturerSpecific.Get, as: ManufacturerSpecificGet
-  alias Grizzly.Network.State, as: NetworkState
-  alias Grizzly.Command.EncodeError
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
 
-  setup do
-    config = Grizzly.config()
-    %Conn{} = conn = Conn.open(config)
-    :ok = NetworkState.set(:idle)
-    {:ok, %{conn: conn}}
-  end
-
-  describe "sending different types of command classes" do
-    test "send application command class", %{conn: conn} do
-      :ok = Grizzly.send_command(conn, SwitchBinarySet, seq_number: 0x08, value: :on)
+  describe "SwitchBinary Commands" do
+    @tag :integration
+    test "SwitchBinarySet version 1" do
+      assert :ok == Grizzly.send_command(2, :switch_binary_set, target_value: :off)
     end
 
-    test "send application command class that waits for a report", %{conn: conn} do
-      {:ok, :on} = Grizzly.send_command(conn, SwitchBinaryGet, seq_number: 0x01)
+    @tag :integration
+    test "SwitchBinarySet version 2" do
+      assert :ok == Grizzly.send_command(2, :switch_binary_set, target_value: :on, duration: 100)
     end
 
-    test "send network command class", %{conn: conn} do
-      {:ok, [1]} = Grizzly.send_command(conn, NodeListGet, seq_number: 0x01)
-    end
-
-    test "send management command class", %{conn: conn} do
-      {:ok, 90} = Grizzly.send_command(conn, BatteryGet, seq_number: 0x01)
-    end
-
-    test "send raw command class", %{conn: conn} do
-      {:ok, %{home_id: 3_476_769_508, ip_address: {64768, 48059, 0, 0, 0, 0, 0, 6}, node_id: 6}}
-      Grizzly.send_command(conn, InvNodeSolicitation, node_id: 0x06)
-    end
-
-    test "send the manufacturer specific command", %{conn: conn} do
-      assert {:ok, %{manufacturer_id: 335, product_id: 21558, product_type_id: 21570}} ==
-               Grizzly.send_command(conn, ManufacturerSpecificGet, seq_number: 0x01)
+    @tag :integration
+    test "SWitchBinaryGet" do
+      assert SwitchBinaryReport.new(target_value: :off) ==
+               Grizzly.send_command(2, :switch_binary_get)
     end
   end
 
-  describe "sending bad stuff to grizzly" do
-    test "send values to switch binary set", %{conn: conn} do
-      {:error, %EncodeError{}} =
-        Grizzly.send_command(conn, SwitchBinarySet, seq_number: 0x08, value: :grizzly)
-    end
+  @tag :integration
+  test "handles nack responses" do
+    assert {:error, :nack_response} == Grizzly.send_command(101, :switch_binary_get)
+  end
+
+  @tag :integration
+  test "send a command to a node that hasn't been connected to yet" do
+    assert SwitchBinaryReport.new(target_value: :off) ==
+             Grizzly.send_command(50, :switch_binary_get)
+  end
+
+  @tag :integration
+  test "send a command to a device that is sleeping" do
+    {:queued, ref, 2} = Grizzly.send_command(102, :battery_get)
+
+    assert is_reference(ref)
   end
 end

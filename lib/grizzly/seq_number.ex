@@ -1,15 +1,6 @@
 defmodule Grizzly.SeqNumber do
-  @moduledoc """
-  Used for managing sequence numbers.
+  @moduledoc false
 
-  According to Z-Wave Network documentation we have to
-  have a global seq number between the values 0x00 and 0xFF (0 - 255).
-
-  This process is used for getting the current sequence number and incrementing
-  the number correctly. After hitting 0xFF (255) the numer will start back at 0x00 (0).
-
-  This is process is only meant to be used internal to the application.
-  """
   use GenServer
 
   def start_link(start_number) do
