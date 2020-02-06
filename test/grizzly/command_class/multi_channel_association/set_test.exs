@@ -22,7 +22,7 @@ defmodule Grizzly.CommandClass.MultiChannelAssociation.Set.Test do
       endpoints = [
         %{node_id: 2, endpoint: 2},
         %{node_id: 3, endpoint: 3},
-        %{node_id: 3, endpoint: 4}
+        %{node_id: 3, endpoint: 0}
       ]
 
       {:ok, command} =
@@ -30,7 +30,7 @@ defmodule Grizzly.CommandClass.MultiChannelAssociation.Set.Test do
 
       binary =
         <<35, 2, 128, 208, 6, 0, 0, 3, 2, 0, 0x8E, 0x01, 0x02, 0x02, 0x03, 0x00, 0x02, 0x02, 0x03,
-          0x03, 0x03, 0x04>>
+          0x03, 0x03, 0x00>>
 
       assert {:ok, binary} == Set.encode(command)
     end

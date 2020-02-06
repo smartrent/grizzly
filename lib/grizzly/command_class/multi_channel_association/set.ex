@@ -53,7 +53,7 @@ defmodule Grizzly.CommandClass.MultiChannelAssociation.Set do
              %{
                group: {:range, 2, 255},
                nodes: [:byte],
-               endpoints: [%{node_id: {:range, 1, 127}, endpoint: :byte}]
+               endpoints: [%{node_id: {:range, 0, 127}, endpoint: :byte}]
              }
            ) do
       encoded_nodes = :erlang.list_to_binary(nodes)

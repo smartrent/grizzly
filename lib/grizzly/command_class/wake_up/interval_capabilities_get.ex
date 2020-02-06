@@ -71,13 +71,13 @@ defmodule Grizzly.CommandClass.WakeUp.IntervalCapabilitiesGet do
   end
 
   def handle_response(%__MODULE__{}, %Packet{
-        body:
-          %{
-            command_class: :wake_up,
-            command: :interval_capabilities_report
-          } = body
+        body: %{
+          command_class: :wake_up,
+          command: :wake_up_interval_capabilities_report,
+          value: value
+        }
       }) do
-    {:done, {:ok, Map.drop(body, [:command_class, :command])}}
+    {:done, {:ok, value}}
   end
 
   def handle_response(%__MODULE__{} = command, %Packet{}) do
