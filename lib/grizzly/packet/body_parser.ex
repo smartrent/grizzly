@@ -645,6 +645,7 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
+  # Version 1
   def parse(<<0x84, 0x06, seconds::size(3)-unit(8), node_id, _rest::binary()>>) do
     %{
       command_class: :wake_up,
@@ -658,15 +659,17 @@ defmodule Grizzly.Packet.BodyParser do
 
   def parse(
         <<0x84, 0x0A, min_interval::size(3)-unit(8), max_interval::size(3)-unit(8),
-          default_interval::size(3)-unit(8), interval_step::size(3)-unit(8)>>
+          default_interval::size(3)-unit(8), interval_step::size(3)-unit(8), _rest::binary()>>
       ) do
     %{
-      command_class: Mappings.from_byte(0x84),
-      command: Mappings.command_from_byte(0x84, 0x0A),
-      min_interval: min_interval,
-      max_interval: max_interval,
-      default_interval: default_interval,
-      interval_step: interval_step
+      command_class: :wake_up,
+      command: :wake_up_interval_capabilities_report,
+      value: %{
+        min_interval: min_interval,
+        max_interval: max_interval,
+        default_interval: default_interval,
+        interval_step: interval_step
+      }
     }
   end
 
