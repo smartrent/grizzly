@@ -1,11 +1,16 @@
 defmodule Grizzly.Transport do
   @moduledoc false
 
-  @callback open(:inet.ip_address(), :inet.port_number()) :: {:ok, :inet.socket()}
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
-  @callback send(:inet.socket(), binary()) :: :ok
+  @type socket :: :ssl.sslsocket() | :inet.socket()
 
-  @callback parse_response(any()) :: {:ok, binary()}
+  @callback open(:inet.ip_address(), :inet.port_number()) ::
+              {:ok, socket()} | {:error, :timeout}
 
-  @callback close(:inet.socket()) :: :ok
+  @callback send(socket(), binary()) :: :ok
+
+  @callback parse_response(any()) :: {:ok, ZIPPacket.t()}
+
+  @callback close(socket()) :: :ok
 end

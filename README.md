@@ -15,6 +15,30 @@ def deps do
 end
 ```
 
+## NG Checklist
+
+- Associations on adding a node?
+- Pass handler to send_command?
+- s2 inclusion
+- add node parse command classes
+- Rethink how Grizzly should start
+- Add `Null` CommandHandler?
+- Test inclusion timeout handling
+- Tag tests to not run all by default
+- remove controlling process from transport
+- Monitor commands 
+- Figure out messages from Grizzly format
+  - {Grizzly, command_name, command}
+  - {Grizzly, command_name, command_ref, command}
+- command support lookup table and better error messages
+- Add section about config options (make them consistent)
+
+
+- Inclusion
+  - ~Does returning the command ref always make sense?~
+  - Should node add wait for the node status report
+
+
 ## Requirements
 
 - [Z-Wave Bridge Controller](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)

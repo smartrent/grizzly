@@ -1,8 +1,7 @@
 use Mix.Config
 
-config :mix_test_watch,
-  clear: true,
-  tasks: [
-    "dialyzer --format dialyxir",
-    "test --stale --no-start"
+config :grizzly,
+  runtime: [
+    auto_start: false,
+    run_zipgateway_bin: false
   ]
