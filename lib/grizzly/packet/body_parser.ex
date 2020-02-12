@@ -612,20 +612,36 @@ defmodule Grizzly.Packet.BodyParser do
         <<0x78, 0x04, seq_number::size(8), remaining_count::size(8), _reserved::size(3),
           _dsk_length::size(5), rest::binary>>
       ) do
-    <<dsk_binary::binary-size(16), extensions::binary()>> = rest
-    {:ok, dsk_string} = DSK.binary_to_string(dsk_binary)
-    {:ok, meta_extensions} = Grizzly.SmartStart.MetaExtension.extensions_from_binary(extensions)
+    case rest do
+      <<>> ->
+        %{
+          command_class: :node_provisioning,
+          command: :list_iteration_report,
+          value: %{
+            seq_number: seq_number,
+            remaining_count: 0,
+            dsk: nil,
+            meta_extensions: []
+          }
+        }
 
-    %{
-      command_class: :node_provisioning,
-      command: :list_iteration_report,
-      value: %{
-        seq_number: seq_number,
-        remaining_count: remaining_count,
-        dsk: dsk_string,
-        meta_extensions: meta_extensions
-      }
-    }
+      <<dsk_binary::binary-size(16), extensions::binary()>> ->
+        {:ok, dsk_string} = DSK.binary_to_string(dsk_binary)
+
+        {:ok, meta_extensions} =
+          Grizzly.SmartStart.MetaExtension.extensions_from_binary(extensions)
+
+        %{
+          command_class: :node_provisioning,
+          command: :list_iteration_report,
+          value: %{
+            seq_number: seq_number,
+            remaining_count: remaining_count,
+            dsk: dsk_string,
+            meta_extensions: meta_extensions
+          }
+        }
+    end
   end
 
   def parse(
