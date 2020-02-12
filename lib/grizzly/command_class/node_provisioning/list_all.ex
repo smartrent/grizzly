@@ -83,8 +83,13 @@ defmodule Grizzly.CommandClass.NodeProvisioning.ListAll do
           }
         }
       ) do
-    info = Map.drop(list_iteration_report, ~w(remaining_count seq_number)a)
-    {:done, {:ok, Enum.reverse([info | buffer])}}
+    info = %{dsk: dsk} = Map.drop(list_iteration_report, ~w(remaining_count seq_number)a)
+
+    if dsk == nil do
+      {:done, {:ok, Enum.reverse(buffer)}}
+    else
+      {:done, {:ok, Enum.reverse([info | buffer])}}
+    end
   end
 
   def handle_response(
