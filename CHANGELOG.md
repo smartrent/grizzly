@@ -1,5 +1,11 @@
 ## Changelog
 
+## v0.8.4
+
+* Fixes
+  * Handle when there are no nodes in the node provisioning list when
+    requesting all the DSKs.
+
 ## v0.8.3
 
 * Enhancements
