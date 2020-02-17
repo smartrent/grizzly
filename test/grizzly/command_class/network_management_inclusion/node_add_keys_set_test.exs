@@ -84,7 +84,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddKeysSet.Test do
 
       expected_report_info = %{required_input_length: 2, dsk: <<0x01, 0x03, 0x05>>}
 
-      assert {:done, {:dsk_report_info, expected_report_info}} ==
+      assert {:send_message, {:dsk_report_info, expected_report_info}, command} ==
                NodeAddKeysSet.handle_response(command, packet)
     end
   end

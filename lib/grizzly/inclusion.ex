@@ -481,6 +481,13 @@ defmodule Grizzly.Inclusion do
     seq_number = SeqNumber.get_and_inc()
     keys_to_grant = Keyword.get(inclusion_opts, :s2_keys)
 
+    _ =
+      Logger.debug(
+        "Handling info :node_add_keys_report. Sending NodeAddKeysSet command with #{
+          inspect(keys_to_grant)
+        }"
+      )
+
     :ok =
       Grizzly.send_command(
         conn,
@@ -500,6 +507,11 @@ defmodule Grizzly.Inclusion do
       ) do
     seq_number = SeqNumber.get_and_inc()
 
+    _ =
+      Logger.debug(
+        "Handling info :dsk_report_info NodeAddDSKSet input_dsk_length = 0. Sending NodeAddDSKSet with input_dsk_length: 0"
+      )
+
     :ok = Grizzly.send_command(conn, NodeAddDSKSet, seq_number: seq_number, input_dsk_length: 0)
 
     send_to_client(inclusion_opts, :sending_dsk_input)
@@ -512,9 +524,11 @@ defmodule Grizzly.Inclusion do
       ) do
     case Keyword.get(inclusion_opts, :pin) do
       nil ->
+        _ = Logger.debug("Handling :dsk_report_info - client is to provide s2 pin")
         send_to_client(inclusion_opts, :provide_S2_pin)
 
       pin ->
+        _ = Logger.debug("Handling info :dsk_report_info NodeAddDSKSet input_dsk_length = 2.")
         _ = send_node_add_dsk_set(conn, pin)
         send_to_client(inclusion_opts, :sending_dsk_input)
     end
@@ -584,6 +598,7 @@ defmodule Grizzly.Inclusion do
 
   defp send_node_add_dsk_set(conn, pin) do
     seq_number = SeqNumber.get_and_inc()
+    _ = Logger.debug("Sending NodeAddDSKSet with pin #{pin}")
 
     Grizzly.send_command(
       conn,

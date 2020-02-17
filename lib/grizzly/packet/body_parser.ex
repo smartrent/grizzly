@@ -108,7 +108,7 @@ defmodule Grizzly.Packet.BodyParser do
     }
   end
 
-  def parse(<<0x34, 0x13, seq_no, _::size(4), input_dsk_length::size(4), dsk::binary-size(16)>>) do
+  def parse(<<0x34, 0x13, seq_no, _::size(4), input_dsk_length::size(4), dsk::binary>>) do
     %{
       command_class: :network_management_inclusion,
       command: :node_add_dsk_report,

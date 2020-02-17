@@ -6,7 +6,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
   add the node and do the security (if S0) exchange at the `zipgateway`
   level.
 
-  If the inclusin process is for S2 security, there will be a
+  If the inclusion process is for S2 security, there will be a
   node add keys report, which is to request granting what level
   of S2 security the user ought to grant. This request will let
   the caller know if Client Side Authentication is request and what
@@ -20,7 +20,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
   alias Grizzly.CommandClass.NetworkManagementInclusion
 
   @typedoc """
-  Mode for the controller to use during inclsion
+  Mode for the controller to use during inclusion
 
   - `:any` - add any type of node to the network and allow for S0 bootstrapping
   - `:stop` - stop add mode
@@ -108,7 +108,9 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
     {:done, {:error, :node_add_failed}}
   end
 
-  def handle_response(_, %Packet{body: %{command: :node_add_status, status: status} = report})
+  def handle_response(_, %Packet{
+        body: %{command: :node_add_status, status: status} = report
+      })
       when status in [:done, :security_failed] do
     zw_node =
       Node.new(
@@ -134,7 +136,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAdd do
           }
         }
       ) do
-    {
+    _ = {
       :send_message,
       {:node_add_keys_report, %{csa?: csa?, requested_keys: requested_keys}},
       command

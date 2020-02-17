@@ -73,18 +73,28 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeAddKeysSet do
     {:continue, command}
   end
 
-  def handle_response(_, %Packet{body: %{command: :node_add_dsk_report} = report}) do
+  # THIS IS NEVER EXECUTED
+  def handle_response(command, %Packet{body: %{command: :node_add_dsk_report} = report}) do
     dsk_report_info = %{
       required_input_length: report.input_length,
       dsk: report.dsk
     }
 
-    {:done, {:dsk_report_info, dsk_report_info}}
+    _ = Logger.debug(":node_add_dsk_report report = #{inspect(report)}")
+
+    {
+      :send_message,
+      {:dsk_report_info, dsk_report_info},
+      command
+    }
   end
 
-  def handle_response(command, packet) do
-    _ = Logger.warn("Unhandled response for setting keys: #{inspect(packet)}")
+  def handle_response(%__MODULE__{} = command, packet) do
+    _ = Logger.debug("NodeAddKeysSet is not handling response #{inspect(packet)}")
+    {:continue, command}
+  end
 
+  def handle_response(command, _) do
     {:continue, command}
   end
 end
