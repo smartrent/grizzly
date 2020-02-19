@@ -167,7 +167,7 @@ defmodule Grizzly do
   This does not make a DTLS connection to the `Node.t()`
   and if you want to connect to the node use `Grizzly.Node.connect/1`.
   """
-  @spec get_node(Node.node_id()) :: {:ok, Node.t()} | {:error, :node_not_found}
+  @spec get_node(Node.node_id()) :: {:ok, Node.t()} | {:error, any()}
   defdelegate get_node(node_id), to: Grizzly.Network
 
   @doc """
@@ -179,7 +179,7 @@ defmodule Grizzly do
   @doc """
   List the nodes on the Z-Wave network
   """
-  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unable_to_get_nodes}
+  @spec get_nodes() :: {:ok, [Node.t()]} | {:error, :unable_to_get_node_list}
   defdelegate get_nodes(), to: Grizzly.Network
 
   @doc """

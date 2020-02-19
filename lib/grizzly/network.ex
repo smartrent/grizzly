@@ -100,7 +100,7 @@ defmodule Grizzly.Network do
   @doc """
   Get a Node from the Z-Wave network
   """
-  @spec get_node(Node.node_id()) :: {:ok, Node.t()} | {:error, :nack_response}
+  @spec get_node(Node.node_id()) :: {:ok, Node.t()} | {:error, any()}
   def get_node(node_id) do
     with {:ok, node_info} <- get_node_info(node_id),
          {:ok, %{ip_address: ip_address, home_id: home_id}} <-

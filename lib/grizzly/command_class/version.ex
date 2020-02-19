@@ -70,7 +70,8 @@ defmodule Grizzly.CommandClass.Version do
   @doc """
   Encode command class
   """
-  @spec encode_command_class(atom) :: {:ok, byte} | {:error, :invalid_arg, any()}
+  @spec encode_command_class(Mappings.command_class_name()) ::
+          {:ok, byte} | {:error, :invalid_arg, Mappings.command_class_name()}
   def encode_command_class(command_class) do
     case Mappings.to_byte(command_class) do
       {:unk, _} ->
