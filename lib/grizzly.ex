@@ -55,7 +55,7 @@ defmodule Grizzly do
   ```
 
   This will subscribe the calling process to the supplied topic. So, if you
-  are using `iex` you can see recevied messages with `flush`, although it would
+  are using `iex` you can see received messages with `flush`, although it would
   be most useful from a `GenServer` where you can use `handle_info` to handle
   the notifications.
 
@@ -78,7 +78,7 @@ defmodule Grizzly do
   @type seq_number :: 0..255
 
   @typedoc """
-  A type the repersents things the have/can establish connections
+  A type the represents things the have/can establish connections
   to the Z/IP network.
   1. `Conn.t` - A Connection struct
   2. `Grizzly.Controller` - The controller process, this is a global, started on

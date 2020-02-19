@@ -71,7 +71,7 @@ defmodule Grizzly.CommandClass.NetworkManagementBasic do
   end
 
   @doc """
-  Decode the bytestring that is returned from Z-Wave that has the DSK
+  Decode the binary that is returned from Z-Wave that has the DSK
   report
   """
   @spec decode_dsk_report(binary()) :: dsk_get_report()

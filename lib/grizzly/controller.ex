@@ -3,7 +3,7 @@ defmodule Grizzly.Controller do
   This module is for Z-Wave controller level operations.
 
   That mostly having to handle network related calls like
-  adding/removing a node, geting nodes' IP, listing nodes,
+  adding/removing a node, getting nodes' IP, listing nodes,
   and etc.
   """
   use GenServer
