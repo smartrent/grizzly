@@ -30,7 +30,7 @@ defmodule Grizzly.SmartStart.MetaExtension.ProductId do
           product_id :: u16(),
           product_type :: u16(),
           application_version :: {byte(), byte()}
-        ) :: {:ok, t()} | {:error, :invalidate_param, param(), any()}
+        ) :: {:ok, t()} | {:error, :invalid_param_argument, param(), any()}
   def new(manufacturer_id, product_id, product_type, application_version) do
     with :ok <- validate_param(:manufacturer_id, manufacturer_id),
          :ok <- validate_param(:product_id, product_id),

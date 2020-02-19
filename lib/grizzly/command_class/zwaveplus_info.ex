@@ -22,7 +22,7 @@ defmodule Grizzly.CommandClass.ZwaveplusInfo do
           | :ip_gateway
           | :reserved
 
-  @spec decode_role_type(value :: byte) :: role_type
+  @spec decode_role_type(value :: 0x00..0x07) :: role_type
   def decode_role_type(0x00), do: :controller_central_static
   def decode_role_type(0x01), do: :controller_sub_static
   def decode_role_type(0x02), do: :controller_portable

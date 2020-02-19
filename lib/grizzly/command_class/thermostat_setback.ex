@@ -24,7 +24,7 @@ defmodule Grizzly.CommandClass.ThermostatSetback do
   def decode_setback_type(0x02), do: :permanent_override
   def decode_setback_type(byte), do: byte
 
-  @spec encode_setback_state(setback_state) :: {:ok, byte} | {:error, :invalid_arg, any()}
+  @spec encode_setback_state(setback_state) :: {:ok, byte} | {:error, :invalid_arg, 0x7B..0x7F}
   def encode_setback_state(:frost_protection), do: {:ok, 0x79}
   def encode_setback_state(:energy_saving_mode), do: {:ok, 0x7A}
   def encode_setback_state(state) when state in 0x7B..0x7E, do: {:error, :invalid_arg, state}

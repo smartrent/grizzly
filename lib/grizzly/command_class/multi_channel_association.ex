@@ -21,7 +21,7 @@ defmodule Grizzly.CommandClass.MultiChannelAssociation do
     @multi_channel_association_marker
   end
 
-  @spec encode_endpoints(endpoints) :: {:ok, binary} | {:error, :invalid_arg, any()}
+  @spec encode_endpoints(endpoints) :: {:ok, binary}
   def encode_endpoints(endpoints) do
     encoded =
       Enum.reduce(
