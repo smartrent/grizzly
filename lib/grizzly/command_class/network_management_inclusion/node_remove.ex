@@ -2,7 +2,7 @@ defmodule Grizzly.CommandClass.NetworkManagementInclusion.NodeRemove do
   @moduledoc """
   A module for working with the NODE_REMOVE command
 
-  This command is used for activing or de-activing the node
+  This command is used for activating or de-activating the node
   remove mode.
   """
   @behaviour Grizzly.Command

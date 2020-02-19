@@ -13,7 +13,7 @@ defmodule Grizzly.Inclusion do
   if you pass the `:client` option into the call that points to
   a `pid`, messages will be sent to that process.
 
-  Moverover, the caller can pass in the `:timeout` option inorder to
+  Move over, the caller can pass in the `:timeout` option in order to
   set the timeout of the inclusion. By default this is set to one minute.
 
   ## Adding Nodes

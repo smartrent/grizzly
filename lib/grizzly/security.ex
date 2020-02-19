@@ -61,7 +61,7 @@ defmodule Grizzly.Security do
   def validate_user_input_pin_length(_), do: :invalid
 
   @doc """
-  Decode a byte repersentation of the key exchanged failed type
+  Decode a byte representation of the key exchanged failed type
   """
   @spec failed_type_from_byte(byte()) :: key_exchange_fail_type() | :unk
   def failed_type_from_byte(0x00), do: :none
@@ -77,7 +77,7 @@ defmodule Grizzly.Security do
   def failed_type_from_byte(_), do: :unk
 
   @doc """
-  Get the byte repersentation of a key.
+  Get the byte representation of a key.
 
   The key `:none` is an invalid key to encode to,
   so this function does not support encoding to that

@@ -2,14 +2,14 @@ defmodule Grizzly.Packet do
   @moduledoc """
   Module for working with raw Z/IP packets
 
-  This is used to marshell a Z/IP packet of bytes
+  This is used to marshall a Z/IP packet of bytes
   into an Elixir data structure for use to work with.
 
-  This data structure is a more "lower level" repersentation of
-  the messaging between this library and Zwave. Most the time
+  This data structure is a more "lower level" representation of
+  the messaging between this library and Z-Wave. Most the time
   you should probably be working with a `Grizzly.Message`.
 
-  This structure is for internal btye string parsing.
+  This structure is for internal byte string parsing.
   """
 
   # TODO: @mattludwigs - make a `to_message` function here or a `from_packet` function in

@@ -18,7 +18,7 @@ defmodule Grizzly.Notifications do
   ```
 
   This will subscribe the calling process to the supplied topic(s). So, if you
-  are using `iex` you can see recevied messages with `flush`, although it would
+  are using `iex` you can see received messages with `flush`, although it would
   be most useful from a `GenServer` where you can use `handle_info/2` to handle
   the notifications.
 
