@@ -173,7 +173,7 @@ defmodule Grizzly do
   @doc """
   Reset the Z-Wave Module to a clean state
   """
-  @spec reset_controller() :: :ok | {:error, :network_busy}
+  @spec reset_controller() :: {:ok, atom()} | {:error, :network_busy}
   defdelegate reset_controller(), to: Grizzly.Network, as: :reset
 
   @doc """
