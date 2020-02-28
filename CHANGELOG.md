@@ -1,5 +1,11 @@
 ## Changelog
 
+## v0.8.5
+
+* Fixes
+  * various spelling and documentation fixes
+  * dialzyer fixes
+
 ## v0.8.4
 
 * Fixes
