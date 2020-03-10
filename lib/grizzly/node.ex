@@ -29,7 +29,6 @@ defmodule Grizzly.Node do
           conn: Conn.t() | nil,
           associations: [Association.t()],
           listening?: boolean(),
-          security: security(),
           home_id: pos_integer()
         }
 
@@ -44,7 +43,6 @@ defmodule Grizzly.Node do
             associations: [],
             conn: nil,
             listening?: false,
-            security: :none,
             home_id: nil
 
   @spec new(opts :: keyword) :: t
