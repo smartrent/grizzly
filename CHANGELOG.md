@@ -1,5 +1,10 @@
 ## Changelog
 
+## v0.8.6
+
+* Fixes
+  * duplicate fields on the `Grizzly.Node` struct
+
 ## v0.8.5
 
 * Fixes
