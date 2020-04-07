@@ -518,10 +518,44 @@ defmodule Grizzly.Packet.BodyParser do
     |> Map.put(:command, :version_report)
   end
 
+  # version >= 5
   def parse(
         <<0x7A, 0x02, manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8), checksum::size(2)-binary-unit(8),
-          _rest::binary>>
+          firmware_id::size(2)-integer-unsigned-unit(8),
+          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
+          max_fragment_size::size(2)-integer-unsigned-unit(8),
+          other_firmware_ids::size(firmware_targets)-binary-unit(16), hardware_version,
+          _rest::binary>> = packet
+      ) do
+    pairs = other_firmware_ids |> Kernel.to_charlist() |> Enum.chunk_every(2)
+    target_firmware_ids = for [high, low] <- pairs, do: high * 16 + low
+
+    report = %{
+      manufacturer_id: manufacturer_id,
+      # chip firmware id
+      firmware_id: firmware_id,
+      checksum: checksum,
+      firmware_upgradable: firmware_upgradable != 0,
+      max_fragment_size: max_fragment_size,
+      hardware_version: hardware_version,
+      number_of_firmware_targets: firmware_targets,
+      target_firmware_ids: target_firmware_ids
+    }
+
+    Logger.info("[Grizzly] Firmware update metadata report v5 = #{inspect(report)}")
+
+    %{
+      command_class: FirmwareUpdateMD,
+      command: :report,
+      value: report
+    }
+  end
+
+  # version >= 1
+  def parse(
+        <<0x7A, 0x02, manufacturer_id::size(2)-integer-unsigned-unit(8),
+          firmware_id::size(2)-integer-unsigned-unit(8),
+          checksum::size(2)-integer-unsigned-unit(8), _rest::binary>> = packet
       ) do
     report = %{manufacturer_id: manufacturer_id, firmware_id: firmware_id, checksum: checksum}
 
