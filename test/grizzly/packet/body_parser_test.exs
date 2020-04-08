@@ -823,7 +823,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
                value: %{
                  manufacturer_id: 1,
                  firmware_id: 2,
-                 checksum: "ab"
+                 checksum: 24930
                }
              }
     end
