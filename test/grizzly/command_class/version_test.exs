@@ -52,10 +52,8 @@ defmodule Grizzly.CommandClass.Version.Test do
   test "decoding the version report" do
     report = %{
       protocol_library: :controller,
-      protocol_version: 1,
-      protocol_sub_version: 1,
-      firmware_version: 1,
-      firmware_sub_version: 1
+      protocol_version: "1.1",
+      firmware_version: "1.1"
     }
 
     assert {:ok, report} == Version.decode_version_report(<<0x02, 0x01, 0x01, 0x01, 0x01>>)

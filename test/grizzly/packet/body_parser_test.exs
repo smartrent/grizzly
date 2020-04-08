@@ -823,7 +823,7 @@ defmodule Grizzly.Packet.BodyParser.Test do
                value: %{
                  manufacturer_id: 1,
                  firmware_id: 2,
-                 checksum: "ab"
+                 checksum: 24930
                }
              }
     end
@@ -859,10 +859,8 @@ defmodule Grizzly.Packet.BodyParser.Test do
                command_class: Version,
                command: :version_report,
                protocol_library: :controller,
-               protocol_version: 1,
-               protocol_sub_version: 1,
-               firmware_version: 1,
-               firmware_sub_version: 1
+               protocol_version: "1.1",
+               firmware_version: "1.1"
              }
     end
   end
