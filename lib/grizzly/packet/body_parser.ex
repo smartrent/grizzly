@@ -557,7 +557,20 @@ defmodule Grizzly.Packet.BodyParser do
       target_firmware_ids: target_firmware_ids
     }
 
-    _ = Logger.info("[Grizzly] Firmware update metadata report v5 = #{inspect(report)}")
+    %{
+      command_class: FirmwareUpdateMD,
+      command: :report,
+      value: report
+    }
+  end
+
+  # version >= 1
+  def parse(
+        <<0x7A, 0x02, manufacturer_id::size(2)-integer-unsigned-unit(8),
+          firmware_id::size(2)-integer-unsigned-unit(8),
+          checksum::size(2)-integer-unsigned-unit(8), _rest::binary>>
+      ) do
+    report = %{manufacturer_id: manufacturer_id, firmware_id: firmware_id, checksum: checksum}
 
     %{
       command_class: FirmwareUpdateMD,

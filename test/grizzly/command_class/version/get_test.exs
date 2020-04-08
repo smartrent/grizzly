@@ -44,10 +44,8 @@ defmodule Grizzly.CommandClass.Version.GetTest do
         command_class: Version,
         command: :version_report,
         protocol_library: :controller,
-        protocol_version: 1,
-        protocol_sub_version: 1,
-        firmware_version: 1,
-        firmware_sub_version: 1
+        protocol_version: "1.1",
+        firmware_version: "1.1"
       }
 
       packet = Packet.new(body: report)
