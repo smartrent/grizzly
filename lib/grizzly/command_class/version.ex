@@ -20,10 +20,8 @@ defmodule Grizzly.CommandClass.Version do
 
   @type version_report :: %{
           protocol_library: library_type(),
-          protocol_version: byte(),
-          protocol_sub_version: byte(),
-          firmware_version: byte(),
-          firmware_sub_version: byte()
+          protocol_version: String.t(),
+          firmware_version: String.t()
         }
 
   @doc """
@@ -53,10 +51,8 @@ defmodule Grizzly.CommandClass.Version do
       {:ok,
        %{
          protocol_library: library_type,
-         protocol_version: protocol_version,
-         protocol_sub_version: protocol_sub_version,
-         firmware_version: firmware_version,
-         firmware_sub_version: firmware_sub_version
+         protocol_version: "#{protocol_version}.#{protocol_sub_version}",
+         firmware_version: "#{firmware_version}.#{firmware_sub_version}"
        }}
     else
       {:error, :invalid_library_type, library_type} ->
