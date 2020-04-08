@@ -1,5 +1,10 @@
 ## Changelog
 
+## v0.8.7
+
+* Enhancements
+  * Support `FIRMWARE_UPDATE_MD` meta data report command v5
+
 ## v0.8.6
 
 * Fixes
