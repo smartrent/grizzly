@@ -2,14 +2,17 @@ defmodule Grizzly.Inclusions.InclusionRunnerSupervisor do
   @moduledoc false
   use DynamicSupervisor
 
+  alias Grizzly.Inclusions
   alias Grizzly.Inclusions.InclusionRunner
 
   def start_link(_) do
     DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def start_runner() do
-    child_spec = InclusionRunner.child_spec(handler: self())
+  @spec start_runner([Inclusions.opt()]) :: DynamicSupervisor.on_start_child()
+  def start_runner(opts \\ []) do
+    opts = Keyword.merge([handler: self()], opts)
+    child_spec = InclusionRunner.child_spec(opts)
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 

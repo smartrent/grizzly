@@ -3,7 +3,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
 
   use GenServer
 
-  alias Grizzly.SeqNumber
+  alias Grizzly.{Inclusions, SeqNumber}
   alias Grizzly.Inclusions.InclusionRunner.Inclusion
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.ZWave.{Security, Command}
@@ -17,13 +17,12 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   """
   @type t :: pid() | __MODULE__
 
-  @type opts :: {:controller_id, Grizzly.node_id()} | {:handler, pid()}
-
   def child_spec(args) do
     # Don't restart the inclusion if there is a failure
     %{id: __MODULE__, start: {__MODULE__, :start_link, [args]}, restart: :temporary}
   end
 
+  @spec start_link([Inclusions.opt()]) :: GenServer.on_start()
   def start_link(opts \\ []) do
     controller_id = Keyword.get(opts, :controller_id, 1)
     handler = Keyword.get(opts, :handler, self())
@@ -199,12 +198,20 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     opts = build_inclusion_opts_for_command(command)
 
     inclusion = Inclusion.handle_command(inclusion, command, opts)
-    send(inclusion.handler, {:grizzly, :inclusion, command})
+    respond_to_handler(inclusion.handler, command)
 
     if inclusion.state == :complete do
       {:stop, :normal, inclusion}
     else
       {:noreply, inclusion}
     end
+  end
+
+  defp respond_to_handler(handler, command) when is_pid(handler) do
+    send(handler, {:grizzly, :inclusion, command})
+  end
+
+  defp respond_to_handler(handler_module, command) do
+    handler_module.handle_command(command)
   end
 end
