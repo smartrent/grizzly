@@ -288,4 +288,45 @@ defmodule Grizzly.ZWave.CommandClasses do
   end
 
   @before_compile Generate
+
+  @doc """
+  Turn the list of command classes into the binary representation outlined in
+  the Network-Protocol command class specification.
+
+  TODO: add more details
+  """
+  @spec command_class_list_to_binary([command_class()]) :: binary()
+  def command_class_list_to_binary(_command_class_list) do
+    # TODO make this correct (Grizzly.ZWave.CommandClassList module)
+    # to make correct the `CommandClassList` should have 4 fields:
+    # :support, :controlled, :secure_supported, :secure_controlled
+    # we should change `command_class_list_from_binary` to use this
+    # as well
+    <<0>>
+  end
+
+  @doc """
+  Turn the binary representation that is outlined in teh Network-Protocol
+  """
+  @spec command_class_list_from_binary(binary()) :: [command_class()]
+  def command_class_list_from_binary(binary) do
+    binary_list = :erlang.binary_to_list(binary)
+
+    Enum.reduce(binary_list, [], fn
+      0xEF, command_classes ->
+        command_classes
+
+      0xF1, command_classes ->
+        command_classes
+
+      0x00, command_classes ->
+        command_classes
+
+      command_class_byte, command_classes ->
+        # Right now lets fail super hard so we can add support for
+        # new command classes quickly
+        {:ok, command_class} = from_byte(command_class_byte)
+        [command_class | command_classes]
+    end)
+  end
 end

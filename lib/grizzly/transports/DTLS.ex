@@ -3,6 +3,8 @@ defmodule Grizzly.Transports.DTLS do
 
   alias Grizzly.ZWave.Commands.ZIPPacket
 
+  require Logger
+
   @impl true
   def open(ip_address, port) do
     case :ssl.connect(ip_address, port, dtls_opts(), 10_000) do
@@ -17,12 +19,11 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   @impl true
-  def parse_response({:ssl, {:sslsocket, {:gen_udp, _, :dtls_connection}, _}, binary}) do
-    require Logger
+  def parse_response({:ssl, {:sslsocket, {:gen_udp, _, :dtls_connection}, _}, bin_list}) do
+    binary = :erlang.list_to_binary(bin_list)
+    _ = Logger.debug("Z/IP Packet rec: #{inspect(binary, base: :hex)}")
 
-    _ = Logger.info(binary)
-
-    case ZIPPacket.from_binary(:erlang.list_to_binary(binary)) do
+    case ZIPPacket.from_binary(binary) do
       {:ok, _zip_packet} = result -> result
     end
   end

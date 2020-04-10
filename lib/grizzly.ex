@@ -2,7 +2,16 @@ defmodule Grizzly do
   alias Grizzly.{Connection, Inclusions, Node}
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinarySet, NodeListGet, NodeAdd}
+
+  alias Grizzly.ZWave.Commands.{
+    SwitchBinaryGet,
+    SwitchBinarySet,
+    NodeListGet,
+    NodeAdd,
+    NodeInfoCachedGet
+  }
+
+  @type send_command_response :: :ok | {:ok, Command.t()} | {:error, :including | any()}
 
   @type seq_number :: non_neg_integer()
 
@@ -16,14 +25,12 @@ defmodule Grizzly do
           | :switch_binary_report
           | :node_add_status
           | :node_remove_status
+          | :node_info_cached_get
 
   @doc """
   Send a command to the node via the node id
-
-  If the Z-Wave controller is currently in the inclusion state this command
-  will not run and the error `{:error, :including}` will be returned.
   """
-  @spec send_command(Node.id(), command(), keyword(), keyword()) :: :ok | {:ok, Command.t()}
+  @spec send_command(Node.id(), command(), keyword(), keyword()) :: send_command_response()
   def send_command(node_id, command_name, args \\ [], opts \\ []) do
     # always open a connection. If the connection is already opened this
     # will not establish a new connection
@@ -35,7 +42,7 @@ defmodule Grizzly do
       Connection.send_command(node_id, command, opts)
     else
       true ->
-        {:error, :inclusion}
+        {:error, :including}
 
       {:error, _} = error ->
         error
@@ -61,6 +68,7 @@ defmodule Grizzly do
   defp lookup(:switch_binary_set), do: SwitchBinarySet
   defp lookup(:node_list_get), do: NodeListGet
   defp lookup(:node_add), do: NodeAdd
+  defp lookup(:node_info_cached_get), do: NodeInfoCachedGet
 
   defp lookup(_) do
     raise ArgumentError, """

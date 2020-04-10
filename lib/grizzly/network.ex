@@ -4,9 +4,8 @@ defmodule Grizzly.Network do
   """
 
   alias Grizzly.SeqNumber
-  alias Grizzly.ZWave.Command
 
-  @spec get_node_ids() :: {:ok, Command.t()}
+  @spec get_node_ids() :: Grizzly.send_command_response()
   def get_node_ids() do
     seq_number = SeqNumber.get_and_inc()
 

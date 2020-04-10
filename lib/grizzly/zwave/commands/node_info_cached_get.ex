@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
     command = %Command{
       name: :node_info_cache_get,
       command_class_name: :network_management_proxy,
-      command_byte: 0x04,
+      command_byte: 0x03,
       command_class_byte: 0x52,
       params: params,
       handler: {WaitReport, complete_report: :node_info_cache_report},

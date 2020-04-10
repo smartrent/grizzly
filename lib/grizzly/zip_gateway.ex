@@ -6,17 +6,34 @@ defmodule Grizzly.ZIPGateway do
   @type run_opt :: {:serial_port, binary()}
 
   @default_port 41230
-  @default_host_base {0xFD00, 0xAAAA, 0, 0, 0, 0, 0}
+
+  # the host base is different for the LAN and PAN networks, we need to
+  # probably handle this a little nicer
+  @default_lan_host_base {0xFD00, 0xAAAA, 0, 0, 0, 0, 0}
+  @default_pan_host_base {0xFD00, 0xBBBB, 0, 0, 0, 0, 0}
 
   @spec host_for_node(non_neg_integer()) :: :inet.ip_address()
+  def host_for_node(1) do
+    # unchecked assumption warning: that controller will always be node id
+    # one. I think this is true for 99% of the cases?
+    case Application.get_env(:grizzly, :zip_gateway) do
+      nil ->
+        Tuple.append(@default_lan_host_base, 1)
+
+      zip_gateway_config ->
+        replace_last(zip_gateway_config.host, 1) ||
+          Tuple.append(@default_lan_host_base, 1)
+    end
+  end
+
   def host_for_node(node_id) do
     case Application.get_env(:grizzly, :zip_gateway) do
       nil ->
-        Tuple.append(@default_host_base, node_id)
+        Tuple.append(@default_pan_host_base, node_id)
 
       zip_gateway_config ->
         replace_last(zip_gateway_config.host, node_id) ||
-          Tuple.append(@default_host_base, node_id)
+          Tuple.append(@default_pan_host_base, node_id)
     end
   end
 
@@ -35,10 +52,10 @@ defmodule Grizzly.ZIPGateway do
   def unsolicited_server_ip() do
     case Application.get_env(:grizzly, :unsolicited_server) do
       nil ->
-        Tuple.append(@default_host_base, 2)
+        Tuple.append(@default_lan_host_base, 2)
 
       config ->
-        config.ip || Tuple.append(@default_host_base, 2)
+        config.ip || Tuple.append(@default_lan_host_base, 2)
     end
   end
 

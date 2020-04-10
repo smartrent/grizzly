@@ -45,9 +45,15 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   def init([node_id, opts]) do
+    require Logger
+
     host = ZIPGateway.host_for_node(node_id)
     port = ZIPGateway.port()
     transport = Connections.get_transport_from_opts(opts)
+
+    Logger.warn("Connecting to #{inspect(host)}:#{inspect(port)} for #{inspect(node_id)}")
+
+    # {64768, 48059, 0, 0, 0, 0, 0, 27}
 
     case transport.open(host, port) do
       {:ok, socket} ->
