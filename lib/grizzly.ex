@@ -114,7 +114,7 @@ defmodule Grizzly do
           command_module :: module,
           command_opts :: keyword
         ) ::
-          :ok | {:ok, any} | {:error, any}
+          :ok | {:ok, any} | {:ok, :queued, reference} | {:error, any}
   def send_command(connected, command_module, command_opts \\ [])
 
   def send_command(%Conn{} = conn, command_module, opts) do

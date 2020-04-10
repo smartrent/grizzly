@@ -19,7 +19,8 @@ defmodule Grizzly.Conn do
     %__MODULE__{conn: conn, ip_address: conn_config.ip, mode: conn_config.mode}
   end
 
-  @spec send_command(t, Command.t(), Keyword.t()) :: :ok | {:ok, any} | {:error, any}
+  @spec send_command(t, Command.t(), Keyword.t()) ::
+          :ok | {:ok, any} | {:ok, :queued, reference} | {:error, any}
   def send_command(conn, command, opts \\ []) do
     ConnServer.send_command(conn, command, opts)
   end

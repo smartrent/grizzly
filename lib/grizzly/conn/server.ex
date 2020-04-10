@@ -71,7 +71,7 @@ defmodule Grizzly.Conn.Server do
   end
 
   @spec send_command(Conn.t(), Command.t(), Keyword.t()) ::
-          :ok | {:ok, any} | {:error, EncodeError.t() | any()}
+          :ok | {:ok, any} | {:ok, :queued, reference()} | {:error, EncodeError.t() | any()}
   def send_command(%Conn{conn: conn_server, mode: mode}, command, opts) do
     GenServer.call(conn_server, {:send_command, command, mode, opts}, 120_000)
   end
