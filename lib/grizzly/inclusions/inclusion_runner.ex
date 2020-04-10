@@ -8,6 +8,15 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.ZWave.{Security, Command}
 
+  @typedoc """
+  At any given moment there can only be 1 `InclusionRunner` process going so
+  this process is the name of this module.
+
+  However, all the function in this module can take the pid of the process or
+  the name to aid in the flexibility of the calling context.
+  """
+  @type t :: pid() | __MODULE__
+
   @type opts :: {:controller_id, Grizzly.node_id()} | {:handler, pid()}
 
   def child_spec(args) do
@@ -19,48 +28,50 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     controller_id = Keyword.get(opts, :controller_id, 1)
     handler = Keyword.get(opts, :handler, self())
 
-    GenServer.start_link(__MODULE__,
-      controller_id: controller_id,
-      handler: handler
+    GenServer.start_link(
+      __MODULE__,
+      [controller_id: controller_id, handler: handler],
+      name: __MODULE__
     )
   end
 
-  @spec seq_number(pid()) :: Grizzly.seq_number()
-  def seq_number(runner) do
+  @spec seq_number(t()) :: Grizzly.seq_number()
+  def seq_number(runner \\ __MODULE__) do
     GenServer.call(runner, :seq_number)
   end
 
-  @spec add_node(pid()) :: :ok
-  def add_node(runner) do
+  @spec add_node(t()) :: :ok
+  def add_node(runner \\ __MODULE__) do
     GenServer.call(runner, :add_node)
   end
 
-  @spec add_node_stop(pid()) :: :ok
-  def add_node_stop(runner) do
+  @spec add_node_stop(t()) :: :ok
+  def add_node_stop(runner \\ __MODULE__) do
     GenServer.call(runner, :add_node_stop)
   end
 
-  @spec remove_node(pid()) :: :ok
-  def remove_node(runner) do
+  @spec remove_node(t()) :: :ok
+  def remove_node(runner \\ __MODULE__) do
     GenServer.call(runner, :remove_node)
   end
 
-  @spec remove_node_stop(pid()) :: :ok
-  def remove_node_stop(runner) do
+  @spec remove_node_stop(t()) :: :ok
+  def remove_node_stop(runner \\ __MODULE__) do
     GenServer.call(runner, :remove_node_stop)
   end
 
-  @spec grant_keys(pid, [Security.key()]) :: :ok
-  def grant_keys(runner, security_keys) do
+  @spec grant_keys(t(), [Security.key()]) :: :ok
+  def grant_keys(runner \\ __MODULE__, security_keys) do
     GenServer.call(runner, {:grant_keys, security_keys})
   end
 
-  @spec set_dsk(pid(), non_neg_integer()) :: :ok
-  def set_dsk(runner, dsk \\ 0) do
+  @spec set_dsk(t(), non_neg_integer()) :: :ok
+  def set_dsk(runner \\ __MODULE__, dsk \\ 0) do
     GenServer.call(runner, {:set_dsk, dsk})
   end
 
-  def stop(runner) do
+  @spec stop(t()) :: :ok
+  def stop(runner \\ __MODULE__) do
     GenServer.stop(runner, :normal)
   end
 

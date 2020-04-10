@@ -51,10 +51,6 @@ defmodule Grizzly.Connections.SyncConnection do
     port = ZIPGateway.port()
     transport = Connections.get_transport_from_opts(opts)
 
-    Logger.warn("Connecting to #{inspect(host)}:#{inspect(port)} for #{inspect(node_id)}")
-
-    # {64768, 48059, 0, 0, 0, 0, 0, 27}
-
     case transport.open(host, port) do
       {:ok, socket} ->
         keep_alive_timer = KeepAliveTimer.create(self())

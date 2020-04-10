@@ -5,7 +5,6 @@ defmodule Grizzly.Connection do
   alias Grizzly.Connections.{SyncConnection, AsyncConnection}
 
   def open(node_id, opts \\ []) do
-    Logger.warn("asdfjaklsjdfklasjdlfkjalskdjflasjdlfjalskdjflasja #{inspect(node_id)}")
     Supervisor.start_connection(node_id, opts)
   end
 
