@@ -14,13 +14,13 @@ defmodule Grizzly.ZWave.Commands.AssociationSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.Node
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   # I think grouping identifier is list that gets masked, but for now we will
   # just work as if if the identifier is only one.
-  @type param :: {:grouping_identifier, byte()} | {:nodes, [Node.node_id()]}
+  @type param :: {:grouping_identifier, byte()} | {:nodes, [ZWave.node_id()]}
 
   @impl true
   @spec new([param]) :: {:ok, Command.t()}

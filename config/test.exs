@@ -9,3 +9,6 @@ config :grizzly,
     auto_start: false,
     run_zipgatway_bin: false
   ]
+
+config :ring_logger,
+  level: :info

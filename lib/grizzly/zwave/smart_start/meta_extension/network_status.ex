@@ -5,7 +5,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.NetworkStatus do
   """
   @behaviour Grizzly.ZWave.SmartStart.MetaExtension
 
-  alias Grizzly.Node
+  alias Grizzly.ZWave
 
   @typedoc """
   The different network statuses are:
@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.NetworkStatus do
   @type network_status :: :not_in_network | :included | :failing
 
   @type t :: %__MODULE__{
-          node_id: Node.node_id(),
+          node_id: ZWave.node_id(),
           network_status: network_status()
         }
 
@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.NetworkStatus do
   `0`. If the node has been included into the network and is either functional
   or failing then it has to have a `node_id` greater than `0`.
   """
-  @spec new(Node.node_id(), network_status()) ::
+  @spec new(ZWave.node_id(), network_status()) ::
           {:ok, t()} | {:error, :invalid_network_status | :invalid_node_id}
   def new(node_id, :not_in_network) when node_id > 0 do
     {:error, :invalid_node_id}

@@ -9,7 +9,7 @@ defmodule Grizzly.Connection do
   end
 
   def send_command(node_id, command, opts \\ []) do
-    Logger.warn("Sending: #{inspect(command)}")
+    _ = Logger.debug("Sending: #{inspect(command)}")
 
     case Keyword.get(opts, :type, :sync) do
       :sync ->
