@@ -19,6 +19,7 @@ end
 
 - Support Assigning association groups
 - CommandClassList
+- Test queued commands
 - Better CommandClass Lookup
 - SmartStart
 - Add `Null` CommandHandler
