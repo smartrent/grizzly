@@ -22,13 +22,13 @@ end
 - Test queued commands
 - Better CommandClass Lookup
 - SmartStart
-- Add `Null` CommandHandler
+- Add `Null` CommandHandler (see `Handlers` below)
 - Command.decode_params should be {:ok, params} or error
 - Update code base to `Grizzly.ZWave` types
 - Associations on adding a node? - probably add an option to `Grizzly.Inclusions.add_node/1`??
 - Pass handler to send_command? - add ability to opt out the default handlers
 - Test inclusion timeout handling
-- Tag tests to not run all by default - (ie timeout sets and stuff - should run in CI)
+- Tag tests to not run all by default - (ie timeout sets and stuff - should run all tests in CI)
 - Monitor commands
 - Figure out messages from Grizzly format
   - {Grizzly, command_name, command}
@@ -36,6 +36,12 @@ end
 - command support lookup table and better error messages
 - Add section about config options (make them consistent)
 - After excluding a node, ensure the connection process is stopped
+
+### Handlers
+
+Current command handlers are part of the Z-Wave command, we should move this up to the Grizzly
+level and provide defaults for the command classes that are passed in. This can me put into the
+look up table. Also, we can have option to pass in a handler to `send_command` to override the default.
 
 ## Requirements
 
