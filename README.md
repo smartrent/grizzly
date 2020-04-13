@@ -24,27 +24,16 @@ end
 - Add `Null` CommandHandler
 - Command.decode_params should be {:ok, params} or error
 - Update code base to `Grizzly.ZWave` types
-
-########### old ###############
-- Associations on adding a node?
-- Pass handler to send_command?
-- s2 inclusion
-- add node parse command classes
-- Rethink how Grizzly should start
+- Associations on adding a node? - probably add an option to `Grizzly.Inclusions.add_node/1`??
+- Pass handler to send_command? - add ability to opt out the default handlers
 - Test inclusion timeout handling
-- Tag tests to not run all by default
-- remove controlling process from transport
-- Monitor commands 
+- Tag tests to not run all by default - (ie timeout sets and stuff - should run in CI)
+- Monitor commands
 - Figure out messages from Grizzly format
   - {Grizzly, command_name, command}
   - {Grizzly, command_name, command_ref, command}
 - command support lookup table and better error messages
 - Add section about config options (make them consistent)
-
-
-- Inclusion
-  - ~Does returning the command ref always make sense?~
-  - Should node add wait for the node status report
 
 
 ## Requirements
