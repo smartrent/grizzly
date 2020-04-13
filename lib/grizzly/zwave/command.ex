@@ -3,27 +3,34 @@ defmodule Grizzly.ZWave.Command do
   Data struct and behaviour for working with Z-Wave commands
   """
 
+  alias Grizzly.ZWave.CommandClass
+
   @type delay_seconds :: non_neg_integer()
 
   @type params :: Keyword.t()
 
   @type t() :: %__MODULE__{
           name: atom(),
-          command_class_name: atom(),
-          command_class_byte: byte(),
+          command_class: CommandClass.t(),
           command_byte: byte(),
           params: params(),
           handler: module() | {module(), any()},
           impl: module()
         }
 
-  @enforce_keys [:name, :command_class_name, :command_byte, :command_class_byte, :impl, :handler]
+  @enforce_keys [
+    :name,
+    :command_class,
+    :command_byte,
+    :impl,
+    :handler
+  ]
+
   defstruct name: nil,
-            params: [],
-            command_class_name: nil,
             command_byte: nil,
-            command_class_byte: nil,
+            command_class: nil,
             handler: nil,
+            params: [],
             impl: nil
 
   @doc """
@@ -49,7 +56,8 @@ defmodule Grizzly.ZWave.Command do
   @spec to_binary(t()) :: binary()
   def to_binary(command) do
     params_bin = encode_params(command)
-    <<command.command_class_byte, command.command_byte>> <> params_bin
+    command_class_byte = command.command_class.byte()
+    <<command_class_byte, command.command_byte>> <> params_bin
   end
 
   @doc """

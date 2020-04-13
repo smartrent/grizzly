@@ -9,6 +9,7 @@ defmodule Grizzly.ZWave.Commands.NodeListGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @type param :: {:seq_number, non_neg_integer()}
@@ -18,9 +19,8 @@ defmodule Grizzly.ZWave.Commands.NodeListGet do
     # TODO: validate params
     command = %Command{
       name: :node_list_get,
-      command_class_name: :network_management_proxy,
-      command_class_byte: 0x52,
       command_byte: 0x01,
+      command_class: NetworkManagementProxy,
       handler: {WaitReport, complete_report: :node_list_report},
       params: params,
       impl: __MODULE__

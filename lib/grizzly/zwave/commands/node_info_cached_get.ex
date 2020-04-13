@@ -49,6 +49,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
           | {:max_age, max_age()}
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @impl true
@@ -58,9 +59,8 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
     # TODO: validate params
     command = %Command{
       name: :node_info_cache_get,
-      command_class_name: :network_management_proxy,
       command_byte: 0x03,
-      command_class_byte: 0x52,
+      command_class: NetworkManagementProxy,
       params: params,
       handler: {WaitReport, complete_report: :node_info_cache_report},
       impl: __MODULE__

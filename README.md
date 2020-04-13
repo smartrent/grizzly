@@ -35,7 +35,6 @@ end
 - command support lookup table and better error messages
 - Add section about config options (make them consistent)
 
-
 ## Requirements
 
 - [Z-Wave Bridge Controller](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)

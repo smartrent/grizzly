@@ -16,6 +16,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave.SmartStart.MetaExtension
   alias Grizzly.ZWave.CommandHandlers.AckResponse
 
@@ -32,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
     command = %Command{
       name: :node_provisioning_set,
       command_byte: 0x01,
-      command_class_name: :node_provisioning,
-      command_class_byte: 0x78,
+      command_class: NodeProvisioning,
       handler: AckResponse,
       params: params,
       impl: __MODULE__

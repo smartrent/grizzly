@@ -5,9 +5,11 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
   import Bitwise
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
+  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @impl true
   def new(params) do
@@ -15,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
     command = %Command{
       name: :node_list_report,
       command_byte: 0x02,
-      command_class_name: :network_management_proxy,
-      command_class_byte: 0x52,
+      command_class: NetworkManagementProxy,
       params: params,
       handler: AckResponse,
       impl: __MODULE__

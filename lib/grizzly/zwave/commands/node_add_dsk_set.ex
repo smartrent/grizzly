@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @impl true
@@ -9,9 +10,8 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
     # TODO validate params
     command = %Command{
       name: :node_add_dsk_set,
-      command_class_name: :network_management_inclusion,
       command_byte: 0x14,
-      command_class_byte: 0x34,
+      command_class: NetworkManagementInclusion,
       params: params,
       # TODO: probably not right
       handler: AckResponse,

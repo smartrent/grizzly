@@ -16,6 +16,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type status :: :done | :failed
@@ -25,9 +26,8 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
     # TODO validate params
     command = %Command{
       name: :node_remove_status,
-      command_class_name: :network_management_inclusion,
-      command_class_byte: 0x34,
       command_byte: 0x04,
+      command_class: NetworkManagementInclusion,
       params: params,
       handler: AckResponse,
       impl: __MODULE__

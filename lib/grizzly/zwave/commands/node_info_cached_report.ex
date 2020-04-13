@@ -23,6 +23,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   import Bitwise
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
   alias Grizzly.ZWave.CommandHandlers.AckResponse
 
@@ -56,8 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
     command = %Command{
       name: :node_info_cache_report,
       command_byte: 0x04,
-      command_class_name: :network_management_proxy,
-      command_class_byte: 0x52,
+      command_class: NetworkManagementProxy,
       params: params,
       handler: AckResponse,
       impl: __MODULE__

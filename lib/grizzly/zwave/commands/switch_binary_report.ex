@@ -10,6 +10,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.SwitchBinary
   alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
@@ -19,9 +20,8 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
     # TODO: validate opts
     command = %Command{
       name: :switch_binary_report,
-      command_class_name: :switch_binary,
-      command_class_byte: 0x25,
       command_byte: 0x03,
+      command_class: SwitchBinary,
       params: opts,
       handler: AckResponse,
       impl: __MODULE__

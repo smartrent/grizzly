@@ -16,6 +16,7 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @type mode :: :node_add_any | :node_add_stop | :node_add_any_s2
@@ -30,9 +31,8 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
     # TODO validate params
     command = %Command{
       name: :node_add,
-      command_class_name: :network_management_inclusion,
       command_byte: 0x01,
-      command_class_byte: 0x34,
+      command_class: NetworkManagementInclusion,
       params: params,
       handler: {WaitReport, complete_report: :node_add_status},
       impl: __MODULE__
