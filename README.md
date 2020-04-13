@@ -17,12 +17,20 @@ end
 
 ## NG Checklist
 
+- Support Assigning association groups
+- CommandClassList
+- Better CommandClass Lookup
+- SmartStart
+- Add `Null` CommandHandler
+- Command.decode_params should be {:ok, params} or error
+- Update code base to `Grizzly.ZWave` types
+
+########### old ###############
 - Associations on adding a node?
 - Pass handler to send_command?
 - s2 inclusion
 - add node parse command classes
 - Rethink how Grizzly should start
-- Add `Null` CommandHandler?
 - Test inclusion timeout handling
 - Tag tests to not run all by default
 - remove controlling process from transport

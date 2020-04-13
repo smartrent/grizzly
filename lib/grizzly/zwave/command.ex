@@ -35,19 +35,13 @@ defmodule Grizzly.ZWave.Command do
 
   @doc """
   Encode the command parameters
-
-  This callback is optional as not all commands have params
   """
   @callback encode_params(t()) :: binary()
 
   @doc """
   Decode the binary string of command params
-
-  This callback is optional as not all commands have params
   """
   @callback decode_params(binary()) :: keyword()
-
-  @optional_callbacks [encode_params: 1, decode_params: 1]
 
   @doc """
   Encode the `Command.t()` into it's binary representation
