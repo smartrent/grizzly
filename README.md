@@ -35,6 +35,7 @@ end
   - {Grizzly, command_name, command_ref, command}
 - command support lookup table and better error messages
 - Add section about config options (make them consistent)
+- After excluding a node, ensure the connection process is stopped
 
 ## Requirements
 
