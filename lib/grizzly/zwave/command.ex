@@ -88,6 +88,16 @@ defmodule Grizzly.ZWave.Command do
     end
   end
 
+  @doc """
+  Put the param value into the params list, updating pervious value if there is
+  one
+  """
+  @spec put_param(t(), atom(), any()) :: t()
+  def put_param(command, param, new_value) do
+    new_params = Keyword.put(command.params, param, new_value)
+    %__MODULE__{command | params: new_params}
+  end
+
   defp list_of_command_params(command) do
     Enum.reduce(command.params, "", fn {param_name, _}, str_list ->
       str_list <> "  * #{inspect(param_name)}\n"

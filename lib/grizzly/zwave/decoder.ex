@@ -32,6 +32,9 @@ defmodule Grizzly.ZWave.Decoder do
   def from_binary(<<0x52, 0x04, params::binary>>),
     do: decode(Commands.NodeInfoCacheReport, params)
 
+  # Association
+  def from_binary(<<0x85, 0x03, params::binary>>), do: decode(Commands.AssociationReport, params)
+
   defp decode(command_impl, params) do
     decoded_params = command_impl.decode_params(params)
     command_impl.new(decoded_params)

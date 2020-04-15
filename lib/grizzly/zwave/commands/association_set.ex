@@ -39,13 +39,14 @@ defmodule Grizzly.ZWave.Commands.AssociationSet do
 
   @impl true
   @spec encode_params(Command.t()) :: binary()
-  def encode_params(_command) do
-    <<>>
+  def encode_params(command) do
+    nodes_bin = :erlang.list_to_binary(Command.param!(command, :nodes))
+    <<Command.param!(command, :grouping_identifier)>> <> nodes_bin
   end
 
   @impl true
   @spec decode_params(binary) :: [param()]
-  def decode_params(_binary) do
-    []
+  def decode_params(<<grouping_identifier, nodes_bin::binary>>) do
+    [grouping_identifier: grouping_identifier, nodes: :erlang.binary_to_list(nodes_bin)]
   end
 end
