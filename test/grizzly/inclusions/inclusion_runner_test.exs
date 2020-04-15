@@ -82,9 +82,27 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert Command.param!(command, :keys_granted) == [:s2_unauthenticated]
   end
 
-  # test "start s2 inclusion with s2 authenticated"
+  test "start s2 inclusion with s2 authenticated" do
+    {:ok, runner} = InclusionRunner.start_link(controller_id: 302)
+    :ok = InclusionRunner.add_node(runner)
 
-  # test "start s2 inclusion don't expect dsk report"
+    assert_receive {:grizzly, :inclusion, command}, 500
 
-  # test "start s2 inclusion, interrupt with failed keys"
+    assert command.name == :node_add_keys_report
+
+    :ok = InclusionRunner.grant_keys(runner, [:s2_authenticated])
+
+    assert_receive {:grizzly, :inclusion, command}, 1000
+
+    assert command.name == :node_add_dsk_report
+    assert Command.param!(command, :input_dsk_length) == 2
+
+    :ok = InclusionRunner.set_dsk(runner, 12345)
+
+    assert_receive {:grizzly, :inclusion, command}, 1000
+
+    assert command.name == :node_add_status
+    assert Command.param!(command, :status) == :done
+    assert Command.param!(command, :keys_granted) == [:s2_authenticated]
+  end
 end

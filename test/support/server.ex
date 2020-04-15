@@ -172,7 +172,7 @@ defmodule GrizzlyTest.Server do
         send_add_node_dsk_report(socket, port, incoming_zip_packet)
 
       :node_add_dsk_set ->
-        {:ok, command} = build_s2_node_add_status(incoming_zip_packet, [:s2_unauthenticated])
+        {:ok, command} = build_s2_node_add_status(incoming_zip_packet)
 
         out_zip_packet =
           ZIPPacket.with_zwave_command(command, seq_number: SeqNumber.get_and_inc())
@@ -210,6 +210,25 @@ defmodule GrizzlyTest.Server do
             seq_number: seq_number,
             input_dsk_length: 0,
             dsk: "50285-18819-09924-30691-15973-33711-04005-03623"
+          )
+
+        out_zip_packet = ZIPPacket.with_zwave_command(dsk_report, seq_number: seq_number)
+
+        :gen_udp.send(
+          socket,
+          {0, 0, 0, 0},
+          port,
+          ZIPPacket.to_binary(out_zip_packet)
+        )
+
+      [:s2_authenticated] ->
+        seq_number = SeqNumber.get_and_inc()
+
+        {:ok, dsk_report} =
+          NodeAddDSKReport.new(
+            seq_number: seq_number,
+            input_dsk_length: 2,
+            dsk: "00000-18819-09924-30691-15973-33711-04005-03623"
           )
 
         out_zip_packet = ZIPPacket.with_zwave_command(dsk_report, seq_number: seq_number)
@@ -271,19 +290,37 @@ defmodule GrizzlyTest.Server do
     SwitchBinaryReport.new(target_value: :off)
   end
 
-  defp build_s2_node_add_status(zip_packet, keys_granted) do
-    NodeAddStatus.new(
-      seq_number: zip_packet.seq_number,
-      node_id: 15,
-      status: :done,
-      listening?: true,
-      basic_device_class: 0x10,
-      generic_device_class: 0x12,
-      specific_device_class: 0x15,
-      command_classes: [0x34],
-      secure_command_classes: [],
-      keys_granted: keys_granted,
-      kex_fail_type: :none
-    )
+  defp build_s2_node_add_status(zip_packet) do
+    case Command.param!(zip_packet.command, :input_dsk_length) do
+      0 ->
+        NodeAddStatus.new(
+          seq_number: zip_packet.seq_number,
+          node_id: 15,
+          status: :done,
+          listening?: true,
+          basic_device_class: 0x10,
+          generic_device_class: 0x12,
+          specific_device_class: 0x15,
+          command_classes: [0x34],
+          secure_command_classes: [],
+          keys_granted: [:s2_unauthenticated],
+          kex_fail_type: :none
+        )
+
+      2 ->
+        NodeAddStatus.new(
+          seq_number: zip_packet.seq_number,
+          node_id: 15,
+          status: :done,
+          listening?: true,
+          basic_device_class: 0x10,
+          generic_device_class: 0x12,
+          specific_device_class: 0x15,
+          command_classes: [0x34],
+          secure_command_classes: [],
+          keys_granted: [:s2_authenticated],
+          kex_fail_type: :none
+        )
+    end
   end
 end
