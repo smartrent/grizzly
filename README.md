@@ -17,11 +17,11 @@ end
 
 ## NG Checklist
 
+### TODOs
+
 - Support Assigning association groups
 - CommandClassList
-- Test queued commands
 - Better CommandClass Lookup
-- SmartStart
 - Add `Null` CommandHandler (see `Handlers` below)
 - Command.decode_params should be {:ok, params} or error
 - Update code base to `Grizzly.ZWave` types
@@ -36,6 +36,11 @@ end
 - command support lookup table and better error messages
 - Add section about config options (make them consistent)
 - After excluding a node, ensure the connection process is stopped
+
+### Testing
+
+- Queued Commands
+- SmartStart
 
 ### Handlers
 
