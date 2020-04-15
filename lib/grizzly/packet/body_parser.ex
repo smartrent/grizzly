@@ -542,8 +542,7 @@ defmodule Grizzly.Packet.BodyParser do
           other_firmware_ids::size(firmware_targets)-binary-unit(16), hardware_version,
           _rest::binary>>
       ) do
-    pairs = other_firmware_ids |> Kernel.to_charlist() |> Enum.chunk_every(2)
-    target_firmware_ids = for [high, low] <- pairs, do: high * 16 + low
+    target_firmware_ids = for <<id::16 <- other_firmware_ids>>, do: id
 
     report = %{
       manufacturer_id: manufacturer_id,
