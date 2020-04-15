@@ -16,7 +16,6 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
-  alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @type mode :: :remove_node_any | :remove_node_stop
 
@@ -28,7 +27,6 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
       command_byte: 0x03,
       command_class: NetworkManagementInclusion,
       params: params,
-      handler: {WaitReport, complete_report: :node_remove_status},
       impl: __MODULE__
     }
 

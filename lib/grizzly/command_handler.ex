@@ -1,4 +1,8 @@
-defmodule Grizzly.ZWave.CommandHandler do
+defmodule Grizzly.CommandHandler do
+  @moduledoc """
+  Behaviour for how commands should handle incoming Z-Wave messages
+  """
+
   alias Grizzly.ZWave.Command
 
   @type handle_response :: {:complete, response :: any()} | {:continue, state :: any()}

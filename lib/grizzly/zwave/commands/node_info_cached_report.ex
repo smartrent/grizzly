@@ -25,7 +25,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @typedoc """
   The status of the refresh of the node information cache
@@ -59,7 +58,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
       command_byte: 0x04,
       command_class: NetworkManagementProxy,
       params: params,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

@@ -19,7 +19,6 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.dsk_string()}
 
@@ -30,7 +29,6 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
       name: :node_provisioning_delete,
       command_byte: 0x02,
       command_class: NodeProvisioning,
-      handler: AckResponse,
       params: params,
       impl: __MODULE__
     }

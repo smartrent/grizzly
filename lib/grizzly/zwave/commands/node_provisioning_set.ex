@@ -18,7 +18,6 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave.SmartStart.MetaExtension
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type param ::
           {:seq_number, Grizzly.ZWave.seq_number()}
@@ -34,7 +33,6 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
       name: :node_provisioning_set,
       command_byte: 0x01,
       command_class: NodeProvisioning,
-      handler: AckResponse,
       params: params,
       impl: __MODULE__
     }

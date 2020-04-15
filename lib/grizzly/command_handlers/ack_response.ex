@@ -1,9 +1,9 @@
-defmodule Grizzly.ZWave.CommandHandlers.AckResponse do
+defmodule Grizzly.CommandHandlers.AckResponse do
   @moduledoc """
   This handler is useful for most set commands that only needs to be
   acknowledged
   """
-  @behaviour Grizzly.ZWave.CommandHandler
+  @behaviour Grizzly.CommandHandler
 
   @impl true
   def init(_) do

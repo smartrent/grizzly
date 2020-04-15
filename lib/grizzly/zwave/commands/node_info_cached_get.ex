@@ -50,7 +50,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
-  alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @impl true
   @spec new([param]) :: {:ok, Command.t()}
@@ -62,7 +61,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
       command_byte: 0x03,
       command_class: NetworkManagementProxy,
       params: params,
-      handler: {WaitReport, complete_report: :node_info_cache_report},
       impl: __MODULE__
     }
 

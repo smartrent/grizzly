@@ -14,7 +14,7 @@ defmodule Grizzly.Commands.CommandRunner do
     %{id: __MODULE__, start: {__MODULE__, :start_link, args}, restart: :temporary}
   end
 
-  @spec start_link(Command.t(), [Command.opt()]) :: GenServer.on_start()
+  @spec start_link(Command.t(), [Grizzly.command_opt()]) :: GenServer.on_start()
   def start_link(command, opts \\ []) do
     opts = Keyword.merge([owner: self(), timeout: 5_000], opts)
     GenServer.start_link(__MODULE__, [command, opts])

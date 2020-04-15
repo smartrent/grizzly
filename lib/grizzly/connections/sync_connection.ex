@@ -45,8 +45,6 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   def init([node_id, opts]) do
-    require Logger
-
     host = ZIPGateway.host_for_node(node_id)
     port = ZIPGateway.port()
     transport = Connections.get_transport_from_opts(opts)
@@ -61,9 +59,9 @@ defmodule Grizzly.Connections.SyncConnection do
     end
   end
 
-  def handle_call({:send_command, command, send_opts}, from, state) do
+  def handle_call({:send_command, command, command_opts}, from, state) do
     {:ok, command_runner, _, new_command_list} =
-      CommandList.create(state.commands, command, from, send_opts)
+      CommandList.create(state.commands, command, from, command_opts)
 
     case do_send_command(command_runner, state) do
       :ok ->

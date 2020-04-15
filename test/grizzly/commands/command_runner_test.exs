@@ -26,6 +26,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
   test "runs a network command that has the seq number as part of the command" do
     {:ok, command} = NodeListGet.new(seq_number: SeqNumber.get_and_inc())
     {:ok, runner} = CommandRunner.start_link(command)
+
     command_seq_number = Command.param!(command, :seq_number)
 
     # ensure that the seq number the command has is used by the command runner

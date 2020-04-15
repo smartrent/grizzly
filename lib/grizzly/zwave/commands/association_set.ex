@@ -17,7 +17,6 @@ defmodule Grizzly.ZWave.Commands.AssociationSet do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Association
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   # I think grouping identifier is list that gets masked, but for now we will
   # just work as if if the identifier is only one.
@@ -32,7 +31,6 @@ defmodule Grizzly.ZWave.Commands.AssociationSet do
       command_byte: 0x01,
       command_class: Association,
       params: params,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

@@ -1,9 +1,9 @@
-defmodule Grizzly.ZWave.CommandHandlers.WaitReport do
+defmodule Grizzly.CommandHandlers.WaitReport do
   @moduledoc """
   This handle is useful for when you want to wait for a particular report from
   the Z-Wave network. Most GET commands can use this handler.
   """
-  @behaviour Grizzly.ZWave.CommandHandler
+  @behaviour Grizzly.CommandHandler
 
   alias Grizzly.ZWave.Command
 

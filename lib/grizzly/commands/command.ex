@@ -4,6 +4,7 @@ defmodule Grizzly.Commands.Command do
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
   alias Grizzly.SeqNumber
+  alias Grizzly.Commands.Table
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands.ZIPPacket
 
@@ -31,7 +32,7 @@ defmodule Grizzly.Commands.Command do
             ref: nil
 
   def from_zwave_command(zwave_command, owner, timeout_ref \\ nil, opts \\ []) do
-    {handler, handler_init_args} = get_handler_spec(zwave_command)
+    {handler, handler_init_args} = get_handler_spec(zwave_command, opts)
     {:ok, handler_state} = handler.init(handler_init_args)
     retries = Keyword.get(opts, :retries, 2)
     command_ref = Keyword.get(opts, :reference, make_ref())
@@ -129,12 +130,18 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp get_handler_spec(zwave_command) do
-    case zwave_command.handler do
-      {_handler, _handler_init_args} = spec -> spec
-      handler -> {handler, []}
+  defp get_handler_spec(zwave_command, opts) do
+    case Keyword.get(opts, :handler) do
+      nil ->
+        format_handler_spec(Table.handler(zwave_command.name))
+
+      handler ->
+        format_handler_spec(handler)
     end
   end
+
+  defp format_handler_spec({_handler, _args} = spec), do: spec
+  defp format_handler_spec(handler), do: {handler, []}
 
   defp get_seq_number(zwave_command) do
     case ZWaveCommand.param(zwave_command, :seq_number) do

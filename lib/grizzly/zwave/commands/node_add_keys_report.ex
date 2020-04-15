@@ -3,7 +3,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
 
   alias Grizzly.ZWave.{Command, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
-  alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @impl true
   def new(params) do
@@ -13,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
       command_byte: 0x11,
       command_class: NetworkManagementInclusion,
       params: params,
-      handler: {WaitReport, complete_report: :node_add_keys_set},
       impl: __MODULE__
     }
 

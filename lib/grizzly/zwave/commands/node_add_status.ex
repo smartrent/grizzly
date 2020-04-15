@@ -24,7 +24,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
 
   alias Grizzly.ZWave.{Command, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type status :: :done | :failed | :security_failed
 
@@ -50,7 +49,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       command_byte: 0x02,
       command_class: NetworkManagementInclusion,
       params: params,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

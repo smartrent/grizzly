@@ -11,7 +11,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SwitchBinary
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
 
@@ -23,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
       command_byte: 0x01,
       command_class: SwitchBinary,
       params: opts,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

@@ -3,7 +3,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryGet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SwitchBinary
-  alias Grizzly.ZWave.CommandHandlers.WaitReport
 
   @impl true
   def new(_opts \\ []) do
@@ -11,7 +10,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryGet do
       name: :switch_binary_get,
       command_byte: 0x02,
       command_class: SwitchBinary,
-      handler: {WaitReport, complete_report: :switch_binary_report},
       impl: __MODULE__
     }
 

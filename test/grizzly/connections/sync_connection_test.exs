@@ -22,7 +22,8 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, command} = SwitchBinaryGet.new()
 
     # 101 node_id will always return a nack_response
-    assert {:error, :nack_response} == SyncConnection.send_command(101, command)
+    assert {:error, :nack_response} ==
+             SyncConnection.send_command(101, command)
   end
 
   test "handles queued responses" do
@@ -35,12 +36,14 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   test "handle command that does not respond (timeout)" do
     {:ok, command} = SwitchBinaryGet.new()
 
-    assert {:error, :timeout} == SyncConnection.send_command(100, command, timeout: 2_500)
+    assert {:error, :timeout} ==
+             SyncConnection.send_command(100, command, timeout: 2_500)
   end
 
   test "handle command that does not respond (long timeout)" do
     {:ok, command} = SwitchBinaryGet.new()
 
-    assert {:error, :timeout} == SyncConnection.send_command(100, command, timeout: 10_000)
+    assert {:error, :timeout} ==
+             SyncConnection.send_command(100, command, timeout: 10_000)
   end
 end

@@ -3,7 +3,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
 
   alias Grizzly.ZWave.{Command, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @impl true
   def new(params) do
@@ -13,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
       command_byte: 0x12,
       command_class: NetworkManagementInclusion,
       params: params,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

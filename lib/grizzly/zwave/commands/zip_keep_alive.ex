@@ -3,7 +3,6 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ZIP
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @impl true
   @spec new(keyword()) :: {:ok, Command.t()}
@@ -13,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
       command_byte: 0x03,
       command_class: ZIP,
       params: params,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

@@ -23,7 +23,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
 
   alias Grizzly.ZWave.{DSK, Command}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
 
   @type param ::
           {:seq_number, Grizzly.seq_number()}
@@ -42,7 +41,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
       command_byte: 0x13,
       command_class: NetworkManagementInclusion,
       params: params,
-      handler: AckResponse,
       impl: __MODULE__
     }
 

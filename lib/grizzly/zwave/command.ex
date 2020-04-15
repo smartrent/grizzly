@@ -14,7 +14,6 @@ defmodule Grizzly.ZWave.Command do
           command_class: CommandClass.t(),
           command_byte: byte(),
           params: params(),
-          handler: module() | {module(), any()},
           impl: module()
         }
 
@@ -22,14 +21,12 @@ defmodule Grizzly.ZWave.Command do
     :name,
     :command_class,
     :command_byte,
-    :impl,
-    :handler
+    :impl
   ]
 
   defstruct name: nil,
             command_byte: nil,
             command_class: nil,
-            handler: nil,
             params: [],
             impl: nil
 

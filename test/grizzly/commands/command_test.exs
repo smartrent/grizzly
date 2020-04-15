@@ -3,7 +3,7 @@ defmodule Grizzly.Commands.CommandTest do
 
   alias Grizzly.Commands.Command
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, SwitchBinarySet, ZIPPacket}
-  alias Grizzly.ZWave.CommandHandlers.AckResponse
+  alias Grizzly.CommandHandlers.AckResponse
 
   test "turns a Z-Wave command into a Grizzly command" do
     {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
