@@ -14,10 +14,13 @@ defmodule Grizzly.Commands.Table do
   command name
   """
   @spec lookup(Grizzly.command()) :: {module(), [Grizzly.command_opt()]}
+  def lookup(:default_set),
+    do: {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}}
+
   def lookup(:switch_binary_get),
     do: {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}
 
-  def lookup(:switch_binary_set), do: {SwitchBinarySet, handler: AckResponse}
+  def lookup(:switch_binary_set), do: {Commands.SwitchBinarySet, handler: AckResponse}
 
   def lookup(:node_list_get),
     do: {Commands.NodeListGet, handler: {WaitReport, complete_report: :node_list_report}}

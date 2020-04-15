@@ -16,14 +16,15 @@ defmodule Grizzly do
           | {:handler, module() | {module(), args :: list()}}
 
   @type command ::
-          :switch_binary_set
-          | :switch_binary_get
+          :default_set
           | :node_list_get
           | :node_add
           | :node_add_keys_set
           | :node_add_dsk_set
           | :node_remove
           | :node_info_cached_get
+          | :switch_binary_set
+          | :switch_binary_get
 
   @doc """
   Send a command to the node via the node id

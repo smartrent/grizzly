@@ -11,4 +11,11 @@ defmodule Grizzly.Network do
 
     Grizzly.send_command(1, :node_list_get, seq_number: seq_number)
   end
+
+  @spec reset_controller() :: Grizzly.send_command_response()
+  def reset_controller() do
+    seq_number = SeqNumber.get_and_inc()
+
+    Grizzly.send_command(1, :default_set, seq_number: seq_number)
+  end
 end
