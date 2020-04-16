@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
 
   @type status :: :done | :busy
@@ -41,10 +41,15 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param()]
+  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, status_byte>>) do
-    {:ok, status} = status_from_byte(status_byte)
-    [seq_number: seq_number, status: status]
+    case status_from_byte(status_byte) do
+      {:ok, status} ->
+        [seq_number: seq_number, status: status]
+
+      {:error, _} ->
+        {:error, %DecodeError{param: :status, value: status_byte, command: :default_set_complete}}
+    end
   end
 
   @spec status_to_byte(status()) :: byte()

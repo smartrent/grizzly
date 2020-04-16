@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type status :: :done | :failed
@@ -44,15 +44,25 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   end
 
   @impl true
+  @spec decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, status_byte, node_id>>) do
-    [seq_number: seq_number, status: decode_status(status_byte), node_id: node_id]
+    case decode_status(status_byte) do
+      {:ok, status} ->
+        {:ok, [seq_number: seq_number, status: status, node_id: node_id]}
+
+      {:error, %DecodeError{}} = error ->
+        error
+    end
   end
 
   @spec encode_status(status()) :: 0x06 | 0x07
   def encode_status(:done), do: 0x06
   def encode_status(:failed), do: 0x07
 
-  @spec decode_status(byte()) :: status()
-  def decode_status(0x06), do: :done
-  def decode_status(0x07), do: :failed
+  @spec decode_status(byte()) :: {:ok, status()} | {:error, DecodeError.t()}
+  def decode_status(0x06), do: {:ok, :done}
+  def decode_status(0x07), do: {:ok, :failed}
+
+  def decode_status(byte),
+    do: {:error, %DecodeError{value: byte, param: :status, command: :node_remove_status}}
 end

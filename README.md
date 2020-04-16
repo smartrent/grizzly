@@ -33,6 +33,7 @@ end
 - command support lookup table and better error messages
 - Add section about config options (make them consistent)
 - After excluding a node, ensure the connection process is stopped
+- Device classes and command classes from byte should use `DecodeError`
 
 ### Testing
 

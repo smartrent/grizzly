@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
           | {:node_id, Grizzly.Node.id()}
           | {:max_age, max_age()}
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @impl true
@@ -78,11 +78,17 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param]
+  @spec decode_params(binary()) :: {:ok, [param]} | {:error, DecodeError.t()}
   def decode_params(params_binary) do
     <<seq_number, max_age_byte, node_id>> = params_binary
 
-    [seq_number: seq_number, max_age: decode_max_age(max_age_byte), node_id: node_id]
+    case decode_max_age(max_age_byte) do
+      {:ok, max_age} ->
+        {:ok, [seq_number: seq_number, max_age: max_age, node_id: node_id]}
+
+      {:error, %DecodeError{}} = error ->
+        error
+    end
   end
 
   @spec encode_max_age(max_age()) :: 0..15
@@ -90,10 +96,13 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
   def encode_max_age(:infinite), do: 15
   def encode_max_age(:force_update), do: 0
 
-  @spec decode_max_age(byte()) :: max_age()
-  def decode_max_age(0), do: :force_update
-  def decode_max_age(15), do: :infinite
+  @spec decode_max_age(byte()) :: {:ok, max_age()} | {:error, DecodeError.t()}
+  def decode_max_age(0), do: {:ok, :force_update}
+  def decode_max_age(15), do: {:ok, :infinite}
   def decode_max_age(n) when n > 0 and n < 15, do: n
+
+  def decode_max_age(n),
+    do: {:error, %DecodeError{value: n, param: :max_age, command: :node_info_cache_get}}
 
   defp set_defaults(params) do
     Keyword.put_new(params, :max_age, 10)

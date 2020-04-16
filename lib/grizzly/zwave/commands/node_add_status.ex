@@ -96,18 +96,19 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     <<command_classes::size(command_classes_length)-binary, security_info::binary>> =
       command_classes
 
-    [
-      status: decode_status(status_byte),
-      seq_number: seq_number,
-      node_id: node_id,
-      listening?: listening? == 1,
-      basic_device_class: basic_device_class,
-      generic_device_class: generic_device_class,
-      specific_device_class: specific_device_class,
-      command_classes: command_classes,
-      secure_command_classes: []
-    ]
-    |> maybe_decode_next_versions_fields(security_info)
+    {:ok,
+     [
+       status: decode_status(status_byte),
+       seq_number: seq_number,
+       node_id: node_id,
+       listening?: listening? == 1,
+       basic_device_class: basic_device_class,
+       generic_device_class: generic_device_class,
+       specific_device_class: specific_device_class,
+       command_classes: command_classes,
+       secure_command_classes: []
+     ]
+     |> maybe_decode_next_versions_fields(security_info)}
   end
 
   @spec encode_status(status()) :: byte()

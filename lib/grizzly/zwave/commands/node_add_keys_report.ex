@@ -29,11 +29,12 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
 
   @impl true
   def decode_params(<<seq_number, csa, requested_keys>>) do
-    [
-      seq_number: seq_number,
-      csa: decode_csa(csa),
-      requested_keys: decode_requested_keys(requested_keys)
-    ]
+    {:ok,
+     [
+       seq_number: seq_number,
+       csa: decode_csa(csa),
+       requested_keys: decode_requested_keys(requested_keys)
+     ]}
   end
 
   def encode_csa(true), do: 0x01

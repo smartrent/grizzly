@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{DSK, Command}
+  alias Grizzly.ZWave.{DSK, Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type param ::
@@ -58,10 +58,15 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   end
 
   @impl true
+  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, _::size(4), input_dsk_length::size(4), dsk::binary>>) do
-    {:ok, dsk} = DSK.binary_to_string(dsk)
+    case DSK.binary_to_string(dsk) do
+      {:ok, dsk} ->
+        {:ok, [seq_number: seq_number, input_dsk_length: input_dsk_length, dsk: dsk]}
 
-    [seq_number: seq_number, input_dsk_length: input_dsk_length, dsk: dsk]
+      {:error, _} ->
+        {:error, %DecodeError{param: :dsk, value: dsk, command: :node_add_dsk_report}}
+    end
   end
 
   defp validate_seq_number(params) do

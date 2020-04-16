@@ -37,6 +37,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGet do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param()]
-  def decode_params(<<grouping_identifier>>), do: [grouping_identifier: grouping_identifier]
+  @spec decode_params(binary()) :: {:ok, [param()]}
+  def decode_params(<<grouping_identifier>>),
+    do: {:ok, [grouping_identifier: grouping_identifier]}
 end

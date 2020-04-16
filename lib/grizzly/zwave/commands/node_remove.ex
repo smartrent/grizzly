@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type mode :: :remove_node_any | :remove_node_stop
@@ -44,14 +44,23 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
 
   @impl true
   def decode_params(<<seq_number, _, mode_byte>>) do
-    [seq_number: seq_number, mode: decode_mode(mode_byte)]
+    case decode_mode(mode_byte) do
+      {:ok, mode} ->
+        {:ok, [seq_number: seq_number, mode: mode]}
+
+      {:error, %DecodeError{}} = error ->
+        error
+    end
   end
 
   @spec encode_mode(mode()) :: 0x01 | 0x05
   def encode_mode(:remove_node_any), do: 0x01
   def encode_mode(:remove_node_stop), do: 0x05
 
-  @spec decode_mode(byte()) :: mode()
-  def decode_mode(0x01), do: :remove_node_any
-  def decode_mode(0x05), do: :remove_node_stop
+  @spec decode_mode(byte()) :: {:ok, mode()} | {:error, DecodeError.t()}
+  def decode_mode(0x01), do: {:ok, :remove_node_any}
+  def decode_mode(0x05), do: {:ok, :remove_node_stop}
+
+  def decode_mode(byte),
+    do: {:error, %DecodeError{value: byte, param: :mode, command: :node_remove}}
 end

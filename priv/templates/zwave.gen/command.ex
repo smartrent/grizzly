@@ -3,7 +3,6 @@ defmodule <%= inspect command_module %> do
   What does this command do??
 
   Params:
-
   <%= for p <- params do %>
     * `<%= inspect p %>` - explain what `<%= inspect p %>` param is for
   <% end %>
@@ -11,7 +10,7 @@ defmodule <%= inspect command_module %> do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
 
   @type param :: # give me some type specs for your params
 
@@ -36,8 +35,8 @@ defmodule <%= inspect command_module %> do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param()]
+  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(_binary) do
-    []
+    {:ok, []}
   end
 end

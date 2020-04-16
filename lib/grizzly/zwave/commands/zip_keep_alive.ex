@@ -22,5 +22,5 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
   def encode_params(_), do: <<>>
 
   @impl true
-  def decode_params(_), do: []
+  def decode_params(_), do: {:ok, []}
 end

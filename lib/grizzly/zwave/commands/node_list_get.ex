@@ -33,5 +33,5 @@ defmodule Grizzly.ZWave.Commands.NodeListGet do
   end
 
   @impl true
-  def decode_params(<<seq_number>>), do: [seq_number: seq_number]
+  def decode_params(<<seq_number>>), do: {:ok, [seq_number: seq_number]}
 end

@@ -7,7 +7,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
 
   import Bitwise
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @impl true
@@ -36,11 +36,22 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
 
   @impl true
   def decode_params(<<seq_number, status, controller_id, node_ids::binary>>) do
-    controller_id = decode_controller_id(controller_id)
-    status = decode_status(status)
-    node_ids = decode_node_ids(node_ids)
+    case decode_status(status) do
+      {:ok, status} ->
+        controller_id = decode_controller_id(controller_id)
+        node_ids = decode_node_ids(node_ids)
 
-    [seq_number: seq_number, controller_id: controller_id, status: status, node_ids: node_ids]
+        {:ok,
+         [
+           seq_number: seq_number,
+           controller_id: controller_id,
+           status: status,
+           node_ids: node_ids
+         ]}
+
+      {:error, %DecodeError{}} = error ->
+        error
+    end
   end
 
   def encode_node_ids(node_ids) do
@@ -55,8 +66,11 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   def encode_status(:latest), do: 0x00
   def encode_status(:outdated), do: 0x01
 
-  def decode_status(0x00), do: :latest
-  def decode_status(0x01), do: :outdated
+  def decode_status(0x00), do: {:ok, :latest}
+  def decode_status(0x01), do: {:ok, :outdated}
+
+  def decode_status(byte),
+    do: {:error, %DecodeError{value: byte, param: :status, command: :node_list_report}}
 
   def encode_controller_id(:unknown), do: 0x00
   def encode_controller_id(byte), do: byte

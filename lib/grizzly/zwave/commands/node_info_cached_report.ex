@@ -109,16 +109,17 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
         specific_device_class_byte
       )
 
-    [
-      seq_number: seq_number,
-      basic_device_class: basic_device_class,
-      generic_device_class: generic_device_class,
-      specific_device_class: specific_device_class,
-      listening?: bit_to_bool(list?),
-      command_classes: CommandClasses.command_class_list_from_binary(command_classes),
-      status: decode_status(status),
-      age: age
-    ]
+    {:ok,
+     [
+       seq_number: seq_number,
+       basic_device_class: basic_device_class,
+       generic_device_class: generic_device_class,
+       specific_device_class: specific_device_class,
+       listening?: bit_to_bool(list?),
+       command_classes: CommandClasses.command_class_list_from_binary(command_classes),
+       status: decode_status(status),
+       age: age
+     ]}
   end
 
   def encode_status(_), do: 0

@@ -39,8 +39,8 @@ defmodule Grizzly.ZWave.Commands.DefaultSet do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param()]
+  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(<<seq_number>>) do
-    [seq_number: seq_number]
+    {:ok, [seq_number: seq_number]}
   end
 end

@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.{Command, DecodeError, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave.SmartStart.MetaExtension
 
@@ -52,19 +52,31 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param()]
+  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<seq_number, _::size(3), dsk_byte_size::size(5),
           dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
       ) do
-    {:ok, dsk_string} = DSK.binary_to_string(dsk_binary)
-    {:ok, meta_extensions} = MetaExtension.extensions_from_binary(meta_extensions_binary)
+    with {:ok, dsk_string} <- DSK.binary_to_string(dsk_binary),
+         {:ok, meta_extensions} <- MetaExtension.extensions_from_binary(meta_extensions_binary) do
+      {:ok,
+       [
+         seq_number: seq_number,
+         dsk: dsk_string,
+         meta_extensions: meta_extensions
+       ]}
+    else
+      {:error, reason} when reason in [:dsk_too_short, :dsk_too_long] ->
+        {:error, %DecodeError{value: dsk_binary, param: :dsk, command: :node_provisioning_set}}
 
-    [
-      seq_number: seq_number,
-      dsk: dsk_string,
-      meta_extensions: meta_extensions
-    ]
+      {:error, _other} ->
+        {:error,
+         %DecodeError{
+           value: meta_extensions_binary,
+           param: :meta_extension,
+           command: :node_provisioning_set
+         }}
+    end
   end
 
   defp encode_meta_extensions(meta_extensions),

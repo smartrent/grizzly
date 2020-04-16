@@ -1,10 +1,18 @@
 defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   @behaviour Grizzly.ZWave.Command
 
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
+  @type param ::
+          {:seq_number, ZWave.seq_number()}
+          | {:accept, boolean()}
+          | {:input_dsk_length, 0..0xF}
+          | {:input_dsk, non_neg_integer()}
+
   @impl true
+  @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     # TODO validate params
     command = %Command{
@@ -19,6 +27,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   end
 
   @impl true
+  @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     accept = Command.param!(command, :accept)
@@ -31,16 +40,18 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   end
 
   @impl true
+  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
         <<seq_number, accept::size(1), _::size(3), input_dsk_length::size(4),
           input_dsk::size(input_dsk_length)-unit(8)>>
       ) do
-    [
-      seq_number: seq_number,
-      accept: bit_to_bool(accept),
-      input_dsk_length: input_dsk_length,
-      input_dsk: input_dsk
-    ]
+    {:ok,
+     [
+       seq_number: seq_number,
+       accept: bit_to_bool(accept),
+       input_dsk_length: input_dsk_length,
+       input_dsk: input_dsk
+     ]}
   end
 
   defp bool_to_bit(true), do: 1

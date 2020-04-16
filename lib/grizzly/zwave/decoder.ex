@@ -1,10 +1,9 @@
 defmodule Grizzly.ZWave.Decoder do
   @moduledoc false
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.{Command, Commands, DecodeError}
 
-  @spec from_binary(binary) :: {:ok, Command.t()}
+  @spec from_binary(binary) :: {:ok, Command.t()} | {:error, DecodeError.t()}
   # Switch Binary (0x25)
   def from_binary(<<0x25, 0x01, params::binary>>),
     do: decode(Commands.SwitchBinarySet, params)
@@ -39,7 +38,12 @@ defmodule Grizzly.ZWave.Decoder do
   def from_binary(<<0x85, 0x03, params::binary>>), do: decode(Commands.AssociationReport, params)
 
   defp decode(command_impl, params) do
-    decoded_params = command_impl.decode_params(params)
-    command_impl.new(decoded_params)
+    case command_impl.decode_params(params) do
+      {:ok, decoded_params} ->
+        command_impl.new(decoded_params)
+
+      {:error, %DecodeError{}} = error ->
+        error
+    end
   end
 end

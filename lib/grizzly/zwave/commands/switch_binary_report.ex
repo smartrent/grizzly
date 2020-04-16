@@ -9,7 +9,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.SwitchBinary
 
   @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
@@ -45,11 +45,22 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   def encode_target_value(:on), do: 0xFF
 
   @impl true
-  def decode_params(<<target_value>>), do: [target_value: target_value_from_byte(target_value)]
+  def decode_params(<<target_value_byte>>) do
+    case target_value_from_byte(target_value_byte) do
+      {:ok, target_value} ->
+        {:ok, [target_value: target_value]}
+
+      {:error, %DecodeError{}} = error ->
+        error
+    end
+  end
 
   def decode_params(<<target_value, duration>>),
     do: [target_value: target_value_from_byte(target_value), duration: duration]
 
-  defp target_value_from_byte(0x00), do: :off
-  defp target_value_from_byte(0xFF), do: :on
+  defp target_value_from_byte(0x00), do: {:ok, :off}
+  defp target_value_from_byte(0xFF), do: {:ok, :on}
+
+  defp target_value_from_byte(byte),
+    do: {:error, %DecodeError{value: byte, param: :target_value, command: :switch_binary_report}}
 end

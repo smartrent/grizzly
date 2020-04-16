@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.{Command, DecodeError, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.dsk_string()}
@@ -46,9 +46,14 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
   end
 
   @impl true
-  @spec decode_params(binary) :: [param()]
+  @spec decode_params(binary) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, _, dsk_bin::binary>>) do
-    {:ok, dsk} = DSK.binary_to_string(dsk_bin)
-    [seq_number: seq_number, dsk: dsk]
+    case DSK.binary_to_string(dsk_bin) do
+      {:ok, dsk} ->
+        {:ok, [seq_number: seq_number, dsk: dsk]}
+
+      {:error, _} ->
+        {:error, %DecodeError{value: dsk_bin, param: :dsk, command: :node_provisioning_delete}}
+    end
   end
 end

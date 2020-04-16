@@ -3,7 +3,7 @@ defmodule Grizzly.ZWave.Command do
   Data struct and behaviour for working with Z-Wave commands
   """
 
-  alias Grizzly.ZWave.CommandClass
+  alias Grizzly.ZWave.{CommandClass, DecodeError}
 
   @type delay_seconds :: non_neg_integer()
 
@@ -23,7 +23,6 @@ defmodule Grizzly.ZWave.Command do
     :command_byte,
     :impl
   ]
-
   defstruct name: nil,
             command_byte: nil,
             command_class: nil,
@@ -45,7 +44,7 @@ defmodule Grizzly.ZWave.Command do
   @doc """
   Decode the binary string of command params
   """
-  @callback decode_params(binary()) :: keyword()
+  @callback decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
 
   @doc """
   Encode the `Command.t()` into it's binary representation

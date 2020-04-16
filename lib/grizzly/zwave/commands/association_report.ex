@@ -53,13 +53,14 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
   end
 
   @impl true
-  @spec decode_params(binary()) :: [param]
+  @spec decode_params(binary()) :: {:ok, [param]}
   def decode_params(<<gi, max_nodes, reports_to_follow, nodes_bin::binary>>) do
-    [
-      grouping_identifier: gi,
-      max_nodes_supported: max_nodes,
-      reports_to_follow: reports_to_follow,
-      nodes: :erlang.binary_to_list(nodes_bin)
-    ]
+    {:ok,
+     [
+       grouping_identifier: gi,
+       max_nodes_supported: max_nodes,
+       reports_to_follow: reports_to_follow,
+       nodes: :erlang.binary_to_list(nodes_bin)
+     ]}
   end
 end

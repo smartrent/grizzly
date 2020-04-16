@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryGet do
 
   # TODO: make default implementation via using
   @impl true
-  def decode_params(_), do: []
+  def decode_params(_), do: {:ok, []}
 
   # TODO: make default implementation via using
   @impl true
