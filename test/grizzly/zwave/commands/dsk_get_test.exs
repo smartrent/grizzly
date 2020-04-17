@@ -8,14 +8,14 @@ defmodule Grizzly.ZWave.Commands.DSKGetTest do
     params = [seq_number: 0x01]
     {:ok, command} = DSKGet.new(params)
 
-    assert :learn_mode == Command.param!(command, :add_mode)
+    assert :learn == Command.param!(command, :add_mode)
   end
 
-  test "creates teh command and validates params (overriding defaults)" do
-    params = [seq_number: 0x01, add_mode: :add_mode]
+  test "creates the command and validates params (overriding defaults)" do
+    params = [seq_number: 0x01, add_mode: :add]
     {:ok, command} = DSKGet.new(params)
 
-    assert :add_mode == Command.param!(command, :add_mode)
+    assert :add == Command.param!(command, :add_mode)
   end
 
   describe "encodes params correctly" do
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.DSKGetTest do
     end
 
     test "when add mode is add mode" do
-      params = [seq_number: 0x01, add_mode: :add_mode]
+      params = [seq_number: 0x01, add_mode: :add]
       {:ok, command} = DSKGet.new(params)
       expected_binary = <<0x01, 0x01>>
 
@@ -46,13 +46,13 @@ defmodule Grizzly.ZWave.Commands.DSKGetTest do
     test "when add mode is learn mode" do
       binary_params = <<0x02, 0x00>>
       {:ok, params} = DSKGet.decode_params(binary_params)
-      assert Keyword.get(params, :add_mode) == :learn_mode
+      assert Keyword.get(params, :add_mode) == :learn
     end
 
     test "when add mode is add mode" do
       binary_params = <<0x02, 0x01>>
       {:ok, params} = DSKGet.decode_params(binary_params)
-      assert Keyword.get(params, :add_mode) == :add_mode
+      assert Keyword.get(params, :add_mode) == :add
     end
   end
 end
