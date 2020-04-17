@@ -11,16 +11,17 @@ defmodule <%= inspect command_module %> do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
+  alias <%= inspect command_class_module %>
 
   @type param :: # give me some type specs for your params
 
   @impl true
-  @spec new([param()]) :: Command.t()
+  @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
       name: <%= inspect command_name %>,
       command_byte: # insert byte here,
-      command_class: <%= inspect command_class_module %>,
+      command_class: <%= inspect command_class %>,
       params: params,
       impl: __MODULE__
     }

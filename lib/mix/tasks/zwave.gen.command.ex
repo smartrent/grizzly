@@ -39,6 +39,7 @@ defmodule Mix.Tasks.Zwave.Gen.Command do
       params: Enum.map(params, &String.to_atom/1),
       command_name: command_name,
       command_module: command_module,
+      command_class: Module.concat([String.to_atom(command_class)]),
       command_class_module: command_class_module
     ]
 
