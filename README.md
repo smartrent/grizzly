@@ -21,16 +21,13 @@ end
 
 - Support Assigning association groups
 - CommandClassList
-- Add `Null` CommandHandler?
 - Command.decode_params should be {:ok, params} or error
 - Update code base to `Grizzly.ZWave` types
 - Associations on adding a node? - probably add an option to `Grizzly.Inclusions.add_node/1`??
-- Tag tests to not run all by default - (ie timeout sets and stuff - should run all tests in CI)
 - Monitor commands - is this still needed?
 - Figure out messages from Grizzly format
   - {Grizzly, command_name, command}
   - {Grizzly, command_name, command_ref, command}
-- command support lookup table and better error messages
 - Add section about config options (make them consistent)
 - After excluding a node, ensure the connection process is stopped
 - Device classes and command classes from byte should use `DecodeError`

@@ -4,6 +4,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
   alias Grizzly.Inclusions.InclusionRunner
   alias Grizzly.ZWave.Command
 
+  @tag :inclusion
   test "add a node to the network" do
     {:ok, runner} = InclusionRunner.start_link(controller_id: 300)
     :ok = InclusionRunner.add_node(runner)
@@ -14,6 +15,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert Command.param!(received_command, :status) == :done
   end
 
+  @tag :inclusion
   test "start inclusion but then stop it" do
     {:ok, runner} = InclusionRunner.start_link(controller_id: 301)
     # start inclusion
@@ -30,6 +32,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert Command.param!(received_command, :status) == :failed
   end
 
+  @tag :inclusion
   test "removes a node from the Z-Wave network" do
     {:ok, runner} = InclusionRunner.start_link(controller_id: 300)
     :ok = InclusionRunner.remove_node(runner)
@@ -42,6 +45,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert Command.param!(received_command, :status) == :done
   end
 
+  @tag :inclusion
   test "start exclusion but then stop it" do
     {:ok, runner} = InclusionRunner.start_link(controller_id: 301)
     # start inclusion
@@ -58,6 +62,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert Command.param!(received_command, :status) == :failed
   end
 
+  @tag :inclusion
   test "start s2 inclusion with out keys, adding s2 unauthenticated keys" do
     {:ok, runner} = InclusionRunner.start_link(controller_id: 302)
     :ok = InclusionRunner.add_node(runner)
@@ -82,6 +87,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert Command.param!(command, :keys_granted) == [:s2_unauthenticated]
   end
 
+  @tag :inclusion
   test "start s2 inclusion with s2 authenticated" do
     {:ok, runner} = InclusionRunner.start_link(controller_id: 302)
     :ok = InclusionRunner.add_node(runner)
