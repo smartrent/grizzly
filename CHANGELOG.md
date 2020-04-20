@@ -1,5 +1,13 @@
 ## Changelog
 
+## v0.8.8
+
+* Enhancements
+  * Make Z-Wave versions standard version formatting
+* Fixes
+  * Paring the FirmwareMD report for version 5
+  * Fix spec for queued commands
+
 ## v0.8.7
 
 * Enhancements
