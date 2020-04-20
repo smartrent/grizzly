@@ -101,7 +101,7 @@ defmodule Grizzly.Connections.SyncConnection do
   def handle_info(data, state) do
     case state.transport.parse_response(data) do
       {:ok, zip_packet} ->
-        Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
+        _ = Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
         new_state = handle_commands(zip_packet, state)
         {:noreply, new_state}
     end
