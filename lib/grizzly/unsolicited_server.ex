@@ -2,6 +2,8 @@ defmodule Grizzly.UnsolicitedServer do
   @moduledoc false
   use GenServer
 
+  require Logger
+
   alias Grizzly.ZIPGateway
   alias Grizzly.UnsolicitedServer.SocketSupervisor
 
@@ -28,6 +30,7 @@ defmodule Grizzly.UnsolicitedServer do
 
       _error ->
         # wait 2 seconds to try again
+        Logger.warn("[Grizzly]: Unsolicited server unable to listen")
         :timer.sleep(2_000)
         {:noreply, state, {:continue, :listen}}
     end

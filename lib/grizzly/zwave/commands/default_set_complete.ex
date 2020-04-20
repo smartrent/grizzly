@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
   def decode_params(<<seq_number, status_byte>>) do
     case status_from_byte(status_byte) do
       {:ok, status} ->
-        [seq_number: seq_number, status: status]
+        {:ok, [seq_number: seq_number, status: status]}
 
       {:error, _} ->
         {:error, %DecodeError{param: :status, value: status_byte, command: :default_set_complete}}

@@ -16,6 +16,6 @@ defmodule Grizzly.Network do
   def reset_controller() do
     seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :default_set, seq_number: seq_number)
+    Grizzly.send_command(1, :default_set, [seq_number: seq_number], timeout: 10_000)
   end
 end

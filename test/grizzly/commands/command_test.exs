@@ -2,7 +2,17 @@ defmodule Grizzly.Commands.CommandTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.Commands.Command
-  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, SwitchBinarySet, ZIPPacket}
+
+  alias Grizzly.ZWave.CommandClasses.ZIP
+
+  alias Grizzly.ZWave.Commands.{
+    SwitchBinaryGet,
+    SwitchBinaryReport,
+    SwitchBinarySet,
+    ZIPKeepAlive,
+    ZIPPacket
+  }
+
   alias Grizzly.CommandHandlers.AckResponse
 
   test "turns a Z-Wave command into a Grizzly command" do
@@ -83,5 +93,13 @@ defmodule Grizzly.Commands.CommandTest do
 
     assert {:error, :nack_response, grizzly_command} ==
              Command.handle_zip_packet(grizzly_command, nack_response)
+  end
+
+  test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do
+    {:ok, keep_alive} = ZIPKeepAlive.new(ack_flag: :ack_request)
+    grizzly_command = Command.from_zwave_command(keep_alive, self(), nil)
+    expected_binary = <<ZIP.byte(), 0x03, 0x80>>
+
+    assert expected_binary == Command.to_binary(grizzly_command)
   end
 end

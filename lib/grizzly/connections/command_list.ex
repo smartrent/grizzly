@@ -4,6 +4,8 @@ defmodule Grizzly.Connections.CommandList do
   # A list of running command processes and their waiter's for the
   # connections to track
 
+  #### TODO separate out keep alive stuff ####
+
   require Logger
 
   alias Grizzly.Commands
@@ -18,12 +20,13 @@ defmodule Grizzly.Connections.CommandList do
   @type command_list_item :: {pid(), command_waiter(), reference()}
 
   @opaque t :: %__MODULE__{
-            commands: [command_list_item()]
+            commands: [command_list_item()],
+            keep_alive_command: ZWaveCommand.t() | nil
           }
 
   # right now using a list but can probably use an erlang array for a
   # better implementation long term
-  defstruct commands: []
+  defstruct commands: [], keep_alive_command: nil
 
   def empty(), do: %__MODULE__{}
 
@@ -41,6 +44,12 @@ defmodule Grizzly.Connections.CommandList do
     end
   end
 
+  def create_keep_alive_command(command_list, keep_alive_command, command_opts \\ []) do
+    case new_keep_alive_command(command_list, keep_alive_command, command_opts) do
+      {:ok, _runner, _new_list} = result -> result
+    end
+  end
+
   @spec response_for_zip_packet(t(), ZIPPacket.t()) ::
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
@@ -51,6 +60,9 @@ defmodule Grizzly.Connections.CommandList do
         {:retry, command_runner, %__MODULE__{commands: command_list}}
 
       {:continue, command_list} ->
+        {:continue, %__MODULE__{commands: command_list}}
+
+      {nil, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
 
       # if commands that are queued, nacked, or complete will not have the command
@@ -163,7 +175,18 @@ defmodule Grizzly.Connections.CommandList do
     end
   end
 
+  defp new_keep_alive_command(command_list, command, command_opts) do
+    case Commands.create_command(command, command_opts) do
+      {:ok, command_runner} ->
+        {:ok, command_runner, put_keep_alive(command_list, command_runner)}
+    end
+  end
+
   defp put_command(command_list, command, waiter, reference) do
     %__MODULE__{command_list | commands: [{command, waiter, reference} | command_list.commands]}
+  end
+
+  defp put_keep_alive(command_list, keep_alive_runner) do
+    %__MODULE__{command_list | keep_alive_command: keep_alive_runner}
   end
 end

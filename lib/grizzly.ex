@@ -25,6 +25,7 @@ defmodule Grizzly do
           | :node_info_cached_get
           | :switch_binary_set
           | :switch_binary_get
+          | :keep_alive
 
   @doc """
   Send a command to the node via the node id

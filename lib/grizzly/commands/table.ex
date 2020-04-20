@@ -27,10 +27,11 @@ defmodule Grizzly.Commands.Table do
        {Commands.NodeRemove, handler: {WaitReport, complete_report: :node_remove_status}}},
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
       {:node_add_dsk_set, {Commands.NodeAddDSKSet, handler: AckResponse}},
-      {:association_set, do: {Commands.AssociationSet, handler: AckResponse}},
+      {:association_set, {Commands.AssociationSet, handler: AckResponse}},
       {:association_get,
        {Commands.AssociationGet,
-        handler: {AggregateReport, complete_report: :association_report, aggregate_field: :nodes}}}
+        handler: {AggregateReport, complete_report: :association_report, aggregate_param: :nodes}}},
+      {:keep_alive, {Commands.ZIPKeepAlive, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do

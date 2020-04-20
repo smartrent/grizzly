@@ -97,17 +97,18 @@ defmodule Grizzly.ZWave.Command do
     %__MODULE__{command | params: new_params}
   end
 
-  defp list_of_command_params(command) do
-    Enum.reduce(command.params, "", fn {param_name, _}, str_list ->
-      str_list <> "  * #{inspect(param_name)}\n"
-    end)
-  end
-
-  defp encode_params(command) do
+  @spec encode_params(t()) :: binary()
+  def encode_params(command) do
     if command.params == [] do
       <<>>
     else
       command.impl.encode_params(command)
     end
+  end
+
+  defp list_of_command_params(command) do
+    Enum.reduce(command.params, "", fn {param_name, _}, str_list ->
+      str_list <> "  * #{inspect(param_name)}\n"
+    end)
   end
 end

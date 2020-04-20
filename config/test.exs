@@ -10,4 +10,4 @@ config :grizzly,
     run_zipgatway_bin: false
   ]
 
-config :logger, level: :info
+config :logger, level: :error

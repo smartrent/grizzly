@@ -51,9 +51,18 @@ defmodule Grizzly.Commands.Command do
 
   @spec to_binary(t()) :: binary()
   def to_binary(command) do
-    command.source
-    |> ZIPPacket.with_zwave_command(seq_number: command.seq_number)
-    |> ZIPPacket.to_binary()
+    zwave_command = command.source
+
+    case zwave_command.name do
+      :keep_alive ->
+        <<zwave_command.command_class.byte(), zwave_command.command_byte>> <>
+          ZWaveCommand.encode_params(zwave_command)
+
+      _other ->
+        command.source
+        |> ZIPPacket.with_zwave_command(seq_number: command.seq_number)
+        |> ZIPPacket.to_binary()
+    end
   end
 
   @spec handle_zip_packet(t(), ZIPPacket.t()) ::

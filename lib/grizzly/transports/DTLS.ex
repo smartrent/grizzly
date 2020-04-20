@@ -1,7 +1,7 @@
 defmodule Grizzly.Transports.DTLS do
   @behaviour Grizzly.Transport
 
-  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave
 
   require Logger
 
@@ -23,9 +23,9 @@ defmodule Grizzly.Transports.DTLS do
     binary = :erlang.list_to_binary(bin_list)
     _ = Logger.debug("Z/IP Packet rec: #{inspect(binary, base: :hex)}")
 
-    case ZIPPacket.from_binary(binary) do
-      {:ok, _zip_packet} = result -> result
-    end
+    # TODO: handle errors
+    {:ok, _result} = result = ZWave.from_binary(binary)
+    result
   end
 
   @impl true

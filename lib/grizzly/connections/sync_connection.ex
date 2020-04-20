@@ -9,9 +9,8 @@ defmodule Grizzly.Connections.SyncConnection do
 
   alias Grizzly.{ZIPGateway, Connections}
   alias Grizzly.Commands.CommandRunner
-  alias Grizzly.Connections.{KeepAliveTimer, CommandList}
+  alias Grizzly.Connections.{KeepAlive, CommandList}
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.ZIPKeepAlive
 
   @type opt :: {:transport, module()}
 
@@ -19,7 +18,10 @@ defmodule Grizzly.Connections.SyncConnection do
 
   defmodule State do
     @moduledoc false
-    defstruct transport: nil, socket: nil, commands: CommandList.empty(), keep_alive_timer: nil
+    defstruct transport: nil,
+              socket: nil,
+              commands: CommandList.empty(),
+              keep_alive: nil
   end
 
   def child_spec(node_id, opts \\ []) do
@@ -51,8 +53,7 @@ defmodule Grizzly.Connections.SyncConnection do
 
     case transport.open(host, port) do
       {:ok, socket} ->
-        keep_alive_timer = KeepAliveTimer.create(self())
-        {:ok, %State{socket: socket, transport: transport, keep_alive_timer: keep_alive_timer}}
+        {:ok, %State{socket: socket, transport: transport, keep_alive: KeepAlive.init(25_000)}}
 
       {:error, :timeout} ->
         {:stop, :timeout}
@@ -69,26 +70,20 @@ defmodule Grizzly.Connections.SyncConnection do
          %State{
            state
            | commands: new_command_list,
-             keep_alive_timer: KeepAliveTimer.restart(state.keep_alive_timer)
+             keep_alive: KeepAlive.timer_restart(state.keep_alive)
          }}
     end
   end
 
   def handle_info(:keep_alive_tick, state) do
-    {:ok, zip_keep_alive} = ZIPKeepAlive.new()
+    %State{keep_alive: keep_alive} = state
 
-    {:ok, command_runner, _, new_command_list} =
-      CommandList.create(state.commands, zip_keep_alive, self())
+    new_keep_alive =
+      keep_alive
+      |> KeepAlive.make_command()
+      |> KeepAlive.run(&do_send_command(&1, state))
 
-    case do_send_command(command_runner, state) do
-      :ok ->
-        {:noreply,
-         %State{
-           state
-           | commands: new_command_list,
-             keep_alive_timer: KeepAliveTimer.restart(state.keep_alive_timer)
-         }}
-    end
+    {:noreply, %State{state | keep_alive: new_keep_alive}}
   end
 
   # handle when there is a timeout and command runner stops
@@ -106,46 +101,44 @@ defmodule Grizzly.Connections.SyncConnection do
   def handle_info(data, state) do
     case state.transport.parse_response(data) do
       {:ok, zip_packet} ->
-        updated_state = handle_commands(zip_packet, state)
-
-        {:noreply,
-         %State{updated_state | keep_alive_timer: KeepAliveTimer.restart(state.keep_alive_timer)}}
+        Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
+        new_state = handle_commands(zip_packet, state)
+        {:noreply, new_state}
     end
   end
 
+  defp handle_commands(%Command{name: :keep_alive}, state) do
+    %State{state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
+  end
+
   defp handle_commands(zip_packet, state) do
-    self = self()
+    updated_state =
+      case CommandList.response_for_zip_packet(state.commands, zip_packet) do
+        {:retry, command_runner, new_comamnd_list} ->
+          :ok = do_send_command(command_runner, state)
+          %State{state | commands: new_comamnd_list}
 
-    case CommandList.response_for_zip_packet(state.commands, zip_packet) do
-      {:retry, command_runner, new_comamnd_list} ->
-        :ok = do_send_command(command_runner, state)
-        %State{state | commands: new_comamnd_list}
+        {:continue, new_comamnd_list} ->
+          %State{state | commands: new_comamnd_list}
 
-      {:continue, new_comamnd_list} ->
-        %State{state | commands: new_comamnd_list}
+        {waiter, {:error, :nack_response, new_comamnd_list}} ->
+          GenServer.reply(waiter, {:error, :nack_response})
+          %State{state | commands: new_comamnd_list}
 
-      # this if for the keep alive as this process only
-      # waits for that command
-      {^self, {_, _, new_comamnd_list}} ->
-        %State{state | commands: new_comamnd_list}
+        {waiter, {:queued, queued_seconds, new_comamnd_list}} ->
+          GenServer.reply(waiter, {:queued, queued_seconds})
+          %State{state | commands: new_comamnd_list}
 
-      {waiter, {:error, :nack_response, new_comamnd_list}} ->
-        GenServer.reply(waiter, {:error, :nack_response})
-        %State{state | commands: new_comamnd_list}
+        {waiter, {:complete, response, new_comamnd_list}} ->
+          GenServer.reply(waiter, response)
+          %State{state | commands: new_comamnd_list}
+      end
 
-      {waiter, {:queued, queued_seconds, new_comamnd_list}} ->
-        GenServer.reply(waiter, {:queued, queued_seconds})
-        %State{state | commands: new_comamnd_list}
-
-      {waiter, {:complete, response, new_comamnd_list}} ->
-        GenServer.reply(waiter, response)
-        %State{state | commands: new_comamnd_list}
-    end
+    %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
   end
 
   defp do_send_command(command_runner, state) do
     binary = CommandRunner.encode_command(command_runner)
-
     state.transport.send(state.socket, binary)
   end
 end
