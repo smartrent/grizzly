@@ -59,36 +59,41 @@ defmodule Grizzly.Commands.Command do
           ZWaveCommand.encode_params(zwave_command)
 
       _other ->
-        command.source
-        |> ZIPPacket.with_zwave_command(seq_number: command.seq_number)
-        |> ZIPPacket.to_binary()
+        {:ok, zip_packet_command} =
+          ZIPPacket.with_zwave_command(zwave_command, command.seq_number,
+            seq_number: command.seq_number
+          )
+
+        ZWaveCommand.to_binary(zip_packet_command)
     end
   end
 
-  @spec handle_zip_packet(t(), ZIPPacket.t()) ::
+  @spec handle_zip_command(t(), ZWaveCommand.t()) ::
           {:continue, t()}
           | {:error, :nack_response, t()}
           | {:queued, non_neg_integer(), t()}
           | {:complete, t()}
           | {:retry, t()}
-  def handle_zip_packet(command, zip_packet) do
-    case zip_packet.flag do
+  def handle_zip_command(command, zip_command) do
+    case ZWaveCommand.param!(zip_command, :flag) do
       :ack_response ->
-        handle_ack_response(command, zip_packet)
+        handle_ack_response(command, zip_command)
 
       :nack_response ->
-        handle_nack_response(command, zip_packet)
+        handle_nack_response(command, zip_command)
 
       :nack_waiting ->
-        handle_nack_waiting(command, zip_packet)
+        handle_nack_waiting(command, zip_command)
 
-      _ ->
-        handle_command(command, zip_packet)
+      flag when flag in [nil, :ack_request] ->
+        do_handle_zip_command(command, zip_command)
     end
   end
 
   defp handle_ack_response(command, zip_packet) do
-    if command.seq_number == zip_packet.seq_number do
+    seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
+
+    if command.seq_number == seq_number do
       handle_ack_response(command)
     else
       {:continue, command}
@@ -106,7 +111,9 @@ defmodule Grizzly.Commands.Command do
   end
 
   defp handle_nack_response(command, zip_packet) do
-    if command.seq_number == zip_packet.seq_number do
+    seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
+
+    if command.seq_number == seq_number do
       handle_nack_response(command)
     else
       {:continue, command}
@@ -120,17 +127,21 @@ defmodule Grizzly.Commands.Command do
     do: {:retry, %__MODULE__{command | retries: n - 1}}
 
   defp handle_nack_waiting(command, zip_packet) do
-    if command.seq_number == zip_packet.seq_number do
+    seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
+
+    if command.seq_number == seq_number do
       # SDS13784 Network specification states that a default of 90 seconds
       # should be used if no expected delay is provided.
-      {:queued, ZIPPacket.extension(zip_packet, :expected_delay, 90), command}
+      make_queued_response(command, zip_packet)
     else
       {:continue, command}
     end
   end
 
-  defp handle_command(command, zip_packet) do
-    case command.handler.handle_command(zip_packet.command, command.handler_state) do
+  defp do_handle_zip_command(command, zip_packet_command) do
+    zwave_command = ZWaveCommand.param!(zip_packet_command, :command)
+
+    case command.handler.handle_command(zwave_command, command.handler_state) do
       {:continue, new_handler_state} ->
         {:continue, %__MODULE__{command | handler_state: new_handler_state}}
 
@@ -159,6 +170,16 @@ defmodule Grizzly.Commands.Command do
 
       seq_number ->
         seq_number
+    end
+  end
+
+  defp make_queued_response(command, zip_packet) do
+    case ZIPPacket.extension(zip_packet, :expected_delay, 90) do
+      delay when delay >= 1 ->
+        {:queued, delay, command}
+
+      0 ->
+        {:continue, command}
     end
   end
 end

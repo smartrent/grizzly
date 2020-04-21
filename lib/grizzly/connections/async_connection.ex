@@ -114,7 +114,7 @@ defmodule Grizzly.Connections.AsyncConnection do
   end
 
   # handle when there is a timeout and command runner stops
-  def handle_info({:grizzly, :command_timeout, command_runner_pid, command_ref}, state) do
+  def handle_info({:grizzly, :command_timeout, command_runner_pid, command_ref, _}, state) do
     waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
     send(waiter, {:grizzly, :send_command, {:error, :timeout, command_ref}})
 
@@ -148,7 +148,10 @@ defmodule Grizzly.Connections.AsyncConnection do
           if !ZIPPacket.ack_response?(zip_packet) do
             # Since we are doing async communications we need to handle when the
             # connection gets an unhandled command from the Z-Wave
-            send(state.owner, {:grizzly, :unhandled_command, zip_packet.command})
+            send(
+              state.owner,
+              {:grizzly, :unhandled_command, Command.param!(zip_packet, :command)}
+            )
           end
 
           %State{state | commands: new_comamnd_list}
@@ -179,7 +182,8 @@ defmodule Grizzly.Connections.AsyncConnection do
     if ZIPPacket.ack_response?(zip_packet) do
       send(from, {:grizzly, :ack_response, command_ref, response})
     else
-      send(from, {:grizzly, zip_packet.command.name, command_ref, response})
+      command = Command.param!(zip_packet, :command)
+      send(from, {:grizzly, command.name, command_ref, response})
     end
   end
 end

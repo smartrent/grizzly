@@ -1,7 +1,7 @@
 defmodule GrizzlyTest.Transport.UDP do
   @behaviour Grizzly.Transport
 
-  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave
 
   @test_host {0, 0, 0, 0}
   @test_port 5_000
@@ -22,7 +22,7 @@ defmodule GrizzlyTest.Transport.UDP do
 
   @impl true
   def parse_response({:udp, _, _, _, binary}) do
-    case ZIPPacket.from_binary(binary) do
+    case ZWave.from_binary(binary) do
       {:ok, _zip_packet} = result -> result
     end
   end

@@ -6,7 +6,7 @@ defmodule Grizzly.Commands.CommandRunner do
   use GenServer
 
   alias Grizzly.Commands.Command
-  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave.Command, as: ZWaveCommand
 
   def child_spec([_command, _opts] = args) do
     # Don't restart the command if there is a failure
@@ -20,14 +20,14 @@ defmodule Grizzly.Commands.CommandRunner do
     GenServer.start_link(__MODULE__, [command, opts])
   end
 
-  @spec handle_zip_packet(pid(), ZIPPacket.t()) ::
+  @spec handle_zip_command(pid(), ZWaveCommand.t()) ::
           :continue
           | {:error, :nack_response}
           | {:queued, non_neg_integer()}
           | :retry
           | {:complete, any()}
-  def handle_zip_packet(runner, zip_packet) do
-    GenServer.call(runner, {:handle_zip_packet, zip_packet})
+  def handle_zip_command(runner, zip_packet) do
+    GenServer.call(runner, {:handle_zip_command, zip_packet})
   end
 
   @spec encode_command(pid()) :: binary()
@@ -54,8 +54,8 @@ defmodule Grizzly.Commands.CommandRunner do
   @impl true
   def handle_call(:seq_number, _from, command), do: {:reply, command.seq_number, command}
 
-  def handle_call({:handle_zip_packet, zip_packet}, _from, command) do
-    case Command.handle_zip_packet(command, zip_packet) do
+  def handle_call({:handle_zip_command, zip_packet}, _from, command) do
+    case Command.handle_zip_command(command, zip_packet) do
       {:continue, new_command} ->
         {:reply, :continue, new_command}
 
@@ -79,7 +79,7 @@ defmodule Grizzly.Commands.CommandRunner do
 
   @impl true
   def handle_info(:timeout, command) do
-    send(command.owner, {:grizzly, :command_timeout, self(), command.ref})
+    send(command.owner, {:grizzly, :command_timeout, self(), command.ref, command.source})
     {:stop, :normal, command}
   end
 

@@ -87,15 +87,19 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   # handle when there is a timeout and command runner stops
-  def handle_info({:grizzly, :command_timeout, command_runner_pid, _ref}, state) do
-    waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
-    GenServer.reply(waiter, {:error, :timeout})
+  def handle_info({:grizzly, :command_timeout, command_runner_pid, _ref, zwave_command}, state) do
+    if zwave_command.name == :keep_alive do
+      {:noreply, state}
+    else
+      waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
+      GenServer.reply(waiter, {:error, :timeout})
 
-    {:noreply,
-     %State{
-       state
-       | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
-     }}
+      {:noreply,
+       %State{
+         state
+         | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
+       }}
+    end
   end
 
   def handle_info(data, state) do

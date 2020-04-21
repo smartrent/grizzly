@@ -20,7 +20,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
-    assert {:complete, :ok} == CommandRunner.handle_zip_packet(runner, ack_response)
+    assert {:complete, :ok} == CommandRunner.handle_zip_command(runner, ack_response)
   end
 
   test "runs a network command that has the seq number as part of the command" do
@@ -40,11 +40,10 @@ defmodule Grizzly.Commands.CommandRunnerTest do
         node_ids: []
       )
 
-    zip_packet =
-      ZIPPacket.with_zwave_command(node_list_report, seq_number: SeqNumber.get_and_inc())
+    {:ok, zip_packet} = ZIPPacket.with_zwave_command(node_list_report, SeqNumber.get_and_inc())
 
     assert {:complete, {:ok, ^node_list_report}} =
-             CommandRunner.handle_zip_packet(runner, zip_packet)
+             CommandRunner.handle_zip_command(runner, zip_packet)
   end
 
   test "runs a basic application command that expects a report" do
@@ -53,11 +52,11 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     {:ok, switch_binary_report} = SwitchBinaryReport.new(target_value: :on)
 
-    zip_packet =
-      ZIPPacket.with_zwave_command(switch_binary_report, seq_number: SeqNumber.get_and_inc())
+    {:ok, zip_packet} =
+      ZIPPacket.with_zwave_command(switch_binary_report, SeqNumber.get_and_inc())
 
     assert {:complete, {:ok, ^switch_binary_report}} =
-             CommandRunner.handle_zip_packet(runner, zip_packet)
+             CommandRunner.handle_zip_command(runner, zip_packet)
   end
 
   test "runs command that will receive a nack response" do
@@ -66,7 +65,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
-    assert {:error, :nack_response} == CommandRunner.handle_zip_packet(runner, nack_response)
+    assert {:error, :nack_response} == CommandRunner.handle_zip_command(runner, nack_response)
   end
 
   test "ignores nack_response not for command" do
@@ -75,16 +74,16 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner) + 1)
 
-    assert :continue == CommandRunner.handle_zip_packet(runner, nack_response)
+    assert :continue == CommandRunner.handle_zip_command(runner, nack_response)
   end
 
   test "handles a queued command" do
     {:ok, command} = SwitchBinaryGet.new()
     {:ok, runner} = CommandRunner.start_link(command)
 
-    nack_waiting = ZIPPacket.make_nack_waiting_response(3, CommandRunner.seq_number(runner))
+    nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
 
-    assert {:queued, 3} == CommandRunner.handle_zip_packet(runner, nack_waiting)
+    assert {:queued, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
   end
 
   test "encodes a command" do

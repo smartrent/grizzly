@@ -137,7 +137,7 @@ defmodule Grizzly.Connections.CommandList do
     Enum.reduce(command_list.commands, {nil, []}, fn {command_runner, _command_waiter, _ref} =
                                                        command,
                                                      {_result, new_command_list} ->
-      case CommandRunner.handle_zip_packet(command_runner, zip_packet) do
+      case CommandRunner.handle_zip_command(command_runner, zip_packet) do
         # if the command says to continue we put it back into the command list
         :continue ->
           {:continue, [command | new_command_list]}

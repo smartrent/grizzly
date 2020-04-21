@@ -64,7 +64,7 @@ defmodule Grizzly.MixProject do
 
   defp aliases() do
     [
-      test: ["test --exclude integration --exclude timeout --exclude inclusion --stale"]
+      test: ["test --exclude integration --exclude inclusion"]
     ]
   end
 end

@@ -16,7 +16,7 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
     refute AsyncConnection.command_alive?(400, command_ref)
   end
 
-  @tag :timeout
+  @tag :integration
   test "gets a timeout for the async command" do
     {:ok, _async_conn} = AsyncConnection.start_link(400)
     {:ok, command} = SwitchBinaryGet.new()

@@ -8,6 +8,7 @@ defmodule Grizzly.ZWave.Decoder do
     @mappings [
       # {command_class_byte, command_byte, command_module}
       # Z/IP (0x23)
+      {0x23, 0x02, Commands.ZIPPacket},
       {0x23, 0x03, Commands.ZIPKeepAlive},
       # Switch Binary (0x25)
       {0x25, 0x01, Commands.SwitchBinarySet},
@@ -28,6 +29,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
       {0x52, 0x04, Commands.NodeInfoCacheReport},
+      # Manufacturer Specific
+      {0x72, 0x05, Commands.ManufacturerSpecificReport},
       # Association (0x85)
       {0x85, 0x03, Commands.AssociationReport},
       # Version (0x86)

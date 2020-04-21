@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
 
   @impl true
   def decode_params(
-        <<seq_number, status::size(4), age::size(4), list?::size(1), _::size(7), _, 0x00,
+        <<seq_number, status::size(4), age::size(4), list?::size(1), _::size(7), _, _keys,
           basic_device_class_byte, generic_device_class_byte, specific_device_class_byte,
           command_classes::binary>>
       ) do

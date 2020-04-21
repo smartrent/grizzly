@@ -47,7 +47,7 @@ defmodule Grizzly.Commands.CommandTest do
 
     ack_response = ZIPPacket.make_ack_response(grizzly_command.seq_number)
 
-    assert {:complete, :ok} == Command.handle_zip_packet(grizzly_command, ack_response)
+    assert {:complete, :ok} == Command.handle_zip_command(grizzly_command, ack_response)
   end
 
   test "handles Z/IP Packet for an report" do
@@ -56,21 +56,21 @@ defmodule Grizzly.Commands.CommandTest do
 
     grizzly_command = Command.from_zwave_command(zwave_command, self())
     ack_response = ZIPPacket.make_ack_response(grizzly_command.seq_number)
-    zip_report = ZIPPacket.with_zwave_command(report, seq_number: 100)
+    {:ok, zip_report} = ZIPPacket.with_zwave_command(report, seq_number: 100)
 
-    assert {:continue, %Command{}} = Command.handle_zip_packet(grizzly_command, ack_response)
+    assert {:continue, %Command{}} = Command.handle_zip_command(grizzly_command, ack_response)
 
-    assert {:complete, {:ok, report}} == Command.handle_zip_packet(grizzly_command, zip_report)
+    assert {:complete, {:ok, report}} == Command.handle_zip_command(grizzly_command, zip_report)
   end
 
   test "handles Z/IP Packet for queued" do
     {:ok, zwave_command} = SwitchBinaryGet.new()
     grizzly_command = Command.from_zwave_command(zwave_command, self())
 
-    nack_waiting = ZIPPacket.make_nack_waiting_response(2, grizzly_command.seq_number)
+    nack_waiting = ZIPPacket.make_nack_waiting_response(grizzly_command.seq_number, 2)
 
     assert {:queued, 2, grizzly_command} ==
-             Command.handle_zip_packet(grizzly_command, nack_waiting)
+             Command.handle_zip_command(grizzly_command, nack_waiting)
   end
 
   test "handles Z/IP Packet for nack response with retires" do
@@ -82,7 +82,7 @@ defmodule Grizzly.Commands.CommandTest do
     expected_new_command = %Command{grizzly_command | retries: grizzly_command.retries - 1}
 
     assert {:retry, expected_new_command} ==
-             Command.handle_zip_packet(grizzly_command, nack_response)
+             Command.handle_zip_command(grizzly_command, nack_response)
   end
 
   test "handles Z/IP Packet for nack response with no retires" do
@@ -92,7 +92,7 @@ defmodule Grizzly.Commands.CommandTest do
     nack_response = ZIPPacket.make_nack_response(grizzly_command.seq_number)
 
     assert {:error, :nack_response, grizzly_command} ==
-             Command.handle_zip_packet(grizzly_command, nack_response)
+             Command.handle_zip_command(grizzly_command, nack_response)
   end
 
   test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do

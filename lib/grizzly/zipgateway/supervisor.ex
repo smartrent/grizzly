@@ -3,6 +3,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
   # Supervisor for the `zipgateway` system process
   use DynamicSupervisor
+  require Logger
 
   alias Grizzly.ZIPGateway.Config
 
@@ -21,6 +22,14 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     serial_port = Keyword.fetch!(opts, :serial_port)
     zipgateway_cfg_path = Keyword.fetch!(opts, :zipgateway_cfg_path)
     priv = Application.app_dir(:grizzly, "priv")
+
+    Logger.info("""
+    Running zipgateway with:
+
+    #{inspect(zipgateway_bin)} -c #{inspect(zipgateway_cfg_path)} -s #{inspect(serial_port)}
+
+    From dir: #{inspect(priv)}
+    """)
 
     child =
       {MuonTrap.Daemon,

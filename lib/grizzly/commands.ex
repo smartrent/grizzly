@@ -29,7 +29,7 @@ defmodule Grizzly.Commands do
           | {:error, :nack_response}
           | {:queued, non_neg_integer()}
   def handle_zip_packet_for_command(command, zip_packet) do
-    CommandRunner.handle_zip_packet(command, zip_packet)
+    CommandRunner.handle_zip_command(command, zip_packet)
   end
 
   @doc """

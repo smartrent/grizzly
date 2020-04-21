@@ -1,6 +1,14 @@
 defmodule Grizzly.ZWave.Commands.ZIPPacket do
+  @moduledoc """
+  Command for sending Z-Wave commands via Z/IP
+  """
+
+  @behaviour Grizzly.ZWave.Command
+
   import Bitwise
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, Decoder}
+  alias Grizzly.ZWave.CommandClasses.ZIP
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions
 
   @type flag ::
@@ -12,32 +20,77 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
           | :nack_option_error
           | :invalid
 
-  @type opt ::
-          {:seq_number, non_neg_integer()}
-          | {:dest, non_neg_integer()}
-          | {:source, non_neg_integer()}
-          | {:flag, flag() | nil}
-          | {:header_extensions, list()}
+  @type param ::
+          {:command, Command.t() | nil}
+          | {:flag, flag()}
+          | {:seq_number, ZWave.seq_number()}
+          | {:source, ZWave.node_id()}
+          | {:dest, ZWave.node_id()}
+          | {:header_extensions, [HeaderExtensions.extension()]}
           | {:secure, boolean()}
 
-  @enforce_keys [:seq_number]
-  @type t :: %__MODULE__{
-          command: Command.t() | nil,
-          flag: flag() | nil,
-          seq_number: non_neg_integer(),
-          source: non_neg_integer(),
-          dest: non_neg_integer(),
-          header_extensions: list(),
-          secure: boolean()
-        }
+  @default_params [
+    source: 0x00,
+    dest: 0x00,
+    secure: true,
+    header_extensions: [],
+    flag: nil,
+    command: nil
+  ]
 
-  defstruct command: nil,
-            flag: nil,
-            seq_number: nil,
-            source: nil,
-            dest: nil,
-            header_extensions: [],
-            secure: true
+  @impl true
+  def new(params \\ []) do
+    # TODO: validate params
+    command = %Command{
+      name: :zip_packet,
+      command_byte: 0x02,
+      command_class: ZIP,
+      params: Keyword.merge(@default_params, params),
+      impl: __MODULE__
+    }
+
+    {:ok, command}
+  end
+
+  @impl true
+  @spec encode_params(Command.t()) :: binary()
+  def encode_params(command) do
+    zwave_command = Command.param(command, :command)
+    flag = Command.param(command, :flag)
+    seq_number = Command.param!(command, :seq_number)
+    source = Command.param!(command, :source)
+    dest = Command.param!(command, :dest)
+    header_extensions = Command.param!(command, :header_extensions)
+    secure = Command.param!(command, :secure)
+
+    meta_byte = meta_to_byte(secure, zwave_command, header_extensions)
+
+    <<flag_to_byte(flag), meta_byte, seq_number, source, dest>>
+    |> maybe_add_header_extensions(header_extensions)
+    |> maybe_add_command(zwave_command)
+  end
+
+  @impl true
+  @spec decode_params(binary()) :: {:ok, [param()]}
+  def decode_params(
+        <<flag_byte, meta_byte, seq_number, source, dest, extensions_and_command::binary>>
+      ) do
+    meta = meta_from_byte(meta_byte)
+    header_extensions = parse_header_extensions(extensions_and_command, meta)
+    {:ok, command} = parse_command(extensions_and_command, meta)
+    flag = flag_from_byte(flag_byte)
+
+    {:ok,
+     [
+       seq_number: seq_number,
+       source: source,
+       dest: dest,
+       secure: meta.secure,
+       header_extensions: header_extensions,
+       command: command,
+       flag: flag
+     ]}
+  end
 
   @spec flag_to_byte(flag() | nil) :: byte()
   def flag_to_byte(nil), do: 0x00
@@ -49,11 +102,11 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   def flag_to_byte(:nack_option_error), do: 0x24
   def flag_to_byte(:invalid), do: raise(ArgumentError, "Z/IP flag is invalid, cannot encode")
 
-  def to_meta_byte(%__MODULE__{} = zip_packet) do
+  def meta_to_byte(secure, command, extensions) do
     meta_map = %{
-      secure: zip_packet.secure,
-      command: zip_packet.command,
-      header_extensions: zip_packet.header_extensions
+      secure: secure,
+      command: command,
+      header_extensions: extensions
     }
 
     Enum.reduce(meta_map, 0, fn
@@ -66,195 +119,91 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     end)
   end
 
-  @spec ack_response?(t()) :: boolean()
-  def ack_response?(%__MODULE__{flag: :ack_response}), do: true
-  def ack_response?(%__MODULE__{}), do: false
+  @spec ack_response?(Command.t()) :: boolean()
+  def ack_response?(command) do
+    Command.param!(command, :flag) == :ack_response
+  end
 
-  @spec make_ack_response(Grizzly.seq_number()) :: t()
+  @spec make_ack_response(ZWave.seq_number()) :: Command.t()
   def make_ack_response(seq_number) do
-    %__MODULE__{
-      seq_number: seq_number,
-      flag: :ack_response,
-      source: 0,
-      dest: 0
-    }
+    {:ok, command} = new(seq_number: seq_number, flag: :ack_response)
+    command
   end
 
   @doc """
   Make a `:nack_response` `ZIPPacket.t()`
   """
-  @spec make_nack_response(Grizzly.seq_number()) :: t()
+  @spec make_nack_response(ZWave.seq_number()) :: Command.t()
   def make_nack_response(seq_number) do
-    %__MODULE__{
-      seq_number: seq_number,
-      flag: :nack_response,
-      source: 0,
-      dest: 0
-    }
+    {:ok, command} = new(seq_number: seq_number, flag: :nack_response)
+    command
   end
 
-  @spec make_nack_waiting_response(Command.delay_seconds(), Grizzly.seq_number()) :: t()
-  def make_nack_waiting_response(delay_in_seconds, seq_number) do
-    %__MODULE__{
-      seq_number: seq_number,
-      flag: :nack_waiting,
-      header_extensions: [{:expected_delay, delay_in_seconds}],
-      source: 0,
-      dest: 0
-    }
+  @spec make_nack_waiting_response(ZWave.seq_number(), seconds :: non_neg_integer()) ::
+          Command.t()
+  def make_nack_waiting_response(seq_number, delay_in_seconds) do
+    {:ok, command} =
+      new(
+        seq_number: seq_number,
+        flag: :nack_waiting,
+        header_extensions: [{:expected_delay, delay_in_seconds}]
+      )
+
+    command
   end
 
   @doc """
   Get the extension by extension name
   """
-  @spec extension(t(), atom(), any()) :: any()
-  def extension(zip_packet, extension_name, default \\ nil) do
-    Enum.find_value(zip_packet.header_extensions, default, fn
+  @spec extension(Command.t(), atom(), any()) :: any()
+  def extension(command, extension_name, default \\ nil) do
+    extensions = Command.param!(command, :header_extensions)
+
+    Enum.find_value(extensions, default, fn
       {^extension_name, extension_value} -> extension_value
       _ -> false
     end)
   end
 
-  # @spec add_extension(t(), HeaderExtensions.extension(), any()) :: t()
+  @spec with_zwave_command(Command.t(), ZWave.seq_number(), [param()]) :: {:ok, Command.t()}
+  def with_zwave_command(zwave_command, seq_number, params \\ []) do
+    params =
+      [flag: :ack_request]
+      |> Keyword.merge(params)
+      |> Keyword.merge(command: zwave_command, seq_number: seq_number)
 
-  @spec with_zwave_command(Command.t(), [opt]) :: t()
-  def with_zwave_command(zwave_command, opts \\ []) do
-    # TODO: Add validation so we don't send invalid
-    # Z/IP Packets
-    seq_number = Keyword.fetch!(opts, :seq_number)
-    header_extensions = Keyword.get(opts, :header_extensions, [])
-    source = Keyword.get(opts, :source, 0)
-    dest = Keyword.get(opts, :dest, 0)
-    secure = Keyword.get(opts, :secure, true)
-    flag = Keyword.get(opts, :flag, :ack_request)
-
-    %__MODULE__{
-      flag: flag,
-      command: zwave_command,
-      seq_number: seq_number,
-      header_extensions: header_extensions,
-      source: source,
-      dest: dest,
-      secure: secure
-    }
+    new(params)
   end
 
-  @spec to_binary(t()) :: binary()
-  def to_binary(%__MODULE__{} = zip_packet) do
-    meta_byte = to_meta_byte(zip_packet)
-    flag_byte = flag_to_byte(zip_packet.flag)
-    header_extensions_bin = header_extensions_to_binary(zip_packet)
-    header_extensions_size = byte_size(header_extensions_bin)
-
-    if zip_packet.command != nil do
-      <<0x23, 0x02, flag_byte, meta_byte, zip_packet.seq_number, 0, 0>>
-      |> add_header_extensions(header_extensions_bin, header_extensions_size)
-      |> add_command(zip_packet.command)
-    else
-      <<0x23, 0x02, flag_byte, meta_byte, zip_packet.seq_number, 0, 0>>
-      |> add_header_extensions(header_extensions_bin, header_extensions_size)
+  @spec command_name(Command.t()) :: atom() | nil
+  def command_name(command) do
+    case Command.param(command, :command) do
+      nil -> nil
+      zwave_command -> zwave_command.name
     end
   end
+
+  defp bit_to_bool(1), do: true
+  defp bit_to_bool(0), do: false
 
   # only add header extensions bytes when there are some
-  defp add_header_extensions(binary, _header_ex, 0), do: binary
+  defp maybe_add_header_extensions(binary_packet, []), do: binary_packet
 
-  defp add_header_extensions(binary, header_extensions, header_extension_length),
+  defp maybe_add_header_extensions(binary_packet, extensions) do
+    header_extensions_bin = header_extensions_to_binary(extensions)
+    header_extensions_size = byte_size(header_extensions_bin) + 1
+
     # add one to the header extension length byte because that byte is the length
     # for all the header extensions plus itself
-    do: binary <> <<header_extension_length + 1>> <> header_extensions
-
-  defp add_command(binary, command), do: binary <> Command.to_binary(command)
-
-  @spec command_name(t()) :: atom() | nil
-  def command_name(zip_packet) do
-    if zip_packet.command do
-      zip_packet.command.name
-    else
-      nil
-    end
+    binary_packet <> <<header_extensions_size>> <> header_extensions_bin
   end
 
-  @spec from_binary(binary()) ::
-          {:ok, t()} | {:error, :invalid_zip_packet, :flag | :missing_zwave_command}
-  def from_binary(<<0x23, 0x02, flags, meta, seq_number, src, dest, rest::binary>>) do
-    meta = parse_meta(meta)
-    header_extensions = parse_header_extensions(rest, meta)
+  defp maybe_add_command(binary_packet, nil), do: binary_packet
+  defp maybe_add_command(binary_packet, command), do: binary_packet <> Command.to_binary(command)
 
-    case parse_command(rest, meta) do
-      {:ok, command} ->
-        flag = get_flag(flags)
-        make_zip_packet(flag, command, meta, src, dest, seq_number, header_extensions)
-
-      command ->
-        flag = get_flag(flags)
-        make_zip_packet(flag, command, meta, src, dest, seq_number, header_extensions)
-    end
-  end
-
-  defp make_zip_packet(:invalid, _, _, _, _, _, _), do: {:error, :invalid_zip_packet, :flags}
-
-  defp make_zip_packet(
-         :ack_request = flag,
-         command,
-         meta,
-         src,
-         dest,
-         seq_number,
-         header_extensions
-       ) do
-    if meta.cmd do
-      {:ok,
-       %__MODULE__{
-         command: command,
-         secure: meta.secure,
-         source: src,
-         dest: dest,
-         flag: flag,
-         seq_number: seq_number,
-         header_extensions: header_extensions
-       }}
-    else
-      {:error, :invalid_zip_packet, :missing_zwave_command}
-    end
-  end
-
-  defp make_zip_packet(
-         :ack_response = flag,
-         _command,
-         meta,
-         src,
-         dest,
-         seq_number,
-         header_extensions
-       ) do
-    {:ok,
-     %__MODULE__{
-       secure: meta.secure,
-       source: src,
-       dest: dest,
-       flag: flag,
-       seq_number: seq_number,
-       header_extensions: header_extensions
-     }}
-  end
-
-  defp make_zip_packet(flag, command, meta, src, dest, seq_number, header_extensions) do
-    {:ok,
-     %__MODULE__{
-       secure: meta.secure,
-       source: src,
-       dest: dest,
-       flag: flag,
-       command: command,
-       seq_number: seq_number,
-       header_extensions: header_extensions
-     }}
-  end
-
-  defp parse_meta(meta_byte) do
+  defp meta_from_byte(byte) do
     <<header?::size(1), cmd?::size(1), more_info?::size(1), secure?::size(1), _::size(4)>> =
-      <<meta_byte>>
+      <<byte>>
 
     %{
       header: bit_to_bool(header?),
@@ -278,7 +227,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     end
   end
 
-  defp parse_command(_, %{cmd: false}), do: nil
+  defp parse_command(_, %{cmd: false}), do: {:ok, nil}
 
   defp parse_command(<<header_extension_length, rest::binary>>, %{cmd: true, header: true}) do
     # Subtract one because the field includes itself thus leading to
@@ -287,7 +236,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     <<_extensions::binary-size(header_extension_length), command_binary::binary>> = rest
 
     if command_binary == "" do
-      nil
+      {:ok, nil}
     else
       Decoder.from_binary(command_binary)
     end
@@ -295,17 +244,15 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
 
   defp parse_command(command_binary, %{cmd: true, header: false}) do
     if command_binary == "" do
-      nil
+      {:ok, nil}
     else
       Decoder.from_binary(command_binary)
     end
   end
 
-  defp bit_to_bool(1), do: true
-  defp bit_to_bool(0), do: false
-
-  defp get_flag(flag_byte) do
+  defp flag_from_byte(flag_byte) do
     case <<flag_byte>> do
+      <<0x00>> -> nil
       <<1::size(1), _::size(1), 1::size(1), _::size(5)>> -> :invalid
       <<_::size(1), 1::size(1), 1::size(1), _::size(5)>> -> :invalid
       <<1::size(1), _::size(7)>> -> :ack_request
@@ -314,11 +261,10 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
       <<_::size(2), 1::size(1), _::size(1), 1::size(1), _::size(3)>> -> :nack_queue_full
       <<_::size(2), 1::size(1), _::size(2), 1::size(1), _::size(2)>> -> :nack_option_error
       <<_::size(2), 1::size(1), _::size(5)>> -> :nack_response
-      _ -> nil
     end
   end
 
-  defp header_extensions_to_binary(zip_packet) do
-    HeaderExtensions.to_binary(zip_packet.header_extensions)
+  defp header_extensions_to_binary(header_extensions) do
+    HeaderExtensions.to_binary(header_extensions)
   end
 end

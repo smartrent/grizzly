@@ -1,7 +1,11 @@
 defmodule Grizzly.UnsolicitedServer.Messages do
   @moduledoc false
 
+  require Logger
+
   alias Grizzly.ZIPGateway
+  alias Grizzly.ZWave
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   @registry __MODULE__.Registry
@@ -35,11 +39,16 @@ defmodule Grizzly.UnsolicitedServer.Messages do
   def broadcast(node_ip_address, zip_packet_bin) do
     node_id = ZIPGateway.node_id_from_ip(node_ip_address)
 
-    case ZIPPacket.from_binary(zip_packet_bin) do
+    case ZWave.from_binary(zip_packet_bin) do
       {:ok, zip_packet} ->
+        _ =
+          Logger.debug(
+            "[GRIZZLY] Unsolicited Message for node #{inspect(node_id)}: #{inspect(zip_packet)}"
+          )
+
         Registry.dispatch(@registry, ZIPPacket.command_name(zip_packet), fn listeners ->
           for {pid, _} <- listeners,
-              do: send(pid, {:grizzly, :event, node_id, zip_packet.command})
+              do: send(pid, {:grizzly, :event, node_id, Command.param!(zip_packet, :command)})
         end)
     end
   end
