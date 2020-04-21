@@ -23,13 +23,14 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     zipgateway_cfg_path = Keyword.fetch!(opts, :zipgateway_cfg_path)
     priv = Application.app_dir(:grizzly, "priv")
 
-    Logger.info("""
-    Running zipgateway with:
+    _ =
+      Logger.info("""
+      Running zipgateway with:
 
-    #{inspect(zipgateway_bin)} -c #{inspect(zipgateway_cfg_path)} -s #{inspect(serial_port)}
+      #{inspect(zipgateway_bin)} -c #{inspect(zipgateway_cfg_path)} -s #{inspect(serial_port)}
 
-    From dir: #{inspect(priv)}
-    """)
+      From dir: #{inspect(priv)}
+      """)
 
     child =
       {MuonTrap.Daemon,

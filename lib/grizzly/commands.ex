@@ -6,7 +6,6 @@ defmodule Grizzly.Commands do
 
   alias Grizzly.Commands.{CommandRunner, CommandRunnerSupervisor}
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.ZIPPacket
 
   @doc """
   Takes a Z-Wave command and returns a runtime process for that command
@@ -22,7 +21,7 @@ defmodule Grizzly.Commands do
   @doc """
   For a running command try to handle the Z/IP Packet
   """
-  @spec handle_zip_packet_for_command(pid(), ZIPPacket.t()) ::
+  @spec handle_zip_packet_for_command(pid(), Command.t()) ::
           :continue
           | :retry
           | {:complete, any()}

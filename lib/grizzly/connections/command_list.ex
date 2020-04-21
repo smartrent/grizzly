@@ -11,7 +11,6 @@ defmodule Grizzly.Connections.CommandList do
   alias Grizzly.Commands
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.ZWave.Command, as: ZWaveCommand
-  alias Grizzly.ZWave.Commands.ZIPPacket
 
   # this command is the process or GenServer waiting for a response
   # from the command
@@ -50,7 +49,7 @@ defmodule Grizzly.Connections.CommandList do
     end
   end
 
-  @spec response_for_zip_packet(t(), ZIPPacket.t()) ::
+  @spec response_for_zip_packet(t(), ZWaveCommand.t()) ::
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
           | {command_waiter(), {:error, :nack_response, t()} | {:complete | :queued, any(), t()}}

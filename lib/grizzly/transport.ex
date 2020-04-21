@@ -2,7 +2,6 @@ defmodule Grizzly.Transport do
   @moduledoc false
 
   alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.Commands.ZIPPacket
 
   @type socket :: :ssl.sslsocket() | :inet.socket()
 
@@ -12,7 +11,7 @@ defmodule Grizzly.Transport do
   @callback send(socket(), binary()) :: :ok
 
   @callback parse_response(any()) ::
-              {:ok, ZIPPacket.t() | Command.t()} | {:error, DecodeError.t()}
+              {:ok, Command.t()} | {:error, DecodeError.t()}
 
   @callback close(socket()) :: :ok
 end

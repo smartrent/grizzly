@@ -131,7 +131,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   end
 
   @doc """
-  Make a `:nack_response` `ZIPPacket.t()`
+  Make a `:nack_response`
   """
   @spec make_nack_response(ZWave.seq_number()) :: Command.t()
   def make_nack_response(seq_number) do
