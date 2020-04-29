@@ -145,7 +145,7 @@ defmodule Grizzly.Inclusions do
 
   When starting any inclusion process you can pass the `:handler` option
   which can be either another pid or a module that implements the
-  `Grizzly.InclusionHandler` behaviour.
+  `Grizzly.InclusionHandler` behaviour, or a tuple with the module and callback arguments.
 
   A basic implementation might look like:
 
@@ -155,8 +155,8 @@ defmodule Grizzly.Inclusions do
 
     require Logger
 
-    def handle_command(command) do
-      Logger.info("Got command: " <> command.name)
+    def handle_command(command, opts) do
+      Logger.info("Got command: " <> command.name <> " with callback arguments " <> inspect opts)
       :ok
     end
   end
@@ -170,7 +170,8 @@ defmodule Grizzly.Inclusions do
   alias Grizzly.Inclusions.InclusionRunner
   alias Grizzly.ZWave.Security
 
-  @type opt :: {:controller_id, Grizzly.node_id()} | {:handler, pid() | module()}
+  @type opt ::
+          {:controller_id, Grizzly.node_id()} | {:handler, pid() | module() | {module, keyword()}}
 
   @doc """
   Start the process to add a Z-Wave node to the network

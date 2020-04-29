@@ -24,5 +24,5 @@ defmodule Grizzly.InclusionHandler do
 
   alias Grizzly.ZWave.Command
 
-  @callback handle_command(Command.t()) :: :ok
+  @callback handle_command(Command.t(), keyword()) :: :ok
 end

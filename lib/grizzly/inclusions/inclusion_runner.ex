@@ -198,7 +198,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     opts = build_inclusion_opts_for_command(command)
 
     inclusion = Inclusion.handle_command(inclusion, command, opts)
-    respond_to_handler(inclusion.handler, command)
+    respond_to_handler(format_handler_spec(inclusion.handler), command)
 
     if inclusion.state == :complete do
       {:stop, :normal, inclusion}
@@ -207,11 +207,15 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     end
   end
 
+  defp format_handler_spec({_handler_module, _handler_opts} = handler), do: handler
+  defp format_handler_spec(handler) when is_pid(handler), do: handler
+  defp format_handler_spec(handler), do: {handler, []}
+
   defp respond_to_handler(handler, command) when is_pid(handler) do
     send(handler, {:grizzly, :inclusion, command})
   end
 
-  defp respond_to_handler(handler_module, command) do
-    handler_module.handle_command(command)
+  defp respond_to_handler({handler_module, handler_opts}, command) do
+    handler_module.handle_command(command, handler_opts)
   end
 end
