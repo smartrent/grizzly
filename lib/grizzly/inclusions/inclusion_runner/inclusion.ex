@@ -20,7 +20,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
           | :dsk_set
 
   @type t :: %__MODULE__{
-          handler: pid() | module(),
+          handler: pid() | module() | {module(), keyword},
           current_command_ref: reference(),
           controller_id: Grizzly.node_id(),
           state: state(),
