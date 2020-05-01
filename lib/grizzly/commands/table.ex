@@ -20,6 +20,13 @@ defmodule Grizzly.Commands.Table do
       {:switch_binary_get,
        {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}},
       {:switch_binary_set, {Commands.SwitchBinarySet, handler: AckResponse}},
+      # Manufacturer specific
+      {:manufacturer_specific_get,
+       {Commands.ManufacturerSpecificGet,
+        handler: {WaitReport, complete_report: :manufacturer_specific_report}}},
+      {:manufacturer_specific_device_specific_get,
+       {Commands.ManufacturerSpecificDeviceSpecificGet,
+        handler: {WaitReport, complete_report: :manufacturer_specific_device_specific_report}}},
       # Multilevel switches
       {:switch_multilevel_get,
        {Commands.SwitchMultilevelGet,
