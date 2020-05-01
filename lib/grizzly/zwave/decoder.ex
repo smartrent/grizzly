@@ -43,6 +43,9 @@ defmodule Grizzly.ZWave.Decoder do
       # Association (0x85)
       {0x85, 0x03, Commands.AssociationReport},
       # Version (0x86)
+      {0x86, 0x11, Commands.VersionGet},
+      {0x86, 0x12, Commands.VersionReport},
+      {0x86, 0x13, Commands.CommandClassGet},
       {0x86, 0x14, Commands.CommandClassReport}
     ]
 
