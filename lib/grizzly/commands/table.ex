@@ -54,7 +54,12 @@ defmodule Grizzly.Commands.Table do
        {Commands.AssociationGet,
         handler: {AggregateReport, complete_report: :association_report, aggregate_param: :nodes}}},
       # Keep alive
-      {:keep_alive, {Commands.ZIPKeepAlive, handler: AckResponse}}
+      {:keep_alive, {Commands.ZIPKeepAlive, handler: AckResponse}},
+      # Version
+      {:version_get,
+       {Commands.VersionGet, handler: {WaitReport, complete_report: :version_report}}},
+      {:version_command_class_get,
+       {Commands.CommandClassGet, handler: {WaitReport, complete_report: :command_class_report}}}
     ]
 
     defmacro __before_compile__(_) do
