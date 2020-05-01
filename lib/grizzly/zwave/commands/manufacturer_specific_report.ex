@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
   @moduledoc """
-  Report the the manufacturer specific information
+  Module for the MANUFACTURER_SPECIFIC_REPORT command of command class COMMAND_CLASS_MANUFACTURER_SPECIFIC
+  Report the manufacturer specific information
 
   Params:
 
