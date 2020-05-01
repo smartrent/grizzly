@@ -12,7 +12,8 @@ defmodule Grizzly.ZWave.Command do
   @type t() :: %__MODULE__{
           name: atom(),
           command_class: CommandClass.t(),
-          command_byte: byte(),
+          # Allow for the NoOperation command which has no command byte, only a command class byte
+          command_byte: byte() | nil,
           params: params(),
           impl: module()
         }
@@ -51,9 +52,15 @@ defmodule Grizzly.ZWave.Command do
   """
   @spec to_binary(t()) :: binary()
   def to_binary(command) do
-    params_bin = encode_params(command)
     command_class_byte = command.command_class.byte()
-    <<command_class_byte, command.command_byte>> <> params_bin
+
+    if command.command_byte != nil do
+      params_bin = encode_params(command)
+      <<command_class_byte, command.command_byte>> <> params_bin
+    else
+      # NoOperation command, for example, has no command byte or parameters
+      <<command_class_byte>>
+    end
   end
 
   @doc """

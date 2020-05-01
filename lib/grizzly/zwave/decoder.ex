@@ -44,6 +44,7 @@ defmodule Grizzly.ZWave.Decoder do
     ]
 
     defmacro __before_compile__(_) do
+      # Exceptions
       from_binary =
         for {command_class_byte, command_byte, command_module} <- @mappings do
           quote do
@@ -57,6 +58,9 @@ defmodule Grizzly.ZWave.Decoder do
       quote do
         @spec from_binary(binary) :: {:ok, Command.t()} | {:error, DecodeError.t()}
         unquote(from_binary)
+
+        # No Operation (0x00) - There is no command byte or args for this command, only the command class byte
+        def from_binary(<<0x00>>), do: decode(Commands.NoOperation, [])
 
         defp decode(command_impl, params) do
           case command_impl.decode_params(params) do
