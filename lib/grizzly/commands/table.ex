@@ -14,6 +14,8 @@ defmodule Grizzly.Commands.Table do
     @table [
       {:default_set,
        {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}}},
+      # Noop
+      {:no_operation, {Commands.NoOperation, handler: AckResponse}},
       # Binary switches
       {:switch_binary_get,
        {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}},
@@ -27,7 +29,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.SwitchMultilevelStartLevelChange, handler: AckResponse}},
       {:switch_multilevel_stop_level_change,
        {Commands.SwitchMultilevelStopLevelChange, handler: AckResponse}},
-      # Node lists
+      # Node management
       {:node_list_get,
        {Commands.NodeListGet, handler: {WaitReport, complete_report: :node_list_report}}},
       {:node_add, {Commands.NodeAdd, handler: {WaitReport, complete_report: :node_add_status}}},
