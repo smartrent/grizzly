@@ -59,7 +59,10 @@ defmodule Grizzly.Commands.Table do
       {:version_get,
        {Commands.VersionGet, handler: {WaitReport, complete_report: :version_report}}},
       {:version_command_class_get,
-       {Commands.CommandClassGet, handler: {WaitReport, complete_report: :command_class_report}}}
+       {Commands.CommandClassGet, handler: {WaitReport, complete_report: :command_class_report}}},
+      # Firmware update metadata
+      {:firmware_update_md_get,
+       {Commands.FirmwareUpdateMDGet, handler: {WaitReport, complete_report: :firmware_md_report}}}
     ]
 
     defmacro __before_compile__(_) do
