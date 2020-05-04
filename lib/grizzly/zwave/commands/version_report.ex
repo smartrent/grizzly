@@ -6,9 +6,13 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
     * `:library_type` - The type of Z-Wave device library is running
 
-    * `:protocol_version` - The "version.sub" implementd Z-Wave protocol
+    * `:protocol_version` - The "version.sub" of the implemented Z-Wave protocol
 
     * `:firmware_version` - The "version.sub" of the firmware
+
+    * `:hardware_version` - the hardware version - v2
+
+    * `:other_firmware_versions` -  The list of "version.sub" of the other firmware targets - v2
 
   """
 
@@ -34,6 +38,8 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
           {:library_type, library_type}
           | {:protocol_version, protocol_version}
           | {:firmware_version, firmware_version}
+          | {:hardware_version, non_neg_integer}
+          | {:other_firmware_versions, [firmware_version]}
 
   @impl true
   def new(params) do
@@ -49,6 +55,47 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   end
 
   @impl true
+  # Version 1
+  def decode_params(
+        <<library_type, protocol_version, protocol_sub_version, firmware_version,
+          firmware_sub_version>>
+      ) do
+    with {:ok, library_type} <- decode_library_type(library_type) do
+      {:ok,
+       [
+         library_type: library_type,
+         protocol_version: "#{protocol_version}.#{protocol_sub_version}",
+         firmware_version: "#{firmware_version}.#{firmware_sub_version}"
+       ]}
+    else
+      {:error, %DecodeError{}} = error ->
+        error
+    end
+  end
+
+  # Version 2
+  def decode_params(
+        <<library_type, protocol_version, protocol_sub_version, firmware_version,
+          firmware_sub_version, hardware_version, firmware_targets,
+          other_firmware_version_data::size(firmware_targets)-binary-unit(16)>>
+      ) do
+    with {:ok, library_type} <- decode_library_type(library_type) do
+      other_firmware_versions = for <<v::8, s::8 <- other_firmware_version_data>>, do: "#{v}.#{s}"
+
+      {:ok,
+       [
+         library_type: library_type,
+         protocol_version: "#{protocol_version}.#{protocol_sub_version}",
+         firmware_version: "#{firmware_version}.#{firmware_sub_version}",
+         hardware_version: hardware_version,
+         other_firmware_versions: other_firmware_versions
+       ]}
+    else
+      {:error, %DecodeError{}} = error ->
+        error
+    end
+  end
+
   def decode_params(
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version>>
@@ -74,7 +121,18 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
     library_type_byte = encode_library_type(library_type)
     {protocol_v, protocol_s} = split_version(protocol_version)
     {firmware_v, firmware_s} = split_version(firmware_version)
-    <<library_type_byte, protocol_v, protocol_s, firmware_v, firmware_s>>
+    hardware_version = Command.param(command, :hardware_version)
+
+    if hardware_version == nil do
+      <<library_type_byte, protocol_v, protocol_s, firmware_v, firmware_s>>
+    else
+      other_firmware_versions = Command.param!(command, :other_firmware_versions)
+      number_of_firmware_targets = Enum.count(other_firmware_versions)
+      other_firmware_version_data = encode_other_firmware_versions(other_firmware_versions)
+
+      <<library_type_byte, protocol_v, protocol_s, firmware_v, firmware_s, hardware_version,
+        number_of_firmware_targets, other_firmware_version_data::binary()>>
+    end
   end
 
   defp decode_library_type(0x01), do: {:ok, :static_controller}
@@ -107,6 +165,13 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   defp encode_library_type(:device_under_test), do: 0x08
   defp encode_library_type(:av_remote), do: 0x0A
   defp encode_library_type(:av_device), do: 0x0B
+
+  defp encode_other_firmware_versions(other_firmware_versions) do
+    for other_firmware_version <- other_firmware_versions, into: <<>> do
+      {v, s} = split_version(other_firmware_version)
+      <<v, s>>
+    end
+  end
 
   defp split_version(version_with_sub) do
     [v, s] = String.split(version_with_sub, ".")
