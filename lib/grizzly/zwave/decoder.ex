@@ -31,8 +31,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x34, 0x14, Commands.NodeAddDSKSet},
       # Network Management Basic Node (0x4D)
       {0x4D, 0x07, Commands.DefaultSetComplete},
-      {0x4D, 0x08, Commands, DSKGet},
-      {0x4D, 0x09, Commands, DSKReport},
+      {0x4D, 0x08, Commands.DSKGet},
+      {0x4D, 0x09, Commands.DSKReport},
       # Network Management Proxy (0x52)
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
