@@ -48,6 +48,7 @@ defmodule Grizzly.Commands.Table do
       # DSKs
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
       {:node_add_dsk_set, {Commands.NodeAddDSKSet, handler: AckResponse}},
+      {:dsk_get, {Commands.DSKGet, handler: {WaitReport, complete_report: :dsk_report}}},
       # Associations
       {:association_set, {Commands.AssociationSet, handler: AckResponse}},
       {:association_get,
