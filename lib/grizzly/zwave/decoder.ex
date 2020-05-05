@@ -7,6 +7,10 @@ defmodule Grizzly.ZWave.Decoder do
 
     @mappings [
       # {command_class_byte, command_byte, command_module}
+      # Basic
+      {0x20, 0x01, Commands.BasicSet},
+      {0x20, 0x02, Commands.BasicGet},
+      {0x20, 0x03, Commands.BasicReport},
       # Z/IP (0x23)
       {0x23, 0x02, Commands.ZIPPacket},
       {0x23, 0x03, Commands.ZIPKeepAlive},

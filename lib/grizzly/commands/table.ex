@@ -16,6 +16,9 @@ defmodule Grizzly.Commands.Table do
        {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}}},
       # Noop
       {:no_operation, {Commands.NoOperation, handler: AckResponse}},
+      # Basic
+      {:basic_get, {Commands.BasicGet, handler: {WaitReport, complete_report: :basic_report}}},
+      {:basic_set, {Commands.BasicSet, handler: AckResponse}},
       # Binary switches
       {:switch_binary_get,
        {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}},
