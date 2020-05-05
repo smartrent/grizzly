@@ -82,9 +82,9 @@ defmodule Grizzly.Commands.Table do
         @spec lookup(Grizzly.command()) :: {module(), [Grizzly.command_opt()]}
         unquote(lookup)
 
-        def lookup(_) do
+        def lookup(command_class) do
           raise ArgumentError, """
-          The command you are trying to send is not supported
+          The command #{inspect(command_class)} you are trying to send is not supported
           """
         end
       end
