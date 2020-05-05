@@ -15,17 +15,7 @@ defmodule Grizzly do
           | {:retries, non_neg_integer()}
           | {:handler, module() | {module(), args :: list()}}
 
-  @type command ::
-          :default_set
-          | :node_list_get
-          | :node_add
-          | :node_add_keys_set
-          | :node_add_dsk_set
-          | :node_remove
-          | :node_info_cached_get
-          | :switch_binary_set
-          | :switch_binary_get
-          | :keep_alive
+  @type command :: atom()
 
   @doc """
   Send a command to the node via the node id
