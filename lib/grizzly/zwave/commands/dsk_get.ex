@@ -6,8 +6,7 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
 
   Params:
 
-    * `:seq_number` - the sequence number of the networked command (required)
-    * `:add_mode` - some S2 nodes maybe have two different types of DSKs one
+    *`:add_mode` - some S2 nodes maybe have two different types of DSKs one
       being added into a Z-Wave network (learn mode) and another for adding
       other nodes in the network (add mode) (optional default `:learn`)
   """
@@ -40,18 +39,16 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
   @impl true
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
-    seq_number = Command.param!(command, :seq_number)
     add_mode = NetworkManagementBasicNode.add_mode_to_byte(Command.param!(command, :add_mode))
 
-    <<seq_number, add_mode>>
+    <<add_mode>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<seq_number, _::size(7), add_mode_bit::size(1)>>) do
+  def decode_params(<<_::size(7), add_mode_bit::size(1)>>) do
     {:ok,
      [
-       seq_number: seq_number,
        add_mode: NetworkManagementBasicNode.add_mode_from_bit(add_mode_bit)
      ]}
   end
