@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
   def new(params) do
     command = %Command{
       name: :dsk_report,
-      command_byte: 0,
+      command_byte: 0x09,
       command_class: NetworkManagementBasicNode,
       params: params,
       impl: __MODULE__
