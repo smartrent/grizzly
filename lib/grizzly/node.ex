@@ -21,4 +21,19 @@ defmodule Grizzly.Node do
       node_id: node_id
     )
   end
+
+  @doc """
+  Get a node's dsk.
+
+  The response to this command is the `DSKReport` command
+  """
+  @spec get_dsk(id(), :add | :learn, [Grizzly.command_opt()]) :: Grizzly.send_command_response()
+  def get_dsk(node_id, add_mode, opts \\ []) do
+    Grizzly.send_command(
+      node_id,
+      :dsk_get,
+      [add_mode: add_mode, seq_number: SeqNumber.get_and_inc()],
+      opts
+    )
+  end
 end
