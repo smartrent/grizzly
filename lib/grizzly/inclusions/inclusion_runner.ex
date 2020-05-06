@@ -198,11 +198,11 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     opts = build_inclusion_opts_for_command(command)
 
     inclusion = Inclusion.handle_command(inclusion, command, opts)
-    respond_to_handler(format_handler_spec(inclusion.handler), command)
 
     if inclusion.state == :complete do
       {:stop, :normal, inclusion}
     else
+      respond_to_handler(format_handler_spec(inclusion.handler), command)
       {:noreply, inclusion}
     end
   end
@@ -216,6 +216,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   end
 
   defp respond_to_handler({handler_module, handler_opts}, command) do
-    handler_module.handle_command(command, handler_opts)
+    # TODO - Consider using a handler runner genserver for calling the plugin inclusion handler
+    spawn_link(fn -> handler_module.handle_command(command, handler_opts) end)
   end
 end
