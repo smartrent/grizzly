@@ -178,7 +178,7 @@ defmodule Grizzly.Commands.Command do
       delay when delay > 1 ->
         {:queued, delay, command}
 
-      0 ->
+      _other ->
         {:continue, command}
     end
   end
