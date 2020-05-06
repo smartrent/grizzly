@@ -199,10 +199,11 @@ defmodule Grizzly.Inclusions.InclusionRunner do
 
     inclusion = Inclusion.handle_command(inclusion, command, opts)
 
+    respond_to_handler(format_handler_spec(inclusion.handler), command)
+
     if inclusion.state == :complete do
       {:stop, :normal, inclusion}
     else
-      respond_to_handler(format_handler_spec(inclusion.handler), command)
       {:noreply, inclusion}
     end
   end
