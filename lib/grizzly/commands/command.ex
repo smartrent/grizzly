@@ -175,7 +175,7 @@ defmodule Grizzly.Commands.Command do
 
   defp make_queued_response(command, zip_packet) do
     case ZIPPacket.extension(zip_packet, :expected_delay, 90) do
-      delay when delay >= 1 ->
+      delay when delay > 1 ->
         {:queued, delay, command}
 
       0 ->
