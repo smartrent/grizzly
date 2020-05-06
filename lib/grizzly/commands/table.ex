@@ -19,6 +19,9 @@ defmodule Grizzly.Commands.Table do
       # Basic
       {:basic_get, {Commands.BasicGet, handler: {WaitReport, complete_report: :basic_report}}},
       {:basic_set, {Commands.BasicSet, handler: AckResponse}},
+      # Battery
+      {:battery_get,
+       {Commands.BatteryGet, handler: {WaitReport, complete_report: :battery_report}}},
       # Binary switches
       {:switch_binary_get,
        {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}},
