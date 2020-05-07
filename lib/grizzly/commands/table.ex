@@ -70,7 +70,16 @@ defmodule Grizzly.Commands.Table do
        {Commands.CommandClassGet, handler: {WaitReport, complete_report: :command_class_report}}},
       # Firmware update metadata
       {:firmware_update_md_get,
-       {Commands.FirmwareUpdateMDGet, handler: {WaitReport, complete_report: :firmware_md_report}}}
+       {Commands.FirmwareUpdateMDGet, handler: {WaitReport, complete_report: :firmware_md_report}}},
+      # Wake up
+      {:wake_up_interval_get,
+       {Commands.WakeUpIntervalGet,
+        handler: {WaitReport, complete_report: :wake_up_interval_report}}},
+      {:wake_up_interval_set, {Commands.WakeUpIntervalSet, handler: AckResponse}},
+      {:wake_up_no_more_information, {Commands.WakeUpNoMoreInformation, handler: AckResponse}},
+      {:wake_up_interval_capabilities_get,
+       {Commands.WakeUpIntervalCapabilitiesGet,
+        handler: {WaitReport, complete_report: :wake_up_interval_capabilities_report}}}
     ]
 
     defmacro __before_compile__(_) do
