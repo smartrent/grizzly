@@ -12,6 +12,7 @@ defmodule Grizzly.Commands.Table do
     alias Grizzly.ZWave.Commands
 
     @table [
+      {:configuration_set, {Commands.ConfigurationSet, handler: AckResponse}},
       {:default_set,
        {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}}},
       # Noop
