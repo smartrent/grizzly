@@ -62,7 +62,15 @@ defmodule Grizzly.ZWave.Decoder do
       {0x86, 0x14, Commands.CommandClassReport},
       # Firmware Update Metadata
       {0x7A, 0x01, Commands.FirmwareUpdateMDGet},
-      {0x7A, 0x02, Commands.FirmwareMDReport}
+      {0x7A, 0x02, Commands.FirmwareMDReport},
+      # Wake Up
+      {0x84, 0x04, Commands.WakeUpIntervalSet},
+      {0x84, 0x05, Commands.WakeUpIntervalSet},
+      {0x84, 0x06, Commands.WakeUpIntervalReport},
+      {0x84, 0x07, Commands.WakeUpNotification},
+      {0x84, 0x08, Commands.WakeUpNoMoreInformation},
+      {0x84, 0x09, Commands.WakeUpIntervalCapabilitiesGet},
+      {0x84, 0x0A, Commands.WakeUpIntervalCapabilitiesReport}
     ]
 
     defmacro __before_compile__(_) do
