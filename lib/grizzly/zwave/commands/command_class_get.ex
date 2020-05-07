@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.CommandClassGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, CommandClasses, DecodeError}
-  alias Grizzly.ZWave.Commands.Version
+  alias Grizzly.ZWave.CommandClasses.Version
 
   @type param :: {:command_class, atom}
 
