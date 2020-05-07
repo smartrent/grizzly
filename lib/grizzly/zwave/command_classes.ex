@@ -100,7 +100,7 @@ defmodule Grizzly.ZWave.CommandClasses do
       {0x82, :hail},
       {0x84, :wake_up},
       {0x85, :association},
-      {0x86, :command_class_version},
+      {0x86, :version},
       {0x87, :indicator},
       {0x88, :proprietary},
       {0x89, :language},
