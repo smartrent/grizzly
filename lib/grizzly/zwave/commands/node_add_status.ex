@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, Security}
+  alias Grizzly.ZWave.{Command, CommandClasses, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type status :: :done | :failed | :security_failed
@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:basic_device_class, byte()}
           | {:generic_device_class, byte()}
           | {:specific_device_class, byte()}
-          | {:command_classes, [byte()]}
+          | {:command_classes, [CommandClasses.command_class()]}
           | {:secure_command_classes, [byte()]}
           | {:granted_keys, [Security.key()]}
           | {:kex_fail_type, Security.key_exchange_fail_type()}
@@ -105,7 +105,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        basic_device_class: basic_device_class,
        generic_device_class: generic_device_class,
        specific_device_class: specific_device_class,
-       command_classes: command_classes,
+       command_classes: CommandClasses.command_class_list_from_binary(command_classes),
        secure_command_classes: []
      ]
      |> maybe_decode_next_versions_fields(security_info)}
