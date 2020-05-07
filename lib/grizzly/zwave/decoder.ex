@@ -44,6 +44,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
       {0x52, 0x04, Commands.NodeInfoCacheReport},
+      # Alarm
+      {0x71, 0x05, Commands.AlarmReport},
       # Manufacturer Specific
       {0x72, 0x04, Commands.ManufacturerSpecificGet},
       {0x72, 0x05, Commands.ManufacturerSpecificReport},
