@@ -18,7 +18,21 @@ defmodule Grizzly.ZWave.Notifications do
       {0x06, :access_control, 0x01, :manual_lock_operation},
       {0x06, :access_control, 0x02, :manual_unlock_operation},
       {0x06, :access_control, 0x03, :rf_lock_operation},
-      {0x06, :access_control, 0x04, :rf_unlock_operation}
+      {0x06, :access_control, 0x04, :rf_unlock_operation},
+      # Home Security (0x07)
+      {0x07, :home_security, 0x00, :state_idle},
+      {0x07, :home_security, 0x01, :intrusion_location_provided},
+      {0x07, :home_security, 0x02, :intrusion},
+      {0x07, :home_security, 0x03, :tampering_product_cover_removed},
+      {0x07, :home_security, 0x04, :tampering_invalid_code},
+      {0x07, :home_security, 0x05, :glass_breakage_location_provided},
+      {0x07, :home_security, 0x06, :glass_breakage},
+      {0x07, :home_security, 0x07, :motion_detection},
+      {0x07, :home_security, 0x08, :motion_detection_location_provided},
+      {0x07, :home_security, 0x09, :tampering_product_moved},
+      {0x07, :home_security, 0x0A, :impact_detected},
+      {0x07, :home_security, 0x0B, :magnetic_field_interface_detected},
+      {0x07, :home_security, 0xFE, :unknown_state}
     ]
 
     defmacro __before_compile__(_) do
