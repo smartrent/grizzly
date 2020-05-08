@@ -44,15 +44,15 @@ defmodule Grizzly.Connections.CommandListTest do
   test "response for queued" do
     {:ok, zwave_command} = SwitchBinaryGet.new()
 
-    {:ok, runner, _ref, command_list} =
+    {:ok, runner, ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, self())
 
     queued_response = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
 
-    assert {self(), {:queued, 3, CommandList.empty()}} ==
+    assert {self(), {:queued, ref, 3, command_list}} ==
              CommandList.response_for_zip_packet(command_list, queued_response)
 
-    refute Process.alive?(runner)
+    assert Process.alive?(runner)
   end
 
   test "response for retry" do

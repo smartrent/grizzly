@@ -18,10 +18,10 @@ defmodule Grizzly.Connections.CommandList do
 
   @type command_list_item :: {pid(), command_waiter(), reference()}
 
-  @opaque t :: %__MODULE__{
-            commands: [command_list_item()],
-            keep_alive_command: ZWaveCommand.t() | nil
-          }
+  @type t :: %__MODULE__{
+          commands: [command_list_item()],
+          keep_alive_command: ZWaveCommand.t() | nil
+        }
 
   # right now using a list but can probably use an erlang array for a
   # better implementation long term
@@ -33,6 +33,8 @@ defmodule Grizzly.Connections.CommandList do
 
   @doc """
   Create the command runtime and update the list of commands
+
+  Returns `{:ok, command_runner_pid, command_reference, new_command_list}`
   """
   @spec create(t(), ZWaveCommand.t(), command_waiter(), keyword()) ::
           {:ok, pid(), reference(), t()}
@@ -52,7 +54,8 @@ defmodule Grizzly.Connections.CommandList do
   @spec response_for_zip_packet(t(), ZWaveCommand.t()) ::
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
-          | {command_waiter(), {:error, :nack_response, t()} | {:complete | :queued, any(), t()}}
+          | {command_waiter(), {:error, :nack_response, t()} | {:complete, any(), t()}}
+          | {command_waiter(), {:queued, reference(), non_neg_integer(), t()}}
   def response_for_zip_packet(command_list, zip_packet) do
     case get_response_for_command(command_list, zip_packet) do
       {:retry, command_runner, command_list} ->
@@ -60,6 +63,10 @@ defmodule Grizzly.Connections.CommandList do
 
       {:continue, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
+
+      {{:queued, ref, seconds, command}, command_list} ->
+        waiter = command_waiter(command)
+        {waiter, {:queued, ref, seconds, %__MODULE__{commands: command_list}}}
 
       {nil, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
@@ -146,8 +153,8 @@ defmodule Grizzly.Connections.CommandList do
           {{:error, :nack_response, command}, new_command_list}
 
         # if the command says it has been queued, we remove it from the command list
-        {:queued, seconds} ->
-          {{:queued, seconds, command}, new_command_list}
+        {:queued, reference, seconds} ->
+          {{:queued, reference, seconds, command}, [command | new_command_list]}
 
         # if the command says to retry we put it back into the command list
         :retry ->
