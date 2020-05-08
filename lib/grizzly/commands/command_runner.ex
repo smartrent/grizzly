@@ -23,7 +23,7 @@ defmodule Grizzly.Commands.CommandRunner do
   @spec handle_zip_command(pid(), ZWaveCommand.t()) ::
           :continue
           | {:error, :nack_response}
-          | {:queued, non_neg_integer()}
+          | {:queued, reference(), non_neg_integer()}
           | :retry
           | {:complete, any()}
   def handle_zip_command(runner, zip_packet) do
@@ -40,15 +40,21 @@ defmodule Grizzly.Commands.CommandRunner do
     GenServer.call(runner, :seq_number)
   end
 
+  @spec reference(pid()) :: reference()
+  def reference(runner) do
+    GenServer.call(runner, :reference)
+  end
+
   def stop(runner), do: GenServer.stop(runner, :normal)
 
   @impl true
   def init([command, opts]) do
     owner = Keyword.fetch!(opts, :owner)
     timeout = Keyword.fetch!(opts, :timeout)
-
     timeout_ref = start_timeout_counter(timeout)
-    {:ok, Command.from_zwave_command(command, owner, timeout_ref, opts)}
+    opts = Keyword.merge(opts, timeout_ref: timeout_ref)
+
+    {:ok, Command.from_zwave_command(command, owner, opts)}
   end
 
   @impl true
@@ -66,11 +72,16 @@ defmodule Grizzly.Commands.CommandRunner do
         {:stop, :normal, {:error, :nack_response}, new_command}
 
       {:queued, seconds, new_command} ->
-        {:stop, :normal, {:queued, seconds}, new_command}
+        # update_timeout(new_command)
+        {:reply, {:queued, command.ref, seconds}, new_command}
 
       {:retry, new_command} ->
         {:reply, :retry, new_command}
     end
+  end
+
+  def handle_call(:reference, _from, command) do
+    {:reply, command.ref, command}
   end
 
   def handle_call(:encode, _from, command) do

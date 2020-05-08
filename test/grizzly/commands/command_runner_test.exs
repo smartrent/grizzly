@@ -80,10 +80,11 @@ defmodule Grizzly.Commands.CommandRunnerTest do
   test "handles a queued command" do
     {:ok, command} = SwitchBinaryGet.new()
     {:ok, runner} = CommandRunner.start_link(command)
+    command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
 
-    assert {:queued, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
+    assert {:queued, command_ref, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
   end
 
   test "encodes a command" do

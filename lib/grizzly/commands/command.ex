@@ -31,11 +31,12 @@ defmodule Grizzly.Commands.Command do
             timeout_ref: nil,
             ref: nil
 
-  def from_zwave_command(zwave_command, owner, timeout_ref \\ nil, opts \\ []) do
+  def from_zwave_command(zwave_command, owner, opts \\ []) do
     {handler, handler_init_args} = get_handler_spec(zwave_command, opts)
     {:ok, handler_state} = handler.init(handler_init_args)
     retries = Keyword.get(opts, :retries, 2)
     command_ref = Keyword.get(opts, :reference, make_ref())
+    timeout_ref = Keyword.get(opts, :timeout_ref)
 
     %__MODULE__{
       handler: handler,

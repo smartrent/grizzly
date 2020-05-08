@@ -87,7 +87,7 @@ defmodule Grizzly.Commands.CommandTest do
 
   test "handles Z/IP Packet for nack response with no retires" do
     {:ok, zwave_command} = SwitchBinaryGet.new()
-    grizzly_command = Command.from_zwave_command(zwave_command, self(), nil, retries: 0)
+    grizzly_command = Command.from_zwave_command(zwave_command, self(), retries: 0)
 
     nack_response = ZIPPacket.make_nack_response(grizzly_command.seq_number)
 
@@ -97,7 +97,7 @@ defmodule Grizzly.Commands.CommandTest do
 
   test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do
     {:ok, keep_alive} = ZIPKeepAlive.new(ack_flag: :ack_request)
-    grizzly_command = Command.from_zwave_command(keep_alive, self(), nil)
+    grizzly_command = Command.from_zwave_command(keep_alive, self())
     expected_binary = <<ZIP.byte(), 0x03, 0x80>>
 
     assert expected_binary == Command.to_binary(grizzly_command)

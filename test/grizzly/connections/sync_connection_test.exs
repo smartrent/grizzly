@@ -30,7 +30,9 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, command} = SwitchBinaryGet.new()
 
     # 102 will always respond with nack waiting with 2 seconds
-    assert {:queued, 2} == SyncConnection.send_command(102, command)
+    assert {:queued, ref, 2} = SyncConnection.send_command(102, command)
+
+    assert is_reference(ref)
   end
 
   @tag :integration

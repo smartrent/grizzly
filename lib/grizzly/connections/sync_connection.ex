@@ -35,7 +35,7 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @spec send_command(Grizzly.node_id(), Command.t(), [send_opt()]) ::
-          :ok | {:ok, Command.t()} | {:queued, Command.delay_seconds()}
+          :ok | {:ok, Command.t()} | {:queued, reference(), Command.delay_seconds()}
   def send_command(node_id, command, opts \\ []) do
     name = Connections.make_name(node_id)
     GenServer.call(name, {:send_command, command, opts}, 140_000)
@@ -129,8 +129,8 @@ defmodule Grizzly.Connections.SyncConnection do
           GenServer.reply(waiter, {:error, :nack_response})
           %State{state | commands: new_comamnd_list}
 
-        {waiter, {:queued, queued_seconds, new_comamnd_list}} ->
-          GenServer.reply(waiter, {:queued, queued_seconds})
+        {waiter, {:queued, ref, queued_seconds, new_comamnd_list}} ->
+          GenServer.reply(waiter, {:queued, ref, queued_seconds})
           %State{state | commands: new_comamnd_list}
 
         {waiter, {:complete, response, new_comamnd_list}} ->

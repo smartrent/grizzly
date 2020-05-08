@@ -31,4 +31,11 @@ defmodule Grizzly.Test do
     assert SwitchBinaryReport.new(target_value: :off) ==
              Grizzly.send_command(50, :switch_binary_get)
   end
+
+  @tag :integration
+  test "send a command to a device that is sleeping" do
+    {:queued, ref, 2} = Grizzly.send_command(102, :battery_get)
+
+    assert is_reference(ref)
+  end
 end

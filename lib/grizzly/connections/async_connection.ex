@@ -160,8 +160,8 @@ defmodule Grizzly.Connections.AsyncConnection do
           send(waiter, {:grizzly, :send_command, {:error, :nack_response}})
           %State{state | commands: new_comamnd_list}
 
-        {waiter, {:queued, queued_seconds, new_comamnd_list}} ->
-          send(waiter, {:grizzly, :send_command, {:queued, queued_seconds}})
+        {waiter, {:queued, ref, queued_seconds, new_comamnd_list}} ->
+          GenServer.reply(waiter, {:queued, ref, queued_seconds})
           %State{state | commands: new_comamnd_list}
 
         {waiter, {:complete, response, new_comamnd_list}} ->
