@@ -64,15 +64,7 @@ defmodule Grizzly.MixProject do
 
   defp aliases() do
     [
-<<<<<<< HEAD
-<<<<<<< HEAD
       test: ["test --exclude integration --exclude inclusion"]
-=======
-      test: ["test --exclude integration --exclude timeout --exclude inclusion --stale"]
->>>>>>> 876446a... Add test excludes
-=======
-      test: ["test --exclude integration --exclude inclusion"]
->>>>>>> 1659521... Fixes, updates, add ManufacturerSpeicificReport
     ]
   end
 end
