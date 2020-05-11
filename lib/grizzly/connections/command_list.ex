@@ -55,7 +55,9 @@ defmodule Grizzly.Connections.CommandList do
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
           | {command_waiter(), {:error, :nack_response, t()} | {:complete, any(), t()}}
+          | {command_waiter(), {:queued_complete, reference(), any(), t()}}
           | {command_waiter(), {:queued, reference(), non_neg_integer(), t()}}
+          | {command_waiter(), {:queued_ping, reference(), non_neg_integer(), t()}}
   def response_for_zip_packet(command_list, zip_packet) do
     case get_response_for_command(command_list, zip_packet) do
       {:retry, command_runner, command_list} ->
@@ -64,9 +66,17 @@ defmodule Grizzly.Connections.CommandList do
       {:continue, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
 
+      {{:queued_complete, ref, response, command}, command_list} ->
+        waiter = waiter_as_pid(command_waiter(command))
+        {waiter, {:queued_complete, ref, response, %__MODULE__{commands: command_list}}}
+
       {{:queued, ref, seconds, command}, command_list} ->
         waiter = command_waiter(command)
         {waiter, {:queued, ref, seconds, %__MODULE__{commands: command_list}}}
+
+      {{:queued_ping, ref, seconds, command}, command_list} ->
+        waiter = waiter_as_pid(command_waiter(command))
+        {waiter, {:queued_ping, ref, seconds, %__MODULE__{commands: command_list}}}
 
       {nil, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
@@ -152,9 +162,17 @@ defmodule Grizzly.Connections.CommandList do
         {:error, :nack_response} ->
           {{:error, :nack_response, command}, new_command_list}
 
-        # if the command says it has been queued, we remove it from the command list
+        # the command is queued put it back into the command list
         {:queued, reference, seconds} ->
           {{:queued, reference, seconds, command}, [command | new_command_list]}
+
+        {:queued_ping, reference, seconds_left} ->
+          {{:queued_ping, reference, seconds_left, command}, [command | new_command_list]}
+
+        # if the queued command is complete don't put it back into the command
+        # list
+        {:queued_complete, reference, result} ->
+          {{:queued_complete, reference, result, command}, new_command_list}
 
         # if the command says to retry we put it back into the command list
         :retry ->
@@ -168,6 +186,9 @@ defmodule Grizzly.Connections.CommandList do
   end
 
   defp command_waiter({_command_runner, waiter, _command_ref}), do: waiter
+
+  defp waiter_as_pid(pid) when is_pid(pid), do: pid
+  defp waiter_as_pid({pid, _tag}), do: pid
 
   defp new_command(command_list, command, waiter, command_opts) do
     # only create a new reference if we are going to need it

@@ -7,6 +7,7 @@ defmodule GrizzlyTest.Server do
 
   alias Grizzly.ZWave.Commands.{
     ZIPPacket,
+    ZIPKeepAlive,
     NodeListReport,
     SwitchBinaryReport,
     NodeAddDSKReport,
@@ -28,41 +29,45 @@ defmodule GrizzlyTest.Server do
     node_id = return_port - 5000
     {:ok, zip_packet} = ZWave.from_binary(msg)
 
-    case node_id do
-      # ignore all commands
-      100 ->
-        :ok
+    if zip_packet.name == :keep_alive do
+      handle_keep_alive(state.socket, return_port, zip_packet)
+    else
+      case node_id do
+        # ignore all commands
+        100 ->
+          :ok
 
-      # nack response only
-      101 ->
-        send_nack_response(state.socket, return_port, zip_packet)
+        # nack response only
+        101 ->
+          send_nack_response(state.socket, return_port, zip_packet)
 
-      # mark as sleeping node
-      102 ->
-        send_nack_waiting(state.socket, return_port, zip_packet)
+        # mark as sleeping node
+        102 ->
+          send_nack_waiting(state.socket, return_port, zip_packet)
 
-      # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
-      301 ->
-        send_ack_response(state.socket, return_port, zip_packet)
-        only_send_report_for_node_add_or_remove_stop(state.socket, return_port, zip_packet)
+        # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
+        301 ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          only_send_report_for_node_add_or_remove_stop(state.socket, return_port, zip_packet)
 
-      # this controller id is for testing happy S2 inclusion
-      302 ->
-        send_ack_response(state.socket, return_port, zip_packet)
-        handle_inclusion_packet(state.socket, return_port, zip_packet)
-        :ok
+        # this controller id is for testing happy S2 inclusion
+        302 ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          handle_inclusion_packet(state.socket, return_port, zip_packet)
+          :ok
 
-      # this controller id is for testing sad S2 inclusion
-      303 ->
-        :ok
+        # this controller id is for testing sad S2 inclusion
+        303 ->
+          :ok
 
-      # async ignore all
-      400 ->
-        :ok
+        # async ignore all
+        400 ->
+          :ok
 
-      _rest ->
-        send_ack_response(state.socket, return_port, zip_packet)
-        maybe_send_a_report(state.socket, return_port, zip_packet)
+        _rest ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          maybe_send_a_report(state.socket, return_port, zip_packet)
+      end
     end
 
     {:noreply, state}
@@ -153,6 +158,19 @@ defmodule GrizzlyTest.Server do
       port,
       ZWave.to_binary(out_packet)
     )
+
+    spawn(fn ->
+      Process.sleep(2_000)
+      maybe_send_a_report(socket, port, incoming_zip_packet)
+    end)
+  end
+
+  defp handle_keep_alive(socket, port, keep_alive) do
+    if Command.param!(keep_alive, :ack_flag) == :ack_request do
+      {:ok, response} = ZIPKeepAlive.new(ack_flag: :ack_response)
+
+      :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(response))
+    end
   end
 
   defp maybe_send_a_report(socket, port, zip_packet) do

@@ -34,7 +34,14 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   @spec to_binary([extension()]) :: binary()
   def to_binary(extensions) do
     Enum.reduce(extensions, <<>>, fn
-      {:expected_delay, seconds}, bin -> bin <> ExpectedDelay.to_binary(seconds)
+      {:expected_delay, seconds}, bin ->
+        bin <> ExpectedDelay.to_binary(seconds)
+
+      {:encapsulation_format_info, security_classes}, bin ->
+        bin <> EncapsulationFormatInfo.to_binary(security_classes)
+
+      :multicast_addressing, bin ->
+        bin <> <<0x05, 0x00>>
     end)
   end
 

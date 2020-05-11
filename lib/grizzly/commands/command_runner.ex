@@ -24,6 +24,8 @@ defmodule Grizzly.Commands.CommandRunner do
           :continue
           | {:error, :nack_response}
           | {:queued, reference(), non_neg_integer()}
+          | {:queued_ping, reference(), non_neg_integer()}
+          | {:queued_complete, reference(), ZWaveCommand.t() | :ok}
           | :retry
           | {:complete, any()}
   def handle_zip_command(runner, zip_packet) do
@@ -65,14 +67,20 @@ defmodule Grizzly.Commands.CommandRunner do
       {:continue, new_command} ->
         {:reply, :continue, new_command}
 
-      {:complete, _result} = result ->
-        {:stop, :normal, result, command}
+      {:complete, result, new_command} ->
+        {:stop, :normal, {:complete, result}, new_command}
 
       {:error, :nack_response, new_command} ->
         {:stop, :normal, {:error, :nack_response}, new_command}
 
+      {:queued_complete, result, new_command} ->
+        {:stop, :normal, {:queued_complete, new_command.ref, result}, new_command}
+
+      {:queued_ping, seconds, new_command} ->
+        {:reply, {:queued_ping, command.ref, seconds}, new_command}
+
       {:queued, seconds, new_command} ->
-        # update_timeout(new_command)
+        new_command = update_timeout(new_command, seconds)
         {:reply, {:queued, command.ref, seconds}, new_command}
 
       {:retry, new_command} ->
@@ -90,8 +98,14 @@ defmodule Grizzly.Commands.CommandRunner do
 
   @impl true
   def handle_info(:timeout, command) do
-    send(command.owner, {:grizzly, :command_timeout, self(), command.ref, command.source})
+    send(command.owner, {:grizzly, :command_timeout, self(), command})
     {:stop, :normal, command}
+  end
+
+  defp update_timeout(command, time_in_seconds) do
+    _ = Process.cancel_timer(command.timeout_ref)
+    new_timeout_ref = start_timeout_counter(time_in_seconds * 1000 + 500)
+    %Command{command | timeout_ref: new_timeout_ref}
   end
 
   defp start_timeout_counter(timeout), do: Process.send_after(self(), :timeout, timeout)

@@ -114,15 +114,22 @@ defmodule Grizzly.Connections.AsyncConnection do
   end
 
   # handle when there is a timeout and command runner stops
-  def handle_info({:grizzly, :command_timeout, command_runner_pid, command_ref, _}, state) do
-    waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
-    send(waiter, {:grizzly, :send_command, {:error, :timeout, command_ref}})
+  def handle_info(
+        {:grizzly, :command_timeout, command_runner_pid, grizzly_command},
+        state
+      ) do
+    if grizzly_command.source.name == :keep_alive do
+      {:noreply, state}
+    else
+      waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
+      do_timeout_reply(waiter, grizzly_command)
 
-    {:noreply,
-     %State{
-       state
-       | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
-     }}
+      {:noreply,
+       %State{
+         state
+         | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
+       }}
+    end
   end
 
   def handle_info(data, state) do
@@ -160,6 +167,10 @@ defmodule Grizzly.Connections.AsyncConnection do
           send(waiter, {:grizzly, :send_command, {:error, :nack_response}})
           %State{state | commands: new_comamnd_list}
 
+        {waiter, {:queued_complete, ref, response, new_command_list}} ->
+          send(waiter, {:grizzly, :queued_command_response, ref, response})
+          %State{state | commands: new_command_list}
+
         {waiter, {:queued, ref, queued_seconds, new_comamnd_list}} ->
           GenServer.reply(waiter, {:queued, ref, queued_seconds})
           %State{state | commands: new_comamnd_list}
@@ -184,6 +195,17 @@ defmodule Grizzly.Connections.AsyncConnection do
     else
       command = Command.param!(zip_packet, :command)
       send(from, {:grizzly, command.name, command_ref, response})
+    end
+  end
+
+  defp do_timeout_reply(waiter, grizzly_command) do
+    response = {:error, :timeout}
+
+    if grizzly_command.status == :queued do
+      {pid, _tag} = waiter
+      send(pid, {:grizzly, :queued_command_response, grizzly_command.ref, response})
+    else
+      send(waiter, {:grizzly, :send_command, {:error, :timeout, grizzly_command.ref}})
     end
   end
 end

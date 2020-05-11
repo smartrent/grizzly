@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
 
   @impl true
   @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params \\ []) do
+  def new(params) do
     command = %Command{
       name: :keep_alive,
       command_byte: 0x03,

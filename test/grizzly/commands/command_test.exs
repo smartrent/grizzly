@@ -47,7 +47,8 @@ defmodule Grizzly.Commands.CommandTest do
 
     ack_response = ZIPPacket.make_ack_response(grizzly_command.seq_number)
 
-    assert {:complete, :ok} == Command.handle_zip_command(grizzly_command, ack_response)
+    assert {:complete, :ok, %Command{grizzly_command | status: :complete}} ==
+             Command.handle_zip_command(grizzly_command, ack_response)
   end
 
   test "handles Z/IP Packet for an report" do
@@ -60,7 +61,8 @@ defmodule Grizzly.Commands.CommandTest do
 
     assert {:continue, %Command{}} = Command.handle_zip_command(grizzly_command, ack_response)
 
-    assert {:complete, {:ok, report}} == Command.handle_zip_command(grizzly_command, zip_report)
+    assert {:complete, {:ok, report}, %Command{grizzly_command | status: :complete}} ==
+             Command.handle_zip_command(grizzly_command, zip_report)
   end
 
   test "handles Z/IP Packet for queued" do
@@ -69,8 +71,20 @@ defmodule Grizzly.Commands.CommandTest do
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(grizzly_command.seq_number, 2)
 
-    assert {:queued, 2, grizzly_command} ==
+    assert {:queued, 2, %Command{grizzly_command | status: :queued}} ==
              Command.handle_zip_command(grizzly_command, nack_waiting)
+  end
+
+  test "handles when a queued command is completed" do
+    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+
+    grizzly_command = Command.from_zwave_command(zwave_command, self())
+    grizzly_command = %Command{grizzly_command | status: :queued}
+
+    ack_response = ZIPPacket.make_ack_response(grizzly_command.seq_number)
+
+    assert {:queued_complete, :ok, %Command{grizzly_command | status: :complete}} ==
+             Command.handle_zip_command(grizzly_command, ack_response)
   end
 
   test "handles Z/IP Packet for nack response with retires" do

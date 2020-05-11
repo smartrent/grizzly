@@ -8,6 +8,8 @@ defmodule Grizzly.Commands.Command do
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands.ZIPPacket
 
+  @type status :: :inflight | :queued | :complete
+
   @type t :: %__MODULE__{
           owner: pid(),
           retries: non_neg_integer(),
@@ -16,7 +18,8 @@ defmodule Grizzly.Commands.Command do
           handler: module(),
           seq_number: Grizzly.seq_number(),
           timeout_ref: reference() | nil,
-          ref: reference()
+          ref: reference(),
+          status: status()
         }
 
   @type opt ::
@@ -29,7 +32,8 @@ defmodule Grizzly.Commands.Command do
             handler: nil,
             seq_number: nil,
             timeout_ref: nil,
-            ref: nil
+            ref: nil,
+            status: :inflight
 
   def from_zwave_command(zwave_command, owner, opts \\ []) do
     {handler, handler_init_args} = get_handler_spec(zwave_command, opts)
@@ -72,8 +76,10 @@ defmodule Grizzly.Commands.Command do
   @spec handle_zip_command(t(), ZWaveCommand.t()) ::
           {:continue, t()}
           | {:error, :nack_response, t()}
+          | {:queued_complete, any(), t()}
+          | {:queued_ping, non_neg_integer(), t()}
           | {:queued, non_neg_integer(), t()}
-          | {:complete, t()}
+          | {:complete, any(), t()}
           | {:retry, t()}
   def handle_zip_command(command, zip_command) do
     case ZWaveCommand.param!(zip_command, :flag) do
@@ -107,7 +113,7 @@ defmodule Grizzly.Commands.Command do
         {:continue, %__MODULE__{command | handler_state: new_handler_state}}
 
       {:complete, _response} = result ->
-        result
+        build_complete_reply(command, result)
     end
   end
 
@@ -147,7 +153,7 @@ defmodule Grizzly.Commands.Command do
         {:continue, %__MODULE__{command | handler_state: new_handler_state}}
 
       {:complete, _response} = result ->
-        result
+        build_complete_reply(command, result)
     end
   end
 
@@ -177,10 +183,33 @@ defmodule Grizzly.Commands.Command do
   defp make_queued_response(command, zip_packet) do
     case ZIPPacket.extension(zip_packet, :expected_delay, 90) do
       delay when delay > 1 ->
-        {:queued, delay, command}
+        make_queued_or_queued_ping_response(command, delay)
 
       _other ->
         {:continue, command}
     end
   end
+
+  defp make_queued_or_queued_ping_response(command, delay) do
+    case command.status do
+      :inflight ->
+        {:queued, delay, %__MODULE__{command | status: :queued}}
+
+      :queued ->
+        {:queued_ping, delay, command}
+    end
+  end
+
+  defp build_complete_reply(command, {:complete, result}) do
+    case command.status do
+      :inflight ->
+        {:complete, result, %__MODULE__{command | status: :complete}}
+
+      :queued ->
+        {:queued_complete, format_result(result), %__MODULE__{command | status: :complete}}
+    end
+  end
+
+  defp format_result({:ok, command}), do: command
+  defp format_result(:ok), do: :ok
 end
