@@ -10,7 +10,9 @@ defmodule Grizzly.Connections.SyncConnection do
   alias Grizzly.{ZIPGateway, Connections}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.Connections.{KeepAlive, CommandList}
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   @type opt :: {:transport, module()}
 
@@ -87,12 +89,15 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   # handle when there is a timeout and command runner stops
-  def handle_info({:grizzly, :command_timeout, command_runner_pid, _ref, zwave_command}, state) do
-    if zwave_command.name == :keep_alive do
+  def handle_info(
+        {:grizzly, :command_timeout, command_runner_pid, grizzly_command},
+        state
+      ) do
+    if grizzly_command.source.name == :keep_alive do
       {:noreply, state}
     else
       waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
-      GenServer.reply(waiter, {:error, :timeout})
+      do_timeout_reply(waiter, grizzly_command)
 
       {:noreply,
        %State{
@@ -116,6 +121,36 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   defp handle_commands(zip_packet, state) do
+    case Command.param!(zip_packet, :flag) do
+      :ack_request ->
+        ## TODO clean up
+        # Something we will get a UDP ping from the controller that requests
+        # use to respond back, this handles that. This is mostly used
+        # when there are messages in the Z/IP Gateway's mailbox to unsure
+        # there is still someone waiting for the queued command.
+        header_extensions = Command.param!(zip_packet, :header_extensions)
+        seq_number = Command.param!(zip_packet, :seq_number)
+        secure = Command.param!(zip_packet, :secure)
+
+        {:ok, ack_response} =
+          ZIPPacket.new(
+            secure: secure,
+            header_extensions: header_extensions,
+            seq_number: seq_number,
+            flag: :ack_response
+          )
+
+        binary = ZWave.to_binary(ack_response)
+        state.transport.send(state.socket, binary)
+
+        state
+
+      _ ->
+        do_handle_commands(zip_packet, state)
+    end
+  end
+
+  defp do_handle_commands(zip_packet, state) do
     updated_state =
       case CommandList.response_for_zip_packet(state.commands, zip_packet) do
         {:retry, command_runner, new_comamnd_list} ->
@@ -127,6 +162,14 @@ defmodule Grizzly.Connections.SyncConnection do
 
         {waiter, {:error, :nack_response, new_comamnd_list}} ->
           GenServer.reply(waiter, {:error, :nack_response})
+          %State{state | commands: new_comamnd_list}
+
+        {waiter, {:queued_complete, ref, response, new_command_list}} ->
+          send(waiter, {:grizzly, :queued_command_response, ref, response})
+          %State{state | commands: new_command_list}
+
+        {waiter, {:queued_ping, ref, queued_seconds, new_comamnd_list}} ->
+          send(waiter, {:grizzly, :queued_ping, ref, queued_seconds})
           %State{state | commands: new_comamnd_list}
 
         {waiter, {:queued, ref, queued_seconds, new_comamnd_list}} ->
@@ -144,5 +187,16 @@ defmodule Grizzly.Connections.SyncConnection do
   defp do_send_command(command_runner, state) do
     binary = CommandRunner.encode_command(command_runner)
     state.transport.send(state.socket, binary)
+  end
+
+  defp do_timeout_reply(waiter, grizzly_command) do
+    response = {:error, :timeout}
+
+    if grizzly_command.status == :queued do
+      {pid, _tag} = waiter
+      send(pid, {:grizzly, :queued_command_response, grizzly_command.ref, response})
+    else
+      GenServer.reply(waiter, response)
+    end
   end
 end

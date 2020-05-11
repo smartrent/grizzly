@@ -87,6 +87,39 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     assert {:queued, command_ref, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
   end
 
+  test "handles queued complete command" do
+    {:ok, command} = SwitchBinarySet.new(target_value: :off)
+    {:ok, runner} = CommandRunner.start_link(command)
+    command_ref = CommandRunner.reference(runner)
+
+    nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
+
+    assert {:queued, command_ref, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
+
+    ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
+
+    assert {:queued_complete, command_ref, :ok} ==
+             CommandRunner.handle_zip_command(runner, ack_response)
+  end
+
+  @tag :integration
+  test "handles queued complete command with long timeout" do
+    {:ok, command} = SwitchBinarySet.new(target_value: :off)
+    {:ok, runner} = CommandRunner.start_link(command)
+    command_ref = CommandRunner.reference(runner)
+
+    nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 10)
+
+    assert {:queued, command_ref, 10} == CommandRunner.handle_zip_command(runner, nack_waiting)
+
+    Process.sleep(10_000)
+
+    ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
+
+    assert {:queued_complete, command_ref, :ok} ==
+             CommandRunner.handle_zip_command(runner, ack_response)
+  end
+
   test "encodes a command" do
     {:ok, command} = SwitchBinaryGet.new()
     {:ok, runner} = CommandRunner.start_link(command)

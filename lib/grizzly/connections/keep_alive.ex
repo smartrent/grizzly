@@ -47,7 +47,7 @@ defmodule Grizzly.Connections.KeepAlive do
   """
   @spec make_command(t()) :: t()
   def make_command(keep_alive) do
-    {:ok, keep_alive_command} = ZIPKeepAlive.new()
+    {:ok, keep_alive_command} = ZIPKeepAlive.new(ack_flag: :ack_request)
     {:ok, command_runner} = Commands.create_command(keep_alive_command)
 
     %__MODULE__{keep_alive | command_runner: command_runner}
