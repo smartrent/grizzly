@@ -15,146 +15,94 @@ def deps do
 end
 ```
 
-## NG Checklist
+## Hardware Requirements
 
-### TODOs
-
-- Support Assigning association groups
-- CommandClassList
-- Command.decode_params should be {:ok, params} or error
-- Update code base to `Grizzly.ZWave` types
-- Associations on adding a node? - probably add an option to `Grizzly.Inclusions.add_node/1`??
-- Monitor commands - is this still needed?
-- Figure out messages from Grizzly format
-  - {Grizzly, command_name, command}
-  - {Grizzly, command_name, command_ref, command}
-- Add section about config options (make them consistent)
-- After excluding a node, ensure the connection process is stopped
-- Device classes and command classes from byte should use `DecodeError`
-
-### Testing
-
-- Queued Commands
-- SmartStart
-- Test inclusion timeout handling
-
-## Requirements
-
-- [Z-Wave Bridge Controller](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)
+- Z-Wave Bridge Controller 
+    * [Z-Wave 500](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)
+    * [Z-Wave 700](https://www.digikey.com/product-detail/en/silicon-labs/SLUSB001A/336-5899-ND/9867108)
 - [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
 - [Silicon Labs zipgateway binary](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
 
-
 See instructions for compiling the `zipgateway` binary.
 
-## Usage
+## Basic Usage
 
-### Adding Z-Wave Devices
-
-When adding Z-Wave devices you will have to know what security group the
-device is using. There are 3 groups: none, S0, and S2. For none and S0 you
-don't have to do anything special during the inclusion process:
+To use a device you have to add it to the Z-Wave network. This is "called
+including a device" or "starting an inclusion." While most of the Grizzly's API
+is synchronous the process of adding a node is not. So, if you are working from
+the IEx console you can use flush to see the newly add device. Here's how this
+process roughly goes.
 
 ```elixir
-iex> Grizzly.add_node()
+iex> Grizzly.Inclusions.add_node()
+:ok
 iex> flush
-{:node_added, %Grizzly.Node{...}}
+%Grizzly.ZWave.Command{
+  name: :node_add_status,
+  ....
+  params: [<node info in here>]
+}
 ```
 
-After calling `Grizzly.add_node/0` you will then trigger the pairing process
-on the device, the instructions for that process can be found in the device's
-user manual.
-
-However, if your device is using S2 security you will need to use `Grizzly.add_node/1`.
-
-If you are using `s2_unauthenticated` this is the call you will want to make:
+To remove a device we have to do an exclusion. Z-Wave uses the umbrella term
+"inclusions" for both adding a removing a device, but an "inclusion" is only
+about device pairing and "exclusion" is only about device removal. The way to
+remove the device from your network in IEx:
 
 ```elixir
-iex> Grizzly.add_node(s2_keys: [:s2_unauthenticated])
+iex> Grizzly.Inclusions.remove_node()
+:ok
 iex> flush
+%Grizzly.ZWave.Command{
+  name: :node_remove_status
+  ...
+  params: [<information about exclusion>]
+}
 ```
 
-If you are using `s2_authenticated` you will need to provide a pin that
-is located on the device:
+There are more details about this process and how to better tie into the
+Grizzly runtime for this events in `Grizzly.Inclusions`.
+
+After you included a node it will be given a node id that you can use to send
+Z-Wave commands to it. Say for example we added an on off switch to our
+network, in Z-Wave this will be called a binary switch, and it was given the id
+of `5`. Turning it off and on would look like this in IEx:
 
 ```elixir
-iex> Grizzly.add_node(s2_keys: [:s2_authenticated], pin: 1111)
-iex> flush
-```
-
-You will see some additional messages when flushing when using S2 security
-but you will not need to do anything with them. When using a `GenServer` to
-manage inclusion you can handle messages via `handle_info/2`
-
-See `Grizzly.Inclusion` module for more information about adding Z-Wave devices
-to the network.
-
-### Removing a Z-Wave Device
-
-Removing a Z-Wave device looks like:
-
-```elixir
-iex> Grizzly.remove_node()
-iex> flush
-{:node_removed, 12}
-```
-
-Where `12` is the id of the node you removed.
-
-When you use a `GenServer` to manage exclusion you can handle messages via
-`handle_info/2`
-
-See `Grizzly.Inclusion` module for more information about removing Z-Wave devices
-from the network.
-
-Additional Z-Wave docs can be found at [Silicon Labs](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk).
-
-### Controlling a Z-Wave Device
-
-Say you have added a door lock to your Z-Wave controller that has the id of `12`, now
-you want to unlock it. There are three steps to this process: get the node from the
-Z-Wave network, connect to the node, and then send Z-Wave commands to it.
-
-```elixir
-iex> {:ok, lock} = Grizzly.get_node(12)
-iex> {:ok, lock} = Grizzly.Node.connect(lock)
-iex> Grizzly.send_command(lock, Grizzly.CommandClass.DoorLock.OperationSet, mode: :unsecured)
+iex> Grizzly.send_command(5, :switch_binary_set, target_value: :on
+:ok
+iex> Grizzly.send_command(5, :switch_binary_set, target_value: :off)
 :ok
 ```
 
-If you are just trying things out in an iex session can you use `send_command`
-with the node id:
+`Grizzly.send_command/3` can return a few responses.
 
-```elixir
-iex> Grizzly.send_command(12, Grizzly.CommandClass.DoorLock.OperationSet, mode: :unsecured)
-```
+### Successful Commands
 
-However, this is slower in general and is only recommended for quick one off
-command sending. If you're building a long running application the first
-example is recommended along with storing the connected device to keep the
-connection alive for faster response times.
+1. `:ok` - normally for setting things on a device or changing the device's
+   state
+1. `{:ok, Grizzly.ZWave.Command.t()}` - this is normally returned when asking
+   for a device state or about some information about a device or Z-Wave
+   network
+1. `{:queued, reference, queue_time}` - some devices sleep, so sending a
+   command to it will be queued for some `queue_time`. Once the device wakes
+   up and handles the queued command the calling process will receive a message
+   like: `{:grizzly, :queued_command_response, reference, response}` where the
+   `reference` is the one that was given at the time of the call, and the
+   `response` one of the two above responses depending on the command that was
+   sent.
+  
+### When things go wrong
 
-See the `Grizzly` module docs for more details about `Grizzly.send_command`
+1. `{:error, :timeout}` - if the command times out for whatever reason
+1. `{:error, :nack_response}` - for when the node is not responding to the
+    command. Grizzly has automatic retries, so if you got this message that
+    might mean the node is reachable, your Z-Wave network is experiencing a of
+    traffic, or the node has recently been hit with a lot of commands and
+    cannot handle anymore at this moment.
 
-### Handling Z-Wave Notifications
-
-Grizzly has a pubsub module (`Grizzly.Notifications`) which is used for sending
-or receiving notifications.
-
-You can subscribe to notifications using:
-
-```elixir
-Grizzly.Notifications.subscribe(topic)
-```
-
-or
-
-```elixir
-Grizzly.Notifications.subscribe_all(topic_list)
-```
-
-See [`Grizzly.Notifications`](https://hexdocs.pm/grizzly/Grizzly.Notifications.html)
-docs for more info.
+More information about `Grizzly.send_command/3` and the options like timeouts
+and retries that can be passed to see the `Grizzly` module.
 
 ## Z-Wave Bridge Configuration
 
