@@ -70,7 +70,12 @@ defmodule Grizzly.ZWave.Decoder do
       {0x84, 0x07, Commands.WakeUpNotification},
       {0x84, 0x08, Commands.WakeUpNoMoreInformation},
       {0x84, 0x09, Commands.WakeUpIntervalCapabilitiesGet},
-      {0x84, 0x0A, Commands.WakeUpIntervalCapabilitiesReport}
+      {0x84, 0x0A, Commands.WakeUpIntervalCapabilitiesReport},
+      # Sensor multilevel
+      {0x31, 0x01, Commands.SensorMultilevelSupportedSensorGet},
+      {0x31, 0x02, Commands.SensorMultilevelSupportedSensorReport},
+      {0x31, 0x04, Commands.SensorMultilevelGet},
+      {0x31, 0x05, Command.SensorMultilevelReport}
     ]
 
     defmacro __before_compile__(_) do
