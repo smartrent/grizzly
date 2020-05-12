@@ -48,6 +48,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x62, 0x01, Commands.DoorLockOperationSet},
       {0x62, 0x02, Commands.DoorLockOperationGet},
       {0x62, 0x03, Commands.DoorLockOperationReport},
+      # User Code
+      {0x63, 0x01, Commands.UserCodeSet},
       # Configuration
       {0x70, 0x04, Commands.ConfigurationSet},
       # Alarm
