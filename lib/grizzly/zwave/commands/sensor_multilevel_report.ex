@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
   # See Grizzly.ZWave.CommandClasses.SensorMultilevel for the full list of sensor type values
   @type sensor_type :: atom
   @type param ::
-          {:sensor_type, sensor_type} | {:scale, 0..3} | {:precision, 0..3} | {:value, number}
+          {:sensor_type, sensor_type} | {:scale, 0..3} | {:value, number}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
