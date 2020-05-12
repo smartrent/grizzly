@@ -56,6 +56,11 @@ defmodule Grizzly.Commands.Table do
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
       {:node_add_dsk_set, {Commands.NodeAddDSKSet, handler: AckResponse}},
       {:dsk_get, {Commands.DSKGet, handler: {WaitReport, complete_report: :dsk_report}}},
+      # Door Lock
+      {:door_lock_operation_set, {Commands.DoorLockOperationSet, handler: AckResponse}},
+      {:door_lock_operation_get,
+       {Commands.DoorLockOperationGet,
+        handler: {WaitReport, complete_report: :door_lock_operation_report}}},
       # Associations
       {:association_set, {Commands.AssociationSet, handler: AckResponse}},
       {:association_get,
