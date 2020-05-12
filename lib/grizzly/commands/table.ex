@@ -87,11 +87,12 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :wake_up_interval_capabilities_report}}},
       # Sensor Multilevel
       {:sensor_multilevel_get,
-       {Command.SensorMultilevelGet,
+       {Commands.SensorMultilevelGet,
         handler: {WaitReport, complete_report: :sensor_multilevel_report}}},
       {:sensor_multilevel_supported_sensor_get,
-       {Command.SensorMultilevelGetSupportedSensorGet,
-        handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}}
+       {Commands.SensorMultilevelGetSupportedSensorGet,
+        handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}},
+      {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
