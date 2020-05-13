@@ -85,7 +85,11 @@ defmodule Grizzly.ZWave.Decoder do
       # Thermostat mode
       {0x40, 0x01, Commands.ThermostatModeSet},
       {0x40, 0x02, Commands.ThermostatModeGet},
-      {0x40, 0x03, Commands.ThermostatModeReport}
+      {0x40, 0x03, Commands.ThermostatModeReport},
+      # Thermostat setpoint
+      {0x43, 0x01, Commands.ThermostatSetpointSet},
+      {0x43, 0x02, Commands.ThermostatSetpointGet},
+      {0x43, 0x03, Commands.ThermostatSetpointReport}
     ]
 
     defmacro __before_compile__(_) do
