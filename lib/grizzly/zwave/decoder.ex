@@ -81,7 +81,11 @@ defmodule Grizzly.ZWave.Decoder do
       {0x31, 0x01, Commands.SensorMultilevelSupportedSensorGet},
       {0x31, 0x02, Commands.SensorMultilevelSupportedSensorReport},
       {0x31, 0x04, Commands.SensorMultilevelGet},
-      {0x31, 0x05, Commands.SensorMultilevelReport}
+      {0x31, 0x05, Commands.SensorMultilevelReport},
+      # Thermostat mode
+      {0x40, 0x01, Commands.ThermostatModeSet},
+      {0x40, 0x02, Commands.ThermostatModeGet},
+      {0x40, 0x03, Commands.ThermostatModeReport}
     ]
 
     defmacro __before_compile__(_) do
