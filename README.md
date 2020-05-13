@@ -23,6 +23,11 @@ end
 - [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
 - [Silicon Labs zipgateway binary](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
 
+The `zipgateway` binary allows Grizzly to use Z-Wave over IP or Z/IP. Using the
+`zipgateway` binary provided by Silicon labs allows Grizzly to support the full
+range of Z-Wave features quickly and reliability. Some of the more advanced 
+features like S2 security and smart start are already supported in Grizzly.
+
 See instructions for compiling the `zipgateway` binary.
 
 ## Basic Usage
@@ -104,16 +109,51 @@ iex> Grizzly.send_command(5, :switch_binary_set, target_value: :off)
 More information about `Grizzly.send_command/3` and the options like timeouts
 and retries that can be passed to see the `Grizzly` module.
 
+## Grizzly Runtime
+
+The Grizzly runtime is a [module](https://github.com/smartrent/grizzly/blob/master/lib/grizzly/runtime.ex)
+that manages the set up operations of the Z-Wave IP stack.
+
+### Z-Wave is Ready
+
+When the Z-Wave stack is completely set up Grizzly will call the `:on_ready`
+module function arg callback that is configured for the runtime. To configure
+this add this to your `config.exs` file:
+
+```elixir
+config :grizzly,
+  runtime: [
+    on_ready: {MyModule, :zwave_up, []}
+  ]
+```
+
+In most cases this all the configuration you need for the runtime.
+
+### Advanced Runtime Configuration
+
+By default the Grizzly runtime handle setting the `zipgateway` binary and 
+generate the correct configuration files or it to run and network correctly.
+The nice things about this default setup is Grizzly leverages OTP to supervise 
+the `zipgateway` binary, and if the binary crashes Grizzly will restart it.
+
+However, there are use cases for needing to manage the `zipgateway` binary
+outside of Grizzly. So if you plan on starting `zipgateway` outside of Grizzly
+you can configure the runtime like:
+
+```elixir
+config :grizzly,
+  runtime: [
+    run_zipgateway_bin: false
+  ]
+```
+
+For more information see `Grizzly.Runtime` module
+
 ## Z-Wave Bridge Configuration
 
 Grizzly defers the low-level Z-Wave protocol handling to a combination of third
 party software and hardware. The software is silicon Labs' `zipgateway` and the
 hardware is a Silicon Labs Z-Wave bridge.
-
-This has a major advantage over using a regular Z-Wave stick such as the Aeon
-product: the Silicon Labs bridge contains the proprietary Z-Wave stack that
-properly handles the different security levels required by devices such as door
-locks. This makes Grizzly more responsive and reliable.
 
 ### Configure the Z-Wave Bridge
 
@@ -159,15 +199,6 @@ config :grizzly,
 
 Grizzly uses the `taptun` module to manage the TCP connection: it checks that
 this is loaded as it starts.
-
-If you want to run tests without running the `zipgateway` binary provided by Silicon Labs you
-can configure `run_zipgateway_bin` to be `false`:
-
-
-```elixir
-config :grizzly,
-  run_zipgateway_bin: false
-```
 
 #### Configuring zipgateway
 
