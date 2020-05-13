@@ -92,7 +92,13 @@ defmodule Grizzly.Commands.Table do
       {:sensor_multilevel_supported_sensor_get,
        {Commands.SensorMultilevelGetSupportedSensorGet,
         handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}},
-      {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}}
+      # User code
+      {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}},
+      # Thermostat mode
+      {:thermostat_mode_set, {Commands.ThermostatModeSet, handler: AckResponse}},
+      {:thermostat_mode_get,
+       {Commands.ThermostatModeGet,
+        handler: {WaitReport, complete_report: :thermostat_mode_report}}}
     ]
 
     defmacro __before_compile__(_) do
