@@ -108,7 +108,11 @@ defmodule Grizzly.Commands.Table do
       {:thermostat_fan_mode_set, {Commands.ThermostatFanModeSet, handler: AckResponse}},
       {:thermostat_fan_mode_get,
        {Commands.ThermostatFanModeGet,
-        handler: {WaitReport, complete_report: :thermostat_fan_mode_report}}}
+        handler: {WaitReport, complete_report: :thermostat_fan_mode_report}}},
+      # Thermostat fan state
+      {:thermostat_fan_state_get,
+       {Commands.ThermostatFanStateGet,
+        handler: {WaitReport, complete_report: :thermostat_fan_state_report}}}
     ]
 
     defmacro __before_compile__(_) do
