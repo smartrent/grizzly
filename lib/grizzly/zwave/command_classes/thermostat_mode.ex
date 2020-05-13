@@ -70,5 +70,5 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatMode do
   def decode_mode(0x1F), do: {:ok, :manufacturer_specific}
 
   def decode_mode(byte),
-    do: {:error, %DecodeError{value: byte, param: :mode, command: :thermostat_mode_report}}
+    do: {:error, %DecodeError{value: byte, param: :mode, command: :thermostat_mode}}
 end
