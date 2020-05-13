@@ -112,7 +112,12 @@ defmodule Grizzly.Commands.Table do
       # Thermostat fan state
       {:thermostat_fan_state_get,
        {Commands.ThermostatFanStateGet,
-        handler: {WaitReport, complete_report: :thermostat_fan_state_report}}}
+        handler: {WaitReport, complete_report: :thermostat_fan_state_report}}},
+      # Thermostat setback
+      {:thermostat_setback_set, {Commands.ThermostatSetbackSet, handler: AckResponse}},
+      {:thermostat_setback_get,
+       {Commands.ThermostatSetbackGet,
+        handler: {WaitReport, complete_report: :thermostat_setback_report}}}
     ]
 
     defmacro __before_compile__(_) do
