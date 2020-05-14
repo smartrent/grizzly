@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.CommandClasses do
       {0x3F, :prepayment},
       {0x40, :thermostat_mode},
       {0x41, :prepayment_encapsulation},
-      {0x42, :operating_state},
+      {0x42, :thermostat_operating_state},
       {0x43, :thermostat_setpoint},
       {0x44, :thermostat_fan_mode},
       {0x45, :thermostat_fan_state},
