@@ -25,8 +25,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :thermostat_setpoint_report,
-      command_byte: 0x03,
+      name: :thermostat_setpoint_set,
+      command_byte: 0x01,
       command_class: ThermostatSetpoint,
       params: params,
       impl: __MODULE__
