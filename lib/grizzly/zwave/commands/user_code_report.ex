@@ -1,6 +1,6 @@
-defmodule Grizzly.ZWave.Commands.UserCodeSet do
+defmodule Grizzly.ZWave.Commands.UserCodeReport do
   @moduledoc """
-  UserCodeSet sets the user code
+  UserCodeReport reports on a user code
 
   Params:
 
@@ -14,17 +14,17 @@ defmodule Grizzly.ZWave.Commands.UserCodeSet do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.UserCode
 
+  @type user_id_status :: :occupied | :available | :reserved_by_admin | :status_not_available
+
   @type param ::
-          {:user_id, byte()}
-          | {:user_id_status, UserCode.user_id_status()}
-          | {:user_code, String.t()}
+          {:user_id, byte()} | {:user_id_status, user_id_status()} | {:user_code, String.t()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :user_code_set,
-      command_byte: 0x01,
+      name: :user_code_report,
+      command_byte: 0x03,
       command_class: UserCode,
       params: params,
       impl: __MODULE__
