@@ -97,7 +97,7 @@ defmodule Grizzly.Commands.Table do
       {:user_code_get,
        {Commands.UserCodeGet, handler: {WaitReport, complete_report: :user_code_report}}},
       {:user_code_users_number_get,
-       {Commands.UserCodeUSersNumberGet,
+       {Commands.UserCodeUsersNumberGet,
         handler: {WaitReport, complete_report: :user_code_users_number_report}}},
       # Meter
       {:meter_get, {Commands.MeterGet, handler: {WaitReport, complete_report: :meter_report}}},
