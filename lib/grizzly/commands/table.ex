@@ -117,7 +117,11 @@ defmodule Grizzly.Commands.Table do
       {:thermostat_setback_set, {Commands.ThermostatSetbackSet, handler: AckResponse}},
       {:thermostat_setback_get,
        {Commands.ThermostatSetbackGet,
-        handler: {WaitReport, complete_report: :thermostat_setback_report}}}
+        handler: {WaitReport, complete_report: :thermostat_setback_report}}},
+      # Thermostat operating state
+      {:thermostat_operating_state_get,
+       {Commands.ThermostatOperatingStateGet,
+        handler: {WaitReport, complete_report: :thermostat_operating_state_report}}}
     ]
 
     defmacro __before_compile__(_) do
