@@ -77,7 +77,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
   end
 
   # UTF-8 format
-  defp device_id_from(0x02, device_id_integer) do
+  defp device_id_from(0x00, device_id_integer) do
     device_id = <<device_id_integer::32>>
     {:ok, device_id}
   end

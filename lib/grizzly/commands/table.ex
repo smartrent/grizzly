@@ -90,7 +90,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.SensorMultilevelGet,
         handler: {WaitReport, complete_report: :sensor_multilevel_report}}},
       {:sensor_multilevel_supported_sensor_get,
-       {Commands.SensorMultilevelGetSupportedSensorGet,
+       {Commands.SensorMultilevelSupportedSensorGet,
         handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}},
       # User code
       {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}},
