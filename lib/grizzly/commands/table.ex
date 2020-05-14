@@ -94,6 +94,12 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}},
       # User code
       {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}},
+      {:user_code_get,
+       {Commands.UserCodeGet, handler: {WaitReport, complete_report: :user_code_report}}},
+      {:user_code_users_number_get,
+       {Commands.UserCodeUSersNumberGet,
+        handler: {WaitReport, complete_report: :user_code_users_number_report}}},
+
       # Thermostat mode
       {:thermostat_mode_set, {Commands.ThermostatModeSet, handler: AckResponse}},
       {:thermostat_mode_get,
