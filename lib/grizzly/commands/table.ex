@@ -136,7 +136,7 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :node_provisioning_report}}},
       {:node_provisioning_delete, {Commands.NodeProvisioningDelete, handler: AckResponse}},
       {:node_provisioning_list_iteration_get,
-       {Commands.NodeProvisioningIterationListGet,
+       {Commands.NodeProvisioningListIterationGet,
         handler: {WaitReport, complete_report: :node_provisioning_list_iteration_report}}}
     ]
 
