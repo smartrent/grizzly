@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberGet do
   def new(_opts \\ []) do
     command = %Command{
       name: :user_code_users_number_get,
-      command_byte: 0x05,
+      command_byte: 0x04,
       command_class: UserCode,
       impl: __MODULE__
     }
