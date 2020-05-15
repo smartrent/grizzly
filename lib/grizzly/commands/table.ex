@@ -128,7 +128,16 @@ defmodule Grizzly.Commands.Table do
       # Thermostat operating state
       {:thermostat_operating_state_get,
        {Commands.ThermostatOperatingStateGet,
-        handler: {WaitReport, complete_report: :thermostat_operating_state_report}}}
+        handler: {WaitReport, complete_report: :thermostat_operating_state_report}}},
+      # Node provisioning
+      {:node_provisioning_set, {Commands.NodeProvisioningSet, handler: AckResponse}},
+      {:node_provisioning_get,
+       {Commands.NodeProvisioningGet,
+        handler: {WaitReport, complete_report: :node_provisioning_report}}},
+      {:node_provisioning_delete, {Commands.NodeProvisioningDelete, handler: AckResponse}},
+      {:node_provisioning_iteration_list_get,
+       {Commands.NodeProvisioningIterationListGet,
+        handler: {WaitReport, complete_report: :node_provisioning_iteration_list_report}}}
     ]
 
     defmacro __before_compile__(_) do
