@@ -110,7 +110,14 @@ defmodule Grizzly.ZWave.Decoder do
       {0x47, 0x03, Commands.ThermostatSetbackReport},
       # Thermostat operating state
       {0x42, 0x02, Commands.ThermostatOperatingStateGet},
-      {0x42, 0x03, Commands.ThermostatOperatingStateReport}
+      {0x42, 0x03, Commands.ThermostatOperatingStateReport},
+      # Node provisioning
+      {0x78, 0x01, Commands.NodeProvisioningSet},
+      {0x78, 0x02, Commands.NodeProvisioningDelete},
+      {0x78, 0x03, Commands.NodeProvisioningListIterationGet},
+      {0x78, 0x04, Commands.NodeProvisioningListIterationReport},
+      {0x78, 0x05, Commands.NodeProvisioningGet},
+      {0x78, 0x06, Commands.NodeProvisioningReport}
     ]
 
     defmacro __before_compile__(_) do
