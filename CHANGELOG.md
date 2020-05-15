@@ -1,5 +1,141 @@
 ## Changelog
 
+## v0.9.0-rc.0
+
+For more detailed guide to the breaking changes and how to upgrade please see
+our [Grizzly v0.8.0 -> v0.9.0](https://gist.github.com/mattludwigs/b172eaae0831f71df5ab53e2d6066081) guide.
+
+This release presents a simpler API, faster boot time, more robustness in Z-Wave communication,
+and resolves all open issues on Grizzly that were reported as bugs.
+
+### Removed APIs
+
+* `Grizzly.Node` struct
+* `Grizzly.Conn` module
+* `Grizzly.Notifications` module
+* `Grizzly.Packet` module
+* `Grizzly.close_connection`
+* `Grizzly.command_class_versions_known?`
+* `Grizzly.update_command_class_versions` 
+* `Grizzly.start_learn_mode`
+* `Grizzly.get_command_class_version`
+* `Grizzly.has_command_class`
+* `Grizzly.connected?`
+* `Grizzly.has_command_class_names`
+* `Grizzly.config`
+* `Grizzly.Network.busy?`
+* `Grizzly.Network.ready?`
+* `Grizzly.Network.get_state`
+* `Grizzly.Network.set_state`
+* `Grizzly.Network.get_node`
+* `Grizzly.Node.new`
+* `Grizzly.Node.update`
+* `Grizzly.Node.put_ip`
+* `Grizzly.Node.get_ip`
+* `Grizzly.Node.connect`
+* `Grizzly.Node.disconnect`
+* `Grizzly.Node.make_config`
+* `Grizzly.Node.has_command_class?`
+* `Grizzly.Node.connected?`
+* `Grizzly.Node.command_class_names`
+* `Grizzly.Node.update_command_class_versions`
+* `Grizzly.Node.get_command_class_version`
+* `Grizzly.Node.command_class_version_known?`
+* `Grizzly.Node.update_command_class`
+* `Grizzly.Node.put_association`
+* `Grizzly.Node.get_association_list`
+* `Grizzly.Node.configure_association`
+* `Grizzly.Node.get_network_information`
+* `Grizzly.Node.initialize_command_versions`
+
+### Moved APIs
+
+* `Grizzly.reset_controller` -> `Grizzly.Network.reset_controller`
+* `Grizzly.get_nodes` -> `Grizzly.Network.get_node_ids`
+* `Grizzly.get_node_info` -> `Grizzly.Node.get_node_info`
+* `Grizzly.Notifications.subscribe` -> `Grizzly.subscribe_command` and
+  `Grizzly.subscribe_commands`
+* `Grizzly.Notifications.unsubscribe` -> `Grizzly.unsubscribe`
+* `Grizzly.add_node` -> `Grizzly.Inclusions.add_node`
+* `Grizzly.remove_node` -> `Grizzly.Inclusions.remove_node`
+* `Grizzly.add_node_stop` -> `Grizzly.Inclusions.add_node_stop`
+* `Grizzly.remove_node_stop` -> `Grizzly.Inclusions.remove_node_stop`
+* `Grizzly.Client` -> `Grizzly.Transport`
+* `Grizzly.Security` -> `Grizzly.ZWave.Security`
+* `Grizzly.DSK` -> `Grizzly.ZWave.DSK`
+* `Grizzly.Node.add_lifeline_group` -> `Grizzly.Node.set_lifeline_association`
+
+We moved all the commands and command classes to be under the the
+`Grizzly.ZWave` module namespace and refactored the command behaviour.
+
+### `Grizzly.send_command` Changes
+
+The main API function to Grizzly has changed in that it only takes a node id,
+command name (atom), command args, and command options.
+
+Also it no longer returns a plain map when there is data to report back from
+a Z-Wave node but it will return `{:ok, %Grizzly.ZWave.Command{}}`.
+
+Please see `Grizzly` and `Grizzly.ZWave.Command` docs for more information.
+
+### Connections
+
+Grizzly uses the `zipgateway` binary under the hood. The binary has its own
+networking stack and provides a DTLS server for us to connect to. Prior to
+Grizzly v0.9.0 we greatly exposed that implementation detail. However, starting
+in Grizzly v0.9.0 we have hidden that implementation detail away and all
+connection functionally is handle by Grizzly internally. This leaves the
+consumer of Grizzly to just work about sending and receiving commands.
+
+If you are using `%Grizzly.Conn{}` directly this is no longer available and you
+should upgrade to just using the node id you were sending commands to.
+
+### When Grizzly is Ready
+
+We use to send a notification to let the consumer to know when Grizzly is
+read. Staring in v0.9.0 the consumer needs to configure Grizzly's runtime
+with the `on_ready` module, function, arg callback.
+
+```elixir
+config :grizzly,
+  runtime: [
+    on_ready: {MyApp, :some_function, []}
+  ]
+```
+
+See `Grizzly.Runtime` for more details
+
+### Inclusion Handler Behaviour
+
+Adding and removing a Z-Wave node can be a very interactive process that
+involves users being able to talk to the including controller and device. The
+way Grizzly < v0.9.0 did it wasn't vary useful or robust. By adding the the
+inclusion handler behaviour we allow the consumer to have full control over the
+inclusion process, enabling closer to Z-Wave specification inclusion process.
+
+See `Grizzly.InclusionHandler` and `Grizzly.Inclusions` for more information.
+
+### Command Handler Behaviour
+
+If you need to handle a Z-Wave command lifecycle differently than the default
+Grizzly implementation you can make your own handler and pass it into
+`Grizzly.send_command` as an option:
+
+```elixir
+Grizzly.send_command(node_id, :switch_binary_set, [value: :on], handler: MyHandler)
+```
+
+See `Grizzly.CommandHandler` for more information.
+
+### Supporting Commands
+
+At the point of the `rc.0` release are not fully 100% supporting the same
+commands as in < v0.8.8, but we are really close. The commands that we haven't
+pulled over are not critical to average Z-Wave device control. We will work to
+get all the commands back into place.
+
+Thank you to Jean-Francois Cloutier for contributing so much to this release.
+
 ## v0.8.8
 
 * Enhancements
