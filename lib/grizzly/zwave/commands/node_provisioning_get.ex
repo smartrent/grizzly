@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
        ]}
     else
       {:error, reason} when reason in [:dsk_too_short, :dsk_too_long] ->
-        {:error, %DecodeError{value: dsk_binary, param: :dsk, command: :node_provisioning_set}}
+        {:error, %DecodeError{value: dsk_binary, param: :dsk, command: :node_provisioning_get}}
     end
   end
 end

@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
     seq_number = Command.param!(command, :seq_number)
     remaining_count = Command.param!(command, :remaining_count)
     meta_extensions = Command.param!(command, :meta_extensions)
-    {:ok, dsk_binary} = DSK.string_to_binary(Command.param!(command, :dsk))
+    {:ok, dsk_binary} = NodeProvisioning.optional_dsk_to_binary(Command.param!(command, :dsk))
     dsk_byte_size = byte_size(dsk_binary)
 
     <<seq_number, remaining_count, 0x00::size(3), dsk_byte_size::size(5)>> <>
@@ -58,7 +58,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
         <<seq_number, remaining_count, _::size(3), dsk_byte_size::size(5),
           dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
       ) do
-    with {:ok, dsk_string} <- DSK.binary_to_string(dsk_binary),
+    with {:ok, dsk_string} <- NodeProvisioning.optional_binary_to_dsk(dsk_binary),
          {:ok, meta_extensions} <- MetaExtension.extensions_from_binary(meta_extensions_binary) do
       {:ok,
        [
@@ -69,7 +69,12 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
        ]}
     else
       {:error, reason} when reason in [:dsk_too_short, :dsk_too_long] ->
-        {:error, %DecodeError{value: dsk_binary, param: :dsk, command: :node_provisioning_set}}
+        {:error,
+         %DecodeError{
+           value: dsk_binary,
+           param: :dsk,
+           command: :node_provisioning_list_iteration_report
+         }}
 
       {:error, _other} ->
         {:error,
