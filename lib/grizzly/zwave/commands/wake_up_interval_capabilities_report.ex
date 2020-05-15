@@ -5,13 +5,9 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
   Params:
 
     * `:minimum_seconds` - the minimum Wake Up Interval supported by the sending node - v2
-
     * `:maximum_seconds` - the maximum Wake Up Interval supported by the sending node - v2
-
     * `:default_seconds` - the default Wake Up Interval value for the sending node. - v2
-
     * `:step_seconds` - the resolution of valid Wake Up Intervals values for the sending node - v2
-
     * `:on_demand` - whether the supporting node supports the Wake Up On Demand functionality - v3
 
   """

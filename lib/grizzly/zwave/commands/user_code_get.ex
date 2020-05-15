@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.UserCodeGet do
   @moduledoc """
-  This module implements command USER_CODE_GET of the COMMAND_CLASS_USER_CODE command class.
+  This module implements command USER_CODE_GET of the COMMAND_CLASS_USER_CODE
+  command class.
 
   This command is used to request the User Code of a specific User Identifier.
 

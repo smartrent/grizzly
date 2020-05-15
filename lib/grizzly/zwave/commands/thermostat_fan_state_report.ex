@@ -1,11 +1,14 @@
 defmodule Grizzly.ZWave.Commands.ThermostatFanStateReport do
   @moduledoc """
-   This module implements command THERMOSTAT_FAN_STATE_REPORT of the COMMAND_CLASS_THERMOSTAT_FAN_STATE command class.
-   This command is used to report the fan operating state of the thermostat device.
+   This module implements command THERMOSTAT_FAN_STATE_REPORT of the
+   COMMAND_CLASS_THERMOSTAT_FAN_STATE command class.
+
+   This command is used to report the fan operating state of the thermostat
+   device.
 
   Params:
 
-    * `:state` - '`:off| :running | :running_high | :running_medium | :circulation | :humidity_circulation | :right_left_circulation | :up_down_circulation | :quiet_circulation` (required)
+    * `:state` - the state of the fan (required)
 
   """
 

@@ -5,7 +5,6 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   Params:
 
     * `:value` - '`:off` or a value betweem 1 and 99
-
     * `:duration` - How long the switch should take to reach target value, 0 -> instantly, 1..127 -> seconds, 128..253 -> minutes, 255 -> unknown (optional v2)
   """
 

@@ -1,11 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ThermostatModeSet do
   @moduledoc """
-  This module implements command THERMOSTAT_MODE_SET of the COMMAND_CLASS_THERMOSTAT_MODE command class.
+  This module implements command THERMOSTAT_MODE_SET of the
+  COMMAND_CLASS_THERMOSTAT_MODE command class.
+
   This command is used to set the mode from the thermostat device.
 
   Params:
 
-    * `:mode` - '`:off | :heat | :cool | :auto | :fan` or other supported thermostat mode values -- See ThermostatMode
+    * `:mode` - the mode of the thermostat, see ThermostatMode (required)
 
   """
 

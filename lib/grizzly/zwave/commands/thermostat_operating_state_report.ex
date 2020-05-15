@@ -1,12 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ThermostatOperatingStateReport do
   @moduledoc """
-  This module implement command THERMOSTAT_OPERATING_STATE_REPORT (v1) of the COMMAND_CLASS_THERMOSTAT_OPERATING_STATE command class
+  This module implement command THERMOSTAT_OPERATING_STATE_REPORT (v1) of the
+  COMMAND_CLASS_THERMOSTAT_OPERATING_STATE command class
 
   This command report the operating state of the thermostat.
 
   Params:
 
-    * `:state` - the operating state, one of :idle | :heating | :cooling | :fan_only | :pending_heat | :pending_cool | :vent_economizer (required)
+    * `:state` - the operating state  (required)
 
   """
 

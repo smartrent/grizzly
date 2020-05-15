@@ -6,10 +6,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
 
   Params:
 
-    - `:seq_number` - the network command sequence number (required)
-    - `:dsk` - a DSK string for the device see `Grizzly.ZWave.DSK` for more
+    * `:seq_number` - the network command sequence number (required)
+    * `:dsk` - a DSK string for the device see `Grizzly.ZWave.DSK` for more
       more information (required)
-    - `:meta_extensions` - a list of `Grizzly.ZWave.SmartStart.MetaExtension.t()`
+    * `:meta_extensions` - a list of `Grizzly.ZWave.SmartStart.MetaExtension.t()`
       (optional default `[]`)
   """
 

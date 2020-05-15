@@ -7,7 +7,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
   Params:
 
     - `:seq_number` - the network command sequence number (required)
-    - `:remaining_count - indicates the remaining amount of entries in the Provisioning List
+    - `:remaining_count` - indicates the remaining amount of entries in the Provisioning List
     - `:dsk` - a DSK string for the device see `Grizzly.ZWave.DSK` for more
       more information (optional)
     - `:meta_extensions` - a list of `Grizzly.ZWave.SmartStart.MetaExtension.t()`

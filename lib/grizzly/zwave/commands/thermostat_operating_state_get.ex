@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ThermostatOperatingStateGet do
   @moduledoc """
-  This module implement command THERMOSTAT_OPERATING_STATE_GET of the COMMAND_CLASS_THERMOSTAT_OPERATING_STATE command class
+  This module implement command THERMOSTAT_OPERATING_STATE_GET of the
+  COMMAND_CLASS_THERMOSTAT_OPERATING_STATE command class
 
   This command gets the operating state of the thermostat.
 

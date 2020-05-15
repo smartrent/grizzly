@@ -5,21 +5,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
   Params:
 
     * `:manufacturer_id` - A unique ID identifying the manufacturer of the device
-
     * `:firmware_id` - A manufacturer SHOULD assign a unique Firmware ID to each existing product variant.
-
     * `:checksum` - The checksum of the firmware image.
-
     * `:upgradable?` - Whether the Z-Wave chip is firmware upgradable
-
     * `:max_fragment_size` - The maximum number of Data bytes that a device is able to receive at a time
-
     * `:other_firmware_ids` - Ids of firmware targets other than the Z-Wave chip. Empty list if the device's only firmware target is the Z-Wave chip
-
     * `:hardware_version` - A value which is unique to this particular version of the product
-
     * `:activation_supported?` - Whether the node supports subsequent activation after Firmware Update transfer
-
     * `:active_during_transfer?` - Whether the supporting node’s Command Classes functionality will continue to function normally during Firmware Update transfer.
 
   """

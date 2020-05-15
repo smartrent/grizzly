@@ -5,23 +5,14 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
   Params:
 
     * `:level` - percent charged - v1
-
     * `:charging_status` - whether charging, discharging or maintaining - v2
-
     * `:rechargeable` - whether the battery is rechargeable - v2
-
     * `:backup` - whether used as a backup source of power - v2
-
     * `:overheating` - whether it is overheating - v2
-
     * `:low_fluid` - whether the battery fluid is low and should be refilled - v2
-
     * `:replace_recharge` - whether the battery needs to be replaced or recharged- v2
-
     * `:disconnected` - whether the battery is disconnected nd the node is running on an alternative power source - v2
-
     * `:low_temperature` - whether the battery of a device has stopped charging due to low temperature - v3
-
 
   """
 

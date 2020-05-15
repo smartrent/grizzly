@@ -4,9 +4,11 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
 
   This command is used to advertise the current meter reading at the sending node.
 
-  Params:   * `:meter_type` - the type of metering physical unit being reported (required)
-            * `:scale` - the unit used (required)
-            * `:value` - the value being reported (required)
+  Params:
+
+    * `:meter_type` - the type of metering physical unit being reported (required)
+    * `:scale` - the unit used (required)
+    * `:value` - the value being reported (required)
 
   """
 

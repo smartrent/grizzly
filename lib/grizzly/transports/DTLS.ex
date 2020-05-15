@@ -1,4 +1,6 @@
 defmodule Grizzly.Transports.DTLS do
+  @moduledoc false
+
   @behaviour Grizzly.Transport
 
   alias Grizzly.ZWave

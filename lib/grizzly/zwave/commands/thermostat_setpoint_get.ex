@@ -1,12 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetpointGet do
   @moduledoc """
-  This module implements command THERMOSTAT_SETPOINT_GET of the COMMAND_CLASS_THERMOSTAT_SETPOINT command class.
+  This module implements command THERMOSTAT_SETPOINT_GET of the
+  COMMAND_CLASS_THERMOSTAT_SETPOINT command class.
 
   This command is used to request the target value for a given setpoint type.
 
   Params:
 
-    * `:type` - one of :heating | :cooling | :furnace | :dry_air | :moist_air | :auto_changeover
+    * `:type` - the setback type (required)
 
   """
 

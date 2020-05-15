@@ -1,8 +1,9 @@
 defmodule Grizzly.ZWave.Commands.ThermostatFanStateGet do
   @moduledoc """
-  This module implement command THERMOSTAT_FAN_STATE_GET of the COMMAND_CLASS_THERMOSTAT_FAN_STATE command class
+  This module implement command THERMOSTAT_FAN_STATE_GET of the
+  COMMAND_CLASS_THERMOSTAT_FAN_STATE command class
 
-  This command is used to request the fan operating state
+  This command is used to request the fan operating state.
 
   Params: -none-
 

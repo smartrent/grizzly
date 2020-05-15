@@ -5,8 +5,8 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
   Params:
 
     * `:target_value` - '`:off`, `:previous` or a value betweem 1 and 99
-
-    * `:duration` - How long the switch should take to reach target value, 0 -> instantly, 1..127 -> seconds, 128..254 -> minutes, 256 -> factory default (option v2)
+    * `:duration` - How long the switch should take to reach target value,
+      0 -> instantly, 1..127 -> seconds, 128..254 -> minutes, 256 -> factory default (option v2)
 
   """
 

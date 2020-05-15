@@ -1,4 +1,6 @@
 defmodule Grizzly.Connection do
+  @moduledoc false
+
   require Logger
 
   alias Grizzly.Connections.Supervisor

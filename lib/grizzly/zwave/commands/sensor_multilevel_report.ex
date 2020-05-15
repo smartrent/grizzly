@@ -1,12 +1,15 @@
 defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
   @moduledoc """
-  This module implements command COMMAND_CLASS_SENSOR_MULTILEVEL implements the SENSOR_MULTILEVEL_REPORT command class.
+  This module implements command COMMAND_CLASS_SENSOR_MULTILEVEL implements the
+  SENSOR_MULTILEVEL_REPORT command class.
+
   This command is used to advertise a multilevel sensor reading.
 
-  Params:  * `:sensor_type` - `one of :temperature or :illuminance or :power or :humidity` etc.(required)
-           * `:scale` - ` 0..3 - identifies a unit of measurement` (required)
-           * `:value` - the sensed, numerical value` (required)
-
+  Params:
+    * `:sensor_type` - one of `:temperature`, `:illuminance`, `:power`, or
+      `:humidity` etc.(required)
+    * `:scale` - `0..3` - identifies a unit of measurement (required)
+    * `:value` - the sensed, numerical value (required)
 
   """
 

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.WakeUpNoMoreInformation do
   @moduledoc """
-  This module implements the WAKE_UP_NO_MORE_INFORMATION command of the COMMAND_CLASS_WAKE_UP command class
+  This module implements the WAKE_UP_NO_MORE_INFORMATION command of the
+  COMMAND_CLASS_WAKE_UP command class
 
   Params: - none -
 
