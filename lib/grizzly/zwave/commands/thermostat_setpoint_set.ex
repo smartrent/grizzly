@@ -1,16 +1,15 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
   @moduledoc """
-  This module implements command THERMOSTAT_SETPOINT_SET of the COMMAND_CLASS_THERMOSTAT_SETPOINT command class.
+  This module implements command THERMOSTAT_SETPOINT_SET of the
+  COMMAND_CLASS_THERMOSTAT_SETPOINT command class.
 
-  This command is used to set the target value for a given setpoint type
+  This command is used to set the target value for a given setpoint type.
 
   Params:
 
-    * `:type` - one of :heating | :cooling | :furnace | :dry_air | :moist_air | :auto_changeover (required)
-
-    * `:scale` - temperature scale is used for the setpoint value, one of :celsius or :fahrenheit (required)
-
-    * `:value` - the value of the setpoint
+    * `:type` - the setpoint type (required)
+    * `:scale` - the setpoint scale (required)
+    * `:value` - the value of the setpoint (required)
 
   """
 
@@ -19,7 +18,10 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
-  @type param :: {:type, ThermostatSetpoint.type()} | {:scale, ThermostatSetpoint.scale()}
+  @type param ::
+          {:type, ThermostatSetpoint.type()}
+          | {:scale, ThermostatSetpoint.scale()}
+          | {:value, non_neg_integer()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}

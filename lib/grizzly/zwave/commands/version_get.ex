@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.VersionGet do
   @moduledoc """
-  This module implements command VERSION_GET of command class COMMAND_CLASS_VERSION
+  This module implements command VERSION_GET of command class
+  COMMAND_CLASS_VERSION
 
   Params: - none -
 

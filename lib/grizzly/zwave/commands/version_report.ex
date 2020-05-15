@@ -1,18 +1,18 @@
 defmodule Grizzly.ZWave.Commands.VersionReport do
   @moduledoc """
-  This module implements command VERSION_REPORT of command class COMMAND_CLASS_VERSION
+  This module implements command VERSION_REPORT of command class
+  COMMAND_CLASS_VERSION
 
   Params:
 
-    * `:library_type` - The type of Z-Wave device library is running
-
+    * `:library_type` - The type of Z-Wave device library is running (required)
     * `:protocol_version` - The "version.sub" of the implemented Z-Wave protocol
-
-    * `:firmware_version` - The "version.sub" of the firmware
-
-    * `:hardware_version` - the hardware version - v2
-
-    * `:other_firmware_versions` -  The list of "version.sub" of the other firmware targets - v2
+      (required)
+    * `:firmware_version` - The "version.sub" of the firmware (required)
+    * `:hardware_version` - the hardware version - (optional V1, required V2
+      and above)
+    * `:other_firmware_versions` -  The list of "version.sub" of the other
+      firmware targets (optional V1, required V2 and above)
 
   """
 

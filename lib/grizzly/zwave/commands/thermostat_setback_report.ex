@@ -1,13 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetbackReport do
   @moduledoc """
-   This module implements command THERMOSTAT_SETBACK_REPORT of the COMMAND_CLASS_THERMOSTAT_SETBACK command class.
-   This command is used to report the setback state of the thermostat.
+   This module implements command THERMOSTAT_SETBACK_REPORT of the
+   COMMAND_CLASS_THERMOSTAT_SETBACK command class. This command is used to
+   report the setback state of the thermostat.
 
   Params:
 
-    * `:type` - one of :no_override | :temporary_override | :permanent_override (required)
-
-    * `:state` - one of a number between -12.8 and 12, or :frost_protection | :energy_saving(required)
+    * `:type` - the setback type (required)
+    * `:state` - the setback state (required)
 
   """
 

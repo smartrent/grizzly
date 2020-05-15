@@ -1,6 +1,6 @@
 defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
   @moduledoc """
-  What does this command do??
+  Gets the number of supported user codes
 
   Params:
 
@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
 
-  @type param :: {:supported_users, byte}
+  @type param :: {:supported_users, byte()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}

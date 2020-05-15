@@ -1,8 +1,9 @@
 defmodule Grizzly.ZWave.Commands.ThermostatFanModeSet do
   @moduledoc """
-   This module implement command THERMOSTAT_FAN_MODE_SET of the COMMAND_CLASS_THERMOSTAT_FAN_MODE command class
+   This module implement command THERMOSTAT_FAN_MODE_SET of the
+   COMMAND_CLASS_THERMOSTAT_FAN_MODE command class
 
-  This command is used to set the fan mode
+  This command is used to set the fan mode.
 
   Params:
 

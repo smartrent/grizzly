@@ -9,8 +9,9 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
   still have run excluded the node from the Z-Wave network.
 
   Params:
-    - `:seq_number` - the sequence number for the network command (required)
-    - `:dsk` - the DSK string of the node to delete, please see
+
+    * `:seq_number` - the sequence number for the network command (required)
+    * `:dsk` - the DSK string of the node to delete, please see
       `Grizzly.ZWave.DSK` for more information (required)
   """
 

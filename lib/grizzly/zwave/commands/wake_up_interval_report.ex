@@ -1,12 +1,14 @@
 defmodule Grizzly.ZWave.Commands.WakeUpIntervalReport do
   @moduledoc """
-  This module implements the WAKE_UP_INTERVAL_REPORT command of the COMMAND_CLASS_WAKE_UP command class.
+  This module implements the WAKE_UP_INTERVAL_REPORT command of the
+  COMMAND_CLASS_WAKE_UP command class.
 
   Params:
 
-    * `:seconds` - the time in seconds between Wake Up periods at the sending node
-
+    * `:seconds` - the time in seconds between Wake Up periods at the sending
+      node (required)
     * `:node_id` - the Wake Up destination NodeID configured at the sending node
+      (required)
 
   """
 

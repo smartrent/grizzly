@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.WakeUpIntervalGet do
   @moduledoc """
-  This module implements the WAKE_UP_INTERVAL_GET command of the COMMAND_CLASS_WAKE_UP command class
+  This module implements the WAKE_UP_INTERVAL_GET command of the
+  COMMAND_CLASS_WAKE_UP command class
 
   Params: - none -
 

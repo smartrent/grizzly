@@ -3,7 +3,9 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport do
   This module implements command SENSOR_MULTILEVEL_SUPPORTED_SENSOR_REPORT of the COMMAND_CLASS_SENSOR_MULTILEVEL command class.
   This command is used to advertise the supported Sensor Types by a supporting node.
 
-  Params: * `:sensor_types` - `list  of :temperature or :illuminance or :power or :humidity` etc. (required)
+  Params:
+
+    * `:sensor_types` - `list  of :temperature or :illuminance or :power or :humidity` etc. (required)
 
   """
 
