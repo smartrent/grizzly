@@ -7,14 +7,14 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductTypeTest do
     expected_product_type = %ProductType{
       generic_device_class: :sensor_binary,
       specific_device_class: :routing_sensor_binary,
-      installer_icon: :icon_type_generic_sensor_notification
+      installer_icon: :generic_sensor_notification
     }
 
     assert {:ok, expected_product_type} ==
              ProductType.new(
                :sensor_binary,
                :routing_sensor_binary,
-               :icon_type_generic_sensor_notification
+               :generic_sensor_notification
              )
   end
 
@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductTypeTest do
       expected_product_type_information = %ProductType{
         generic_device_class: :entry_control,
         specific_device_class: :door_lock,
-        installer_icon: :icon_type_generic_entry_control
+        installer_icon: :generic_entry_control
       }
 
       assert {:ok, expected_product_type_information} == ProductType.from_binary(binary)
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductTypeTest do
     product_type = %ProductType{
       generic_device_class: :sensor_binary,
       specific_device_class: :routing_sensor_binary,
-      installer_icon: :icon_type_generic_sensor_notification
+      installer_icon: :generic_sensor_notification
     }
 
     expected_binary = <<0x00, 0x04, 0x20, 0x01, 0x0C, 0x00>>
