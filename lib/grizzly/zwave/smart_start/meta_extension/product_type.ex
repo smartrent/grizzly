@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductType do
   @type t :: %__MODULE__{
           generic_device_class: atom(),
           specific_device_class: atom(),
-          installer_icon: IconType.icon_name()
+          installer_icon: IconType.name()
         }
 
   defstruct generic_device_class: nil, specific_device_class: nil, installer_icon: nil
@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductType do
   * `:unknown_icon_type` - the installer icon type cannot be encoded into its
      byte representation
   """
-  @spec new(atom(), atom(), IconType.icon_name()) ::
+  @spec new(atom(), atom(), IconType.name()) ::
           {:ok, t()}
   def new(generic_device_class, specific_device_class, installer_icon) do
     {:ok,

@@ -199,21 +199,21 @@ defmodule Grizzly.ZWave.IconType do
         end
 
       quote do
-        @type icon_name :: atom()
+        @type name :: atom()
 
         @type icon_integer :: 0x0000..0x2203
 
         @doc """
         Get the icon type from a 16 bit integer
         """
-        @spec from_integer(icon_integer()) :: {:ok, icon_name()} | {:error, :unknown_icon_type}
+        @spec from_integer(icon_integer()) :: {:ok, name()} | {:error, :unknown_icon_type}
         unquote(from_integer)
         def from_integer(_), do: {:error, :unknown_icon_type}
 
         @doc """
         Get the 16 bit integer from the icon type
         """
-        @spec to_integer(icon_name()) :: {:ok, icon_integer()} | {:error, :unknown_icon_type}
+        @spec to_integer(name()) :: {:ok, icon_integer()} | {:error, :unknown_icon_type}
         unquote(to_integer)
         def to_integer(_), do: {:error, :unknown_icon_type}
       end
