@@ -146,6 +146,8 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
   defp encode_low_temperature(true), do: 0x01
 
   defp level_from_byte(level_byte) when level_byte in 0..100, do: {:ok, level_byte}
+  # low battery warning
+  defp level_from_byte(0xFF), do: {:ok, 0}
 
   defp level_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :level, command: :battery_report}}
