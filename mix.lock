@@ -1,8 +1,8 @@
 %{
-  "dialyxir": {:hex, :dialyxir, "1.0.0-rc.6", "78e97d9c0ff1b5521dd68041193891aebebce52fc3b93463c0a6806874557d7d", [:mix], [{:erlex, "~> 0.2.1", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm", "49496d63267bc1a4614ffd5f67c45d9fc3ea62701a6797975bc98bc156d2763f"},
+  "dialyxir": {:hex, :dialyxir, "1.0.0", "6a1fa629f7881a9f5aaf3a78f094b2a51a0357c843871b8bc98824e7342d00a5", [:mix], [{:erlex, ">= 0.2.6", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm", "aeb06588145fac14ca08d8061a142d52753dbc2cf7f0d00fc1013f53f8654654"},
   "earmark": {:hex, :earmark, "1.4.4", "4821b8d05cda507189d51f2caeef370cf1e18ca5d7dfb7d31e9cafe6688106a4", [:mix], [], "hexpm", "1f93aba7340574847c0f609da787f0d79efcab51b044bb6e242cae5aca9d264d"},
   "elixir_make": {:hex, :elixir_make, "0.6.0", "38349f3e29aff4864352084fc736fa7fa0f2995a819a737554f7ebd28b85aaab", [:mix], [], "hexpm", "d522695b93b7f0b4c0fcb2dfe73a6b905b1c301226a5a55cb42e5b14d509e050"},
-  "erlex": {:hex, :erlex, "0.2.2", "cb0e6878fdf86dc63509eaf2233a71fa73fc383c8362c8ff8e8b6f0c2bb7017c", [:mix], [], "hexpm", "423a8f6ac70b77f0001c18adbff2b10413afed6901c2975aa33151a9c1263307"},
+  "erlex": {:hex, :erlex, "0.2.6", "c7987d15e899c7a2f34f5420d2a2ea0d659682c06ac607572df55a43753aa12e", [:mix], [], "hexpm", "2ed2e25711feb44d52b17d2780eabf998452f6efda104877a3881c2f8c0c0c75"},
   "ex_doc": {:hex, :ex_doc, "0.22.0", "fb0495cd70849bc4d7bc716d4e740aebfaddb77bb1074addf357912468c831d6", [:mix], [{:earmark, "~> 1.4", [hex: :earmark, repo: "hexpm", optional: false]}, {:makeup_elixir, "~> 0.14", [hex: :makeup_elixir, repo: "hexpm", optional: false]}], "hexpm", "f9b36237b220c8262d561489967b6a604832593f0dc1fb1608662909457e91aa"},
   "file_system": {:hex, :file_system, "0.2.7", "e6f7f155970975789f26e77b8b8d8ab084c59844d8ecfaf58cbda31c494d14aa", [:mix], [], "hexpm", "b4cfa2d69c7f0b18fd06db222b2398abeef743a72504e6bd7df9c52f171b047f"},
   "makeup": {:hex, :makeup, "1.0.1", "82f332e461dc6c79dbd82fbe2a9c10d48ed07146f0a478286e590c83c52010b5", [:mix], [{:nimble_parsec, "~> 0.5.0", [hex: :nimble_parsec, repo: "hexpm", optional: false]}], "hexpm", "49736fe5b66a08d8575bf5321d716bac5da20c8e6b97714fec2bcd6febcfa1f8"},
