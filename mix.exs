@@ -5,7 +5,7 @@ defmodule Grizzly.MixProject do
     [
       app: :grizzly,
       version: "0.9.0-rc.0",
-      elixir: "~> 1.5",
+      elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
