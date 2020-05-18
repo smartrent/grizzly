@@ -53,8 +53,8 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<meter_type_byte, precision::size(3), scale_byte::size(2), size::size(3),
-          int_value::size(size)-unit(8), _::binary>>
+        <<_::size(3), meter_type_byte::size(5), precision::size(3), scale_byte::size(2),
+          size::size(3), int_value::size(size)-unit(8), _::binary>>
       ) do
     with {:ok, meter_type} <- decode_meter_type(meter_type_byte),
          {:ok, scale} <- decode_meter_scale(scale_byte, meter_type) do
