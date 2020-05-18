@@ -58,7 +58,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductType do
   def from_binary(
         <<0::size(7), 0::size(1), 0x04, gen_dev_class, spec_dev_class, installer_icon::size(16)>>
       ) do
-    {:ok, installer_icon} = IconType.from_integer(installer_icon)
+    {:ok, installer_icon} = IconType.to_name(installer_icon)
     {:ok, generic_class} = DeviceClasses.generic_device_class_from_byte(gen_dev_class)
 
     {:ok, spec_class} =
@@ -90,7 +90,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.ProductType do
       }) do
     gen_byte = DeviceClasses.generic_device_class_to_byte(gdc)
     spec_byte = DeviceClasses.specific_device_class_to_byte(gdc, sdc)
-    {:ok, icon_integer} = IconType.to_integer(icon)
+    {:ok, icon_integer} = IconType.to_value(icon)
     {:ok, <<0x00, 0x04, gen_byte, spec_byte, icon_integer::size(16)>>}
   end
 end
