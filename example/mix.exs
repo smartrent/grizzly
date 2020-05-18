@@ -1,16 +1,18 @@
 defmodule Example.MixProject do
   use Mix.Project
 
+  Mix.target(:rpi3)
+
   @app :example
   @version "0.1.0"
-  @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :x86_64]
+  @all_targets [:rpi3]
 
   def project do
     [
       app: @app,
       version: @version,
       elixir: "~> 1.9",
-      archives: [nerves_bootstrap: "~> 1.6"],
+      archives: [nerves_bootstrap: "~> 1.8"],
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
       aliases: [loadconfig: [&bootstrap/1]],
@@ -39,26 +41,18 @@ defmodule Example.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.5.0", runtime: false},
+      {:nerves, "~> 1.6.0", runtime: false},
       {:shoehorn, "~> 0.6"},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
 
       # Dependencies for all targets except :host
-      {:grizzly, path: "../", targets: @all_targets},
-      {:busybox, "~> 0.1.3", targets: @all_targets},
       {:nerves_runtime, "~> 0.6", targets: @all_targets},
-      {:nerves_init_gadget, "~> 0.4", targets: @all_targets},
+      {:nerves_pack, "~> 0.2", targets: @all_targets},
+      {:grizzly, path: "../", targets: @all_targets},
 
       # Dependencies for specific targets
-      {:nerves_system_rpi, "~> 1.8", runtime: false, targets: :rpi},
-      {:nerves_system_rpi0, "~> 1.8", runtime: false, targets: :rpi0},
-      {:nerves_system_rpi2, "~> 1.8", runtime: false, targets: :rpi2},
-      {:nerves_system_rpi3, "~> 1.8", runtime: false, targets: :rpi3},
-      {:nerves_system_rpi3a, "~> 1.8", runtime: false, targets: :rpi3a},
-      {:nerves_system_rpi4, "~> 1.8", runtime: false, targets: :rpi4},
-      {:nerves_system_bbb, "~> 2.3", runtime: false, targets: :bbb},
-      {:nerves_system_x86_64, "~> 1.8", runtime: false, targets: :x86_64}
+      {:nerves_system_rpi3, "~> 1.11", runtime: false, targets: :rpi3}
     ]
   end
 
