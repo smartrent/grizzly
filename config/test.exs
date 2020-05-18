@@ -7,7 +7,7 @@ config :grizzly,
   },
   runtime: [
     auto_start: false,
-    run_zipgatway_bin: false
+    run_zipgateway_bin: false
   ]
 
 config :logger, level: :error
