@@ -71,7 +71,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
       ProductType.new(
         :sensor_binary,
         :routing_sensor_binary,
-        :icon_type_generic_sensor_notification
+        :generic_sensor_notification
       )
 
     binary = <<0x00, 0x04, 0x20, 0x01, 0x0C, 0x00>>
@@ -147,7 +147,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
         ProductType.new(
           :sensor_binary,
           :routing_sensor_binary,
-          :icon_type_generic_sensor_notification
+          :generic_sensor_notification
         )
 
       product_type_binary = <<0x00, 0x04, 0x20, 0x01, 0x0C, 0x00>>
