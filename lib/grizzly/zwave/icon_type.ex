@@ -184,17 +184,17 @@ defmodule Grizzly.ZWave.IconType do
     ]
 
     defmacro __before_compile__(_) do
-      from_integer =
+      to_name =
         for {integer, name} <- @mappings do
           quote do
-            def from_integer(unquote(integer)), do: {:ok, unquote(name)}
+            def to_name(unquote(integer)), do: {:ok, unquote(name)}
           end
         end
 
-      to_integer =
+      to_value =
         for {integer, name} <- @mappings do
           quote do
-            def to_integer(unquote(name)), do: {:ok, unquote(integer)}
+            def to_value(unquote(name)), do: {:ok, unquote(integer)}
           end
         end
 
@@ -204,18 +204,18 @@ defmodule Grizzly.ZWave.IconType do
         @type value :: 0x0000..0x2203
 
         @doc """
-        Get the icon type from a 16 bit integer
+        Get the icon type's name from a 16-bit integer value
         """
-        @spec from_integer(value()) :: {:ok, name()} | {:error, :unknown_icon_type}
-        unquote(from_integer)
-        def from_integer(_), do: {:error, :unknown_icon_type}
+        @spec to_name(value()) :: {:ok, name()} | {:error, :unknown_icon_type}
+        unquote(to_name)
+        def to_name(_), do: {:error, :unknown_icon_type}
 
         @doc """
-        Get the 16 bit integer from the icon type
+        Get the 16-bit integer value from the icon type's name
         """
-        @spec to_integer(name()) :: {:ok, value()} | {:error, :unknown_icon_type}
-        unquote(to_integer)
-        def to_integer(_), do: {:error, :unknown_icon_type}
+        @spec to_value(name()) :: {:ok, value()} | {:error, :unknown_icon_type}
+        unquote(to_value)
+        def to_value(_), do: {:error, :unknown_icon_type}
       end
     end
   end
