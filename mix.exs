@@ -29,7 +29,7 @@ defmodule Grizzly.MixProject do
 
   defp deps do
     [
-      {:dialyxir, "~> 1.0.0-rc.3", only: [:test, :dev], runtime: false},
+      {:dialyxir, "~> 1.0.0", only: [:test, :dev], runtime: false},
       {:muontrap, "~> 0.4"},
       {:ex_doc, "~> 0.21", only: [:dev, :docs], runtime: false}
     ]
