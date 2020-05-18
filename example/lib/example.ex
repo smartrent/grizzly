@@ -1,148 +1,88 @@
 defmodule Example do
-  @moduledoc """
-  Little self contained examples for working with Z-Wave common devices.
-
-  There are many more commands in Grizzly and Z-Wave then what is
-  represented here, please see `Grizzly`'s documentation for more
-  commands.
-
-  Each device can implement the commands a little different so be
-  sure to refer to the device's user manual for more details about
-  how each command behaves for your particular device.
-  """
-
-  alias Grizzly.CommandClass.{
-    # for working with on/off switches
-    SwitchBinary,
-    # for locking and unlocking door locks
-    DoorLock,
-    # for working with user codes on locks
-    UserCode,
-    # working with the thermostat setpoint
-    ThermostatSetpoint
-  }
+  alias Grizzly.ZWave.Command
 
   def turn_switch_on(switch_id) do
-    with {:ok, switch} <- Grizzly.get_node(switch_id),
-         {:ok, switch} <- Grizzly.Node.connect(switch),
-         :ok <- Grizzly.send_command(switch, SwitchBinary.Set, value: :on) do
-      :ok
-    else
-      error -> error
-    end
+    Grizzly.send_command(switch_id, :switch_binary_set, target_value: :on)
   end
 
   def turn_switch_off(switch_id) do
-    with {:ok, switch} <- Grizzly.get_node(switch_id),
-         {:ok, switch} <- Grizzly.Node.connect(switch),
-         {:ok, switch_state} <- Grizzly.send_command(switch, SwitchBinary.Get) do
-      switch_state
-    else
-      error -> error
+    Grizzly.send_command(switch_id, :switch_binary_set, target_value: :off)
+  end
+
+  def get_switch_state(switch_id) do
+    case Grizzly.send_command(switch_id, :switch_binary_get) do
+      {:ok, command} ->
+        {:ok, Command.param!(command, :target_value)}
     end
   end
 
   def lock_lock(lock_id) do
-    with {:ok, lock} <- Grizzly.get_node(lock_id),
-         {:ok, lock} <- Grizzly.Node.connect(lock),
-         :ok <- Grizzly.send_command(lock, DoorLock.OperationSet, mode: :secured) do
-      :ok
-    else
-      error -> error
-    end
+    Grizzly.send_command(lock_id, :door_lock_operation_set, mode: :unsecured)
   end
 
   def unlock_lock(lock_id) do
-    with {:ok, lock} <- Grizzly.get_node(lock_id),
-         {:ok, lock} <- Grizzly.Node.connect(lock),
-         :ok <- Grizzly.send_command(lock, DoorLock.OperationSet, mode: :unsecured) do
-      :ok
-    else
-      error -> error
-    end
+    Grizzly.send_command(lock_id, :door_lock_operation_get, mode: :secured)
   end
 
-  def set_user_code(node_id) do
-    with {:ok, zw_node} <- Grizzly.get_node(node_id),
-         {:ok, zw_node} <- Grizzly.Node.connect(zw_node),
-         :ok <-
-           Grizzly.send_command(zw_node, UserCode.Set,
-             slot_id: 1,
-             slot_status: :occupied,
-             user_code: [1, 2, 3, 4, 5]
-           ) do
-      :ok
-    else
-      error -> error
-    end
+  # user code is a 4 - 10 digit string: "1234"
+  def set_user_code(lock_id, slot_id, user_code) do
+    params = [
+      user_id: slot_id,
+      user_id_status: :occupied,
+      user_code: user_code
+    ]
+
+    Grizzly.send_command(lock_id, :user_code_set, params)
   end
 
-  def reset_user_code(node_id) do
-    with {:ok, zw_node} <- Grizzly.get_node(node_id),
-         {:ok, zw_node} <- Grizzly.Node.connect(zw_node),
-         :ok <-
-           Grizzly.send_command(zw_node, UserCode.Set,
-             slot_id: 1,
-             slot_status: :available,
-             user_code: [0, 0, 0, 0, 0]
-           ) do
-      :ok
-    else
-      error -> error
-    end
+  def reset_user_code(lock_id, slot_id) do
+    params = [
+      user_id: slot_id,
+      user_id_status: :available,
+      user_code: "0000"
+    ]
+
+    Grizzly.send_command(lock_id, :user_code_set, params)
   end
 
   def get_lock_state(lock_id) do
-    with {:ok, lock} <- Grizzly.get_node(lock_id),
-         {:ok, lock} <- Grizzly.Node.connect(lock),
-         {:ok, lock_state} <- Grizzly.send_command(lock, DoorLock.OperationGet) do
-      lock_state
-    else
-      error -> error
+    case Grizzly.send_command(lock_id, :dor_lock_operation_get) do
+      {:ok, command} ->
+        {:ok, Command.param!(command, :mode)}
     end
   end
 
   def get_thermostat_heating_setpoint(thermostat_id) do
-    with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
-         {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
-         {:ok, heating_setpoint} <-
-           Grizzly.send_command(thermostat, ThermostatSetpoint.Get, type: :heating) do
-      heating_setpoint
-    else
-      error -> error
+    case Grizzly.send_command(thermostat_id, :thermostat_setpoint_get, type: :heating) do
+      {:ok, command} ->
+        {:ok, Command.param!(command, :value)}
     end
   end
 
   def set_thermostat_heating_setpoint(thermostat_id) do
-    with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
-         {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
-         {:ok, heating_setpoint} <-
-           Grizzly.send_command(thermostat, ThermostatSetpoint.Set, type: :heating, value: 78) do
-      heating_setpoint
-    else
-      error -> error
-    end
+    params = [
+      type: :heating,
+      scale: :fahrenheit,
+      value: 78
+    ]
+
+    :ok = Grizzly.send_command(thermostat_id, :thermostat_setpoint_set, params)
   end
 
   def get_thermostat_cooling_setpoint(thermostat_id) do
-    with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
-         {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
-         {:ok, cooling_setpoint} <-
-           Grizzly.send_command(thermostat, ThermostatSetpoint.Get, type: :cooling) do
-      cooling_setpoint
-    else
-      error -> error
+    case Grizzly.send_command(thermostat_id, :thermostat_setpoint_get, type: :cooling) do
+      {:ok, command} ->
+        {:ok, Command.param(command, :value)}
     end
   end
 
   def set_thermostat_cooling_setpoint(thermostat_id) do
-    with {:ok, thermostat} <- Grizzly.get_node(thermostat_id),
-         {:ok, thermostat} <- Grizzly.Node.connect(thermostat),
-         {:ok, cooling_setpoint} <-
-           Grizzly.send_command(thermostat, ThermostatSetpoint.Set, type: :cooling, value: 76) do
-      cooling_setpoint
-    else
-      error -> error
-    end
+    params = [
+      type: :cooling,
+      scale: :fahrenheit,
+      value: 76
+    ]
+
+    :ok = Grizzly.send_command(thermostat_id, :thermostat_setpoint_set, params)
   end
 end

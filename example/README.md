@@ -1,14 +1,6 @@
 # Example
 
-Example firmware that provides common Z-Wave commands to control
-devices.
-
-You will need a compiled binary of `zipgateway` in `./rootfs_overlay/usr/sbin`
-in order for this to work.
-
-The examples in `lib/example.ex` assume devices are already on the Z-Wave
-network and you know their `node_id`. In order to added and remove devices
-see `Grizzly.add_node` and `Grizzly.remove_node` functions.
+**TODO: Add description**
 
 ## Targets
 
