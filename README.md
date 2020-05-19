@@ -10,14 +10,14 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.9.0-rc.0"}
+    {:grizzly, "~> 0.9.0-rc.1"}
   ]
 end
 ```
 
 ## Hardware Requirements
 
-- Z-Wave Bridge Controller 
+- Z-Wave Bridge Controller
     * [Z-Wave 500](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)
     * [Z-Wave 700](https://www.digikey.com/product-detail/en/silicon-labs/SLUSB001A/336-5899-ND/9867108)
 - [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
@@ -25,7 +25,7 @@ end
 
 The `zipgateway` binary allows Grizzly to use Z-Wave over IP or Z/IP. Using the
 `zipgateway` binary provided by Silicon labs allows Grizzly to support the full
-range of Z-Wave features quickly and reliability. Some of the more advanced 
+range of Z-Wave features quickly and reliability. Some of the more advanced
 features like S2 security and smart start are already supported in Grizzly.
 
 See instructions for compiling the `zipgateway` binary.
@@ -96,7 +96,7 @@ iex> Grizzly.send_command(5, :switch_binary_set, target_value: :off)
    `reference` is the one that was given at the time of the call, and the
    `response` one of the two above responses depending on the command that was
    sent.
-  
+
 ### When things go wrong
 
 1. `{:error, :timeout}` - if the command times out for whatever reason
@@ -131,9 +131,9 @@ In most cases this all the configuration you need for the runtime.
 
 ### Advanced Runtime Configuration
 
-By default the Grizzly runtime handle setting the `zipgateway` binary and 
+By default the Grizzly runtime handle setting the `zipgateway` binary and
 generate the correct configuration files or it to run and network correctly.
-The nice things about this default setup is Grizzly leverages OTP to supervise 
+The nice things about this default setup is Grizzly leverages OTP to supervise
 the `zipgateway` binary, and if the binary crashes Grizzly will restart it.
 
 However, there are use cases for needing to manage the `zipgateway` binary
