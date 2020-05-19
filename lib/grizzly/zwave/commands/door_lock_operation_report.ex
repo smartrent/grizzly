@@ -17,6 +17,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     * `:door_state` - the state of the door being open or closed (optional)
     * `:timeout_minutes` - how long the door has been unlocked (required)
     * `:timeout_seconds` - how long the door has been unlocked (required)
+    * `:target_mode` - the target mode of an ongoing transition or of the most recent transition (optional - v4)
+    * `duration` - the estimated remaining time before the target mode is realized (optional - v4)
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -79,6 +81,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
           | {:door_state, door_state()}
           | {:timeout_minutes, timeout_minutes()}
           | {:timeout_seconds, timeout_seconds()}
+          | {:target_mode, DoorLock.mode()}
+          | {:duration, :unknown | non_neg_integer()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
@@ -105,7 +109,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     door_state = Command.param!(command, :door_state)
     timeout_minutes = Command.param!(command, :timeout_minutes)
     timeout_seconds = Command.param!(command, :timeout_seconds)
-
+    target_mode = Command.param(command, :target_mode)
     outside_handles_byte = door_handles_modes_to_byte(outside_door_handles)
     inside_handles_byte = door_handles_modes_to_byte(inside_door_handles)
     door_condition_byte = door_condition_to_byte(latch_position, bolt_position, door_state)
@@ -114,8 +118,18 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
     <<handles_byte>> = <<outside_handles_byte::size(4), inside_handles_byte::size(4)>>
 
-    <<DoorLock.mode_to_byte(mode), handles_byte, door_condition_byte, timeout_minutes_byte,
-      timeout_seconds_byte>>
+    if target_mode == nil do
+      <<DoorLock.mode_to_byte(mode), handles_byte, door_condition_byte, timeout_minutes_byte,
+        timeout_seconds_byte>>
+    else
+      # version 4
+      duration = Command.param!(command, :duration)
+      target_mode_byte = DoorLock.mode_to_byte(target_mode)
+      duration_byte = duration_to_byte(duration)
+
+      <<DoorLock.mode_to_byte(mode), handles_byte, door_condition_byte, timeout_minutes_byte,
+        timeout_seconds_byte, target_mode_byte, duration_byte>>
+    end
   end
 
   @impl true
@@ -143,6 +157,38 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
          door_state: door_state,
          timeout_minutes: timeout_minutes,
          timeout_seconds: timeout_seconds
+       ]}
+    end
+  end
+
+  # Version 4
+  def decode_params(
+        <<mode_byte, outside_handles_int::size(4), inside_handles_int::size(4),
+          door_condition_byte, timeout_minutes, timeout_seconds, target_mode_byte, duration_byte>>
+      ) do
+    outside_handles = door_handles_modes_from_byte(outside_handles_int)
+    inside_handles = door_handles_modes_from_byte(inside_handles_int)
+    latch_position = latch_position_from_byte(door_condition_byte)
+    bolt_position = bolt_position_from_byte(door_condition_byte)
+    door_state = door_state_from_byte(door_condition_byte)
+
+    with {:ok, mode} <- DoorLock.mode_from_byte(mode_byte),
+         {:ok, timeout_minutes} <- timeout_minutes_from_byte(timeout_minutes),
+         {:ok, timeout_seconds} <- timeout_seconds_from_byte(timeout_seconds),
+         {:ok, target_mode} <- DoorLock.mode_from_byte(target_mode_byte),
+         {:ok, duration} <- duration_from_byte(duration_byte) do
+      {:ok,
+       [
+         mode: mode,
+         outside_handles_mode: outside_handles,
+         inside_handles_mode: inside_handles,
+         latch_position: latch_position,
+         bolt_position: bolt_position,
+         door_state: door_state,
+         timeout_minutes: timeout_minutes,
+         timeout_seconds: timeout_seconds,
+         target_mode: target_mode,
+         duration: duration
        ]}
     end
   end
@@ -200,6 +246,10 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   defp timeout_minutes_to_byte(m) when m >= 0 and m <= 0xFC, do: m
   defp timeout_minutes_to_byte(:undefined), do: 0xFE
+
+  defp duration_to_byte(secs) when secs in 0..127, do: secs
+  defp duration_to_byte(secs) when secs in 128..(126 * 60), do: round(secs / 60) + 0x7F
+  defp duration_to_byte(:unknown), do: 0xFE
 
   defp door_handles_modes_from_byte(byte) do
     <<_::size(4), handle_4::size(1), handle_3::size(1), handle_2::size(1), handle_1::size(1)>> =
@@ -260,4 +310,11 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   defp timeout_seconds_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :timeout_second, command: :operation_report}}
+
+  defp duration_from_byte(byte) when byte in 0x00..0x7F, do: {:ok, byte}
+  defp duration_from_byte(byte) when byte in 0x80..0xFD, do: {:ok, (byte - 0x7F) * 60}
+  defp duration_from_byte(0xFE), do: :unknown
+
+  defp duration_from_byte(byte),
+    do: {:error, %DecodeError{value: byte, param: :duration, command: :supervision_report}}
 end
