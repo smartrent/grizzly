@@ -68,7 +68,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16Test do
       assert {:ok, expected_uuid} == UUID16.from_binary(binary)
     end
 
-    test "when representation is 16 ACSII characters" do
+    test "when representation is 16 ASCII characters" do
       binary =
         <<0x06, 0x11, 0x01, ?H, ?e, ?l, ?l, ?o, 0x20, ?E, ?l, ?i, ?x, ?i, ?r, ?!, ?!, ?!, ?!>>
 
@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16Test do
       assert {:ok, expected_uuid} == UUID16.from_binary(binary)
     end
 
-    test "when representation is sn: with with 16 ACSII characters" do
+    test "when representation is sn: with with 16 ASCII characters" do
       binary =
         <<0x06, 0x11, 0x03, ?H, ?e, ?l, ?l, ?o, 0x20, ?E, ?l, ?i, ?x, ?i, ?r, ?!, ?!, ?!, ?!>>
 
