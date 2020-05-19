@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.DSK do
 
   An example of this would be `50285-18819-09924-30691-15973-33711-04005-03623`
   """
-  @type dsk_string :: String.t()
+  @type dsk_string :: <<_::376>>
 
   @typedoc """
   The DSK binary is the elixir binary string form of the DSK
@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.DSK do
   <<196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
   ```
   """
-  @type dsk_binary :: binary()
+  @type dsk_binary :: <<_::128>>
 
   @doc """
   Take a string representation of the DSK and change it into the
