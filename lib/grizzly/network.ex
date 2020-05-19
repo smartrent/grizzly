@@ -5,6 +5,14 @@ defmodule Grizzly.Network do
 
   alias Grizzly.SeqNumber
 
+  @doc """
+  Get a list of node ids from the network
+
+  Just because a node id might be in the list does not mean the node is on the
+  network. A device might have been reset or unpaired from the controller with
+  out the controller knowing. However, in most use cases this shouldn't be an
+  issue.
+  """
   @spec get_node_ids() :: Grizzly.send_command_response()
   def get_node_ids() do
     seq_number = SeqNumber.get_and_inc()
@@ -12,6 +20,11 @@ defmodule Grizzly.Network do
     Grizzly.send_command(1, :node_list_get, seq_number: seq_number)
   end
 
+  @doc """
+  Reset the Z-Wave controller
+
+  This command takes a few seconds to run.
+  """
   @spec reset_controller() :: Grizzly.send_command_response()
   def reset_controller() do
     seq_number = SeqNumber.get_and_inc()
@@ -19,6 +32,9 @@ defmodule Grizzly.Network do
     Grizzly.send_command(1, :default_set, [seq_number: seq_number], timeout: 10_000)
   end
 
+  @doc """
+  Delete a node from the network's provisioning list via the node's DSK
+  """
   @spec delete_node_provisioning(Grizzly.ZWave.DSK.dsk_string()) ::
           Grizzly.send_command_response()
   def delete_node_provisioning(dsk) do
@@ -27,6 +43,9 @@ defmodule Grizzly.Network do
     Grizzly.send_command(1, :node_provisioning_delete, seq_number: seq_number, dsk: dsk)
   end
 
+  @doc """
+  Get the nodes provisioning list information via the node's DSK
+  """
   @spec get_node_provisioning(Grizzly.ZWave.DSK.dsk_string()) ::
           Grizzly.send_command_response()
   def get_node_provisioning(dsk) do
@@ -35,6 +54,9 @@ defmodule Grizzly.Network do
     Grizzly.send_command(1, :node_provisioning_get, seq_number: seq_number, dsk: dsk)
   end
 
+  @doc """
+  A node to the network provisioning list
+  """
   @spec set_node_provisioning(
           Grizzly.ZWave.DSK.dsk_string(),
           [Grizzly.ZWave.SmartStart.MetaExtension.t()]
@@ -51,6 +73,9 @@ defmodule Grizzly.Network do
     )
   end
 
+  @doc """
+  List all the nodes on the provisioning list
+  """
   @spec list_node_provisionings(integer) :: Grizzly.send_command_response()
   def list_node_provisionings(remaining_counter) do
     seq_number = SeqNumber.get_and_inc()
