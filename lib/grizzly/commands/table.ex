@@ -137,7 +137,10 @@ defmodule Grizzly.Commands.Table do
       {:node_provisioning_delete, {Commands.NodeProvisioningDelete, handler: AckResponse}},
       {:node_provisioning_list_iteration_get,
        {Commands.NodeProvisioningListIterationGet,
-        handler: {WaitReport, complete_report: :node_provisioning_list_iteration_report}}}
+        handler: {WaitReport, complete_report: :node_provisioning_list_iteration_report}}},
+      # Supervision
+      {:supervision_get,
+       {Commands.SupervisionGet, handler: {WaitReport, complete_report: :supervision_report}}}
     ]
 
     defmacro __before_compile__(_) do
