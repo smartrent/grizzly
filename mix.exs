@@ -13,7 +13,8 @@ defmodule Grizzly.MixProject do
       dialyzer: dialyzer(),
       description: description(),
       package: package(),
-      docs: docs()
+      docs: docs(),
+      preferred_cli_env: [docs: :docs, "hex.publish": :docs]
     ]
   end
 
@@ -31,7 +32,7 @@ defmodule Grizzly.MixProject do
     [
       {:dialyxir, "~> 1.0.0", only: [:test, :dev], runtime: false},
       {:muontrap, "~> 0.4"},
-      {:ex_doc, "~> 0.21", only: [:dev, :docs], runtime: false}
+      {:ex_doc, "~> 0.21", only: :docs, runtime: false}
     ]
   end
 
