@@ -140,7 +140,10 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :node_provisioning_list_iteration_report}}},
       # Supervision
       {:supervision_get,
-       {Commands.SupervisionGet, handler: {WaitReport, complete_report: :supervision_report}}}
+       {Commands.SupervisionGet, handler: {WaitReport, complete_report: :supervision_report}}},
+      # Sensor binary
+      {:sensor_binary_get,
+       {Commands.SensorBinaryGet, handler: {WaitReport, complete_report: :sensor_binary_report}}}
     ]
 
     defmacro __before_compile__(_) do
