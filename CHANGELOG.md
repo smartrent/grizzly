@@ -1,5 +1,23 @@
 ## Changelog
 
+## v0.9.0-rc.1
+
+Breaking Changes
+  * `Grizzly.ZWave.IconTypes` removed `icon_type` from the atom values of the
+    icon name.
+  * `Grizzly.ZWave.DeciveTypes.icon_name()` ->
+    `Grizzly.ZWave.DeviceTypes.name()`
+  * `Grizzly.ZWave.DeciveTypes.icon_integer()` ->
+    `Grizzly.ZWave.DeviceTypes.value()`
+Enhancements
+  * Doc updates
+  * Internal code quality
+  * Deps updates
+  * Better types around DSKs
+  * CI support for elixir versions 1.8, 1.9, and 1.10
+  * Support all versions of the meter report
+  * Support a low battery report
+
 ## v0.9.0-rc.0
 
 For more detailed guide to the breaking changes and how to upgrade please see
@@ -16,7 +34,7 @@ and resolves all open issues on Grizzly that were reported as bugs.
 * `Grizzly.Packet` module
 * `Grizzly.close_connection`
 * `Grizzly.command_class_versions_known?`
-* `Grizzly.update_command_class_versions` 
+* `Grizzly.update_command_class_versions`
 * `Grizzly.start_learn_mode`
 * `Grizzly.get_command_class_version`
 * `Grizzly.has_command_class`
