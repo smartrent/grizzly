@@ -59,27 +59,33 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
     status = Command.param!(command, :status)
-    listening? = Command.param!(command, :listening?)
-    basic_device_class = Command.param!(command, :basic_device_class)
-    generic_device_class = Command.param!(command, :generic_device_class)
-    specific_device_class = Command.param!(command, :specific_device_class)
-    command_classes = Command.param!(command, :command_classes)
-    secure_command_classes = Command.param!(command, :secure_command_classes)
     seq_number = Command.param!(command, :seq_number)
 
-    # We add 6 to the length of the command classes to account for the 3 device
-    # classes 2 Z-Wave protocol bytes and the node info length byte. See
-    # SDS13784 4.4.8.2 for more details
-    node_info_length = length(command_classes) + length(secure_command_classes) + 6
+    if status == :failed do
+      <<seq_number, encode_status(status), 0x00, node_id, 0x01>>
+    else
+      listening? = Command.param!(command, :listening?)
+      basic_device_class = Command.param!(command, :basic_device_class)
+      generic_device_class = Command.param!(command, :generic_device_class)
+      specific_device_class = Command.param!(command, :specific_device_class)
+      command_classes = Command.param!(command, :command_classes)
+      secure_command_classes = Command.param!(command, :secure_command_classes)
 
-    # TODO: fix opt func bit (after the listening bit)
-    binary =
-      <<seq_number, encode_status(status), 0x00, node_id, node_info_length,
-        encode_listening_bit(listening?), 0x00, basic_device_class, generic_device_class,
-        specific_device_class>> <>
-        :erlang.list_to_binary(command_classes) <> :erlang.list_to_binary(secure_command_classes)
+      # We add 6 to the length of the command classes to account for the 3 device
+      # classes 2 Z-Wave protocol bytes and the node info length byte. See
+      # SDS13784 4.4.8.2 for more details
+      node_info_length = length(command_classes) + length(secure_command_classes) + 6
 
-    maybe_add_version_2_fields(command, binary)
+      # TODO: fix opt func bit (after the listening bit)
+      binary =
+        <<seq_number, encode_status(status), 0x00, node_id, node_info_length,
+          encode_listening_bit(listening?), 0x00, basic_device_class, generic_device_class,
+          specific_device_class>> <>
+          :erlang.list_to_binary(command_classes) <>
+          :erlang.list_to_binary(secure_command_classes)
+
+      maybe_add_version_2_fields(command, binary)
+    end
   end
 
   @impl true
@@ -109,6 +115,21 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        secure_command_classes: []
      ]
      |> maybe_decode_next_versions_fields(security_info)}
+  end
+
+  def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
+    {:ok,
+     [
+       status: decode_status(status_byte),
+       seq_number: seq_number,
+       node_id: node_id,
+       listening?: false,
+       basic_device_class: :unknown,
+       generic_device_class: :unknown,
+       specific_device_class: :unknown,
+       command_classes: [],
+       secure_command_classes: []
+     ]}
   end
 
   @spec encode_status(status()) :: byte()
