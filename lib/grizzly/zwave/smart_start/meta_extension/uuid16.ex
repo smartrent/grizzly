@@ -118,7 +118,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
   defp format_to_byte(:rfc4122, :none), do: 6
 
   defp uuid_to_binary(uuid, :hex) do
-    hex_uuid_to_binary(uuid, <<>>)
+    hex_uuid_to_binary(uuid)
   end
 
   defp uuid_to_binary(uuid, :ascii) do
@@ -133,26 +133,12 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
 
   defp rfc4122_uuid_to_binary(uuid) do
     uuid
-    |> String.split("-")
-    |> Enum.flat_map(&String.split(&1, "", trim: true))
-    |> Enum.chunk_every(2)
-    |> Enum.map(fn digits ->
-      digits
-      |> Enum.join("")
-      |> String.to_integer(16)
-    end)
-    |> :erlang.list_to_binary()
+    |> String.replace("-", "")
+    |> Base.decode16!(case: :mixed)
   end
 
-  defp hex_uuid_to_binary("", binary) do
-    binary
-  end
-
-  defp hex_uuid_to_binary(uuid, binary) do
-    {digit, digits} = String.split_at(uuid, 2)
-    byte = String.to_integer(digit, 16)
-
-    hex_uuid_to_binary(digits, binary <> <<byte>>)
+  defp hex_uuid_to_binary(uuid) do
+    Base.decode16!(uuid, case: :mixed)
   end
 
   defp ascii_uuid_to_binary(uuid_string) do
@@ -162,7 +148,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
   end
 
   defp uuid_as_hex_digits(uuid) do
-    hex_digits_as_string(uuid)
+    Base.encode16(uuid)
   end
 
   defp uuid_as_ascii(uuid) do
@@ -207,7 +193,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
         clock_seq,
         node
       ]
-      |> Enum.map(&hex_digits_as_string/1)
+      |> Enum.map(&Base.encode16/1)
       |> Enum.join("-")
 
     {:ok, formatted}
@@ -215,18 +201,6 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
 
   defp uuid_from_binary(format, uuid) when format in 7..99 do
     uuid_from_binary(0, uuid)
-  end
-
-  defp hex_digits_as_string(binary) do
-    list = :erlang.binary_to_list(binary)
-
-    Enum.reduce(list, "", fn integer, uuid_string ->
-      if integer < 16 do
-        uuid_string <> "0" <> Integer.to_string(integer, 16)
-      else
-        uuid_string <> Integer.to_string(integer, 16)
-      end
-    end)
   end
 
   defp validate_format(format) when format in [:hex, :ascii, :rfc4122], do: :ok
