@@ -173,6 +173,10 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     handle_incoming_command(command, inclusion)
   end
 
+  def handle_info({:grizzly, :send_command, :ok}, inclusion) do
+    {:noreply, inclusion}
+  end
+
   @impl true
   def terminate(:normal, inclusion) do
     :ok = AsyncConnection.stop(inclusion.controller_id)
