@@ -1,5 +1,29 @@
 ## Changelog
 
+## v0.9.0-rc.2
+
+Deprecated
+  * `Grizzly.Node.get_node_info/1` - use `Grizzly.Node.get_info/1` instead
+
+Added
+  * `Grizzly.Node.get_info/1`
+  * `Grizzly.ZWave.CommandClasses.Supervision`
+  * `Grizzly.ZWave.Commands.SupervisionGet`
+  * `Grizzly.ZWave.Commands.SupervisionReport`
+  * `Grizzly.ZWave.CommandClasses.SensorBinary`
+  * `Grizzly.ZWave.Commands.SensorBinaryGet`
+  * `Grizzly.ZWave.Commands.SensorBinaryReport`
+
+Enhancements
+  * Support for `DoorLockOperationReport` >= V3 parsing
+
+Fixes
+  * Bad parsing of `NodAddStatus` `:failed` value
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.9.0-rc.1
 
 Breaking Changes
@@ -9,6 +33,7 @@ Breaking Changes
     `Grizzly.ZWave.DeviceTypes.name()`
   * `Grizzly.ZWave.DeciveTypes.icon_integer()` ->
     `Grizzly.ZWave.DeviceTypes.value()`
+
 Enhancements
   * Doc updates
   * Internal code quality
