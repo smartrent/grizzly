@@ -176,9 +176,9 @@ defmodule Grizzly.Connections.SyncConnection do
           GenServer.reply(waiter, {:queued, ref, queued_seconds})
           %State{state | commands: new_comamnd_list}
 
-        {waiter, {:complete, response, new_comamnd_list}} ->
+        {waiter, {:complete, response, new_command_list}} ->
           GenServer.reply(waiter, response)
-          %State{state | commands: new_comamnd_list}
+          %State{state | commands: new_command_list}
       end
 
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}

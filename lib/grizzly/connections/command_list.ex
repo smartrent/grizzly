@@ -150,38 +150,41 @@ defmodule Grizzly.Connections.CommandList do
   end
 
   defp get_response_for_command(command_list, zip_packet) do
-    Enum.reduce(command_list.commands, {nil, []}, fn {command_runner, _command_waiter, _ref} =
-                                                       command,
-                                                     {_result, new_command_list} ->
-      case CommandRunner.handle_zip_command(command_runner, zip_packet) do
-        # if the command says to continue we put it back into the command list
-        :continue ->
-          {:continue, [command | new_command_list]}
+    Enum.reduce(command_list.commands, {nil, []}, fn
+      # if a command has already completed we don't need to commands anymore, so
+      # we just put this one back into the list in for future incoming commands
+      command, {{:complete, _response, _command} = complete, new_command_list} ->
+        {complete, [command | new_command_list]}
 
-        # if the command says it has a nack_response, we remove it from the command list
-        {:error, :nack_response} ->
-          {{:error, :nack_response, command}, new_command_list}
+      {command_runner, _command_waiter, _ref} = command, {_result, new_command_list} ->
+        case CommandRunner.handle_zip_command(command_runner, zip_packet) do
+          # if the command says to continue we put it back into the command list
+          :continue ->
+            {:continue, [command | new_command_list]}
 
-        # the command is queued put it back into the command list
-        {:queued, reference, seconds} ->
-          {{:queued, reference, seconds, command}, [command | new_command_list]}
+          # if the command says it has a nack_response, we remove it from the command list
+          {:error, :nack_response} ->
+            {{:error, :nack_response, command}, new_command_list}
 
-        {:queued_ping, reference, seconds_left} ->
-          {{:queued_ping, reference, seconds_left, command}, [command | new_command_list]}
+          # the command is queued put it back into the command list
+          {:queued, reference, seconds} ->
+            {{:queued, reference, seconds, command}, [command | new_command_list]}
 
-        # if the queued command is complete don't put it back into the command
-        # list
-        {:queued_complete, reference, result} ->
-          {{:queued_complete, reference, result, command}, new_command_list}
+          {:queued_ping, reference, seconds_left} ->
+            {{:queued_ping, reference, seconds_left, command}, [command | new_command_list]}
 
-        # if the command says to retry we put it back into the command list
-        :retry ->
-          {:retry, command_runner, [command | new_command_list]}
+          # if the queued command is complete don't put it back into the command
+          # list
+          {:queued_complete, reference, result} ->
+            {{:queued_complete, reference, result, command}, new_command_list}
 
-        # if the command says it has a nack_response, we remove it from the command list
-        {:complete, response} ->
-          {{:complete, response, command}, new_command_list}
-      end
+          # if the command says to retry we put it back into the command list
+          :retry ->
+            {:retry, command_runner, [command | new_command_list]}
+
+          {:complete, response} ->
+            {{:complete, response, command}, new_command_list}
+        end
     end)
   end
 
