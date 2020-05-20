@@ -10,13 +10,17 @@ defmodule Grizzly.Node do
 
   @type lifeline_opts :: {:controller_id, ZWave.node_id()} | {:extra_node_ids, [ZWave.node_id()]}
 
+  @deprecated "Use Grizzly.Node.get_info/1 instead"
+  @spec get_node_info(ZWave.node_id()) :: Grizzly.send_command_response()
+  def get_node_info(node_id), do: get_info(node_id)
+
   @doc """
   Get the information for a node by its id
 
   The response to this command is the `NodeInfoCacheReport` command
   """
-  @spec get_node_info(ZWave.node_id()) :: Grizzly.send_command_response()
-  def get_node_info(node_id) do
+  @spec get_info(ZWave.node_id()) :: Grizzly.send_command_response()
+  def get_info(node_id) do
     seq_number = SeqNumber.get_and_inc()
 
     Grizzly.send_command(1, :node_info_cached_get,
