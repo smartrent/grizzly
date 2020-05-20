@@ -183,12 +183,37 @@ SDK](https://www.silabs.com/products/development-tools/software/z-wave/controlle
 from Silicon Labs. You'll need to create an account with them to do this, but
 the download is free.
 
-The default binaries that come with the download will not work by default in
-Nerves system, so you will need to compile the source for your target. The
-source code can be found in the `Source` directory.
+To have Grizzly compile this, you'll need to specify where the source code is.
+The source code can be found in the `Source/usr/local` directory from the download.
 
-This can be tricky and the instructions are a work in progress, so for now
-please contact us if you any troubles.
+```sh
+$ ZIPGATEWAY_SOURCE=/path/to/Source/usr/local mix compile
+```
+
+You can also set this in your `config.exs`:
+
+```elixir
+System.put_env("ZIPGATEWAY_SOURCE", "/path/to/Source/usr/local")
+```
+
+By default, Grizzly checks the `grizzly/src` location for the zipgateway source
+during compilation. You can place a copy there to avoid setting env variables.
+
+You'll need a few dependencies installed for MacOS and Linux compilation:
+
+**MacOS**
+
+```sh
+$ brew install gmake gsed bison flex openssl@1.1
+```
+
+**Linux (Debian)**
+
+```sh
+$ sudo apt install bison flex openssl
+```
+
+Cross-Compilation for Nerves systems is coming soon...
 
 #### Connecting zipgateway to Grizzly
 

@@ -1,0 +1,86 @@
+From ad4373ceabc972745ebcd2f3861908214d250c71 Mon Sep 17 00:00:00 2001
+From: Jon Carstens <jjcarstens@me.com>
+Date: Wed, 20 May 2020 13:27:26 -0600
+Subject: [PATCH] Remove libusb
+
+---
+ CMakeLists.txt         | 12 ++----------
+ src/ZWFirmwareUpdate.c |  8 +-------
+ 2 files changed, 3 insertions(+), 17 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index afbdb61..8cc2af1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,11 +29,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+ 
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
+ 
+-
+-if ( NOT LibUSB_LIBRARIES)
+-   find_package(LibUSB 1.0)
+-endif()
+-
+ if (NOT OPENSSL_LIBRARIES)
+    if( APPLE )
+      find_package(OpenSSL 1.1.0)
+@@ -121,7 +116,6 @@ src/transport/s2_keystore.c
+ src/zwdb.c
+ src/zwpgrmr/crc32.c
+ src/zwpgrmr/linux_serial_interface.c
+-src/zwpgrmr/linux_usb_interface.c
+ src/zwpgrmr/zpg.c
+ src/zwpgrmr/zpgp.c
+ src/provisioning_list.c
+@@ -178,7 +172,6 @@ set(CONTIKI contiki )
+ 
+ include_directories( 
+ ${OPENSSL_INCLUDE_DIRS}
+-${LibUSB_INCLUDE_DIRS}
+ ${LIBS2_INCLUDE_DIRS}
+ ${TS2_INCLUDE_DIRS}
+ Z-Wave/include 
+@@ -250,12 +243,11 @@ ${CONTIKI}/platform/linux/File_eeprom.c
+ add_subdirectory (src/analyzer)
+ 
+ message (STATUS "openssl libraries: ${OPENSSL_LIBRARIES}")
+-message (STATUS "libsusb libraries: ${LibUSB_LIBRARIES}")
+ add_executable(zipgateway ${GW_SRC} ${CONTIKI_SRC} ${TS2_SRC} ${BISON_pvsparser_OUTPUTS} ${FLEX_pvslexer_OUTPUTS})
+ if( APPLE )
+-  target_link_libraries(zipgateway ZWaveAnalyzer ${S2_LIBRARIES} ${OPENSSL_LIBRARIES} ${LibUSB_LIBRARIES})
++  target_link_libraries(zipgateway ZWaveAnalyzer ${S2_LIBRARIES} ${OPENSSL_LIBRARIES})
+ else()
+-  target_link_libraries(zipgateway ZWaveAnalyzer ${S2_LIBRARIES} rt ${OPENSSL_LIBRARIES} ${LibUSB_LIBRARIES})
++  target_link_libraries(zipgateway ZWaveAnalyzer ${S2_LIBRARIES} rt ${OPENSSL_LIBRARIES})
+ endif()
+ 
+ add_custom_target(doc
+diff --git a/src/ZWFirmwareUpdate.c b/src/ZWFirmwareUpdate.c
+index d0d3577..4cdae09 100644
+--- a/src/ZWFirmwareUpdate.c
++++ b/src/ZWFirmwareUpdate.c
+@@ -79,7 +79,6 @@
+ #include "dev/eeprom.h"
+ #include <zpg.h>
+ #include <linux_serial_interface.h>
+-#include <linux_usb_interface.h>
+ #include "eeprom_layout.h"
+ #include "Serialapi.h"
+ #include <stdlib.h>
+@@ -126,12 +125,7 @@ int ZWFirmwareUpdate(unsigned char isAPM)
+   pgmr.con = printf;
+   pgmr.err = printf;
+ try_again:
+-  /* First try USB then Serial */
+-  if (linux_usb_interface.parse_dev_string(&pgmr, "USB"))
+-  {
+-    /*...*/
+-  }
+-  else if (linux_serial_interface.parse_dev_string(&pgmr, cfg.serial_port))
++  if (linux_serial_interface.parse_dev_string(&pgmr, cfg.serial_port))
+   {
+     /*...*/
+   }
+-- 
+2.21.0 (Apple Git-122.2)
+

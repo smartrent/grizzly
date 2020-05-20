@@ -1,0 +1,25 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 246da4d..d6c4c28 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,7 +2,7 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(zipgateway C )
+ include( ExternalProject )
+-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wparentheses -Wno-array-bounds -std=gnu99 -D_DEFAULT_SOURCE")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wparentheses -Wno-array-bounds -std=gnu99 -D_DEFAULT_SOURCE")
+ 
+ # Detect Debug build, below match is case-insensitive
+ if(CMAKE_BUILD_TYPE MATCHES [dD][eE][bB][uU][gG])
+@@ -36,10 +36,10 @@ endif()
+ 
+ if (NOT OPENSSL_LIBRARIES)
+    if( APPLE )
+-     find_package(OpenSSL 1.0.0)
++     find_package(OpenSSL 1.1.0)
+        set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR} )
+    else ()
+-     pkg_search_module(OPENSSL REQUIRED openssl>=1.0.1 )
++     pkg_search_module(OPENSSL REQUIRED openssl>=1.1.0 )
+    endif()
+ endif()

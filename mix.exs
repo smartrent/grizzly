@@ -16,7 +16,11 @@ defmodule Grizzly.MixProject do
       description: description(),
       package: package(),
       docs: docs(),
-      preferred_cli_env: [docs: :docs, "hex.publish": :docs]
+      preferred_cli_env: [docs: :docs, "hex.publish": :docs],
+      compilers: [:elixir_make | Mix.compilers()],
+      make_clean: ["clean"],
+      make_error_message: "",
+      make_targets: ["all"]
     ]
   end
 
@@ -32,6 +36,7 @@ defmodule Grizzly.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.0.0", only: [:test, :dev], runtime: false},
+      {:elixir_make, "~> 0.6", runtime: false},
       {:muontrap, "~> 0.4"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},

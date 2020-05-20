@@ -1,0 +1,48 @@
+From 322a83000eeefeb95b2a984b30623d0c7bb8b3f3 Mon Sep 17 00:00:00 2001
+From: Jon Carstens <jjcarstens@me.com>
+Date: Wed, 20 May 2020 16:23:51 -0600
+Subject: [PATCH] remove udpreply, convert_eeprom, and libpcap
+
+---
+ CMakeLists.txt | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8cc2af1..59947b0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -62,11 +62,11 @@ set(TS2 "${LIBS2}/transport_service")
+ set(TS2_SRC ${TS2}/transport_service2.c ${TS2}/transport2_fsm.c)
+ add_subdirectory( ${LIBS2} libs2 )
+ 
+-enable_testing()
+-if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+-    add_subdirectory( udprelay )
+-endif()
+-add_subdirectory( convert_eeprom )
++# enable_testing()
++# if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
++#     add_subdirectory( udprelay )
++# endif()
++# add_subdirectory( convert_eeprom )
+ 
+ set(GW_SRC
+ src-gen/Secure_learn.c
+@@ -281,10 +281,10 @@ install(FILES WRTpackage/files/ZIPR.x509_1024.pem DESTINATION ${CMAKE_INSTALL_PR
+   GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+ install(FILES WRTpackage/files/ZIPR.key_1024.pem DESTINATION ${CMAKE_INSTALL_PREFIX}/etc PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+   GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+-install(FILES ${CMAKE_BINARY_DIR}/udprelay/udprelay DESTINATION ${CMAKE_INSTALL_PREFIX}/sbin PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+-  GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+-install(FILES ${CMAKE_BINARY_DIR}/convert_eeprom/zgw_convert_eeprom DESTINATION ${CMAKE_INSTALL_PREFIX}/sbin PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+-  GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
++# install(FILES ${CMAKE_BINARY_DIR}/udprelay/udprelay DESTINATION ${CMAKE_INSTALL_PREFIX}/sbin PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
++#   GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
++# install(FILES ${CMAKE_BINARY_DIR}/convert_eeprom/zgw_convert_eeprom DESTINATION ${CMAKE_INSTALL_PREFIX}/sbin PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
++#   GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+ 
+ 
+ install(FILES files/zipgateway.cfg DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
+-- 
+2.21.0 (Apple Git-122.2)
+
