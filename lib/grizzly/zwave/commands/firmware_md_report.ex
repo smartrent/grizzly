@@ -1,6 +1,6 @@
 defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
   @moduledoc """
-  What does this command do??
+  The Firmware Meta Data Report Command is used to advertise the status of the current firmware in the device.
 
   Params:
 

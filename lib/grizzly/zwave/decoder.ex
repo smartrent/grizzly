@@ -78,8 +78,15 @@ defmodule Grizzly.ZWave.Decoder do
       {0x86, 0x13, Commands.CommandClassGet},
       {0x86, 0x14, Commands.CommandClassReport},
       # Firmware Update Metadata
-      {0x7A, 0x01, Commands.FirmwareUpdateMDGet},
+      {0x7A, 0x01, Commands.FirmwareMDGet},
       {0x7A, 0x02, Commands.FirmwareMDReport},
+      {0x7A, 0x03, Commands.FirmwareUpdateMDRequestGet},
+      {0x7A, 0x04, Commands.FirwmareUpdateMDRequestReport},
+      {0x7A, 0x05, Commands.FirwmareUpdateMDGet},
+      {0x7A, 0x06, Commands.FirwmareUpdateMDReport},
+      {0x7A, 0x07, Commands.FirwmareUpdateMDStatusReport},
+      {0x7A, 0x08, Commands.FirmwareUpdateActivationSet},
+      {0x7A, 0x09, Commands.FirmwareUpdateActivationReport},
       # Wake Up
       {0x84, 0x04, Commands.WakeUpIntervalSet},
       {0x84, 0x05, Commands.WakeUpIntervalSet},
