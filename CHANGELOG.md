@@ -1,5 +1,19 @@
 ## Changelog
 
+## v0.9.0-rc.3
+
+Enhancements
+  * Some Z-Wave devices report the wrong value for the switch multilevel
+    report so we added support for those values.
+
+Fixes
+  * When two processes quickly sent the same command to the same device only
+    one process would receive the response
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.9.0-rc.2
 
 Deprecated
