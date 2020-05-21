@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
 
   Params:
 
-    * `:value` - '`:off` or a value betweem 1 and 99
+    * `:value` - '`:off` or a value betweem 1 and 100
     * `:duration` - How long the switch should take to reach target value, 0 -> instantly, 1..127 -> seconds, 128..253 -> minutes, 255 -> unknown (optional v2)
   """
 
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   def encode_value(:off), do: 0x00
-  def encode_value(value) when value in 0..99, do: value
+  def encode_value(value) when value in 0..100, do: value
   def encode_value(:unknown), do: 0xFE
   def encode_value(:previous), do: 0xFF
 
@@ -87,7 +87,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   defp value_from_byte(0x00), do: {:ok, :off}
-  defp value_from_byte(byte) when byte in 0..99, do: {:ok, byte}
+  defp value_from_byte(byte) when byte in 0..100, do: {:ok, byte}
   defp value_from_byte(0xFE), do: {:ok, :unknown}
   # deprecated
   defp value_from_byte(0xFF), do: {:ok, 99}
