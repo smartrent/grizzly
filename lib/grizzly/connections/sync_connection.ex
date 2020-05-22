@@ -30,21 +30,27 @@ defmodule Grizzly.Connections.SyncConnection do
     %{id: __MODULE__, start: {__MODULE__, :start_link, [node_id, opts]}, restart: :transient}
   end
 
-  @spec start_link(Grizzly.node_id(), [opt]) :: GenServer.on_start()
+  @spec start_link(ZWave.node_id(), [opt]) :: GenServer.on_start()
   def start_link(node_id, opts \\ []) do
     name = Connections.make_name(node_id)
     GenServer.start_link(__MODULE__, [node_id, opts], name: name)
   end
 
-  @spec send_command(Grizzly.node_id(), Command.t(), [send_opt()]) ::
+  @spec send_command(ZWave.node_id() | pid(), Command.t(), [send_opt()]) ::
           :ok | {:ok, Command.t()} | {:queued, reference(), Command.delay_seconds()}
   def send_command(node_id, command, opts \\ []) do
     name = Connections.make_name(node_id)
     GenServer.call(name, {:send_command, command, opts}, 140_000)
   end
 
-  def close(node_id) do
-    name = Connections.make_name(node_id)
+  @doc """
+  Close the connection
+  """
+  @spec close(ZWave.node_id() | pid()) :: :ok
+  def close(node_id_or_pid) do
+    name = Connections.make_name(node_id_or_pid)
+    # when stop this process the socket port that is owned
+    # this process gets cleaned up for us.
     GenServer.stop(name, :normal)
   end
 

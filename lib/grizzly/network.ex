@@ -3,7 +3,7 @@ defmodule Grizzly.Network do
   Module for working with the Z-Wave network
   """
 
-  alias Grizzly.SeqNumber
+  alias Grizzly.{Connections, SeqNumber}
 
   @doc """
   Get a list of node ids from the network
@@ -27,6 +27,14 @@ defmodule Grizzly.Network do
   """
   @spec reset_controller() :: Grizzly.send_command_response()
   def reset_controller() do
+    # close all the connections before resetting the controller. It's okay
+    # to blindly close all connections because when we send the command to
+    # the controller Grizzly will automatically reconnect to the controller
+    # at that point in time. We do this because the connections to the Z-Wave
+    # devices are still reachable after being removed and we will still be
+    # sending keep alive messages when we don't need to and will have
+    # unnecessary connections hanging out just taking up resources.
+    :ok = Connections.close_all()
     seq_number = SeqNumber.get_and_inc()
 
     Grizzly.send_command(1, :default_set, [seq_number: seq_number], timeout: 10_000)
