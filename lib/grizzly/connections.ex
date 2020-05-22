@@ -4,6 +4,16 @@ defmodule Grizzly.Connections do
   # This module is helper functions for connections
 
   alias Grizzly.{ConnectionRegistry, ZIPGateway}
+  alias Grizzly.Connections.Supervisor, as: ConnectionsSupervisor
+
+  @doc """
+  Close all the connections current open to the various
+  nodes
+  """
+  @spec close_all() :: :ok
+  def close_all() do
+    ConnectionsSupervisor.close_all_connections()
+  end
 
   def make_name(name), do: ConnectionRegistry.via_name(name)
 
