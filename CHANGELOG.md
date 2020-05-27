@@ -1,5 +1,27 @@
 ## Changelog
 
+## v0.9.0-rc.4
+
+Enhancements
+  * Add `Grizzly.ZWave.Commands.FirmwareMDGet`
+  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet`
+  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport`
+  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport`
+  * Add `Grizzly.ZWave.Commands.FrimwareUpdateMDReport`
+  * Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationSet`
+  * Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationReport`
+  * Remove some dead code
+
+Fixes
+  * When resetting the controller we were not closing the connections to
+    the nodes. This caused some error logging in `zipgateway` and also left
+    open unused resources. This could cause problems later when reconnecting
+    devices to resources that were already in the system.
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.9.0-rc.3
 
 Enhancements
