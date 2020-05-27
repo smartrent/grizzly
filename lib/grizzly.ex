@@ -35,6 +35,7 @@ defmodule Grizzly do
      responded with another command (probably some type of report)
   1. `{:error, :including}` - current the Z-Wave controller is adding or
      removing a device and commands cannot be processed right now
+  1. `{:error, :firmware_updating}` - current the Z-Wave controller is updating firmware and commands cannot be processed right now
   1. `{:error, reason}` - there was some other reason for an error, two
      common ones are: `:timeout` and `:nack_response`
   1. `{:queued, reference, seconds}` - the node is a sleeping node so the
@@ -45,7 +46,7 @@ defmodule Grizzly do
   see the typedoc for `Grizzly.send_command_response()`.
   """
 
-  alias Grizzly.{Connection, Inclusions, Node}
+  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Node}
   alias Grizzly.Commands.Table
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave.Command
@@ -93,7 +94,7 @@ defmodule Grizzly do
   @type send_command_response ::
           :ok
           | {:ok, Command.t()}
-          | {:error, :including | :timeout | :nack_response | any()}
+          | {:error, :including | :updating_firmware | :timeout | :nack_response | any()}
           | {:queued, reference(), non_neg_integer()}
 
   @type seq_number :: non_neg_integer()
@@ -115,15 +116,18 @@ defmodule Grizzly do
   def send_command(node_id, command_name, args \\ [], opts \\ []) do
     # always open a connection. If the connection is already opened this
     # will not establish a new connection
+    including? = Inclusions.inclusion_running?()
+    updating_firmware? = FirmwareUpdates.firmware_update_running?()
 
-    with false <- Inclusions.inclusion_running?(),
+    with false <- including? or updating_firmware?,
          {command_module, default_opts} <- Table.lookup(command_name),
          {:ok, command} <- command_module.new(args),
          {:ok, _} <- Connection.open(node_id) do
       Connection.send_command(node_id, command, Keyword.merge(default_opts, opts))
     else
       true ->
-        {:error, :including}
+        reason = if including?, do: :including, else: :updating_firmware
+        {:error, reason}
 
       {:error, _} = error ->
         error

@@ -10,6 +10,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDReport do
 
     * `:data` - one firmware image fragment (required)
 
+    * `:checksum` - the checksum for the entire command (minus the checksum bytes) (v3 - optional)
+
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -37,13 +39,21 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDReport do
     last_byte = encode_last(Command.param!(command, :last?))
     report_number = Command.param!(command, :report_number)
     data = Command.param!(command, :data)
-    <<last_byte::size(1), report_number::size(15)-integer-unsigned, data::binary>>
+    binary_params = <<last_byte::size(1), report_number::size(15)-integer-unsigned, data::binary>>
+    checksum = Command.param(command, :checksum)
+
+    if checksum == nil do
+      binary_params
+    else
+      binary_params <> <<checksum::size(16)-integer-unsigned>>
+    end
   end
 
   @impl true
   def decode_params(
         <<last_byte::size(1), report_number::size(15)-integer-unsigned, data::binary>>
       ) do
+    # The last 2 bytes of data MAY be a checksum
     {:ok, last?} = decode_last(last_byte)
     {:ok, [last?: last?, report_number: report_number, data: data]}
   end

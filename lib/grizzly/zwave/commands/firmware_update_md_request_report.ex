@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
           | :authenticated_required
           | :excessive_fragment_size
           | :target_not_upgradable
-          | :invalid_harware_version
+          | :invalid_hardware_version
           | :firmware_update_in_progress
           | :insufficient_battery_level
   @type param :: {:status, status}
@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
   def encode_status(:authenticated_required), do: 0x01
   def encode_status(:excessive_fragment_size), do: 0x02
   def encode_status(:target_not_upgradable), do: 0x03
-  def encode_status(:invalid_harware_version), do: 0x04
+  def encode_status(:invalid_hardware_version), do: 0x04
   def encode_status(:firmware_update_in_progress), do: 0x05
   def encode_status(:insufficient_battery_level), do: 0x06
 
@@ -68,7 +68,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
   def decode_status(0x01), do: {:ok, :authenticated_required}
   def decode_status(0x02), do: {:ok, :excessive_fragment_size}
   def decode_status(0x03), do: {:ok, :target_not_upgradable}
-  def decode_status(0x04), do: {:ok, :invalid_harware_version}
+  def decode_status(0x04), do: {:ok, :invalid_hardware_version}
   def decode_status(0x05), do: {:ok, :firmware_update_in_progress}
   def decode_status(0x06), do: {:ok, :insufficient_battery_level}
 

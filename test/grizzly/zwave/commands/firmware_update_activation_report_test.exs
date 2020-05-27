@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
         firmware_id: 2,
         checksum: 3,
         firmware_target: 0,
-        firmware_update_status: :success,
+        status: :success,
         hardware_version: 4
       )
 
@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
     assert Command.param!(command, :firmware_id) == 2
     assert Command.param!(command, :checksum) == 3
     assert Command.param!(command, :firmware_target) == 0
-    assert Command.param!(command, :firmware_update_status) == :success
+    assert Command.param!(command, :status) == :success
     assert Command.param!(command, :hardware_version) == 4
   end
 
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
         firmware_id: 2,
         checksum: 3,
         firmware_target: 0,
-        firmware_update_status: :success
+        status: :success
       )
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0xFF>>
@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
         firmware_id: 2,
         checksum: 3,
         firmware_target: 0,
-        firmware_update_status: :success,
+        status: :success,
         hardware_version: 4
       )
 

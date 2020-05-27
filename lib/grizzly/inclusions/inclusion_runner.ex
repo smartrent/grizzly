@@ -161,11 +161,11 @@ defmodule Grizzly.Inclusions.InclusionRunner do
         {:grizzly, :send_command, {:ok, command}},
         inclusion
       ) do
-    handle_incoming_command(command, inclusion)
+    handle_command(command, inclusion)
   end
 
   def handle_info({:grizzly, :unhandled_command, command}, inclusion) do
-    handle_incoming_command(command, inclusion)
+    handle_command(command, inclusion)
   end
 
   def handle_info({:grizzly, :send_command, :ok}, inclusion) do
@@ -201,7 +201,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     end
   end
 
-  defp handle_incoming_command(command, inclusion) do
+  defp handle_command(command, inclusion) do
     command = get_command(command)
     opts = build_inclusion_opts_for_command(command)
 

@@ -30,6 +30,9 @@ defmodule Grizzly.Application do
       # Supervisor for starting and stopping Z-Wave inclusions
       Grizzly.Inclusions.InclusionRunnerSupervisor,
 
+      # Supervisor for updating firmware
+      Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor,
+
       # Supervisor for running commands
       Grizzly.Commands.CommandRunnerSupervisor,
 
