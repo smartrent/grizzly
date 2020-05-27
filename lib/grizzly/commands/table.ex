@@ -76,13 +76,13 @@ defmodule Grizzly.Commands.Table do
       # Firmware update metadata
       {:firmware_md_get,
        {Commands.FirmwareMDGet, handler: {WaitReport, complete_report: :firmware_md_report}}},
-      {:firwmare_update_md_request_get,
+      {:firmware_update_md_request_get,
        {Commands.FirmwareUpdateMDRequestGet,
         handler: {WaitReport, complete_report: :firmware_update_md_request_report}}},
-      {:firwmare_update_md_get,
+      {:firmware_update_md_get,
        {Commands.FirmwareUpdateMDGet,
         handler: {WaitReport, complete_report: :firmware_update_md_report}}},
-      {:firwmare_update_activation_get,
+      {:firmware_update_activation_get,
        {Commands.FirmwareUpdateActivationSet,
         handler: {WaitReport, complete_report: :firmware_update_activation_report}}},
       # Wake up

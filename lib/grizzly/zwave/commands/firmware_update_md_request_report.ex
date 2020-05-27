@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestReport do
+defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
   @moduledoc """
   This command is used to advertise if the firmware update will be initiated.
 
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :firwmare_update_md_request_report,
+      name: :firmware_update_md_request_report,
       command_byte: 0x04,
       command_class: FirmwareUpdateMD,
       params: params,
@@ -75,5 +75,5 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestReport do
   def decode_status(byte),
     do:
       {:error,
-       %DecodeError{value: byte, param: :status, command: :firwmare_update_md_request_report}}
+       %DecodeError{value: byte, param: :status, command: :firmware_update_md_request_report}}
 end

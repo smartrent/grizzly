@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport do
 
   Params:
 
-    * `:status` the status of the firwmare update
+    * `:status` the status of the firmware update
 
     * `:wait_time` - the time in seconds that is needed before the receiving node again becomes available
   """
