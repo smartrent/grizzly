@@ -34,11 +34,6 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     )
   end
 
-  @spec seq_number(t()) :: Grizzly.seq_number()
-  def seq_number(runner \\ __MODULE__) do
-    GenServer.call(runner, :seq_number)
-  end
-
   @spec add_node(t()) :: :ok
   def add_node(runner \\ __MODULE__) do
     GenServer.call(runner, :add_node)
