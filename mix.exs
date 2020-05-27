@@ -1,10 +1,12 @@
 defmodule Grizzly.MixProject do
   use Mix.Project
 
+  @version "0.9.0-rc.4"
+
   def project do
     [
       app: :grizzly,
-      version: "0.9.0-rc.3",
+      version: @version,
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -56,10 +58,12 @@ defmodule Grizzly.MixProject do
 
   defp docs() do
     [
-      extras: ["README.md"],
+      extras: ["README.md", "CHANGELOG.md"],
       main: "readme",
       logo: "./assets/grizzly-icon-yellow.png",
-      source_url: "https://github.com/smartrent/grizzly"
+      source_ref: "v#{@version}",
+      source_url: "https://github.com/smartrent/grizzly",
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
   end
 
