@@ -85,14 +85,11 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
   end
 
   # v3
-  def decode_params(<<
-        minimum_seconds::size(3)-unit(8),
-        maximum_seconds::size(3)-unit(8),
-        default_seconds::size(3)-unit(8),
-        step_seconds::size(3)-unit(8),
-        0x00::size(7),
-        on_demand_byte::size(1)
-      >>) do
+  def decode_params(
+        <<minimum_seconds::size(3)-unit(8), maximum_seconds::size(3)-unit(8),
+          default_seconds::size(3)-unit(8), step_seconds::size(3)-unit(8), 0x00::size(7),
+          on_demand_byte::size(1)>>
+      ) do
     {:ok,
      [
        minimum_seconds: minimum_seconds,

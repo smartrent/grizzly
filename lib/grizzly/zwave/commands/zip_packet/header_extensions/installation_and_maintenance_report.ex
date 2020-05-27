@@ -1,4 +1,8 @@
 defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaintenanceReport do
+  @moduledoc """
+  The installation and maintenance report for a Z/IP Packet
+  """
+
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.BinaryParser
 
   def from_binary(<<0x03, length, rest::binary>>) do

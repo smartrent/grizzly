@@ -34,7 +34,8 @@ defmodule Grizzly.MixProject do
     [
       {:dialyxir, "~> 1.0.0", only: [:test, :dev], runtime: false},
       {:muontrap, "~> 0.4"},
-      {:ex_doc, "~> 0.21", only: :docs, runtime: false}
+      {:ex_doc, "~> 0.21", only: :docs, runtime: false},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -46,7 +47,7 @@ defmodule Grizzly.MixProject do
   end
 
   defp description do
-    "Z-Wave Z/IP gateway client"
+    "Elixir Z-Wave library"
   end
 
   defp package do
