@@ -1,4 +1,17 @@
 defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
+  @moduledoc """
+  Command to report the security keys requested by an including node if that
+  node is participating in S2 bootstrapping.
+
+  Params:
+
+    * `:seq_number` - the sequence number of the command (required)
+    * `:csa` - if the including node is doing client side authentication
+      (require)
+    * `:requested_keys` - a list of requested security keys see
+      `Grizzly.ZWave.Security` for more information. (required)
+  """
+
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, Security}

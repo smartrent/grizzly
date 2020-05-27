@@ -1,4 +1,8 @@
 defmodule Grizzly.ZWave.SmartStart.MetaExtension do
+  @moduledoc """
+  Meta Extension support for SmartRent devices
+  """
+
   alias Grizzly.ZWave.SmartStart.MetaExtension.{
     AdvancedJoining,
     BootstrappingMode,

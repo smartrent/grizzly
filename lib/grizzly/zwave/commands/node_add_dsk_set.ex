@@ -1,4 +1,16 @@
 defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
+  @moduledoc """
+  Command to set the DSK for a including node
+
+  Params:
+
+    * `:seq_number` - the sequence number for the command (required)
+    * `:accept` - the including controller accepts the inclusion process
+       and should proceed with adding the including node (required)
+    * `input_dsk_length` - the length of the DSK provided (required)
+    * `input_dsk` - the DSK pin for the including node (required)
+  """
+
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave

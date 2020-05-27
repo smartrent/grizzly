@@ -1,4 +1,21 @@
 defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
+  @moduledoc """
+  Command used to grant the security keys to the including node if the
+  including node requested keys.
+
+  This normally only needs to happen during the S2 bootstrapping process.
+
+  Params:
+
+    * `:seq_number` - the sequence number (required)
+    * `:csa` - if the including node requested client side authentication,
+      then setting this to `true` will allow for that node to preform CSA
+      (required)
+    * `:granted_keys` - the keys the including controller is granting to the
+      including device, see `Grizzly.ZWave.Security` for more information
+      (required)
+  """
+
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, Security}

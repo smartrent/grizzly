@@ -113,7 +113,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   end
 
   defp maybe_add_params(event_params_list) do
-    if length(event_params_list) == 0 do
+    if Enum.empty?(event_params_list) do
       <<0x00>>
     else
       :erlang.list_to_binary(event_params_list)

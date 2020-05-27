@@ -1,4 +1,8 @@
 defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatInfo do
+  @moduledoc """
+  Encapsulation format info for a Z/IP Packet
+  """
+
   import Bitwise
 
   @type security ::

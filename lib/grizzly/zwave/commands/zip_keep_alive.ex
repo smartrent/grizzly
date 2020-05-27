@@ -1,4 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
+  @moduledoc """
+  The Z/IP Packet keep alive command
+
+  Params:
+
+    * `:ack_flag` - the flag if the receiving node should acknowledge the
+       keep alive packet or not
+  """
+
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}

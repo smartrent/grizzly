@@ -1,4 +1,10 @@
 defmodule Grizzly.ZWave.Commands.SwitchBinaryGet do
+  @moduledoc """
+  Get the command value of a binary switch
+
+  Params: -none-
+  """
+
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
