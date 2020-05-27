@@ -13,8 +13,13 @@ defmodule GrizzlyTest.Server do
     NodeAddDSKReport,
     NodeAddStatus,
     NodeAddKeysReport,
-    NodeRemoveStatus
+    NodeRemoveStatus,
+    FirmwareUpdateMDRequestReport,
+    FirmwareUpdateMDGet,
+    FirmwareUpdateMDStatusReport
   }
+
+  require Logger
 
   def start(port) do
     GenServer.start(__MODULE__, port, name: __MODULE__)
@@ -44,6 +49,28 @@ defmodule GrizzlyTest.Server do
         # mark as sleeping node
         102 ->
           send_nack_waiting(state.socket, return_port, zip_packet)
+
+        # Node 201 is for testing starting a firmware update and uploading an image
+        201 ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          maybe_send_a_report(state.socket, return_port, zip_packet)
+          # the device asks for image fragments
+          send_firmware_update_md_get_command(state.socket, return_port,
+            number_of_reports: 1,
+            # Change this to be the last fragment
+            report_number: 1
+          )
+
+        202 ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          maybe_send_a_report(state.socket, return_port, zip_packet)
+          # the device asks for image fragments
+          send_firmware_update_md_get_command(state.socket, return_port,
+            number_of_reports: 2,
+            # change this to the before last fragment
+            report_number: 1
+            # TODO only expect an update status report on the last fragment
+          )
 
         # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
         301 ->
@@ -189,6 +216,25 @@ defmodule GrizzlyTest.Server do
     end
   end
 
+  defp send_firmware_update_md_get_command(socket, port,
+         number_of_reports: number_of_reports,
+         report_number: report_number
+       ) do
+    seq_number = SeqNumber.get_and_inc()
+
+    {:ok, command} =
+      FirmwareUpdateMDGet.new(number_of_reports: number_of_reports, report_number: report_number)
+
+    {:ok, out_packet} = ZIPPacket.with_zwave_command(command, seq_number, flag: nil)
+
+    :gen_udp.send(
+      socket,
+      {0, 0, 0, 0},
+      port,
+      ZWave.to_binary(out_packet)
+    )
+  end
+
   def handle_inclusion_packet(socket, port, incoming_zip_packet) do
     encapsulated_command = Command.param!(incoming_zip_packet, :command)
 
@@ -276,6 +322,9 @@ defmodule GrizzlyTest.Server do
   defp expects_a_report(:node_add), do: true
   defp expects_a_report(:node_remove), do: true
   defp expects_a_report(:node_list_get), do: true
+  defp expects_a_report(:firmware_update_md_request_get), do: true
+  defp expects_a_report(:firmware_update_md_report), do: true
+
   defp expects_a_report(_), do: false
 
   defp build_report(zip_packet) do
@@ -326,6 +375,17 @@ defmodule GrizzlyTest.Server do
       seq_number: seq_number,
       node_id: 15,
       status: :done
+    )
+  end
+
+  defp do_build_report(:firmware_update_md_request_get, _zip_packet) do
+    FirmwareUpdateMDRequestReport.new(status: :ok)
+  end
+
+  defp do_build_report(:firmware_update_md_report, _zip_packet) do
+    FirmwareUpdateMDStatusReport.new(
+      status: :successful_restarting,
+      wait_time: 5
     )
   end
 

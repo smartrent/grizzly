@@ -5,6 +5,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
 
   Params:
 
+    * `status` - The status of activating the updated firmware
+
     * `:manufacturer_id` - A unique ID identifying the manufacturer of the device (required)
 
     * `:firmware_id` - A manufacturer SHOULD assign a unique Firmware ID to each existing product variant. (required)
@@ -22,13 +24,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
 
-  @type firmware_update_status :: :invalid_identification | :activation_error | :success
+  @type status :: :invalid_identification | :activation_error | :success
   @type param ::
           {:manufacturer_id, non_neg_integer}
           | {:firmware_id, non_neg_integer}
           | {:checksum, non_neg_integer}
           | {:firmware_target, byte}
-          | {:firmware_update_status, firmware_update_status}
+          | {:status, status}
           | {:hardware_version, byte}
 
   @impl true
@@ -52,21 +54,21 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
     checksum = Command.param!(command, :checksum)
     firmware_target = Command.param!(command, :firmware_target)
 
-    firmware_update_status_byte =
-      Command.param!(command, :firmware_update_status)
-      |> encode_firmware_update_status()
+    status_byte =
+      Command.param!(command, :status)
+      |> encode_status()
 
     hardware_version = Command.param(command, :hardware_version)
 
     if hardware_version == nil do
       <<manufacturer_id::size(2)-integer-unsigned-unit(8),
         firmware_id::size(2)-integer-unsigned-unit(8), checksum::size(2)-integer-unsigned-unit(8),
-        firmware_target, firmware_update_status_byte>>
+        firmware_target, status_byte>>
     else
       # version 5
       <<manufacturer_id::size(2)-integer-unsigned-unit(8),
         firmware_id::size(2)-integer-unsigned-unit(8), checksum::size(2)-integer-unsigned-unit(8),
-        firmware_target, firmware_update_status_byte, hardware_version>>
+        firmware_target, status_byte, hardware_version>>
     end
   end
 
@@ -75,18 +77,18 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
   def decode_params(
         <<manufacturer_id::size(2)-integer-unsigned-unit(8),
           firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          firmware_update_status_byte, hardware_version>>
+          checksum::size(2)-integer-unsigned-unit(8), firmware_target, status_byte,
+          hardware_version>>
       ) do
-    with {:ok, firmware_update_status} <-
-           decode_firmware_update_status(firmware_update_status_byte) do
+    with {:ok, status} <-
+           decode_status(status_byte) do
       {:ok,
        [
          manufacturer_id: manufacturer_id,
          firmware_id: firmware_id,
          firmware_target: firmware_target,
          checksum: checksum,
-         firmware_update_status: firmware_update_status,
+         status: status,
          hardware_version: hardware_version
        ]}
     else
@@ -99,18 +101,17 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
   def decode_params(
         <<manufacturer_id::size(2)-integer-unsigned-unit(8),
           firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          firmware_update_status_byte>>
+          checksum::size(2)-integer-unsigned-unit(8), firmware_target, status_byte>>
       ) do
-    with {:ok, firmware_update_status} <-
-           decode_firmware_update_status(firmware_update_status_byte) do
+    with {:ok, status} <-
+           decode_status(status_byte) do
       {:ok,
        [
          manufacturer_id: manufacturer_id,
          firmware_id: firmware_id,
          firmware_target: firmware_target,
          checksum: checksum,
-         firmware_update_status: firmware_update_status
+         status: status
        ]}
     else
       {:error, %DecodeError{} = error} ->
@@ -118,20 +119,20 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
     end
   end
 
-  defp encode_firmware_update_status(:invalid_identification), do: 0x00
-  defp encode_firmware_update_status(:activation_error), do: 0x01
-  defp encode_firmware_update_status(:success), do: 0xFF
+  defp encode_status(:invalid_identification), do: 0x00
+  defp encode_status(:activation_error), do: 0x01
+  defp encode_status(:success), do: 0xFF
 
-  def decode_firmware_update_status(0x00), do: {:ok, :invalid_identification}
-  def decode_firmware_update_status(0x01), do: {:ok, :activation_error}
-  def decode_firmware_update_status(0x02), do: {:ok, :success}
+  def decode_status(0x00), do: {:ok, :invalid_identification}
+  def decode_status(0x01), do: {:ok, :activation_error}
+  def decode_status(0x02), do: {:ok, :success}
 
-  def decode_firmware_update_status(byte),
+  def decode_status(byte),
     do:
       {:error,
        %DecodeError{
          value: byte,
-         param: :firmware_update_status,
+         param: :status,
          command: :firmware_update_activation_report
        }}
 end

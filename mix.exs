@@ -35,7 +35,8 @@ defmodule Grizzly.MixProject do
       {:dialyxir, "~> 1.0.0", only: [:test, :dev], runtime: false},
       {:muontrap, "~> 0.4"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:crc, "~> 0.10"}
     ]
   end
 
