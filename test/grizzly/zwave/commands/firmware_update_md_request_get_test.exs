@@ -1,12 +1,12 @@
-defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
+defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGetTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGet
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet
   alias Grizzly.ZWave.Command
 
   test "creates the command and validates params" do
     {:ok, command} =
-      FirwmareUpdateMDRequestGet.new(
+      FirmwareUpdateMDRequestGet.new(
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
 
   test "encodes params correctly - v1" do
     {:ok, command} =
-      FirwmareUpdateMDRequestGet.new(
+      FirmwareUpdateMDRequestGet.new(
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3
@@ -34,12 +34,12 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03>>
 
-    assert expected_param_binary == FirwmareUpdateMDRequestGet.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateMDRequestGet.encode_params(command)
   end
 
   test "encodes params correctly - v3" do
     {:ok, command} =
-      FirwmareUpdateMDRequestGet.new(
+      FirmwareUpdateMDRequestGet.new(
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -49,12 +49,12 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0xFF>>
 
-    assert expected_param_binary == FirwmareUpdateMDRequestGet.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateMDRequestGet.encode_params(command)
   end
 
   test "encodes params correctly - v4" do
     {:ok, command} =
-      FirwmareUpdateMDRequestGet.new(
+      FirmwareUpdateMDRequestGet.new(
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -66,12 +66,12 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
     expected_param_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0xFF, 0x00::size(7), 0x01::size(1)>>
 
-    assert expected_param_binary == FirwmareUpdateMDRequestGet.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateMDRequestGet.encode_params(command)
   end
 
   test "encodes params correctly - v5" do
     {:ok, command} =
-      FirwmareUpdateMDRequestGet.new(
+      FirmwareUpdateMDRequestGet.new(
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -84,13 +84,13 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
     expected_param_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0xFF, 0x00::size(7), 0x00::size(1), 0x02>>
 
-    assert expected_param_binary == FirwmareUpdateMDRequestGet.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateMDRequestGet.encode_params(command)
   end
 
   test "decodes params correctly - v1" do
     params_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03>>
 
-    {:ok, params} = FirwmareUpdateMDRequestGet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateMDRequestGet.decode_params(params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -99,7 +99,7 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
   test "decodes params correctly - v3" do
     params_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0xFF>>
 
-    {:ok, params} = FirwmareUpdateMDRequestGet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateMDRequestGet.decode_params(params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -111,7 +111,7 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
     params_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0xFF, 0x00::size(7), 0x01::size(1)>>
 
-    {:ok, params} = FirwmareUpdateMDRequestGet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateMDRequestGet.decode_params(params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -124,7 +124,7 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGetTest do
     params_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0xFF, 0x00::size(7), 0x00::size(1), 0x02>>
 
-    {:ok, params} = FirwmareUpdateMDRequestGet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateMDRequestGet.decode_params(params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3

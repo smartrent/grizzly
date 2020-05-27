@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGet do
+defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
   @moduledoc """
   The Firmware Update Meta Data Request Get Command is used to request that a firmware update be initiated.
 
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.FirwmareUpdateMDRequestGet do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :firwmare_update_md_request_get,
+      name: :firmware_update_md_request_get,
       command_byte: 0x03,
       command_class: FirmwareUpdateMD,
       params: params,
