@@ -1,5 +1,25 @@
 ## Changelog
 
+## v0.9.0
+
+The official `v0.9.0` release!
+
+If you trying to upgrade from `v0.8.x` please see [Grizzly v0.8.0 -> v0.9.0](https://gist.github.com/mattludwigs/b172eaae0831f71df5ab53e2d6066081)
+guide and follow the Changelog from the initial `v0.9.0-rc.0` release.
+
+Changes from the last `rc` are:
+
+Enhancements
+  * Support Erlang 23.0 with Elixir 1.10
+  * Dep updates and tooling enhancements
+
+Fixes
+  * miss spellings of command names
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.9.0-rc.4
 
 Enhancements
@@ -7,7 +27,7 @@ Enhancements
   * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet`
   * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport`
   * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport`
-  * Add `Grizzly.ZWave.Commands.FrimwareUpdateMDReport`
+  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDReport`
   * Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationSet`
   * Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationReport`
   * Remove some dead code
