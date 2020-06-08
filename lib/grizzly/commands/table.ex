@@ -66,6 +66,16 @@ defmodule Grizzly.Commands.Table do
       {:association_get,
        {Commands.AssociationGet,
         handler: {AggregateReport, complete_report: :association_report, aggregate_param: :nodes}}},
+      # Association Group Info
+      {:association_group_name_get,
+       {Commands.AssociationGroupNameGet,
+        handler: {WaitReport, complete_report: :association_group_name_report}}},
+      {:association_group_info_get,
+       {Commands.AssociationGroupInfoGet,
+        handler: {WaitReport, complete_report: :association_group_info_report}}},
+      {:association_group_command_list_get,
+       {Commands.AssociationGroupCommandListGet,
+        handler: {WaitReport, complete_report: :association_group_command_list_report}}},
       # Keep alive
       {:keep_alive, {Commands.ZIPKeepAlive, handler: AckResponse}},
       # Version

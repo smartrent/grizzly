@@ -51,6 +51,13 @@ defmodule Grizzly.ZWave.Decoder do
       # Multi Channel
       {0x60, 0x07, Commands.MultiChannelEndpointGet},
       {0x60, 0x08, Commands.MultiChannelEndpointReport},
+      # Association group info
+      {0x59, 0x01, Commands.AssociationGroupNameGet},
+      {0x59, 0x02, Commands.AssociationGroupNameReport},
+      {0x59, 0x03, Commands.AssociationGroupInfoGet},
+      {0x59, 0x04, Commands.AssociationGroupInfoReport},
+      {0x59, 0x05, Commands.AssociationGroupCommandListGet},
+      {0x59, 0x06, Commands.AssociationGroupCommandListReport},
       # Door Lock
       {0x62, 0x01, Commands.DoorLockOperationSet},
       {0x62, 0x02, Commands.DoorLockOperationGet},
@@ -149,12 +156,24 @@ defmodule Grizzly.ZWave.Decoder do
           end
         end
 
+      command_module =
+        for {command_class_byte, command_byte, command_module} <- @mappings do
+          quote do
+            def command_module(unquote(command_class_byte), unquote(command_byte)),
+              do: {:ok, unquote(command_module)}
+          end
+        end
+
       quote do
         @spec from_binary(binary) :: {:ok, Command.t()} | {:error, DecodeError.t()}
         unquote(from_binary)
 
         # No Operation (0x00) - There is no command byte or args for this command, only the command class byte
         def from_binary(<<0x00>>), do: decode(Commands.NoOperation, [])
+
+        @spec command_module(byte, byte) :: {:ok, module} | {:error, :unsupported_command}
+        unquote(command_module)
+        def command_module(_cc_byte, _c_byte), do: {:error, :unsupported_command}
 
         defp decode(command_impl, params) do
           case command_impl.decode_params(params) do
