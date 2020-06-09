@@ -67,6 +67,7 @@ defmodule Grizzly.ZWave.CommandClasses do
       {0x5D, :antitheft},
       {0x5E, :zwaveplus_info},
       {0x5F, :zip_gateway},
+      {0x60, :multi_channel},
       {0x61, :zip_portal},
       {0x62, :door_lock},
       {0x63, :user_code},
@@ -250,6 +251,7 @@ defmodule Grizzly.ZWave.CommandClasses do
                 | :time
                 | :time_parameters
                 | :geographic_location
+                | :multi_channel
                 | :multi_channel_association
                 | :multi_cmd
                 | :energy_production
