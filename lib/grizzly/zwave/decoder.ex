@@ -48,6 +48,9 @@ defmodule Grizzly.ZWave.Decoder do
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
       {0x52, 0x04, Commands.NodeInfoCacheReport},
+      # Multi Channel
+      {0x60, 0x07, Commands.MultiChannelEndpointGet},
+      {0x60, 0x08, Commands.MultiChannelEndpointReport},
       # Door Lock
       {0x62, 0x01, Commands.DoorLockOperationSet},
       {0x62, 0x02, Commands.DoorLockOperationGet},

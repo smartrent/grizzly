@@ -152,7 +152,11 @@ defmodule Grizzly.Commands.Table do
        {Commands.SupervisionGet, handler: {WaitReport, complete_report: :supervision_report}}},
       # Sensor binary
       {:sensor_binary_get,
-       {Commands.SensorBinaryGet, handler: {WaitReport, complete_report: :sensor_binary_report}}}
+       {Commands.SensorBinaryGet, handler: {WaitReport, complete_report: :sensor_binary_report}}},
+      # Multi Channel
+      {:multi_channel_endpoint_get,
+       {Commands.MultiChannelEndpointGet,
+        handler: {WaitReport, complete_report: :multi_channel_endpoint_report}}}
     ]
 
     defmacro __before_compile__(_) do
