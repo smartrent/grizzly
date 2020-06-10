@@ -13,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     * `:basic_device_class` - the Z-Wave basic device class
     * `:generic_device_class` - the Z-Wave generic device class
     * `:specific_device_class` - the Z-Wave specific device class
-    * `:command_classes` - a list of the command class the device supports
-    * `:secure_command_classes` - a list of the command classes that can be
+    * `:command_classes` - a list of the command class the device supports, tagged by their security level
        used only if the device was included securely
     * `:granted_keys` - the security keys granted during S2 inclusion (optional)
     * `:kex_fail_type` - the error that occurred in the S2 bootstrapping (optional)
@@ -27,6 +26,11 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
 
   @type status :: :done | :failed | :security_failed
 
+  @type tagged_command_classes ::
+          {:non_secure_supported, [CommandClasses.command_class()]}
+          | {:non_secure_controlled, [CommandClasses.command_class()]}
+          | {:secure_supported, [CommandClasses.command_class()]}
+          | {:secure_controlled, [CommandClasses.command_class()]}
   @type param ::
           {:node_id, Grizzly.node_id()}
           | {:status, status()}
@@ -35,8 +39,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:basic_device_class, byte()}
           | {:generic_device_class, byte()}
           | {:specific_device_class, byte()}
-          | {:command_classes, [CommandClasses.command_class()]}
-          | {:secure_command_classes, [byte()]}
+          | {:command_classes, [tagged_command_classes]}
           | {:granted_keys, [Security.key()]}
           | {:kex_fail_type, Security.key_exchange_fail_type()}
 
@@ -69,20 +72,20 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       generic_device_class = Command.param!(command, :generic_device_class)
       specific_device_class = Command.param!(command, :specific_device_class)
       command_classes = Command.param!(command, :command_classes)
-      secure_command_classes = Command.param!(command, :secure_command_classes)
 
       # We add 6 to the length of the command classes to account for the 3 device
-      # classes 2 Z-Wave protocol bytes and the node info length byte. See
-      # SDS13784 4.4.8.2 for more details
-      node_info_length = length(command_classes) + length(secure_command_classes) + 6
+      # classes 2 Z-Wave protocol bytes and the node info length byte.
+      # Also add the number of command classes plus 4 bytes for the separators
+      # See SDS13784 4.4.8.2 for more details
+      node_info_length = 6 + cc_count(command_classes) + 4
 
       # TODO: fix opt func bit (after the listening bit)
       binary =
         <<seq_number, encode_status(status), 0x00, node_id, node_info_length,
-          encode_listening_bit(listening?), 0x00, basic_device_class, generic_device_class,
+          encode_listening_bit(listening?)::size(1), 0x00::size(7), 0x00, basic_device_class,
+          generic_device_class,
           specific_device_class>> <>
-          :erlang.list_to_binary(command_classes) <>
-          :erlang.list_to_binary(secure_command_classes)
+          CommandClasses.command_class_list_to_binary(command_classes)
 
       maybe_add_version_2_fields(command, binary)
     end
@@ -94,12 +97,12 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           _::size(7), _, basic_device_class, generic_device_class, specific_device_class,
           command_classes::binary>>
       ) do
-    # TODO: decode the command classes correctly
+    # TODO: decode the command classes correctly (currently assuming no extended command classes)
     # TODO: decode the device classes correctly
 
-    command_classes_length = node_info_length - 6
+    tagged_command_classes_length = node_info_length - 6
 
-    <<command_classes::size(command_classes_length)-binary, security_info::binary>> =
+    <<tagged_command_classes::size(tagged_command_classes_length)-binary, security_info::binary>> =
       command_classes
 
     {:ok,
@@ -111,8 +114,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        basic_device_class: basic_device_class,
        generic_device_class: generic_device_class,
        specific_device_class: specific_device_class,
-       command_classes: CommandClasses.command_class_list_from_binary(command_classes),
-       secure_command_classes: []
+       command_classes: CommandClasses.command_class_list_from_binary(tagged_command_classes)
      ]
      |> maybe_decode_next_versions_fields(security_info)}
   end
@@ -127,8 +129,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        basic_device_class: :unknown,
        generic_device_class: :unknown,
        specific_device_class: :unknown,
-       command_classes: [],
-       secure_command_classes: []
+       command_classes: []
      ]}
   end
 
@@ -143,7 +144,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   def decode_status(0x09), do: :security_failed
 
   @spec encode_listening_bit(boolean()) :: byte()
-  def encode_listening_bit(true), do: 0x80
+  def encode_listening_bit(true), do: 0x01
   def encode_listening_bit(false), do: 0x00
 
   defp maybe_add_version_2_fields(command, command_bin) do
@@ -188,5 +189,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     kex_failed_type = Security.failed_type_from_byte(kex_failed_type_byte)
 
     params ++ [keys_granted: keys_granted, kex_failed_type: kex_failed_type, input_dsk: dsk]
+  end
+
+  defp cc_count(tagged_command_classes) do
+    tagged_command_classes |> Keyword.values() |> List.flatten() |> length()
   end
 end

@@ -118,8 +118,7 @@ defmodule GrizzlyTest.Server do
         basic_device_class: 0x10,
         generic_device_class: 0x12,
         specific_device_class: 0x15,
-        command_classes: [0x34],
-        secure_command_classes: []
+        command_classes: [0x34]
       )
     end
   end
@@ -301,6 +300,13 @@ defmodule GrizzlyTest.Server do
   defp do_build_report(:node_add, zip_packet) do
     seq_number = Command.param!(zip_packet, :seq_number)
 
+    command_classes = [
+      non_secure_supported: [:basic, :meter],
+      non_secure_controlled: [],
+      secure_supported: [:alarm, :switch_binary],
+      secure_controlled: [:door_lock, :user_code]
+    ]
+
     NodeAddStatus.new(
       seq_number: seq_number,
       node_id: 15,
@@ -309,8 +315,7 @@ defmodule GrizzlyTest.Server do
       basic_device_class: 0x10,
       generic_device_class: 0x12,
       specific_device_class: 0x15,
-      command_classes: [0x34],
-      secure_command_classes: []
+      command_classes: command_classes
     )
   end
 
@@ -332,6 +337,13 @@ defmodule GrizzlyTest.Server do
     encapsulated_command = Command.param!(zip_packet, :command)
     seq_number = Command.param!(zip_packet, :seq_number)
 
+    command_classes = [
+      non_secure_supported: [:basic, :meter],
+      non_secure_controlled: [],
+      secure_supported: [:alarm, :switch_binary],
+      secure_controlled: [:door_lock, :user_code]
+    ]
+
     case Command.param!(encapsulated_command, :input_dsk_length) do
       0 ->
         NodeAddStatus.new(
@@ -342,8 +354,7 @@ defmodule GrizzlyTest.Server do
           basic_device_class: 0x10,
           generic_device_class: 0x12,
           specific_device_class: 0x15,
-          command_classes: [0x34],
-          secure_command_classes: [],
+          command_classes: command_classes,
           keys_granted: [:s2_unauthenticated],
           kex_fail_type: :none
         )
@@ -357,8 +368,7 @@ defmodule GrizzlyTest.Server do
           basic_device_class: 0x10,
           generic_device_class: 0x12,
           specific_device_class: 0x15,
-          command_classes: [0x34],
-          secure_command_classes: [],
+          command_classes: command_classes,
           keys_granted: [:s2_authenticated],
           kex_fail_type: :none
         )
