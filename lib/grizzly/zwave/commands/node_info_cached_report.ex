@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   - `:age` - the age of the cache data. A number that is expressed `2 ^ n`
     minutes (required)
   - `:listening?` - if the node is listening node or sleeping node (required)
-  - `:command_classes` - a list of command classes (optional default empty
+  - `:command_classes` - a list of lists of command classes tagged by security attributes (optional default empty
     list)
   - `:basic_device_class` - the basic device class (required)
   - `:generic_device_class` - the generic device class (required)
@@ -38,13 +38,17 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   """
   @type status :: :ok | :not_responding | :unknown
 
+  @type tagged_command_classes ::
+          {:non_secure_supported, [CommandClasses.command_class()]}
+          | {:non_secure_controlled, [CommandClasses.command_class()]}
+          | {:secure_supported, [CommandClasses.command_class()]}
+          | {:secure_controlled, [CommandClasses.command_class()]}
   @type param ::
           {:seq_number, Grizzly.seq_number()}
           | {:status, status()}
           | {:age, 1..14}
           | {:listening?, boolean()}
-          | {:command_classes, [CommandClasses.command_class()]}
-          | {:secure_command_classes, [CommandClasses.command_class()]}
+          | {:command_classes, [tagged_command_classes]}
           | {:basic_device_class, DeviceClasses.basic_device_class()}
           | {:generic_device_class, DeviceClasses.generic_device_class()}
           | {:specific_device_class, DeviceClasses.specific_device_class()}

@@ -298,37 +298,58 @@ defmodule Grizzly.ZWave.CommandClasses do
   TODO: add more details
   """
   @spec command_class_list_to_binary([command_class()]) :: binary()
-  def command_class_list_to_binary(_command_class_list) do
-    # TODO make this correct (Grizzly.ZWave.CommandClassList module)
-    # to make correct the `CommandClassList` should have 4 fields:
-    # :support, :controlled, :secure_supported, :secure_controlled
-    # we should change `command_class_list_from_binary` to use this
-    # as well
-    <<0>>
+  def command_class_list_to_binary(command_class_list) do
+    non_secure_supported = Keyword.get(command_class_list, :non_secure_supported, [])
+    non_secure_controlled = Keyword.get(command_class_list, :non_secure_controlled, [])
+    secure_supported = Keyword.get(command_class_list, :secure_supported, [])
+    secure_controlled = Keyword.get(command_class_list, :secure_controlled, [])
+    non_secure_supported_bin = for cc <- non_secure_supported, into: <<>>, do: <<to_byte(cc)>>
+    non_secure_controlled_bin = for cc <- non_secure_controlled, into: <<>>, do: <<to_byte(cc)>>
+    secure_supported_bin = for cc <- secure_supported, into: <<>>, do: <<to_byte(cc)>>
+    secure_controlled_bin = for cc <- secure_controlled, into: <<>>, do: <<to_byte(cc)>>
+
+    <<non_secure_supported_bin::binary, 0xEF, non_secure_controlled_bin::binary, 0xF1, 0x00,
+      secure_supported_bin::binary, 0xEF, secure_controlled_bin::binary>>
   end
 
   @doc """
-  Turn the binary representation that is outlined in teh Network-Protocol
+  Turn the binary representation that is outlined in the Network-Protocol specs
   """
   @spec command_class_list_from_binary(binary()) :: [command_class()]
   def command_class_list_from_binary(binary) do
     binary_list = :erlang.binary_to_list(binary)
 
-    Enum.reduce(binary_list, [], fn
-      0xEF, command_classes ->
-        command_classes
+    {_, command_classes} =
+      Enum.reduce(
+        binary_list,
+        {:non_secure_supported,
+         [
+           non_secure_supported: [],
+           non_secure_controlled: [],
+           secure_supported: [],
+           secure_controlled: []
+         ]},
+        fn
+          0xEF, {:non_secure_supported, command_classes} ->
+            {:non_secure_controlled, command_classes}
 
-      0xF1, command_classes ->
-        command_classes
+          0xF1, {:non_secure_controlled, command_classes} ->
+            {:secure_supported_mark, command_classes}
 
-      0x00, command_classes ->
-        command_classes
+          _byte, {:secure_supported_mark, command_classes} ->
+            {:secure_supported, command_classes}
 
-      command_class_byte, command_classes ->
-        # Right now lets fail super hard so we can add support for
-        # new command classes quickly
-        {:ok, command_class} = from_byte(command_class_byte)
-        [command_class | command_classes]
-    end)
+          0xEF, {:secure_supported, command_classes} ->
+            {:secure_controlled, command_classes}
+
+          command_class_byte, {security, command_classes} ->
+            # Right now lets fail super hard so we can add support for
+            # new command classes quickly
+            {:ok, command_class} = from_byte(command_class_byte)
+            {security, Keyword.update(command_classes, security, [], &(&1 ++ [command_class]))}
+        end
+      )
+
+    command_classes
   end
 end
