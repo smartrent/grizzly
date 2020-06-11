@@ -1,4 +1,6 @@
 defmodule Grizzly.ZWave.CommandClasses do
+  require Logger
+
   defmodule Generate do
     @moduledoc false
 
@@ -278,7 +280,11 @@ defmodule Grizzly.ZWave.CommandClasses do
         """
         @spec from_byte(byte()) :: {:ok, command_class()} | {:error, :unsupported_command_class}
         unquote(from_byte)
-        def from_byte(_), do: {:error, :unsupported_command_class}
+
+        def from_byte(byte) do
+          Logger.warn("[Grizzly] Unsupported command class from byte #{byte}")
+          {:error, :unsupported_command_class}
+        end
 
         @doc """
         Get the byte representation of the command class
@@ -333,16 +339,17 @@ defmodule Grizzly.ZWave.CommandClasses do
           0xEF, {:non_secure_supported, command_classes} ->
             {:non_secure_controlled, command_classes}
 
-          0xF1, {:non_secure_controlled, command_classes} ->
-            {:secure_supported_mark, command_classes}
+          0xF1, {_, command_classes} ->
+            {:secure_supported, command_classes}
 
-          _byte, {:secure_supported_mark, command_classes} ->
+          0x00, {_, command_classes} ->
             {:secure_supported, command_classes}
 
           0xEF, {:secure_supported, command_classes} ->
             {:secure_controlled, command_classes}
 
-          command_class_byte, {security, command_classes} ->
+          command_class_byte, {security, command_classes}
+          when command_class_byte not in [0xF1, 0xEF, 0x00] ->
             # Right now lets fail super hard so we can add support for
             # new command classes quickly
             {:ok, command_class} = from_byte(command_class_byte)
