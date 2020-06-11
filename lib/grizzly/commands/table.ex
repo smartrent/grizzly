@@ -89,10 +89,8 @@ defmodule Grizzly.Commands.Table do
       {:firmware_update_md_request_get,
        {Commands.FirmwareUpdateMDRequestGet,
         handler: {WaitReport, complete_report: :firmware_update_md_request_report}}},
-      {:firmware_update_md_get,
-       {Commands.FirmwareUpdateMDGet,
-        handler: {WaitReport, complete_report: :firmware_update_md_report}}},
-      {:firmware_update_activation_get,
+      {:firmware_update_md_report, {Commands.FirmwareUpdateMDReport, handler: AckResponse}},
+      {:firmware_update_activation_set,
        {Commands.FirmwareUpdateActivationSet,
         handler: {WaitReport, complete_report: :firmware_update_activation_report}}},
       # Wake up
