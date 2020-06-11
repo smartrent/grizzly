@@ -1,5 +1,45 @@
 ## Changelog
 
+## v0.10.0
+
+Removed the parameter `:secure_command_classes` from
+`Grizzly.ZWave.Command.NodeInfoCacheReport`. Also updated the param
+`:command_classes` to be a keyword list of the various command classes that
+the node can have.
+
+The fields in the keyword list are:
+  * `:non_secure_supported`
+  * `:non_secure_controlled`
+  * `:secure_supported`
+  * `:secure_controlled`
+
+If you are using `:secure_command_classes` for checking if the device is
+securely added you can update like this:
+
+```elixir
+
+{:ok, node_info} = Grizzly.Node.get_info(10)
+
+Keyword.get(Grizzly.ZWave.Command.param!(node_info, :command_classes), :secure_controlled)
+```
+
+Enhancements
+  * Add `Grizzly.ZWave.Commands.AssociationGroupCommandListGet`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupCommandListReport`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupInfoGet`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupInfoReport`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupNameGet`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupNameReport`
+  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointGet`
+  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointReport`
+
+Fixes
+  * Internal command class name discrepancies
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.9.0
 
 The official `v0.9.0` release!
