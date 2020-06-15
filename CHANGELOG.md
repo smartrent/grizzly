@@ -1,5 +1,15 @@
 ## Changelog
 
+## v.0.10.1
+
+Enhancements
+  * Add `Grizzly.ZWave.Commands.ConfigurationGet`
+  * Add `Grizzly.ZWave.Commands.ConfigurationReport`
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.10.0
 
 Removed the parameter `:secure_command_classes` from
