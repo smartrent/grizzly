@@ -73,6 +73,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x6C, 0x02, Commands.SupervisionReport},
       # Configuration
       {0x70, 0x04, Commands.ConfigurationSet},
+      {0x70, 0x05, Commands.ConfigurationGet},
+      {0x70, 0x06, Commands.ConfigurationReport},
       # Alarm
       {0x71, 0x05, Commands.AlarmReport},
       # Manufacturer Specific
