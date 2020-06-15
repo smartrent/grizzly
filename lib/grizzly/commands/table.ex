@@ -12,7 +12,6 @@ defmodule Grizzly.Commands.Table do
     alias Grizzly.ZWave.Commands
 
     @table [
-      {:configuration_set, {Commands.ConfigurationSet, handler: AckResponse}},
       {:default_set,
        {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}}},
       # Noop
@@ -27,6 +26,10 @@ defmodule Grizzly.Commands.Table do
       {:switch_binary_get,
        {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}},
       {:switch_binary_set, {Commands.SwitchBinarySet, handler: AckResponse}},
+      # Configuration
+      {:configuration_set, {Commands.ConfigurationSet, handler: AckResponse}},
+      {:configuration_get,
+       {Commands.ConfigurationGet, handler: {WaitReport, complete_report: :configuation_report}}},
       # Manufacturer specific
       {:manufacturer_specific_get,
        {Commands.ManufacturerSpecificGet,
