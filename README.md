@@ -111,7 +111,7 @@ and retries that can be passed to see the `Grizzly` module.
 
 ## Grizzly Runtime
 
-The Grizzly runtime is a [module](https://github.com/smartrent/grizzly/blob/master/lib/grizzly/runtime.ex)
+The Grizzly runtime is a [module](https://github.com/smartrent/grizzly/blob/main/lib/grizzly/runtime.ex)
 that manages the set up operations of the Z-Wave IP stack.
 
 ### Z-Wave is Ready
