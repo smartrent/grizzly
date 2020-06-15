@@ -29,7 +29,7 @@ defmodule Grizzly.Commands.Table do
       # Configuration
       {:configuration_set, {Commands.ConfigurationSet, handler: AckResponse}},
       {:configuration_get,
-       {Commands.ConfigurationGet, handler: {WaitReport, complete_report: :configuation_report}}},
+       {Commands.ConfigurationGet, handler: {WaitReport, complete_report: :configuration_report}}},
       # Manufacturer specific
       {:manufacturer_specific_get,
        {Commands.ManufacturerSpecificGet,
