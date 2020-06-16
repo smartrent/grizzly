@@ -237,7 +237,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
   @spec encode_sensor_types([atom]) :: binary
   def encode_sensor_types(sensor_types) do
     for bit_list <- byte_indices(sensor_types) do
-      for bit <- bit_list, into: <<>>, do: <<bit::1>>
+      for bit <- Enum.reverse(bit_list), into: <<>>, do: <<bit::1>>
     end
     |> :binary.list_to_bin()
   end
@@ -256,6 +256,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
 
   defp bit_set_indices(byte) do
     for(<<x::1 <- byte>>, do: x)
+    |> Enum.reverse()
     |> Enum.with_index()
     |> Enum.reduce([], fn {bit, index}, acc ->
       if bit == 1, do: [index | acc], else: acc
