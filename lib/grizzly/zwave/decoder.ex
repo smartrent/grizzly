@@ -35,6 +35,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x34, 0x02, Commands.NodeAddStatus},
       {0x34, 0x03, Commands.NodeRemove},
       {0x34, 0x04, Commands.NodeRemoveStatus},
+      {0x34, 0x07, Commands.FailedNodeRemove},
+      {0x34, 0x08, Commands.FailedNodeRemoveStatus},
       {0x34, 0x11, Commands.NodeAddKeysReport},
       {0x34, 0x12, Commands.NodeAddKeysSet},
       {0x34, 0x13, Commands.NodeAddDSKReport},
