@@ -55,6 +55,9 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :node_info_cache_report}}},
       {:node_remove,
        {Commands.NodeRemove, handler: {WaitReport, complete_report: :node_remove_status}}},
+      {:failed_node_remove,
+       {Commands.FailedNodeRemove,
+        handler: {WaitReport, complete_report: :failed_node_remove_status}}},
       # DSKs
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
       {:node_add_dsk_set, {Commands.NodeAddDSKSet, handler: AckResponse}},

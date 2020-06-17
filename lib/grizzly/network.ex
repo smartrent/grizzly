@@ -3,6 +3,7 @@ defmodule Grizzly.Network do
   Module for working with the Z-Wave network
   """
 
+  alias Grizzly.ZWave
   alias Grizzly.{Connections, SeqNumber}
 
   @doc """
@@ -94,5 +95,16 @@ defmodule Grizzly.Network do
       seq_number: seq_number,
       remaining_counter: remaining_counter
     )
+  end
+
+  @doc """
+  Remove a (presumably) failed node
+  """
+  @spec remove_failed_node(ZWave.node_id()) ::
+          Grizzly.send_command_response()
+  def remove_failed_node(node_id) do
+    seq_number = SeqNumber.get_and_inc()
+
+    Grizzly.send_command(1, :failed_node_remove, seq_number: seq_number, node_id: node_id)
   end
 end
