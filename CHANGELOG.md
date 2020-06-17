@@ -1,5 +1,19 @@
 ## Changelog
 
+## v.0.10.2
+
+Enhancements
+  * Add `Grizzly.ZWave.Commands.FailedNodeRemove`
+  * Add `Grizzly.ZWave.Commands.FailedNodeRemoveStatus`
+
+Fixes
+  * Sensor types returned from the support sensors report
+  * Broken link in docs
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v.0.10.1
 
 Enhancements
