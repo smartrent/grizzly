@@ -172,6 +172,15 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     {:noreply, inclusion}
   end
 
+  def handle_info({:grizzly, :send_command, {:error, :timeout, _command_ref}}, inclusion) do
+    respond_to_handler(
+      format_handler_spec(inclusion.handler),
+      {:error, :timeout, inclusion.state}
+    )
+
+    {:noreply, inclusion}
+  end
+
   @impl true
   def terminate(:normal, inclusion) do
     :ok = AsyncConnection.stop(inclusion.controller_id)
@@ -213,6 +222,13 @@ defmodule Grizzly.Inclusions.InclusionRunner do
 
   defp respond_to_handler(handler, command) when is_pid(handler) do
     send(handler, {:grizzly, :inclusion, command})
+  end
+
+  defp respond_to_handler(
+         {handler_module, handler_opts},
+         {:error, _reason, inclusion_state}
+       ) do
+    spawn_link(fn -> handler_module.handle_timeout(inclusion_state, handler_opts) end)
   end
 
   defp respond_to_handler({handler_module, handler_opts}, command) do

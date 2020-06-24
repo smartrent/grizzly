@@ -8,7 +8,7 @@ defmodule Grizzly.InclusionHandler do
   out of the box.
 
   When you initialize an inclusion process you can pass the `:handler` option
-  to the function which can either be the a `pid` (defaults to caller pid) or a
+  to the command-handling function which can either be the a `pid` (defaults to caller pid) or a
   module that implements this behaviour.
 
   These reports this callback function will want to handle are:
@@ -20,9 +20,14 @@ defmodule Grizzly.InclusionHandler do
 
   If you are not handling S2 devices the last two can be ignored until you are
   ready to provide support them.
+
+   The timeout-handling function will want to handle timeouts, particularly on state :dsk_requested,
+   if you are handling S2-authenticated devices.
+
   """
 
   alias Grizzly.ZWave.Command
 
   @callback handle_command(Command.t(), keyword()) :: :ok
+  @callback handle_timeout(atom, keyword()) :: :ok
 end

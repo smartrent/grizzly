@@ -238,7 +238,7 @@ defmodule Grizzly.Inclusions do
   """
   @spec add_node_stop() :: :ok
   def add_node_stop() do
-    InclusionRunner.add_node(InclusionRunner)
+    InclusionRunner.add_node_stop(InclusionRunner)
   end
 
   @doc """
@@ -247,6 +247,14 @@ defmodule Grizzly.Inclusions do
   @spec remove_node_stop() :: :ok
   def remove_node_stop() do
     InclusionRunner.remove_node_stop(InclusionRunner)
+  end
+
+  @doc """
+  Stop the inclusion runner
+  """
+  @spec stop :: :ok
+  def stop() do
+    InclusionRunner.stop(InclusionRunner)
   end
 
   @doc """
