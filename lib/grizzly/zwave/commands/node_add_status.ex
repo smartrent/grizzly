@@ -95,15 +95,22 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   def decode_params(
         <<seq_number, status_byte, _reserved, node_id, node_info_length, listening?::size(1),
           _::size(7), _, basic_device_class, generic_device_class, specific_device_class,
-          command_classes::binary>>
+          command_classes_bin::binary>>
       ) do
     # TODO: decode the command classes correctly (currently assuming no extended command classes)
     # TODO: decode the device classes correctly
 
     tagged_command_classes_length = node_info_length - 6
 
-    <<tagged_command_classes::size(tagged_command_classes_length)-binary, security_info::binary>> =
-      command_classes
+    {command_classes, security_info} =
+      case command_classes_bin do
+        <<>> ->
+          {[], ""}
+
+        <<tagged_command_classes::size(tagged_command_classes_length)-binary,
+          security_info::binary>> ->
+          {CommandClasses.command_class_list_from_binary(tagged_command_classes), security_info}
+      end
 
     {:ok,
      [
@@ -114,7 +121,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        basic_device_class: basic_device_class,
        generic_device_class: generic_device_class,
        specific_device_class: specific_device_class,
-       command_classes: CommandClasses.command_class_list_from_binary(tagged_command_classes)
+       command_classes: command_classes
      ]
      |> maybe_decode_next_versions_fields(security_info)}
   end
