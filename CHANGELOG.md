@@ -1,5 +1,23 @@
 ## Changelog
 
+## v0.10.3
+  
+Enhancements
+  * Add `handle_timeout/2` to the `Grizzly.InclusionHandler` behaviour. This
+    allows for handling when an inclusion process timesout.
+  * Add `Grizzly.Inclusions.stop/0` force stop any type of inclusion process.
+  * Add `Grizzly.FirmwareUpdates` module for updating the Z-Wave firmware on
+    Z-Wave hardware
+
+Fixes
+  * not parsing command classes correctly on `Grizzly.ZWave.Commands.NodeAddStatus`
+  * Not stopping an inclusion process correctly when calling
+    `Grizzly.Inclusions.add_node_stop/0`
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v.0.10.2
 
 Enhancements
