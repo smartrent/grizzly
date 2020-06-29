@@ -1,4 +1,9 @@
 defmodule Grizzly.ZWave.Notifications do
+  alias Grizzly.ZWave.Commands.UserCodeReport
+  alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.{Decoder, DecodeError}
+  require Logger
+
   defmodule Generate do
     @moduledoc false
     @table [
@@ -157,4 +162,47 @@ defmodule Grizzly.ZWave.Notifications do
   @type zwave_alarm_status :: :deactivate | :activate
 
   @before_compile Generate
+
+  def encode_event_params(_zwave_type, _zwave_event, []), do: <<>>
+
+  def encode_event_params(:access_control, zwave_event, event_params_list)
+      when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
+    {:ok, user_code_report} = UserCodeReport.new(event_params_list)
+
+    <<UserCode.byte(), user_code_report.command_byte>> <>
+      UserCodeReport.encode_params(user_code_report)
+  end
+
+  def encode_event_params(zwave_type, zwave_event, event_params) do
+    Logger.info(
+      "[Grizzly] Encoding not implemented for event params #{inspect(event_params)} for zwave_type #{
+        inspect(zwave_type)
+      } and zwave_event #{inspect(zwave_event)}"
+    )
+
+    <<>>
+  end
+
+  def decode_event_params(_zwave_type, _zwave_event, <<>>), do: {:ok, []}
+
+  def decode_event_params(:access_control, zwave_event, params_binary)
+      when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
+    with {:ok, user_code_report} <- Decoder.from_binary(params_binary) do
+      {:ok, user_code_report.params}
+    else
+      {:error, %DecodeError{}} = decode_error ->
+        Logger.warn("[Grizzly] Failed to decode UserCodeReport from #{inspect(params_binary)}")
+        decode_error
+    end
+  end
+
+  def decode_event_params(zwave_type, zwave_event, params_binary) do
+    Logger.info(
+      "Decoding not implemented for event params #{inspect(params_binary)} for zwave_type #{
+        inspect(zwave_type)
+      } and zwave_event #{inspect(zwave_event)}"
+    )
+
+    {:ok, []}
+  end
 end
