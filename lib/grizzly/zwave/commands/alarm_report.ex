@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     * `:zwave_status` - if the device status is active or deactive (v2)
     * `:zwave_type` - part of `Grizzly.ZWave.Notifications` spec (v2)
     * `:zwave_event` - part of the `Grizzly.ZWave.Notifications` spec (v2)
-    * `:event_parameters` - additional parameters for the event, see user
+    * `:event_parameters` - additional parameters for the event as keyword list, see user
       manual for more information (v2, optional, default `[]`)
   """
 
@@ -65,10 +65,12 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
   def decode_params(
         <<type, level, zensor_node_id, zwave_status, zwave_type_byte, zwave_event_byte,
-          _params_length, params::binary>>
+          params_length, event_params::binary-size(params_length), _rest::binary>>
       ) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
-         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte) do
+         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
+         {:ok, event_parameters} <-
+           Notifications.decode_event_params(zwave_type, zwave_event, event_params) do
       {:ok,
        [
          type: type,
@@ -77,7 +79,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
          zwave_status: zwave_status,
          zwave_type: zwave_type,
          zwave_event: zwave_event,
-         event_parameters: params_from_binary(params)
+         event_parameters: event_parameters
        ]}
     else
       {:error, :invalid_type_byte} ->
@@ -86,6 +88,9 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
       {:error, :invalid_event_byte} ->
         {:error,
          %DecodeError{value: zwave_event_byte, param: :zwave_event, command: :alarm_report}}
+
+      error ->
+        error
     end
   end
 
@@ -104,24 +109,21 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     zwave_type = Command.param!(command, :zwave_type)
     zwave_event = Command.param!(command, :zwave_event)
     event_params = Command.param!(command, :event_parameters)
-    params_length = length(event_params)
+
+    encoded_event_params =
+      Notifications.encode_event_params(zwave_type, zwave_event, event_params)
+
+    params_length = byte_size(encoded_event_params)
 
     <<type, level, zensor_node_id, zwave_status, Notifications.type_to_byte(zwave_type),
       Notifications.event_to_byte(zwave_type, zwave_event),
       params_length>> <>
-      maybe_add_params(event_params)
+      encoded_event_params
   end
 
-  defp maybe_add_params(event_params_list) do
-    if Enum.empty?(event_params_list) do
-      <<0x00>>
-    else
-      :erlang.list_to_binary(event_params_list)
-    end
-  end
-
-  defp params_from_binary(<<0>>), do: []
-  defp params_from_binary(params_bin), do: :erlang.binary_to_list(params_bin)
+  # TODO - Actually translate into report commands
+  # defp params_from_binary(<<0>>), do: []
+  # defp params_from_binary(params_bin), do: :erlang.binary_to_list(params_bin)
 
   defp build_params(params) do
     if Keyword.has_key?(params, :zwave_type) do

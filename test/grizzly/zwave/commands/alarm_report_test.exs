@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
           zwave_type: :access_control
         )
 
-      assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x00, 0x00>> ==
+      assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x00>> ==
                AlarmReport.encode_params(command)
     end
 
@@ -80,12 +80,12 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
           type: 0x10,
           level: 0x25,
           zwave_status: 0x00,
-          zwave_event: :manual_unlock_operation,
+          zwave_event: :keypad_unlock_operation,
           zwave_type: :access_control,
-          event_parameters: [0x01, 0x02]
+          event_parameters: [user_id: 251, user_id_status: :occupied, user_code: ""]
         )
 
-      assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x02, 0x01, 0x02>> ==
+      assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x04, 0x63, 0x03, 0xFB, 0x01>> ==
                AlarmReport.encode_params(command)
     end
   end
@@ -113,7 +113,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
     end
 
     test "v2 with event params" do
-      binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x04, 0x00, 0x01, 0x02, 0x03>>
+      binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x04, 0x63, 0x03, 0xFB, 0x01>>
 
       {:ok, params} = AlarmReport.decode_params(binary)
 
@@ -121,9 +121,14 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
       assert Keyword.fetch!(params, :level) == 0x25
       assert Keyword.fetch!(params, :zwave_status) == 0x00
       assert Keyword.fetch!(params, :zensor_net_node_id) == 0x00
-      assert Keyword.fetch!(params, :zwave_event) == :manual_unlock_operation
+      assert Keyword.fetch!(params, :zwave_event) == :keypad_unlock_operation
       assert Keyword.fetch!(params, :zwave_type) == :access_control
-      assert Keyword.fetch!(params, :event_parameters) == [0x00, 0x01, 0x02, 0x03]
+
+      assert Keyword.fetch!(params, :event_parameters) == [
+               user_id: 251,
+               user_id_status: :occupied,
+               user_code: ""
+             ]
     end
   end
 end
