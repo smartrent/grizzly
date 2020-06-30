@@ -60,6 +60,9 @@ defmodule Grizzly.ZWave.Decoder do
       {0x59, 0x04, Commands.AssociationGroupInfoReport},
       {0x59, 0x05, Commands.AssociationGroupCommandListGet},
       {0x59, 0x06, Commands.AssociationGroupCommandListReport},
+      # Z/IP Gateway
+      {0x5F, 0x0C, Commands.ApplicationNodeInfoGet},
+      {0x5F, 0x0D, Commands.ApplicationNodeInfoReport},
       # Door Lock
       {0x62, 0x01, Commands.DoorLockOperationSet},
       {0x62, 0x02, Commands.DoorLockOperationGet},

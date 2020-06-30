@@ -170,7 +170,10 @@ defmodule Grizzly.Commands.Table do
       # Multi Channel
       {:multi_channel_endpoint_get,
        {Commands.MultiChannelEndpointGet,
-        handler: {WaitReport, complete_report: :multi_channel_endpoint_report}}}
+        handler: {WaitReport, complete_report: :multi_channel_endpoint_report}}},
+      {:application_node_info_get,
+       {Commands.ApplicationNodeInfoGet,
+        handler: {WaitReport, complete_report: :application_node_info_report}}}
     ]
 
     defmacro __before_compile__(_) do
