@@ -1,6 +1,6 @@
 defmodule Grizzly.ZWave.Notifications do
-  alias Grizzly.ZWave.Commands.UserCodeReport
-  alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.Commands.{UserCodeReport, NodeLocationReport}
+  alias Grizzly.ZWave.CommandClasses.{UserCode, NodeNaming}
   alias Grizzly.ZWave.{Decoder, DecodeError}
   require Logger
 
@@ -20,9 +20,9 @@ defmodule Grizzly.ZWave.Notifications do
       {0x01, :smoke_alarm, 0x08, :maintenance_required_dust_in_device},
       # Water (0x05)
       {0x05, :water, 0x00, :state_idle},
-      {0x05, :water, 0x01, :water_leak_detected_known_location},
+      {0x05, :water, 0x01, :water_leak_detected_location_provided},
       {0x05, :water, 0x02, :water_leak_detected},
-      {0x05, :water, 0x03, :water_level_dropped_known_location},
+      {0x05, :water, 0x03, :water_level_dropped_location_provided},
       {0x05, :water, 0x04, :water_level_dropped},
       {0x05, :water, 0x05, :replace_water_filter},
       {0x05, :water, 0x06, :water_flow_alarm},
@@ -81,8 +81,8 @@ defmodule Grizzly.ZWave.Notifications do
       {0x07, :home_security, 0x04, :tampering_invalid_code},
       {0x07, :home_security, 0x05, :glass_breakage_location_provided},
       {0x07, :home_security, 0x06, :glass_breakage},
-      {0x07, :home_security, 0x07, :motion_detection},
-      {0x07, :home_security, 0x08, :motion_detection_location_provided},
+      {0x07, :home_security, 0x07, :motion_detection_location_provided},
+      {0x07, :home_security, 0x08, :motion_detection},
       {0x07, :home_security, 0x09, :tampering_product_moved},
       {0x07, :home_security, 0x0A, :impact_detected},
       {0x07, :home_security, 0x0B, :magnetic_field_interface_detected},
@@ -173,6 +173,36 @@ defmodule Grizzly.ZWave.Notifications do
       UserCodeReport.encode_params(user_code_report)
   end
 
+  def encode_event_params(:home_security, zwave_event, event_params_list)
+      when zwave_event in [
+             :intrusion_location_provided,
+             :glass_breakage_location_provided,
+             :motion_detection_location_provided
+           ] do
+    {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
+
+    <<NodeNaming.byte(), node_location_report.command_byte>> <>
+      NodeLocationReport.encode_params(node_location_report)
+  end
+
+  def encode_event_params(:smoke_alarm, :smoke_detected_location_provided, event_params_list) do
+    {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
+
+    <<NodeNaming.byte(), node_location_report.command_byte>> <>
+      NodeLocationReport.encode_params(node_location_report)
+  end
+
+  def encode_event_params(:water, zwave_event, event_params_list)
+      when zwave_event in [
+             :water_leak_detected_location_provided,
+             :water_level_droppped_location_provided
+           ] do
+    {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
+
+    <<NodeNaming.byte(), node_location_report.command_byte>> <>
+      NodeLocationReport.encode_params(node_location_report)
+  end
+
   def encode_event_params(zwave_type, zwave_event, event_params) do
     Logger.info(
       "[Grizzly] Encoding not implemented for event params #{inspect(event_params)} for zwave_type #{
@@ -183,7 +213,13 @@ defmodule Grizzly.ZWave.Notifications do
     <<>>
   end
 
-  def decode_event_params(_zwave_type, _zwave_event, <<>>), do: {:ok, []}
+  def decode_event_params(zwave_type, zwave_event, <<>>) do
+    Logger.info(
+      "[Grizzly] No event parameters for #{inspect(zwave_type)} #{inspect(zwave_event)}"
+    )
+
+    {:ok, []}
+  end
 
   def decode_event_params(:access_control, zwave_event, params_binary)
       when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
@@ -192,6 +228,54 @@ defmodule Grizzly.ZWave.Notifications do
     else
       {:error, %DecodeError{}} = decode_error ->
         Logger.warn("[Grizzly] Failed to decode UserCodeReport from #{inspect(params_binary)}")
+        decode_error
+    end
+  end
+
+  def decode_event_params(:home_security, zwave_event, params_binary)
+      when zwave_event in [
+             :intrusion_location_provided,
+             :glass_breakage_location_provided,
+             :motion_detection_location_provided
+           ] do
+    with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
+      {:ok, node_location_report.params}
+    else
+      {:error, %DecodeError{}} = decode_error ->
+        Logger.warn(
+          "[Grizzly] Failed to decode NodeLocationReport from #{inspect(params_binary)}"
+        )
+
+        decode_error
+    end
+  end
+
+  def decode_event_params(:water, zwave_event, params_binary)
+      when zwave_event in [
+             :water_leak_detected_location_provided,
+             :water_level_droppped_location_provided
+           ] do
+    with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
+      {:ok, node_location_report.params}
+    else
+      {:error, %DecodeError{}} = decode_error ->
+        Logger.warn(
+          "[Grizzly] Failed to decode NodeLocationReport from #{inspect(params_binary)}"
+        )
+
+        decode_error
+    end
+  end
+
+  def decode_event_params(:smoke_alarm, :smoke_detected_location_provided, params_binary) do
+    with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
+      {:ok, node_location_report.params}
+    else
+      {:error, %DecodeError{}} = decode_error ->
+        Logger.warn(
+          "[Grizzly] Failed to decode NodeLocationReport from #{inspect(params_binary)}"
+        )
+
         decode_error
     end
   end

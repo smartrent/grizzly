@@ -148,7 +148,14 @@ defmodule Grizzly.ZWave.Decoder do
       {0x78, 0x03, Commands.NodeProvisioningListIterationGet},
       {0x78, 0x04, Commands.NodeProvisioningListIterationReport},
       {0x78, 0x05, Commands.NodeProvisioningGet},
-      {0x78, 0x06, Commands.NodeProvisioningReport}
+      {0x78, 0x06, Commands.NodeProvisioningReport},
+      # Node naming and location
+      {0x77, 0x01, Commands.NodeNameSet},
+      {0x77, 0x02, Commands.NodeNameGet},
+      {0x77, 0x03, Commands.NodeNameReport},
+      {0x77, 0x04, Commands.NodeLocationSet},
+      {0x77, 0x05, Commands.NodeLocationGet},
+      {0x77, 0x06, Commands.NodeLocationReport}
     ]
 
     defmacro __before_compile__(_) do
