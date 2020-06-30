@@ -1,7 +1,23 @@
 ## Changelog
 
+## v0.11.0
+
+Grizzly now supports parsing alarm/notification parameters as a keyword list of
+parameters. This change is breaking because the event parameters use to be the
+raw binary we received from the Z-Wave network and now it is a keyword list.
+
+We only support lock and keypad event parameters currently, but this puts into
+place the start of being able to support event parameters.
+
+Enhancements
+  * Support parsing event parameters for lock and keypad operations
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.10.3
-  
+
 Enhancements
   * Add `handle_timeout/2` to the `Grizzly.InclusionHandler` behaviour. This
     allows for handling when an inclusion process timesout.
