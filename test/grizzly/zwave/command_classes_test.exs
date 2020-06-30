@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.CommandClassesTest do
         secure_controlled: [:door_lock, :user_code]
       ]
 
-      expected_binary = <<0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF, 0x62, 0x63>>
+      expected_binary = <<0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF, 0x62, 0x63>>
       assert expected_binary == CommandClasses.command_class_list_to_binary(command_classes)
     end
 

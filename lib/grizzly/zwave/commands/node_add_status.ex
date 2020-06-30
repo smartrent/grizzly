@@ -77,7 +77,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       # classes 2 Z-Wave protocol bytes and the node info length byte.
       # Also add the number of command classes plus 4 bytes for the separators
       # See SDS13784 4.4.8.2 for more details
-      node_info_length = 6 + cc_count(command_classes) + 4
+      node_info_length = 6 + cc_count(command_classes)
 
       # TODO: fix opt func bit (after the listening bit)
       binary =
@@ -199,6 +199,25 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   end
 
   defp cc_count(tagged_command_classes) do
-    tagged_command_classes |> Keyword.values() |> List.flatten() |> length()
+    padding = get_padding(tagged_command_classes)
+    cc_length = tagged_command_classes |> Keyword.values() |> List.flatten() |> length()
+
+    cc_length + padding
+  end
+
+  defp get_padding(tagged_command_classes) do
+    Enum.reduce(tagged_command_classes, 0, fn
+      {_, []}, padding ->
+        padding
+
+      {:secure_supported, _}, padding ->
+        padding + 2
+
+      {other, _}, padding when other in [:non_secure_controlled, :secure_controlled] ->
+        padding + 1
+
+      _, padding ->
+        padding
+    end)
   end
 end
