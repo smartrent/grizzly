@@ -173,7 +173,14 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :multi_channel_endpoint_report}}},
       {:application_node_info_get,
        {Commands.ApplicationNodeInfoGet,
-        handler: {WaitReport, complete_report: :application_node_info_report}}}
+        handler: {WaitReport, complete_report: :application_node_info_report}}},
+      # Node Naming and Location
+      {:node_name_get,
+       {Commands.NodeNameGet, handler: {WaitReport, complete_report: :node_name_report}}},
+      {:node_name_set, {Commands.NodeNameSet, handler: AckResponse}},
+      {:node_location_get,
+       {Commands.NodeLocationGet, handler: {WaitReport, complete_report: :node_location_report}}},
+      {:node_location_set, {Commands.NodeLocationSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
