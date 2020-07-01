@@ -19,6 +19,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipLanIp6=fd00:aaaa::1
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
+    ExtraClasses= 133 89 90 142 108 143
     """
 
     cfg = Config.new()
@@ -42,6 +43,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
     ZipProductID = 1
+    ExtraClasses= 133 89 90 142 108 143
     """
 
     cfg = Config.new(%{product_id: 1})
@@ -66,6 +68,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipLanIp6=fd00:aaaa::1
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
+    ExtraClasses= 133 89 90 142 108 143
     """
 
     assert :ok = Config.write(cfg)
