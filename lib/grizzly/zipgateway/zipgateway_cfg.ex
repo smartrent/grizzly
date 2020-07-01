@@ -23,7 +23,8 @@ defmodule Grizzly.ZIPGateway.Config do
           hardware_version: non_neg_integer() | nil,
           product_id: non_neg_integer() | nil,
           product_type: non_neg_integer() | nil,
-          serial_log: String.t() | nil
+          serial_log: String.t() | nil,
+          extra_classes: [byte()]
         }
 
   defstruct unsolicited_destination_ip6: "fd00:aaaa::2",
@@ -43,7 +44,8 @@ defmodule Grizzly.ZIPGateway.Config do
             product_id: nil,
             product_type: nil,
             hardware_version: nil,
-            manufacturer_id: nil
+            manufacturer_id: nil,
+            extra_classes: [0x85, 0x59, 0x5A, 0x8E, 0x6C, 0x8F]
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -97,6 +99,18 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :manufacturer_id, "ZipManufacturerID")
     |> maybe_put_config_item(cfg, :hardware_version, "ZipHardwareVersion")
     |> maybe_put_config_item(cfg, :product_type, "ZipProductType")
+    |> maybe_put_config_item(cfg, :extra_classes, "ExtraClasses")
+  end
+
+  defp maybe_put_config_item(config_string, cfg, :extra_classes = field, cfg_name) do
+    case Map.get(cfg, field) do
+      nil ->
+        config_string
+
+      extra_command_classes ->
+        extra_command_classes_string = Enum.join(extra_command_classes, " ")
+        config_string <> "#{cfg_name}= #{extra_command_classes_string}\n"
+    end
   end
 
   defp maybe_put_config_item(config_string, cfg, field, cfg_name) do
