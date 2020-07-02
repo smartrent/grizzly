@@ -9,11 +9,10 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     * `:level` - the level is device specific, see device user manual for more
       details (required)
     * `:zensor_net_node_id` - the Zensor net node, if the device is not
-      based off of Zensor Net, then this field is `0` (optional, must be set for v2+, must be nil if v1)
-    * `sequence_number`: 0..255 if in a sequence (v8, optional, default is nil)
-    * `:zwave_status` - if the device status is active or deactive (v2+)
-    * `:zwave_type` - part of `Grizzly.ZWave.Notifications` spec (v2+)
-    * `:zwave_event` - part of the `Grizzly.ZWave.Notifications` spec (v2+)
+     based off of Zensor Net, then this field is `0` (v2, optional, default 0)
+    * `:zwave_status` - if the device alarm status is :enabled or :disabled (v2)
+    * `:zwave_type` - part of `Grizzly.ZWave.Notifications` spec (v2)
+    * `:zwave_event` - part of the `Grizzly.ZWave.Notifications` spec (v2)
     * `:event_parameters` - additional parameters for the event as keyword list, see user
       manual for more information (v2+, optional, default `[]`)
   """
@@ -28,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
           {:type, byte()}
           | {:level, byte()}
           | {:zensor_net_node_id, ZWave.node_id()}
-          | {:zwave_status, byte()}
+          | {:zwave_status, Notifications.status()}
           | {:zwave_event, Notifications.event()}
           | {:zwave_type, Notifications.type()}
           | {:sequence_number, byte()}
@@ -71,24 +70,24 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   end
 
   def decode_params(
-        <<type, level, _reserved, zwave_status, zwave_type_byte, zwave_event_byte, 0x01::size(1),
-          0x00::size(2), params_length::size(5), event_params::binary-size(params_length),
-          sequence_number>>
+        <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte,
+          0x00::size(1), 0x00::size(2), params_length::size(5),
+          event_params::binary-size(params_length)>>
       ) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
          {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
+         {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
          {:ok, event_parameters} <-
            Notifications.decode_event_params(zwave_type, zwave_event, event_params) do
       {:ok,
        [
          type: type,
          level: level,
-         zensor_net_node_id: 0,
+         zensor_net_node_id: zensor_node_id,
          zwave_status: zwave_status,
          zwave_type: zwave_type,
          zwave_event: zwave_event,
-         event_parameters: event_parameters,
-         sequence_number: sequence_number
+         event_parameters: event_parameters
        ]}
     else
       {:error, :invalid_type_byte} ->
@@ -104,11 +103,13 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   end
 
   def decode_params(
-        <<type, level, zensor_node_id, zwave_status, zwave_type_byte, zwave_event_byte,
-          params_length, event_params::binary-size(params_length), _rest::binary>>
+        <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte,
+          0x01::size(1), 0x00::size(2), params_length::size(5),
+          event_params::binary-size(params_length), sequence_number>>
       ) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
          {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
+         {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
          {:ok, event_parameters} <-
            Notifications.decode_event_params(zwave_type, zwave_event, event_params) do
       {:ok,
@@ -119,7 +120,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
          zwave_status: zwave_status,
          zwave_type: zwave_type,
          zwave_event: zwave_event,
-         event_parameters: event_parameters
+         event_parameters: event_parameters,
+         sequence_number: sequence_number
        ]}
     else
       {:error, :invalid_type_byte} ->
@@ -155,7 +157,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
     params_length = byte_size(encoded_event_params)
 
-    <<type, level, zensor_node_id, zwave_status, Notifications.type_to_byte(zwave_type),
+    <<type, level, zensor_node_id, Notifications.status_to_byte(zwave_status),
+      Notifications.type_to_byte(zwave_type),
       Notifications.event_to_byte(zwave_type, zwave_event),
       params_length>> <>
       encoded_event_params
@@ -175,7 +178,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
     params_length = byte_size(encoded_event_params)
 
-    <<type, level, 0x00, zwave_status, Notifications.type_to_byte(zwave_type),
+    <<type, level, 0x00, Notifications.status_to_byte(zwave_status),
+      Notifications.type_to_byte(zwave_type),
       Notifications.event_to_byte(zwave_type, zwave_event), 0x01::size(1), 0x00::size(2),
       params_length::size(5)>> <>
       encoded_event_params <>

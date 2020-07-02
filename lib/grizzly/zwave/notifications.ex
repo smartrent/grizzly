@@ -289,4 +289,12 @@ defmodule Grizzly.ZWave.Notifications do
 
     {:ok, []}
   end
+
+  @type status :: :enabled | :disabled
+  def status_to_byte(:disabled), do: 0x00
+  def status_to_byte(:enabled), do: 0xFF
+
+  def status_from_byte(0x00), do: {:ok, :disabled}
+  def status_from_byte(0xFF), do: {:ok, :enabled}
+  def status_from_byte(_byte), do: {:error, :invalid_status_byte}
 end
