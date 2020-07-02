@@ -88,6 +88,24 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
       assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x04, 0x63, 0x03, 0xFB, 0x01>> ==
                AlarmReport.encode_params(command)
     end
+
+    test "v8 with sequence number" do
+      {:ok, command} =
+        AlarmReport.new(
+          type: 0x10,
+          level: 0x25,
+          zwave_status: 0x00,
+          zwave_event: :keypad_unlock_operation,
+          zwave_type: :access_control,
+          event_parameters: [user_id: 251, user_id_status: :occupied, user_code: ""],
+          sequence_number: 9
+        )
+
+      assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x01::size(1), 0x00::size(2), 0x04::size(5),
+               0x63, 0x03, 0xFB, 0x01,
+               0x09>> ==
+               AlarmReport.encode_params(command)
+    end
   end
 
   describe "decodes params correctly" do
@@ -129,6 +147,29 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
                user_id_status: :occupied,
                user_code: ""
              ]
+    end
+
+    test "v8 with sequence number" do
+      binary =
+        <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x01::size(1), 0x00::size(2), 0x04::size(5), 0x63,
+          0x03, 0xFB, 0x01, 0x09>>
+
+      {:ok, params} = AlarmReport.decode_params(binary)
+
+      assert Keyword.fetch!(params, :type) == 0x10
+      assert Keyword.fetch!(params, :level) == 0x25
+      assert Keyword.fetch!(params, :zwave_status) == 0x00
+      assert Keyword.fetch!(params, :zensor_net_node_id) == 0x00
+      assert Keyword.fetch!(params, :zwave_event) == :keypad_unlock_operation
+      assert Keyword.fetch!(params, :zwave_type) == :access_control
+
+      assert Keyword.fetch!(params, :event_parameters) == [
+               user_id: 251,
+               user_id_status: :occupied,
+               user_code: ""
+             ]
+
+      assert Keyword.fetch!(params, :sequence_number) == 9
     end
   end
 end
