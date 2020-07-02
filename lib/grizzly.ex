@@ -157,4 +157,25 @@ defmodule Grizzly do
   def unsubscribe_command(command_name) do
     Messages.unsubscribe(command_name)
   end
+
+  @doc """
+  List the support commands
+  """
+  @spec list_commands() :: [atom()]
+  def list_commands() do
+    Enum.map(Table.dump(), fn {command, _} -> command end)
+  end
+
+  @doc """
+  List the command for a particular command class
+  """
+  @spec commands_for_command_class(atom()) :: [atom()]
+  def commands_for_command_class(command_class_name) do
+    Table.dump()
+    |> Enum.filter(fn {_command, {command_module, _}} ->
+      {:ok, command} = command_module.new([])
+      command.command_class.name() == command_class_name
+    end)
+    |> Enum.map(fn {command, _} -> command end)
+  end
 end

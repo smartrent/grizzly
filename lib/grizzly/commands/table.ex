@@ -204,6 +204,13 @@ defmodule Grizzly.Commands.Table do
           The command #{inspect(command_class)} you are trying to send is not supported
           """
         end
+
+        @doc """
+        Dump all the contents of the table
+        """
+        def dump() do
+          unquote(@table)
+        end
       end
     end
   end
