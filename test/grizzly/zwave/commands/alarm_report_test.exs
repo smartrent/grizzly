@@ -17,14 +17,14 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         AlarmReport.new(
           type: 0x10,
           level: 0x25,
-          zwave_status: 0x00,
+          zwave_status: :enabled,
           zwave_event: :manual_unlock_operation,
           zwave_type: :access_control
         )
 
       assert Command.param!(command, :zwave_event) == :manual_unlock_operation
       assert Command.param!(command, :zwave_type) == :access_control
-      assert Command.param!(command, :zwave_status) == 0x00
+      assert Command.param!(command, :zwave_status) == :enabled
       assert Command.param!(command, :type) == 0x10
       assert Command.param!(command, :level) == 0x25
       assert Command.param!(command, :event_parameters) == []
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         AlarmReport.new(
           type: 0x10,
           level: 0x25,
-          zwave_status: 0x00,
+          zwave_status: :disabled,
           zwave_event: :manual_unlock_operation,
           zwave_type: :access_control,
           zensor_net_node_id: 0x05,
@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
       assert Command.param!(command, :zwave_event) == :manual_unlock_operation
       assert Command.param!(command, :zwave_type) == :access_control
-      assert Command.param!(command, :zwave_status) == 0x00
+      assert Command.param!(command, :zwave_status) == :disabled
       assert Command.param!(command, :type) == 0x10
       assert Command.param!(command, :level) == 0x25
       assert Command.param!(command, :event_parameters) == [0x02, 0x03]
@@ -65,7 +65,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         AlarmReport.new(
           type: 0x10,
           level: 0x25,
-          zwave_status: 0x00,
+          zwave_status: :disabled,
           zwave_event: :manual_unlock_operation,
           zwave_type: :access_control
         )
@@ -79,7 +79,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         AlarmReport.new(
           type: 0x10,
           level: 0x25,
-          zwave_status: 0x00,
+          zwave_status: :disabled,
           zwave_event: :keypad_unlock_operation,
           zwave_type: :access_control,
           event_parameters: [user_id: 251, user_id_status: :occupied, user_code: ""]
@@ -94,7 +94,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         AlarmReport.new(
           type: 0x10,
           level: 0x25,
-          zwave_status: 0x00,
+          zwave_status: :disabled,
           zwave_event: :keypad_unlock_operation,
           zwave_type: :access_control,
           event_parameters: [user_id: 251, user_id_status: :occupied, user_code: ""],
@@ -117,13 +117,13 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
     end
 
     test "v2 with no event params" do
-      binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x00, 0x00>>
+      binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x00>>
 
       {:ok, params} = AlarmReport.decode_params(binary)
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
-      assert Keyword.fetch!(params, :zwave_status) == 0x00
+      assert Keyword.fetch!(params, :zwave_status) == :disabled
       assert Keyword.fetch!(params, :zensor_net_node_id) == 0x00
       assert Keyword.fetch!(params, :zwave_event) == :manual_unlock_operation
       assert Keyword.fetch!(params, :zwave_type) == :access_control
@@ -137,7 +137,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
-      assert Keyword.fetch!(params, :zwave_status) == 0x00
+      assert Keyword.fetch!(params, :zwave_status) == :disabled
       assert Keyword.fetch!(params, :zensor_net_node_id) == 0x00
       assert Keyword.fetch!(params, :zwave_event) == :keypad_unlock_operation
       assert Keyword.fetch!(params, :zwave_type) == :access_control
@@ -158,7 +158,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
-      assert Keyword.fetch!(params, :zwave_status) == 0x00
+      assert Keyword.fetch!(params, :zwave_status) == :disabled
       assert Keyword.fetch!(params, :zensor_net_node_id) == 0x00
       assert Keyword.fetch!(params, :zwave_event) == :keypad_unlock_operation
       assert Keyword.fetch!(params, :zwave_type) == :access_control

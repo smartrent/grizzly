@@ -180,7 +180,10 @@ defmodule Grizzly.Commands.Table do
       {:node_name_set, {Commands.NodeNameSet, handler: AckResponse}},
       {:node_location_get,
        {Commands.NodeLocationGet, handler: {WaitReport, complete_report: :node_location_report}}},
-      {:node_location_set, {Commands.NodeLocationSet, handler: AckResponse}}
+      {:node_location_set, {Commands.NodeLocationSet, handler: AckResponse}},
+      # Alarm
+      {:alarm_get, {Commands.AlarmGet, handler: {WaitReport, complete_report: :alarm_report}}},
+      {:alarm_set, {Commands.AlarmSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
