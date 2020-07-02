@@ -1,6 +1,6 @@
 defmodule Grizzly.ZWave.Commands.AlarmReport do
   @moduledoc """
-  This command notifies the application of the alarm state
+  This command notifies the application of the alarm state (v1, v2) or the notification state (v8).
 
   Params:
 
@@ -9,12 +9,13 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     * `:level` - the level is device specific, see device user manual for more
       details (required)
     * `:zensor_net_node_id` - the Zensor net node, if the device is not
-      based off of Zensor Net, then this field is `0` (v2, optional, default 0)
-    * `:zwave_status` - if the device status is active or deactive (v2)
-    * `:zwave_type` - part of `Grizzly.ZWave.Notifications` spec (v2)
-    * `:zwave_event` - part of the `Grizzly.ZWave.Notifications` spec (v2)
+      based off of Zensor Net, then this field is `0` (optional, must be set for v2+, must be nil if v1)
+    * `sequence_number`: 0..255 if in a sequence (v8, optional, default is nil)
+    * `:zwave_status` - if the device status is active or deactive (v2+)
+    * `:zwave_type` - part of `Grizzly.ZWave.Notifications` spec (v2+)
+    * `:zwave_event` - part of the `Grizzly.ZWave.Notifications` spec (v2+)
     * `:event_parameters` - additional parameters for the event as keyword list, see user
-      manual for more information (v2, optional, default `[]`)
+      manual for more information (v2+, optional, default `[]`)
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -30,6 +31,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
           | {:zwave_status, byte()}
           | {:zwave_event, Notifications.event()}
           | {:zwave_type, Notifications.type()}
+          | {:sequence_number, byte()}
           | {:event_parameters, [byte()]}
 
   @impl true
@@ -50,10 +52,15 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   @impl true
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
-    if Command.param(command, :zensor_net_node_id, false) do
-      encode_v2(command)
-    else
-      encode_v1(command)
+    cond do
+      Command.param(command, :sequence_number) != nil ->
+        encode_v8(command)
+
+      Command.param(command, :zensor_net_node_id) != nil ->
+        encode_v2(command)
+
+      true ->
+        encode_v1(command)
     end
   end
 
@@ -61,6 +68,39 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<type, level>>) do
     {:ok, [type: type, level: level]}
+  end
+
+  def decode_params(
+        <<type, level, _reserved, zwave_status, zwave_type_byte, zwave_event_byte, 0x01::size(1),
+          0x00::size(2), params_length::size(5), event_params::binary-size(params_length),
+          sequence_number>>
+      ) do
+    with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
+         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
+         {:ok, event_parameters} <-
+           Notifications.decode_event_params(zwave_type, zwave_event, event_params) do
+      {:ok,
+       [
+         type: type,
+         level: level,
+         zensor_net_node_id: 0,
+         zwave_status: zwave_status,
+         zwave_type: zwave_type,
+         zwave_event: zwave_event,
+         event_parameters: event_parameters,
+         sequence_number: sequence_number
+       ]}
+    else
+      {:error, :invalid_type_byte} ->
+        {:error, %DecodeError{value: zwave_type_byte, param: :zwave_type, command: :alarm_report}}
+
+      {:error, :invalid_event_byte} ->
+        {:error,
+         %DecodeError{value: zwave_event_byte, param: :zwave_event, command: :alarm_report}}
+
+      error ->
+        error
+    end
   end
 
   def decode_params(
@@ -119,6 +159,27 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
       Notifications.event_to_byte(zwave_type, zwave_event),
       params_length>> <>
       encoded_event_params
+  end
+
+  defp encode_v8(command) do
+    type = Command.param!(command, :type)
+    level = Command.param!(command, :level)
+    zwave_status = Command.param!(command, :zwave_status)
+    zwave_type = Command.param!(command, :zwave_type)
+    zwave_event = Command.param!(command, :zwave_event)
+    sequence_number = Command.param!(command, :sequence_number)
+    event_params = Command.param!(command, :event_parameters)
+
+    encoded_event_params =
+      Notifications.encode_event_params(zwave_type, zwave_event, event_params)
+
+    params_length = byte_size(encoded_event_params)
+
+    <<type, level, 0x00, zwave_status, Notifications.type_to_byte(zwave_type),
+      Notifications.event_to_byte(zwave_type, zwave_event), 0x01::size(1), 0x00::size(2),
+      params_length::size(5)>> <>
+      encoded_event_params <>
+      <<sequence_number>>
   end
 
   # TODO - Actually translate into report commands
