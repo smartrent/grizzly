@@ -4,6 +4,187 @@ defmodule Grizzly.ZWave.Notifications do
   alias Grizzly.ZWave.{Decoder, DecodeError}
   require Logger
 
+  @alarm_types [
+    # Byte 1
+    [
+      :unknown,
+      :smoke_alarm,
+      :co_alarm,
+      :co2_alarm,
+      :heat_alarm,
+      :water_alarm,
+      :access_control,
+      :home_security
+    ],
+    # Byte 2
+    [
+      :power_management,
+      :system,
+      :emergency_alarm,
+      :clock,
+      :appliance,
+      :home_health,
+      :siren,
+      :water_valve
+    ],
+    # Byte 3
+    [
+      :weather_alarm,
+      :irrigation,
+      :gas_alarm,
+      :pest_control,
+      :light_sensor,
+      :water_quality_monitoring,
+      :home_monitoring,
+      :request_pending_notification
+    ]
+  ]
+
+  @type_events [
+    smoke_alarm: [
+      # byte 1
+      [
+        :unknown,
+        :smoke_detected_location_provided,
+        :smoked_detected,
+        :smoke_alarm_test,
+        :replacement_required,
+        :replacement_required_end_of_life,
+        :alarm_silenced,
+        :maintenance_required_planned_periodic_inspection
+      ],
+      # byte 2
+      [
+        :maintenance_required_dust_in_device,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    water: [
+      # byte 1
+      [
+        :unknown,
+        :water_leak_detected_location_provided,
+        :water_leak_detected,
+        :water_level_dropped_location_provided,
+        :water_level_dropped,
+        :replace_water_filter,
+        :water_flow_alarm,
+        :water_pressure_alarm
+      ],
+      # byte 2
+      [
+        :water_temperature_alarm,
+        :water_level_alarm,
+        :sump_pump_active,
+        :sump_pump_failure,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    access_control: [
+      # byte 1
+      [
+        :unknown,
+        :manual_lock_operation,
+        :manual_unlock_operation,
+        :rf_lock_operation,
+        :rf_unlock_operation,
+        :keypad_lock_operation,
+        :keypad_unlock_operation,
+        :manual_not_fully_locked_operation
+      ],
+      # byte 2
+      [
+        :rf_not_fully_locked_operation,
+        :auto_lock_locked_operation,
+        :auto_lock_not_fully_locked_operation,
+        :lock_jammed,
+        :all_user_codes_deleted,
+        :single_user_code_deleted,
+        :new_user_code_added,
+        :new_user_code_not_added_duplicate
+      ],
+      # byte 3
+      [
+        :keypad_temporarily_disabled,
+        :keypad_busy,
+        :new_program_code_entered,
+        :manually_enter_user_code_exceeds_code_limit,
+        :unlock_by_rf_with_invalid_user_code,
+        :locked_by_rf_with_invalid_user_code,
+        :window_or_door_is_open,
+        :window_or_door_is_closed
+      ],
+      # byte 4
+      [
+        :window_or_door_handle_is_open,
+        :window_or_door_handle_is_closed,
+        :messaging_user_code_entered_via_keypad,
+        :barrier_performing_initialization_process,
+        :barrier_operation_exceeded_time_limit,
+        :barrier_operation_force_exceeded,
+        :barrier_operation_exceeded_mechanical_limit,
+        :barrier_unable_to_perform_operation_ul_requirements
+      ],
+      # byte 5
+      [
+        :barrier_unattended_operation_disabled_ul_requirements,
+        :barrier_failed_operation_malfunction,
+        :barrier_vacation_mode,
+        :barrier_safety_beam_obstacle,
+        :barrier_sensor_not_detected,
+        :barrier_sensor_low_battery,
+        :barrier_short_in_wall_station_wires,
+        :unknown
+      ]
+    ],
+    home_security: [
+      # byte 1
+      [
+        :unknown,
+        :intrusion_location_provided,
+        :intrusion,
+        :tampering_product_cover_removed,
+        :tampering_invalid_code,
+        :glass_breakage_location_provided,
+        :glass_breakage,
+        :motion_detection_location_provided
+      ],
+      # byte 2
+      [
+        :motion_detection,
+        :tampering_product_moved,
+        :impact_detected,
+        :magnetic_field_interface_detected,
+        :unknown_state,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    siren: [
+      # byte 1
+      [
+        :unknown,
+        :state_active,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ]
+  ]
+
   defmodule Generate do
     @moduledoc false
     @table [
@@ -297,4 +478,89 @@ defmodule Grizzly.ZWave.Notifications do
   def status_from_byte(0x00), do: {:ok, :disabled}
   def status_from_byte(0xFF), do: {:ok, :enabled}
   def status_from_byte(_byte), do: {:error, :invalid_status_byte}
+
+  @spec encode_alarm_types([atom]) :: binary
+  def encode_alarm_types(alarm_types) do
+    for bit_list <- byte_indices(alarm_types, @alarm_types) do
+      for bit <- Enum.reverse(bit_list), into: <<>>, do: <<bit::1>>
+    end
+    |> :binary.list_to_bin()
+  end
+
+  @spec encode_type_events(atom, [atom]) :: binary
+  def encode_type_events(type, events) do
+    reference = Keyword.fetch!(@type_events, type)
+
+    for bit_list <- byte_indices(events, reference) do
+      for bit <- Enum.reverse(bit_list), into: <<>>, do: <<bit::1>>
+    end
+    |> :binary.list_to_bin()
+  end
+
+  defp byte_indices(list_of_lists, reference) do
+    for byte <- (Enum.count(reference) - 1)..0 do
+      items_per_byte = Enum.at(reference, byte)
+
+      for index <- 0..7 do
+        if Enum.at(items_per_byte, index) in list_of_lists, do: 1, else: 0
+      end
+    end
+    |> Enum.drop_while(fn indices -> Enum.all?(indices, &(&1 == 0)) end)
+    |> Enum.reverse()
+  end
+
+  @spec decode_alarm_types(binary) :: {:ok, [atom()]} | {:error, :invalid_type}
+  def decode_alarm_types(binary) do
+    alarm_types =
+      :binary.bin_to_list(binary)
+      |> Enum.map(&bit_set_indices(<<&1>>))
+      |> Enum.with_index()
+      |> Enum.map(fn {bit_indices, byte} ->
+        Enum.map(bit_indices, &decode_bit(byte, &1, @alarm_types))
+      end)
+      |> List.flatten()
+
+    if Enum.any?(alarm_types, &(&1 == nil)) do
+      {:error, :invalid_type}
+    else
+      {:ok, alarm_types}
+    end
+  end
+
+  @spec decode_type_events(atom, binary) ::
+          {:error, :invalid_type} | {:error, :invalid_type_event} | {:ok, [atom()]}
+  def decode_type_events(type, binary) do
+    with {:ok, reference} <- Keyword.fetch(@type_events, type) do
+      type_events =
+        :binary.bin_to_list(binary)
+        |> Enum.map(&bit_set_indices(<<&1>>))
+        |> Enum.with_index()
+        |> Enum.map(fn {bit_indices, byte} ->
+          Enum.map(bit_indices, &decode_bit(byte, &1, reference))
+        end)
+        |> List.flatten()
+
+      if Enum.any?(type_events, &(&1 == nil)) do
+        {:error, :invalid_type_event}
+      else
+        {:ok, type_events}
+      end
+    else
+      :error ->
+        {:error, :invalid_type_byte}
+    end
+  end
+
+  defp bit_set_indices(byte) do
+    for(<<x::1 <- byte>>, do: x)
+    |> Enum.reverse()
+    |> Enum.with_index()
+    |> Enum.reduce([], fn {bit, index}, acc ->
+      if bit == 1, do: [index | acc], else: acc
+    end)
+  end
+
+  defp decode_bit(byte, bit_index, reference) do
+    Enum.at(reference, byte) |> Enum.at(bit_index)
+  end
 end
