@@ -183,7 +183,13 @@ defmodule Grizzly.Commands.Table do
       {:node_location_set, {Commands.NodeLocationSet, handler: AckResponse}},
       # Alarm
       {:alarm_get, {Commands.AlarmGet, handler: {WaitReport, complete_report: :alarm_report}}},
-      {:alarm_set, {Commands.AlarmSet, handler: AckResponse}}
+      {:alarm_set, {Commands.AlarmSet, handler: AckResponse}},
+      {:alarm_type_supported_get,
+       {Commands.AlarmTypeSupportedGet,
+        handler: {WaitReport, complete_report: :alarm_type_supported_report}}},
+      {:alarm_event_supported_get,
+       {Commands.AlarmEventSupportedGet,
+        handler: {WaitReport, complete_report: :alarm_event_supported_report}}}
     ]
 
     defmacro __before_compile__(_) do
