@@ -16,6 +16,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
 
   @behaviour Grizzly.ZWave.Command
 
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Association
 
@@ -25,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
           {:grouping_identifier, byte()}
           | {:max_nodes_supported, byte()}
           | {:reports_to_follow, byte()}
-          | {:nodes, [Grizzly.ZWave.node_id()]}
+          | {:nodes, [ZWave.node_id()]}
 
   @impl true
   @spec new([param]) :: {:ok, Command.t()}

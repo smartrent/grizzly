@@ -94,7 +94,21 @@ defmodule Grizzly.ZWave.Decoder do
       {0x72, 0x06, Commands.ManufacturerSpecificDeviceSpecificGet},
       {0x72, 0x07, Commands.ManufacturerSpecificDeviceSpecificReport},
       # Association (0x85)
+      {0x85, 0x01, Commands.AssociationSet},
+      {0x85, 0x02, Commands.AssociationGet},
       {0x85, 0x03, Commands.AssociationReport},
+      {0x85, 0x04, Commands.AssociationRemove},
+      {0x85, 0x05, Commands.AssociationGroupingsGet},
+      {0x85, 0x06, Commands.AssociationGroupingsReport},
+      {0x85, 0x0B, Commands.AssociationSpecificGroupGet},
+      {0x85, 0x0C, Commands.AssociationSpecificGroupReport},
+      # Multi Channel Association (0x8E)
+      {0x8E, 0x01, Commands.MultiChannelAssociationSet},
+      {0x8E, 0x02, Commands.MultiChannelAssociationGet},
+      {0x8E, 0x03, Commands.MultiChannelAssociationReport},
+      {0x8E, 0x04, Commands.MultiChannelAssociationRemove},
+      {0x8E, 0x05, Commands.MultiChannelAssociationGroupingsGet},
+      {0x8E, 0x06, Commands.MultiChannelAssociationGroupingsReport},
       # Version (0x86)
       {0x86, 0x11, Commands.VersionGet},
       {0x86, 0x12, Commands.VersionReport},
