@@ -207,7 +207,7 @@ defmodule Grizzly.ZWave.CommandClasses do
                 | :application_capability
                 | :zip_nd
                 | :association_group_info
-                | :device_rest_locally
+                | :device_reset_locally
                 | :central_scene
                 | :ip_association
                 | :antitheft
