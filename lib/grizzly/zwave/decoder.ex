@@ -157,7 +157,9 @@ defmodule Grizzly.ZWave.Decoder do
       {0x77, 0x03, Commands.NodeNameReport},
       {0x77, 0x04, Commands.NodeLocationSet},
       {0x77, 0x05, Commands.NodeLocationGet},
-      {0x77, 0x06, Commands.NodeLocationReport}
+      {0x77, 0x06, Commands.NodeLocationReport},
+      # Device reset locally
+      {0x5A, 0x01, Commands.DeviceResetLocallyNotification}
     ]
 
     defmacro __before_compile__(_) do
