@@ -63,7 +63,7 @@ defmodule Grizzly.ZWave.Security do
   @doc """
   Decode a byte representation of the key exchanged failed type
   """
-  @spec failed_type_from_byte(byte()) :: key_exchange_fail_type() | :unk
+  @spec failed_type_from_byte(byte()) :: key_exchange_fail_type()
   def failed_type_from_byte(0x00), do: :none
   def failed_type_from_byte(0x01), do: :key
   def failed_type_from_byte(0x02), do: :scheme
