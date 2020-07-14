@@ -107,32 +107,4 @@ defmodule Grizzly.Network do
 
     Grizzly.send_command(1, :failed_node_remove, seq_number: seq_number, node_id: node_id)
   end
-
-  @doc """
-  Put controller in learn mode, return no interview status and only if in direct range.
-  """
-  @spec set_controller_learn_mode() :: Grizzly.send_command_response()
-  def set_controller_learn_mode() do
-    seq_number = SeqNumber.get_and_inc()
-
-    Grizzly.send_command(1, :learn_mode_set,
-      seq_number: seq_number,
-      mode: :direct_range_only,
-      return_interview_status: :off
-    )
-  end
-
-  @doc """
-  Disable controller learn mode, return no interview status.
-  """
-  @spec stop_controller_learn_mode() :: Grizzly.send_command_response()
-  def stop_controller_learn_mode() do
-    seq_number = SeqNumber.get_and_inc()
-
-    Grizzly.send_command(1, :learn_mode_set,
-      seq_number: seq_number,
-      mode: :disable,
-      return_interview_status: :off
-    )
-  end
 end

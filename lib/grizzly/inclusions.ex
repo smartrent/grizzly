@@ -250,6 +250,25 @@ defmodule Grizzly.Inclusions do
   end
 
   @doc """
+  Start learn mode on the controller
+  """
+  @spec learn_mode([opt()]) :: any
+  def learn_mode(opts \\ []) do
+    case InclusionRunnerSupervisor.start_runner(opts) do
+      {:ok, runner} ->
+        InclusionRunner.learn_mode(runner)
+    end
+  end
+
+  @doc """
+  Stop learn mode on the controller
+  """
+  @spec learn_mode_stop :: any
+  def learn_mode_stop() do
+    InclusionRunner.learn_mode_stop(InclusionRunner)
+  end
+
+  @doc """
   Stop the inclusion runner
   """
   @spec stop :: :ok
