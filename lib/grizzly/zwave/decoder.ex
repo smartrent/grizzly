@@ -55,6 +55,13 @@ defmodule Grizzly.ZWave.Decoder do
       # Multi Channel
       {0x60, 0x07, Commands.MultiChannelEndpointGet},
       {0x60, 0x08, Commands.MultiChannelEndpointReport},
+      {0x60, 0x09, Commands.MultiChannelCapabilityGet},
+      {0x60, 0x0A, Commands.MultiChannelCapabilityReport},
+      {0x60, 0x0B, Commands.MultiChannelEndpointFind},
+      {0x60, 0x0C, Commands.MultiChannelEndpointFindReport},
+      {0x60, 0x0D, Commands.MultiChannelCommandEncapsulation},
+      {0x60, 0x0E, Commands.MultiChannelAggregatedMembersGet},
+      {0x60, 0x0F, Commands.MultiChannelAggregatedMembersReport},
       # Association group info
       {0x59, 0x01, Commands.AssociationGroupNameGet},
       {0x59, 0x02, Commands.AssociationGroupNameReport},

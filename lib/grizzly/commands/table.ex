@@ -193,6 +193,18 @@ defmodule Grizzly.Commands.Table do
       {:multi_channel_endpoint_get,
        {Commands.MultiChannelEndpointGet,
         handler: {WaitReport, complete_report: :multi_channel_endpoint_report}}},
+      {:multi_channel_capability_get,
+       {Commands.MultiChannelCapabilityGet,
+        handler: {WaitReport, complete_report: :multi_channel_capability_report}}},
+      {:multi_channel_endpoint_find,
+       {Commands.MultiChannelEndpointFind,
+        handler:
+          {AggregateReport,
+           complete_report: :multi_channel_endpoint_find_report, aggregate_param: :end_points}}},
+      {:multi_channel_aggregated_members_get,
+       {Commands.MultiChannelAggregatedMembersGet,
+        handler: {WaitReport, complete_report: :multi_channel_aggregated_members_report}}},
+      #
       {:application_node_info_get,
        {Commands.ApplicationNodeInfoGet,
         handler: {WaitReport, complete_report: :application_node_info_report}}},
