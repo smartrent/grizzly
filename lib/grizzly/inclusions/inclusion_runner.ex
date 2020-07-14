@@ -64,6 +64,14 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     GenServer.call(runner, {:set_dsk, dsk})
   end
 
+  def learn_mode(runner \\ __MODULE__) do
+    GenServer.call(runner, :learn_mode)
+  end
+
+  def learn_mode_stop(runner \\ __MODULE__) do
+    GenServer.call(runner, :learn_mode_stop)
+  end
+
   @spec stop(t()) :: :ok
   def stop(runner \\ __MODULE__) do
     GenServer.stop(runner, :normal)
@@ -115,6 +123,27 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     :ok = AsyncConnection.stop_command(inclusion.controller_id, inclusion.current_command_ref)
     seq_number = SeqNumber.get_and_inc()
     {command, new_inclusion} = Inclusion.next_command(inclusion, :node_removing_stop, seq_number)
+
+    {:ok, command_ref} =
+      AsyncConnection.send_command(inclusion.controller_id, command, timeout: 60_000)
+
+    {:reply, :ok, Inclusion.update_command_ref(new_inclusion, command_ref)}
+  end
+
+  def handle_call(:learn_mode, _from, inclusion) do
+    seq_number = SeqNumber.get_and_inc()
+    {command, new_inclusion} = Inclusion.next_command(inclusion, :learn_mode, seq_number)
+
+    {:ok, command_ref} =
+      AsyncConnection.send_command(inclusion.controller_id, command, timeout: 120_000)
+
+    {:reply, :ok, Inclusion.update_command_ref(new_inclusion, command_ref)}
+  end
+
+  def handle_call(:learn_mode_stop, _from, inclusion) do
+    :ok = AsyncConnection.stop_command(inclusion.controller_id, inclusion.current_command_ref)
+    seq_number = SeqNumber.get_and_inc()
+    {command, new_inclusion} = Inclusion.next_command(inclusion, :learn_mode_stop, seq_number)
 
     {:ok, command_ref} =
       AsyncConnection.send_command(inclusion.controller_id, command, timeout: 60_000)

@@ -5,7 +5,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
   # the various states
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{NodeAdd, NodeRemove, NodeAddKeysSet, NodeAddDSKSet}
+  alias Grizzly.ZWave.Commands.{NodeAdd, NodeRemove, NodeAddKeysSet, NodeAddDSKSet, LearnModeSet}
 
   @type state ::
           :started
@@ -18,6 +18,8 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
           | :keys_granted
           | :dsk_requested
           | :dsk_set
+          | :learn_mode
+          | :learn_mode_stop
 
   @type t :: %__MODULE__{
           handler: pid() | module() | {module(), keyword},
@@ -51,6 +53,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
    - `:node_add_status` - the report about the node add process
    - `:node_remove_status` - the report about the node removal process
    - `:node_add_dsk_report` - the report to tell Grizzly to add the DSK
+   - `:learn_mode_set_status` - the report about setting learn mode
   """
   @spec handle_command(t(), Command.t(), keyword()) :: t()
   def handle_command(inclusion, command, opts \\ []) do
@@ -59,6 +62,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
       :node_add_status -> complete(inclusion)
       :node_remove_status -> complete(inclusion)
       :node_add_dsk_report -> dsk_requested(inclusion, opts)
+      :learn_mode_set_status -> complete(inclusion)
     end
   end
 
@@ -124,6 +128,24 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
     end
   end
 
+  def next_command(inclusion, :learn_mode, seq_number, _) do
+    {:ok, command} =
+      LearnModeSet.new(
+        seq_number: seq_number,
+        mode: :direct_range_only,
+        return_interview_status: :off
+      )
+
+    {command, learn_mode(inclusion)}
+  end
+
+  def next_command(inclusion, :learn_mode_stop, seq_number, _) do
+    {:ok, command} =
+      LearnModeSet.new(seq_number: seq_number, mode: :disable, return_interview_status: :off)
+
+    {command, learn_mode_stop(inclusion)}
+  end
+
   def node_adding(%__MODULE__{state: :started} = inclusion) do
     %__MODULE__{inclusion | state: :node_adding}
   end
@@ -160,6 +182,14 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
 
   def dsk_set(%__MODULE__{state: :dsk_requested} = inclusion) do
     %__MODULE__{inclusion | state: :dsk_set}
+  end
+
+  def learn_mode(%__MODULE__{state: :started} = inclusion) do
+    %__MODULE__{inclusion | state: :learn_mode}
+  end
+
+  def learn_mode_stop(%__MODULE__{state: :learn_mode} = inclusion) do
+    %__MODULE__{inclusion | state: :learn_mode_stop}
   end
 
   # Have not ran into any case for need to check higher than two
