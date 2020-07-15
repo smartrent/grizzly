@@ -43,7 +43,7 @@ jobs:
             - v1-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
       - run: mix compile --warnings-as-errors
-      - run: mix test --include inclusion --include integration
+      - run: mix test --include inclusion --include integration --include firmware_update
       - run: mix format --check-formatted
       - run: mix docs
       - run: mix hex.build
@@ -72,7 +72,7 @@ jobs:
             - v1-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
       - run: mix compile --warnings-as-errors
-      - run: mix test --include inclusion --include integration
+      - run: mix test --include inclusion --include integration --include firmware_update
       - run: mix format --check-formatted
       - run: MIX_ENV=docs mix docs
       - run: MIX_ENV=docs mix hex.build

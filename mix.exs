@@ -71,7 +71,7 @@ defmodule Grizzly.MixProject do
 
   defp aliases() do
     [
-      test: ["test --exclude integration --exclude inclusion"]
+      test: ["test --exclude integration --exclude inclusion --exclude firmware_update"]
     ]
   end
 end
