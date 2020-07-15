@@ -1,5 +1,68 @@
 ## Changelog
 
+## v0.12.0
+
+There is a small breaking change that will only effect you if you hard have
+`:water_leak_detected_known_location` and `:water_leak_dropped_known_location`
+hard coded into your application for any reason. These are notifications about
+water leaks, and so if you have not directly tried to match on or handle logic
+about water leak notifications then this breaking change should not effect you.
+
+From a high level this release provides updates to Z-Wave notifications in
+terms of command support and package parsing, extra tooling for better
+introspection, a handful of new commands and command classes, and helpful
+configuration items.
+
+Enhancements
+  * Add `Grizzly.ZWave.Commands.ApplicationNodeInfoReport`
+  * Add `Grizzly.ZWave.CommandClass.NodeNaming`
+  * Add `Grizzly.ZWave.Commands.NodeLocationGet`
+  * Add `Grizzly.ZWave.Commands.NodeLocationReport`
+  * Add `Grizzly.ZWave.Commands.NodeLocationSet`
+  * Add `Grizzly.ZWave.Commands.NodeNameGet`
+  * Add `Grizzly.ZWave.Commands.NodeNameReport`
+  * Add `Grizzly.ZWave.Commands.NodeNameSet`
+  * Add `Grizzly.ZWave.Commands.AlarmGet`
+  * Add `Grizzly.ZWave.Commands.AlarmSet`
+  * Add `Grizzly.ZWave.Commands.AlarmEventSupportedGet`
+  * Add `Grizzly.ZWave.Commands.AlarmEventSupportedReport`
+  * Add `Grizzly.ZWave.Commands.AlarmTypeSupportedGet`
+  * Add `Grizzly.ZWave.Commands.AlarmTypeSupportedReport`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupingsGet`
+  * Add `Grizzly.ZWave.Commands.AssociationGroupingsReport`
+  * Add `Grizzly.ZWave.Commands.AssociationRemove`
+  * Add `Grizzly.ZWave.Commands.AssociationReport`
+  * Add `Grizzly.ZWave.Commands.AssociationSpecificGroupingsGet`
+  * Add `Grizzly.ZWave.Commands.AssociationSpecificGroupingsReport`
+  * Add `Grizzly.ZWave.CommandClasses.MultiChannelAssociation`
+  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsGet`
+  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport`
+  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationRemove`
+  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationReport`
+  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationSet`
+  * Add `Grizzly.ZWave.CommandClass.DeviceResetLocally`
+  * Add `Grizzly.ZWave.Commands.DeviceResetLocallyNotification`
+  * Add `Grizzly.ZWave.Commands.LearnModeSet`
+  * Add `Grizzly.ZWave.Commands.LearnModeSetStatus`
+  * Add `Grizzly.Inclusions.learn_mode/1`
+  * Add `Grizzly.Inclusions.learn_mode_stop/0`
+  * Support version 8 of the `Grizzly.ZWave.Commands.AlarmReport`
+  * Support parsing naming and location parameters from Z-Wave notifications
+  * Add `mix zipgateway.cfg` to print out the zipgateway config that Grizzly
+    is configured to use.
+  * Add `Grizzly.list_commands/0` to list all support Z-Wave commands in
+    Grizzly.
+  * Add `Grizzly.commands_for_command_class/1` for listing the Z-Wave commands
+    support by Grizzly for a particular command class.
+  * Add `:handlers` to `:grizzly` configuration options for firmware update and
+    inclusion handlers.
+  * Documentation updates
+
+Fixes
+  * Parsing the wrong byte for into the wrong notification type
+  * Invalid type spec for `Grizzly.ZWave.Security.failed_type_from_byte/1`
+
+
 ## v0.11.0
 
 Grizzly now supports parsing alarm/notification parameters as a keyword list of
