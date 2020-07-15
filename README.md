@@ -149,6 +149,35 @@ config :grizzly,
 
 For more information see `Grizzly.Runtime` module
 
+## Handlers
+
+Grizzly manages the low level details of around things that require more than
+just sending one off commands like including/excluding a device and firmware
+updates.
+
+However, sometimes your higher level application will have some logic that you
+will want to preform during the process. So, there are handler behaviours for
+this types of processes. You can read more about those behaviours in their
+respective modules.
+
+You can provide the handler for any such process that accepts one either at
+runtime or through mix configuration options. The configuration option looks
+like:
+
+```elixir
+config :grizzly,
+  handlers: %{
+    firmware_update: MyFirmwareUpdateHandler,
+    inclusion: MyInclusionHandler
+  }
+```
+
+If you do not pass any handler at runtime or configure any for the process will
+send messages to the calling process.
+
+You can override the configured handlers at runtime by passing in the `:handler`
+option to these processes.
+
 ## Z-Wave Bridge Configuration
 
 Grizzly defers the low-level Z-Wave protocol handling to a combination of third
