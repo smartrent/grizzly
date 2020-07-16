@@ -22,8 +22,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x25, 0x02, Commands.SwitchBinaryGet},
       {0x25, 0x03, Commands.SwitchBinaryReport},
       # Switch Multilevel (0x26)
-      {0x26, 0x01, Commands.SwitchMultiLevelSet},
-      {0x26, 0x02, Commands.SwitchMultiLevelGet},
+      {0x26, 0x01, Commands.SwitchMultilevelSet},
+      {0x26, 0x02, Commands.SwitchMultilevelGet},
       {0x26, 0x03, Commands.SwitchMultilevelReport},
       {0x26, 0x04, Commands.SwitchMultilevelStartLevelChange},
       {0x26, 0x05, Commands.SwitchMultiLevelStopLevelChange},
