@@ -185,6 +185,10 @@ defmodule Grizzly.ZWave.Decoder do
       {0x77, 0x04, Commands.NodeLocationSet},
       {0x77, 0x05, Commands.NodeLocationGet},
       {0x77, 0x06, Commands.NodeLocationReport},
+      # Time parameters
+      {0x8B, 0x01, Commands.TimeParametersSet},
+      {0x8B, 0x02, Commands.TimeParametersGet},
+      {0x8B, 0x03, Commands.TimeParametersReport},
       # Device reset locally
       {0x5A, 0x01, Commands.DeviceResetLocallyNotification}
     ]
