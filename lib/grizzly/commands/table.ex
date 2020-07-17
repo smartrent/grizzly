@@ -215,6 +215,11 @@ defmodule Grizzly.Commands.Table do
       {:node_location_get,
        {Commands.NodeLocationGet, handler: {WaitReport, complete_report: :node_location_report}}},
       {:node_location_set, {Commands.NodeLocationSet, handler: AckResponse}},
+      # Time parameters
+      {:time_parameters_get,
+       {Commands.TimeParametersGet,
+        handler: {WaitReport, complete_report: :time_parameters_report}}},
+      {:time_parameters_set, {Commands.TimeParametersSet, handler: AckResponse}},
       # Alarm
       {:alarm_get, {Commands.AlarmGet, handler: {WaitReport, complete_report: :alarm_report}}},
       {:alarm_set, {Commands.AlarmSet, handler: AckResponse}},
