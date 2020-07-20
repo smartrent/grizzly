@@ -1,5 +1,40 @@
 ## Changelog
 
+## v0.12.1
+
+Enhancements
+  * Add `Grizzly.ZWave.Commands.MultiChannelAggregatedMemberGet`
+  * Add `Grizzly.ZWave.Commands.MultiChannelAggregatedMemberReport`
+  * Add `Grizzly.ZWave.Commands.MultiChannelCapabilityGet`
+  * Add `Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation`
+  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointFind`
+  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointFindReport`
+  * Add `Grizzly.ZWave.CommandClasses.MultiCommand`
+  * Add `Grizzly.ZWave.Commands.MultiCommandEncapsulation`
+  * Add `Grizzly.ZWave.CommandClasses.Time`
+  * Add `Grizzly.ZWave.Commands.DateGet`
+  * Add `Grizzly.ZWave.Commands.DateReport`
+  * Add `Grizzly.ZWave.Commands.TimeGet`
+  * Add `Grizzly.ZWave.Commands.TimeReport`
+  * Add `Grizzly.ZWave.Commands.TimeOffsetGet`
+  * Add `Grizzly.ZWave.Commands.TimeOffsetReport`
+  * Add `Grizzly.ZWave.Commands.TimeOffsetSet`
+  * Add `Grizzly.ZWave.CommandsClasses.TimeParameters`
+  * Add `Grizzly.ZWave.Commands.TimeParametersGet`
+  * Add `Grizzly.ZWave.Commands.TimeParametersReport`
+  * Add `Grizzly.ZWave.Commands.TimeParametersSet`
+  * Documentation updates
+
+Fixes
+  * Some devices send alarm reports that do not match the specification in a
+    minor way. So, we allow for parsing of these reports now.
+  * Fixed internal command class name to module implementation mapping issue
+    for `:switch_multilevel_set` and `:switch_multilevel_get` commands.
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.12.0
 
 There is a small breaking change that will only effect you if you hard have
@@ -62,6 +97,9 @@ Fixes
   * Parsing the wrong byte for into the wrong notification type
   * Invalid type spec for `Grizzly.ZWave.Security.failed_type_from_byte/1`
 
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
 
 ## v0.11.0
 
