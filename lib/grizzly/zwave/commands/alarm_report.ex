@@ -69,11 +69,20 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     {:ok, [type: type, level: level]}
   end
 
-  def decode_params(
-        <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte,
-          0x00::size(1), 0x00::size(2), params_length::size(5),
-          event_params::binary-size(params_length)>>
-      ) do
+  def decode_params(<<
+        type,
+        level,
+        zensor_node_id,
+        status_byte,
+        zwave_type_byte,
+        zwave_event_byte,
+        0x00::size(1),
+        0x00::size(2),
+        params_length::size(5),
+        event_params::binary-size(params_length),
+        # Sometimes a 0 seq_number is added
+        _::binary
+      >>) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
          {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
          {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
