@@ -10,7 +10,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.12.0"}
+    {:grizzly, "~> 0.12.1"}
   ]
 end
 ```
@@ -20,7 +20,9 @@ end
 - Z-Wave Bridge Controller
     * [Z-Wave 500](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)
     * [Z-Wave 700](https://www.digikey.com/product-detail/en/silicon-labs/SLUSB001A/336-5899-ND/9867108)
-- [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
+- Compatible System
+    * [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
+    * [zipgateway-env](https://github.com/mattludwigs/zipgateway-env)
 - [Silicon Labs zipgateway binary](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
 
 The `zipgateway` binary allows Grizzly to use Z-Wave over IP or Z/IP. Using the
@@ -28,7 +30,7 @@ The `zipgateway` binary allows Grizzly to use Z-Wave over IP or Z/IP. Using the
 range of Z-Wave features quickly and reliability. Some of the more advanced
 features like S2 security and smart start are already supported in Grizzly.
 
-See instructions for compiling the `zipgateway` binary.
+See instructions below for compiling the `zipgateway` binary and/or running locally.
 
 ## Basic Usage
 
@@ -201,6 +203,16 @@ github page.
 
 
 ### Compile and Configure zipgateway
+
+## Quick and Fast running locally
+
+If you want to run Grizzly locally for development and/or learning before going
+through the challenge of compiling and running in Nerves we recommend the
+[zipgateway-env](https://github.com/mattludwigs/zipgateway-env) project. This
+provides a docker container and CLI for compiling and running different
+versions of `zipgateway`.
+
+## Nerves Devices (WIP)
 
 First download the [Z/IP GW
 SDK](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
