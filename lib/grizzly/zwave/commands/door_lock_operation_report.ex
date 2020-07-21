@@ -68,7 +68,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   """
   @type door_state :: :open | :closed
 
-  @type timeout_minutes :: 0x00..0xFC | :undefined
+  @type timeout_minutes :: 0x00..0xFD | :undefined
 
   @type timeout_seconds :: 0x00..0x3B | :undefined
 
@@ -299,7 +299,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
-  defp timeout_minutes_from_byte(m) when m >= 0 and m <= 0xFC, do: {:ok, m}
+  defp timeout_minutes_from_byte(m) when m >= 0 and m <= 0xFD, do: {:ok, m}
   defp timeout_minutes_from_byte(0xFE), do: {:ok, :undefined}
 
   defp timeout_minutes_from_byte(byte),
