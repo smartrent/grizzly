@@ -58,11 +58,21 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
     destination_end_point_byte = encode_destination_end_point(destination_end_point, bit_address?)
     encoded_command_class = CommandClasses.to_byte(command_class)
     encapsulated_command = make_command(encapsulated_command_name, parameters)
-    encoded_parameters = apply(encapsulated_command.impl, :encode_params, [encapsulated_command])
 
-    <<0x00::size(1), source_end_point::size(7), destination_end_point_byte, encoded_command_class,
-      encapsulated_command.command_byte>> <>
-      encoded_parameters
+    encapsulated_parameters =
+      apply(encapsulated_command.impl, :encode_params, [encapsulated_command])
+
+    encapsulated_command_byte = encapsulated_command.command_byte
+
+    if encapsulated_command_byte == nil do
+      # The no_operation command has no command byte
+      <<0x00::size(1), source_end_point::size(7), destination_end_point_byte,
+        encoded_command_class>>
+    else
+      <<0x00::size(1), source_end_point::size(7), destination_end_point_byte,
+        encoded_command_class, encapsulated_command_byte>>
+    end <>
+      encapsulated_parameters
   end
 
   @impl true
@@ -80,15 +90,16 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
 
     with {:ok, encapsulated_command} <-
            decode_command(command_class_byte, command_byte, parameters_binary) do
-      {:ok,
-       [
-         source_end_point: source_end_point,
-         bit_address?: bit_address?,
-         destination_end_point: destination_end_point,
-         command_class: command_class,
-         command: encapsulated_command.name,
-         parameters: encapsulated_command.params
-       ]}
+      decoded_params = [
+        source_end_point: source_end_point,
+        bit_address?: bit_address?,
+        destination_end_point: destination_end_point,
+        command_class: command_class,
+        command: encapsulated_command.name,
+        parameters: encapsulated_command.params
+      ]
+
+      {:ok, decoded_params}
     else
       {:error, %DecodeError{}} = error ->
         error

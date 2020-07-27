@@ -204,6 +204,10 @@ defmodule Grizzly.Commands.Table do
       {:multi_channel_aggregated_members_get,
        {Commands.MultiChannelAggregatedMembersGet,
         handler: {WaitReport, complete_report: :multi_channel_aggregated_members_report}}},
+      {:multi_channel_get_command_encapsulation,
+       {Commands.MultiChannelCommandEncapsulation, handler: {WaitReport, complete_report: :any}}},
+      {:multi_channel_command_encapsulation,
+       {Commands.MultiChannelCommandEncapsulation, handler: AckResponse}},
       #
       {:application_node_info_get,
        {Commands.ApplicationNodeInfoGet,
