@@ -5,6 +5,7 @@ defmodule Grizzly.ZWave.CommandClasses do
     @moduledoc false
 
     @mappings [
+      {0x00, :no_operation},
       {0x02, :zensor_net},
       {0x20, :basic},
       {0x21, :controller_replication},
@@ -274,6 +275,7 @@ defmodule Grizzly.ZWave.CommandClasses do
                 | :security_2
                 | :mark
                 | :non_interoperable
+                | :no_operation
 
         @doc """
         Try to parse the byte into a command class
