@@ -102,6 +102,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x72, 0x05, Commands.ManufacturerSpecificReport},
       {0x72, 0x06, Commands.ManufacturerSpecificDeviceSpecificGet},
       {0x72, 0x07, Commands.ManufacturerSpecificDeviceSpecificReport},
+      # Hail
+      {0x82, 0x01, Commands.Hail},
       # Association (0x85)
       {0x85, 0x01, Commands.AssociationSet},
       {0x85, 0x02, Commands.AssociationGet},
