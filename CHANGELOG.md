@@ -1,5 +1,13 @@
 ## Changelog
 
+## v0.12.2
+
+Enhancements
+  * Add `Grizzly.ZWave.CommandClasses.Hail`
+  * Add `Grizzly.ZWave.Commands.Hail`
+  * Support updated Z-Wave spec command params for
+    `Grizzly.ZWave.Commands.DoorLockOperationReport`
+
 ## v0.12.1
 
 Enhancements
