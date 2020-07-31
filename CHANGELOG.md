@@ -1,5 +1,14 @@
 ## Changelog
 
+## v0.12.3
+
+Fixes
+  * Handle multichannel commands that are not appropriately encapsulated
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.12.2
 
 Enhancements
