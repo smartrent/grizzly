@@ -3,7 +3,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
 
   use GenServer
 
-  alias Grizzly.{Inclusions, SeqNumber}
+  alias Grizzly.{Inclusions, SeqNumber, Report}
   alias Grizzly.Inclusions.InclusionRunner.Inclusion
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.ZWave.{Security, Command}
@@ -186,22 +186,11 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   end
 
   @impl true
-  def handle_info(
-        {:grizzly, :send_command, {:ok, command}},
-        inclusion
-      ) do
-    handle_command(command, inclusion)
-  end
-
-  def handle_info({:grizzly, :unhandled_command, command}, inclusion) do
-    handle_command(command, inclusion)
-  end
-
-  def handle_info({:grizzly, :send_command, :ok}, inclusion) do
+  def handle_info({:grizzly, :report, %Report{type: :ack_response}}, inclusion) do
     {:noreply, inclusion}
   end
 
-  def handle_info({:grizzly, :send_command, {:error, :timeout, _command_ref}}, inclusion) do
+  def handle_info({:grizzly, :report, {:error, :timeout, _command_ref}}, inclusion) do
     respond_to_handler(
       format_handler_spec(inclusion.handler),
       {:error, :timeout, inclusion.state}
@@ -210,15 +199,19 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     {:noreply, inclusion}
   end
 
+  def handle_info(
+        {:grizzly, :report, report},
+        inclusion
+      ) do
+    handle_report(report, inclusion)
+  end
+
   @impl true
   def terminate(:normal, inclusion) do
     :ok = AsyncConnection.stop(inclusion.controller_id)
 
     :ok
   end
-
-  defp get_command({:ok, command}), do: command
-  defp get_command(command), do: command
 
   defp build_inclusion_opts_for_command(command) do
     case command.name do
@@ -230,13 +223,11 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     end
   end
 
-  defp handle_command(command, inclusion) do
-    command = get_command(command)
-    opts = build_inclusion_opts_for_command(command)
+  defp handle_report(report, inclusion) do
+    opts = build_inclusion_opts_for_command(report.command)
+    inclusion = Inclusion.handle_command(inclusion, report.command, opts)
 
-    inclusion = Inclusion.handle_command(inclusion, command, opts)
-
-    respond_to_handler(format_handler_spec(inclusion.handler), command)
+    respond_to_handler(format_handler_spec(inclusion.handler), report)
 
     if inclusion.state == :complete do
       {:stop, :normal, inclusion}
@@ -249,8 +240,8 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   defp format_handler_spec(handler) when is_pid(handler), do: handler
   defp format_handler_spec(handler), do: {handler, []}
 
-  defp respond_to_handler(handler, command) when is_pid(handler) do
-    send(handler, {:grizzly, :inclusion, command})
+  defp respond_to_handler(handler, report) when is_pid(handler) do
+    send(handler, {:grizzly, :report, report})
   end
 
   defp respond_to_handler(
@@ -260,8 +251,8 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     spawn_link(fn -> handler_module.handle_timeout(inclusion_state, handler_opts) end)
   end
 
-  defp respond_to_handler({handler_module, handler_opts}, command) do
+  defp respond_to_handler({handler_module, handler_opts}, report) do
     # TODO - Consider using a handler runner genserver for calling the plugin inclusion handler
-    spawn_link(fn -> handler_module.handle_command(command, handler_opts) end)
+    spawn_link(fn -> handler_module.handle_report(report, handler_opts) end)
   end
 end

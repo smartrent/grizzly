@@ -4,7 +4,7 @@ defmodule Grizzly.Connections.KeepAlive do
   # module for working with the Z/IP Keep Alive command and handling the keep
   # alive information
 
-  alias Grizzly.Commands
+  alias Grizzly.{Commands, ZWave}
   alias Grizzly.ZWave.Commands.ZIPKeepAlive
 
   @type opt :: {:owner, pid()}
@@ -14,14 +14,16 @@ defmodule Grizzly.Connections.KeepAlive do
           last_send: non_neg_integer() | nil,
           interval: non_neg_integer() | nil,
           owner: pid(),
-          command_runner: pid() | nil
+          command_runner: pid() | nil,
+          node_id: ZWave.node_id()
         }
 
   defstruct ref: nil,
             last_send: nil,
             interval: nil,
             owner: nil,
-            command_runner: nil
+            command_runner: nil,
+            node_id: nil
 
   @doc """
   Initialize a keep alive timer
@@ -29,13 +31,14 @@ defmodule Grizzly.Connections.KeepAlive do
   This will start the timer at the given interval and send the message
   `:keep_alive_tick` after that interval has passed
   """
-  @spec init(non_neg_integer(), [opt()]) :: t()
-  def init(interval, opt \\ []) do
+  @spec init(ZWave.node_id(), non_neg_integer(), [opt()]) :: t()
+  def init(node_id, interval, opt \\ []) do
     owner = Keyword.get(opt, :owner, self())
 
     %__MODULE__{
       interval: interval,
-      owner: owner
+      owner: owner,
+      node_id: node_id
     }
     |> timer_start()
   end
@@ -48,7 +51,7 @@ defmodule Grizzly.Connections.KeepAlive do
   @spec make_command(t()) :: t()
   def make_command(keep_alive) do
     {:ok, keep_alive_command} = ZIPKeepAlive.new(ack_flag: :ack_request)
-    {:ok, command_runner} = Commands.create_command(keep_alive_command)
+    {:ok, command_runner} = Commands.create_command(keep_alive_command, keep_alive.node_id)
 
     %__MODULE__{keep_alive | command_runner: command_runner}
   end

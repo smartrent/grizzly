@@ -11,7 +11,7 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   use GenServer
 
-  alias Grizzly.Connections
+  alias Grizzly.{Connections, Report}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.Connections.{KeepAlive, CommandList}
   alias Grizzly.ZWave.Command
@@ -23,7 +23,8 @@ defmodule Grizzly.Connections.AsyncConnection do
               socket: nil,
               commands: CommandList.empty(),
               owner: nil,
-              keep_alive: nil
+              keep_alive: nil,
+              node_id: nil
   end
 
   def child_spec(node_id, opts \\ []) do
@@ -69,8 +70,9 @@ defmodule Grizzly.Connections.AsyncConnection do
          %State{
            socket: socket,
            transport: transport,
-           keep_alive: KeepAlive.init(25_000),
-           owner: Keyword.fetch!(opts, :owner)
+           keep_alive: KeepAlive.init(node_id, 25_000),
+           owner: Keyword.fetch!(opts, :owner),
+           node_id: node_id
          }}
 
       {:error, :timeout} ->
@@ -80,7 +82,7 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   def handle_call({:send_command, command, send_opts}, {waiter, _ref}, state) do
     {:ok, command_runner, command_ref, new_command_list} =
-      CommandList.create(state.commands, command, waiter, send_opts)
+      CommandList.create(state.commands, command, state.node_id, waiter, send_opts)
 
     case do_send_command(command_runner, state) do
       :ok ->
@@ -157,30 +159,26 @@ defmodule Grizzly.Connections.AsyncConnection do
             # connection gets an unhandled command from the Z-Wave
             send(
               state.owner,
-              {:grizzly, :unhandled_command, Command.param!(zip_packet, :command)}
+              {:grizzly, :report, to_report(zip_packet, state.node_id)}
             )
           end
 
           %State{state | commands: new_comamnd_list}
 
         {waiter, {:error, :nack_response, new_comamnd_list}} ->
-          send(waiter, {:grizzly, :send_command, {:error, :nack_response}})
+          send(waiter, {:error, :nack_response})
           %State{state | commands: new_comamnd_list}
 
-        {waiter, {:queued_complete, ref, response, new_command_list}} ->
-          send(waiter, {:grizzly, :queued_command_response, ref, response})
-          %State{state | commands: new_command_list}
-
-        {waiter, {:queued, ref, queued_seconds, new_comamnd_list}} ->
-          GenServer.reply(waiter, {:queued, ref, queued_seconds})
-          %State{state | commands: new_comamnd_list}
-
-        {waiter, {:complete, response, new_comamnd_list}} ->
-          send(waiter, {:grizzly, :send_command, response})
+        {waiter, {%Report{} = report, new_comamnd_list}} ->
+          send(waiter, {:grizzly, :report, report})
           %State{state | commands: new_comamnd_list}
       end
 
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
+  end
+
+  defp to_report(zip_packet, node_id) do
+    Report.new(:complete, :command, node_id, command: Command.param!(zip_packet, :command))
   end
 
   defp do_send_command(command_runner, state) do
@@ -189,23 +187,22 @@ defmodule Grizzly.Connections.AsyncConnection do
     state.transport.send(state.socket, binary)
   end
 
-  def send_response(from, zip_packet, command_ref, response) do
-    if ZIPPacket.ack_response?(zip_packet) do
-      send(from, {:grizzly, :ack_response, command_ref, response})
-    else
-      command = Command.param!(zip_packet, :command)
-      send(from, {:grizzly, command.name, command_ref, response})
-    end
-  end
-
   defp do_timeout_reply(waiter, grizzly_command) do
-    response = {:error, :timeout}
-
     if grizzly_command.status == :queued do
       {pid, _tag} = waiter
-      send(pid, {:grizzly, :queued_command_response, grizzly_command.ref, response})
+
+      report =
+        Report.new(:complete, :timeout, grizzly_command.node_id,
+          command_ref: grizzly_command.ref,
+          queued: true
+        )
+
+      send(pid, {:grizzly, :report, report})
     else
-      send(waiter, {:grizzly, :send_command, {:error, :timeout, grizzly_command.ref}})
+      report =
+        Report.new(:complete, :timeout, grizzly_command.node_id, command_ref: grizzly_command.ref)
+
+      send(waiter, {:grizzly, :report, report})
     end
   end
 end

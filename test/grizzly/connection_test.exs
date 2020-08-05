@@ -1,7 +1,7 @@
 defmodule Grizzly.ConnectionTest do
   use ExUnit.Case
 
-  alias Grizzly.Connection
+  alias Grizzly.{Connection, Report}
 
   test "open a connection" do
     assert {:ok, _connection} = Connection.open(1)
@@ -15,6 +15,7 @@ defmodule Grizzly.ConnectionTest do
 
     # the send command should reconnect when trying to send a command and
     # work as if no connection closing happened.
-    assert :ok == Grizzly.send_command(555, :switch_binary_set, target_value: :off)
+    assert {:ok, %Report{status: :complete, type: :ack_response, node_id: 555}} =
+             Grizzly.send_command(555, :switch_binary_set, target_value: :off)
   end
 end

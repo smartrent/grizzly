@@ -21,58 +21,61 @@ defmodule Grizzly do
   Grizzly.send_command(node_id, :switch_binary_set, value: :off)
   ```
 
-  Also, a command can have options. Namely, `:timeout` (default `5_000`) and
-  `:retries` (default `2`).
+  Also, a command can have options.
 
   ```elixir
   Grizzly.send_command(node_id, :switch_binary_get, [], timeout: 10_000, retries: 5)
   ```
 
-  The `send_command` returns one 4 values:
+  Some possible return values from `send_command` are:
 
-  1. `:ok` - the command was sent and everything is okay
-  1. `{:ok, Command.t()}` - the command was sent and the Z-Wave device
-     responded with another command (probably some type of report)
+  1. `{:ok, Grizzly.Report.t()}` - the command was sent and the Z-Wave device
+     responded with a report. See `Grizzly.Report` for more information.
   1. `{:error, :including}` - current the Z-Wave controller is adding or
      removing a device and commands cannot be processed right now
   1. `{:error, :firmware_updating}` - current the Z-Wave controller is updating firmware and commands cannot be processed right now
   1. `{:error, reason}` - there was some other reason for an error, two
-     common ones are: `:timeout` and `:nack_response`
-  1. `{:queued, reference, seconds}` - the node is a sleeping node so the
-      controller queued the command and expects the command to be sent in after
-      the reported seconds have passed.
+     common ones are: `:nack_response`
 
   For a more detailed explanation of the responses from a `send_command` call
   see the typedoc for `Grizzly.send_command_response()`.
+
+  # Events from Z-Wave
+
+  Events generating from a Z-Wave device, for example a motion detected event,
+  can be handled via the `Grizzly.subscribe_command/1` and
+  `Grizzly.subscribe_commands/1` functions. This will allow you to subscribe
+  to specific commands. When the command is received from the Z-Wave network
+  it will placed in a `Grizzly.Report` and set to the subscribing process. The
+  node that generated the report can be accessed with the `:node_id` field in
+  the report.
+
+  ```elixir
+  iex> Grizzly.subscribe_command(:battery_report)
+
+  # sometime latter
+
+  iex> flush
+  {:grizzly, :event, %Grizzly.Report{command: %Grizzly.ZWave.Command{name: :battery_report}}}
+  ```
+
   """
 
-  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Node}
+  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Node, Report}
   alias Grizzly.Commands.Table
   alias Grizzly.UnsolicitedServer.Messages
-  alias Grizzly.ZWave.Command
 
   @typedoc """
   The response from sending a Z-Wave command
 
-  When everything is okay you will either back an `:ok` or a
-  `{:ok, %Grizzly.Zwave.Command{}}`. The Z-Wave Command data structure provides
-  a consistent interface to all the Z-Wave commands. For more information see
-  `Grizzly.ZWave.Command` module.
-
-  In Grizzly `:ok` does not mean the Z-Wave node received *and* processed your
-  command. Rather it only means that the command was received. If you want to
-  make sure the device processed your command correctly you will have to issue
-  another command to get the value you just set and verify it that way.
+  When everything is okay the response will be `{:ok, Grizzly.Report{}}`. For
+  documentation about a report see `Grizzly.Report` module.
 
   When there are errors the response will be in the pattern of
   `{:error, reason}`.
 
-  Three reasons that Grizzly supports for all commands are `:timeout`,
-  `:nack_response`, and `:including`.
-
-  If your command takes awhile to run you adjust the
-  `:timeout` value with the `:timeout` command option using
-  `Grizzly.send_command/4`.
+  Three reasons that Grizzly supports for all commands are `:nack_response`,
+  `:update_firmware`, and `:including`.
 
   A `:nack_response` normally means that the Z-Wave node that you were trying
   to send a command to is unreachable and did not receive your command at all.
@@ -91,20 +94,19 @@ defmodule Grizzly do
   inclusion. It's best to wait and try again once your application is done
   trying to include.
   """
-  @type send_command_response ::
-          :ok
-          | {:ok, Command.t()}
-          | {:error, :including | :updating_firmware | :timeout | :nack_response | any()}
-          | {:queued, reference(), non_neg_integer()}
+  @type send_command_response() ::
+          {:ok, Report.t()}
+          | {:error, :including | :updating_firmware | :nack_response | any()}
 
-  @type seq_number :: non_neg_integer()
+  @type seq_number() :: non_neg_integer()
 
-  @type node_id :: non_neg_integer()
+  @type node_id() :: non_neg_integer()
 
-  @type command_opt ::
+  @type command_opt() ::
           {:timeout, non_neg_integer()}
           | {:retries, non_neg_integer()}
           | {:handler, module() | {module(), args :: list()}}
+          | {:transmission_stats, boolean()}
 
   @type command :: atom()
 

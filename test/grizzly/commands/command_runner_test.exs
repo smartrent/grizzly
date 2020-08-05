@@ -1,7 +1,7 @@
 defmodule Grizzly.Commands.CommandRunnerTest do
   use ExUnit.Case
 
-  alias Grizzly.SeqNumber
+  alias Grizzly.{SeqNumber, Report}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.ZWave.Command
 
@@ -16,16 +16,19 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
   test "runs a basic application command that only expects an ack response" do
     {:ok, command} = SwitchBinarySet.new(target_value: :off)
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
+    ref = CommandRunner.reference(runner)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
+    report = Report.new(:complete, :ack_response, 1, command_ref: ref)
 
-    assert {:complete, :ok} == CommandRunner.handle_zip_command(runner, ack_response)
+    assert report == CommandRunner.handle_zip_command(runner, ack_response)
   end
 
   test "runs a network command that has the seq number as part of the command" do
     {:ok, command} = NodeListGet.new(seq_number: SeqNumber.get_and_inc())
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
+    ref = CommandRunner.reference(runner)
 
     command_seq_number = Command.param!(command, :seq_number)
 
@@ -40,28 +43,31 @@ defmodule Grizzly.Commands.CommandRunnerTest do
         node_ids: []
       )
 
+    report = Report.new(:complete, :command, 1, command: node_list_report, command_ref: ref)
+
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(node_list_report, SeqNumber.get_and_inc())
 
-    assert {:complete, {:ok, ^node_list_report}} =
-             CommandRunner.handle_zip_command(runner, zip_packet)
+    assert report == CommandRunner.handle_zip_command(runner, zip_packet)
   end
 
   test "runs a basic application command that expects a report" do
     {:ok, command} = SwitchBinaryGet.new()
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
+    ref = CommandRunner.reference(runner)
 
     {:ok, switch_binary_report} = SwitchBinaryReport.new(target_value: :on)
+
+    report = Report.new(:complete, :command, 1, command: switch_binary_report, command_ref: ref)
 
     {:ok, zip_packet} =
       ZIPPacket.with_zwave_command(switch_binary_report, SeqNumber.get_and_inc())
 
-    assert {:complete, {:ok, ^switch_binary_report}} =
-             CommandRunner.handle_zip_command(runner, zip_packet)
+    assert report == CommandRunner.handle_zip_command(runner, zip_packet)
   end
 
   test "runs command that will receive a nack response" do
     {:ok, command} = SwitchBinaryGet.new()
-    {:ok, runner} = CommandRunner.start_link(command, retries: 0)
+    {:ok, runner} = CommandRunner.start_link(command, 1, retries: 0)
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
@@ -70,7 +76,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
   test "ignores nack_response not for command" do
     {:ok, command} = SwitchBinaryGet.new()
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner) + 1)
 
@@ -79,50 +85,73 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
   test "handles a queued command" do
     {:ok, command} = SwitchBinaryGet.new()
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
     command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
 
-    assert {:queued, command_ref, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
+    report =
+      Report.new(:inflight, :queued_delay, 1,
+        queued: true,
+        command_ref: command_ref,
+        queued_delay: 3
+      )
+
+    assert report == CommandRunner.handle_zip_command(runner, nack_waiting)
   end
 
   test "handles queued complete command" do
     {:ok, command} = SwitchBinarySet.new(target_value: :off)
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
     command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
 
-    assert {:queued, command_ref, 3} == CommandRunner.handle_zip_command(runner, nack_waiting)
+    assert Report.new(:inflight, :queued_delay, 1,
+             queued: true,
+             queued_delay: 3,
+             command_ref: command_ref
+           ) ==
+             CommandRunner.handle_zip_command(runner, nack_waiting)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
-    assert {:queued_complete, command_ref, :ok} ==
+    report =
+      Report.new(:complete, :ack_response, 1,
+        queued: true,
+        command_ref: command_ref
+      )
+
+    assert report ==
              CommandRunner.handle_zip_command(runner, ack_response)
   end
 
   @tag :integration
   test "handles queued complete command with long timeout" do
     {:ok, command} = SwitchBinarySet.new(target_value: :off)
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
     command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 10)
 
-    assert {:queued, command_ref, 10} == CommandRunner.handle_zip_command(runner, nack_waiting)
+    assert Report.new(:inflight, :queued_delay, 1,
+             queued_delay: 10,
+             queued: true,
+             command_ref: command_ref
+           ) ==
+             CommandRunner.handle_zip_command(runner, nack_waiting)
 
     Process.sleep(10_000)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
-    assert {:queued_complete, command_ref, :ok} ==
+    assert Report.new(:complete, :ack_response, 1, command_ref: command_ref, queued: true) ==
              CommandRunner.handle_zip_command(runner, ack_response)
   end
 
   test "encodes a command" do
     {:ok, command} = SwitchBinaryGet.new()
-    {:ok, runner} = CommandRunner.start_link(command)
+    {:ok, runner} = CommandRunner.start_link(command, 1)
     seq_number = CommandRunner.seq_number(runner)
 
     assert <<0x23, 0x02, 0x80, 0x50, seq_number, 0x00, 0x00, 0x25, 0x02>> ==
@@ -132,14 +161,14 @@ defmodule Grizzly.Commands.CommandRunnerTest do
   describe "seq numbering" do
     test "assign a seq number for a command without one" do
       {:ok, command} = SwitchBinaryGet.new()
-      {:ok, runner} = CommandRunner.start_link(command)
+      {:ok, runner} = CommandRunner.start_link(command, 1)
 
       assert CommandRunner.seq_number(runner)
     end
 
     test "use the seq number for a command that has one" do
       {:ok, command} = NodeListGet.new(seq_number: SeqNumber.get_and_inc())
-      {:ok, runner} = CommandRunner.start_link(command)
+      {:ok, runner} = CommandRunner.start_link(command, 1)
       command_seq_number = Command.param!(command, :seq_number)
 
       # ensure that the seq number the command has is used by the command runner

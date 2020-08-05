@@ -26,8 +26,8 @@ defmodule Grizzly.InclusionHandler do
 
   """
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.Report
 
-  @callback handle_command(Command.t(), keyword()) :: :ok
+  @callback handle_report(Report.t(), keyword()) :: :ok
   @callback handle_timeout(atom, keyword()) :: :ok
 end

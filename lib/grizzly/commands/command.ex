@@ -3,7 +3,7 @@ defmodule Grizzly.Commands.Command do
 
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
-  alias Grizzly.SeqNumber
+  alias Grizzly.{Report, SeqNumber, ZWave}
   alias Grizzly.Commands.Table
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands.ZIPPacket
@@ -19,11 +19,17 @@ defmodule Grizzly.Commands.Command do
           seq_number: Grizzly.seq_number(),
           timeout_ref: reference() | nil,
           ref: reference(),
-          status: status()
+          status: status(),
+          with_transmission_stats: boolean(),
+          transmission_stats: keyword(),
+          node_id: ZWave.node_id()
         }
 
   @type opt ::
-          {:timeout_ref, reference()} | {:reference, reference()} | {:retries, non_neg_integer()}
+          {:timeout_ref, reference()}
+          | {:reference, reference()}
+          | {:retries, non_neg_integer()}
+          | {:transmission_stats, boolean()}
 
   defstruct owner: nil,
             retries: 2,
@@ -33,14 +39,19 @@ defmodule Grizzly.Commands.Command do
             seq_number: nil,
             timeout_ref: nil,
             ref: nil,
-            status: :inflight
+            status: :inflight,
+            with_transmission_stats: false,
+            transmission_stats: [],
+            node_id: nil
 
-  def from_zwave_command(zwave_command, owner, opts \\ []) do
+  @spec from_zwave_command(ZWaveCommand.t(), ZWave.node_id(), pid(), [opt()]) :: t()
+  def from_zwave_command(zwave_command, node_id, owner, opts \\ []) do
     {handler, handler_init_args} = get_handler_spec(zwave_command, opts)
     {:ok, handler_state} = handler.init(handler_init_args)
     retries = Keyword.get(opts, :retries, 2)
     command_ref = Keyword.get(opts, :reference, make_ref())
     timeout_ref = Keyword.get(opts, :timeout_ref)
+    with_transmission_stats = Keyword.get(opts, :transmission_stats, false)
 
     %__MODULE__{
       handler: handler,
@@ -50,7 +61,9 @@ defmodule Grizzly.Commands.Command do
       seq_number: get_seq_number(zwave_command),
       timeout_ref: timeout_ref,
       retries: retries,
-      ref: command_ref
+      ref: command_ref,
+      with_transmission_stats: with_transmission_stats,
+      node_id: node_id
     }
   end
 
@@ -64,23 +77,20 @@ defmodule Grizzly.Commands.Command do
           ZWaveCommand.encode_params(zwave_command)
 
       _other ->
+        opts = make_zip_packet_command_opts(command)
+
         {:ok, zip_packet_command} =
-          ZIPPacket.with_zwave_command(zwave_command, command.seq_number,
-            seq_number: command.seq_number
-          )
+          ZIPPacket.with_zwave_command(zwave_command, command.seq_number, opts)
 
         ZWaveCommand.to_binary(zip_packet_command)
     end
   end
 
   @spec handle_zip_command(t(), ZWaveCommand.t()) ::
-          {:continue, t()}
+          {Report.t(), t()}
           | {:error, :nack_response, t()}
-          | {:queued_complete, any(), t()}
-          | {:queued_ping, non_neg_integer(), t()}
-          | {:queued, non_neg_integer(), t()}
-          | {:complete, any(), t()}
           | {:retry, t()}
+          | {:continue, t()}
   def handle_zip_command(command, zip_command) do
     case ZWaveCommand.param!(zip_command, :flag) do
       :ack_response ->
@@ -101,19 +111,29 @@ defmodule Grizzly.Commands.Command do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
     if command.seq_number == seq_number do
-      handle_ack_response(command)
+      do_handle_ack_response(command, zip_packet)
     else
       {:continue, command}
     end
   end
 
-  defp handle_ack_response(command) do
+  defp do_handle_ack_response(command, zip_packet) do
+    transmission_stats = make_network_stats(command, zip_packet)
+
     case command.handler.handle_ack(command.handler_state) do
       {:continue, new_handler_state} ->
-        {:continue, %__MODULE__{command | handler_state: new_handler_state}}
+        {:continue,
+         %__MODULE__{
+           command
+           | handler_state: new_handler_state,
+             transmission_stats: transmission_stats
+         }}
 
-      {:complete, _response} = result ->
-        build_complete_reply(command, result)
+      {:complete, response} ->
+        build_complete_reply(
+          %__MODULE__{command | transmission_stats: transmission_stats},
+          response
+        )
     end
   end
 
@@ -152,8 +172,8 @@ defmodule Grizzly.Commands.Command do
       {:continue, new_handler_state} ->
         {:continue, %__MODULE__{command | handler_state: new_handler_state}}
 
-      {:complete, _response} = result ->
-        build_complete_reply(command, result)
+      {:complete, response} ->
+        build_complete_reply(command, response)
     end
   end
 
@@ -193,23 +213,111 @@ defmodule Grizzly.Commands.Command do
   defp make_queued_or_queued_ping_response(command, delay) do
     case command.status do
       :inflight ->
-        {:queued, delay, %__MODULE__{command | status: :queued}}
+        queued_delay_report =
+          Report.new(:inflight, :queued_delay, command.node_id,
+            command_ref: command.ref,
+            queued_delay: delay,
+            queued: true
+          )
+
+        {queued_delay_report, %__MODULE__{command | status: :queued}}
 
       :queued ->
-        {:queued_ping, delay, command}
+        {Report.new(:inflight, :queued_ping, command.node_id,
+           command_ref: command.ref,
+           queued_delay: delay,
+           queued: true
+         ), command}
     end
   end
 
-  defp build_complete_reply(command, {:complete, result}) do
+  defp build_complete_reply(command, response) do
     case command.status do
       :inflight ->
-        {:complete, result, %__MODULE__{command | status: :complete}}
+        {build_report(command, response), %__MODULE__{command | status: :complete}}
 
       :queued ->
-        {:queued_complete, format_result(result), %__MODULE__{command | status: :complete}}
+        case response do
+          :ok ->
+            {Report.new(:complete, :ack_response, command.node_id,
+               command_ref: command.ref,
+               queued: true
+             ), %__MODULE__{command | status: :complete}}
+
+          %ZWaveCommand{} ->
+            {Report.new(:complete, :command, command.node_id,
+               command_ref: command.ref,
+               command: response,
+               queued: true
+             ), %__MODULE__{command | status: :complete}}
+        end
     end
   end
 
-  defp format_result({:ok, command}), do: command
-  defp format_result(:ok), do: :ok
+  defp make_zip_packet_command_opts(grizzly_command) do
+    Keyword.new()
+    |> maybe_add_installation_and_maintenance_get(grizzly_command)
+    |> add_seq_number(grizzly_command)
+  end
+
+  defp maybe_add_installation_and_maintenance_get(opts, grizzly_command) do
+    if grizzly_command.with_transmission_stats do
+      Keyword.put(opts, :header_extensions, [:install_and_maintenance_get])
+    else
+      opts
+    end
+  end
+
+  defp add_seq_number(opts, grizzly_command) do
+    Keyword.put(opts, :seq_number, grizzly_command.seq_number)
+  end
+
+  defp make_network_stats(command, zip_packet) do
+    Keyword.new()
+    |> maybe_return_network_stats(command, zip_packet)
+  end
+
+  defp maybe_return_network_stats(meta, command, zip_packet) do
+    if command.with_transmission_stats do
+      stats = get_stats_from_zip_packet(zip_packet)
+
+      Enum.reduce(stats, meta, fn
+        {key, value}, m -> Keyword.put(m, key, value)
+        {key, value, value2}, m -> Keyword.put(m, key, {value, value2})
+      end)
+    else
+      meta
+    end
+  end
+
+  defp get_stats_from_zip_packet(zip_packet) do
+    case ZIPPacket.extension(zip_packet, :installation_and_maintenance_report) do
+      nil ->
+        []
+
+      report ->
+        report
+    end
+  end
+
+  defp build_report(command, :ok) do
+    %Report{
+      status: :complete,
+      command_ref: command.ref,
+      transmission_stats: command.transmission_stats,
+      type: :ack_response,
+      node_id: command.node_id
+    }
+  end
+
+  defp build_report(command, response) do
+    %Report{
+      status: :complete,
+      command: response,
+      transmission_stats: command.transmission_stats,
+      type: :command,
+      command_ref: command.ref,
+      node_id: command.node_id
+    }
+  end
 end

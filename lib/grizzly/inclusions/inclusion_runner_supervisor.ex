@@ -27,7 +27,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerSupervisor do
   end
 
   defp get_inclusion_handler() do
-    case Application.get_env(:girzzly, :handlers) do
+    case Application.get_env(:grizzly, :handlers) do
       nil ->
         self()
 

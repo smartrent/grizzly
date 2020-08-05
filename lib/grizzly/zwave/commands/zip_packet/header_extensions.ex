@@ -42,6 +42,9 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
 
       :multicast_addressing, bin ->
         bin <> <<0x05, 0x00>>
+
+      :install_and_maintenance_get, bin ->
+        bin <> <<0x02, 0x00>>
     end)
   end
 

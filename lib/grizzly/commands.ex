@@ -4,6 +4,7 @@ defmodule Grizzly.Commands do
   # module for providing away to setup and tie Z-Wave commands into the
   # Grizzly runtime for handling commands
 
+  alias Grizzly.ZWave
   alias Grizzly.Commands.{CommandRunner, CommandRunnerSupervisor}
   alias Grizzly.ZWave.Command
 
@@ -13,9 +14,9 @@ defmodule Grizzly.Commands do
   This command process is supervised and will stop once the command has
   completed its life cycle or until the timeout has expired
   """
-  @spec create_command(Command.t(), keyword()) :: {:ok, pid()}
-  def create_command(zwave_command, opts \\ []) do
-    CommandRunnerSupervisor.start_runner(zwave_command, opts)
+  @spec create_command(Command.t(), ZWave.node_id(), keyword()) :: {:ok, pid()}
+  def create_command(zwave_command, node_id, opts \\ []) do
+    CommandRunnerSupervisor.start_runner(zwave_command, node_id, opts)
   end
 
   @doc """

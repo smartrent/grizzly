@@ -1,22 +1,28 @@
 defmodule Grizzly.Test do
   use ExUnit.Case
 
+  alias Grizzly.Report
   alias Grizzly.ZWave.Commands.SwitchBinaryReport
 
   describe "SwitchBinary Commands" do
     @tag :integration
     test "SwitchBinarySet version 1" do
-      assert :ok == Grizzly.send_command(2, :switch_binary_set, target_value: :off)
+      assert {:ok, %Report{status: :complete, type: :ack_response, node_id: 2}} =
+               Grizzly.send_command(2, :switch_binary_set, target_value: :off)
     end
 
     @tag :integration
     test "SwitchBinarySet version 2" do
-      assert :ok == Grizzly.send_command(2, :switch_binary_set, target_value: :on, duration: 100)
+      assert {:ok, %Report{status: :complete, type: :ack_response, node_id: 2}} =
+               Grizzly.send_command(2, :switch_binary_set, target_value: :on, duration: 100)
     end
 
     @tag :integration
     test "SWitchBinaryGet" do
-      assert SwitchBinaryReport.new(target_value: :off) ==
+      {:ok, switch_report} = SwitchBinaryReport.new(target_value: :off)
+
+      assert {:ok,
+              %Report{status: :complete, type: :command, command: ^switch_report, node_id: 2}} =
                Grizzly.send_command(2, :switch_binary_get)
     end
   end
@@ -27,15 +33,24 @@ defmodule Grizzly.Test do
   end
 
   @tag :integration
+  test "command that timeouts" do
+    assert {:ok, %Report{status: :complete, type: :timeout, node_id: 100}} =
+             Grizzly.send_command(100, :switch_binary_get)
+  end
+
+  @tag :integration
   test "send a command to a node that hasn't been connected to yet" do
-    assert SwitchBinaryReport.new(target_value: :off) ==
+    {:ok, switch_report} = SwitchBinaryReport.new(target_value: :off)
+
+    assert {:ok, %Report{status: :complete, type: :command, command: ^switch_report, node_id: 50}} =
              Grizzly.send_command(50, :switch_binary_get)
   end
 
   @tag :integration
   test "send a command to a device that is sleeping" do
-    {:queued, ref, 2} = Grizzly.send_command(102, :battery_get)
+    {:ok, %Report{queued_delay: 2, queued: true} = report} =
+      Grizzly.send_command(102, :battery_get)
 
-    assert is_reference(ref)
+    assert is_reference(report.command_ref)
   end
 end

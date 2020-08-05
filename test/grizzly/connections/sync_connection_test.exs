@@ -1,9 +1,8 @@
 defmodule Grizzly.Connections.SyncConnectionTest do
   use ExUnit.Case
 
-  alias Grizzly.Connection
+  alias Grizzly.{Connection, Report}
   alias Grizzly.Connections.SyncConnection
-  alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
 
   setup do
@@ -31,22 +30,24 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, command} = SwitchBinaryGet.new()
 
     # 102 will always respond with nack waiting with 2 seconds
-    assert {:queued, ref, 2} = SyncConnection.send_command(102, command)
+    assert {:ok,
+            %Report{status: :inflight, type: :queued_delay, queued_delay: 2, queued: true} =
+              report} = SyncConnection.send_command(102, command)
+
+    ref = report.command_ref
 
     assert is_reference(ref)
 
-    assert_receive {:grizzly, :queued_command_response, ^ref,
-                    %ZWaveCommand{} = zwave_command_response},
-                   2_500
+    assert_receive {:grizzly, :report, %Report{command_ref: ^ref} = report}, 2_500
 
-    assert zwave_command_response.name == :switch_binary_report
+    assert report.command.name == :switch_binary_report
   end
 
   @tag :integration
   test "handle command that does not respond (timeout)" do
     {:ok, command} = SwitchBinaryGet.new()
 
-    assert {:error, :timeout} ==
+    assert {:ok, %Report{type: :timeout, node_id: 100}} =
              SyncConnection.send_command(100, command, timeout: 2_500)
   end
 
@@ -54,7 +55,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   test "handle command that does not respond (long timeout)" do
     {:ok, command} = SwitchBinaryGet.new()
 
-    assert {:error, :timeout} ==
+    assert {:ok, %Report{type: :timeout, node_id: 100}} =
              SyncConnection.send_command(100, command, timeout: 10_000)
   end
 end
