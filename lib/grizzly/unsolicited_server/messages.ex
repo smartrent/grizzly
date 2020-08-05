@@ -3,8 +3,7 @@ defmodule Grizzly.UnsolicitedServer.Messages do
 
   require Logger
 
-  alias Grizzly.ZIPGateway
-  alias Grizzly.ZWave
+  alias Grizzly.{Report, ZIPGateway, ZWave}
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 
@@ -48,8 +47,15 @@ defmodule Grizzly.UnsolicitedServer.Messages do
 
         Registry.dispatch(@registry, ZIPPacket.command_name(zip_packet), fn listeners ->
           for {pid, _} <- listeners,
-              do: send(pid, {:grizzly, :event, node_id, Command.param!(zip_packet, :command)})
+              do: send_report(pid, node_id, zip_packet)
         end)
     end
+  end
+
+  defp send_report(pid, node_id, zip_packet) do
+    report =
+      Report.new(:complete, :unsolicited, node_id, command: Command.param!(zip_packet, :command))
+
+    send(pid, {:grizzly, :report, report})
   end
 end

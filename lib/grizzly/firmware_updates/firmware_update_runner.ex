@@ -2,7 +2,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   @moduledoc false
   use GenServer
 
-  alias Grizzly.FirmwareUpdates
+  alias Grizzly.{FirmwareUpdates, Report}
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.{FirmwareUpdate, Image}
   alias Grizzly.Connections.AsyncConnection
   require Logger
@@ -115,19 +115,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
   @impl true
   # Async responses to commands sent
-  def handle_info(
-        {:grizzly, :send_command, {:ok, command}},
-        firmware_update
-      ) do
-    handle_command(command, firmware_update)
-  end
+  def handle_info({:grizzly, :report, report}, firmware_update) do
+    case report.type do
+      :ack_response ->
+        {:noreply, firmware_update}
 
-  def handle_info({:grizzly, :unhandled_command, command}, firmware_update) do
-    handle_command(command, firmware_update)
-  end
-
-  def handle_info({:grizzly, :send_command, :ok}, firmware_update) do
-    {:noreply, firmware_update}
+      :command ->
+        handle_report(report, firmware_update)
+    end
   end
 
   @impl true
@@ -137,12 +132,13 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :ok
   end
 
-  defp get_command({:ok, command}), do: command
-  defp get_command(command), do: command
+  defp handle_report(%Report{type: :ack_response}, firmware_update) do
+    {:noreply, firmware_update}
+  end
 
-  defp handle_command(command, firmware_update) do
-    Logger.debug("[Grizzly] Handling FW update command #{inspect(command)}")
-    command = get_command(command)
+  defp handle_report(report, firmware_update) do
+    Logger.debug("[Grizzly] Handling FW update command #{inspect(report)}")
+    command = report.command
     new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
 
     respond_to_handler(format_handler_spec(firmware_update.handler), command)
@@ -190,7 +186,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   defp format_handler_spec(handler), do: {handler, []}
 
   defp respond_to_handler(handler, command) when is_pid(handler) do
-    send(handler, {:grizzly, :firmware_update, command})
+    send(handler, {:grizzly, :report, command})
   end
 
   defp respond_to_handler({handler_module, handler_opts}, command) do

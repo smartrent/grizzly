@@ -8,7 +8,7 @@ defmodule Grizzly.Connections.CommandList do
 
   require Logger
 
-  alias Grizzly.Commands
+  alias Grizzly.{Commands, Report, ZWave}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 
@@ -36,47 +36,40 @@ defmodule Grizzly.Connections.CommandList do
 
   Returns `{:ok, command_runner_pid, command_reference, new_command_list}`
   """
-  @spec create(t(), ZWaveCommand.t(), command_waiter(), keyword()) ::
+  @spec create(t(), ZWaveCommand.t(), ZWave.node_id(), command_waiter(), keyword()) ::
           {:ok, pid(), reference(), t()}
-  def create(command_list, command, waiter, command_opts \\ []) do
-    case new_command(command_list, command, waiter, command_opts) do
+  def create(command_list, command, node_id, waiter, command_opts \\ []) do
+    case new_command(command_list, command, node_id, waiter, command_opts) do
       {:ok, command_runner, reference, new_command_list} ->
         {:ok, command_runner, reference, new_command_list}
-    end
-  end
-
-  def create_keep_alive_command(command_list, keep_alive_command, command_opts \\ []) do
-    case new_keep_alive_command(command_list, keep_alive_command, command_opts) do
-      {:ok, _runner, _new_list} = result -> result
     end
   end
 
   @spec response_for_zip_packet(t(), ZWaveCommand.t()) ::
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
-          | {command_waiter(), {:error, :nack_response, t()} | {:complete, any(), t()}}
-          | {command_waiter(), {:queued_complete, reference(), any(), t()}}
-          | {command_waiter(), {:queued, reference(), non_neg_integer(), t()}}
-          | {command_waiter(), {:queued_ping, reference(), non_neg_integer(), t()}}
+          | {command_waiter(), {Report.t(), t()}}
+          | {command_waiter(), {:error, :nack_response, t()}}
   def response_for_zip_packet(command_list, zip_packet) do
     case get_response_for_command(command_list, zip_packet) do
-      {:retry, command_runner, command_list} ->
+      {{:retry, command_runner}, command_list} ->
         {:retry, command_runner, %__MODULE__{commands: command_list}}
 
       {:continue, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
 
-      {{:queued_complete, ref, response, command}, command_list} ->
+      {{%Report{queued: true, status: :inflight, type: :queued_ping} = report, command},
+       command_list} ->
         waiter = waiter_as_pid(command_waiter(command))
-        {waiter, {:queued_complete, ref, response, %__MODULE__{commands: command_list}}}
+        {waiter, {report, %__MODULE__{commands: command_list}}}
 
-      {{:queued, ref, seconds, command}, command_list} ->
+      {{%Report{queued: true, status: :complete} = report, command}, command_list} ->
+        waiter = waiter_as_pid(command_waiter(command))
+        {waiter, {report, %__MODULE__{commands: command_list}}}
+
+      {{%Report{} = report, command}, command_list} ->
         waiter = command_waiter(command)
-        {waiter, {:queued, ref, seconds, %__MODULE__{commands: command_list}}}
-
-      {{:queued_ping, ref, seconds, command}, command_list} ->
-        waiter = waiter_as_pid(command_waiter(command))
-        {waiter, {:queued_ping, ref, seconds, %__MODULE__{commands: command_list}}}
+        {waiter, {report, %__MODULE__{commands: command_list}}}
 
       {nil, command_list} ->
         {:continue, %__MODULE__{commands: command_list}}
@@ -153,8 +146,8 @@ defmodule Grizzly.Connections.CommandList do
     Enum.reduce(command_list.commands, {nil, []}, fn
       # if a command has already completed we don't need to commands anymore, so
       # we just put this one back into the list in for future incoming commands
-      command, {{:complete, _response, _command} = complete, new_command_list} ->
-        {complete, [command | new_command_list]}
+      command, {{%Report{} = report, completed_command}, new_command_list} ->
+        {{report, completed_command}, [command | new_command_list]}
 
       {command_runner, _command_waiter, _ref} = command, {_result, new_command_list} ->
         case CommandRunner.handle_zip_command(command_runner, zip_packet) do
@@ -166,24 +159,16 @@ defmodule Grizzly.Connections.CommandList do
           {:error, :nack_response} ->
             {{:error, :nack_response, command}, new_command_list}
 
-          # the command is queued put it back into the command list
-          {:queued, reference, seconds} ->
-            {{:queued, reference, seconds, command}, [command | new_command_list]}
-
-          {:queued_ping, reference, seconds_left} ->
-            {{:queued_ping, reference, seconds_left, command}, [command | new_command_list]}
-
-          # if the queued command is complete don't put it back into the command
-          # list
-          {:queued_complete, reference, result} ->
-            {{:queued_complete, reference, result, command}, new_command_list}
-
           # if the command says to retry we put it back into the command list
           :retry ->
-            {:retry, command_runner, [command | new_command_list]}
+            {{:retry, command_runner}, [command | new_command_list]}
 
-          {:complete, response} ->
-            {{:complete, response, command}, new_command_list}
+          # if the command has been queued we can keep holding onto the command
+          %Report{status: :inflight, queued: true} = report ->
+            {{report, command}, [command | new_command_list]}
+
+          %Report{} = report ->
+            {{report, command}, new_command_list}
         end
     end)
   end
@@ -193,30 +178,19 @@ defmodule Grizzly.Connections.CommandList do
   defp waiter_as_pid(pid) when is_pid(pid), do: pid
   defp waiter_as_pid({pid, _tag}), do: pid
 
-  defp new_command(command_list, command, waiter, command_opts) do
+  defp new_command(command_list, command, node_id, waiter, command_opts) do
     # only create a new reference if we are going to need it
     command_ref = Keyword.get_lazy(command_opts, :reference, fn -> make_ref() end)
     command_opts = Keyword.put_new(command_opts, :reference, command_ref)
 
-    case Commands.create_command(command, command_opts) do
+    case Commands.create_command(command, node_id, command_opts) do
       {:ok, command_runner} ->
         {:ok, command_runner, command_ref,
          put_command(command_list, command_runner, waiter, command_ref)}
     end
   end
 
-  defp new_keep_alive_command(command_list, command, command_opts) do
-    case Commands.create_command(command, command_opts) do
-      {:ok, command_runner} ->
-        {:ok, command_runner, put_keep_alive(command_list, command_runner)}
-    end
-  end
-
   defp put_command(command_list, command, waiter, reference) do
     %__MODULE__{command_list | commands: [{command, waiter, reference} | command_list.commands]}
-  end
-
-  defp put_keep_alive(command_list, keep_alive_runner) do
-    %__MODULE__{command_list | keep_alive_command: keep_alive_runner}
   end
 end

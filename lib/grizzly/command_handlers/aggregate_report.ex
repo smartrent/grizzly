@@ -31,7 +31,7 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
     rtf = Command.param!(command, :reports_to_follow)
 
     if rtf == 0 do
-      {:complete, {:ok, prepare_aggregate_data(command, state)}}
+      {:complete, prepare_aggregate_data(command, state)}
     else
       {:continue, aggregate(command, state)}
     end

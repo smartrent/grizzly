@@ -16,7 +16,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
       )
 
     :ok = FirmwareUpdateRunner.start_firmware_update(runner, image_path)
-    assert_receive {:grizzly, :firmware_update, received_command}, 500
+    assert_receive {:grizzly, :report, received_command}, 500
     assert received_command.name == :firmware_update_md_request_report
   end
 
@@ -31,13 +31,13 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
       )
 
     :ok = FirmwareUpdateRunner.start_firmware_update(runner, image_path)
-    assert_receive {:grizzly, :firmware_update, received_command}, 500
+    assert_receive {:grizzly, :report, received_command}, 500
     assert received_command.name == :firmware_update_md_request_report
     :timer.sleep(500)
-    assert_receive {:grizzly, :firmware_update, get_command}, 500
+    assert_receive {:grizzly, :report, get_command}, 500
     assert get_command.name == :firmware_update_md_get
     :timer.sleep(500)
-    assert_receive {:grizzly, :firmware_update, status_command}, 500
+    assert_receive {:grizzly, :report, status_command}, 500
     assert status_command.name == :firmware_update_md_status_report
   end
 end

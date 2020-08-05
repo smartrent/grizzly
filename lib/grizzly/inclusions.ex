@@ -58,17 +58,17 @@ defmodule Grizzly.Inclusions do
       {:reply, :ok, state}
     end
 
-    def handle_info({:grizzly, :inclusion, command}, state) do
-      case Command.param!(command, :status) do
+    def handle_info({:grizzly, :inclusion, report}, state) do
+      case Command.param!(report.command, :status) do
         :done ->
-          node_id = Command.param!(command, :node_id)
+          node_id = Command.param!(report.command, :node_id)
           Logger.info("Node added with id: " <> node_id)
 
         :failed ->
           Logger.warn("Adding node failed :(")
 
         :security_failed ->
-          node_id = Command.param!(command, :node_id)
+          node_id = Command.param!(report.command, :node_id)
           Logger.warn("Node added with id: " <> node_id <> "but the security failed")
       end
 
@@ -155,8 +155,8 @@ defmodule Grizzly.Inclusions do
 
     require Logger
 
-    def handle_command(command, opts) do
-      Logger.info("Got command: " <> command.name <> " with callback arguments " <> inspect opts)
+    def handle_report(report, opts) do
+      Logger.info("Got command: " <> report.command.name <> " with callback arguments " <> inspect opts)
       :ok
     end
   end

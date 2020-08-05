@@ -44,11 +44,12 @@ process roughly goes.
 iex> Grizzly.Inclusions.add_node()
 :ok
 iex> flush
-%Grizzly.ZWave.Command{
-  name: :node_add_status,
-  ....
-  params: [<node info in here>]
-}
+{:grizzly, :report,  %Grizzly.Report{
+  command: %Grizzly.ZWave.Command{
+    name: :node_add_status,
+    params: [<node info in here>]
+  }
+}}
 ```
 
 To remove a device we have to do an exclusion. Z-Wave uses the umbrella term
@@ -60,11 +61,12 @@ remove the device from your network in IEx:
 iex> Grizzly.Inclusions.remove_node()
 :ok
 iex> flush
-%Grizzly.ZWave.Command{
-  name: :node_remove_status
-  ...
-  params: [<information about exclusion>]
-}
+{:grizzly, :report,  %Grizzly.Report{
+  command: %Grizzly.ZWave.Command{
+    name: :node_remove_status,
+    params: [<node info in here>]
+  }
+}}
 ```
 
 There are more details about this process and how to better tie into the
@@ -76,40 +78,72 @@ network, in Z-Wave this will be called a binary switch, and it was given the id
 of `5`. Turning it off and on would look like this in IEx:
 
 ```elixir
-iex> Grizzly.send_command(5, :switch_binary_set, target_value: :on
-:ok
+iex> Grizzly.send_command(5, :switch_binary_set, target_value: :on)
+{:ok, %Grizzly.Report{}}
 iex> Grizzly.send_command(5, :switch_binary_set, target_value: :off)
-:ok
+{:ok, %Grizzly.Report{}}
 ```
 
-`Grizzly.send_command/3` can return a few responses.
+For more documentation on what `Grizzly.send_command/4` can return see the
+`Grizzly` and `Grizzly.Report` module documentation.
 
 ### Successful Commands
 
-1. `:ok` - normally for setting things on a device or changing the device's
-   state
-1. `{:ok, Grizzly.ZWave.Command.t()}` - this is normally returned when asking
+1. `{:ok, %Grizzly.Report{type: :ack_response}` - normally for setting things
+   on a device or changing the device's state
+1. `{:ok, %Grizzly.Report{type: :command}}` - this is normally returned when asking
    for a device state or about some information about a device or Z-Wave
-   network
-1. `{:queued, reference, queue_time}` - some devices sleep, so sending a
-   command to it will be queued for some `queue_time`. Once the device wakes
-   up and handles the queued command the calling process will receive a message
-   like: `{:grizzly, :queued_command_response, reference, response}` where the
-   `reference` is the one that was given at the time of the call, and the
-   `response` one of the two above responses depending on the command that was
-   sent.
+   network. The command be access by the `:command` field field of the report.
+1. `{:ok, %Grizzly.Report{type: :queued}}` - some devices sleep, so sending a
+   command to it will be queued for some amount of type that can be access in
+   the `:queued_delay` field. Once a device wakes up the calling process will
+   receive the messages in this form: `{:grizzly, :report, %Grizzly.Report{}}`
+   where the type can either be `:queued_ping` or `:command`. To check if the
+   report you receive was queued you can check the `:queued` field in the
+   report.
+1. `{:ok, %Grizzly.Report{type: :timeout}}` - the command was sent but for some
+   reason this commanded timed out.
 
 ### When things go wrong
 
-1. `{:error, :timeout}` - if the command times out for whatever reason
 1. `{:error, :nack_response}` - for when the node is not responding to the
     command. Grizzly has automatic retries, so if you got this message that
     might mean the node is reachable, your Z-Wave network is experiencing a of
     traffic, or the node has recently been hit with a lot of commands and
     cannot handle anymore at this moment.
+1. `{:error, :including}` - the Z-Wave controller is currently in the inclusion
+   state and the controller cannot send any commands currently
+1. `{:error, :firmware_updating}` - the Z-Wave controller is currently in the
+   process of having it's firmware updated and is not able to send commands
 
-More information about `Grizzly.send_command/3` and the options like timeouts
+More information about `Grizzly.send_command/4` and the options like timeouts
 and retries that can be passed to see the `Grizzly` module.
+
+More information about reports see the documentation in the `Grizzly.Report`
+module.
+
+## Unsolicited Messages
+
+When reports are sent from the Z-Wave network to the controller without the
+controller asking for a report these are called unsolicited messages. A concrete
+example of this is when you manually unlock a lock, the controller will receive
+a message from the device if the associations are setup correctly (see 
+`Grizzly.Node.set_lifeline_association/2` for more information). You can listen
+for these reports using either `Grizzly.subscribe_command/1` or
+`Grizzly.subscribe_commands/1`. 
+
+```elixir
+Grizzly.subscribe_command(:door_lock_operation_report)
+
+# manually unlock a lock
+
+flush
+
+{:grizzly, :report, %Grizzly.Report{type: :unsolicited}}
+```
+
+To know what reports a device sends please see the device's user manual as these
+events will be outlined by the manufacture in the manual.
 
 ## Grizzly Runtime
 

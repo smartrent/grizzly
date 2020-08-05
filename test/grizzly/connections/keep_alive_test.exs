@@ -5,14 +5,14 @@ defmodule Grizzly.Connections.KeepAliveTest do
 
   @tag :integration
   test "receive message after" do
-    KeepAlive.init(2_000)
+    KeepAlive.init(1, 2_000)
 
     assert_receive :keep_alive_tick, 2_100
   end
 
   @tag :integration
   test "resets the timer early" do
-    ka = KeepAlive.init(2_000)
+    ka = KeepAlive.init(1, 2_000)
 
     :timer.sleep(1_000)
 
@@ -24,7 +24,7 @@ defmodule Grizzly.Connections.KeepAliveTest do
 
   @tag :integration
   test "stops keep alive" do
-    ka = KeepAlive.init(2_000) |> KeepAlive.timer_clear()
+    ka = KeepAlive.init(1, 2_000) |> KeepAlive.timer_clear()
 
     refute_receive :keep_alive_tick, 2_100
     assert ka.ref == nil

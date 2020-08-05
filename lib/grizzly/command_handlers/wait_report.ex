@@ -21,10 +21,10 @@ defmodule Grizzly.CommandHandlers.WaitReport do
   def handle_ack(state), do: {:continue, state}
 
   @spec handle_command(Command.t(), state()) ::
-          {:continue, state} | {:complete, {:ok, Command.t()}}
+          {:continue, state} | {:complete, Command.t()}
   def handle_command(command, state) do
     if state.complete_report == :any or command.name == state.complete_report do
-      {:complete, {:ok, command}}
+      {:complete, command}
     else
       {:continue, state}
     end

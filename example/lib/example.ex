@@ -1,4 +1,5 @@
 defmodule Example do
+  alias Grizzly.Report
   alias Grizzly.ZWave.Command
 
   def turn_switch_on(switch_id) do
@@ -11,7 +12,7 @@ defmodule Example do
 
   def get_switch_state(switch_id) do
     case Grizzly.send_command(switch_id, :switch_binary_get) do
-      {:ok, command} ->
+      {:ok, %Report{status: :complete, type: :command, command: command}} ->
         {:ok, Command.param!(command, :target_value)}
     end
   end
@@ -47,14 +48,14 @@ defmodule Example do
 
   def get_lock_state(lock_id) do
     case Grizzly.send_command(lock_id, :dor_lock_operation_get) do
-      {:ok, command} ->
+      {:ok, %Report{status: :complete, type: :command, command: command}} ->
         {:ok, Command.param!(command, :mode)}
     end
   end
 
   def get_thermostat_heating_setpoint(thermostat_id) do
     case Grizzly.send_command(thermostat_id, :thermostat_setpoint_get, type: :heating) do
-      {:ok, command} ->
+      {:ok, %Report{status: :complete, type: :command, command: command}} ->
         {:ok, Command.param!(command, :value)}
     end
   end
@@ -71,7 +72,7 @@ defmodule Example do
 
   def get_thermostat_cooling_setpoint(thermostat_id) do
     case Grizzly.send_command(thermostat_id, :thermostat_setpoint_get, type: :cooling) do
-      {:ok, command} ->
+      {:ok, %Report{status: :complete, type: :command, command: command}} ->
         {:ok, Command.param(command, :value)}
     end
   end

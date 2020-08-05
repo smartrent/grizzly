@@ -24,8 +24,8 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
     {:ok, command_ref} =
       AsyncConnection.send_command(400, command, timeout: 1_000, handler: AckResponse)
 
-    assert_receive {:grizzly, :send_command, {:error, :timeout, timeout_ref}}, 2_000
+    assert_receive {:grizzly, :report, report}, 2_000
 
-    assert command_ref == timeout_ref
+    assert report.command_ref == command_ref
   end
 end

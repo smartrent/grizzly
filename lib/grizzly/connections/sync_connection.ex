@@ -7,7 +7,7 @@ defmodule Grizzly.Connections.SyncConnection do
 
   require Logger
 
-  alias Grizzly.{ZIPGateway, Connections}
+  alias Grizzly.{ZIPGateway, Connections, Report}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.Connections.{KeepAlive, CommandList}
   alias Grizzly.ZWave
@@ -37,10 +37,10 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @spec send_command(ZWave.node_id() | pid(), Command.t(), [send_opt()]) ::
-          :ok | {:ok, Command.t()} | {:queued, reference(), Command.delay_seconds()}
+          Grizzly.send_command_response()
   def send_command(node_id, command, opts \\ []) do
     name = Connections.make_name(node_id)
-    GenServer.call(name, {:send_command, command, opts}, 140_000)
+    GenServer.call(name, {:send_command, command, node_id, opts}, 140_000)
   end
 
   @doc """
@@ -61,16 +61,21 @@ defmodule Grizzly.Connections.SyncConnection do
 
     case transport.open(host, port) do
       {:ok, socket} ->
-        {:ok, %State{socket: socket, transport: transport, keep_alive: KeepAlive.init(25_000)}}
+        {:ok,
+         %State{
+           socket: socket,
+           transport: transport,
+           keep_alive: KeepAlive.init(node_id, 25_000)
+         }}
 
       {:error, :timeout} ->
         {:stop, :timeout}
     end
   end
 
-  def handle_call({:send_command, command, command_opts}, from, state) do
+  def handle_call({:send_command, command, node_id, command_opts}, from, state) do
     {:ok, command_runner, _, new_command_list} =
-      CommandList.create(state.commands, command, from, command_opts)
+      CommandList.create(state.commands, command, node_id, from, command_opts)
 
     case do_send_command(command_runner, state) do
       :ok ->
@@ -170,21 +175,13 @@ defmodule Grizzly.Connections.SyncConnection do
           GenServer.reply(waiter, {:error, :nack_response})
           %State{state | commands: new_comamnd_list}
 
-        {waiter, {:queued_complete, ref, response, new_command_list}} ->
-          send(waiter, {:grizzly, :queued_command_response, ref, response})
-          %State{state | commands: new_command_list}
-
-        {waiter, {:queued_ping, ref, queued_seconds, new_comamnd_list}} ->
-          send(waiter, {:grizzly, :queued_ping, ref, queued_seconds})
+        {waiter, {%Report{} = report, new_comamnd_list}} when is_pid(waiter) ->
+          send(waiter, {:grizzly, :report, report})
           %State{state | commands: new_comamnd_list}
 
-        {waiter, {:queued, ref, queued_seconds, new_comamnd_list}} ->
-          GenServer.reply(waiter, {:queued, ref, queued_seconds})
+        {waiter, {%Report{} = report, new_comamnd_list}} ->
+          GenServer.reply(waiter, {:ok, report})
           %State{state | commands: new_comamnd_list}
-
-        {waiter, {:complete, response, new_command_list}} ->
-          GenServer.reply(waiter, response)
-          %State{state | commands: new_command_list}
       end
 
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
@@ -196,13 +193,21 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   defp do_timeout_reply(waiter, grizzly_command) do
-    response = {:error, :timeout}
-
     if grizzly_command.status == :queued do
       {pid, _tag} = waiter
-      send(pid, {:grizzly, :queued_command_response, grizzly_command.ref, response})
+
+      report =
+        Report.new(:complete, :timeout, grizzly_command.node_id,
+          command_ref: grizzly_command.ref,
+          queued: true
+        )
+
+      send(pid, {:grizzly, :report, report})
     else
-      GenServer.reply(waiter, response)
+      report =
+        Report.new(:complete, :timeout, grizzly_command.node_id, command_ref: grizzly_command.ref)
+
+      GenServer.reply(waiter, {:ok, report})
     end
   end
 end
