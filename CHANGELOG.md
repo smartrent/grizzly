@@ -1,5 +1,29 @@
 ## Changelog
 
+## v0.13.0
+
+This update breaks the main `Grizzly.send_command/4` API as Grizzly use to
+respond with different tuples but now it will return with the new
+`Grizzly.Report.t()` data structure. A full guide on the breaking changes
+and what needs to be updated can be found [here](https://gist.github.com/mattludwigs/323cbdbfc32075745cd3fdae7163c930).
+
+This change allows us to gather more information about a response from Grizzly.
+For example, with this change you can get transmission stats about network
+properties when sending a command now:
+
+```elixir 
+{:ok, report} = Grizzly.send_command(node_id, command, command_args, transmission_stats: true)
+
+report.transmission_stats
+```
+
+See the `Grizzly.Report` module for full details.
+
+Enhancements
+  * Add `Grizzly.Report`
+  * Add getting transmission stats for sent commands
+  * Docs and type spec updates
+
 ## v0.12.3
 
 Fixes
