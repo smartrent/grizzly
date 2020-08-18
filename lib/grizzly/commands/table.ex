@@ -238,7 +238,17 @@ defmodule Grizzly.Commands.Table do
       {:date_get, {Commands.TimeGet, handler: {WaitReport, complete_report: :date_report}}},
       {:time_offset_get,
        {Commands.TimeOffsetGet, handler: {WaitReport, complete_report: :time_offset_report}}},
-      {:time_offset_set, {Commands.TimeOffsetSet, handler: AckResponse}}
+      {:time_offset_set, {Commands.TimeOffsetSet, handler: AckResponse}},
+      # Indicator
+      {:indicator_get,
+       {Commands.IndicatorGet, handler: {WaitReport, complete_report: :indicator_report}}},
+      {:indicator_set, {Commands.IndicatorSet, handler: AckResponse}},
+      {:indicator_supported_get,
+       {Commands.IndicatorSupportedGet,
+        handler: {WaitReport, complete_report: :indicator_supported_report}}},
+      {:indicator_description_get,
+       {Commands.IndicatorSupportedGet,
+        handler: {WaitReport, complete_report: :indicator_description_report}}}
     ]
 
     defmacro __before_compile__(_) do

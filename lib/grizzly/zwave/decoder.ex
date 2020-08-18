@@ -193,14 +193,22 @@ defmodule Grizzly.ZWave.Decoder do
       {0x8B, 0x03, Commands.TimeParametersReport},
       # Device reset locally
       {0x5A, 0x01, Commands.DeviceResetLocallyNotification},
-      # Time
+      # Indicator
       {0x8A, 0x01, Commands.TimeGet},
       {0x8A, 0x02, Commands.TimeReport},
       {0x8A, 0x03, Commands.DateGet},
       {0x8A, 0x04, Commands.DateReport},
       {0x8A, 0x05, Commands.TimeOffsetSet},
       {0x8A, 0x06, Commands.TimeOffsetGet},
-      {0x8A, 0x07, Commands.TimeOffsetReport}
+      {0x8A, 0x07, Commands.TimeOffsetReport},
+      # Time
+      {0x87, 0x01, Commands.IndicatorSet},
+      {0x87, 0x02, Commands.IndicatorGet},
+      {0x87, 0x03, Commands.IndicatorReport},
+      {0x87, 0x04, Commands.IndicatorSupportedGet},
+      {0x87, 0x05, Commands.IndicatorSupportedReport},
+      {0x87, 0x06, Commands.IndicatorDescriptionGet},
+      {0x87, 0x07, Commands.IndicatorDescriptionReport}
     ]
 
     defmacro __before_compile__(_) do
