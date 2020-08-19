@@ -252,7 +252,12 @@ defmodule Grizzly.Commands.Table do
       # Antitheft
       {:antitheft_get,
        {Commands.AntitheftGet, handler: {WaitReport, complete_report: :antitheft_report}}},
-      {:antitheft_set, {Commands.AntitheftSet, handler: AckResponse}}
+      {:antitheft_set, {Commands.AntitheftSet, handler: AckResponse}},
+      # Antitheft unlock
+      {:antitheft_unlock_get,
+       {Commands.AntitheftUnlockGet,
+        handler: {WaitReport, complete_report: :antitheft_unlock_report}}},
+      {:antitheft_unlock_set, {Commands.AntitheftUnlockSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
