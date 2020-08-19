@@ -99,6 +99,7 @@ defmodule Grizzly.ZWave.CommandClasses do
       {0x7B, :grouping_name},
       {0x7C, :remote_association_activate},
       {0x7D, :remote_association},
+      {0x7E, :antitheft_unlock},
       {0x80, :battery},
       {0x81, :clock},
       {0x82, :hail},
