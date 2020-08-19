@@ -248,7 +248,11 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :indicator_supported_report}}},
       {:indicator_description_get,
        {Commands.IndicatorSupportedGet,
-        handler: {WaitReport, complete_report: :indicator_description_report}}}
+        handler: {WaitReport, complete_report: :indicator_description_report}}},
+      # Antitheft
+      {:antitheft_get,
+       {Commands.AntitheftGet, handler: {WaitReport, complete_report: :antitheft_report}}},
+      {:antitheft_set, {Commands.AntitheftSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
