@@ -30,6 +30,11 @@ defmodule Grizzly.Commands.Table do
       {:configuration_set, {Commands.ConfigurationSet, handler: AckResponse}},
       {:configuration_get,
        {Commands.ConfigurationGet, handler: {WaitReport, complete_report: :configuration_report}}},
+      {:configuration_bulk_set, {Commands.ConfigurationBulkSet, handler: AckResponse}},
+      {:configuration_bulk_get,
+       {Commands.ConfigurationGet,
+        handler:
+          {AggregateReport, complete_report: :configuration_bulk_report, aggregate_param: :values}}},
       # Manufacturer specific
       {:manufacturer_specific_get,
        {Commands.ManufacturerSpecificGet,
