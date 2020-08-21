@@ -11,6 +11,9 @@ defmodule Grizzly.ZWave.Decoder do
       {0x20, 0x01, Commands.BasicSet},
       {0x20, 0x02, Commands.BasicGet},
       {0x20, 0x03, Commands.BasicReport},
+      # Application status
+      {0x22, 0x01, Commands.ApplicationBusy},
+      {0x22, 0x02, Commands.ApplicationRejectedRequest},
       # Battery
       {0x80, 0x02, Commands.BatteryGet},
       {0x80, 0x03, Commands.BatteryReport},
