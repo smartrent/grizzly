@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :configuration_bulk_set,
+      name: :configuration_bulk_report,
       command_byte: 0x09,
       command_class: Configuration,
       params: params,
@@ -67,10 +67,12 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
 
   @impl true
   def decode_params(
-        <<offset::size(16), _count, reports_to_follow, default_bit::size(1),
+        <<offset::size(16), count, reports_to_follow, default_bit::size(1),
           handshake_bit::size(1), _reserved::size(3), size::size(3), values_bin::binary>>
       ) do
-    values = for <<value::signed-integer-size(size)-unit(8) <- values_bin>>, do: value
+    values =
+      for(<<value::signed-integer-size(size)-unit(8) <- values_bin>>, do: value)
+      |> Enum.take(count)
 
     {:ok,
      [
