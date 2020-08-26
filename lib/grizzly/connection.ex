@@ -8,13 +8,15 @@ defmodule Grizzly.Connection do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
+  @type opt() :: {:mode, :sync | :async} | {:owner, pid()}
+
   @doc """
   Open a connection to a node
 
   If the DTLS connection cannot be opened after some time this will return
   `{:error, :timeout}`
   """
-  @spec open(ZWave.node_id()) :: {:ok, pid()} | {:error, :timeout}
+  @spec open(ZWave.node_id(), [opt()]) :: {:ok, pid()} | {:error, :timeout}
   def open(node_id, opts \\ []) do
     Supervisor.start_connection(node_id, opts)
   end

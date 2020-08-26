@@ -5,8 +5,8 @@ defmodule Grizzly.Inclusions.InclusionRunnerSupervisor do
   alias Grizzly.Inclusions
   alias Grizzly.Inclusions.InclusionRunner
 
-  def start_link(_) do
-    DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)
+  def start_link(grizzly_options) do
+    DynamicSupervisor.start_link(__MODULE__, grizzly_options, name: __MODULE__)
   end
 
   @spec start_runner([Inclusions.opt()]) :: DynamicSupervisor.on_start_child()
@@ -16,10 +16,14 @@ defmodule Grizzly.Inclusions.InclusionRunnerSupervisor do
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
-  @impl true
-  def init(_) do
+  @impl DynamicSupervisor
+  def init(grizzly_options) do
     # Only one inclusion runner can be running at a time
-    DynamicSupervisor.init(strategy: :one_for_one, max_children: 1)
+    DynamicSupervisor.init(
+      strategy: :one_for_one,
+      max_children: 1,
+      extra_arguments: [grizzly_options]
+    )
   end
 
   defp ensure_handler(opts) do

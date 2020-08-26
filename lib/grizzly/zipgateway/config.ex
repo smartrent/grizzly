@@ -3,8 +3,6 @@ defmodule Grizzly.ZIPGateway.Config do
 
   # This module is for making the `zipgateway.cfg` file
 
-  alias Grizzly.ZIPGateway
-
   @type t :: %__MODULE__{
           unsolicited_destination_ip6: String.t(),
           unsolicited_destination_port: :inet.port_number(),
@@ -15,8 +13,8 @@ defmodule Grizzly.ZIPGateway.Config do
           tun_script: Path.t(),
           pvs_storage_file: Path.t(),
           provisioning_config_file: Path.t(),
-          pan_ip6: String.t(),
-          lan_ip6: String.t(),
+          pan_ip: :inet.ip_address(),
+          lan_ip: :inet.ip_address(),
           lan_gw6: String.t(),
           psk: String.t(),
           manufacturer_id: non_neg_integer() | nil,
@@ -36,8 +34,8 @@ defmodule Grizzly.ZIPGateway.Config do
             tun_script: "./zipgateway.tun",
             pvs_storage_file: "/root/provisioning_list_store.dat",
             provisioning_config_file: "/etc/zipgateway_provisioning_list.cfg",
-            pan_ip6: "fd00:bbbb::1",
-            lan_ip6: "fd00:aaaa::1",
+            pan_ip: {0xFD00, 0xBBBB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
+            lan_ip: {0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
             lan_gw6: "::1",
             psk: "123456789012345678901234567890AA",
             serial_log: nil,
@@ -59,7 +57,9 @@ defmodule Grizzly.ZIPGateway.Config do
         :product_id,
         :product_type,
         :serial_log,
-        :tun_script
+        :tun_script,
+        :lan_ip,
+        :pan_ip
       ])
 
     struct(__MODULE__, opts)
@@ -68,10 +68,10 @@ defmodule Grizzly.ZIPGateway.Config do
   @doc """
   Write the contents of the `ZipgatewayCfg.t()` to the file system
   """
-  @spec write(t()) :: :ok | {:error, File.posix()}
-  def write(cfg) do
+  @spec write(t(), Path.t()) :: :ok | {:error, File.posix()}
+  def write(cfg, path) do
     contents = __MODULE__.to_string(cfg)
-    File.write(ZIPGateway.cfg_path(), contents)
+    File.write(path, contents)
   end
 
   @doc """
@@ -89,8 +89,6 @@ defmodule Grizzly.ZIPGateway.Config do
     TunScript=#{cfg.tun_script}
     PVSStorageFile=#{cfg.pvs_storage_file}
     ProvisioningConfigFile=#{cfg.provisioning_config_file}
-    ZipPanIp6=#{cfg.pan_ip6}
-    ZipLanIp6=#{cfg.lan_ip6}
     ZipLanGw6=#{cfg.lan_gw6}
     ZipPSK=#{cfg.psk}
     """
@@ -100,6 +98,8 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :hardware_version, "ZipHardwareVersion")
     |> maybe_put_config_item(cfg, :product_type, "ZipProductType")
     |> maybe_put_config_item(cfg, :extra_classes, "ExtraClasses")
+    |> maybe_put_config_item(cfg, :pan_ip, "ZipPanIp6")
+    |> maybe_put_config_item(cfg, :lan_ip, "ZipLanIp6")
   end
 
   defp maybe_put_config_item(config_string, cfg, :extra_classes = field, cfg_name) do
@@ -111,6 +111,17 @@ defmodule Grizzly.ZIPGateway.Config do
         extra_command_classes_string = Enum.join(extra_command_classes, " ")
         config_string <> "#{cfg_name}= #{extra_command_classes_string}\n"
     end
+  end
+
+  defp maybe_put_config_item(config_string, cfg, field, cfg_name)
+       when field in [:pan_ip, :lan_ip] do
+    ip =
+      cfg
+      |> Map.get(field)
+      |> :inet.ntoa()
+      |> List.to_string()
+
+    config_string <> "#{cfg_name}=#{ip}\n"
   end
 
   defp maybe_put_config_item(config_string, cfg, field, cfg_name) do

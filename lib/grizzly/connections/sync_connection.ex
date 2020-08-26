@@ -7,16 +7,14 @@ defmodule Grizzly.Connections.SyncConnection do
 
   require Logger
 
-  alias Grizzly.{ZIPGateway, Connections, Report}
+  alias Grizzly.{ZIPGateway, Connections, Options, Report}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.Connections.{KeepAlive, CommandList}
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 
-  @type opt :: {:transport, module()}
-
-  @type send_opt :: {:timeout, non_neg_integer()} | {:retries, non_neg_integer()}
+  @type send_opt() :: {:timeout, non_neg_integer()} | {:retries, non_neg_integer()}
 
   defmodule State do
     @moduledoc false
@@ -30,10 +28,11 @@ defmodule Grizzly.Connections.SyncConnection do
     %{id: __MODULE__, start: {__MODULE__, :start_link, [node_id, opts]}, restart: :transient}
   end
 
-  @spec start_link(ZWave.node_id(), [opt]) :: GenServer.on_start()
-  def start_link(node_id, opts \\ []) do
+  @spec start_link(Options.t(), ZWave.node_id(), [Grizzly.command_opt()]) ::
+          GenServer.on_start()
+  def start_link(grizzly_options, node_id, opts \\ []) do
     name = Connections.make_name(node_id)
-    GenServer.start_link(__MODULE__, [node_id, opts], name: name)
+    GenServer.start_link(__MODULE__, [grizzly_options, node_id, opts], name: name)
   end
 
   @spec send_command(ZWave.node_id() | pid(), Command.t(), [send_opt()]) ::
@@ -54,12 +53,11 @@ defmodule Grizzly.Connections.SyncConnection do
     GenServer.stop(name, :normal)
   end
 
-  def init([node_id, opts]) do
-    host = ZIPGateway.host_for_node(node_id)
-    port = ZIPGateway.port()
-    transport = Connections.get_transport_from_opts(opts)
+  def init([grizzly_options, node_id, _opts]) do
+    host = ZIPGateway.host_for_node(node_id, grizzly_options)
+    transport = grizzly_options.transport
 
-    case transport.open(host, port) do
+    case transport.open(host, grizzly_options.zipgateway_port) do
       {:ok, socket} ->
         {:ok,
          %State{

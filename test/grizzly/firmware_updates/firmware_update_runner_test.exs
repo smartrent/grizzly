@@ -2,7 +2,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
-  # alias Grizzly.ZWave.Command
+  alias GrizzlyTest.Utils
 
   @tag :firmware_update
   test "request that a device begin a firmware update" do
@@ -10,7 +10,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
 
     {:ok, runner} =
       FirmwareUpdateRunner.start_link(
-        # test server will ack and send report response
+        Utils.default_options(),
         device_id: 300,
         manufacturer_id: 1
       )
@@ -25,7 +25,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
 
     {:ok, runner} =
       FirmwareUpdateRunner.start_link(
-        # test server will ack and send report response
+        Utils.default_options(),
         device_id: 201,
         manufacturer_id: 1
       )

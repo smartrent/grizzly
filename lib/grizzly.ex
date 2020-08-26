@@ -61,9 +61,10 @@ defmodule Grizzly do
 
   """
 
-  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Node, Report}
+  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Report}
   alias Grizzly.Commands.Table
   alias Grizzly.UnsolicitedServer.Messages
+  alias Grizzly.ZWave
 
   @typedoc """
   The response from sending a Z-Wave command
@@ -102,10 +103,17 @@ defmodule Grizzly do
 
   @type node_id() :: non_neg_integer()
 
+  @typedoc """
+  A custom handler for the command.
+
+  See `Grizzly.CommandHandler` behaviour for more documentation.
+  """
+  @type handler() :: module() | {module(), args :: any()}
+
   @type command_opt() ::
           {:timeout, non_neg_integer()}
           | {:retries, non_neg_integer()}
-          | {:handler, module() | {module(), args :: list()}}
+          | {:handler, handler()}
           | {:transmission_stats, boolean()}
 
   @type command :: atom()
@@ -113,7 +121,7 @@ defmodule Grizzly do
   @doc """
   Send a command to the node via the node id
   """
-  @spec send_command(Node.id(), command(), args :: list(), [command_opt()]) ::
+  @spec send_command(ZWave.node_id(), command(), args :: list(), [command_opt()]) ::
           send_command_response()
   def send_command(node_id, command_name, args \\ [], opts \\ []) do
     # always open a connection. If the connection is already opened this

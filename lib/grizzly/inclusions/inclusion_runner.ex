@@ -3,7 +3,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
 
   use GenServer
 
-  alias Grizzly.{Inclusions, SeqNumber, Report}
+  alias Grizzly.{Connection, Inclusions, Options, SeqNumber, Report}
   alias Grizzly.Inclusions.InclusionRunner.Inclusion
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.ZWave.{Security, Command}
@@ -22,14 +22,14 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     %{id: __MODULE__, start: {__MODULE__, :start_link, [args]}, restart: :temporary}
   end
 
-  @spec start_link([Inclusions.opt()]) :: GenServer.on_start()
-  def start_link(opts \\ []) do
+  @spec start_link(Options.t(), [Inclusions.opt()]) :: GenServer.on_start()
+  def start_link(grizzly_options, opts \\ []) do
     controller_id = Keyword.get(opts, :controller_id, 1)
     handler = Keyword.get(opts, :handler, self())
 
     GenServer.start_link(
       __MODULE__,
-      [controller_id: controller_id, handler: handler],
+      [grizzly_options, [controller_id: controller_id, handler: handler]],
       name: __MODULE__
     )
   end
@@ -78,10 +78,10 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   end
 
   @impl true
-  def init(opts) do
+  def init([_grizzly_options, opts]) do
     handler = Keyword.fetch!(opts, :handler)
     controller_id = Keyword.fetch!(opts, :controller_id)
-    {:ok, _} = AsyncConnection.start_link(Keyword.fetch!(opts, :controller_id))
+    {:ok, _} = Connection.open(Keyword.fetch!(opts, :controller_id), mode: :async)
     {:ok, %Inclusion{handler: handler, controller_id: controller_id}}
   end
 

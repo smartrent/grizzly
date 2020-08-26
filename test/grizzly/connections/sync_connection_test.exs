@@ -4,6 +4,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   alias Grizzly.{Connection, Report}
   alias Grizzly.Connections.SyncConnection
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias GrizzlyTest.Utils
 
   setup do
     # establish the connections for the tests
@@ -15,7 +16,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   end
 
   test "reports timeout" do
-    assert {:error, :timeout} == SyncConnection.start_link(600)
+    assert {:error, :timeout} == SyncConnection.start_link(Utils.default_options(), 600)
   end
 
   test "handles nack responses" do

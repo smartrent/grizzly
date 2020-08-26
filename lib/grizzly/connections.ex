@@ -3,7 +3,7 @@ defmodule Grizzly.Connections do
 
   # This module is helper functions for connections
 
-  alias Grizzly.{ConnectionRegistry, ZIPGateway}
+  alias Grizzly.ConnectionRegistry
   alias Grizzly.Connections.Supervisor, as: ConnectionsSupervisor
 
   @doc """
@@ -26,13 +26,6 @@ defmodule Grizzly.Connections do
       transport ->
         transport
     end
-  end
-
-  def build_host_port_from_node_id(node_id) do
-    host = ZIPGateway.host_for_node(node_id)
-    port = ZIPGateway.port()
-
-    {host, port}
   end
 
   def format_response(:ok), do: :ok
