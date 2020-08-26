@@ -2,59 +2,53 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   @moduledoc false
 
   # Supervisor for the `zipgateway` system process
-  use DynamicSupervisor
-  require Logger
+  use Supervisor
 
-  alias Grizzly.ZIPGateway.Config
+  alias Grizzly.Options
+  alias Grizzly.ZIPGateway.{Config, ReadyChecker}
 
-  @type run_opt ::
-          {:serial_port, binary()}
-          | {:zipgateway_bin, Path.t()}
-          | {:zipgateway_cfg, Config.t()}
-          | {:zipgateway_cfg_path, Path.t()}
-
-  def start_link(_) do
-    DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)
+  @spec start_link(Options.t()) :: Supervisor.on_start()
+  def start_link(options) do
+    Supervisor.start_link(__MODULE__, options, name: __MODULE__)
   end
 
-  def run_zipgateway(opts) do
-    zipgateway_bin = Keyword.fetch!(opts, :zipgateway_bin)
-    serial_port = Keyword.fetch!(opts, :serial_port)
-    zipgateway_cfg_path = Keyword.fetch!(opts, :zipgateway_cfg_path)
-    priv = Application.app_dir(:grizzly, "priv")
+  @impl Supervisor
+  def init(options) do
+    Supervisor.init(children(options), strategy: :one_for_one)
+  end
 
-    _ =
-      Logger.info("""
-      Running zipgateway with:
+  defp children(options) do
+    if options.run_zipgateway do
+      [make_zipgateway_child_spec(options)]
+      |> maybe_start_on_ready_checker(options)
+    else
+      []
+    end
+  end
 
-      #{inspect(zipgateway_bin)} -c #{inspect(zipgateway_cfg_path)} -s #{inspect(serial_port)}
+  defp make_zipgateway_child_spec(options) do
+    :ok = system_checks(options)
 
-      From dir: #{inspect(priv)}
-      """)
+    :ok =
+      options |> Options.to_zipgateway_config() |> Config.write(options.zipgateway_config_path)
 
-    child =
-      {MuonTrap.Daemon,
-       [
-         zipgateway_bin,
-         ["-c", zipgateway_cfg_path, "-s", serial_port],
-         [cd: priv, log_output: :debug]
-       ]}
-
-    # TODO: make better! See what is currently in Grizzly
     _ = System.cmd("modprobe", ["tun"])
 
-    :ok = check_serial_port(serial_port)
+    priv = Application.app_dir(:grizzly, "priv")
 
-    # write the cfg after we know when can find the binary and everything in the system
-    # looking good to run zipgateway
-    :ok = Config.write(Keyword.get(opts, :zipgateway_cfg))
-
-    DynamicSupervisor.start_child(__MODULE__, child)
+    {MuonTrap.Daemon,
+     [
+       options.zipgateway_binary,
+       ["-c", options.zipgateway_config_path, "-s", options.serial_port],
+       [cd: priv, log_output: :debug]
+     ]}
   end
 
-  @impl true
-  def init(_) do
-    DynamicSupervisor.init(strategy: :one_for_one, max_children: 1)
+  defp system_checks(options) do
+    :ok = check_serial_port(options.serial_port)
+    :ok = find_zipgateway_bin(options.zipgateway_binary)
+
+    :ok
   end
 
   defp check_serial_port(serial_port) do
@@ -70,6 +64,37 @@ defmodule Grizzly.ZIPGateway.Supervisor do
       If you are using a Z-Wave controller embedded onto your system make sure you
       are using the correct serial port in the configuration.
       """
+    end
+  end
+
+  defp find_zipgateway_bin(zipgateway_path) do
+    case File.stat(zipgateway_path) do
+      {:error, _posix} ->
+        raise ArgumentError, """
+        Cannot find the zipgateway executable (looked for it in #{inspect(zipgateway_path)})
+
+        If it is located somewhere else, please pass the path to Grizzly.Supervisor
+
+        ```
+        Grizzly.Supervisor.start_link(zipgateay_path: <path>)
+        ```
+
+        ```
+        {Grizzly.Supervisor, [zipgateway_path: <path>]}
+        ```
+
+        """
+
+      {:ok, _stat} ->
+        :ok
+    end
+  end
+
+  defp maybe_start_on_ready_checker(children, opts) do
+    if opts.on_ready do
+      children ++ [{ReadyChecker, opts.on_ready}]
+    else
+      children
     end
   end
 end

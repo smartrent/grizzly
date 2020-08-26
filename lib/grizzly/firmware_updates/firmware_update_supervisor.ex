@@ -2,13 +2,17 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor do
   @moduledoc false
   use DynamicSupervisor
 
-  alias Grizzly.FirmwareUpdates
+  alias Grizzly.{FirmwareUpdates, Options}
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
 
-  def start_link(_) do
-    DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)
+  @spec start_link(Options.t()) :: Supervisor.on_start()
+  def start_link(options) do
+    DynamicSupervisor.start_link(__MODULE__, options, name: __MODULE__)
   end
 
+  @doc """
+  Start a firmware runner process to manage the firmware update
+  """
   @spec start_runner([FirmwareUpdates.opt()]) :: DynamicSupervisor.on_start_child()
   def start_runner(opts \\ []) do
     opts = ensure_handler(opts)
@@ -16,10 +20,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor do
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
-  @impl true
-  def init(_) do
+  @impl DynamicSupervisor
+  def init(grizzly_options) do
     # Only one firmware update runner can be running at a time
-    DynamicSupervisor.init(strategy: :one_for_one, max_children: 1)
+    DynamicSupervisor.init(
+      strategy: :one_for_one,
+      max_children: 1,
+      extra_arguments: [grizzly_options]
+    )
   end
 
   defp ensure_handler(opts) do

@@ -3,6 +3,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   alias Grizzly.Inclusions.InclusionRunner
   alias Grizzly.ZWave.Command
+  alias GrizzlyTest.Utils
 
   defmodule TestHandler do
     @moduledoc false
@@ -28,7 +29,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   @tag :inclusion
   test "add a node to the network" do
-    {:ok, runner} = InclusionRunner.start_link(controller_id: 300)
+    {:ok, runner} = InclusionRunner.start_link(Utils.default_options(), controller_id: 300)
     :ok = InclusionRunner.add_node(runner)
 
     assert_receive {:grizzly, :report, report}, 500
@@ -40,7 +41,10 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
   @tag :inclusion
   test "add node to network with handler module" do
     {:ok, runner} =
-      InclusionRunner.start_link(controller_id: 300, handler: {TestHandler, tester: self()})
+      InclusionRunner.start_link(Utils.default_options(),
+        controller_id: 300,
+        handler: {TestHandler, tester: self()}
+      )
 
     :ok = InclusionRunner.add_node(runner)
 
@@ -49,7 +53,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   @tag :inclusion
   test "start inclusion but then stop it" do
-    {:ok, runner} = InclusionRunner.start_link(controller_id: 301)
+    {:ok, runner} = InclusionRunner.start_link(Utils.default_options(), controller_id: 301)
     # start inclusion
     :ok = InclusionRunner.add_node(runner)
 
@@ -66,7 +70,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   @tag :inclusion
   test "removes a node from the Z-Wave network" do
-    {:ok, runner} = InclusionRunner.start_link(controller_id: 300)
+    {:ok, runner} = InclusionRunner.start_link(Utils.default_options(), controller_id: 300)
     :ok = InclusionRunner.remove_node(runner)
 
     :timer.sleep(500)
@@ -79,7 +83,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   @tag :inclusion
   test "start exclusion but then stop it" do
-    {:ok, runner} = InclusionRunner.start_link(controller_id: 301)
+    {:ok, runner} = InclusionRunner.start_link(Utils.default_options(), controller_id: 301)
     # start inclusion
     :ok = InclusionRunner.remove_node(runner)
 
@@ -96,7 +100,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   @tag :inclusion
   test "start s2 inclusion with out keys, adding s2 unauthenticated keys" do
-    {:ok, runner} = InclusionRunner.start_link(controller_id: 302)
+    {:ok, runner} = InclusionRunner.start_link(Utils.default_options(), controller_id: 302)
     :ok = InclusionRunner.add_node(runner)
 
     assert_receive {:grizzly, :report, report}, 500
@@ -121,7 +125,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
 
   @tag :inclusion
   test "start s2 inclusion with s2 authenticated" do
-    {:ok, runner} = InclusionRunner.start_link(controller_id: 302)
+    {:ok, runner} = InclusionRunner.start_link(Utils.default_options(), controller_id: 302)
     :ok = InclusionRunner.add_node(runner)
 
     assert_receive {:grizzly, :report, report}, 500

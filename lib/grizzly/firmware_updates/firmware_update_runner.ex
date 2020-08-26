@@ -2,7 +2,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   @moduledoc false
   use GenServer
 
-  alias Grizzly.{FirmwareUpdates, Report}
+  alias Grizzly.{Connection, FirmwareUpdates, Options, Report}
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.{FirmwareUpdate, Image}
   alias Grizzly.Connections.AsyncConnection
   require Logger
@@ -28,8 +28,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     }
   end
 
-  @spec start_link([FirmwareUpdates.opt()]) :: GenServer.on_start()
-  def start_link(opts \\ []) do
+  @spec start_link(Options.t(), [FirmwareUpdates.opt()]) :: GenServer.on_start()
+  def start_link(_grizzly_options, opts \\ []) do
     # ensure that manufacturer id is in the opts - probably should do better validation
     _ = Keyword.fetch!(opts, :manufacturer_id)
 
@@ -61,7 +61,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     max_fragment_size = Keyword.fetch!(opts, :max_fragment_size)
     activation_may_be_delayed? = Keyword.fetch!(opts, :activation_may_be_delayed?)
 
-    {:ok, _} = AsyncConnection.start_link(Keyword.fetch!(opts, :device_id))
+    # {:ok, _} = AsyncConnection.start_link(Keyword.fetch!(opts, :device_id))
+    {:ok, _} = Connection.open(Keyword.fetch!(opts, :device_id), mode: :async)
 
     {:ok,
      %FirmwareUpdate{

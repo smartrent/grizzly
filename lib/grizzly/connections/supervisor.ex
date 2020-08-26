@@ -2,22 +2,23 @@ defmodule Grizzly.Connections.Supervisor do
   @moduledoc false
   use DynamicSupervisor
 
-  alias Grizzly.Connection
+  alias Grizzly.{Connection, Options, ZWave}
   alias Grizzly.Connections.{AsyncConnection, SyncConnection}
-  alias Grizzly.ZWave
 
-  def start_link(args) do
-    DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
+  @spec start_link(Options.t()) :: Supervisor.on_start()
+  def start_link(options) do
+    DynamicSupervisor.start_link(__MODULE__, options, name: __MODULE__)
   end
 
-  @spec start_connection(ZWave.node_id(), [Grizzly.command_opt()]) ::
+  @spec start_connection(ZWave.node_id(), [Connection.opt()]) ::
           {:ok, pid()} | {:error, :timeout}
   def start_connection(node_id, opts \\ []) do
     case Keyword.get(opts, :mode, :sync) do
       :async ->
-        # don't allow async connections if they are not already started
-        # maybe move async connections to be call an inclusion connection?
-        do_start_connection(AsyncConnection, node_id)
+        # put the calling process as the owner if sine the supervisor
+        # will be owner when calling form here.
+        opts = Keyword.put_new(opts, :owner, self())
+        do_start_connection(AsyncConnection, node_id, opts)
 
       :sync ->
         do_start_connection(SyncConnection, node_id)
@@ -36,12 +37,16 @@ defmodule Grizzly.Connections.Supervisor do
     end)
   end
 
-  def init(_) do
-    DynamicSupervisor.init(strategy: :one_for_one)
+  @impl DynamicSupervisor
+  def init(grizzly_options) do
+    DynamicSupervisor.init(strategy: :one_for_one, extra_arguments: [grizzly_options])
   end
 
-  defp do_start_connection(connection_module, node_id) do
-    case DynamicSupervisor.start_child(__MODULE__, connection_module.child_spec(node_id)) do
+  defp do_start_connection(connection_module, node_id, command_opts \\ []) do
+    case DynamicSupervisor.start_child(
+           __MODULE__,
+           connection_module.child_spec(node_id, command_opts)
+         ) do
       {:ok, _} = ok -> ok
       {:error, :timeout} = timeout_error -> timeout_error
       {:error, {:already_started, pid}} -> {:ok, pid}

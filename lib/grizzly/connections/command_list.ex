@@ -6,8 +6,6 @@ defmodule Grizzly.Connections.CommandList do
 
   #### TODO separate out keep alive stuff ####
 
-  require Logger
-
   alias Grizzly.{Commands, Report, ZWave}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.ZWave.Command, as: ZWaveCommand
