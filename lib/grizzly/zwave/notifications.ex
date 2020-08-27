@@ -347,7 +347,7 @@ defmodule Grizzly.ZWave.Notifications do
   def encode_event_params(_zwave_type, _zwave_event, []), do: <<>>
 
   def encode_event_params(:access_control, zwave_event, event_params_list)
-      when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
+      when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation, :new_user_code_added] do
     {:ok, user_code_report} = UserCodeReport.new(event_params_list)
 
     <<UserCode.byte(), user_code_report.command_byte>> <>

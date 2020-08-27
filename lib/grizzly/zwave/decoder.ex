@@ -72,6 +72,13 @@ defmodule Grizzly.ZWave.Decoder do
       {0x59, 0x04, Commands.AssociationGroupInfoReport},
       {0x59, 0x05, Commands.AssociationGroupCommandListGet},
       {0x59, 0x06, Commands.AssociationGroupCommandListReport},
+      # Central scene
+      {0x5B, 0x01, Commands.CentralSceneSupportedGet},
+      {0x5B, 0x02, Commands.CentralSceneSupportedReport},
+      {0x5B, 0x03, Commands.CentralSceneNotification},
+      {0x5B, 0x04, Commands.CentralSceneConfigurationSet},
+      {0x5B, 0x05, Commands.CentralSceneConfigurationGet},
+      {0x5B, 0x06, Commands.CentralSceneConfigurationReport},
       # Antitheft
       {0x5D, 0x01, Commands.AntitheftSet},
       {0x5D, 0x02, Commands.AntitheftGet},
