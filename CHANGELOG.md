@@ -1,5 +1,47 @@
 ## Changelog
 
+## v0.14.0
+
+This breaking change has to do with how Grizzly is started. It is no longer an
+application. Grizzly exposes the `Grizzly.Supervisor` module for a consuming
+application to add to its supervision tree. All other APIs are backwards capable.
+
+See the [upgrade guide](https://gist.github.com/mattludwigs/bb312906b1bf85a021080c45d1562f2b)
+for more specifics on how to upgrade.
+
+Breaking Changes
+  * Grizzly is not an OTP application anymore and will need to be started
+    manually via the new `Grizzly.Supervisor` module
+  * All application config/mix config options are not used
+  * Removed the `Grizzly.Runtime` module
+
+Enhancements
+  * Add `Grizzly.Supervisor` module
+  * Add `Grizzly.ZWave.CommandClasses.Indicator`
+  * Add `Grizzly.ZWave.Commands.IndicatorGet`
+  * Add `Grizzly.ZWave.Commands.IndicatorSet`
+  * Add `Grizzly.ZWave.Commands.IndicatorReport`
+  * Add `Grizzly.ZWave.Commands.IndicatorSupportedGet`
+  * Add `Grizzly.ZWave.Commands.IndicatorSupportedReport`
+  * Add `Grizzly.ZWave.CommandClasses.Antitheft`
+  * Add `Grizzly.ZWave.Commands.AntitheftGet`
+  * Add `Grizzly.ZWave.Commands.AntitheftReport`
+  * Add `Grizzly.ZWave.CommandClasses.AntitheftUnlock`
+  * Add `Grizzly.ZWave.Commands.AntitheftUnlockSet`
+  * Add `Grizzly.ZWave.Commands.AntitheftUnlockGet`
+  * Add `Grizzly.ZWave.Commands.AntitheftUnlockReport`
+  * Add `Grizzly.ZWave.Commands.ConfigurationBulkGet`
+  * Add `Grizzly.ZWave.Commands.ConfigurationBulkSet`
+  * Add `Grizzly.ZWave.Commands.ConfigurationBulkReport`
+  * Add `Grizzly.ZWave.Commands.ConfigurationPropertiesGet`
+  * Add `Grizzly.ZWave.CommandClasses.ApplicationStatus`
+  * Add `Grizzly.ZWave.Commands.ApplicationBusy`
+  * Add `Grizzly.ZWave.Commands.ApplicationRejectedRequest`
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.13.0
 
 This update breaks the main `Grizzly.send_command/4` API as Grizzly use to

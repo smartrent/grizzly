@@ -10,7 +10,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.13.0"}
+    {:grizzly, "~> 0.14.0"}
   ]
 end
 ```
@@ -33,6 +33,27 @@ features like S2 security and smart start are already supported in Grizzly.
 See instructions below for compiling the `zipgateway` binary and/or running locally.
 
 ## Basic Usage
+
+Grizzly exposes a supervisor `Grizzly.Supervisor` for the consuming application
+to add to its supervisor tree. This gives the most flexibility and control over
+when Grizzly's processes start. Common ways to start Grizzly can look like:
+
+```elixir
+# all the default options are fine
+Grizzly.Supervisor.start_link()
+
+# using custom hardware where the serial port is different than the default
+# the default serial port is /dev/ttyUSB0.
+Grizzly.Supervisor.start_link(serial_port: "/dev/ttyS4")
+
+# if your system is using zipgateway-env and/or something other than Grizzly
+# will start and manage running the zipgateway binary
+Grizzly.Supervisor.start_link(run_zipgateway: false)
+```
+
+There are other configuration options you can pass to Grizzly but the above are
+most common options. The `Grizzly.Supervisor` docs explains all the options in
+more detail.
 
 To use a device you have to add it to the Z-Wave network. This is "called
 including a device" or "starting an inclusion." While most of the Grizzly's API
@@ -144,97 +165,6 @@ flush
 
 To know what reports a device sends please see the device's user manual as these
 events will be outlined by the manufacture in the manual.
-
-## Grizzly Runtime
-
-The Grizzly runtime is a [module](https://github.com/smartrent/grizzly/blob/main/lib/grizzly/runtime.ex)
-that manages the set up operations of the Z-Wave IP stack.
-
-### Z-Wave is Ready
-
-When the Z-Wave stack is completely set up Grizzly will call the `:on_ready`
-module function arg callback that is configured for the runtime. To configure
-this add this to your `config.exs` file:
-
-```elixir
-config :grizzly,
-  runtime: [
-    on_ready: {MyModule, :zwave_up, []}
-  ]
-```
-
-In most cases this all the configuration you need for the runtime.
-
-### Advanced Runtime Configuration
-
-By default the Grizzly runtime handle setting the `zipgateway` binary and
-generate the correct configuration files or it to run and network correctly.
-The nice things about this default setup is Grizzly leverages OTP to supervise
-the `zipgateway` binary, and if the binary crashes Grizzly will restart it.
-
-However, there are use cases for needing to manage the `zipgateway` binary
-outside of Grizzly. So if you plan on starting `zipgateway` outside of Grizzly
-you can configure the runtime like:
-
-```elixir
-config :grizzly,
-  runtime: [
-    run_zipgateway_bin: false
-  ]
-```
-
-For more information see `Grizzly.Runtime` module
-
-## Handlers
-
-Grizzly manages the low level details of around things that require more than
-just sending one off commands like including/excluding a device and firmware
-updates.
-
-However, sometimes your higher level application will have some logic that you
-will want to preform during the process. So, there are handler behaviours for
-this types of processes. You can read more about those behaviours in their
-respective modules.
-
-You can provide the handler for any such process that accepts one either at
-runtime or through mix configuration options. The configuration option looks
-like:
-
-```elixir
-config :grizzly,
-  handlers: %{
-    firmware_update: MyFirmwareUpdateHandler,
-    inclusion: MyInclusionHandler
-  }
-```
-
-If you do not pass any handler at runtime or configure any for the process will
-send messages to the calling process.
-
-You can override the configured handlers at runtime by passing in the `:handler`
-option to these processes.
-
-## Z-Wave Bridge Configuration
-
-Grizzly defers the low-level Z-Wave protocol handling to a combination of third
-party software and hardware. The software is silicon Labs' `zipgateway` and the
-hardware is a Silicon Labs Z-Wave bridge.
-
-### Configure the Z-Wave Bridge
-
-Different systems will use different serial ports to talk to the Z-Wave
-bridge. In order to configure this, there is a `serial_port` option. Below
-is an example for the Raspberry PI 3:
-
-```elixir
-config :grizzly,
-  serial_port: "/dev/ttyACM0"
-```
-
-If you are using a base nerves system please see the documentation for your
-particular system at the [Nerves Project](https://github.com/nerves-project)
-github page.
-
 
 ### Compile and Configure zipgateway
 
