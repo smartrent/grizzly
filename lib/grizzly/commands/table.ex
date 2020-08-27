@@ -265,7 +265,14 @@ defmodule Grizzly.Commands.Table do
       {:antitheft_unlock_get,
        {Commands.AntitheftUnlockGet,
         handler: {WaitReport, complete_report: :antitheft_unlock_report}}},
-      {:antitheft_unlock_set, {Commands.AntitheftUnlockSet, handler: AckResponse}}
+      {:antitheft_unlock_set, {Commands.AntitheftUnlockSet, handler: AckResponse}},
+      # Central scene
+      {:central_scene_supported_get,
+       {Commands.CentralSceneSupportedGet,
+        handler: {WaitReport, complete_report: :central_scene_supported_report}}},
+      {:central_scene_configuration_get,
+       {Commands.CentralSceneConfigurationGet,
+        handler: {WaitReport, complete_report: :central_scene_configuration_report}}}
     ]
 
     defmacro __before_compile__(_) do
