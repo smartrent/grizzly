@@ -4,7 +4,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   # This module holds the state of the FirmwareUpdateRunner and
   # knows how to move the process along (which commmand follows which)
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, CRC}
   alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
 
@@ -264,18 +264,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   # The checksum algorithm implements a CRC-CCITT using initialization value equal to 0x1D0F and 0x1021
   # (normal representation) as the poly.
   # Results match those of CRC-CCITT (0x1D0F) on https://www.lammertbies.nl/comm/info/crc-calculation
-  defp checksum(bytes) do
-    CRC.crc(
-      %{
-        width: 16,
-        poly: 0x1021,
-        init: 0x1D0F,
-        refin: false,
-        refout: false,
-        xorout: 0x00
-      },
-      bytes
-    )
+  defp checksum(binary) do
+    CRC.crc16_aug_ccitt(binary)
   end
 
   defp report_number(%__MODULE__{
