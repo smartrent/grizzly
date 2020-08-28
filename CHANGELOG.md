@@ -1,5 +1,21 @@
 ## Changelog
 
+## v0.14.1
+
+Enhancements
+  * Support `zipgateway` 7.14.01
+  * Add `Grizzly.ZWave.CommandClasses.CentralScene`
+  * Add `Grizzly.ZWave.Commands.CentralSceneConfigurationGet`
+  * Add `Grizzly.ZWave.Commands.CentralSceneConfigurationSet`
+  * Add `Grizzly.ZWave.Commands.CentralSceneConfigurationReport`
+  * Add `Grizzly.ZWave.Commands.CentralSceneNotification`
+  * Add `Grizzly.ZWave.Commands.CentralSceneSupportedGet`
+  * Add `Grizzly.ZWave.Commands.CentralSceneSupportedReport`
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.14.0
 
 This breaking change has to do with how Grizzly is started. It is no longer an
