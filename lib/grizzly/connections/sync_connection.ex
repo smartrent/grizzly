@@ -132,30 +132,33 @@ defmodule Grizzly.Connections.SyncConnection do
   defp handle_commands(zip_packet, state) do
     case Command.param!(zip_packet, :flag) do
       :ack_request ->
-        ## TODO clean up
-        # Something we will get a UDP ping from the controller that requests
-        # use to respond back, this handles that. This is mostly used
-        # when there are messages in the Z/IP Gateway's mailbox to unsure
-        # there is still someone waiting for the queued command.
-        header_extensions = Command.param!(zip_packet, :header_extensions)
-        seq_number = Command.param!(zip_packet, :seq_number)
-        secure = Command.param!(zip_packet, :secure)
-
-        {:ok, ack_response} =
-          ZIPPacket.new(
-            secure: secure,
-            header_extensions: header_extensions,
-            seq_number: seq_number,
-            flag: :ack_response
-          )
-
-        binary = ZWave.to_binary(ack_response)
-        state.transport.send(state.socket, binary)
-
-        state
+        handle_ack_request(zip_packet, state)
 
       _ ->
         do_handle_commands(zip_packet, state)
+    end
+  end
+
+  defp handle_ack_request(zip_packet, state) do
+    header_extensions = Command.param!(zip_packet, :header_extensions)
+    seq_number = Command.param!(zip_packet, :seq_number)
+    secure = Command.param!(zip_packet, :secure)
+
+    {:ok, ack_response} =
+      ZIPPacket.new(
+        secure: secure,
+        header_extensions: header_extensions,
+        seq_number: seq_number,
+        flag: :ack_response
+      )
+
+    binary = ZWave.to_binary(ack_response)
+    state.transport.send(state.socket, binary)
+
+    if Command.param!(zip_packet, :command) != nil do
+      do_handle_commands(zip_packet, state)
+    else
+      state
     end
   end
 

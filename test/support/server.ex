@@ -200,17 +200,21 @@ defmodule GrizzlyTest.Server do
   end
 
   defp maybe_send_a_report(socket, port, zip_packet) do
-    encapsulated_command = Command.param!(zip_packet, :command)
+    if Command.param!(zip_packet, :flag) != :ack_response do
+      encapsulated_command = Command.param!(zip_packet, :command)
 
-    if expects_a_report(encapsulated_command.name) do
-      {:ok, out_packet} = build_report(zip_packet)
+      if expects_a_report(encapsulated_command.name) do
+        {:ok, out_packet} = build_report(zip_packet)
 
-      :gen_udp.send(
-        socket,
-        {0, 0, 0, 0},
-        port,
-        ZWave.to_binary(out_packet)
-      )
+        :gen_udp.send(
+          socket,
+          {0, 0, 0, 0},
+          port,
+          ZWave.to_binary(out_packet)
+        )
+      else
+        :ok
+      end
     else
       :ok
     end
@@ -318,6 +322,7 @@ defmodule GrizzlyTest.Server do
     end
   end
 
+  defp expects_a_report(nil), do: false
   defp expects_a_report(:switch_binary_get), do: true
   defp expects_a_report(:node_add), do: true
   defp expects_a_report(:node_remove), do: true
@@ -332,7 +337,7 @@ defmodule GrizzlyTest.Server do
     {:ok, report} = do_build_report(encapsulated_command.name, zip_packet)
     seq_number = SeqNumber.get_and_inc()
 
-    ZIPPacket.with_zwave_command(report, seq_number, flag: nil)
+    ZIPPacket.with_zwave_command(report, seq_number, flag: flag_for_report(report))
   end
 
   defp do_build_report(:node_list_get, zip_packet) do
@@ -433,5 +438,13 @@ defmodule GrizzlyTest.Server do
           kex_fail_type: :none
         )
     end
+  end
+
+  defp flag_for_report(%Command{name: :switch_binary_report}) do
+    :ack_request
+  end
+
+  defp flag_for_report(_) do
+    nil
   end
 end
