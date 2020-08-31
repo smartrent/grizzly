@@ -42,6 +42,7 @@ defmodule Grizzly.Supervisor do
   use Supervisor
 
   alias Grizzly.Options
+  alias Grizzly.ZIPGateway.ReadyChecker
 
   @typedoc """
   Arguments for running `Grizzly.Supervisor`
@@ -146,12 +147,21 @@ defmodule Grizzly.Supervisor do
       Grizzly.Commands.CommandRunnerSupervisor
     ]
     |> maybe_run_zipgateway_supervisor(options)
+    |> maybe_start_on_ready_checker(options)
   end
 
   defp maybe_run_zipgateway_supervisor(children, options) do
     if options.run_zipgateway do
       # Supervisor for the zipgateway binary
       [{Grizzly.ZIPGateway.Supervisor, options} | children]
+    else
+      children
+    end
+  end
+
+  defp maybe_start_on_ready_checker(children, opts) do
+    if opts.on_ready do
+      children ++ [{ReadyChecker, opts.on_ready}]
     else
       children
     end
