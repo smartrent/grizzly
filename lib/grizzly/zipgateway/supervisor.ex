@@ -5,7 +5,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   use Supervisor
 
   alias Grizzly.Options
-  alias Grizzly.ZIPGateway.{Config, ReadyChecker}
+  alias Grizzly.ZIPGateway.Config
 
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do
@@ -20,7 +20,6 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   defp children(options) do
     if options.run_zipgateway do
       [make_zipgateway_child_spec(options)]
-      |> maybe_start_on_ready_checker(options)
     else
       []
     end
@@ -87,14 +86,6 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
       {:ok, _stat} ->
         :ok
-    end
-  end
-
-  defp maybe_start_on_ready_checker(children, opts) do
-    if opts.on_ready do
-      children ++ [{ReadyChecker, opts.on_ready}]
-    else
-      children
     end
   end
 end
