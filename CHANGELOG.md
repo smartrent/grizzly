@@ -1,5 +1,12 @@
 ## Changelog
 
+## v0.14.3 - 2020-08-31
+
+Fixed
+  - Fix the start order of the connection supervisor and Z-Wave ready checker
+    to ensure the supervisor process is alive before trying to test the
+    connection
+
 ## v0.14.2
 
 Added
