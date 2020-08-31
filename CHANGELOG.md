@@ -1,5 +1,13 @@
 ## Changelog
 
+## v0.14.2
+
+Added
+  * `Grizzly.ZWave.CRC` module for CRC functions related to the Z-Wave protocol
+
+Removed
+  * `crc` dependency 
+
 ## v0.14.1
 
 Enhancements
