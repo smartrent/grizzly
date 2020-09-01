@@ -1,5 +1,14 @@
 ## Changelog
 
+## 0v.14.4 - 2020-09-01
+
+Added
+  - Full support for `ThermostatFanMode` mode types
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.14.3 - 2020-08-31
 
 Fixed
