@@ -28,12 +28,10 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
   @spec handle_command(Command.t(), state()) ::
           {:continue, state} | {:complete, {:ok, Command.t()}}
   def handle_command(command, state) do
-    rtf = Command.param!(command, :reports_to_follow)
-
-    if rtf == 0 do
-      {:complete, prepare_aggregate_data(command, state)}
+    if command.name == state.complete_report do
+      do_handle_command(command, state)
     else
-      {:continue, aggregate(command, state)}
+      {:continue, state}
     end
   end
 
@@ -42,13 +40,23 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
 
     new_aggregate_values = Command.param!(command, aggregate_param)
 
-    %{state | aggregates: [new_aggregate_values | aggregates]}
+    %{state | aggregates: aggregates ++ new_aggregate_values}
   end
 
   defp prepare_aggregate_data(command, state) do
     %{aggregate_param: aggregate_param, aggregates: aggregates} = state
     final_values = Command.param!(command, aggregate_param)
 
-    Command.put_param(command, aggregate_param, final_values ++ Enum.reverse(aggregates))
+    Command.put_param(command, aggregate_param, aggregates ++ final_values)
+  end
+
+  defp do_handle_command(command, state) do
+    rtf = Command.param!(command, :reports_to_follow)
+
+    if rtf == 0 do
+      {:complete, prepare_aggregate_data(command, state)}
+    else
+      {:continue, aggregate(command, state)}
+    end
   end
 end
