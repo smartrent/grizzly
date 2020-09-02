@@ -1,5 +1,13 @@
 ## Changelog
 
+## 0v.14.5 - 2020-09-02
+
+Fixed
+ - Commands with aggregated reports did not aggregate the results as expected
+ - Commands with aggregated reports would crash if that device was also
+   handling another command due to the aggregate handler assuming that only one
+   command was being processed at one time
+
 ## 0v.14.4 - 2020-09-01
 
 Added
