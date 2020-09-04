@@ -58,7 +58,7 @@ defmodule Grizzly.MixProject do
 
   defp docs() do
     [
-      extras: ["README.md", "CHANGELOG.md"],
+      extras: ["README.md", "CHANGELOG.md", "docs/cookbook.md"],
       main: "readme",
       logo: "./assets/grizzly-icon-yellow.png",
       source_ref: "v#{@version}",
