@@ -32,6 +32,8 @@ features like S2 security and smart start are already supported in Grizzly.
 
 See instructions below for compiling the `zipgateway` binary and/or running locally.
 
+If you want a quick reference to common uses of Grizzly see the `cookbook` docs.
+
 ## Basic Usage
 
 Grizzly exposes a supervisor `Grizzly.Supervisor` for the consuming application
