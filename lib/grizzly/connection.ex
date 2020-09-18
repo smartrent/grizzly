@@ -44,7 +44,7 @@ defmodule Grizzly.Connection do
   @spec send_command(ZWave.node_id(), Command.t(), [Grizzly.command_opt()]) ::
           Grizzly.send_command_response()
   def send_command(node_id, command, opts \\ []) do
-    _ = Logger.debug("Sending: #{inspect(command)}")
+    _ = Logger.debug("Sending Cmd: #{inspect(command)}")
 
     case Keyword.get(opts, :type, :sync) do
       :sync ->

@@ -23,7 +23,6 @@ defmodule Grizzly.Transports.DTLS do
   @impl true
   def parse_response({:ssl, {:sslsocket, {:gen_udp, _, :dtls_connection}, _}, bin_list}) do
     binary = :erlang.list_to_binary(bin_list)
-    _ = Logger.debug("Z/IP Packet rec: #{inspect(binary, base: :hex)}")
 
     # TODO: handle errors
     {:ok, _result} = result = ZWave.from_binary(binary)
