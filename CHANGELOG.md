@@ -1,6 +1,16 @@
 ## Changelog
 
-## 0v.14.5 - 2020-09-02
+## v0.14.6 - 2020-09-18
+
+### Added
+
+- Cookbook documentation for common uses of Grizzly
+
+### Changed
+
+- Reduced the amount of logging
+
+## v0.14.5 - 2020-09-02
 
 Fixed
  - Commands with aggregated reports did not aggregate the results as expected
@@ -8,7 +18,7 @@ Fixed
    handling another command due to the aggregate handler assuming that only one
    command was being processed at one time
 
-## 0v.14.4 - 2020-09-01
+## v0.14.4 - 2020-09-01
 
 Added
   - Full support for `ThermostatFanMode` mode types
@@ -30,7 +40,7 @@ Added
   * `Grizzly.ZWave.CRC` module for CRC functions related to the Z-Wave protocol
 
 Removed
-  * `crc` dependency 
+  * `crc` dependency
 
 ## v0.14.1
 
@@ -101,7 +111,7 @@ This change allows us to gather more information about a response from Grizzly.
 For example, with this change you can get transmission stats about network
 properties when sending a command now:
 
-```elixir 
+```elixir
 {:ok, report} = Grizzly.send_command(node_id, command, command_args, transmission_stats: true)
 
 report.transmission_stats

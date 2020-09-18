@@ -10,7 +10,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.14.5"}
+    {:grizzly, "~> 0.14.6"}
   ]
 end
 ```
@@ -150,10 +150,10 @@ module.
 When reports are sent from the Z-Wave network to the controller without the
 controller asking for a report these are called unsolicited messages. A concrete
 example of this is when you manually unlock a lock, the controller will receive
-a message from the device if the associations are setup correctly (see 
+a message from the device if the associations are setup correctly (see
 `Grizzly.Node.set_lifeline_association/2` for more information). You can listen
 for these reports using either `Grizzly.subscribe_command/1` or
-`Grizzly.subscribe_commands/1`. 
+`Grizzly.subscribe_commands/1`.
 
 ```elixir
 Grizzly.subscribe_command(:door_lock_operation_report)
