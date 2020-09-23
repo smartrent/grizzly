@@ -55,6 +55,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
       {0x52, 0x04, Commands.NodeInfoCacheReport},
+      {0x52, 0x0C, Commands.FailedNodeListReport},
       # Multi Channel
       {0x60, 0x07, Commands.MultiChannelEndpointGet},
       {0x60, 0x08, Commands.MultiChannelEndpointReport},
