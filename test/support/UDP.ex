@@ -1,34 +1,56 @@
 defmodule GrizzlyTest.Transport.UDP do
+  @moduledoc false
+
   @behaviour Grizzly.Transport
 
-  alias Grizzly.ZWave
+  alias Grizzly.{Transport, ZWave}
+  alias Grizzly.Transport.Response
 
   @test_host {0, 0, 0, 0}
   @test_port 5_000
 
-  @impl true
-  def open({0, 0, 0, 600}, _port), do: {:error, :timeout}
+  @impl Grizzly.Transport
+  def open(args) do
+    case Keyword.get(args, :ip_address) do
+      {0, 0, 0, 600} ->
+        {:error, :timeout}
 
-  def open({0, 0, 0, node_id}, _port) do
-    case :gen_udp.open(@test_port + node_id, [:binary, {:active, true}]) do
-      {:ok, socket} -> {:ok, socket}
+      {0, 0, 0, node_id} ->
+        {:ok, socket} = :gen_udp.open(@test_port + node_id, [:binary, {:active, true}])
+        {:ok, Transport.new(__MODULE__, %{socket: socket})}
     end
   end
 
-  @impl true
-  def send(socket, binary) do
-    :gen_udp.send(socket, @test_host, @test_port, binary)
+  @impl Grizzly.Transport
+  def listen(transport), do: {:ok, transport, strategy: :none}
+
+  @impl Grizzly.Transport
+  def accept(transport) do
+    {:ok, transport}
   end
 
-  @impl true
-  def parse_response({:udp, _, _, _, binary}) do
+  @impl Grizzly.Transport
+  def handshake(transport), do: {:ok, transport}
+
+  @impl Grizzly.Transport
+  def send(transport, binary) do
+    transport
+    |> Transport.assign(:socket)
+    |> :gen_udp.send(@test_host, @test_port, binary)
+  end
+
+  @impl Grizzly.Transport
+  def parse_response({:udp, _, ip, _, binary}) do
     case ZWave.from_binary(binary) do
-      {:ok, _zip_packet} = result -> result
+      {:ok, command} ->
+        {:ok, %Response{ip_address: ip, command: command}}
     end
   end
 
-  @impl true
-  def close(socket) do
-    :gen_udp.close(socket)
+  @impl Grizzly.Transport
+  def close(transport) do
+    transport
+    |> Transport.assign(:socket)
+    |> :gen_udp.close()
   end
 end

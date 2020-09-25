@@ -5,34 +5,35 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
   require Logger
 
+  alias Grizzly.Transport
   alias Grizzly.UnsolicitedServer.{SocketSupervisor, Messages}
 
-  defmodule State do
-    @moduledoc false
-    defstruct listen_socket: nil
+  @spec child_spec(Transport.t()) :: map()
+  def child_spec(transport) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [transport]},
+      restart: :temporary
+    }
   end
 
-  def child_spec(listen_socket) do
-    %{id: __MODULE__, start: {__MODULE__, :start_link, [listen_socket]}, restart: :temporary}
+  @spec start_link(Transport.t()) :: GenServer.on_start()
+  def start_link(listening_transport) do
+    GenServer.start_link(__MODULE__, [listening_transport])
   end
 
-  def start_link(listen_socket) do
-    GenServer.start_link(__MODULE__, listen_socket)
+  @impl GenServer
+  def init([transport]) do
+    {:ok, transport, {:continue, :accept}}
   end
 
-  @impl true
-  def init(listen_socket) do
-    {:ok, %State{listen_socket: listen_socket}, {:continue, :accept}}
-  end
-
-  @impl true
-  def handle_continue(:accept, %State{listen_socket: listen_socket} = state) do
-    {:ok, transport_accept_sock} = :ssl.transport_accept(listen_socket)
-
-    with {:ok, _sock} <- :ssl.handshake(transport_accept_sock) do
+  @impl GenServer
+  def handle_continue(:accept, listening_transport) do
+    with {:ok, accept_transport} <- Transport.accept(listening_transport),
+         {:ok, _sock} <- Transport.handshake(accept_transport) do
       # Start a new listen socket to replace this one as this one is now not
       # open for more traffic now
-      {:ok, _} = SocketSupervisor.start_socket(listen_socket)
+      {:ok, _} = SocketSupervisor.start_socket(listening_transport)
     else
       other ->
         Logger.warn(
@@ -40,18 +41,19 @@ defmodule Grizzly.UnsolicitedServer.Socket do
         )
     end
 
-    {:noreply, state}
+    {:noreply, listening_transport}
   end
 
-  @impl true
-  def handle_info({:ssl, {:sslsocket, {_, {_, {{ip, _}, _}}, _}, _}, data}, state) do
-    :ok = Messages.broadcast(ip, data)
-
-    {:noreply, state}
+  @impl GenServer
+  def handle_info({:ssl_closed, _}, transport) do
+    {:stop, :normal, transport}
   end
 
-  def handle_info({:ssl_closed, {:sslsocket, {_, {_, {{_ip, _}, _}}, _}, _}}, state) do
-    _ = Logger.info("grizzly: unsolicated messages closed")
-    {:stop, :normal, state}
+  def handle_info(response, transport) do
+    case Transport.parse_response(transport, response) do
+      {:ok, %Transport.Response{} = transport_response} ->
+        :ok = Messages.broadcast(transport_response.ip_address, transport_response.command)
+        {:noreply, transport}
+    end
   end
 end
