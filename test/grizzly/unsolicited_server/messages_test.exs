@@ -1,7 +1,7 @@
 defmodule Grizzly.UnsolicitedServer.MessagesTest do
   use ExUnit.Case
 
-  alias Grizzly.{Report, ZWave}
+  alias Grizzly.Report
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, ZIPPacket}
   alias Grizzly.UnsolicitedServer.Messages
 
@@ -13,7 +13,7 @@ defmodule Grizzly.UnsolicitedServer.MessagesTest do
 
     Messages.broadcast(
       {0, 0, 0, 2},
-      ZWave.to_binary(zip_packet)
+      zip_packet
     )
 
     assert_receive {:grizzly, :report, %Report{} = report}, 500

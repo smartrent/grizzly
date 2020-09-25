@@ -130,8 +130,8 @@ defmodule Grizzly.Supervisor do
 
       # TODO: move unsolicited server stuff to own supervisor
       Grizzly.UnsolicitedServer.Messages,
-      Grizzly.UnsolicitedServer,
       Grizzly.UnsolicitedServer.SocketSupervisor,
+      {Grizzly.UnsolicitedServer, options},
       ##########################
 
       # Supervisor for starting connections to Z-Wave nodes

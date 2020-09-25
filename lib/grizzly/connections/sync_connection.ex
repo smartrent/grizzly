@@ -7,7 +7,7 @@ defmodule Grizzly.Connections.SyncConnection do
 
   require Logger
 
-  alias Grizzly.{ZIPGateway, Connections, Options, Report}
+  alias Grizzly.{Transport, ZIPGateway, Connections, Options, Report}
   alias Grizzly.Commands.CommandRunner
   alias Grizzly.Connections.{KeepAlive, CommandList}
   alias Grizzly.ZWave
@@ -19,7 +19,6 @@ defmodule Grizzly.Connections.SyncConnection do
   defmodule State do
     @moduledoc false
     defstruct transport: nil,
-              socket: nil,
               commands: CommandList.empty(),
               keep_alive: nil
   end
@@ -55,13 +54,17 @@ defmodule Grizzly.Connections.SyncConnection do
 
   def init([grizzly_options, node_id, _opts]) do
     host = ZIPGateway.host_for_node(node_id, grizzly_options)
-    transport = grizzly_options.transport
+    transport_impl = grizzly_options.transport
 
-    case transport.open(host, grizzly_options.zipgateway_port) do
-      {:ok, socket} ->
+    transport_opts = [
+      ip_address: host,
+      port: grizzly_options.zipgateway_port
+    ]
+
+    case Transport.open(transport_impl, transport_opts) do
+      {:ok, transport} ->
         {:ok,
          %State{
-           socket: socket,
            transport: transport,
            keep_alive: KeepAlive.init(node_id, 25_000)
          }}
@@ -117,9 +120,11 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   def handle_info(data, state) do
-    case state.transport.parse_response(data) do
-      {:ok, zip_packet} ->
-        new_state = handle_commands(zip_packet, state)
+    %State{transport: transport} = state
+
+    case Transport.parse_response(transport, data) do
+      {:ok, transport_response} ->
+        new_state = handle_commands(transport_response.command, state)
         {:noreply, new_state}
     end
   end
@@ -141,6 +146,7 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   defp handle_ack_request(zip_packet, state) do
+    %State{transport: transport} = state
     header_extensions = Command.param!(zip_packet, :header_extensions)
     seq_number = Command.param!(zip_packet, :seq_number)
     secure = Command.param!(zip_packet, :secure)
@@ -154,7 +160,7 @@ defmodule Grizzly.Connections.SyncConnection do
       )
 
     binary = ZWave.to_binary(ack_response)
-    state.transport.send(state.socket, binary)
+    Transport.send(transport, binary)
 
     if Command.param!(zip_packet, :command) != nil do
       do_handle_commands(zip_packet, state)
@@ -190,8 +196,9 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   defp do_send_command(command_runner, state) do
+    %State{transport: transport} = state
     binary = CommandRunner.encode_command(command_runner)
-    state.transport.send(state.socket, binary)
+    Transport.send(transport, binary)
   end
 
   defp do_timeout_reply(waiter, grizzly_command) do

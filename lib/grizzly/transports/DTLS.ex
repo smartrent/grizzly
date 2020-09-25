@@ -1,41 +1,132 @@
 defmodule Grizzly.Transports.DTLS do
-  @moduledoc false
+  @moduledoc """
+  DTLS implementation of the `Grizzly.Transport` behaviour
+  """
 
   @behaviour Grizzly.Transport
 
-  alias Grizzly.ZWave
+  alias Grizzly.{Transport, ZWave}
+  alias Grizzly.Transport.Response
 
   require Logger
 
-  @impl true
-  def open(ip_address, port) do
+  @impl Grizzly.Transport
+  def open(args) do
+    ip_address = Keyword.fetch!(args, :ip_address)
+    port = Keyword.fetch!(args, :port)
+
     case :ssl.connect(ip_address, port, dtls_opts(), 10_000) do
-      {:ok, _socket} = result -> result
-      {:error, _} = error -> error
+      {:ok, socket} ->
+        {:ok, Transport.new(__MODULE__, %{socket: socket, port: port})}
+
+      {:error, _} = error ->
+        error
     end
   end
 
-  @impl true
-  def send(socket, binary) do
+  @impl Grizzly.Transport
+  def send(transport, binary) do
+    socket = Transport.assign(transport, :socket)
     :ssl.send(socket, binary)
   end
 
-  @impl true
-  def parse_response({:ssl, {:sslsocket, {:gen_udp, _, :dtls_connection}, _}, bin_list}) do
+  @impl Grizzly.Transport
+  def parse_response(
+        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _}, _}}, :dtls_connection}, _}, bin_list}
+      ) do
     binary = :erlang.list_to_binary(bin_list)
 
     # TODO: handle errors
-    {:ok, _result} = result = ZWave.from_binary(binary)
-    result
+    {:ok, command} = ZWave.from_binary(binary)
+
+    {:ok,
+     %Response{
+       ip_address: ip,
+       command: command
+     }}
   end
 
-  @impl true
-  def close(socket) do
-    :ssl.close(socket)
+  def parse_response({:ssl, {:sslsocket, {:gen_udp, _port, :dtls_connection}, _}, bin_list}) do
+    binary = :erlang.list_to_binary(bin_list)
+
+    # TODO: handle errors
+    {:ok, command} = ZWave.from_binary(binary)
+
+    {:ok,
+     %Response{
+       command: command
+     }}
   end
 
+  @impl Grizzly.Transport
+  def close(transport) do
+    transport
+    |> Transport.assign(:socket)
+    |> :ssl.close()
+  end
+
+  @impl Grizzly.Transport
+  def listen(transport) do
+    port = Transport.assign(transport, :port)
+    ip_address = Transport.assign(transport, :ip_address)
+
+    case :ssl.listen(port, dtls_opts(ip_address)) do
+      {:ok, listening_socket} ->
+        {:ok, Transport.assigns(transport, :socket, listening_socket), strategy: :accept}
+
+      error ->
+        error
+    end
+  end
+
+  @impl Grizzly.Transport
+  def accept(transport) do
+    socket = Transport.assign(transport, :socket)
+
+    case :ssl.transport_accept(socket) do
+      {:ok, socket} ->
+        {:ok, Transport.assigns(transport, :accept_socket, socket)}
+
+      error ->
+        error
+    end
+  end
+
+  @impl Grizzly.Transport
+  def handshake(transport) do
+    accept_socket = Transport.assign(transport, :accept_socket)
+
+    case :ssl.handshake(accept_socket) do
+      {:ok, _handshake_socket} ->
+        {:ok, transport}
+
+      error ->
+        error
+    end
+  end
+
+  @doc false
   def user_lookup(:psk, _username, userstate) do
     {:ok, userstate}
+  end
+
+  defp dtls_opts(ifaddr) do
+    [
+      {:ssl_imp, :new},
+      {:active, true},
+      {:verify, :verify_none},
+      {:versions, [:dtlsv1]},
+      {:protocol, :dtls},
+      {:ciphers, [{:psk, :aes_128_cbc, :sha}]},
+      {:psk_identity, 'Client_identity'},
+      {:user_lookup_fun,
+       {&user_lookup/3,
+        <<0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
+          0x90, 0xAA>>}},
+      {:cb_info, {:gen_udp, :udp, :udp_close, :udp_error}},
+      :inet6,
+      {:ifaddr, ifaddr}
+    ]
   end
 
   defp dtls_opts() do
