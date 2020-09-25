@@ -1,5 +1,15 @@
 ## Changelog
 
+## v0.14.7 - 2020-09-25
+
+### Added
+
+- Added `Grizzly.ZWave.Commands.FailedNodeListReport` command
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.14.6 - 2020-09-18
 
 ### Added
