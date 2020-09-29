@@ -1,5 +1,11 @@
 ## Changelog
 
+## v0.14.8 - 2020-09-29
+
+### Added
+
+- Support for power management notifications
+
 ## v0.14.7 - 2020-09-25
 
 ### Added
