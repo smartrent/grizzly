@@ -6,6 +6,7 @@ Below are short notes about using Grizzly.
 1. [Docker Local Development](#docker-local-development)
 1. [Add Devices](#add-devices)
 1. [Remove Devices](#remove-devices)
+1. [Factory Reset Controller](#factory-reset-controller)
 1. [Command Basics](#command-basics)
 1. [Binary Switches](#binary-switches)
 1. [Door Locks](#door-locks)
@@ -147,6 +148,25 @@ Where the report command that is received is
 `Grizzly.ZWave.Commands.NodeRemoveStatus`.
 
 You can also provide an Inclusion handler which is explained in [Add Devices](#add-devices).
+
+## Factory Reset Controller
+
+If you have been doing development and adding and removing devices or testing
+some Z-Wave Network functionally that has lead to the network getting in a
+broken state and you just want to start over again you can reset your controller
+by doing this:
+
+```
+Grizzly.Network.reset_controller()
+```
+
+This will make the controller forget any devices that are paired with it and
+delete all node provisioning entries from the SmartStart node provisioning list.
+
+For devices that thought they were included on the newly reset controller you
+will to excluded them by going through the [remove devices](#remove-devices)
+steps before you are able to re-include them back into the controller's
+network.
 
 ## Command Basics
 
