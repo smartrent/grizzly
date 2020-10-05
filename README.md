@@ -112,7 +112,7 @@ For more documentation on what `Grizzly.send_command/4` can return see the
 
 ### Successful Commands
 
-1. `{:ok, %Grizzly.Report{type: :ack_response}` - normally for setting things
+1. `{:ok, %Grizzly.Report{type: :ack_response}}` - normally for setting things
    on a device or changing the device's state
 1. `{:ok, %Grizzly.Report{type: :command}}` - this is normally returned when asking
    for a device state or about some information about a device or Z-Wave
