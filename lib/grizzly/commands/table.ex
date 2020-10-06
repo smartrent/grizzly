@@ -243,7 +243,7 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :alarm_event_supported_report}}},
       # Time
       {:time_get, {Commands.TimeGet, handler: {WaitReport, complete_report: :time_report}}},
-      {:date_get, {Commands.TimeGet, handler: {WaitReport, complete_report: :date_report}}},
+      {:date_get, {Commands.DateGet, handler: {WaitReport, complete_report: :date_report}}},
       {:time_offset_get,
        {Commands.TimeOffsetGet, handler: {WaitReport, complete_report: :time_offset_report}}},
       {:time_offset_set, {Commands.TimeOffsetSet, handler: AckResponse}},
