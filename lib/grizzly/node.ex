@@ -10,10 +10,6 @@ defmodule Grizzly.Node do
 
   @type lifeline_opts :: {:controller_id, ZWave.node_id()} | {:extra_node_ids, [ZWave.node_id()]}
 
-  @deprecated "Use Grizzly.Node.get_info/1 instead"
-  @spec get_node_info(ZWave.node_id()) :: Grizzly.send_command_response()
-  def get_node_info(node_id), do: get_info(node_id)
-
   @doc """
   Get the information for a node by its id
 
