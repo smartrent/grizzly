@@ -4,8 +4,6 @@ defmodule Grizzly.ZIPGateway.Config do
   # This module is for making the `zipgateway.cfg` file
 
   @type t :: %__MODULE__{
-          unsolicited_destination_ip6: String.t(),
-          unsolicited_destination_port: :inet.port_number(),
           ca_cert: Path.t(),
           cert: Path.t(),
           priv_key: Path.t(),
@@ -22,12 +20,11 @@ defmodule Grizzly.ZIPGateway.Config do
           product_id: non_neg_integer() | nil,
           product_type: non_neg_integer() | nil,
           serial_log: String.t() | nil,
-          extra_classes: [byte()]
+          extra_classes: [byte()],
+          unsolicited_destination: {:inet.ip_address(), :inet.port_number()}
         }
 
-  defstruct unsolicited_destination_ip6: "fd00:aaaa::2",
-            unsolicited_destination_port: 41230,
-            ca_cert: "./Portal.ca_x509.pem",
+  defstruct ca_cert: "./Portal.ca_x509.pem",
             cert: "./ZIPR.x509_1024.pem",
             priv_key: "./ZIPR.key_1024.pem",
             eeprom_file: "/root/zipeeprom.dat",
@@ -43,7 +40,8 @@ defmodule Grizzly.ZIPGateway.Config do
             product_type: nil,
             hardware_version: nil,
             manufacturer_id: nil,
-            extra_classes: [0x85, 0x59, 0x5A, 0x8E, 0x6C, 0x8F]
+            extra_classes: [0x85, 0x59, 0x5A, 0x8E, 0x6C, 0x8F],
+            unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230}
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -80,8 +78,6 @@ defmodule Grizzly.ZIPGateway.Config do
   @spec to_string(t()) :: String.t()
   def to_string(cfg) do
     """
-    ZipUnsolicitedDestinationIp6=#{cfg.unsolicited_destination_ip6}
-    ZipUnsolicitedDestinationPort=#{cfg.unsolicited_destination_port}
     ZipCaCert=#{cfg.ca_cert}
     ZipCert=#{cfg.cert}
     ZipPrivKey=#{cfg.priv_key}
@@ -100,6 +96,7 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :extra_classes, "ExtraClasses")
     |> maybe_put_config_item(cfg, :pan_ip, "ZipPanIp6")
     |> maybe_put_config_item(cfg, :lan_ip, "ZipLanIp6")
+    |> maybe_put_config_item(cfg, :unsolicited_destination, nil)
   end
 
   defp maybe_put_config_item(config_string, cfg, :extra_classes = field, cfg_name) do
@@ -111,6 +108,19 @@ defmodule Grizzly.ZIPGateway.Config do
         extra_command_classes_string = Enum.join(extra_command_classes, " ")
         config_string <> "#{cfg_name}= #{extra_command_classes_string}\n"
     end
+  end
+
+  defp maybe_put_config_item(config_string, cfg, :unsolicited_destination, _) do
+    {ip, port} = cfg.unsolicited_destination
+
+    ip_string =
+      ip
+      |> :inet.ntoa()
+      |> Kernel.to_string()
+
+    config_string <>
+      "ZipUnsolicitedDestinationIp6=#{ip_string}\n" <>
+      "ZipUnsolicitedDestinationPort=#{port}\n"
   end
 
   defp maybe_put_config_item(config_string, cfg, field, cfg_name)

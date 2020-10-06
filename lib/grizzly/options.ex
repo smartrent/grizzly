@@ -21,7 +21,8 @@ defmodule Grizzly.Options do
           lan_ip: :inet.ip_address(),
           pan_ip: :inet.ip_address(),
           inclusion_handler: Grizzly.handler() | nil,
-          firmware_update_handler: Grizzly.handler() | nil
+          firmware_update_handler: Grizzly.handler() | nil,
+          unsolicited_destination: {:inet.ip_address(), :inet.port_number()}
         }
 
   defstruct run_zipgateway: true,
@@ -40,7 +41,8 @@ defmodule Grizzly.Options do
             pan_ip: {0xFD00, 0xBBBB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
             lan_ip: {0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
             inclusion_handler: nil,
-            firmware_update_handler: nil
+            firmware_update_handler: nil,
+            unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230}
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

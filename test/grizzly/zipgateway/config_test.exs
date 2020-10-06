@@ -7,8 +7,6 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
 
   test "default config to string" do
     output = """
-    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
-    ZipUnsolicitedDestinationPort=41230
     ZipCaCert=./Portal.ca_x509.pem
     ZipCert=./ZIPR.x509_1024.pem
     ZipPrivKey=./ZIPR.key_1024.pem
@@ -21,6 +19,8 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ExtraClasses= 133 89 90 142 108 143
     ZipPanIp6=fd00:bbbb::1
     ZipLanIp6=fd00:aaaa::1
+    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+    ZipUnsolicitedDestinationPort=41230
     """
 
     cfg = Config.new()
@@ -30,8 +30,6 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
 
   test "when options are added as string" do
     output = """
-    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
-    ZipUnsolicitedDestinationPort=41230
     ZipCaCert=./Portal.ca_x509.pem
     ZipCert=./ZIPR.x509_1024.pem
     ZipPrivKey=./ZIPR.key_1024.pem
@@ -45,6 +43,8 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ExtraClasses= 133 89 90 142 108 143
     ZipPanIp6=fd00:bbbb::1
     ZipLanIp6=fd00:aaaa::1
+    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+    ZipUnsolicitedDestinationPort=41230
     """
 
     cfg = Config.new(%{product_id: 1})
@@ -56,8 +56,6 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     cfg = Config.new()
 
     expected_contents = """
-    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
-    ZipUnsolicitedDestinationPort=41230
     ZipCaCert=./Portal.ca_x509.pem
     ZipCert=./ZIPR.x509_1024.pem
     ZipPrivKey=./ZIPR.key_1024.pem
@@ -70,6 +68,8 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ExtraClasses= 133 89 90 142 108 143
     ZipPanIp6=fd00:bbbb::1
     ZipLanIp6=fd00:aaaa::1
+    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+    ZipUnsolicitedDestinationPort=41230
     """
 
     assert :ok = Config.write(cfg, cfg_path())
