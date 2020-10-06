@@ -81,6 +81,8 @@ defmodule Grizzly.Supervisor do
     behaviour. This is optional.
   - `:firmware_update_handler` - a module that implements the
     `Grizzly.FirmwareUpdateHandler` behaviour. This is optional.
+  - `:unsolicited_destination` - configure the ip address and port number for
+     the unsolicited destination server.
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -104,7 +106,11 @@ defmodule Grizzly.Supervisor do
           | {:pan_ip, :inet.ip_address()}
           | {:inclusion_handler, Grizzly.handler()}
           | {:firmware_update_handler, Grizzly.handler()}
+          | {:unsolicited_destination, {:inet.ip_address(), :inet.port_number()}}
 
+  @doc """
+  Start the Grizzly.Supervisor
+  """
   @spec start_link([arg()]) :: Supervisor.on_start()
   def start_link(init_args) do
     Supervisor.start_link(__MODULE__, init_args, name: __MODULE__)

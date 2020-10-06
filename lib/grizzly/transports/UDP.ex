@@ -22,7 +22,15 @@ defmodule Grizzly.Transports.UDP do
 
   @impl Transport
   def listen(transport) do
-    {:ok, transport, strategy: :none}
+    port = Transport.assign(transport, :port)
+
+    case :gen_udp.open(port, [:binary, {:active, true}]) do
+      {:ok, socket} ->
+        {:ok, Transport.assigns(transport, :socket, socket), strategy: :none}
+
+      error ->
+        error
+    end
   end
 
   @impl Transport
