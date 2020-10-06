@@ -217,7 +217,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x8B, 0x03, Commands.TimeParametersReport},
       # Device reset locally
       {0x5A, 0x01, Commands.DeviceResetLocallyNotification},
-      # Indicator
+      # Time
       {0x8A, 0x01, Commands.TimeGet},
       {0x8A, 0x02, Commands.TimeReport},
       {0x8A, 0x03, Commands.DateGet},
@@ -225,7 +225,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x8A, 0x05, Commands.TimeOffsetSet},
       {0x8A, 0x06, Commands.TimeOffsetGet},
       {0x8A, 0x07, Commands.TimeOffsetReport},
-      # Time
+      # Indicator
       {0x87, 0x01, Commands.IndicatorSet},
       {0x87, 0x02, Commands.IndicatorGet},
       {0x87, 0x03, Commands.IndicatorReport},

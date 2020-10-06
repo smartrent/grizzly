@@ -22,11 +22,12 @@ defmodule Grizzly.ZWave.Commands.TimeReport do
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
-  def new(_params) do
+  def new(params) do
     command = %Command{
       name: :time_report,
       command_byte: 0x02,
       command_class: Time,
+      params: params,
       impl: __MODULE__
     }
 
