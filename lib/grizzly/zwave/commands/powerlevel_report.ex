@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :powerlevel_set,
+      name: :powerlevel_report,
       command_byte: 0x03,
       command_class: Powerlevel,
       params: params,
