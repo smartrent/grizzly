@@ -272,7 +272,15 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :central_scene_supported_report}}},
       {:central_scene_configuration_get,
        {Commands.CentralSceneConfigurationGet,
-        handler: {WaitReport, complete_report: :central_scene_configuration_report}}}
+        handler: {WaitReport, complete_report: :central_scene_configuration_report}}},
+      # Powerlevel
+      {:powerlevel_get,
+       {Commands.PowerlevelGet, handler: {WaitReport, complete_report: :powerlevel_report}}},
+      {:powerlevel_set, {Commands.PowerlevelSet, handler: AckResponse}},
+      {:powerlevel_test_node_get,
+       {Commands.PowerlevelTestNodeGet,
+        handler: {WaitReport, complete_report: :powerlevel_test_node_report}}},
+      {:powerlevel_test_node_set, {Commands.PowerlevelTestNodeSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
