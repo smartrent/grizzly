@@ -92,6 +92,35 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     ZIPPacket.with_zwave_command(groupings_report, seq_number, flag: nil)
   end
 
+  defp handle_command(%Command{name: :association_remove} = command, opts) do
+    grouping_id = Command.param!(command, :grouping_identifier)
+    nodes = Command.param!(command, :nodes)
+    data_file = Keyword.get(opts, :data_file)
+
+    # This case matching is based off a table from the Z-Wave specification
+    # Right now we only have one association grouping, so the first and third
+    # match are the same right now. I want to keep the matching explicit right
+    # now as I hope it will enable quicker understand to any future work that
+    # will be as it maps nicely to the documentation found in the Z-Wave
+    # specification.
+    case {grouping_id, nodes} do
+      {1, []} ->
+        remove_all_nodes_from_grouping(grouping_id, data_file)
+
+      {1, _} ->
+        remove_nodes_from_grouping(grouping_id, nodes, data_file)
+
+      {0, []} ->
+        remove_all_nodes_from_grouping(1, data_file)
+
+      {0, _} ->
+        remove_nodes_from_grouping(1, nodes, data_file)
+
+      _ ->
+        :ok
+    end
+  end
+
   defp handle_command(_command, _), do: :ok
 
   defp get_grouping_identifier_and_nodes(data_file) do
@@ -102,5 +131,19 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       {:ok, binary} ->
         :erlang.binary_to_term(binary)
     end
+  end
+
+  defp remove_nodes_from_grouping(1, nodes, data_file) do
+    {1, current_nodes} = get_grouping_identifier_and_nodes(data_file)
+
+    new_nodes = current_nodes -- nodes
+    new_associations = :erlang.term_to_binary({1, new_nodes})
+
+    File.write(data_file, new_associations)
+  end
+
+  defp remove_all_nodes_from_grouping(1, data_file) do
+    binary = :erlang.term_to_binary({1, []})
+    File.write(data_file, binary)
   end
 end
