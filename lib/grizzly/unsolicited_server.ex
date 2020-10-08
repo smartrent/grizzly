@@ -7,6 +7,11 @@ defmodule Grizzly.UnsolicitedServer do
   alias Grizzly.{Options, Transport}
   alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler}
 
+  defmodule State do
+    @moduledoc false
+    defstruct transport: nil, data_file: nil
+  end
+
   @doc """
   Start the unsolicited server
   """
@@ -18,6 +23,7 @@ defmodule Grizzly.UnsolicitedServer do
   @impl GenServer
   def init(%Options{} = grizzly_opts) do
     {ip, port} = grizzly_opts.unsolicited_destination
+    data_file = Path.join(grizzly_opts.unsolicited_data_path, "associations")
 
     transport =
       Transport.new(grizzly_opts.transport, %{
@@ -25,30 +31,34 @@ defmodule Grizzly.UnsolicitedServer do
         port: port
       })
 
-    {:ok, transport, {:continue, :listen}}
+    {:ok, %State{transport: transport, data_file: data_file}, {:continue, :listen}}
   end
 
   @impl GenServer
-  def handle_continue(:listen, transport) do
+  def handle_continue(:listen, state) do
+    %State{transport: transport} = state
+
     case listen(transport) do
       {:ok, listening_transport, listen_opts} ->
-        maybe_start_accept_sockets(listening_transport, listen_opts)
-        {:noreply, listening_transport}
+        maybe_start_accept_sockets(listening_transport, listen_opts, state)
+        {:noreply, %State{state | transport: listening_transport}}
 
       _error ->
         # wait 2 seconds to try again
         _ = Logger.warn("[Grizzly]: Unsolicited server unable to listen")
         :timer.sleep(2000)
-        {:noreply, transport, {:continue, :listen}}
+        {:noreply, state, {:continue, :listen}}
     end
   end
 
   @impl GenServer
-  def handle_info(message, transport) do
+  def handle_info(message, state) do
+    %State{transport: transport, data_file: data_file} = state
+
     case Transport.parse_response(transport, message) do
       {:ok, transport_response} ->
-        ResponseHandler.handle_response(transport, transport_response)
-        {:noreply, transport}
+        ResponseHandler.handle_response(transport, transport_response, data_file: data_file)
+        {:noreply, state}
     end
   end
 
@@ -60,10 +70,14 @@ defmodule Grizzly.UnsolicitedServer do
     end
   end
 
-  def maybe_start_accept_sockets(listening_transport, listen_opts) do
+  def maybe_start_accept_sockets(listening_transport, listen_opts, state) do
     case Keyword.get(listen_opts, :strategy) do
       :accept ->
-        Enum.each(1..10, fn _ -> SocketSupervisor.start_socket(listening_transport) end)
+        %State{data_file: data_file} = state
+
+        Enum.each(1..10, fn _ ->
+          SocketSupervisor.start_socket(listening_transport, data_file: data_file)
+        end)
 
       :none ->
         :ok

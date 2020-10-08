@@ -83,6 +83,8 @@ defmodule Grizzly.Supervisor do
     `Grizzly.FirmwareUpdateHandler` behaviour. This is optional.
   - `:unsolicited_destination` - configure the ip address and port number for
      the unsolicited destination server.
+  - `:unsolicited_data_path` - A path to the directory where the unsolicited
+    server should persist data (defaults to `/root`)
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -107,6 +109,7 @@ defmodule Grizzly.Supervisor do
           | {:inclusion_handler, Grizzly.handler()}
           | {:firmware_update_handler, Grizzly.handler()}
           | {:unsolicited_destination, {:inet.ip_address(), :inet.port_number()}}
+          | {:unsolicited_data_path, Path.t()}
 
   @doc """
   Start the Grizzly.Supervisor
