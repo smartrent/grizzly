@@ -194,6 +194,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x47, 0x01, Commands.ThermostatSetbackSet},
       {0x47, 0x02, Commands.ThermostatSetbackGet},
       {0x47, 0x03, Commands.ThermostatSetbackReport},
+      # CRC 16 encapsulation
+      {0x56, 0x01, Commands.CRC16Encap},
       # Thermostat operating state
       {0x42, 0x02, Commands.ThermostatOperatingStateGet},
       {0x42, 0x03, Commands.ThermostatOperatingStateReport},
