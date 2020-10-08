@@ -9,7 +9,13 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{AssociationReport, AssociationGroupingsReport, ZIPPacket}
+
+  alias Grizzly.ZWave.Commands.{
+    AssociationReport,
+    AssociationGroupingsReport,
+    AssociationSpecificGroupReport,
+    ZIPPacket
+  }
 
   @type opt() :: {:data_file, Path.t()}
 
@@ -44,6 +50,13 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       _ ->
         :ok
     end
+  end
+
+  defp handle_command(%Command{name: :association_specific_group_get}, _) do
+    seq_number = SeqNumber.get_and_inc()
+    {:ok, report} = AssociationSpecificGroupReport.new(group: 0)
+
+    ZIPPacket.with_zwave_command(report, seq_number)
   end
 
   defp handle_command(%Command{name: :association_get}, opts) do
