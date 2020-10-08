@@ -25,7 +25,7 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   @impl Grizzly.Transport
-  def send(transport, binary) do
+  def send(transport, binary, _) do
     socket = Transport.assign(transport, :socket)
     :ssl.send(socket, binary)
   end

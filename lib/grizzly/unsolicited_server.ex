@@ -5,7 +5,7 @@ defmodule Grizzly.UnsolicitedServer do
   require Logger
 
   alias Grizzly.{Options, Transport}
-  alias Grizzly.UnsolicitedServer.{Messages, SocketSupervisor}
+  alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler}
 
   @doc """
   Start the unsolicited server
@@ -33,7 +33,7 @@ defmodule Grizzly.UnsolicitedServer do
     case listen(transport) do
       {:ok, listening_transport, listen_opts} ->
         maybe_start_accept_sockets(listening_transport, listen_opts)
-        {:noreply, transport}
+        {:noreply, listening_transport}
 
       _error ->
         # wait 2 seconds to try again
@@ -46,8 +46,8 @@ defmodule Grizzly.UnsolicitedServer do
   @impl GenServer
   def handle_info(message, transport) do
     case Transport.parse_response(transport, message) do
-      {:ok, %Transport.Response{} = transport_response} ->
-        :ok = Messages.broadcast(transport_response.ip_address, transport_response.command)
+      {:ok, transport_response} ->
+        ResponseHandler.handle_response(transport, transport_response)
         {:noreply, transport}
     end
   end

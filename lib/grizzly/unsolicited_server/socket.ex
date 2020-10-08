@@ -6,7 +6,7 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   require Logger
 
   alias Grizzly.Transport
-  alias Grizzly.UnsolicitedServer.{SocketSupervisor, Messages}
+  alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler}
 
   @spec child_spec(Transport.t()) :: map()
   def child_spec(transport) do
@@ -52,7 +52,7 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   def handle_info(response, transport) do
     case Transport.parse_response(transport, response) do
       {:ok, %Transport.Response{} = transport_response} ->
-        :ok = Messages.broadcast(transport_response.ip_address, transport_response.command)
+        ResponseHandler.handle_response(transport, transport_response)
         {:noreply, transport}
     end
   end
