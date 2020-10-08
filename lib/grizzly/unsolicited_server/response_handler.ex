@@ -9,7 +9,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{AssociationReport, ZIPPacket}
+  alias Grizzly.ZWave.Commands.{AssociationReport, AssociationGroupingsReport, ZIPPacket}
 
   @doc """
   When a transport receives a response from the Z-Wave network handle it
@@ -56,6 +56,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       )
 
     ZIPPacket.with_zwave_command(association_report, seq_number, flag: nil)
+  end
+
+  defp handle_command(%Command{name: :association_groupings_get}) do
+    seq_number = SeqNumber.get_and_inc()
+
+    {:ok, groupings_report} = AssociationGroupingsReport.new(supported_groupings: 1)
+
+    ZIPPacket.with_zwave_command(groupings_report, seq_number, flag: nil)
   end
 
   defp handle_command(_command), do: :ok
