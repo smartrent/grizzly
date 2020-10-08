@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupingsGet do
   alias Grizzly.ZWave.CommandClasses.Association
 
   @impl true
-  def new(params) do
+  def new(params \\ []) do
     command = %Command{
       name: :association_groupings_get,
       command_byte: 0x05,
