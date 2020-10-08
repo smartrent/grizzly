@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
 
   @type param ::
           {:command, Command.t() | nil}
-          | {:flag, flag()}
+          | {:flag, flag() | nil}
           | {:seq_number, ZWave.seq_number()}
           | {:source, ZWave.node_id()}
           | {:dest, ZWave.node_id()}
