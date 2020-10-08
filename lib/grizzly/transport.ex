@@ -55,7 +55,7 @@ defmodule Grizzly.Transport do
 
   @callback handshake(t()) :: {:ok, t()} | {:error, any()}
 
-  @callback send(t(), binary()) :: :ok
+  @callback send(t(), binary(), keyword()) :: :ok
 
   @callback parse_response(any()) ::
               {:ok, Response.t()} | {:error, DecodeError.t()}
@@ -133,11 +133,11 @@ defmodule Grizzly.Transport do
   @doc """
   Send binary data using a transport
   """
-  @spec send(t(), binary()) :: :ok
-  def send(transport, binary) do
+  @spec send(t(), binary(), keyword()) :: :ok
+  def send(transport, binary, opts \\ []) do
     %__MODULE__{impl: transport_impl} = transport
 
-    transport_impl.send(transport, binary)
+    transport_impl.send(transport, binary, opts)
   end
 
   @doc """

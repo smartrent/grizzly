@@ -44,7 +44,7 @@ defmodule Grizzly.Transports.UDP do
   end
 
   @impl Grizzly.Transport
-  def send(transport, binary) do
+  def send(transport, binary, []) do
     host = Transport.assign(transport, :ip_address)
     port = Transport.assign(transport, :port)
 
@@ -53,13 +53,22 @@ defmodule Grizzly.Transports.UDP do
     |> :gen_udp.send(host, port, binary)
   end
 
+  def send(transport, binary, opts) do
+    {ip_address, port} = Keyword.fetch!(opts, :to)
+
+    transport
+    |> Transport.assign(:socket)
+    |> :gen_udp.send(ip_address, port, binary)
+  end
+
   @impl Grizzly.Transport
-  def parse_response({:udp, _, ip_address, _, binary}) do
+  def parse_response({:udp, _, ip_address, port, binary}) do
     case ZWave.from_binary(binary) do
       {:ok, command} ->
         {:ok,
          %Response{
            ip_address: ip_address,
+           port: port,
            command: command
          }}
 

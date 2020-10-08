@@ -33,7 +33,7 @@ defmodule GrizzlyTest.Transport.UDP do
   def handshake(transport), do: {:ok, transport}
 
   @impl Grizzly.Transport
-  def send(transport, binary) do
+  def send(transport, binary, _) do
     transport
     |> Transport.assign(:socket)
     |> :gen_udp.send(@test_host, @test_port, binary)
