@@ -4,17 +4,20 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
 
   Params:
 
-    * `:target_value` - `:on` or `:off`(required)
-    * `:duration` - 0-255 (optional)
+    * `:target_value` - `:on`, :off`, or `:unknown` (required)
+    * `:duration` - 0-255 (required V2)
+    * `:current_value` - `:on`, `:off`, or `:unknown` (required V2)
   """
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.SwitchBinary
 
-  @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
+  @type value() :: :on | :off | :unknown
 
-  @impl true
+  @type param() :: {:target_value, value()} | {:duration, byte()} | {:current_value, value()}
+
+  @impl Grizzly.ZWave.Command
   def new(opts) do
     # TODO: validate opts
     command = %Command{
@@ -28,25 +31,28 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     target_value_byte = encode_target_value(Command.param!(command, :target_value))
 
-    case Command.param(command, :duration) do
+    case Command.param(command, :current_value) do
       nil ->
         <<target_value_byte>>
 
-      duration_byte ->
-        <<target_value_byte, duration_byte>>
+      current_value ->
+        duration = Command.param!(command, :duration)
+        current_value_byte = encode_target_value(current_value)
+        <<current_value_byte, target_value_byte, duration>>
     end
   end
 
   def encode_target_value(:off), do: 0x00
+  def encode_target_value(:unknown), do: 0xFE
   def encode_target_value(:on), do: 0xFF
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<target_value_byte>>) do
-    case target_value_from_byte(target_value_byte) do
+    case value_from_byte(target_value_byte) do
       {:ok, target_value} ->
         {:ok, [target_value: target_value]}
 
@@ -55,12 +61,22 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
     end
   end
 
-  def decode_params(<<target_value, duration>>),
-    do: [target_value: target_value_from_byte(target_value), duration: duration]
+  def decode_params(<<current_value, target_value, duration>>) do
+    with {:ok, target_value} <- value_from_byte(target_value),
+         {:ok, current_value} <- value_from_byte(current_value) do
+      {:ok,
+       [
+         target_value: target_value,
+         duration: duration,
+         current_value: current_value
+       ]}
+    end
+  end
 
-  defp target_value_from_byte(0x00), do: {:ok, :off}
-  defp target_value_from_byte(0xFF), do: {:ok, :on}
+  defp value_from_byte(0x00), do: {:ok, :off}
+  defp value_from_byte(0xFE), do: {:ok, :unknown}
+  defp value_from_byte(0xFF), do: {:ok, :on}
 
-  defp target_value_from_byte(byte),
+  defp value_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :target_value, command: :switch_binary_report}}
 end
