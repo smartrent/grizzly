@@ -1,5 +1,26 @@
 ## Changelog
 
+## v0.15.1 - 2020-10-09
+
+### Added
+
+- Support for getting association grouping report via the Z-Wave PAN
+- Support for setting associations via the Z-Wave PAN
+- Support for removing associations via the Z-Wave PAN
+- Support for getting specific associations via the Z-Wave PAN
+- Added option to `Grizzly.Supervisor` for where to store data used by the
+  unsolicited server for support of extra command classes
+
+### Changed
+
+- When getting the associations via the Z-Wave PAN, Grizzly will now look at the
+  stored data and respond accordingly.
+
+### Fixed
+
+- `Grizzly.ZWave.Commands.SwitchBinaryReport` did not properly encode and decode
+  the version 2 of the switch binary command class
+
 ## v0.15.0 - 2020-10-08
 
 This release does a major overhaul on the `Grizzly.Transport` behaviour. If you
