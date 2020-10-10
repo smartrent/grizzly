@@ -1,0 +1,29 @@
+From 6d27aa7e6ac2cfd375357dc062b71e30fdfb2619 Mon Sep 17 00:00:00 2001
+From: Jon Carstens <jjcarstens@me.com>
+Date: Wed, 20 May 2020 10:52:51 -0600
+Subject: [PATCH] fix pkgconfig.h lookup for version printouts
+
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 65f8dcc..afbdb61 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -148,9 +148,9 @@ if (VERSION MATCHES "^ver")
+  #    MESSAGE( STATUS "Using pkgconfig.h CMAKE_CURRENT_SOURCE_DIR: " ${CMAKE_CURRENT_SOURCE_DIR})
+     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig.h.cmake.in ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig.h)
+ else()
+-    execute_process(COMMAND grep PACKAGE_VERSION_MAJOR ../pkgconfig.h COMMAND awk "{print $3}" COMMAND tr -d "[[:space:]]" OUTPUT_VARIABLE VERSION_MAJOR)
+-    execute_process(COMMAND grep PACKAGE_VERSION_MINOR ../pkgconfig.h COMMAND awk "{print $3}" COMMAND tr -d "[[:space:]]" OUTPUT_VARIABLE VERSION_MINOR)
+-    execute_process(COMMAND grep PACKAGE_PATCH_LEVEL ../pkgconfig.h COMMAND awk "{print $3}" COMMAND tr -d "[[:space:]]" OUTPUT_VARIABLE PATCH_LEVEL)
++    execute_process(COMMAND grep PACKAGE_VERSION_MAJOR ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig.h COMMAND awk "{print $3}" COMMAND tr -d "[[:space:]]" OUTPUT_VARIABLE VERSION_MAJOR)
++    execute_process(COMMAND grep PACKAGE_VERSION_MINOR ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig.h COMMAND awk "{print $3}" COMMAND tr -d "[[:space:]]" OUTPUT_VARIABLE VERSION_MINOR)
++    execute_process(COMMAND grep PACKAGE_PATCH_LEVEL ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig.h COMMAND awk "{print $3}" COMMAND tr -d "[[:space:]]" OUTPUT_VARIABLE PATCH_LEVEL)
+     set(VERSION_SHA1 "release" )
+ endif()
+ MESSAGE(STATUS "VERSION_MAJOR: " ${VERSION_MAJOR})
+-- 
+2.21.0 (Apple Git-122.2)
+

@@ -1,0 +1,28 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d6c4c28..65f8dcc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -129,7 +129,7 @@ src/pvs_parse_help.c
+ src/CC_provisioning_list.c
+ )
+ 
+-add_subdirectory( test )
++# add_subdirectory( test )
+ set(TS2_INCLUDE_DIRS "${LIBS2}/transport_service")
+ #add_subdirectory( ${TS2} transport_service ) 
+ 
+diff --git a/libs2/CMakeLists.txt b/libs2/CMakeLists.txt
+index a90d4f1..e65647c 100644
+--- a/libs2/CMakeLists.txt
++++ b/libs2/CMakeLists.txt
+@@ -48,8 +48,8 @@ set(CMAKE_C_FLAGS_DEBUG "-g3")
+ 
+ enable_testing()
+ 
+-add_subdirectory(TestFramework)
+-add_subdirectory(test)
++# add_subdirectory(TestFramework)
++# add_subdirectory(test)
+ add_subdirectory(crypto)
+ add_subdirectory(protocol)
+ add_subdirectory(inclusion)

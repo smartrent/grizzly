@@ -1,0 +1,46 @@
+From 73fafaf4786b3898f8d4fe80b603783c20c8e690 Mon Sep 17 00:00:00 2001
+From: Jon Carstens <jjcarstens@me.com>
+Date: Wed, 20 May 2020 16:27:17 -0600
+Subject: [PATCH] Fix build for Linux x86_64
+
+---
+ CMakeLists.txt        | 3 ++-
+ src/command_handler.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 59947b0..7f55bd1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,6 +2,7 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(zipgateway C )
+ include( ExternalProject )
++include( FindPkgConfig )
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wparentheses -Wno-array-bounds -std=gnu99 -D_DEFAULT_SOURCE")
+ 
+ # Detect Debug build, below match is case-insensitive
+@@ -18,7 +19,7 @@ add_definitions ( -DZIPGW -DDEBUG_S2_INCL_FSM -DDEBUG_S2_FSM)
+ if( APPLE )
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-address-of-packed-member")  
+ else()
+-  if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686" OR  ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64"  )
++  if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686" )
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+     set(CMAKE_SYSTEM_PROCESSOR "i386")
+     message("Building 32bit ")
+diff --git a/src/command_handler.h b/src/command_handler.h
+index a9d4b9b..54774e4 100755
+--- a/src/command_handler.h
++++ b/src/command_handler.h
+@@ -113,6 +113,7 @@ typedef struct {
+   uint16_t cmdClass;   /// command class that this handler implements
+   uint8_t  version;    /// version of the implemented command class
+   security_scheme_t  minimal_scheme; ///the minimal security level which this command is supported on.
++  uint64_t padding;
+ } command_handler_t;
+ 
+ #ifdef __APPLE__
+-- 
+2.21.0 (Apple Git-122.2)
+

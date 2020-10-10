@@ -26,3 +26,6 @@ nerves_hub-*.tar
 
 # Igonre Elixir LS VS code directory for VS code users
 .elixir_ls
+
+src/*
+priv/zipgateway
