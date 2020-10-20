@@ -35,7 +35,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor do
   end
 
   defp get_firmware_update_handler() do
-    case Application.get_env(:girzzly, :handlers) do
+    case Application.get_env(:grizzly, :handlers) do
       nil ->
         self()
 
