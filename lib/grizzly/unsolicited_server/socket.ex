@@ -8,34 +8,32 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   alias Grizzly.Transport
   alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler}
 
-  @spec child_spec(Transport.t(), [SocketSupervisor.opt()]) :: map()
-  def child_spec(transport, opts) do
+  @spec child_spec(Transport.t()) :: map()
+  def child_spec(transport) do
     %{
       id: __MODULE__,
-      start: {__MODULE__, :start_link, [transport, opts]},
+      start: {__MODULE__, :start_link, [transport]},
       restart: :temporary
     }
   end
 
-  @spec start_link(Transport.t(), [SocketSupervisor.opt()]) :: GenServer.on_start()
-  def start_link(listening_transport, opts \\ []) do
-    GenServer.start_link(__MODULE__, [listening_transport, opts])
+  @spec start_link(Transport.t()) :: GenServer.on_start()
+  def start_link(listening_transport) do
+    GenServer.start_link(__MODULE__, listening_transport)
   end
 
   @impl GenServer
-  def init([transport, opts]) do
-    {:ok, {transport, opts}, {:continue, :accept}}
+  def init(transport) do
+    {:ok, transport, {:continue, :accept}}
   end
 
   @impl GenServer
-  def handle_continue(:accept, state) do
-    {listening_transport, opts} = state
-
+  def handle_continue(:accept, listening_transport) do
     with {:ok, accept_transport} <- Transport.accept(listening_transport),
          {:ok, _sock} <- Transport.handshake(accept_transport) do
       # Start a new listen socket to replace this one as this one is now not
       # open for more traffic now
-      {:ok, _} = SocketSupervisor.start_socket(listening_transport, opts)
+      {:ok, _} = SocketSupervisor.start_socket(listening_transport)
     else
       other ->
         Logger.warn(
@@ -43,21 +41,19 @@ defmodule Grizzly.UnsolicitedServer.Socket do
         )
     end
 
-    {:noreply, state}
+    {:noreply, listening_transport}
   end
 
   @impl GenServer
-  def handle_info({:ssl_closed, _}, state) do
-    {:stop, :normal, state}
+  def handle_info({:ssl_closed, _}, transport) do
+    {:stop, :normal, transport}
   end
 
-  def handle_info(response, state) do
-    {transport, opts} = state
-
+  def handle_info(response, transport) do
     case Transport.parse_response(transport, response) do
       {:ok, %Transport.Response{} = transport_response} ->
-        ResponseHandler.handle_response(transport, transport_response, opts)
-        {:noreply, state}
+        ResponseHandler.handle_response(transport, transport_response)
+        {:noreply, transport}
     end
   end
 end

@@ -5,15 +5,13 @@ defmodule Grizzly.UnsolicitedServer.SocketSupervisor do
   alias Grizzly.Transport
   alias Grizzly.UnsolicitedServer.Socket
 
-  @type opt() :: {:data_file, Path.t()}
-
   def start_link(_) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  @spec start_socket(Transport.t(), [opt()]) :: DynamicSupervisor.on_start_child()
-  def start_socket(transport, opts) do
-    child_spec = Socket.child_spec(transport, opts)
+  @spec start_socket(Transport.t()) :: DynamicSupervisor.on_start_child()
+  def start_socket(transport) do
+    child_spec = Socket.child_spec(transport)
 
     __MODULE__
     |> DynamicSupervisor.start_child(child_spec)
