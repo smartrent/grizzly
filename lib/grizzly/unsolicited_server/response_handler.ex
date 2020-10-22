@@ -4,6 +4,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   # module helper for handling various different responses from the Z-Wave PAN
   # network
 
+  require Logger
+
   alias Grizzly.SeqNumber
   alias Grizzly.Transport
   alias Grizzly.UnsolicitedServer.Messages
@@ -35,7 +37,28 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       :notification ->
         :ok = Messages.broadcast(response.ip_address, response.command)
 
+      {:notification, command} ->
+        :ok = Messages.broadcast(response.ip_address, command)
+
       :ok ->
+        :ok
+    end
+  end
+
+  defp handle_command(%Command{name: :supervision_get} = command, _opt) do
+    encapsulated_command = Command.param!(command, :encapsulated_command)
+
+    case ZWave.from_binary(encapsulated_command) do
+      {:ok, report} ->
+        {:notification, report}
+
+      {:error, reason} ->
+        Logger.warn(
+          "Failed to parse: #{inspect(encapsulated_command)} notification for reason: #{
+            inspect(reason)
+          }"
+        )
+
         :ok
     end
   end
