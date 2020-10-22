@@ -25,21 +25,6 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   """
   @spec handle_response(Transport.t(), Transport.Response.t(), [opt()]) :: :ok
   def handle_response(transport, response, opts \\ []) do
-    case Command.param!(response.command, :flag) do
-      :ack_request ->
-        seq_number = Command.param!(response.command, :seq_number)
-        command = ZIPPacket.make_ack_response(seq_number)
-        binary = ZWave.to_binary(command)
-
-        :ok = Transport.send(transport, binary, to: {response.ip_address, response.port})
-        :ok = maybe_handle_extra_command(transport, response, opts)
-
-      _ ->
-        :ok = Messages.broadcast(response.ip_address, response.command)
-    end
-  end
-
-  defp maybe_handle_extra_command(transport, response, opts) do
     internal_command = Command.param!(response.command, :command)
 
     case handle_command(internal_command, opts) do
@@ -47,7 +32,10 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         binary = ZWave.to_binary(zip_packet)
         Transport.send(transport, binary, to: {response.ip_address, response.port})
 
-      _ ->
+      :notification ->
+        :ok = Messages.broadcast(response.ip_address, response.command)
+
+      :ok ->
         :ok
     end
   end
@@ -134,7 +122,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(_command, _), do: :ok
+  defp handle_command(_command, _), do: :notification
 
   defp get_grouping_identifier_and_nodes(data_file) do
     case File.read(data_file) do
