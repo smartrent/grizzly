@@ -253,6 +253,7 @@ defmodule Grizzly.ZWave.Notifications do
       {0x06, :access_control, 0x49, :barrier_sensor_not_detected},
       {0x06, :access_control, 0x4A, :barrier_sensor_low_battery},
       {0x06, :access_control, 0x4B, :barrier_short_in_wall_station_wires},
+      {0x06, :access_control, 0xFE, :unknown_event},
 
       # Home Security (0x07)
       {0x07, :home_security, 0x00, :state_idle},
