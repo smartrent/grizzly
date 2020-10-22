@@ -9,7 +9,7 @@ defmodule Grizzly.UnsolicitedServer do
 
   defmodule State do
     @moduledoc false
-    defstruct transport: nil, data_file: nil
+    defstruct transport: nil
   end
 
   @doc """
@@ -23,7 +23,6 @@ defmodule Grizzly.UnsolicitedServer do
   @impl GenServer
   def init(%Options{} = grizzly_opts) do
     {ip, port} = grizzly_opts.unsolicited_destination
-    data_file = Path.join(grizzly_opts.unsolicited_data_path, "associations")
 
     transport =
       Transport.new(grizzly_opts.transport, %{
@@ -31,7 +30,7 @@ defmodule Grizzly.UnsolicitedServer do
         port: port
       })
 
-    {:ok, %State{transport: transport, data_file: data_file}, {:continue, :listen}}
+    {:ok, %State{transport: transport}, {:continue, :listen}}
   end
 
   @impl GenServer
@@ -40,7 +39,7 @@ defmodule Grizzly.UnsolicitedServer do
 
     case listen(transport) do
       {:ok, listening_transport, listen_opts} ->
-        maybe_start_accept_sockets(listening_transport, listen_opts, state)
+        maybe_start_accept_sockets(listening_transport, listen_opts)
         {:noreply, %State{state | transport: listening_transport}}
 
       _error ->
@@ -53,11 +52,11 @@ defmodule Grizzly.UnsolicitedServer do
 
   @impl GenServer
   def handle_info(message, state) do
-    %State{transport: transport, data_file: data_file} = state
+    %State{transport: transport} = state
 
     case Transport.parse_response(transport, message) do
       {:ok, transport_response} ->
-        ResponseHandler.handle_response(transport, transport_response, data_file: data_file)
+        ResponseHandler.handle_response(transport, transport_response)
         {:noreply, state}
     end
   end
@@ -70,13 +69,11 @@ defmodule Grizzly.UnsolicitedServer do
     end
   end
 
-  def maybe_start_accept_sockets(listening_transport, listen_opts, state) do
+  def maybe_start_accept_sockets(listening_transport, listen_opts) do
     case Keyword.get(listen_opts, :strategy) do
       :accept ->
-        %State{data_file: data_file} = state
-
         Enum.each(1..10, fn _ ->
-          SocketSupervisor.start_socket(listening_transport, data_file: data_file)
+          SocketSupervisor.start_socket(listening_transport)
         end)
 
       :none ->

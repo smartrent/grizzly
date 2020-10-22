@@ -136,6 +136,7 @@ defmodule Grizzly.Supervisor do
       #
       {Registry, [keys: :duplicate, name: Grizzly.Events.Registry]},
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
+      {Grizzly.Associations, options},
 
       # TODO: move unsolicited server stuff to own supervisor
       Grizzly.UnsolicitedServer.Messages,

@@ -23,7 +23,7 @@ defmodule Grizzly.Options do
           inclusion_handler: Grizzly.handler() | nil,
           firmware_update_handler: Grizzly.handler() | nil,
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
-          unsolicited_data_path: Path.t()
+          associations_file: Path.t()
         }
 
   defstruct run_zipgateway: true,
@@ -44,7 +44,7 @@ defmodule Grizzly.Options do
             inclusion_handler: nil,
             firmware_update_handler: nil,
             unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
-            unsolicited_data_path: "/root"
+            associations_file: nil
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do
