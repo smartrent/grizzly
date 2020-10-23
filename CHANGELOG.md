@@ -1,5 +1,23 @@
 ## Changelog
 
+## v0.15.2 - 2020-10-23
+
+### Added
+
+- Support for the `unknown_event` notification event for the `access_control`
+  notification type
+
+### Fixed
+
+- Support `SupervisionGet` command for notifications.
+- Tried to send `:ack_response` via unsolicited server which the unsolicited
+  server should not be sending anything directly.
+- Fix typo in code
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.1 - 2020-10-09
 
 ### Added
