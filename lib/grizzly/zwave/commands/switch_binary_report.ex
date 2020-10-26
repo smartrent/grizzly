@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
 
   Params:
 
-    * `:target_value` - `:on`, :off`, or `:unknown` (required)
+    * `:target_value` - `:on`, `:off`, or `:unknown` (required)
     * `:duration` - 0-255 (required V2)
     * `:current_value` - `:on`, `:off`, or `:unknown` (required V2)
   """
