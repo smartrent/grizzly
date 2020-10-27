@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.15.3 - 2020-10-27
+
+### Fixed
+
+- Documentation fixes
+- Internal firmware update runner bug
+
+### Changed
+
+- Updates in internal association persistence
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.2 - 2020-10-23
 
 ### Added
