@@ -4,8 +4,9 @@ defmodule Grizzly.UnsolicitedServer do
 
   require Logger
 
-  alias Grizzly.{Options, Transport}
-  alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler}
+  alias Grizzly.{Options, SeqNumber, Transport, ZWave}
+  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler, Messages}
 
   defmodule State do
     @moduledoc false
@@ -56,7 +57,24 @@ defmodule Grizzly.UnsolicitedServer do
 
     case Transport.parse_response(transport, message) do
       {:ok, transport_response} ->
-        ResponseHandler.handle_response(transport, transport_response)
+        %Transport.Response{ip_address: ip_address, port: port} = transport_response
+
+        case ResponseHandler.handle_response(transport_response) do
+          :ok ->
+            :ok
+
+          {:send, command} ->
+            {:ok, zip_packet} =
+              ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
+
+            binary = ZWave.to_binary(zip_packet)
+
+            Transport.send(transport, binary, to: {ip_address, port})
+
+          {:notify, command} ->
+            :ok = Messages.broadcast(transport_response.ip_address, command)
+        end
+
         {:noreply, state}
     end
   end

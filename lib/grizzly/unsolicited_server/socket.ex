@@ -5,8 +5,9 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
   require Logger
 
-  alias Grizzly.Transport
-  alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler}
+  alias Grizzly.{SeqNumber, Transport, ZWave}
+  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.UnsolicitedServer.{Messages, SocketSupervisor, ResponseHandler}
 
   @spec child_spec(Transport.t()) :: map()
   def child_spec(transport) do
@@ -50,10 +51,25 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   end
 
   def handle_info(response, transport) do
-    case Transport.parse_response(transport, response) do
-      {:ok, %Transport.Response{} = transport_response} ->
-        ResponseHandler.handle_response(transport, transport_response)
-        {:noreply, transport}
+    {:ok, %Transport.Response{ip_address: ip_address, port: port} = transport_response} =
+      Transport.parse_response(transport, response)
+
+    case ResponseHandler.handle_response(transport_response) do
+      :ok ->
+        :ok
+
+      {:send, command} ->
+        {:ok, zip_packet} =
+          ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
+
+        binary = ZWave.to_binary(zip_packet)
+
+        Transport.send(transport, binary, to: {ip_address, port})
+
+      {:notify, command} ->
+        :ok = Messages.broadcast(transport_response.ip_address, command)
     end
+
+    {:noreply, transport}
   end
 end
