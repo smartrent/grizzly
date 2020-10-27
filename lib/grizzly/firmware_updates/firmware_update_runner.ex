@@ -139,20 +139,31 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
   defp handle_report(report, firmware_update) do
     Logger.debug("[Grizzly] Handling FW update command #{inspect(report)}")
-    command = report.command
-    new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
 
-    respond_to_handler(format_handler_spec(firmware_update.handler), command)
+    case report do
+      %Report{status: :complete, type: :command, command: nil} ->
+        Logger.warn(
+          "[Grizzly] FW update report of type :command has no command: #{inspect(report)}. Ignoring it."
+        )
 
-    if new_firmware_update.state == :complete do
-      {:stop, :normal, firmware_update}
-    else
-      maybe_desired_state_with_delay = FirmwareUpdate.continuation(new_firmware_update)
+        {:noreply, firmware_update}
 
-      final_firmware_update =
-        handle_continuation(maybe_desired_state_with_delay, new_firmware_update)
+      _other ->
+        command = report.command
+        new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
 
-      {:noreply, final_firmware_update}
+        respond_to_handler(format_handler_spec(firmware_update.handler), command)
+
+        if new_firmware_update.state == :complete do
+          {:stop, :normal, firmware_update}
+        else
+          maybe_desired_state_with_delay = FirmwareUpdate.continuation(new_firmware_update)
+
+          final_firmware_update =
+            handle_continuation(maybe_desired_state_with_delay, new_firmware_update)
+
+          {:noreply, final_firmware_update}
+        end
     end
   end
 
