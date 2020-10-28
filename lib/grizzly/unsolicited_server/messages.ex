@@ -5,7 +5,6 @@ defmodule Grizzly.UnsolicitedServer.Messages do
 
   alias Grizzly.{Report, ZIPGateway}
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.ZIPPacket
 
   @registry __MODULE__.Registry
 
@@ -35,24 +34,29 @@ defmodule Grizzly.UnsolicitedServer.Messages do
   end
 
   @spec broadcast(:inet.ip_address(), Command.t()) :: :ok
-  def broadcast(node_ip_address, zip_packet) do
+  def broadcast(node_ip_address, zip_packet_or_command) do
     node_id = ZIPGateway.node_id_from_ip(node_ip_address)
 
-    _ =
-      Logger.debug(
-        "[GRIZZLY] Unsolicited Message for node #{inspect(node_id)}: #{inspect(zip_packet)}"
-      )
+    Logger.debug(
+      "[GRIZZLY] Unsolicited Message for node #{inspect(node_id)}: #{
+        inspect(zip_packet_or_command)
+      }"
+    )
 
-    Registry.dispatch(@registry, ZIPPacket.command_name(zip_packet), fn listeners ->
+    command =
+      case zip_packet_or_command.name do
+        :zip_packet ->
+          Command.param!(zip_packet_or_command, :command)
+
+        _name ->
+          zip_packet_or_command
+      end
+
+    report = Report.new(:complete, :unsolicited, node_id, command: command)
+
+    Registry.dispatch(@registry, command.name, fn listeners ->
       for {pid, _} <- listeners,
-          do: send_report(pid, node_id, zip_packet)
+          do: send(pid, {:grizzly, :report, report})
     end)
-  end
-
-  defp send_report(pid, node_id, zip_packet) do
-    report =
-      Report.new(:complete, :unsolicited, node_id, command: Command.param!(zip_packet, :command))
-
-    send(pid, {:grizzly, :report, report})
   end
 end
