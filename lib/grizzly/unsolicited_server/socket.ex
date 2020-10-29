@@ -51,25 +51,29 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   end
 
   def handle_info(response, transport) do
-    {:ok, %Transport.Response{ip_address: ip_address, port: port} = transport_response} =
-      Transport.parse_response(transport, response)
+    {:ok, transport_response} = Transport.parse_response(transport, response)
 
     case ResponseHandler.handle_response(transport_response) do
-      :ok ->
+      [] ->
         :ok
 
-      {:send, command} ->
-        {:ok, zip_packet} =
-          ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
-
-        binary = ZWave.to_binary(zip_packet)
-
-        Transport.send(transport, binary, to: {ip_address, port})
-
-      {:notify, command} ->
-        :ok = Messages.broadcast(transport_response.ip_address, command)
+      actions ->
+        Enum.each(actions, &run_response_action(transport, transport_response, &1))
     end
 
     {:noreply, transport}
+  end
+
+  defp run_response_action(transport, response, {:send, command}) do
+    %Transport.Response{ip_address: ip_address, port: port} = response
+    {:ok, zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
+
+    binary = ZWave.to_binary(zip_packet)
+
+    Transport.send(transport, binary, to: {ip_address, port})
+  end
+
+  defp run_response_action(_transport, response, {:notify, command}) do
+    :ok = Messages.broadcast(response.ip_address, command)
   end
 end
