@@ -9,6 +9,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   alias Grizzly.ZWave.Commands.{
     AssociationGet,
     AssociationGroupingsGet,
+    AssociationGroupNameGet,
     AssociationSet,
     AssociationSpecificGroupGet,
     SupervisionGet,
@@ -98,6 +99,27 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     assert {:send, agr} = ResponseHandler.handle_response(make_response(agg))
 
     assert agr.name == :association_groupings_report
+  end
+
+  describe "association group" do
+    test "name get - known group (lifeline)" do
+      {:ok, agng} = AssociationGroupNameGet.new(group_id: 1)
+      assert {:send, agnr} = ResponseHandler.handle_response(make_response(agng))
+
+      assert agnr.name == :association_group_name_report
+      assert Command.param!(agnr, :group_id) == 1
+      assert Command.param!(agnr, :name) == "Lifeline"
+    end
+
+    test "name get - unknown group" do
+      {:ok, agng} = AssociationGroupNameGet.new(group_id: 123)
+
+      assert {:send, agnr} = ResponseHandler.handle_response(make_response(agng))
+
+      assert agnr.name == :association_group_name_report
+      assert Command.param!(agnr, :group_id) == 1
+      assert Command.param!(agnr, :name) == "Lifeline"
+    end
   end
 
   defp make_response(command) do
