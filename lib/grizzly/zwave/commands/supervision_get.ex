@@ -7,9 +7,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionGet do
 
     * `:status_updates` - used to allow a receiving node to advertise application status updates in future Supervision
                           Report Commands (required)
-
     * `:session_id` - used to detect redundant invocations due to retransmissions (required)
-
     * `:encapsulated_command` - an encapsulated command  (required) -see ZWave Transport Encapsulation Command Class Specifications
 
   """

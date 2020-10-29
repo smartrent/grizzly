@@ -5,14 +5,10 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
   Params:
 
     * `:more_status_updates` - used to advertise if more Supervision Reports follow for the actual Session ID (required)
-
     * `:session_id` - carries the same value as the Session ID field of the Supervision Get Command which
                       initiated this session (required)
-
     * `:status` - the current status of the command process, one of :no_support, :working, :fail or :success (required)
-
     * `:duration` - the time in seconds needed to complete the current operation (required)
-
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -20,14 +16,16 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.Supervision
 
-  @type more_status_updates :: :last_report | :more_reports
-  @type status :: :no_support | :working | :fail | :success
-  @type param ::
+  @type more_status_updates() :: :last_report | :more_reports
+  @type status() :: :no_support | :working | :fail | :success
+  @type param() ::
           {:more_status_updates, more_status_updates}
           | {:status, status}
           | {:duration, :unknown | non_neg_integer()}
+          | {:session_id, byte()}
 
   @impl true
+  @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
       name: :supervision_report,
