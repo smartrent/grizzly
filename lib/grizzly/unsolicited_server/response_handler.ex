@@ -13,6 +13,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   alias Grizzly.ZWave.Commands.{
     AssociationReport,
     AssociationGroupingsReport,
+    AssociationGroupNameReport,
     AssociationSpecificGroupReport
   }
 
@@ -140,6 +141,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       _ ->
         :ok
     end
+  end
+
+  defp handle_command(%Command{name: :association_group_name_get}, _opts) do
+    # Always just return the lifeline group (group_id == 1) as of right now
+    # because that is all that Grizzly supports right now.
+    AssociationGroupNameReport.new(group_id: 1, name: "Lifeline")
   end
 
   defp handle_command(_command, _opts), do: :notification

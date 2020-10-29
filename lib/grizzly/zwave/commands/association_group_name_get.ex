@@ -13,9 +13,10 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupNameGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
 
-  @type param :: {:group_id, byte}
+  @type param() :: {:group_id, byte}
 
   @impl true
+  @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
       name: :association_group_name_get,
