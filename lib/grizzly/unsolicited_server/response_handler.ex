@@ -14,7 +14,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     AssociationReport,
     AssociationGroupingsReport,
     AssociationGroupNameReport,
-    AssociationSpecificGroupReport
+    AssociationSpecificGroupReport,
+    SupervisionReport
   }
 
   @type opt() :: {:association_server, GenServer.name()}
@@ -25,35 +26,29 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   When a transport receives a response from the Z-Wave network handle it
   and send any other commands back over the Z-Wave PAN if needed
   """
-  @spec handle_response(Transport.Response.t(), [opt()]) :: [action()]
+  @spec handle_response(Transport.Response.t(), [opt()]) :: [action()] | {:error, reason :: any()}
   def handle_response(response, opts \\ []) do
     internal_command = Command.param!(response.command, :command)
 
     case handle_command(internal_command, opts) do
-      {:ok, command} ->
-        # binary = ZWave.to_binary(zip_packet)
-        # Transport.send(transport, binary, to: {response.ip_address, response.port})
-        [{:send, command}]
-
-      :notification ->
-        # :ok = Messages.broadcast(response.ip_address, response.command)
+      :notify ->
         [{:notify, internal_command}]
 
-      {:notification, command} ->
-        # :ok = Messages.broadcast(response.ip_address, command)
-        [{:notify, command}]
+      {:error, _any} = error ->
+        error
 
-      :ok ->
-        []
+      actions when is_list(actions) ->
+        actions
     end
   end
 
   defp handle_command(%Command{name: :supervision_get} = command, _) do
+    {:ok, supervision_report} = make_supervision_report(command)
     encapsulated_command = Command.param!(command, :encapsulated_command)
 
     case ZWave.from_binary(encapsulated_command) do
       {:ok, report} ->
-        {:notification, report}
+        [{:notify, report}, {:send, supervision_report}]
 
       {:error, reason} ->
         Logger.warn(
@@ -62,12 +57,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
           }"
         )
 
-        :ok
+        []
     end
   end
 
   defp handle_command(%Command{name: :association_specific_group_get}, _) do
-    AssociationSpecificGroupReport.new(group: 0)
+    case AssociationSpecificGroupReport.new(group: 0) do
+      {:ok, command} -> [{:send, command}]
+    end
   end
 
   defp handle_command(%Command{name: :association_get}, opts) do
@@ -78,21 +75,24 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     # grouping information for group id 1.
     associations_server = Keyword.get(opts, :associations_server, Associations)
 
-    case Associations.get(associations_server, 1) do
-      nil ->
-        AssociationReport.new(
-          grouping_identifier: 1,
-          max_nodes_supported: 1,
-          nodes: []
-        )
+    {:ok, respond_with_command} =
+      case Associations.get(associations_server, 1) do
+        nil ->
+          AssociationReport.new(
+            grouping_identifier: 1,
+            max_nodes_supported: 1,
+            nodes: []
+          )
 
-      association ->
-        AssociationReport.new(
-          grouping_identifier: association.grouping_id,
-          max_nodes_supported: 1,
-          nodes: association.node_ids
-        )
-    end
+        association ->
+          AssociationReport.new(
+            grouping_identifier: association.grouping_id,
+            max_nodes_supported: 1,
+            nodes: association.node_ids
+          )
+      end
+
+    [{:send, respond_with_command}]
   end
 
   defp handle_command(%Command{name: :association_set} = command, opts) do
@@ -104,14 +104,16 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     # if the command contains something other than one we will just move along.
     if grouping_identifier == 1 do
       nodes = Command.param!(command, :nodes)
-      Associations.save(associations_server, grouping_identifier, nodes)
-    else
-      :ok
+      :ok = Associations.save(associations_server, grouping_identifier, nodes)
     end
+
+    []
   end
 
   defp handle_command(%Command{name: :association_groupings_get}, _opts) do
-    AssociationGroupingsReport.new(supported_groupings: 1)
+    case AssociationGroupingsReport.new(supported_groupings: 1) do
+      {:ok, command} -> [{:send, command}]
+    end
   end
 
   defp handle_command(%Command{name: :association_remove} = command, opts) do
@@ -127,27 +129,46 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     # specification.
     case {grouping_id, nodes} do
       {1, []} ->
-        Associations.delete_all_nodes_from_grouping(associations_server, grouping_id)
+        :ok = Associations.delete_all_nodes_from_grouping(associations_server, grouping_id)
+        []
 
       {1, nodes} ->
-        Associations.delete_nodes_from_grouping(associations_server, grouping_id, nodes)
+        case Associations.delete_nodes_from_grouping(associations_server, grouping_id, nodes) do
+          :ok -> []
+          error -> error
+        end
 
       {0, []} ->
-        Associations.delete_all(associations_server)
+        :ok = Associations.delete_all(associations_server)
+        []
 
       {0, nodes} ->
-        Associations.delete_nodes_from_all_groupings(associations_server, nodes)
+        :ok = Associations.delete_nodes_from_all_groupings(associations_server, nodes)
+        []
 
       _ ->
-        :ok
+        []
     end
   end
 
   defp handle_command(%Command{name: :association_group_name_get}, _opts) do
     # Always just return the lifeline group (group_id == 1) as of right now
     # because that is all that Grizzly supports right now.
-    AssociationGroupNameReport.new(group_id: 1, name: "Lifeline")
+    case AssociationGroupNameReport.new(group_id: 1, name: "Lifeline") do
+      {:ok, command} -> [{:send, command}]
+    end
   end
 
-  defp handle_command(_command, _opts), do: :notification
+  defp handle_command(_command, _opts), do: :notify
+
+  def make_supervision_report(%Command{name: :supervision_get} = command) do
+    session_id = Command.param!(command, :session_id)
+
+    SupervisionReport.new(
+      session_id: session_id,
+      status: :success,
+      more_status_updates: :last_report,
+      duration: 0
+    )
+  end
 end

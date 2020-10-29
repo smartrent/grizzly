@@ -1,7 +1,7 @@
 defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.{Associations, Options, ZWave}
+  alias Grizzly.{Associations, Options}
   alias Grizzly.UnsolicitedServer.ResponseHandler
   alias Grizzly.Transport.Response
   alias Grizzly.ZWave.Command
@@ -26,21 +26,6 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     end)
 
     {:ok, %{assoc_server: :response_handler_assocs}}
-  end
-
-  test "handle supervision get" do
-    {:ok, report} = SwitchBinaryReport.new(target_value: :on)
-
-    {:ok, supervision_get} =
-      SupervisionGet.new(
-        encapsulated_command: ZWave.to_binary(report),
-        session_id: 1,
-        status_updates: :one_now
-      )
-
-    response = make_response(supervision_get)
-
-    assert [{:notify, report}] == ResponseHandler.handle_response(response)
   end
 
   test "handle non-extra command" do
@@ -119,6 +104,27 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
       assert agnr.name == :association_group_name_report
       assert Command.param!(agnr, :group_id) == 1
       assert Command.param!(agnr, :name) == "Lifeline"
+    end
+  end
+
+  describe "supervision" do
+    test "get" do
+      {:ok, sup_get} =
+        SupervisionGet.new(
+          status_updates: :one_now,
+          session_id: 11,
+          encapsulated_command: <<113, 5, 0, 0, 0, 255, 6, 254, 0>>
+        )
+
+      assert [{:notify, notify_command}, {:send, report}] =
+               ResponseHandler.handle_response(make_response(sup_get))
+
+      assert notify_command.name == :alarm_report
+
+      assert report.name == :supervision_report
+      assert Command.param!(report, :session_id) == 11
+      assert Command.param!(report, :more_status_updates) == :last_report
+      assert Command.param!(report, :status) == :success
     end
   end
 
