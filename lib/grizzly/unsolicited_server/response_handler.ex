@@ -19,13 +19,13 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   @type opt() :: {:association_server, GenServer.name()}
 
-  @type handle_response_result() :: :ok | {:notify, Command.t()} | {:send, Command.t()}
+  @type action() :: {:notify, Command.t()} | {:send, Command.t()}
 
   @doc """
   When a transport receives a response from the Z-Wave network handle it
   and send any other commands back over the Z-Wave PAN if needed
   """
-  @spec handle_response(Transport.Response.t(), [opt()]) :: handle_response_result()
+  @spec handle_response(Transport.Response.t(), [opt()]) :: [action()]
   def handle_response(response, opts \\ []) do
     internal_command = Command.param!(response.command, :command)
 
@@ -33,18 +33,18 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       {:ok, command} ->
         # binary = ZWave.to_binary(zip_packet)
         # Transport.send(transport, binary, to: {response.ip_address, response.port})
-        {:send, command}
+        [{:send, command}]
 
       :notification ->
         # :ok = Messages.broadcast(response.ip_address, response.command)
-        {:notify, internal_command}
+        [{:notify, internal_command}]
 
       {:notification, command} ->
         # :ok = Messages.broadcast(response.ip_address, command)
-        {:notify, command}
+        [{:notify, command}]
 
       :ok ->
-        :ok
+        []
     end
   end
 

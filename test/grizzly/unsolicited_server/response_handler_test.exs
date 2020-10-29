@@ -40,14 +40,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     response = make_response(supervision_get)
 
-    assert {:notify, report} == ResponseHandler.handle_response(response)
+    assert [{:notify, report}] == ResponseHandler.handle_response(response)
   end
 
   test "handle non-extra command" do
     {:ok, report} = SwitchBinaryReport.new(target_value: :off)
     response = make_response(report)
 
-    assert {:notify, report} == ResponseHandler.handle_response(response)
+    assert [{:notify, report}] == ResponseHandler.handle_response(response)
   end
 
   test "handle association specific group get" do
@@ -55,7 +55,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     response = make_response(asgg)
 
-    assert {:send, asgr} = ResponseHandler.handle_response(response)
+    assert [{:send, asgr}] = ResponseHandler.handle_response(response)
 
     assert asgr.name == :association_specific_group_report
     assert Command.param!(asgr, :group) == 0
@@ -66,7 +66,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     response = make_response(assoc_get)
 
-    assert {:send, assoc_report} =
+    assert [{:send, assoc_report}] =
              ResponseHandler.handle_response(response, associations_server: server)
 
     assert assoc_report.name == :association_report
@@ -78,7 +78,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     response = make_response(assoc_get)
 
-    assert {:send, assoc_report} =
+    assert [{:send, assoc_report}] =
              ResponseHandler.handle_response(response, associations_server: server)
 
     assert assoc_report.name == :association_report
@@ -91,12 +91,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     response = make_response(assoc_set)
 
-    assert :ok == ResponseHandler.handle_response(response, associations_server: server)
+    assert [] == ResponseHandler.handle_response(response, associations_server: server)
   end
 
   test "handle association groupings get" do
     {:ok, agg} = AssociationGroupingsGet.new()
-    assert {:send, agr} = ResponseHandler.handle_response(make_response(agg))
+    assert [{:send, agr}] = ResponseHandler.handle_response(make_response(agg))
 
     assert agr.name == :association_groupings_report
   end
@@ -104,7 +104,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   describe "association group" do
     test "name get - known group (lifeline)" do
       {:ok, agng} = AssociationGroupNameGet.new(group_id: 1)
-      assert {:send, agnr} = ResponseHandler.handle_response(make_response(agng))
+      assert [{:send, agnr}] = ResponseHandler.handle_response(make_response(agng))
 
       assert agnr.name == :association_group_name_report
       assert Command.param!(agnr, :group_id) == 1
@@ -114,7 +114,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     test "name get - unknown group" do
       {:ok, agng} = AssociationGroupNameGet.new(group_id: 123)
 
-      assert {:send, agnr} = ResponseHandler.handle_response(make_response(agng))
+      assert [{:send, agnr}] = ResponseHandler.handle_response(make_response(agng))
 
       assert agnr.name == :association_group_name_report
       assert Command.param!(agnr, :group_id) == 1
