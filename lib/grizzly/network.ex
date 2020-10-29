@@ -3,8 +3,16 @@ defmodule Grizzly.Network do
   Module for working with the Z-Wave network
   """
 
-  alias Grizzly.ZWave
-  alias Grizzly.{Connections, SeqNumber}
+  alias Grizzly.{Associations, Connections, Report, SeqNumber, ZWave}
+  alias Grizzly.ZWave.Command
+
+  @typedoc """
+  Options for when you want to reset the device
+
+  - `:notify` - if the flag is set to true this will try to notify any node that
+    is part of the lifeline association group (default `true`)
+  """
+  @type reset_opt() :: {:notify, boolean()}
 
   @doc """
   Get a list of node ids from the network
@@ -26,8 +34,8 @@ defmodule Grizzly.Network do
 
   This command takes a few seconds to run.
   """
-  @spec reset_controller() :: Grizzly.send_command_response()
-  def reset_controller() do
+  @spec reset_controller([reset_opt()]) :: Grizzly.send_command_response()
+  def reset_controller(opts \\ []) do
     # close all the connections before resetting the controller. It's okay
     # to blindly close all connections because when we send the command to
     # the controller Grizzly will automatically reconnect to the controller
@@ -38,7 +46,13 @@ defmodule Grizzly.Network do
     :ok = Connections.close_all()
     seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :default_set, [seq_number: seq_number], timeout: 10_000)
+    case Grizzly.send_command(1, :default_set, [seq_number: seq_number], timeout: 10_000) do
+      {:ok, %Report{type: :command, status: :complete}} = response ->
+        maybe_notify_reset(response, opts)
+
+      other ->
+        other
+    end
   end
 
   @doc """
@@ -106,5 +120,39 @@ defmodule Grizzly.Network do
     seq_number = SeqNumber.get_and_inc()
 
     Grizzly.send_command(1, :failed_node_remove, seq_number: seq_number, node_id: node_id)
+  end
+
+  defp maybe_notify_reset(response, opts) do
+    {:ok, %Report{command: command}} = response
+
+    case Command.param!(command, :status) do
+      :done ->
+        maybe_notify_reset(opts)
+        response
+
+      :busy ->
+        response
+    end
+  end
+
+  defp maybe_notify_reset(opts) do
+    if Keyword.get(opts, :notify, true) do
+      notify_reset()
+    else
+      :ok
+    end
+  end
+
+  defp notify_reset() do
+    # get the nodes in the lifeline group
+    case Associations.get(1) do
+      nil ->
+        :ok
+
+      association ->
+        Enum.each(association.node_ids, fn node_id ->
+          Grizzly.send_command(node_id, :device_reset_locally_notification)
+        end)
+    end
   end
 end

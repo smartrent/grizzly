@@ -280,7 +280,9 @@ defmodule Grizzly.Commands.Table do
       {:powerlevel_test_node_get,
        {Commands.PowerlevelTestNodeGet,
         handler: {WaitReport, complete_report: :powerlevel_test_node_report}}},
-      {:powerlevel_test_node_set, {Commands.PowerlevelTestNodeSet, handler: AckResponse}}
+      {:powerlevel_test_node_set, {Commands.PowerlevelTestNodeSet, handler: AckResponse}},
+      {:device_reset_locally_notification,
+       {Commands.DeviceResetLocallyNotification, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
