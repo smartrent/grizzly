@@ -20,7 +20,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   @type opt() :: {:association_server, GenServer.name()}
 
-  @type action() :: {:notify, Command.t()} | {:send, Command.t()}
+  @type action() ::
+          {:notify, Command.t()} | {:send, Command.t()} | {:forward_to_controller, Command.t()}
 
   @doc """
   When a transport receives a response from the Z-Wave network handle it
@@ -31,9 +32,6 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     internal_command = Command.param!(response.command, :command)
 
     case handle_command(internal_command, opts) do
-      :notify ->
-        [{:notify, internal_command}]
-
       {:error, _any} = error ->
         error
 
@@ -159,7 +157,34 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(_command, _opts), do: :notify
+  defp handle_command(%Command{name: :multi_command_encapsulated} = command, opts) do
+    commands = Command.param!(command, :commands)
+
+    extra_commands = [
+      :supervision_get,
+      :association_group_name_get,
+      :association_get,
+      :association_set,
+      :association_remove,
+      :association_groupings_get,
+      :association_specific_group_get
+    ]
+
+    Enum.reduce(commands, [], fn cmd, actions ->
+      if Enum.member?(extra_commands, cmd) do
+        new_actions = handle_command(cmd, opts)
+        actions ++ new_actions
+      else
+        if cmd.name == :alarm_report do
+          actions ++ [{:notify, cmd}]
+        else
+          actions ++ [{:forward_to_controller, cmd}]
+        end
+      end
+    end)
+  end
+
+  defp handle_command(command, _opts), do: [{:notify, command}]
 
   def make_supervision_report(%Command{name: :supervision_get} = command) do
     session_id = Command.param!(command, :session_id)

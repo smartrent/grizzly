@@ -5,7 +5,7 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
   require Logger
 
-  alias Grizzly.{SeqNumber, Transport, ZWave}
+  alias Grizzly.{Report, SeqNumber, Transport, ZWave}
   alias Grizzly.ZWave.Commands.ZIPPacket
   alias Grizzly.UnsolicitedServer.{Messages, SocketSupervisor, ResponseHandler}
 
@@ -75,5 +75,33 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
   defp run_response_action(_transport, response, {:notify, command}) do
     :ok = Messages.broadcast(response.ip_address, command)
+  end
+
+  defp run_response_action(transport, response, {:forward_to_controller, command}) do
+    case Grizzly.send_command(1, command.name, command.params) do
+      {:ok, report} ->
+        handle_grizzly_report(report, transport, response)
+
+      error ->
+        error
+    end
+  end
+
+  defp handle_grizzly_report(%Report{type: :ack_response}, transport, response) do
+    %Transport.Response{ip_address: ip_address, port: port} = response
+    zip_packet = ZIPPacket.make_ack_response(SeqNumber.get_and_inc())
+
+    binary = ZWave.to_binary(zip_packet)
+
+    Transport.send(transport, binary, to: {ip_address, port})
+  end
+
+  defp handle_grizzly_report(%Report{type: :command, command: command}, transport, response) do
+    %Transport.Response{ip_address: ip_address, port: port} = response
+    {:ok, zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
+
+    binary = ZWave.to_binary(zip_packet)
+
+    Transport.send(transport, binary, to: {ip_address, port})
   end
 end

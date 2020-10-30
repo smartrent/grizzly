@@ -7,7 +7,7 @@ defmodule Grizzly.Commands.Table do
 
   defmodule Generate do
     @moduledoc false
-    alias Grizzly.CommandHandlers.{AckResponse, WaitReport, AggregateReport}
+    alias Grizzly.CommandHandlers.{AckResponse, AggregateReport, WaitReport}
 
     alias Grizzly.ZWave.Commands
 
