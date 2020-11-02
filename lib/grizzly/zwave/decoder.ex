@@ -220,6 +220,10 @@ defmodule Grizzly.ZWave.Decoder do
       {0x77, 0x04, Commands.NodeLocationSet},
       {0x77, 0x05, Commands.NodeLocationGet},
       {0x77, 0x06, Commands.NodeLocationReport},
+      # Clock
+      {0x81, 0x04, Commands.ClockSet},
+      {0x81, 0x05, Commands.ClockGet},
+      {0x81, 0x06, Commands.ClockReport},
       # Time parameters
       {0x8B, 0x01, Commands.TimeParametersSet},
       {0x8B, 0x02, Commands.TimeParametersGet},

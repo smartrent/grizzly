@@ -282,7 +282,10 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :powerlevel_test_node_report}}},
       {:powerlevel_test_node_set, {Commands.PowerlevelTestNodeSet, handler: AckResponse}},
       {:device_reset_locally_notification,
-       {Commands.DeviceResetLocallyNotification, handler: AckResponse}}
+       {Commands.DeviceResetLocallyNotification, handler: AckResponse}},
+      # Clock
+      {:clock_get, {Commands.ClockGet, handler: {WaitReport, complete_report: :clock_report}}},
+      {:clock_set, {Commands.ClockSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
