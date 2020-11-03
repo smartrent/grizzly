@@ -97,6 +97,14 @@ defmodule Grizzly.ZWave.Decoder do
       {0x63, 0x03, Commands.UserCodeReport},
       {0x63, 0x04, Commands.UserCodeUsersNumberGet},
       {0x63, 0x05, Commands.UserCodeUsersNumberReport},
+      # Network management installation maintenance
+      {0x67, 0x02, Commands.PriorityRouteGet},
+      {0x67, 0x03, Commands.PriorityRouteReport},
+      {0x67, 0x04, Commands.StatisticsGet},
+      {0x67, 0x05, Commands.StatisticsReport},
+      {0x67, 0x06, Commands.StatisticsClear},
+      {0x67, 0x07, Commands.RssiGet},
+      {0x67, 0x08, Commands.RssiReport},
       # Supervision
       {0x6C, 0x01, Commands.SupervisionGet},
       {0x6C, 0x02, Commands.SupervisionReport},
