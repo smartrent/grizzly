@@ -285,7 +285,14 @@ defmodule Grizzly.Commands.Table do
        {Commands.DeviceResetLocallyNotification, handler: AckResponse}},
       # Clock
       {:clock_get, {Commands.ClockGet, handler: {WaitReport, complete_report: :clock_report}}},
-      {:clock_set, {Commands.ClockSet, handler: AckResponse}}
+      {:clock_set, {Commands.ClockSet, handler: AckResponse}},
+      # Network Management Installation Maintenance
+      {:priority_route_get,
+       {Commands.PriorityRouteGet, handler: {WaitReport, complete_report: :priorityRouteReport}}},
+      {:statistics_get,
+       {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statisticsReport}}},
+      {:statistics_clear, {Commands.StatisticsGet, handler: AckResponse}},
+      {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssiReport}}}
     ]
 
     defmacro __before_compile__(_) do
