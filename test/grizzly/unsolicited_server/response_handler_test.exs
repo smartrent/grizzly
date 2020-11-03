@@ -10,6 +10,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     AssociationGet,
     AssociationGroupingsGet,
     AssociationGroupNameGet,
+    AssociationGroupInfoGet,
     AssociationSet,
     AssociationSpecificGroupGet,
     SupervisionGet,
@@ -104,6 +105,16 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
       assert agnr.name == :association_group_name_report
       assert Command.param!(agnr, :group_id) == 1
       assert Command.param!(agnr, :name) == "Lifeline"
+    end
+
+    test "info get" do
+      {:ok, agig} =
+        AssociationGroupInfoGet.new(refresh_cache: false, group_id: 1, refresh_cache: false)
+
+      assert [{:send, agir}] = ResponseHandler.handle_response(make_response(agig))
+
+      assert agir.name == :association_group_info_report
+      assert Command.param!(agir, :groups_info) == [[group_id: 1, profile: :general_lifeline]]
     end
   end
 
