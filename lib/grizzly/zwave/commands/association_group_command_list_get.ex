@@ -6,9 +6,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListGet do
 
     * `:allow_cache` - This field indicates that a Z-Wave Gateway device is allowed to intercept the request and return a
                        cached response on behalf of the specified target. (required)
-
     * `:group_id` - The group identifier (required)
-
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -16,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
 
-  @type param :: {:allow_cache, boolean} | {:group_id, byte}
+  @type param() :: {:allow_cache, boolean()} | {:group_id, byte()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}

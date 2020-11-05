@@ -14,6 +14,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     AssociationReport,
     AssociationGroupingsReport,
     AssociationGroupNameReport,
+    AssociationGroupCommandListReport,
     AssociationGroupInfoReport,
     AssociationSpecificGroupReport,
     SupervisionReport
@@ -168,11 +169,22 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:send, report}]
   end
 
+  defp handle_command(%Command{name: :association_group_command_list_get}, _opts) do
+    {:ok, report} =
+      AssociationGroupCommandListReport.new(
+        group_id: 0x01,
+        commands: [:device_reset_locally_notification]
+      )
+
+    [{:send, report}]
+  end
+
   defp handle_command(%Command{name: :multi_command_encapsulated} = command, opts) do
     commands = Command.param!(command, :commands)
 
     extra_commands = [
       :supervision_get,
+      :association_group_command_list_get,
       :association_group_name_get,
       :association_group_info_get,
       :association_get,
