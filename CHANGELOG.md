@@ -1,5 +1,28 @@
 ## Changelog
 
+## v0.15.4 - 2020-11-5
+
+### Added
+
+- Network management installation and maintenance command class
+- Clock command class
+- Unsolicited server support for the extra command classes:
+  - Association group command class list
+  - Association group name get
+  - Association group info get
+  - Device rest locally notification
+  
+## Changed
+
+- When a supervision get command is received in the unsolicited destination we
+  send the supervision report for that command back to the sender.
+- Dev deps updates
+- Code clean up
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.3 - 2020-10-27
 
 ### Fixed
