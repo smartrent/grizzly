@@ -5,9 +5,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   Params:
 
     * `:group_id` - the group identifier
-
     * `:commands` - lists of commands
-
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -18,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
 
   require Logger
 
-  @type param :: {:group_id, byte} | {:commands, [atom]}
+  @type param() :: {:group_id, byte()} | {:commands, [atom()]}
 
   @impl true
   def new(params) do
