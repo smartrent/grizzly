@@ -5,7 +5,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGet do
   Params:
 
     * `:grouping_identifier` - the actual association group
-
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -13,10 +12,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.MultiChannelAssociation
 
-  @type param :: {:grouping_identifier, byte()}
+  @type param() :: {:grouping_identifier, byte()}
 
   @impl true
-  @spec new([param]) :: {:ok, Command.t()}
+  @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
       name: :multi_channel_association_get,

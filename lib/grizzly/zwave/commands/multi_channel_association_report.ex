@@ -5,16 +5,12 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReport do
   Params:
 
     * `:grouping_identifier` - the association grouping identifier (required)
-
     * `:max_nodes_supported` - the maximum number of destinations supported by the advertised association group. Each destination
                                may be a NodeID destination or an End Point destination.
-
     * `:reports_to_follow` - if the full destination list is too long for one
                              report this field reports the number of follow up reports (optional
                              default `0`)
-
     * `:nodes` - list of nodes to add the grouping identifier (required)
-
     * `:node_endpoints` - Endpoints of multichannel nodes
 
   """
@@ -25,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReport do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.MultiChannelAssociation
 
-  @type param ::
+  @type param() ::
           {:grouping_identifier, byte()}
           | {:max_nodes_supported, byte()}
           | {:reports_to_follow, byte()}
