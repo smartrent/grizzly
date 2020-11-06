@@ -15,20 +15,30 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     AssociationSet,
     AssociationSpecificGroupGet,
     MultiChannelAssociationGroupingsGet,
+    MultiChannelAssociationGet,
+    MultiChannelAssociationSet,
+    MultiChannelAssociationRemove,
     SupervisionGet,
     SwitchBinaryReport,
     ZIPPacket
   }
 
-  setup do
+  setup_all do
     options = %Options{associations_file: "/tmp/response_handler_assocs"}
     {:ok, _} = Associations.start_link(options, name: :response_handler_assocs)
 
+    multi_channel_options = %Options{
+      associations_file: "/tmp/response_handler_assocs_multi_channel"
+    }
+
+    {:ok, _} = Associations.start_link(multi_channel_options, name: :multi_channel_assocs)
+
     on_exit(fn ->
       File.rm("/tmp/response_handler_assocs")
+      File.rm("/tmp/response_handler_assocs_multi_channel")
     end)
 
-    {:ok, %{assoc_server: :response_handler_assocs}}
+    {:ok, %{assoc_server: :response_handler_assocs, multi_channel_server: :multi_channel_assocs}}
   end
 
   test "handle non-extra command" do
@@ -159,6 +169,30 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
       assert mcagr.name == :multi_channel_association_groupings_report
 
       assert Command.param!(mcagr, :supported_groupings) == 1
+    end
+
+    test "get", %{multi_channel_server: server} do
+      {:ok, mcag} = MultiChannelAssociationGet.new(grouping_identifier: 1)
+
+      assert [{:send, mcar}] =
+               ResponseHandler.handle_response(make_response(mcag), associations_server: server)
+
+      assert mcar.name == :multi_channel_association_report
+      assert is_list(Command.param!(mcar, :nodes))
+    end
+
+    test "set", %{multi_channel_server: server} do
+      {:ok, mcas} = MultiChannelAssociationSet.new(grouping_identifier: 1, nodes: [1, 2, 3, 4])
+
+      assert [] =
+               ResponseHandler.handle_response(make_response(mcas), associations_server: server)
+    end
+
+    test "remove", %{multi_channel_server: server} do
+      {:ok, mcar} = MultiChannelAssociationRemove.new(grouping_identifier: 1, nodes: [])
+
+      assert [] =
+               ResponseHandler.handle_response(make_response(mcar), associations_server: server)
     end
   end
 

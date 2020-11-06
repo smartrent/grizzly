@@ -6,11 +6,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
   Params:
 
    * `:grouping_identifier` - the association grouping identifier (required)
-
-    * `:nodes` - list of nodes to add the grouping identifier (required)
-
-    * `:node_endpoints` - Endpoints of multichannel nodes
-
+   * `:nodes` - list of nodes to add the grouping identifier (required)
+   * `:node_endpoints` - Endpoints of multichannel nodes
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -19,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.MultiChannelAssociation
 
-  @type param ::
+  @type param() ::
           {:grouping_identifier, byte()}
           | {:nodes, [ZWave.node_id()]}
           | {:node_endpoints, [MultiChannelAssociation.node_endpoint()]}
