@@ -14,6 +14,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     AssociationGroupCommandListGet,
     AssociationSet,
     AssociationSpecificGroupGet,
+    MultiChannelAssociationGroupingsGet,
     SupervisionGet,
     SwitchBinaryReport,
     ZIPPacket
@@ -146,6 +147,18 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
       assert Command.param!(report, :session_id) == 11
       assert Command.param!(report, :more_status_updates) == :last_report
       assert Command.param!(report, :status) == :success
+    end
+  end
+
+  describe "multi channel association" do
+    test "groupings get" do
+      {:ok, mcagg} = MultiChannelAssociationGroupingsGet.new()
+
+      assert [{:send, mcagr}] = ResponseHandler.handle_response(make_response(mcagg))
+
+      assert mcagr.name == :multi_channel_association_groupings_report
+
+      assert Command.param!(mcagr, :supported_groupings) == 1
     end
   end
 

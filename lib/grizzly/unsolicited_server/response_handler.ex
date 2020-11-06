@@ -17,6 +17,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     AssociationGroupCommandListReport,
     AssociationGroupInfoReport,
     AssociationSpecificGroupReport,
+    MultiChannelAssociationGroupingsReport,
     SupervisionReport
   }
 
@@ -179,6 +180,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:send, report}]
   end
 
+  defp handle_command(%Command{name: :multi_channel_association_groupings_get}, _opts) do
+    {:ok, report} = MultiChannelAssociationGroupingsReport.new(supported_groupings: 1)
+
+    [{:send, report}]
+  end
+
   defp handle_command(%Command{name: :multi_command_encapsulated} = command, opts) do
     commands = Command.param!(command, :commands)
 
@@ -191,7 +198,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       :association_set,
       :association_remove,
       :association_groupings_get,
-      :association_specific_group_get
+      :association_specific_group_get,
+      :multi_channel_association_groupings_get
     ]
 
     Enum.reduce(commands, [], fn cmd, actions ->
