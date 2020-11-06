@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsGet do
   alias Grizzly.ZWave.CommandClasses.MultiChannelAssociation
 
   @impl true
-  def new(params) do
+  def new(params \\ []) do
     command = %Command{
       name: :multi_channel_association_groupings_get,
       command_byte: 0x05,

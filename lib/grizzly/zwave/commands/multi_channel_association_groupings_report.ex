@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.MultiChannelAssociation
 
-  @type param :: {:supported_groupings, byte()}
+  @type param() :: {:supported_groupings, byte()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
