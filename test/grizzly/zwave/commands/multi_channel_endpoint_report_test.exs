@@ -40,6 +40,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReportTest do
     assert Keyword.get(params, :dynamic) == false
     assert Keyword.get(params, :identical) == true
     assert Keyword.get(params, :endpoints) == 3
+    assert Keyword.get(params, :aggregated_endpoints) == 0
   end
 
   test "decodes params correctly - v4" do
