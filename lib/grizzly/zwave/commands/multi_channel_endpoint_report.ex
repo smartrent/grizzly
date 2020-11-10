@@ -77,6 +77,13 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReport do
       ) do
     dynamic? = dynamic_bit == 0x01
     identical? = identical_bit == 0x01
-    {:ok, [dynamic: dynamic?, identical: identical?, endpoints: endpoints]}
+
+    {:ok,
+     [
+       dynamic: dynamic?,
+       identical: identical?,
+       endpoints: endpoints,
+       aggregated_endpoints: 0
+     ]}
   end
 end
