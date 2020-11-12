@@ -1,5 +1,19 @@
 ## Changelog
 
+## v0.15.5 - 2020-11-12
+
+### Added
+
+- Support multi-channel associations in the unsolicited destination
+
+### Fixed
+
+- Add the `:aggregated_endpoints` params to the `MultiChannelEndpointReport`
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.4 - 2020-11-5
 
 ### Added
@@ -12,7 +26,7 @@
   - Association group info get
   - Device rest locally notification
   
-## Changed
+### Changed
 
 - When a supervision get command is received in the unsolicited destination we
   send the supervision report for that command back to the sender.
