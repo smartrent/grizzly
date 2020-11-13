@@ -7,7 +7,7 @@ defmodule Grizzly.MixProject do
     [
       app: :grizzly,
       version: @version,
-      elixir: "~> 1.8",
+      elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -16,7 +16,8 @@ defmodule Grizzly.MixProject do
       description: description(),
       package: package(),
       docs: docs(),
-      preferred_cli_env: [docs: :docs, "hex.publish": :docs]
+      preferred_cli_env: [docs: :docs, "hex.publish": :docs],
+      xref: [exclude: EEx]
     ]
   end
 

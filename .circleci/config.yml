@@ -26,6 +26,64 @@ defaults: &defaults
   working_directory: ~/repo
 
 jobs:
+  build_elixir_1_11_otp_23:
+    docker:
+      - image: erlang:23.0
+    environment:
+          ELIXIR_VERSION: 1.11.2-otp-23
+          LC_ALL: C.UTF-8
+    <<: *defaults
+    steps:
+      - checkout
+      - <<: *install_system_deps
+      - <<: *install_elixir
+      - <<: *install_hex_rebar
+      - restore_cache:
+          keys:
+            - v1-mix-cache-{{ checksum "mix.lock" }}
+      - run: mix deps.get
+      - run: mix compile --warnings-as-errors
+      - run: mix test --include inclusion --include integration --include firmware_update
+      - run: mix format --check-formatted
+      - run: mix docs
+      - run: mix hex.build
+      - run: MIX_ENV=test mix credo -a
+      - run: mix dialyzer
+      - save_cache:
+          key: v1-mix-cache-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - deps
+
+  build_elixir_1_11_otp_22:
+    docker:
+      - image: erlang:22.3
+    environment:
+          ELIXIR_VERSION: 1.11.2-otp-22
+          LC_ALL: C.UTF-8
+    <<: *defaults
+    steps:
+      - checkout
+      - <<: *install_system_deps
+      - <<: *install_elixir
+      - <<: *install_hex_rebar
+      - restore_cache:
+          keys:
+            - v1-mix-cache-{{ checksum "mix.lock" }}
+      - run: mix deps.get
+      - run: mix compile --warnings-as-errors
+      - run: mix test --include inclusion --include integration --include firmware_update
+      - run: mix format --check-formatted
+      - run: mix docs
+      - run: mix hex.build
+      - run: MIX_ENV=test mix credo -a
+      - run: mix dialyzer
+      - save_cache:
+          key: v1-mix-cache-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - deps
+
   build_elixir_1_10_otp_23:
     docker:
       - image: erlang:23.0
@@ -55,6 +113,7 @@ jobs:
             - _build
             - deps
 
+
   build_elixir_1_10_otp_22:
     docker:
       - image: erlang:22.3
@@ -83,43 +142,11 @@ jobs:
             - _build
             - deps
 
-  build_elixir_1_9_otp_22:
-    docker:
-      - image: erlang:22.2.8
-        environment:
-          ELIXIR_VERSION: 1.9.4-otp-22
-          LC_ALL: C.UTF-8
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_system_deps
-      - <<: *install_elixir
-      - <<: *install_hex_rebar
-      - run: mix deps.get
-      - run: mix compile
-      - run: mix test
-
-  build_elixir_1_8_otp_22:
-    docker:
-      - image: erlang:22.0
-        environment:
-          ELIXIR_VERSION: 1.8.2-otp-22
-          LC_ALL: C.UTF-8
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_system_deps
-      - <<: *install_elixir
-      - <<: *install_hex_rebar
-      - run: mix deps.get
-      - run: mix compile
-      - run: mix test
-
 workflows:
   version: 2
   build_test:
     jobs:
+      - build_elixir_1_11_otp_23
+      - build_elixir_1_11_otp_22
       - build_elixir_1_10_otp_23
       - build_elixir_1_10_otp_22
-      - build_elixir_1_9_otp_22
-      - build_elixir_1_8_otp_22
