@@ -48,6 +48,8 @@ defmodule Grizzly.ZWave.Decoder do
       # Network Management Basic Node (0x4D)
       {0x4D, 0x01, Commands.LearnModeSet},
       {0x4D, 0x02, Commands.LearnModeSetStatus},
+      {0x4D, 0x03, Commands.NetworkUpdateRequest},
+      {0x4D, 0x04, Commands.NetworkUpdateRequestStatus},
       {0x4D, 0x07, Commands.DefaultSetComplete},
       {0x4D, 0x08, Commands.DSKGet},
       {0x4D, 0x09, Commands.DSKReport},

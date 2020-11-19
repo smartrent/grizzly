@@ -122,6 +122,17 @@ defmodule Grizzly.Network do
     Grizzly.send_command(1, :failed_node_remove, seq_number: seq_number, node_id: node_id)
   end
 
+  @doc """
+  Request a network update (network healing)
+  """
+  @spec request_network_update() ::
+          Grizzly.send_command_response()
+  def request_network_update() do
+    seq_number = SeqNumber.get_and_inc()
+
+    Grizzly.send_command(1, :request_network_update, seq_number: seq_number)
+  end
+
   defp maybe_notify_reset(response, opts) do
     {:ok, %Report{command: command}} = response
 
