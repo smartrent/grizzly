@@ -68,6 +68,10 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :failed_node_remove_status}}},
       {:learn_mode_set,
        {Commands.LearnModeSet, handler: {WaitReport, complete_report: :learn_mode_set_status}}},
+      {:network_update_request,
+       {Commands.NetworkUpdateRequest,
+        handler: {WaitReport, complete_report: :network_update_request_status}}},
+
       # DSKs
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
       {:node_add_dsk_set, {Commands.NodeAddDSKSet, handler: AckResponse}},
