@@ -1,20 +1,5 @@
 ## Changelog
 
-## v0.15.6 - 2020-11-19
-
-### Added
-
-- Add support for `NetworkUpdateRequest` command
-- Add `Grizzly.Network.request_network_update/0`
-
-### Changes
-
-- Drop support for Elixir 1.8 and 1.9
-
-Thank you to those who contributed to this release:
-
-- Jean-Francois Cloutier
-
 ## v0.15.5 - 2020-11-12
 
 ### Added
