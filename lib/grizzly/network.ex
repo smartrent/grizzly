@@ -130,7 +130,7 @@ defmodule Grizzly.Network do
   def request_network_update() do
     seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :request_network_update, seq_number: seq_number)
+    Grizzly.send_command(1, :network_update_request, seq_number: seq_number)
   end
 
   defp maybe_notify_reset(response, opts) do
