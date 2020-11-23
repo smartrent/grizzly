@@ -64,7 +64,7 @@ defmodule Grizzly.ZWave.CommandClasses do
       {0x57, :application_capability},
       {0x58, :zip_nd},
       {0x59, :association_group_info},
-      {0x5A, :device_rest_locally},
+      {0x5A, :device_reset_locally},
       {0x5B, :central_scene},
       {0x5C, :ip_association},
       {0x5D, :antitheft},
