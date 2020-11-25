@@ -31,6 +31,8 @@ defmodule Grizzly.Transport do
           port: :inet.port_number()
         ]
 
+  @type parse_opt() :: {:raw, boolean()}
+
   @typedoc """
   After starting a server options can be passed back to the caller so that the
   caller can do any other work it might seem fit.
@@ -57,8 +59,8 @@ defmodule Grizzly.Transport do
 
   @callback send(t(), binary(), keyword()) :: :ok
 
-  @callback parse_response(any()) ::
-              {:ok, Response.t()} | {:error, DecodeError.t()}
+  @callback parse_response(any(), [parse_opt()]) ::
+              {:ok, Response.t()} | {:error, DecodeError.t()} | {:ok, binary()}
 
   @callback close(t()) :: :ok
 
@@ -144,9 +146,9 @@ defmodule Grizzly.Transport do
   Parse the response for the transport
   """
   @spec parse_response(t(), any()) :: {:ok, Response.t()} | {:error, DecodeError.t()}
-  def parse_response(transport, response) do
+  def parse_response(transport, response, opts \\ []) do
     %__MODULE__{impl: transport_impl} = transport
 
-    transport_impl.parse_response(response)
+    transport_impl.parse_response(response, opts)
   end
 end

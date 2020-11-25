@@ -3,7 +3,7 @@ defmodule Grizzly.Connections.Supervisor do
   use DynamicSupervisor
 
   alias Grizzly.{Connection, Options, ZWave}
-  alias Grizzly.Connections.{AsyncConnection, SyncConnection}
+  alias Grizzly.Connections.{AsyncConnection, BinaryConnection, SyncConnection}
 
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do
@@ -22,6 +22,9 @@ defmodule Grizzly.Connections.Supervisor do
 
       :sync ->
         do_start_connection(SyncConnection, node_id)
+
+      :binary ->
+        do_start_connection(BinaryConnection, node_id, owner: self())
     end
   end
 

@@ -32,30 +32,45 @@ defmodule Grizzly.Transports.DTLS do
 
   @impl Grizzly.Transport
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _}, _}}, :dtls_connection}, _}, bin_list}
+        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _}, _}}, :dtls_connection}, _}, bin_list},
+        opts
       ) do
     binary = :erlang.list_to_binary(bin_list)
 
-    # TODO: handle errors
-    {:ok, command} = ZWave.from_binary(binary)
+    case parse_zip_packet(binary, opts) do
+      {:ok, bin} when is_binary(bin) ->
+        {:ok, bin}
 
-    {:ok,
-     %Response{
-       ip_address: ip,
-       command: command
-     }}
+      {:ok, command} ->
+        {:ok,
+         %Response{
+           ip_address: ip,
+           command: command
+         }}
+    end
   end
 
-  def parse_response({:ssl, {:sslsocket, {:gen_udp, _port, :dtls_connection}, _}, bin_list}) do
+  def parse_response({:ssl, {:sslsocket, {:gen_udp, _port, :dtls_connection}, _}, bin_list}, opts) do
     binary = :erlang.list_to_binary(bin_list)
 
-    # TODO: handle errors
-    {:ok, command} = ZWave.from_binary(binary)
+    case parse_zip_packet(binary, opts) do
+      {:ok, bin} when is_binary(bin) ->
+        {:ok, bin}
 
-    {:ok,
-     %Response{
-       command: command
-     }}
+      {:ok, command} ->
+        {:ok,
+         %Response{
+           command: command
+         }}
+    end
+  end
+
+  defp parse_zip_packet(binary, opts) do
+    if Keyword.get(opts, :raw, false) do
+      {:ok, binary}
+    else
+      ZWave.from_binary(binary)
+    end
   end
 
   @impl Grizzly.Transport

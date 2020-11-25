@@ -4,11 +4,11 @@ defmodule Grizzly.Connection do
   require Logger
 
   alias Grizzly.Connections.Supervisor
-  alias Grizzly.Connections.{SyncConnection, AsyncConnection}
+  alias Grizzly.Connections.{BinaryConnection, SyncConnection, AsyncConnection}
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
-  @type opt() :: {:mode, :sync | :async} | {:owner, pid()}
+  @type opt() :: {:mode, :sync | :async | :binary} | {:owner, pid()}
 
   @doc """
   Open a connection to a node
@@ -53,5 +53,12 @@ defmodule Grizzly.Connection do
       :async ->
         AsyncConnection.send_command(node_id, command, opts)
     end
+  end
+
+  def send_binary(node_id, binary, opts \\ []) do
+    base = Keyword.get(opts, :format, :hex)
+    _ = Logger.debug("Sending binary: #{inspect(binary, base: base)}")
+
+    BinaryConnection.send_binary(node_id, binary)
   end
 end
