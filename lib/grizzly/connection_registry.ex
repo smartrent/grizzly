@@ -1,7 +1,11 @@
 defmodule Grizzly.ConnectionRegistry do
   @moduledoc false
 
-  @spec via_name(Grizzly.node_id() | {:async, Grizzly.node_id()} | pid()) ::
+  alias Grizzly.ZWave
+
+  @type name() :: ZWave.node_id() | {:async, ZWave.node_id()} | {:binary, ZWave.node_id(), pid()}
+
+  @spec via_name(name()) ::
           {:via, Registry, {__MODULE__, Grizzly.node_id()}} | pid()
   def via_name(pid) when is_pid(pid), do: pid
 

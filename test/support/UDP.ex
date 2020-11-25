@@ -40,10 +40,14 @@ defmodule GrizzlyTest.Transport.UDP do
   end
 
   @impl Grizzly.Transport
-  def parse_response({:udp, _, ip, _, binary}) do
-    case ZWave.from_binary(binary) do
-      {:ok, command} ->
-        {:ok, %Response{ip_address: ip, command: command}}
+  def parse_response({:udp, _, ip, _, binary}, opts) do
+    if Keyword.get(opts, :raw, false) do
+      {:ok, binary}
+    else
+      case ZWave.from_binary(binary) do
+        {:ok, command} ->
+          {:ok, %Response{ip_address: ip, command: command}}
+      end
     end
   end
 

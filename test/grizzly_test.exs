@@ -2,7 +2,7 @@ defmodule Grizzly.Test do
   use ExUnit.Case
 
   alias Grizzly.Report
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, ZIPPacket}
 
   describe "SwitchBinary Commands" do
     @tag :integration
@@ -52,5 +52,19 @@ defmodule Grizzly.Test do
       Grizzly.send_command(102, :battery_get)
 
     assert is_reference(report.command_ref)
+  end
+
+  @tag :integration
+  test "send a binary packet" do
+    {:ok, switch_get} = SwitchBinaryGet.new()
+    {:ok, packet} = ZIPPacket.with_zwave_command(switch_get, 0xA0)
+    binary = Grizzly.ZWave.to_binary(packet)
+
+    Grizzly.send_binary(3, binary)
+
+    assert_receive {:grizzly, :binary_response, <<0x23, 0x2, 0x40, 0x10, 0xA0, 0x0, 0x0>>}
+
+    assert_receive {:grizzly, :binary_response,
+                    <<0x23, 0x2, 0x80, 0x50, _seq_no, 0x0, 0x0, 0x25, 0x3, 0x0>>}
   end
 end

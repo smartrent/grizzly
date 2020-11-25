@@ -145,6 +145,59 @@ defmodule Grizzly do
   end
 
   @doc """
+  Send a raw binary to the Z-Wave node
+
+  This function does not block and expects the sending process to handle the
+  lifecycle of the command being sent. This maximizes control but minimizes
+  safety and puts things such as timeouts, retries, and response handling in
+  the hand of the calling process.
+
+  When sending the binary ensure the binary is the encoded
+  `Grizzly.ZWave.Commands.ZIPPacket`.
+
+  ```elixir
+  seq_no = 0x01
+  {:ok, my_command} = Grizzly.ZWave.Commands.SwitchBinaryGet.new()
+  {:ok, packet} = Grizzly.ZWave.Commands.ZIPPacket.with_zwave_command(my_command, seq_no)
+  binary = Grizzly.ZWave.to_binary(packet)
+
+  Grizzly.send_binary(node_id, binary)
+  ```
+
+  This is helpful when you need very fine grade control of the Z/IP Packet or if
+  you not expecting a response from a Z-Wave network to handle the back and
+  forth between your application and the Z-Wave network. Also, this can be useful
+  for debugging purposes.
+
+  First check if `send_command/4` will provide the functionality that is needed
+  before using this function.
+
+  After sending a binary packet the calling process will receive messages in
+  the form of:
+
+  ```elixir
+  {:grizzly, :binary_response, binary}
+  ```
+  """
+  @spec send_binary(ZWave.node_id(), binary()) :: :ok | {:error, :including | :firmware_updating}
+  def send_binary(node_id, binary) do
+    including? = Inclusions.inclusion_running?()
+    updating_firmware? = FirmwareUpdates.firmware_update_running?()
+
+    case {including?, updating_firmware?} do
+      {true, _} ->
+        {:error, :including}
+
+      {_, true} ->
+        {:error, :firmware_updating}
+
+      _can_send ->
+        {:ok, _} = Connection.open(node_id, mode: :binary)
+        Connection.send_binary(node_id, binary)
+    end
+  end
+
+  @doc """
   Subscribe to a command event from a Z-Wave device
   """
   @spec subscribe_command(command()) :: :ok
