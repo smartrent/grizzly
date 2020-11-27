@@ -19,6 +19,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatI
   def security_to_security_to_byte(:s2_authenticated), do: 0x02
   def security_to_security_to_byte(:s2_access_control), do: 0x04
   def security_to_security_to_byte(:s0), do: 0x80
+  def security_to_security_to_byte(_not_security), do: 0x00
 
   def to_binary(security_classes) do
     security_class_byte =
