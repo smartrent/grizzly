@@ -88,6 +88,7 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
           | :sound_30
           | :sound_31
           | :sound_32
+          | :undefined
 
   @type property_id ::
           byte
@@ -101,6 +102,7 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
           | :timeout_hundredths_second
           | :sound_level
           | :low_power
+          | :undefined
 
   @impl true
   def byte(), do: 0x87
@@ -108,6 +110,7 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
   @impl true
   def name(), do: :indicator
 
+  def indicator_id_to_byte(:undefined), do: 0x00
   def indicator_id_to_byte(:armed), do: 0x01
   def indicator_id_to_byte(:disarmed), do: 0x02
   def indicator_id_to_byte(:ready), do: 0x03
@@ -190,6 +193,7 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
   def indicator_id_to_byte(:buzzer), do: 0xF0
   def indicator_id_to_byte(byte) when byte in 0x00..0xF0, do: byte
 
+  def property_id_to_byte(:undefined), do: 0x00
   def property_id_to_byte(:multilevel), do: 0x01
   def property_id_to_byte(:binary), do: 0x02
   def property_id_to_byte(:toggling_periods), do: 0x03
@@ -293,6 +297,8 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
   def indicator_id_from_byte(0x7F), do: {:ok, :sound_32}
   def indicator_id_from_byte(0xF0), do: {:ok, :buzzer}
 
+  # Devices can return an indicator id == 0
+  def indicator_id_from_byte(0x00), do: {:ok, :undefined}
   def indicator_id_from_byte(byte) when byte in 0x80..0x9F, do: {:ok, byte}
 
   def indicator_id_from_byte(byte),
@@ -308,6 +314,7 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
   def property_id_from_byte(0x08), do: {:ok, :timeout_hundredths_second}
   def property_id_from_byte(0x09), do: {:ok, :sound_level}
   def property_id_from_byte(0x0A), do: {:ok, :low_power}
+  def property_id_from_byte(0x00), do: {:ok, :undefined}
 
   def property_id_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :property_id, command: nil}}
