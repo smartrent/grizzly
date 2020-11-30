@@ -1,5 +1,21 @@
 ## Changelog
 
+## v0.15.7 - 2020-11-30
+
+### Added
+
+- Add `Grizzly.send_binary/2`
+
+### Fixed
+
+- Error when handling older Z-Wave devices that use CRC16 checksums over any
+  security schema
+- Internal typo
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.6 - 2020-11-19
 
 ### Added
