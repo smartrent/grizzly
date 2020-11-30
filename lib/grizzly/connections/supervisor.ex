@@ -10,7 +10,10 @@ defmodule Grizzly.Connections.Supervisor do
     DynamicSupervisor.start_link(__MODULE__, options, name: __MODULE__)
   end
 
-  @spec start_connection(ZWave.node_id(), [Connection.opt()]) ::
+  @doc """
+  Start a connection to a Z-Wave Node or the Z/IP Gateway
+  """
+  @spec start_connection(ZWave.node_id() | :gateway, [Connection.opt()]) ::
           {:ok, pid()} | {:error, :timeout}
   def start_connection(node_id, opts \\ []) do
     case Keyword.get(opts, :mode, :sync) do

@@ -14,6 +14,8 @@ defmodule Grizzly.Network do
   """
   @type reset_opt() :: {:notify, boolean()}
 
+  @type opt() :: {:node_id, ZWave.node_id()}
+
   @doc """
   Get a list of node ids from the network
 
@@ -21,20 +23,33 @@ defmodule Grizzly.Network do
   network. A device might have been reset or unpaired from the controller with
   out the controller knowing. However, in most use cases this shouldn't be an
   issue.
-  """
-  @spec get_node_ids() :: Grizzly.send_command_response()
-  def get_node_ids() do
-    seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :node_list_get, seq_number: seq_number)
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
+  """
+  @spec get_node_ids([opt()]) :: Grizzly.send_command_response()
+  def get_node_ids(opts \\ []) do
+    seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
+
+    Grizzly.send_command(node_id, :node_list_get, seq_number: seq_number)
   end
 
   @doc """
   Reset the Z-Wave controller
 
   This command takes a few seconds to run.
+
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
   """
-  @spec reset_controller([reset_opt()]) :: Grizzly.send_command_response()
+  @spec reset_controller([reset_opt() | opt()]) :: Grizzly.send_command_response()
   def reset_controller(opts \\ []) do
     # close all the connections before resetting the controller. It's okay
     # to blindly close all connections because when we send the command to
@@ -45,8 +60,9 @@ defmodule Grizzly.Network do
     # unnecessary connections hanging out just taking up resources.
     :ok = Connections.close_all()
     seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
 
-    case Grizzly.send_command(1, :default_set, [seq_number: seq_number], timeout: 10_000) do
+    case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 10_000) do
       {:ok, %Report{type: :command, status: :complete}} = response ->
         maybe_notify_reset(response, opts)
 
@@ -57,38 +73,60 @@ defmodule Grizzly.Network do
 
   @doc """
   Delete a node from the network's provisioning list via the node's DSK
-  """
-  @spec delete_node_provisioning(Grizzly.ZWave.DSK.dsk_string()) ::
-          Grizzly.send_command_response()
-  def delete_node_provisioning(dsk) do
-    seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :node_provisioning_delete, seq_number: seq_number, dsk: dsk)
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
+  """
+  @spec delete_node_provisioning(Grizzly.ZWave.DSK.dsk_string(), [opt()]) ::
+          Grizzly.send_command_response()
+  def delete_node_provisioning(dsk, opts \\ []) do
+    seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
+
+    Grizzly.send_command(node_id, :node_provisioning_delete, seq_number: seq_number, dsk: dsk)
   end
 
   @doc """
   Get the nodes provisioning list information via the node's DSK
-  """
-  @spec get_node_provisioning(Grizzly.ZWave.DSK.dsk_string()) ::
-          Grizzly.send_command_response()
-  def get_node_provisioning(dsk) do
-    seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :node_provisioning_get, seq_number: seq_number, dsk: dsk)
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
+  """
+  @spec get_node_provisioning(Grizzly.ZWave.DSK.dsk_string(), [opt()]) ::
+          Grizzly.send_command_response()
+  def get_node_provisioning(dsk, opts \\ []) do
+    seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
+
+    Grizzly.send_command(node_id, :node_provisioning_get, seq_number: seq_number, dsk: dsk)
   end
 
   @doc """
   A node to the network provisioning list
+
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
   """
   @spec set_node_provisioning(
           Grizzly.ZWave.DSK.dsk_string(),
-          [Grizzly.ZWave.SmartStart.MetaExtension.t()]
+          [Grizzly.ZWave.SmartStart.MetaExtension.t()],
+          [opt()]
         ) :: Grizzly.send_command_response()
-  def set_node_provisioning(dsk, meta_extensions) do
+  def set_node_provisioning(dsk, meta_extensions, opts \\ []) do
     seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
 
     Grizzly.send_command(
-      1,
+      node_id,
       :node_provisioning_set,
       seq_number: seq_number,
       dsk: dsk,
@@ -98,13 +136,20 @@ defmodule Grizzly.Network do
 
   @doc """
   List all the nodes on the provisioning list
+
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
   """
-  @spec list_node_provisionings(integer) :: Grizzly.send_command_response()
-  def list_node_provisionings(remaining_counter) do
+  @spec list_node_provisionings(integer(), [opt()]) :: Grizzly.send_command_response()
+  def list_node_provisionings(remaining_counter, opts \\ []) do
     seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
 
     Grizzly.send_command(
-      1,
+      node_id,
       :node_provisioning_list_iteration_get,
       seq_number: seq_number,
       remaining_counter: remaining_counter
@@ -113,24 +158,42 @@ defmodule Grizzly.Network do
 
   @doc """
   Remove a (presumably) failed node
-  """
-  @spec remove_failed_node(ZWave.node_id()) ::
-          Grizzly.send_command_response()
-  def remove_failed_node(node_id) do
-    seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :failed_node_remove, seq_number: seq_number, node_id: node_id)
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
+  """
+  @spec remove_failed_node([opt()]) ::
+          Grizzly.send_command_response()
+  def remove_failed_node(opts \\ []) do
+    seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
+
+    Grizzly.send_command(node_id, :failed_node_remove, seq_number: seq_number, node_id: node_id)
   end
 
   @doc """
   Request a network update (network healing)
-  """
-  @spec request_network_update() ::
-          Grizzly.send_command_response()
-  def request_network_update() do
-    seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :network_update_request, seq_number: seq_number)
+  Options
+
+    * `:node_id` - If your controller is part of another controller's network
+      you might want to issue network commands to that controller. By default
+      this option will chose your controller.
+  """
+  @spec request_network_update([opt()]) ::
+          Grizzly.send_command_response()
+  def request_network_update(opts \\ []) do
+    seq_number = SeqNumber.get_and_inc()
+    node_id = node_id_from_opts(opts)
+
+    Grizzly.send_command(node_id, :network_update_request, seq_number: seq_number)
+  end
+
+  defp node_id_from_opts(opts) do
+    Keyword.get(opts, :node_id, :gateway)
   end
 
   defp maybe_notify_reset(response, opts) do

@@ -12,8 +12,8 @@ defmodule Grizzly.ZIPGateway do
   @doc """
   Get the IP address for the node id based of the LAN or PAN IP addresses
   """
-  @spec host_for_node(ZWave.node_id(), Options.t()) :: :inet.ip_address()
-  def host_for_node(1, options), do: options.lan_ip
+  @spec host_for_node(ZWave.node_id() | :gateway, Options.t()) :: :inet.ip_address()
+  def host_for_node(:gateway, options), do: options.lan_ip
 
   def host_for_node(node_id, options) do
     options.pan_ip

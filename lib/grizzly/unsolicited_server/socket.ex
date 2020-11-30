@@ -5,7 +5,8 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
   require Logger
 
-  alias Grizzly.{Report, SeqNumber, Transport, ZWave}
+  alias Grizzly.{Report, SeqNumber, Transport, ZWave, ZIPGateway}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
   alias Grizzly.UnsolicitedServer.{Messages, SocketSupervisor, ResponseHandler}
 
@@ -46,8 +47,13 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   end
 
   @impl GenServer
-  def handle_info({:ssl_closed, _}, transport) do
+  def handle_info({:ssl_closed, _} = message, transport) do
+    Logger.error("[CLOSED]: #{inspect(message)}")
     {:stop, :normal, transport}
+  end
+
+  def handle_info({:grizzly, :binary_response, _does_not_matter}, transport) do
+    {:noreply, transport}
   end
 
   def handle_info(response, transport) do
@@ -58,50 +64,61 @@ defmodule Grizzly.UnsolicitedServer.Socket do
         :ok
 
       actions ->
-        Enum.each(actions, &run_response_action(transport, transport_response, &1))
+        Enum.each(actions, &run_response_action(transport_response, &1))
     end
 
     {:noreply, transport}
   end
 
-  defp run_response_action(transport, response, {:send, command}) do
-    %Transport.Response{ip_address: ip_address, port: port} = response
-    {:ok, zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
+  defp run_response_action(response, {:send, command}) do
+    %Transport.Response{ip_address: ip_address, command: zippacket} = response
+    # We have to perverse the header extensions to ensure command encapsulation
+    # is correct when sending the response back to the Z-Wave PAN.
+    header_extensions = Command.param!(zippacket, :header_extensions)
+
+    {:ok, zip_packet} =
+      ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(),
+        flag: nil,
+        header_extensions: header_extensions
+      )
 
     binary = ZWave.to_binary(zip_packet)
+    node_id = ZIPGateway.node_id_from_ip(ip_address)
 
-    Transport.send(transport, binary, to: {ip_address, port})
+    Grizzly.send_binary(node_id, binary)
   end
 
-  defp run_response_action(_transport, response, {:notify, command}) do
+  defp run_response_action(response, {:notify, command}) do
     :ok = Messages.broadcast(response.ip_address, command)
   end
 
-  defp run_response_action(transport, response, {:forward_to_controller, command}) do
-    case Grizzly.send_command(1, command.name, command.params) do
+  defp run_response_action(response, {:forward_to_controller, command}) do
+    case Grizzly.send_command(:gateway, command.name, command.params) do
       {:ok, report} ->
-        handle_grizzly_report(report, transport, response)
+        handle_grizzly_report(report, response)
 
       error ->
         error
     end
   end
 
-  defp handle_grizzly_report(%Report{type: :ack_response}, transport, response) do
-    %Transport.Response{ip_address: ip_address, port: port} = response
+  defp handle_grizzly_report(%Report{type: :ack_response}, response) do
+    %Transport.Response{ip_address: ip_address} = response
     zip_packet = ZIPPacket.make_ack_response(SeqNumber.get_and_inc())
 
     binary = ZWave.to_binary(zip_packet)
+    node_id = ZIPGateway.node_id_from_ip(ip_address)
 
-    Transport.send(transport, binary, to: {ip_address, port})
+    Grizzly.send_binary(node_id, binary)
   end
 
-  defp handle_grizzly_report(%Report{type: :command, command: command}, transport, response) do
-    %Transport.Response{ip_address: ip_address, port: port} = response
+  defp handle_grizzly_report(%Report{type: :command, command: command}, response) do
+    %Transport.Response{ip_address: ip_address} = response
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(), flag: nil)
 
     binary = ZWave.to_binary(zip_packet)
+    node_id = ZIPGateway.node_id_from_ip(ip_address)
 
-    Transport.send(transport, binary, to: {ip_address, port})
+    Grizzly.send_binary(node_id, binary)
   end
 end

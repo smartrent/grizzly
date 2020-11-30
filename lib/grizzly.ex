@@ -119,9 +119,13 @@ defmodule Grizzly do
   @type command :: atom()
 
   @doc """
-  Send a command to the node via the node id
+  Send a command to the node via the node id or to Z/IP Gateway
+
+  If you want to send a command to the Gateway directly please see the
+  `Grizzly.Network` module first as there are many helpers in there that will
+  be default talk your controller by default.
   """
-  @spec send_command(ZWave.node_id(), command(), args :: list(), [command_opt()]) ::
+  @spec send_command(ZWave.node_id() | :gateway, command(), args :: list(), [command_opt()]) ::
           send_command_response()
   def send_command(node_id, command_name, args \\ [], opts \\ []) do
     # always open a connection. If the connection is already opened this
