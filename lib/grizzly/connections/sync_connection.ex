@@ -28,11 +28,14 @@ defmodule Grizzly.Connections.SyncConnection do
     %{id: __MODULE__, start: {__MODULE__, :start_link, [node_id, opts]}, restart: :transient}
   end
 
-  @spec start_link(Options.t(), ZWave.node_id(), [Grizzly.command_opt()]) ::
+  @doc """
+  Start connection to a device or the Z/IP Gateway
+  """
+  @spec start_link(Options.t(), ZWave.node_id() | :gateway, [Grizzly.command_opt()]) ::
           GenServer.on_start()
-  def start_link(grizzly_options, node_id, opts \\ []) do
-    name = Connections.make_name(node_id)
-    GenServer.start_link(__MODULE__, [grizzly_options, node_id, opts], name: name)
+  def start_link(grizzly_options, node_id_or_gateway, opts \\ []) do
+    name = Connections.make_name(node_id_or_gateway)
+    GenServer.start_link(__MODULE__, [grizzly_options, node_id_or_gateway, opts], name: name)
   end
 
   @spec send_command(ZWave.node_id() | pid(), Command.t(), [send_opt()]) ::
@@ -54,8 +57,8 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @impl GenServer
-  def init([grizzly_options, node_id, _opts]) do
-    host = ZIPGateway.host_for_node(node_id, grizzly_options)
+  def init([grizzly_options, node_id_or_gateway, _opts]) do
+    host = ZIPGateway.host_for_node(node_id_or_gateway, grizzly_options)
     transport_impl = grizzly_options.transport
 
     transport_opts = [
@@ -68,8 +71,8 @@ defmodule Grizzly.Connections.SyncConnection do
         {:ok,
          %State{
            transport: transport,
-           keep_alive: KeepAlive.init(node_id, 25_000),
-           node_id: node_id
+           keep_alive: KeepAlive.init(node_id_or_gateway, 25_000),
+           node_id: node_id_or_gateway
          }}
 
       {:error, :timeout} ->

@@ -19,7 +19,7 @@ defmodule Grizzly.Node do
   def get_info(node_id) do
     seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(1, :node_info_cached_get,
+    Grizzly.send_command(:gateway, :node_info_cached_get,
       seq_number: seq_number,
       node_id: node_id
     )
@@ -29,8 +29,10 @@ defmodule Grizzly.Node do
   Get a node's dsk.
 
   The response to this command is the `DSKReport` command
+
+  Sending this command with `:gateway` will always go to your Z-Wave controller
   """
-  @spec get_dsk(ZWave.node_id(), :add | :learn, [Grizzly.command_opt()]) ::
+  @spec get_dsk(ZWave.node_id() | :gateway, :add | :learn, [Grizzly.command_opt()]) ::
           Grizzly.send_command_response()
   def get_dsk(node_id, add_mode, opts \\ []) do
     Grizzly.send_command(

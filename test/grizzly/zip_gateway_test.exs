@@ -5,8 +5,13 @@ defmodule Grizzly.ZIPGatewayTest do
   alias GrizzlyTest.Utils
 
   test "get IP for node id 1 with IPv6" do
-    assert {0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01} ==
+    assert {0xFD00, 0xBBBB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01} ==
              ZIPGateway.host_for_node(1, Options.new())
+  end
+
+  test "get IP for Gateway with IPv6" do
+    assert {0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01} ==
+             ZIPGateway.host_for_node(:gateway, Options.new())
   end
 
   test "get IP for node id 1 with IPv4" do

@@ -11,12 +11,12 @@ defmodule Grizzly.Connection do
   @type opt() :: {:mode, :sync | :async | :binary} | {:owner, pid()}
 
   @doc """
-  Open a connection to a node
+  Open a connection to a node or the Z/IP Gateway
 
   If the DTLS connection cannot be opened after some time this will return
   `{:error, :timeout}`
   """
-  @spec open(ZWave.node_id(), [opt()]) :: {:ok, pid()} | {:error, :timeout}
+  @spec open(ZWave.node_id() | :gateway, [opt()]) :: {:ok, pid()} | {:error, :timeout}
   def open(node_id, opts \\ []) do
     Supervisor.start_connection(node_id, opts)
   end

@@ -3,7 +3,11 @@ defmodule Grizzly.ConnectionRegistry do
 
   alias Grizzly.ZWave
 
-  @type name() :: ZWave.node_id() | {:async, ZWave.node_id()} | {:binary, ZWave.node_id(), pid()}
+  @type name() ::
+          ZWave.node_id()
+          | :gateway
+          | {:async, ZWave.node_id()}
+          | {:binary, ZWave.node_id(), pid()}
 
   @spec via_name(name()) ::
           {:via, Registry, {__MODULE__, Grizzly.node_id()}} | pid()
