@@ -62,23 +62,19 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
      rest}
   end
 
-  defp parse_extension(<<0x84, 0x02, security_to_security, crc16, rest::binary>>) do
+  defp parse_extension(
+         <<0x84, 0x02, security_to_security, _::size(7), crc16::size(1), rest::binary>>
+       ) do
     security_to_security =
       EncapsulationFormatInfo.security_to_security_from_byte(security_to_security)
 
-    info = maybe_add_crc16([security_to_security], crc16)
+    crc16_bool = if crc16 == 1, do: true, else: false
 
-    {{:encapsulation_format_info, info}, rest}
+    {{:encapsulation_format_info, EncapsulationFormatInfo.new(security_to_security, crc16_bool)},
+     rest}
   end
 
   defp parse_extension(<<0x05, 0x00, rest::binary>>) do
     {:multicast_addressing, rest}
-  end
-
-  defp maybe_add_crc16(info, crc16_byte) do
-    case EncapsulationFormatInfo.crc16_from_byte(crc16_byte) do
-      nil -> info
-      crc16 -> [crc16 | info]
-    end
   end
 end

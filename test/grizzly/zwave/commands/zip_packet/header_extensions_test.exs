@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensionsTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions
+  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatInfo
 
   test "parses for expected delay" do
     header_ext = HeaderExtensions.from_binary(<<0x01, 0x03, 0x00, 0x00, 0x01>>)
@@ -27,8 +28,15 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensionsTest do
   test "parses encapsulation format info" do
     info_binary = <<0x84, 0x02, 0x80, 0x01>>
     header_ext = HeaderExtensions.from_binary(info_binary)
+    encap_info = %EncapsulationFormatInfo{security_classes: [:s0], crc16: true}
 
-    assert [{:encapsulation_format_info, [:crc16, :s0]}] == header_ext
+    assert [{:encapsulation_format_info, encap_info}] == header_ext
+  end
+
+  test "makes the encapsulation format info into a binary" do
+    encapinfo = EncapsulationFormatInfo.new(:non_secure, true)
+
+    assert <<0x84, 0x02, 0x00, 0x01>> == EncapsulationFormatInfo.to_binary(encapinfo)
   end
 
   test "parse multicast addressing" do
