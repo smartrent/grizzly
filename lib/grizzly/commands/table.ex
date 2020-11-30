@@ -296,7 +296,10 @@ defmodule Grizzly.Commands.Table do
       {:statistics_get,
        {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statisticsReport}}},
       {:statistics_clear, {Commands.StatisticsGet, handler: AckResponse}},
-      {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssiReport}}}
+      {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssiReport}}},
+      # Zwaveplus Info
+      {:zwaveplus_info_get,
+       {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}}
     ]
 
     defmacro __before_compile__(_) do

@@ -86,6 +86,9 @@ defmodule Grizzly.ZWave.Decoder do
       {0x5D, 0x01, Commands.AntitheftSet},
       {0x5D, 0x02, Commands.AntitheftGet},
       {0x5D, 0x03, Commands.AntitheftReport},
+      # Zwabeplus Info
+      {0x5E, 0x01, Commands.ZwaveplusInfoGet},
+      {0x5E, 0x02, Commands.ZwaveplusInfoReport},
       # Z/IP Gateway
       {0x5F, 0x0C, Commands.ApplicationNodeInfoGet},
       {0x5F, 0x0D, Commands.ApplicationNodeInfoReport},
