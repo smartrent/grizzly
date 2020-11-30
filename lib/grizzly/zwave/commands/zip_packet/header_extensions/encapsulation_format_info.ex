@@ -5,8 +5,15 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatI
 
   import Bitwise
 
-  @type security ::
+  @type security() ::
           :non_secure | :s2_unauthenticated | :s2_authenticated | :s2_access_control | :s0
+
+  @type t() :: %__MODULE__{
+          security_classes: [security()],
+          crc16: boolean()
+        }
+
+  defstruct security_classes: [], crc16: false
 
   def security_to_security_from_byte(0x00), do: :non_secure
   def security_to_security_from_byte(0x01), do: :s2_unauthenticated
@@ -20,22 +27,28 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatI
   def security_to_security_to_byte(:s2_access_control), do: 0x04
   def security_to_security_to_byte(:s0), do: 0x80
 
-  def to_binary(security_classes) do
+  @doc """
+  Make a new EncapsulationFormatInfo struct
+  """
+  @spec new(security(), crc16 :: boolean()) :: t()
+  def new(security, crc16) do
+    %__MODULE__{security_classes: [security], crc16: crc16}
+  end
+
+  @doc """
+  Make an `EncapsulationFormatInfo` into a binary
+  """
+  @spec to_binary(t()) :: binary()
+  def to_binary(encapformat) do
+    %__MODULE__{security_classes: security_classes, crc16: crc16?} = encapformat
+
+    crc16_byte = if crc16?, do: 0x01, else: 0x00
+
     security_class_byte =
       Enum.reduce(security_classes, 0, fn security_class, mask ->
         mask ||| security_to_security_to_byte(security_class)
       end)
 
-    <<0x84, 0x02, security_class_byte, 0x00>>
-  end
-
-  def crc16_from_byte(crc16_byte) do
-    <<_::size(7), crc16_bit::size(1)>> = <<crc16_byte>>
-
-    if crc16_bit == 1 do
-      :crc16
-    else
-      nil
-    end
+    <<0x84, 0x02, security_class_byte, crc16_byte>>
   end
 end
