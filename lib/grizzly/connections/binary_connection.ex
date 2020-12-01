@@ -13,14 +13,15 @@ defmodule Grizzly.Connections.BinaryConnection do
   # another device asks us something about our device.
 
   use GenServer
+  require Logger
 
   alias Grizzly.{Connections, Options, Transport, ZIPGateway, ZWave}
 
   defmodule State do
     @moduledoc false
 
-    @enforce_keys [:transport, :owner]
-    defstruct transport: nil, owner: nil
+    @enforce_keys [:transport, :owner, :node_id]
+    defstruct transport: nil, owner: nil, node_id: nil
   end
 
   def child_spec(node_id, opts) do
@@ -61,7 +62,8 @@ defmodule Grizzly.Connections.BinaryConnection do
         {:ok,
          %State{
            transport: transport,
-           owner: owner
+           owner: owner,
+           node_id: node_id
          }}
 
       {:error, :timeout} ->
@@ -80,12 +82,19 @@ defmodule Grizzly.Connections.BinaryConnection do
 
   @impl GenServer
   def handle_info(data, state) do
-    %State{transport: transport, owner: owner} = state
+    %State{transport: transport, owner: owner, node_id: node_id} = state
 
     case Transport.parse_response(transport, data, raw: true) do
+      {:ok, :connection_closed} ->
+        Logger.debug("[Grizzly] connection to node #{inspect(node_id)} closed")
+        {:stop, :normal, state}
+
       {:ok, binary} ->
         send(owner, {:grizzly, :binary_response, binary})
         {:noreply, state}
     end
   end
+
+  @impl GenServer
+  def terminate(:normal, state), do: state
 end

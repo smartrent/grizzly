@@ -65,6 +65,10 @@ defmodule Grizzly.Transports.DTLS do
     end
   end
 
+  def parse_response({:ssl_closed, _}, _opts) do
+    {:ok, :connection_closed}
+  end
+
   defp parse_zip_packet(binary, opts) do
     if Keyword.get(opts, :raw, false) do
       {:ok, binary}
