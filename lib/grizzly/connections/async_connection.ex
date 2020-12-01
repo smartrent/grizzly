@@ -17,6 +17,8 @@ defmodule Grizzly.Connections.AsyncConnection do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 
+  require Logger
+
   defmodule State do
     @moduledoc false
     defstruct transport: nil,
@@ -63,6 +65,7 @@ defmodule Grizzly.Connections.AsyncConnection do
     GenServer.stop(name, :normal)
   end
 
+  @impl GenServer
   def init([grizzly_options, node_id, opts]) do
     host = ZIPGateway.host_for_node(node_id, grizzly_options)
     transport_impl = grizzly_options.transport
@@ -87,6 +90,7 @@ defmodule Grizzly.Connections.AsyncConnection do
     end
   end
 
+  @impl GenServer
   def handle_call({:send_command, command, send_opts}, {waiter, _ref}, state) do
     {:ok, command_runner, command_ref, new_command_list} =
       CommandList.create(state.commands, command, state.node_id, waiter, send_opts)
@@ -111,6 +115,7 @@ defmodule Grizzly.Connections.AsyncConnection do
     {:reply, CommandList.has_command_ref?(state.commands, command_ref), state}
   end
 
+  @impl GenServer
   def handle_info(:keep_alive_tick, state) do
     %State{keep_alive: keep_alive} = state
 
@@ -142,14 +147,21 @@ defmodule Grizzly.Connections.AsyncConnection do
   end
 
   def handle_info(data, state) do
-    %State{transport: transport} = state
+    %State{transport: transport, node_id: node_id} = state
 
     case Transport.parse_response(transport, data) do
+      {:ok, :connection_closed} ->
+        Logger.debug("[Grizzly] connection to node #{inspect(node_id)} closed")
+        {:stop, :normal, state}
+
       {:ok, transport_response} ->
         updated_state = handle_commands(transport_response.command, state)
         {:noreply, updated_state}
     end
   end
+
+  @impl GenServer
+  def terminate(:normal, state), do: state
 
   defp handle_commands(%Command{name: :keep_alive}, state) do
     %State{state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}

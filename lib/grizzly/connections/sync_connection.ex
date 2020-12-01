@@ -20,7 +20,8 @@ defmodule Grizzly.Connections.SyncConnection do
     @moduledoc false
     defstruct transport: nil,
               commands: CommandList.empty(),
-              keep_alive: nil
+              keep_alive: nil,
+              node_id: nil
   end
 
   def child_spec(node_id, opts \\ []) do
@@ -52,6 +53,7 @@ defmodule Grizzly.Connections.SyncConnection do
     GenServer.stop(name, :normal)
   end
 
+  @impl GenServer
   def init([grizzly_options, node_id, _opts]) do
     host = ZIPGateway.host_for_node(node_id, grizzly_options)
     transport_impl = grizzly_options.transport
@@ -66,7 +68,8 @@ defmodule Grizzly.Connections.SyncConnection do
         {:ok,
          %State{
            transport: transport,
-           keep_alive: KeepAlive.init(node_id, 25_000)
+           keep_alive: KeepAlive.init(node_id, 25_000),
+           node_id: node_id
          }}
 
       {:error, :timeout} ->
@@ -74,6 +77,7 @@ defmodule Grizzly.Connections.SyncConnection do
     end
   end
 
+  @impl GenServer
   def handle_call({:send_command, command, node_id, command_opts}, from, state) do
     {:ok, command_runner, _, new_command_list} =
       CommandList.create(state.commands, command, node_id, from, command_opts)
@@ -89,6 +93,7 @@ defmodule Grizzly.Connections.SyncConnection do
     end
   end
 
+  @impl GenServer
   def handle_info(:keep_alive_tick, state) do
     %State{keep_alive: keep_alive} = state
 
@@ -120,14 +125,21 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   def handle_info(data, state) do
-    %State{transport: transport} = state
+    %State{transport: transport, node_id: node_id} = state
 
     case Transport.parse_response(transport, data) do
+      {:ok, :connection_closed} ->
+        Logger.debug("[Grizzly] connection to node #{inspect(node_id)} closed")
+        {:stop, :normal, state}
+
       {:ok, transport_response} ->
         new_state = handle_commands(transport_response.command, state)
         {:noreply, new_state}
     end
   end
+
+  @impl GenServer
+  def terminate(:normal, state), do: state
 
   defp handle_commands(%Command{name: :keep_alive}, state) do
     %State{state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}

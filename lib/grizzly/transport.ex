@@ -60,7 +60,7 @@ defmodule Grizzly.Transport do
   @callback send(t(), binary(), keyword()) :: :ok
 
   @callback parse_response(any(), [parse_opt()]) ::
-              {:ok, Response.t()} | {:error, DecodeError.t()} | {:ok, binary()}
+              {:ok, Response.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
 
   @callback close(t()) :: :ok
 
@@ -145,7 +145,8 @@ defmodule Grizzly.Transport do
   @doc """
   Parse the response for the transport
   """
-  @spec parse_response(t(), any()) :: {:ok, Response.t()} | {:error, DecodeError.t()}
+  @spec parse_response(t(), any()) ::
+          {:ok, Response.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
   def parse_response(transport, response, opts \\ []) do
     %__MODULE__{impl: transport_impl} = transport
 
