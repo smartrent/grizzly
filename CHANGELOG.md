@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.15.8 - 2020-12-1
+
+### Added
+
+- Support for `ZwavePlusInfo` command class
+
+### Fixed
+
+- No function clause matching error when a connection closes
+- Missing support for `:undefined` indicator
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.7 - 2020-11-30
 
 ### Added
