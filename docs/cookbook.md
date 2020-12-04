@@ -12,10 +12,9 @@ Below are short notes about using Grizzly.
 1. [Door Locks](#door-locks)
 1. [DSK](#dsk)
 
-## Starting Grizzly 
+## Starting Grizzly
 
 If you using Grizzly you will need to start the supervision tree manually.
-
 
 ```elixir
 Grizzly.Supervisor.start_link(opts)
@@ -42,8 +41,8 @@ a docker based environment that is setup to compile `zipgateway` from source and
 provides a CLI for running the binary.
 
 After getting `zipgateway-env` setup and working you can use grizzly locally.
-You will need to pass the `:run_zipgateay` option when you start Grizzly setting
-it to `false`:
+You will need to pass the `:run_zipgateway` option when you start Grizzly
+setting it to `false`:
 
 ```elixir
 iex> Grizzly.Supervisor.start_link(run_zipgateway: false)
@@ -87,14 +86,14 @@ command.
 
 That command's param `:status` will tell you if inclusion failed or not:
 
-``` elixir 
+``` elixir
 alias Grizzly.ZWave.Command
 
 #... code ...
 
 def handle_info({:grizzly, :report, report}, state) do
   case report.command.name do
-    :node_add_status -> 
+    :node_add_status ->
       handle_node_add_status(report.command, state)
   end
 end
@@ -137,7 +136,7 @@ difference the `:granted_keys` param will be `[:s0]`.
 
 To remove a device you can call:
 
-```
+```elixir
 Grizzly.Inclusions.remove_device()
 ```
 
@@ -157,7 +156,7 @@ some Z-Wave Network functionally that has lead to the network getting in a
 broken state and you just want to start over again you can reset your controller
 by doing this:
 
-```
+```elixir
 Grizzly.Network.reset_controller()
 ```
 
@@ -198,7 +197,7 @@ will receive a report command back.
 
 ### When you get ack responses back
 
-The other main report you will receive is an `:ack_response`. This report just 
+The other main report you will receive is an `:ack_response`. This report just
 says the communication to the device was successful. That does not mean the
 device will perform what you sent, but that is was received. This is common when
 you want to set a value on the device.
@@ -218,7 +217,7 @@ Commands:
 1. [Grizzly.ZWave.Commands.SwitchBinaryGet](https://hexdocs.pm/grizzly/Grizzly.ZWave.Commands.SwitchBinaryGet.html)
 1. [Grizzly.ZWave.Commands.SwitchBinarySet](https://hexdocs.pm/grizzly/Grizzly.ZWave.Commands.SwitchBinarySet.html)
 
-Report: 
+Report:
 
 1. [Grizzly.ZWave.Commands.SwitchBinaryReport](https://hexdocs.pm/grizzly/Grizzly.ZWave.Commands.SwitchBinaryReport.html)
 
@@ -231,12 +230,12 @@ iex> Command.param!(report.command, :target_value)
 ```
 
 ```elixir
-iex> {:ok, %Grizzly.Report{type: :ack_response}} = 
+iex> {:ok, %Grizzly.Report{type: :ack_response}} =
        Grizzly.send_command(switch_id, :switch_binary_set, value: :off)
 {:ok, %Grizzly.Report{}}
 ```
 
-# Door Locks
+## Door Locks
 
 Commands:
 
@@ -245,7 +244,7 @@ Commands:
 
 Reports:
 
-1. [Grizly.ZWave.Commands.DockLockOperationReport](https://hexdocs.pm/grizzly/Grizzly.ZWave.Commands.DoorLockOperationReport.html)
+1. [Grizzly.ZWave.Commands.DockLockOperationReport](https://hexdocs.pm/grizzly/Grizzly.ZWave.Commands.DoorLockOperationReport.html)
 
 Usage:
 
@@ -256,12 +255,12 @@ iex> Command.param!(report.command, :mode)
 ```
 
 ```elixir
-iex> {:ok, %Grizzly.Report{type: :ack_response}} = 
+iex> {:ok, %Grizzly.Report{type: :ack_response}} =
        Grizzly.send_command(lock_id, :dock_lock_operation_set, mode: :unsecured)
 {:ok, %Grizzly.Report{}}
 ```
 
-# DSK
+## DSK
 
 This returns this node's DSK. This is normally printed on a label as a QRCode or
 a UUID and is what will show up on a hub if you include this node into a Z-Wave
