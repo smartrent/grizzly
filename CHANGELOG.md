@@ -1,5 +1,21 @@
 ## Changelog
 
+## v0.15.9 - 2020-12-4
+
+### Added
+
+- Sending commands directly to the Z-Wave Gateway by passing
+  `Grizzly.send_command/4` `:gateway` as the node id.
+- How to get DSK for a device in the cookbook docs
+
+### Fixed
+
+- Spelling, whitespace and markdown issues in docs
+
+Thank you to those who contributed to this release:
+
+- Frank Hunleth
+
 ## v0.15.8 - 2020-12-1
 
 ### Added
