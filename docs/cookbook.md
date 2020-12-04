@@ -10,6 +10,7 @@ Below are short notes about using Grizzly.
 1. [Command Basics](#command-basics)
 1. [Binary Switches](#binary-switches)
 1. [Door Locks](#door-locks)
+1. [DSK](#dsk)
 
 ## Starting Grizzly 
 
@@ -260,3 +261,33 @@ iex> {:ok, %Grizzly.Report{type: :ack_response}} =
 {:ok, %Grizzly.Report{}}
 ```
 
+# DSK
+
+This returns this node's DSK. This is normally printed on a label as a QRCode or
+a UUID and is what will show up on a hub if you include this node into a Z-Wave
+network.
+
+```elixir
+iex> Grizzly.Node.get_dsk(1, :learn)
+{:ok,
+ %Grizzly.Report{
+   command: %Grizzly.ZWave.Command{
+     command_byte: 9,
+     command_class: Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode,
+     impl: Grizzly.ZWave.Commands.DSKReport,
+     name: :dsk_report,
+     params: [
+       seq_number: 58,
+       add_mode: :learn,
+       dsk: "12345-12345-12345-12345-12345-12345-12345-12345"
+     ]
+   },
+   command_ref: #Reference<0.2080011265.2613837825.149583>,
+   node_id: 1,
+   queued: false,
+   queued_delay: 0,
+   status: :complete,
+   transmission_stats: [],
+   type: :command
+ }}
+```
