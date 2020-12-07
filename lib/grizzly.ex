@@ -61,7 +61,7 @@ defmodule Grizzly do
 
   """
 
-  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Report}
+  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Report, VersionReports}
   alias Grizzly.Commands.Table
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
@@ -121,13 +121,36 @@ defmodule Grizzly do
   @doc """
   Send a command to the node via the node id or to Z/IP Gateway
 
-  If you want to send a command to the Gateway directly please see the
-  `Grizzly.Network` module first as there are many helpers in there that will
-  be default talk your controller by default.
+  To talk to your controller directly you can pass `:gateway` as the node id.
+  This is helpful because your controller might not always be the same node id
+  on any given network. This ensures that not matter node id your controller is
+  you will still be able to query it and make it perform Z-Wave functions. There
+  are many Z-Wave functions a controller do. There are helper functions for
+  these functions in `Grizzly.Network` and `Grizzly.Node`.
   """
   @spec send_command(ZWave.node_id() | :gateway, command(), args :: list(), [command_opt()]) ::
           send_command_response()
-  def send_command(node_id, command_name, args \\ [], opts \\ []) do
+  def send_command(node_id, command_name, args \\ [], opts \\ [])
+
+  def send_command(:gateway, :version_command_class_get, args, _opts) do
+    command_class = Keyword.get(args, :command_class)
+
+    case VersionReports.version_report_for(command_class) do
+      {:ok, version_report} ->
+        {:ok,
+         %Report{command: version_report, node_id: :gateway, status: :complete, type: :command}}
+
+      {:error, _} ->
+        {:ok,
+         %Report{
+           node_id: :gateway,
+           status: :complete,
+           type: :timeout
+         }}
+    end
+  end
+
+  def send_command(node_id, command_name, args, opts) do
     # always open a connection. If the connection is already opened this
     # will not establish a new connection
     including? = Inclusions.inclusion_running?()

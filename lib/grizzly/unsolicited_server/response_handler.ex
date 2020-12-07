@@ -6,7 +6,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   require Logger
 
-  alias Grizzly.Transport
+  alias Grizzly.{Transport, VersionReports}
   alias Grizzly.{Associations, ZWave}
   alias Grizzly.ZWave.Command
 
@@ -296,6 +296,18 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         end
       end
     end)
+  end
+
+  defp handle_command(%Command{name: :command_class_get} = command, _opts) do
+    command_class = Command.param!(command, :command_class)
+
+    case VersionReports.version_report_for(command_class) do
+      {:ok, report} ->
+        [{:send, report}]
+
+      {:error, _} ->
+        []
+    end
   end
 
   defp handle_command(command, _opts), do: [{:notify, command}]
