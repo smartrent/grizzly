@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpNoMoreInformation do
   @impl true
   def new(_opts \\ []) do
     command = %Command{
-      name: :wake_up_interval_get,
+      name: :wake_up_no_more_information,
       command_byte: 0x08,
       command_class: WakeUp,
       impl: __MODULE__
