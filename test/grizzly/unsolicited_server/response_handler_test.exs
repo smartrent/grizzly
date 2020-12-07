@@ -20,6 +20,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     MultiChannelAssociationRemove,
     SupervisionGet,
     SwitchBinaryReport,
+    CommandClassGet,
     ZIPPacket
   }
 
@@ -194,6 +195,15 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
       assert [] =
                ResponseHandler.handle_response(make_response(mcar), associations_server: server)
     end
+  end
+
+  test "version get query" do
+    {:ok, version_get} = CommandClassGet.new(command_class: :association)
+
+    assert [{:send, version_report}] = ResponseHandler.handle_response(make_response(version_get))
+
+    assert version_report.name == :command_class_report
+    assert Command.param!(version_report, :version) == 3
   end
 
   defp make_response(command) do

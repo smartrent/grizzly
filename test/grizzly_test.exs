@@ -2,6 +2,7 @@ defmodule Grizzly.Test do
   use ExUnit.Case
 
   alias Grizzly.Report
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, ZIPPacket}
 
   describe "SwitchBinary Commands" do
@@ -66,5 +67,55 @@ defmodule Grizzly.Test do
 
     assert_receive {:grizzly, :binary_response,
                     <<0x23, 0x2, 0x80, 0x50, _seq_no, 0x0, 0x0, 0x25, 0x3, 0x0>>}
+  end
+
+  describe "version get" do
+    test "association" do
+      {:ok, report} =
+        Grizzly.send_command(:gateway, :version_command_class_get, command_class: :association)
+
+      assert Command.param!(report.command, :version) == 3
+    end
+
+    test "association group info" do
+      {:ok, report} =
+        Grizzly.send_command(:gateway, :version_command_class_get,
+          command_class: :association_group_info
+        )
+
+      assert Command.param!(report.command, :version) == 1
+    end
+
+    test "device reset locally" do
+      {:ok, report} =
+        Grizzly.send_command(:gateway, :version_command_class_get,
+          command_class: :device_reset_locally
+        )
+
+      assert Command.param!(report.command, :version) == 1
+    end
+
+    test "multi channel association" do
+      {:ok, report} =
+        Grizzly.send_command(:gateway, :version_command_class_get,
+          command_class: :multi_channel_association
+        )
+
+      assert Command.param!(report.command, :version) == 3
+    end
+
+    test "supervision" do
+      {:ok, report} =
+        Grizzly.send_command(:gateway, :version_command_class_get, command_class: :supervision)
+
+      assert Command.param!(report.command, :version) == 1
+    end
+
+    test "multi command" do
+      {:ok, report} =
+        Grizzly.send_command(:gateway, :version_command_class_get, command_class: :multi_command)
+
+      assert Command.param!(report.command, :version) == 1
+    end
   end
 end
