@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.15.10 - 2020-12-8
+
+### Added
+
+- Support for querying the gateway about the command class versions it supports
+  when querying extra supported command classes.
+
+### Fixed
+
+- Spelling error fix for the `WakeUpNoMoreInformation` command name
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.9 - 2020-12-4
 
 ### Added
