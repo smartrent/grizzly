@@ -305,7 +305,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       {:ok, report} ->
         [{:send, report}]
 
-      {:error, _} ->
+      _ ->
         []
     end
   end
