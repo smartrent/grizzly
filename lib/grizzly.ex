@@ -66,6 +66,8 @@ defmodule Grizzly do
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
 
+  import Grizzly.VersionReports, only: [is_extra_command: 1]
+
   @typedoc """
   The response from sending a Z-Wave command
 
@@ -132,22 +134,15 @@ defmodule Grizzly do
           send_command_response()
   def send_command(node_id, command_name, args \\ [], opts \\ [])
 
-  def send_command(:gateway, :version_command_class_get, args, _opts) do
-    command_class = Keyword.get(args, :command_class)
-
-    case VersionReports.version_report_for(command_class) do
-      {:ok, version_report} ->
-        {:ok,
-         %Report{command: version_report, node_id: :gateway, status: :complete, type: :command}}
-
-      {:error, _} ->
-        {:ok,
-         %Report{
-           node_id: :gateway,
-           status: :complete,
-           type: :timeout
-         }}
-    end
+  def send_command(
+        :gateway,
+        :version_command_class_get,
+        [command_class: command_class],
+        _opts
+      )
+      when is_extra_command(command_class) do
+    {:ok, version_report} = VersionReports.version_report_for(command_class)
+    {:ok, %Report{command: version_report, node_id: :gateway, status: :complete, type: :command}}
   end
 
   def send_command(node_id, command_name, args, opts) do

@@ -9,11 +9,22 @@ defmodule Grizzly.VersionReports do
   alias Grizzly.ZWave.{Command, CommandClasses}
   alias Grizzly.ZWave.Commands.CommandClassReport
 
+  @extra_supported_commands [
+    :association,
+    :association_group_info,
+    :device_reset_locally,
+    :multi_channel_association,
+    :multi_command,
+    :supervision
+  ]
+
+  defguard is_extra_command(command) when command in @extra_supported_commands
+
   @doc """
   Get the version report for the command class
   """
   @spec version_report_for(CommandClasses.command_class()) ::
-          {:ok, Command.t()} | {:error, :command_not_supported}
+          {:ok, Command.t()} | :command_not_supported
   def version_report_for(:association = name) do
     CommandClassReport.new(command_class: name, version: 3)
   end
@@ -39,6 +50,6 @@ defmodule Grizzly.VersionReports do
   end
 
   def version_report_for(_) do
-    {:error, :command_not_supported}
+    :command_not_supported
   end
 end
