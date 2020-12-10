@@ -20,6 +20,10 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
           | :secured
           | :unknown
 
+  @type operation_type :: :constant_operation | :timed_operation
+
+  @type door_components :: :bolt | :latch | :door
+
   @impl true
   def byte(), do: 0x62
 
@@ -49,5 +53,38 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
   def mode_from_byte(0xFE), do: {:ok, :unknown}
 
   def mode_from_byte(byte),
-    do: {:error, %DecodeError{value: byte, param: :mode, command: :operation_set}}
+    do: {:error, %DecodeError{value: byte, param: :mode}}
+
+  def operation_type_to_byte(:constant_operation), do: 0x01
+  def operation_type_to_byte(:timed_operation), do: 0x02
+
+  def operation_type_from_byte(0x01), do: {:ok, :constant_operation}
+  def operation_type_from_byte(0x02), do: {:ok, :timed_operation}
+
+  def operation_type_from_byte(byte),
+    do: {:error, %DecodeError{param: :operation_type, value: byte}}
+
+  def door_handles_to_bitmask(handles) do
+    <<bitmask::size(4)>> =
+      for handle <- 4..1, into: <<>> do
+        if handle in handles, do: <<0x01::1>>, else: <<0x00::1>>
+      end
+
+    bitmask
+  end
+
+  def door_handles_from_bitmask(byte) do
+    bitmask = <<byte::size(4)>>
+
+    for(<<x::1 <- bitmask>>, do: x)
+    |> Enum.reverse()
+    |> Enum.with_index(1)
+    |> Enum.reduce([], fn {bit, index}, acc ->
+      if bit == 1, do: [index | acc], else: acc
+    end)
+  end
+
+  def to_minutes_and_seconds(seconds) do
+    {div(seconds, 60), rem(seconds, 60)}
+  end
 end

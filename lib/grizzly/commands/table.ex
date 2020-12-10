@@ -81,6 +81,14 @@ defmodule Grizzly.Commands.Table do
       {:door_lock_operation_get,
        {Commands.DoorLockOperationGet,
         handler: {WaitReport, complete_report: :door_lock_operation_report}}},
+      {:door_lock_configuration_set, {Commands.DoorConfigurationSet, handler: AckResponse}},
+      {:door_lock_configuration_get,
+       {Commands.DoorLockConfigurationGet,
+        handler: {WaitReport, complete_report: :door_lock_configuration_report}}},
+      {:door_lock_capabilities_get,
+       {Commands.DoorLockCapabilitiesGet,
+        handler: {WaitReport, complete_report: :door_lock_capabilities_report}}},
+
       # Associations
       {:association_set, {Commands.AssociationSet, handler: AckResponse}},
       {:association_get,

@@ -158,6 +158,9 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
          timeout_minutes: timeout_minutes,
          timeout_seconds: timeout_seconds
        ]}
+    else
+      {:error, %DecodeError{} = decode_error} ->
+        %DecodeError{decode_error | command: :door_lock_operation_report}
     end
   end
 

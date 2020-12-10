@@ -42,8 +42,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSet do
       {:ok, mode} ->
         {:ok, [mode: mode]}
 
-      {:error, %DecodeError{}} = error ->
-        error
+      {:error, %DecodeError{} = decode_error} ->
+        {:error, %DecodeError{decode_error | command: :door_lock_operation_set}}
     end
   end
 end

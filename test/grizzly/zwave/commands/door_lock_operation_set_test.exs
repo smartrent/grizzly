@@ -5,7 +5,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSetTest do
   alias Grizzly.ZWave.Commands.DoorLockOperationSet
 
   test "creates the command and validates params" do
-    assert {:ok, operation_set} = DoorLockOperationSet.new(mode: :secured)
+    assert {:ok, _operation_set} = DoorLockOperationSet.new(mode: :secured)
   end
 
   describe "encodes params correctly" do
