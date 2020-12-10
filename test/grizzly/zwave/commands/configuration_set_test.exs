@@ -5,11 +5,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
 
   describe "creates the command and validates params" do
     test "with default" do
-      assert {:ok, configuration_set} = ConfigurationSet.new(value: :default, param_number: 15)
+      assert {:ok, _configuration_set} = ConfigurationSet.new(value: :default, param_number: 15)
     end
 
     test "with a value" do
-      assert {:ok, configuration_set} =
+      assert {:ok, _configuration_set} =
                ConfigurationSet.new(value: 123, param_number: 15, size: 1)
     end
   end
