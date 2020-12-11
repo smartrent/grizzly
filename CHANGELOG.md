@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.15.11 - 2020-12-11
+
+### Added
+
+- Support for DoorLock command class version 4
+
+### Fixed
+
+- Querying command class versions for extra commands on the LAN will return the
+  version report correctly now.
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.15.10 - 2020-12-8
 
 ### Added
