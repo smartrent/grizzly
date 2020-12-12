@@ -171,7 +171,7 @@ defmodule Grizzly.Network do
     seq_number = SeqNumber.get_and_inc()
     node_id = node_id_from_opts(opts)
 
-    Grizzly.send_command(node_id, :failed_node_remove, seq_number: seq_number, node_id: node_id)
+    Grizzly.send_command(:gateway, :failed_node_remove, seq_number: seq_number, node_id: node_id)
   end
 
   @doc """
