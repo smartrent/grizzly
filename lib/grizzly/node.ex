@@ -10,19 +10,35 @@ defmodule Grizzly.Node do
 
   @type lifeline_opts :: {:controller_id, ZWave.node_id()} | {:extra_node_ids, [ZWave.node_id()]}
 
+  @typedoc """
+  Options to use when getting device info.
+
+  * `:force_update` - By default there is a cache managed by `zipgateway` that
+    tracks the device information. Sometimes that can get out of date, so you
+    can pass `[force_update: true]` to force the cache to update the device
+    info. By default this is `false`
+  """
+  @type info_opt() :: {:force_update, boolean()}
+
   @doc """
   Get the information for a node by its id
 
   The response to this command is the `NodeInfoCacheReport` command
   """
-  @spec get_info(ZWave.node_id()) :: Grizzly.send_command_response()
-  def get_info(node_id) do
+  @spec get_info(ZWave.node_id(), [info_opt()]) :: Grizzly.send_command_response()
+  def get_info(node_id, info_opt \\ []) do
     seq_number = SeqNumber.get_and_inc()
 
-    Grizzly.send_command(:gateway, :node_info_cached_get,
+    params = [
       seq_number: seq_number,
       node_id: node_id
-    )
+    ]
+
+    if Keyword.get(info_opt, :force_update, false) do
+      Grizzly.send_command(:gateway, :node_info_cached_get, params ++ [max_age: :force_update])
+    else
+      Grizzly.send_command(:gateway, :node_info_cached_get, params)
+    end
   end
 
   @doc """
