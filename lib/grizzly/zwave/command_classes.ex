@@ -248,7 +248,7 @@ defmodule Grizzly.ZWave.CommandClasses do
                 | :hail
                 | :wake_up
                 | :association
-                | :command_class_version
+                | :version
                 | :indicator
                 | :proprietary
                 | :language
