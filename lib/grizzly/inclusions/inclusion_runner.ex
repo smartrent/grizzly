@@ -213,6 +213,10 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     :ok
   end
 
+  def terminate(_reason, _inclusion) do
+    :ok
+  end
+
   defp build_inclusion_opts_for_command(command) do
     case command.name do
       :node_add_dsk_report ->
