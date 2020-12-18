@@ -94,7 +94,4 @@ defmodule Grizzly.Connections.BinaryConnection do
         {:noreply, state}
     end
   end
-
-  @impl GenServer
-  def terminate(:normal, state), do: state
 end
