@@ -298,7 +298,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end)
   end
 
-  defp handle_command(%Command{name: :command_class_get} = command, _opts) do
+  defp handle_command(%Command{name: :version_command_class_get} = command, _opts) do
     command_class = Command.param!(command, :command_class)
 
     case VersionReports.version_report_for(command_class) do

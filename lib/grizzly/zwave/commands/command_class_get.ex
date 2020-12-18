@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.CommandClassGet do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :command_class_get,
+      name: :version_command_class_get,
       command_byte: 0x13,
       command_class: Version,
       params: params,
@@ -43,7 +43,8 @@ defmodule Grizzly.ZWave.Commands.CommandClassGet do
         {:ok, command_class: cc}
 
       {:error, _} ->
-        {:error, %DecodeError{value: cc_byte, param: :command_class, command: :command_class_get}}
+        {:error,
+         %DecodeError{value: cc_byte, param: :command_class, command: :version_command_class_get}}
     end
   end
 end
