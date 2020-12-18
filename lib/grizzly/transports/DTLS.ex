@@ -31,6 +31,7 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   @impl Grizzly.Transport
+  # Erlang/OTP <= 23.1.x
   def parse_response(
         {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _}, _}}, :dtls_connection}, _}, bin_list},
         opts
@@ -47,6 +48,22 @@ defmodule Grizzly.Transports.DTLS do
            ip_address: ip,
            command: command
          }}
+    end
+  end
+
+  # Erlang/OTP >= 23.2
+  def parse_response(
+        {:ssl, {:sslsocket, {:gen_udp, {{ip, _}, _}, :dtls_gen_connection}, _}, bin_list},
+        opts
+      ) do
+    binary = :erlang.list_to_binary(bin_list)
+
+    case parse_zip_packet(binary, opts) do
+      {:ok, bin} when is_binary(bin) ->
+        {:ok, bin}
+
+      {:ok, command} ->
+        {:ok, %Response{ip_address: ip, command: command}}
     end
   end
 
