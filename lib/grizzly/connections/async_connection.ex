@@ -160,9 +160,6 @@ defmodule Grizzly.Connections.AsyncConnection do
     end
   end
 
-  @impl GenServer
-  def terminate(:normal, state), do: state
-
   defp handle_commands(%Command{name: :keep_alive}, state) do
     %State{state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
   end

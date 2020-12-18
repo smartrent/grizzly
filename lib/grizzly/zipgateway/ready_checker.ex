@@ -36,7 +36,4 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
         {:noreply, on_ready, {:continue, :try_connect}}
     end
   end
-
-  @impl GenServer
-  def terminate(_, _state), do: :ok
 end
