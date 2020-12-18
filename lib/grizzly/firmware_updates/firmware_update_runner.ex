@@ -133,6 +133,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :ok
   end
 
+  def terminate(_reason, _firmware_update) do
+    :ok
+  end
+
   defp handle_report(%Report{type: :ack_response}, firmware_update) do
     {:noreply, firmware_update}
   end
