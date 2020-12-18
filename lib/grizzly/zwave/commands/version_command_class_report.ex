@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.CommandClassReport do
+defmodule Grizzly.ZWave.Commands.VersionCommandClassReport do
   @moduledoc """
   Reports the command class version for a device
 
@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.CommandClassReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :command_class_report,
+      name: :version_command_class_report,
       command_byte: 0x14,
       command_class: Version,
       params: params,
@@ -46,7 +46,11 @@ defmodule Grizzly.ZWave.Commands.CommandClassReport do
 
       {:error, _} ->
         {:error,
-         %DecodeError{value: cc_byte, param: :command_class, command: :command_class_report}}
+         %DecodeError{
+           value: cc_byte,
+           param: :command_class,
+           command: :version_command_class_report
+         }}
     end
   end
 end
