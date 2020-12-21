@@ -1,5 +1,35 @@
 ## Changelog
 
+## v0.16.0 - 2020-12-21
+
+This release introduces a breaking change to the naming of the command class get
+and command class report modules. If you are using those modules directly, you
+will need to update to the use the new module names.
+
+### Changed
+
+- `Grizzly.ZWave.Commands.CommandClassGet` is now
+  `Grizzly.ZWave.Commands.VersionCommandClassGet`
+- The `:name` field for `:command_class_get` is now `:version_command_class_get`
+- `Grizzly.ZWave.Commands.CommandClassReport` is now
+  `Grizzly.ZWave.Commands.VersionCommandClassReport`
+- The `:name` field for `:command_class_report` is now
+  `:version_command_class_report`
+
+### Added
+
+- Added support for forcing the Z-Wave cache to update when fetching node
+  information. See `Grizzly.Node.get_info/2` for more information.
+- Support for OTP 23.2
+
+### Fixed
+
+- In some GenServers an exception would cascade
+
+### Updates
+
+- Easier to read stack traces when some GenServers crash
+
 ## v0.15.11 - 2020-12-11
 
 ### Added
