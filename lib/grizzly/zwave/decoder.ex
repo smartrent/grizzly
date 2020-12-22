@@ -116,6 +116,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x67, 0x06, Commands.StatisticsClear},
       {0x67, 0x07, Commands.RssiGet},
       {0x67, 0x08, Commands.RssiReport},
+      {0x67, 0x09, Commands.S2ResynchronizationEvent},
+
       # Supervision
       {0x6C, 0x01, Commands.SupervisionGet},
       {0x6C, 0x02, Commands.SupervisionReport},
