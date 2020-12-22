@@ -75,8 +75,8 @@ defmodule Grizzly.Connections.SyncConnection do
            node_id: node_id_or_gateway
          }}
 
-      {:error, :timeout} ->
-        {:stop, :timeout}
+      {:error, reason} ->
+        {:stop, reason}
     end
   end
 

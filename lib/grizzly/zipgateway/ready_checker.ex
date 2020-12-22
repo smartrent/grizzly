@@ -28,9 +28,9 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
         :ok = apply(m, f, a)
         {:stop, :normal, on_ready}
 
-      {:error, :timeout} ->
+      {:error, _reason} ->
         # give a little breathing space
-        :timer.sleep(250)
+        :timer.sleep(500)
 
         # try again
         {:noreply, on_ready, {:continue, :try_connect}}

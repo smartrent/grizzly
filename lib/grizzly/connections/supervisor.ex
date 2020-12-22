@@ -54,8 +54,8 @@ defmodule Grizzly.Connections.Supervisor do
            connection_module.child_spec(node_id, command_opts)
          ) do
       {:ok, _} = ok -> ok
-      {:error, :timeout} = timeout_error -> timeout_error
       {:error, {:already_started, pid}} -> {:ok, pid}
+      {:error, _reason} = other_error -> other_error
     end
   end
 end

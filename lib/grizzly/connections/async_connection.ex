@@ -85,8 +85,8 @@ defmodule Grizzly.Connections.AsyncConnection do
            node_id: node_id
          }}
 
-      {:error, :timeout} ->
-        {:stop, :timeout}
+      {:error, reason} ->
+        {:stop, reason}
     end
   end
 
