@@ -14,8 +14,9 @@ defmodule Grizzly.Transports.DTLS do
   def open(args) do
     ip_address = Keyword.fetch!(args, :ip_address)
     port = Keyword.fetch!(args, :port)
+    ifaddr = {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}
 
-    case :ssl.connect(ip_address, port, dtls_opts(), 10_000) do
+    case :ssl.connect(ip_address, port, dtls_opts(ifaddr), 10_000) do
       {:ok, socket} ->
         {:ok, Transport.new(__MODULE__, %{socket: socket, port: port})}
 
@@ -162,24 +163,6 @@ defmodule Grizzly.Transports.DTLS do
       {:cb_info, {:gen_udp, :udp, :udp_close, :udp_error}},
       :inet6,
       {:ifaddr, ifaddr}
-    ]
-  end
-
-  defp dtls_opts() do
-    [
-      {:ssl_imp, :new},
-      {:active, true},
-      {:verify, :verify_none},
-      {:versions, [:dtlsv1]},
-      {:protocol, :dtls},
-      {:ciphers, [{:psk, :aes_128_cbc, :sha}]},
-      {:psk_identity, 'Client_identity'},
-      {:user_lookup_fun,
-       {&user_lookup/3,
-        <<0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
-          0x90, 0xAA>>}},
-      {:cb_info, {:gen_udp, :udp, :udp_close, :udp_error}},
-      :inet6
     ]
   end
 end
