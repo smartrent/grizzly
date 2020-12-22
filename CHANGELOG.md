@@ -1,5 +1,25 @@
 ## Changelog
 
+## v0.16.1 - 2020-12-22
+
+### Added
+
+- `Grizzly.ZWave.Commands.S2ResynchronizationEvent`
+
+### Fixed
+
+- Data structure change in the associations file when deleting all associations
+- Wrong `MultiChannelAssociation` version number being reported to devices
+- Ensure ack responses are sent when extra commands are received
+- Force bind to `fd00::aaaa::2` since `zipgateway` forces that all acks come
+  from this address
+- Crash when receiving errors other than timeouts when trying to establish
+  connections to `zipgateway`
+
+Thank you to those who contributed to this release:
+
+- Frank Hunleth
+
 ## v0.16.0 - 2020-12-21
 
 This release introduces a breaking change to the naming of the command class get
@@ -146,8 +166,8 @@ Thank you to those who contributed to this release:
   - Association group command class list
   - Association group name get
   - Association group info get
-  - Device rest locally notification
-  
+  - Device reset locally notification
+
 ### Changed
 
 - When a supervision get command is received in the unsolicited destination we
