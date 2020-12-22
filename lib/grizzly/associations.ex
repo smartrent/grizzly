@@ -156,7 +156,7 @@ defmodule Grizzly.Associations do
 
   def handle_call(:delete_all, _from, state) do
     %State{file_path: path} = state
-    binary = :erlang.term_to_binary([])
+    binary = :erlang.term_to_binary(%{})
 
     :ok = File.write(path, binary)
 
