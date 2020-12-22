@@ -124,9 +124,13 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     Command.param!(command, :flag) == :ack_response
   end
 
-  @spec make_ack_response(ZWave.seq_number()) :: Command.t()
-  def make_ack_response(seq_number) do
-    {:ok, command} = new(seq_number: seq_number, flag: :ack_response)
+  @spec make_ack_response(ZWave.seq_number(), keyword()) :: Command.t()
+  def make_ack_response(seq_number, opts \\ []) do
+    header_extensions = Keyword.get(opts, :header_extensions, [])
+
+    {:ok, command} =
+      new(seq_number: seq_number, flag: :ack_response, header_extensions: header_extensions)
+
     command
   end
 

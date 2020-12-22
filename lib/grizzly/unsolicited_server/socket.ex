@@ -75,15 +75,17 @@ defmodule Grizzly.UnsolicitedServer.Socket do
     # We have to perverse the header extensions to ensure command encapsulation
     # is correct when sending the response back to the Z-Wave PAN.
     header_extensions = Command.param!(zippacket, :header_extensions)
+    node_id = ZIPGateway.node_id_from_ip(ip_address)
+
+    _ = send_ack_response(node_id, zippacket)
 
     {:ok, zip_packet} =
       ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(),
-        flag: nil,
+        flag: :ack_request,
         header_extensions: header_extensions
       )
 
     binary = ZWave.to_binary(zip_packet)
-    node_id = ZIPGateway.node_id_from_ip(ip_address)
 
     Grizzly.send_binary(node_id, binary)
   end
@@ -120,5 +122,17 @@ defmodule Grizzly.UnsolicitedServer.Socket do
     node_id = ZIPGateway.node_id_from_ip(ip_address)
 
     Grizzly.send_binary(node_id, binary)
+  end
+
+  defp send_ack_response(node_id, zippacket) do
+    header_extensions = Command.param!(zippacket, :header_extensions)
+    seq = Command.param!(zippacket, :seq_number)
+
+    ack_bin =
+      seq
+      |> ZIPPacket.make_ack_response(header_extensions: header_extensions)
+      |> ZWave.to_binary()
+
+    Grizzly.send_binary(node_id, ack_bin)
   end
 end
