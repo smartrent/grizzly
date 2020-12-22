@@ -101,7 +101,7 @@ defmodule Grizzly.Test do
           command_class: :multi_channel_association
         )
 
-      assert Command.param!(report.command, :version) == 3
+      assert Command.param!(report.command, :version) == 4
     end
 
     test "supervision" do

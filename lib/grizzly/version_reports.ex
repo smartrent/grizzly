@@ -38,7 +38,7 @@ defmodule Grizzly.VersionReports do
   end
 
   def version_report_for(:multi_channel_association = name) do
-    VersionCommandClassReport.new(command_class: name, version: 3)
+    VersionCommandClassReport.new(command_class: name, version: 4)
   end
 
   def version_report_for(:supervision = name) do
