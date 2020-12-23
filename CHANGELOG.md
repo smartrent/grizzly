@@ -1,5 +1,12 @@
 ## Changelog
 
+## v0.16.2 - 2020-12-23
+
+### Added
+
+- `:list_mode` param for the
+  `Grizzly.ZWave.Commands.AssociationGroupInfoReport` command.
+
 ## v0.16.1 - 2020-12-22
 
 ### Added
