@@ -161,11 +161,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :association_group_info_get}, _opts) do
+  defp handle_command(%Command{name: :association_group_info_get} = command, _opts) do
     {:ok, report} =
       AssociationGroupInfoReport.new(
         dynamic: false,
-        groups_info: [[group_id: 1, profile: :general_lifeline]]
+        groups_info: [[group_id: 1, profile: :general_lifeline]],
+        list_mode: Command.param(command, :all, false)
       )
 
     [{:send, report}]
