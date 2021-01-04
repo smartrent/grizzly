@@ -44,13 +44,17 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :supervision_get} = command, _) do
+  defp handle_command(%Command{name: :supervision_get} = command, opts) do
     {:ok, supervision_report} = make_supervision_report(command)
     encapsulated_command = Command.param!(command, :encapsulated_command)
 
     case ZWave.from_binary(encapsulated_command) do
       {:ok, report} ->
-        [{:notify, report}, {:send, supervision_report}]
+        # We need to process the internal command and get the actions that need
+        # to be preformed. The supervision report must come last in the chain of
+        # actions. See SDS13783 section 3.7.2.2 for more information.
+        actions = handle_command(report, opts)
+        actions ++ [{:send, supervision_report}]
 
       {:error, reason} ->
         Logger.warn(
