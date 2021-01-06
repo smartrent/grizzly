@@ -23,7 +23,9 @@ defmodule Grizzly.Options do
           inclusion_handler: Grizzly.handler() | nil,
           firmware_update_handler: Grizzly.handler() | nil,
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
-          associations_file: Path.t()
+          associations_file: Path.t(),
+          eeprom_file: Path.t() | nil,
+          database_file: Path.t() | nil
         }
 
   defstruct run_zipgateway: true,
@@ -44,15 +46,25 @@ defmodule Grizzly.Options do
             inclusion_handler: nil,
             firmware_update_handler: nil,
             unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
-            associations_file: nil
+            associations_file: nil,
+            eeprom_file: "/data/zipeeprom.dat",
+            database_file: "/data/zipgateway.db"
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do
     struct(__MODULE__, opts)
   end
 
-  @spec to_zipgateway_config(t()) :: Config.t()
-  def to_zipgateway_config(grizzly_opts) do
+  @spec to_zipgateway_config(t(), boolean()) :: Config.t()
+  def to_zipgateway_config(%__MODULE__{database_file: file} = grizzly_opts, use_database?)
+      when file == nil or not use_database? do
+    # Build a zipgateway configuration for zipgateway <7.14.2
     Config.new(grizzly_opts)
+  end
+
+  def to_zipgateway_config(%__MODULE__{} = grizzly_opts, true = _use_database?) do
+    # Build a zipgateway configuration for zipgateway >= 7.14.2. This version
+    # of zipgateway will exit if an eeprom file is specified
+    Config.new(%{grizzly_opts | eeprom_file: nil})
   end
 end

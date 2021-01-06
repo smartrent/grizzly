@@ -7,7 +7,7 @@ defmodule Grizzly.ZIPGateway.Config do
           ca_cert: Path.t(),
           cert: Path.t(),
           priv_key: Path.t(),
-          eeprom_file: Path.t(),
+          eeprom_file: Path.t() | nil,
           tun_script: Path.t(),
           pvs_storage_file: Path.t(),
           provisioning_config_file: Path.t(),
@@ -21,13 +21,14 @@ defmodule Grizzly.ZIPGateway.Config do
           product_type: non_neg_integer() | nil,
           serial_log: String.t() | nil,
           extra_classes: [byte()],
-          unsolicited_destination: {:inet.ip_address(), :inet.port_number()}
+          unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
+          database_file: Path.t() | nil
         }
 
   defstruct ca_cert: "./Portal.ca_x509.pem",
             cert: "./ZIPR.x509_1024.pem",
             priv_key: "./ZIPR.key_1024.pem",
-            eeprom_file: "/root/zipeeprom.dat",
+            eeprom_file: nil,
             tun_script: "./zipgateway.tun",
             pvs_storage_file: "/root/provisioning_list_store.dat",
             provisioning_config_file: "/etc/zipgateway_provisioning_list.cfg",
@@ -41,7 +42,8 @@ defmodule Grizzly.ZIPGateway.Config do
             hardware_version: nil,
             manufacturer_id: nil,
             extra_classes: [0x85, 0x59, 0x5A, 0x8E, 0x6C, 0x8F],
-            unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230}
+            unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
+            database_file: nil
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -57,7 +59,9 @@ defmodule Grizzly.ZIPGateway.Config do
         :serial_log,
         :tun_script,
         :lan_ip,
-        :pan_ip
+        :pan_ip,
+        :database_file,
+        :eeprom_file
       ])
 
     struct(__MODULE__, opts)
@@ -81,7 +85,6 @@ defmodule Grizzly.ZIPGateway.Config do
     ZipCaCert=#{cfg.ca_cert}
     ZipCert=#{cfg.cert}
     ZipPrivKey=#{cfg.priv_key}
-    Eepromfile=#{cfg.eeprom_file}
     TunScript=#{cfg.tun_script}
     PVSStorageFile=#{cfg.pvs_storage_file}
     ProvisioningConfigFile=#{cfg.provisioning_config_file}
@@ -97,6 +100,8 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :pan_ip, "ZipPanIp6")
     |> maybe_put_config_item(cfg, :lan_ip, "ZipLanIp6")
     |> maybe_put_config_item(cfg, :unsolicited_destination, nil)
+    |> maybe_put_config_item(cfg, :database_file, "ZipGwDatabase")
+    |> maybe_put_config_item(cfg, :eeprom_file, "Eepromfile")
   end
 
   defp maybe_put_config_item(config_string, cfg, :extra_classes = field, cfg_name) do
@@ -138,7 +143,7 @@ defmodule Grizzly.ZIPGateway.Config do
     cfg_item = Map.get(cfg, field)
 
     if cfg_item != nil do
-      config_string <> "#{cfg_name} = #{cfg_item}\n"
+      config_string <> "#{cfg_name}=#{cfg_item}\n"
     else
       config_string
     end
