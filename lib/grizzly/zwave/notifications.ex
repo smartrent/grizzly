@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Notifications do
       :co_alarm,
       :co2_alarm,
       :heat_alarm,
-      :water_alarm,
+      :water,
       :access_control,
       :home_security
     ],
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Notifications do
     smoke_alarm: [
       # byte 1
       [
-        :unknown,
+        :state_idle,
         :smoke_detected_location_provided,
         :smoked_detected,
         :smoke_alarm_test,
@@ -65,10 +65,60 @@ defmodule Grizzly.ZWave.Notifications do
         :unknown
       ]
     ],
-    water: [
+    co_alarm: [
       # byte 1
       [
+        :state_idle,
+        :co_detected_location_provided,
+        :co_detected,
+        :co_test,
+        :replacement_required,
+        :replacement_required_end_of_life,
+        :alarm_silenced,
+        :maintenance_required_planned_periodic_inspection
+      ]
+    ],
+    co2_alarm: [
+      # byte 1
+      [
+        :state_idle,
+        :co2_detected_location_provided,
+        :co2_detected,
+        :co2_test,
+        :replacement_required,
+        :replacement_required_end_of_life,
+        :alarm_silenced,
+        :maintenance_required_planned_periodic_inspection
+      ]
+    ],
+    heat_alarm: [
+      # byte 1
+      [
+        :state_idle,
+        :overheat_detected_location_provided,
+        :overheat_detected,
+        :rapid_temperature_rise_location_provided,
+        :rapid_temperature_rise,
+        :underheat_detected_location_provided,
+        :underheat_detected,
+        :heat_alarm_test
+      ],
+      # byte 2
+      [
+        :replacement_required_end_of_life,
+        :alarm_silenced,
+        :maintenance_required_dust_in_device,
+        :maintenance_required_planned_periodic_inspection,
+        :rapid_temperature_fall_location_provided,
+        :rapid_temperature_fall,
         :unknown,
+        :unknown
+      ]
+    ],
+    water_alarm: [
+      # byte 1
+      [
+        :state_idle,
         :water_leak_detected_location_provided,
         :water_leak_detected,
         :water_level_dropped_location_provided,
@@ -92,7 +142,7 @@ defmodule Grizzly.ZWave.Notifications do
     access_control: [
       # byte 1
       [
-        :unknown,
+        :state_idle,
         :manual_lock_operation,
         :manual_unlock_operation,
         :rf_lock_operation,
@@ -149,7 +199,7 @@ defmodule Grizzly.ZWave.Notifications do
     home_security: [
       # byte 1
       [
-        :unknown,
+        :state_idle,
         :intrusion_location_provided,
         :intrusion,
         :tampering_product_cover_removed,
@@ -164,7 +214,148 @@ defmodule Grizzly.ZWave.Notifications do
         :tampering_product_moved,
         :impact_detected,
         :magnetic_field_interface_detected,
-        :unknown_state,
+        :rf_jamming_detected,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    power_management: [
+      # byte 1
+      [
+        :state_idle,
+        :power_applied,
+        :ac_mains_disconnected,
+        :ac_mains_reconnected,
+        :surge_detected,
+        :voltage_drop,
+        :over_current_detected,
+        :over_voltage_detected
+      ],
+      # byte 2
+      [
+        :over_load_detected,
+        :load_error,
+        :replace_battery_soon,
+        :replace_battery_now,
+        :battery_is_charging,
+        :battery_is_fully_charged,
+        :charge_battery_soon,
+        :charge_battery_now
+      ],
+      # byte 3
+      [
+        :back_up_battery_low,
+        :battery_fluid_is_low,
+        :back_up_battery_disconnected,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    system: [
+      # byte 1
+      [
+        :state_idle,
+        :system_hardware_failure,
+        :system_software_failure,
+        :system_hardware_failure_code_provided,
+        :system_software_failure_code_provided,
+        :heartbeat,
+        :tampering_product_cover_removed,
+        :emergency_shutoff
+      ],
+      # byte 2
+      [
+        :undefined,
+        :digital_input_high_state,
+        :digital_input_low_state,
+        :digital_input_open,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    emergency_alarm: [
+      # byte 1
+      :state_idle,
+      :contact_police,
+      :contact_fire_service,
+      :contact_medical_service,
+      :panic_alert,
+      :unknown,
+      :unknown,
+      :unknown
+    ],
+    clock: [
+      # byte 1
+      :state_idle,
+      :wake_up_alert,
+      :time_ended,
+      :time_remaining,
+      :unknown,
+      :unknown,
+      :unknown,
+      :unknown
+    ],
+    appliance: [
+      # byte 1
+      [
+        :state_idle,
+        :program_started,
+        :program_in_progress,
+        :program_completed,
+        :replace_main_filter,
+        :failure_to_set_target_temperature,
+        :supplying_water,
+        :water_supply_failure
+      ],
+      # byte 2
+      [
+        :boiling,
+        :boiling_failure,
+        :washing,
+        :washing_failure,
+        :rinsing,
+        :rinsing_failure,
+        :draining,
+        :draining_failure
+      ],
+      # byte 3
+      [
+        :spinning,
+        :spinning_failure,
+        :drying,
+        :drying_failure,
+        :fan_failure,
+        :compressor_failure,
+        :unknown,
+        :unknown
+      ]
+    ],
+    home_health: [
+      # byte 1
+      [
+        :state_idle,
+        :leaving_bed,
+        :sitting_on_bed,
+        :lying_on_bed,
+        :posture_changed,
+        :sitting_on_bed_edge,
+        # patient is hitting the bottle
+        :volatile_organic_compound_level,
+        :sleep_apnea_detected
+      ],
+      # byte 2
+      [
+        :sleep_stage_0_detected,
+        :sleep_stage_1_detected,
+        :sleep_stage_2_detected,
+        :sleep_stage_3_detected,
+        :unknown,
         :unknown,
         :unknown,
         :unknown
@@ -173,9 +364,146 @@ defmodule Grizzly.ZWave.Notifications do
     siren: [
       # byte 1
       [
-        :unknown,
+        :state_idle,
         :state_active,
         :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    water_valve: [
+      # byte 1
+      [
+        :state_idle,
+        :valve_operation,
+        :master_valve_operation,
+        :valve_short_circuit,
+        :master_valve_short_circuit,
+        :master_valve_current_alarm,
+        :unknown,
+        :unknown
+      ]
+    ],
+    weather_alarm: [
+      # byte 1
+      [
+        :state_idle,
+        :rain_alarm,
+        :moisture_alarm,
+        :freeze_alarm,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    irrigation: [
+      # byte 1
+      [
+        :state_idle,
+        :schedule_started,
+        :schedule_finished,
+        :valve_table_run_started,
+        :valve_table_run_finished,
+        :device_not_configured,
+        :unknown,
+        :unknown
+      ]
+    ],
+    gas_alarm: [
+      # byte 1
+      [
+        :state_idle,
+        :combustible_gas_detected_location_provided,
+        :combustible_gas_detected,
+        :toxic_gas_detected_location_provided,
+        :toxic_gas_detected,
+        :gas_alarm_test,
+        :replacement_required,
+        :unknown
+      ]
+    ],
+    pest_control: [
+      # byte 1
+      [
+        :state_idle,
+        :trap_armed_location_provided,
+        :trap_armed,
+        :trap_rearm_required_location_provided,
+        :trap_rearm_required,
+        :pest_detected_location_provided,
+        :pest_detected,
+        :pest_exterminated_location_provided
+      ],
+      # byte 2
+      [
+        :pest_exterminated,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    light_sensor: [
+      # byte 1
+      [
+        :state_idle,
+        :light_detected,
+        :light_color_transition_detected,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    water_quality_monitoring: [
+      # byte 1
+      [
+        :state_idle,
+        :chlorine_alarm,
+        :acidity_alarm,
+        :water_oxidation_alarm,
+        :chlorine_empty,
+        :acidity_empty,
+        :waterflow_measuring_station_shortage_detected,
+        :waterflow_clear_water_shortage_detected
+      ],
+      # byte 2
+      [
+        :disinfection_system_error_detected,
+        :filter_cleaning_ongoing,
+        :heating_operation_ongoing,
+        :filter_pump_operation_ongoing,
+        :freshwater_operation_ongoing,
+        :dry_protection_operation_active,
+        :water_tank_empty,
+        :water_tank_level_unknown
+      ],
+      # byte 3
+      [
+        :water_tank_full,
+        :collective_disorder,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown,
+        :unknown
+      ]
+    ],
+    home_monitoring: [
+      # byte 1
+      [
+        :state_idle,
+        :home_occupied_location_provided,
+        :home_occupied,
         :unknown,
         :unknown,
         :unknown,
@@ -199,6 +527,47 @@ defmodule Grizzly.ZWave.Notifications do
       {0x01, :smoke_alarm, 0x06, :alarm_silenced},
       {0x01, :smoke_alarm, 0x07, :maintenance_required_planned_periodic_inspection},
       {0x01, :smoke_alarm, 0x08, :maintenance_required_dust_in_device},
+      {0x01, :smoke_alarm, 0xFE, :unknown},
+
+      # CO Alarm (0x02)
+      {0x02, :co_alarm, 0x00, :state_idle},
+      {0x02, :co_alarm, 0x01, :co_detected_location_provided},
+      {0x02, :co_alarm, 0x02, :co_detected},
+      {0x02, :co_alarm, 0x03, :co_test},
+      {0x02, :co_alarm, 0x04, :replacement_required},
+      {0x02, :co_alarm, 0x05, :replacement_required_end_of_life},
+      {0x02, :co_alarm, 0x06, :alarm_silenced},
+      {0x02, :co_alarm, 0x07, :maintenance_required_planned_periodic_inspection},
+      {0x02, :co_alarm, 0xFE, :unknown},
+
+      # CO2 Alarm (0x03)
+      {0x03, :co2_alarm, 0x00, :state_idle},
+      {0x03, :co2_alarm, 0x01, :co2_detected_location_provided},
+      {0x03, :co2_alarm, 0x02, :co2_detected},
+      {0x03, :co2_alarm, 0x03, :co2_test},
+      {0x03, :co2_alarm, 0x04, :replacement_required},
+      {0x03, :co2_alarm, 0x05, :replacement_required_end_of_life},
+      {0x03, :co2_alarm, 0x06, :alarm_silenced},
+      {0x03, :co2_alarm, 0x07, :maintenance_required_planned_periodic_inspection},
+      {0x03, :co2_alarm, 0xFE, :unknown},
+
+      # Heat Alarm (0x04)
+      {0x04, :heat_alarm, 0x00, :state_idle},
+      {0x04, :heat_alarm, 0x01, :overheat_detected_location_provided},
+      {0x04, :heat_alarm, 0x02, :overheat_detected},
+      {0x04, :heat_alarm, 0x03, :rapid_temperature_rise_location_provided},
+      {0x04, :heat_alarm, 0x04, :rapid_temperature_rise},
+      {0x04, :heat_alarm, 0x05, :underheat_detected_location_provided},
+      {0x04, :heat_alarm, 0x06, :underheat_detected},
+      {0x04, :heat_alarm, 0x07, :heat_alarm_test},
+      {0x04, :heat_alarm, 0x08, :replacement_required_end_of_life},
+      {0x04, :heat_alarm, 0x09, :alarm_silenced},
+      {0x04, :heat_alarm, 0x0A, :maintenance_required_dust_in_device},
+      {0x04, :heat_alarm, 0x0B, :maintenance_required_planned_periodic_inspection},
+      {0x04, :heat_alarm, 0x0C, :rapid_temperature_fall_location_provided},
+      {0x04, :heat_alarm, 0x0D, :rapid_temperature_fall},
+      {0x04, :heat_alarm, 0xFE, :unknown},
+
       # Water (0x05)
       {0x05, :water, 0x00, :state_idle},
       {0x05, :water, 0x01, :water_leak_detected_location_provided},
@@ -213,6 +582,7 @@ defmodule Grizzly.ZWave.Notifications do
       {0x05, :water, 0x0A, :sump_pump_active},
       {0x05, :water, 0x0B, :sump_pump_failure},
       {0x05, :water, 0xFE, :unknown},
+
       # Access Control (0x06)
       {0x06, :access_control, 0x00, :state_idle},
       {0x06, :access_control, 0x01, :manual_lock_operation},
@@ -253,9 +623,9 @@ defmodule Grizzly.ZWave.Notifications do
       {0x06, :access_control, 0x49, :barrier_sensor_not_detected},
       {0x06, :access_control, 0x4A, :barrier_sensor_low_battery},
       {0x06, :access_control, 0x4B, :barrier_short_in_wall_station_wires},
-      {0x06, :access_control, 0xFE, :unknown_event},
+      {0x06, :access_control, 0xFE, :unknown},
 
-      # Home Security (0x07)
+      # # Home Security (0x07)
       {0x07, :home_security, 0x00, :state_idle},
       {0x07, :home_security, 0x01, :intrusion_location_provided},
       {0x07, :home_security, 0x02, :intrusion},
@@ -268,8 +638,9 @@ defmodule Grizzly.ZWave.Notifications do
       {0x07, :home_security, 0x09, :tampering_product_moved},
       {0x07, :home_security, 0x0A, :impact_detected},
       {0x07, :home_security, 0x0B, :magnetic_field_interface_detected},
-      {0x07, :home_security, 0xFE, :unknown_state},
-      # Power Management (0x08)
+      {0x07, :home_security, 0xFE, :unknown},
+
+      # # Power Management (0x08)
       {0x08, :power_management, 0x00, :state_idle},
       {0x08, :power_management, 0x01, :power_applied},
       {0x08, :power_management, 0x02, :ac_mains_disconnected},
@@ -282,17 +653,171 @@ defmodule Grizzly.ZWave.Notifications do
       {0x08, :power_management, 0x09, :load_error},
       {0x08, :power_management, 0x0A, :replace_battery_soon},
       {0x08, :power_management, 0x0B, :replace_battery_now},
-      {0x08, :power_management, 0x11, :battery_fluid_is_low},
       {0x08, :power_management, 0x0C, :battery_is_charging},
       {0x08, :power_management, 0x0D, :battery_is_fully_charged},
       {0x08, :power_management, 0x0E, :charge_battery_soon},
       {0x08, :power_management, 0x0F, :charge_battery_now},
       {0x08, :power_management, 0x10, :back_up_battery_low},
+      {0x08, :power_management, 0x11, :battery_fluid_is_low},
       {0x08, :power_management, 0x12, :back_up_battery_disconnected},
-      {0x08, :power_management, 0xFE, :unknown_event},
+      {0x08, :power_management, 0xFE, :unknown},
+
+      # System (0x09)
+      {0x09, :system, 0x00, :state_idle},
+      {0x09, :system, 0x01, :system_hardware_failure},
+      {0x09, :system, 0x02, :system_software_failure},
+      {0x09, :system, 0x03, :system_hardware_failure_code_provided},
+      {0x09, :system, 0x04, :system_software_failure_code_provided},
+      {0x09, :system, 0x05, :heartbeat},
+      {0x09, :system, 0x06, :tampering_product_cover_removed},
+      {0x09, :system, 0x07, :emergency_shutoff},
+      {0x09, :system, 0x08, :undefined},
+      {0x09, :system, 0x09, :digital_input_high_state},
+      {0x09, :system, 0x0A, :digital_input_low_state},
+      {0x09, :system, 0x0B, :digital_input_open},
+      {0x09, :system, 0xFE, :unknown},
+
+      # Emergency Alarm (0x0A)
+      {0x0A, :emergency_alarm, 0x00, :state_idle},
+      {0x0A, :emergency_alarm, 0x01, :co2_detected_location_provided},
+      {0x0A, :emergency_alarm, 0x02, :co2_detected},
+      {0x0A, :emergency_alarm, 0x03, :co2_test},
+      {0x0A, :emergency_alarm, 0x04, :replacement_required},
+      {0x0A, :emergency_alarm, 0x05, :replacement_required_end_of_life},
+      {0x0A, :emergency_alarm, 0x06, :alarm_silenced},
+      {0x0A, :emergency_alarm, 0x07, :maintenance_required_planned_periodic_inspection},
+
+      # Clock (0x0B)
+      {0x0B, :clock, 0x00, :state_idle},
+      {0x0B, :clock, 0x01, :wake_up_alert},
+      {0x0B, :clock, 0x02, :time_ended},
+      {0x0B, :clock, 0x03, :time_remaining},
+      {0x0B, :clock, 0xFE, :unknown},
+
+      # Appliance (0x0C)
+      {0x0C, :appliance, 0x00, :state_idle},
+      {0x0C, :appliance, 0x01, :program_started},
+      {0x0C, :appliance, 0x02, :program_in_progress},
+      {0x0C, :appliance, 0x03, :program_completed},
+      {0x0C, :appliance, 0x04, :replace_main_filter},
+      {0x0C, :appliance, 0x05, :failure_to_set_target_temperature},
+      {0x0C, :appliance, 0x06, :supplying_water},
+      {0x0C, :appliance, 0x07, :water_supply_failure},
+      {0x0C, :appliance, 0x08, :boiling},
+      {0x0C, :appliance, 0x09, :boiling_failure},
+      {0x0C, :appliance, 0x0A, :washing},
+      {0x0C, :appliance, 0x0B, :washing_failure},
+      {0x0C, :appliance, 0x0C, :rinsing},
+      {0x0C, :appliance, 0x0D, :rinsing_failure},
+      {0x0C, :appliance, 0x0E, :draining},
+      {0x0C, :appliance, 0x0F, :draining_failure},
+      {0x0C, :appliance, 0x10, :spinning},
+      {0x0C, :appliance, 0x11, :spinning_failure},
+      {0x0C, :appliance, 0x12, :drying},
+      {0x0C, :appliance, 0x13, :drying_failure},
+      {0x0C, :appliance, 0x14, :fan_failure},
+      {0x0C, :appliance, 0x15, :compressor_failure},
+      {0x0C, :appliance, 0xFE, :unknown},
+
+      # Home health (0x0D)
+      {0x0D, :home_health, 0x00, :state_idle},
+      {0x0D, :home_health, 0x01, :leaving_bed},
+      {0x0D, :home_health, 0x02, :sitting_on_bed},
+      {0x0D, :home_health, 0x03, :lying_on_bed},
+      {0x0D, :home_health, 0x04, :posture_changed},
+      {0x0D, :home_health, 0x05, :sitting_on_bed_edge},
+      {0x0D, :home_health, 0x06, :volatile_organic_compound_level},
+      {0x0D, :home_health, 0x07, :sleep_apnea_detected},
+      {0x0D, :home_health, 0x08, :sleep_stage_0_detected},
+      {0x0D, :home_health, 0x09, :sleep_stage_1_detected},
+      {0x0D, :home_health, 0x0A, :sleep_stage_2_detected},
+      {0x0D, :home_health, 0x0B, :sleep_stage_3_detected},
+      {0x0D, :home_health, 0xFE, :unknown},
+
       # Siren (0x0E)
       {0x0E, :siren, 0x00, :state_idle},
-      {0x0E, :siren, 0x01, :state_active}
+      {0x0E, :siren, 0x01, :state_active},
+      {0x0E, :siren, 0xFE, :unknown},
+
+      # Water valve (0x0F)
+      {0x0F, :water_valve, 0x00, :state_idle},
+      {0x0F, :water_valve, 0x01, :valve_operation},
+      {0x0F, :water_valve, 0x02, :master_valve_operation},
+      {0x0F, :water_valve, 0x03, :valve_short_circuit},
+      {0x0F, :water_valve, 0x04, :master_valve_short_circuit},
+      {0x0F, :water_valve, 0x05, :master_valve_current_alarm},
+      {0x0F, :water_valve, 0xFE, :unknown},
+
+      # Weather alarm (0x10)
+      {0x10, :weather_alarm, 0x00, :state_idle},
+      {0x10, :weather_alarm, 0x01, :rain_alarm},
+      {0x10, :weather_alarm, 0x02, :moisture_alarm},
+      {0x10, :weather_alarm, 0x03, :freeze_alarm},
+      {0x10, :weather_alarm, 0xFE, :unknown},
+
+      # Irrigation (0x11)
+      {0x11, :irrigation, 0x00, :state_idle},
+      {0x11, :irrigation, 0x01, :schedule_started},
+      {0x11, :irrigation, 0x02, :schedule_finished},
+      {0x11, :irrigation, 0x03, :valve_table_run_started},
+      {0x11, :irrigation, 0x04, :valve_table_run_finished},
+      {0x11, :irrigation, 0x05, :device_not_configured},
+      {0x11, :irrigation, 0xFE, :unknown},
+
+      # Gas alarm (0x12)
+      {0x12, :gas_alarm, 0x00, :state_idle},
+      {0x12, :gas_alarm, 0x01, :combustible_gas_detected_location_provided},
+      {0x12, :gas_alarm, 0x02, :combustible_gas_detected},
+      {0x12, :gas_alarm, 0x03, :toxic_gas_detected_location_provided},
+      {0x12, :gas_alarm, 0x04, :toxic_gas_detected},
+      {0x12, :gas_alarm, 0x05, :gas_alarm_test},
+      {0x12, :gas_alarm, 0x06, :replacement_required},
+      {0x12, :gas_alarm, 0xFE, :unknown},
+
+      # Pest control (0x13)
+      {0x13, :pest_contol, 0x00, :state_idle},
+      {0x13, :pest_contol, 0x01, :trap_armed_location_provided},
+      {0x13, :pest_contol, 0x02, :trap_armed},
+      {0x13, :pest_contol, 0x03, :trap_rearm_required_location_provided},
+      {0x13, :pest_contol, 0x04, :trap_rearm_required},
+      {0x13, :pest_contol, 0x05, :pest_detected_location_provided},
+      {0x13, :pest_contol, 0x06, :pest_detected},
+      {0x13, :pest_contol, 0x07, :pest_exterminated_location_provided},
+      {0x13, :pest_contol, 0x08, :pest_exterminated},
+      {0x13, :pest_contol, 0xFE, :unknown},
+
+      # Light sensor (0x14)
+      {0x14, :light_sensor, 0x00, :state_idle},
+      {0x14, :light_sensor, 0x01, :light_detected},
+      {0x14, :light_sensor, 0x02, :light_color_transition_detected},
+      {0x14, :light_sensor, 0xFE, :unknown},
+
+      # Water quality monitoring (0x15)
+      {0x15, :water_quality_monitoring, 0x00, :state_idle},
+      {0x15, :water_quality_monitoring, 0x01, :chlorine_alarm},
+      {0x15, :water_quality_monitoring, 0x02, :acidity_alarm},
+      {0x15, :water_quality_monitoring, 0x03, :water_oxidation_alarm},
+      {0x15, :water_quality_monitoring, 0x04, :chlorine_empty},
+      {0x15, :water_quality_monitoring, 0x05, :acidity_empty},
+      {0x15, :water_quality_monitoring, 0x06, :waterflow_measuring_station_shortage_detected},
+      {0x15, :water_quality_monitoring, 0x07, :waterflow_clear_water_shortage_detected},
+      {0x15, :water_quality_monitoring, 0x08, :disinfection_system_error_detected},
+      {0x15, :water_quality_monitoring, 0x09, :filter_cleaning_ongoing},
+      {0x15, :water_quality_monitoring, 0x0A, :heating_operation_ongoing},
+      {0x15, :water_quality_monitoring, 0x0B, :filter_pump_operation_ongoing},
+      {0x15, :water_quality_monitoring, 0x0C, :freshwater_operation_ongoing},
+      {0x15, :water_quality_monitoring, 0x0D, :dry_protection_operation_active},
+      {0x15, :water_quality_monitoring, 0x0E, :water_tank_empty},
+      {0x15, :water_quality_monitoring, 0x0F, :water_tank_level_unknown},
+      {0x15, :water_quality_monitoring, 0x10, :water_tank_full},
+      {0x15, :water_quality_monitoring, 0x11, :collective_disorder},
+      {0x15, :water_quality_monitoring, 0xFE, :unknown},
+
+      # Home monitoring (0x16)
+      {0x16, :home_monitoring, 0x00, :state_idle},
+      {0x16, :home_monitoring, 0x01, :home_occupied_location_provided},
+      {0x16, :home_monitoring, 0x02, :home_occupied},
+      {0x16, :home_monitoring, 0xFE, :unknown}
     ]
 
     defmacro __before_compile__(_) do
