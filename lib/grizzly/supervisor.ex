@@ -85,6 +85,12 @@ defmodule Grizzly.Supervisor do
      the unsolicited destination server.
   - `:unsolicited_data_path` - A path to the directory where the unsolicited
     server should persist data (defaults to `/root`)
+  - `:database_file` - `zipgateway` >= 7.14.2 uses an sqlite database to store
+    information about the Z-Wave network. This will default to
+    "/data/zipgateway.db".
+  - `:eeprom_file` - `zipgateway` < 7.14.2 uses an eeprom file to store
+    information about the Z-Wave network. This will default to
+    "/data/zipeeprom.dat".
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -110,6 +116,8 @@ defmodule Grizzly.Supervisor do
           | {:firmware_update_handler, Grizzly.handler()}
           | {:unsolicited_destination, {:inet.ip_address(), :inet.port_number()}}
           | {:unsolicited_data_path, Path.t()}
+          | {:eeprom_file, Path.t()}
+          | {:database_file, Path.t()}
 
   @doc """
   Start the Grizzly.Supervisor

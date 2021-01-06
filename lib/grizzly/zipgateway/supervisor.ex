@@ -6,6 +6,9 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
   alias Grizzly.Options
   alias Grizzly.ZIPGateway.Config
+  require Logger
+
+  @zgw_eeprom_to_sqlite "/usr/bin/zgw_eeprom_to_sqlite"
 
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do
@@ -14,33 +17,70 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
   @impl Supervisor
   def init(options) do
-    Supervisor.init(children(options), strategy: :one_for_one)
+    Supervisor.init(child_specs(options), strategy: :one_for_one)
   end
 
-  defp children(options) do
+  defp child_specs(options) do
     if options.run_zipgateway do
-      [make_zipgateway_child_spec(options)]
+      zipgateway_child_specs(options)
     else
       []
     end
   end
 
-  defp make_zipgateway_child_spec(options) do
+  defp zipgateway_child_specs(options) do
+    try_migrate_eeprom_to_sql(options)
+
     :ok = system_checks(options)
 
     :ok =
-      options |> Options.to_zipgateway_config() |> Config.write(options.zipgateway_config_path)
+      options
+      |> Options.to_zipgateway_config(use_database?())
+      |> Config.write(options.zipgateway_config_path)
 
     _ = System.cmd("modprobe", ["tun"])
 
     priv = Application.app_dir(:grizzly, "priv")
 
-    {MuonTrap.Daemon,
-     [
-       options.zipgateway_binary,
-       ["-c", options.zipgateway_config_path, "-s", options.serial_port],
-       [cd: priv, log_output: :debug]
-     ]}
+    [
+      {MuonTrap.Daemon,
+       [
+         options.zipgateway_binary,
+         ["-c", options.zipgateway_config_path, "-s", options.serial_port],
+         [cd: priv, log_output: :debug]
+       ]}
+    ]
+  end
+
+  defp try_migrate_eeprom_to_sql(%{eeprom_file: eeprom_file, database_file: database_file}) do
+    if use_database?() and
+         eeprom_file != nil and
+         database_file != nil and
+         not File.exists?(database_file) and
+         File.exists?(eeprom_file) do
+      run_eeprom_to_sql_prog(eeprom_file, database_file)
+    end
+
+    :ok
+  end
+
+  defp use_database?() do
+    File.exists?(@zgw_eeprom_to_sqlite)
+  end
+
+  defp run_eeprom_to_sql_prog(eeprom_file, database_file) do
+    Logger.info("Running #{@zgw_eeprom_to_sqlite} -e #{eeprom_file} -d #{database_file}")
+
+    case System.cmd(@zgw_eeprom_to_sqlite, ["-e", eeprom_file, "-d", database_file]) do
+      {message, 0} ->
+        Logger.info("Successfully migrated EEPROM to DB: #{inspect(message)}")
+        :ok
+
+      {message, _error_no} ->
+        Logger.error("EEPROM to DB migration failed: #{inspect(message)}")
+    end
+
+    :ok
   end
 
   defp system_checks(options) do
@@ -75,7 +115,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
         If it is located somewhere else, please pass the path to Grizzly.Supervisor
 
         ```
-        Grizzly.Supervisor.start_link(zipgateay_path: <path>)
+        Grizzly.Supervisor.start_link(zipgateway_path: <path>)
         ```
 
         ```
