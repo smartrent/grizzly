@@ -5,13 +5,13 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
   Params:
 
     * `:status` - the antitheft status of the device, one of :protection_disabled_unlocked , :protection_enabled_locked_fully_functional,
-                  :protection_enabled_locked_restricted (required)
+                  :protection_enabled_locked_restricted (required v2+)
 
-    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the company’s product that has locked the node (required)
+    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the company’s product that has locked the node (required v2+)
 
-    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key value to help retriving the Magic Code (required)
+    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key value to help retriving the Magic Code (required v2+)
 
-    * `:locking_entity_id` - This field MUST specify a unique Z-Wave Alliance identifier for the entity that has locked the node (required)
+    * `:locking_entity_id` - This field MUST specify a unique Z-Wave Alliance identifier for the entity that has locked the node (required v3 only)
 
   """
 
@@ -49,15 +49,21 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
     antitheft_hint =
       Command.param!(command, :antitheft_hint) |> Antitheft.validate_magic_code_or_hint()
 
-    locking_entity_id = Command.param!(command, :locking_entity_id)
+    locking_entity_id = Command.param(command, :locking_entity_id)
 
-    <<status_byte, manufacturer_id::size(16), byte_size(antitheft_hint)>> <>
-      antitheft_hint <>
-      <<locking_entity_id::size(16)>>
+    if locking_entity_id == nil do
+      <<status_byte, manufacturer_id::size(16), byte_size(antitheft_hint)>> <>
+        antitheft_hint
+    else
+      <<status_byte, manufacturer_id::size(16), byte_size(antitheft_hint)>> <>
+        antitheft_hint <>
+        <<locking_entity_id::size(16)>>
+    end
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+  # v3
   def decode_params(
         <<status_byte, manufacturer_id::size(16), antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length), locking_entity_id::size(16)>>
@@ -69,6 +75,24 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
          manufacturer_id: manufacturer_id,
          antitheft_hint: antitheft_hint,
          locking_entity_id: locking_entity_id
+       ]}
+    else
+      {:error, %DecodeError{} = decode_error} ->
+        {:error, %DecodeError{decode_error | command: :antitheft_report}}
+    end
+  end
+
+  # v2
+  def decode_params(
+        <<status_byte, manufacturer_id::size(16), antitheft_hint_length,
+          antitheft_hint::binary-size(antitheft_hint_length)>>
+      ) do
+    with {:ok, status} <- Antitheft.status_from_byte(status_byte) do
+      {:ok,
+       [
+         status: status,
+         manufacturer_id: manufacturer_id,
+         antitheft_hint: antitheft_hint
        ]}
     else
       {:error, %DecodeError{} = decode_error} ->
