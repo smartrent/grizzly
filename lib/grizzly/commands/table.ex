@@ -286,6 +286,13 @@ defmodule Grizzly.Commands.Table do
       {:central_scene_configuration_get,
        {Commands.CentralSceneConfigurationGet,
         handler: {WaitReport, complete_report: :central_scene_configuration_report}}},
+      # Scene actuator configuration
+      {:scene_actuator_conf_get,
+       {Commands.SceneActuatorConfGet,
+        handler: {WaitReport, complete_report: :scene_actuator_conf_report}}},
+      {:scene_actuator_conf_set, {Commands.SceneActuatorConfSet, handler: AckResponse}},
+      # Scene activation
+      {:scene_activation_set, {Commands.SceneActivationSet, handler: AckResponse}},
       # Powerlevel
       {:powerlevel_get,
        {Commands.PowerlevelGet, handler: {WaitReport, complete_report: :powerlevel_report}}},

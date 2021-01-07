@@ -266,7 +266,13 @@ defmodule Grizzly.ZWave.Decoder do
       {0x87, 0x04, Commands.IndicatorSupportedGet},
       {0x87, 0x05, Commands.IndicatorSupportedReport},
       {0x87, 0x06, Commands.IndicatorDescriptionGet},
-      {0x87, 0x07, Commands.IndicatorDescriptionReport}
+      {0x87, 0x07, Commands.IndicatorDescriptionReport},
+      # Scene activation
+      {0x2B, 0x01, Commands.SceneActovationSet},
+      # Scene actuator configuration
+      {0x2C, 0x01, Commands.SceneActuatorConfSet},
+      {0x2C, 0x02, Commands.SceneActuatorConfGet},
+      {0x2C, 0x03, Commands.SceneActuatorConfReport}
     ]
 
     defmacro __before_compile__(_) do
