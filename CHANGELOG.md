@@ -1,5 +1,34 @@
 ## Changelog
 
+## v0.17.0 - 2021-1-8
+
+Breaking change with how Grizzly reports water alarms.
+
+If you are listening for water alarm notifications you will need to update from
+`:water` to `:water_alarm`. This change was made to align better with the Z-Wave
+specification.
+
+### Added
+
+- Complete support for all notification events
+- Support for version 2 of the Antitheft command class
+- Support for SceneActuatorConf command class
+- Support for SceneActivation command class
+- More support for Erlang 23.2 DSL messages
+
+### Changed
+
+- `:water` is not `:water_alarm` notification
+
+### Fixed
+
+- When receiving the supervision command class with a command encapsulated
+  Grizzly was not actually processing the encapsulated command.
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.16.2 - 2020-12-23
 
 ### Added
