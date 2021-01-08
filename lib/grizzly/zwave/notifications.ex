@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Notifications do
       :co_alarm,
       :co2_alarm,
       :heat_alarm,
-      :water,
+      :water_alarm,
       :access_control,
       :home_security
     ],
@@ -569,19 +569,19 @@ defmodule Grizzly.ZWave.Notifications do
       {0x04, :heat_alarm, 0xFE, :unknown},
 
       # Water (0x05)
-      {0x05, :water, 0x00, :state_idle},
-      {0x05, :water, 0x01, :water_leak_detected_location_provided},
-      {0x05, :water, 0x02, :water_leak_detected},
-      {0x05, :water, 0x03, :water_level_dropped_location_provided},
-      {0x05, :water, 0x04, :water_level_dropped},
-      {0x05, :water, 0x05, :replace_water_filter},
-      {0x05, :water, 0x06, :water_flow_alarm},
-      {0x05, :water, 0x07, :water_pressure_alarm},
-      {0x05, :water, 0x08, :water_temperature_alarm},
-      {0x05, :water, 0x09, :water_level_alarm},
-      {0x05, :water, 0x0A, :sump_pump_active},
-      {0x05, :water, 0x0B, :sump_pump_failure},
-      {0x05, :water, 0xFE, :unknown},
+      {0x05, :water_alarm, 0x00, :state_idle},
+      {0x05, :water_alarm, 0x01, :water_leak_detected_location_provided},
+      {0x05, :water_alarm, 0x02, :water_leak_detected},
+      {0x05, :water_alarm, 0x03, :water_level_dropped_location_provided},
+      {0x05, :water_alarm, 0x04, :water_level_dropped},
+      {0x05, :water_alarm, 0x05, :replace_water_filter},
+      {0x05, :water_alarm, 0x06, :water_flow_alarm},
+      {0x05, :water_alarm, 0x07, :water_pressure_alarm},
+      {0x05, :water_alarm, 0x08, :water_temperature_alarm},
+      {0x05, :water_alarm, 0x09, :water_level_alarm},
+      {0x05, :water_alarm, 0x0A, :sump_pump_active},
+      {0x05, :water_alarm, 0x0B, :sump_pump_failure},
+      {0x05, :water_alarm, 0xFE, :unknown},
 
       # Access Control (0x06)
       {0x06, :access_control, 0x00, :state_idle},
@@ -920,7 +920,7 @@ defmodule Grizzly.ZWave.Notifications do
       NodeLocationReport.encode_params(node_location_report)
   end
 
-  def encode_event_params(:water, zwave_event, event_params_list)
+  def encode_event_params(:water_alarm, zwave_event, event_params_list)
       when zwave_event in [
              :water_leak_detected_location_provided,
              :water_level_droppped_location_provided
@@ -978,7 +978,7 @@ defmodule Grizzly.ZWave.Notifications do
     end
   end
 
-  def decode_event_params(:water, zwave_event, params_binary)
+  def decode_event_params(:water_alarm, zwave_event, params_binary)
       when zwave_event in [
              :water_leak_detected_location_provided,
              :water_level_droppped_location_provided
