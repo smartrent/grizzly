@@ -5,10 +5,11 @@ defmodule Grizzly.Transports.DTLS do
 
   @behaviour Grizzly.Transport
 
-  alias Grizzly.{Transport, ZWave}
+  alias Grizzly.{Trace, Transport, ZWave}
   alias Grizzly.Transport.Response
 
-  require Logger
+  @grizzly_ip :inet.ntoa({0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02})
+  @grizzly_port 41230
 
   @impl Grizzly.Transport
   def open(args) do
@@ -26,18 +27,27 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   @impl Grizzly.Transport
-  def send(transport, binary, _) do
+  def send(transport, binary, opts) do
     socket = Transport.assign(transport, :socket)
+
+    # `:trace` can explicitly be set to false to disable tracing on a particular
+    # command
+    if Keyword.get(opts, :trace, true) do
+      _ = maybe_write_trace(:outgoing, to_string(@grizzly_ip), @grizzly_port, binary)
+    end
+
     :ssl.send(socket, binary)
   end
 
   @impl Grizzly.Transport
   # Erlang/OTP <= 23.1.x
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _}, _}}, :dtls_connection}, _}, bin_list},
+        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, port}, _}}, :dtls_connection}, _}, bin_list},
         opts
       ) do
     binary = :erlang.list_to_binary(bin_list)
+
+    _ = maybe_write_trace(:incoming, ip, port, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -54,22 +64,30 @@ defmodule Grizzly.Transports.DTLS do
 
   # Erlang/OTP >= 23.2
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {{ip, _}, _}, :dtls_gen_connection}, _}, bin_list},
+        {:ssl, {:sslsocket, {:gen_udp, {{ip, port}, _}, :dtls_gen_connection}, _}, bin_list},
         opts
       ) do
-    handle_ssl_message_with_ip(ip, bin_list, opts)
+    handle_ssl_message_with_ip(ip, port, bin_list, opts)
   end
 
   # Erlang/OTP >= 23.2
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _}, _}}, :dtls_gen_connection}, _}, bin_list},
+        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, port}, _}}, :dtls_gen_connection}, _}, bin_list},
         opts
       ) do
-    handle_ssl_message_with_ip(ip, bin_list, opts)
+    handle_ssl_message_with_ip(ip, port, bin_list, opts)
   end
 
-  def parse_response({:ssl, {:sslsocket, {:gen_udp, _port, :dtls_connection}, _}, bin_list}, opts) do
+  def parse_response(
+        {:ssl, {:sslsocket, {:gen_udp, _erlang_port, :dtls_connection}, _}, bin_list},
+        opts
+      ) do
+    transport = Keyword.get(opts, :transport)
     binary = :erlang.list_to_binary(bin_list)
+
+    {:ok, {ip, port}} = get_sockname(transport)
+
+    _ = maybe_write_trace(:incoming, ip, port, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -87,8 +105,18 @@ defmodule Grizzly.Transports.DTLS do
     {:ok, :connection_closed}
   end
 
-  defp handle_ssl_message_with_ip(ip, binary_list, opts) do
+  defp get_sockname(nil) do
+    {:ok, {"unk", "unk"}}
+  end
+
+  defp get_sockname(transport) do
+    socket = Transport.assign(transport, :socket)
+    :ssl.sockname(socket)
+  end
+
+  defp handle_ssl_message_with_ip(ip, port, binary_list, opts) do
     binary = :erlang.list_to_binary(binary_list)
+    _ = maybe_write_trace(:incoming, ip, port, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -176,5 +204,30 @@ defmodule Grizzly.Transports.DTLS do
       :inet6,
       {:ifaddr, ifaddr}
     ]
+  end
+
+  defp maybe_write_trace(in_or_out, ip, port, binary) do
+    ip_port_str = make_ip_port_str(ip, port)
+    grizzly_ip_port_string = "#{@grizzly_ip}:#{@grizzly_ip}"
+
+    case in_or_out do
+      :incoming ->
+        Trace.log(binary, src: ip_port_str, dest: grizzly_ip_port_string)
+
+      :outgoing ->
+        Trace.log(binary, src: grizzly_ip_port_string, dest: ip_port_str)
+    end
+  end
+
+  defp make_ip_port_str("", port) do
+    ":#{port}"
+  end
+
+  defp make_ip_port_str(ip, port) when is_binary(ip) do
+    "#{ip}:#{port}"
+  end
+
+  defp make_ip_port_str(ip, port) do
+    "#{:inet.ntoa(ip)}:#{port}"
   end
 end

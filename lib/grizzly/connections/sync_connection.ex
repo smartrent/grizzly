@@ -103,7 +103,7 @@ defmodule Grizzly.Connections.SyncConnection do
     new_keep_alive =
       keep_alive
       |> KeepAlive.make_command()
-      |> KeepAlive.run(&do_send_command(&1, state))
+      |> KeepAlive.run(&do_send_command(&1, state, trace: false))
 
     {:noreply, %State{state | keep_alive: new_keep_alive}}
   end
@@ -207,10 +207,11 @@ defmodule Grizzly.Connections.SyncConnection do
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
   end
 
-  defp do_send_command(command_runner, state) do
+  defp do_send_command(command_runner, state, opts \\ []) do
     %State{transport: transport} = state
     binary = CommandRunner.encode_command(command_runner)
-    Transport.send(transport, binary)
+
+    Transport.send(transport, binary, opts)
   end
 
   defp do_timeout_reply(waiter, grizzly_command) do

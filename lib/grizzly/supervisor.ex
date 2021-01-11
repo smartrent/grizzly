@@ -140,6 +140,7 @@ defmodule Grizzly.Supervisor do
       # sequence number counter that starts at a random number between
       # 0 and 0xFF (255)
       {Grizzly.SeqNumber, Enum.random(0..255)},
+      Grizzly.Trace,
 
       #
       {Registry, [keys: :duplicate, name: Grizzly.Events.Registry]},
