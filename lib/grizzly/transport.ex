@@ -28,7 +28,8 @@ defmodule Grizzly.Transport do
 
   @type args() :: [
           ip_address: :inet.ip_address(),
-          port: :inet.port_number()
+          port: :inet.port_number(),
+          transport: t()
         ]
 
   @type parse_opt() :: {:raw, boolean()}
@@ -149,6 +150,7 @@ defmodule Grizzly.Transport do
           {:ok, Response.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
   def parse_response(transport, response, opts \\ []) do
     %__MODULE__{impl: transport_impl} = transport
+    opts = [transport: transport] ++ opts
 
     transport_impl.parse_response(response, opts)
   end
