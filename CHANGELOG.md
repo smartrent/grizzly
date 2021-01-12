@@ -1,5 +1,28 @@
 ## Changelog
 
+## v0.17.1 - 2021-1-12
+
+Added supported for using `zipgateway` versions >= 7.14.2.
+
+When upgrading from a `zipgateway` version less than 7.14.2 you should provide
+the `zgw_eeprom_to_sqlite` utility in your system or firmware. The utility should
+be located in `/usr/bin`. Grizzly will try to run the utility if we detected it.
+
+You can configure the database file and eeprom file via `:database_file` and
+`:eeprom_file` options for the `Grizzly.Supervisor`. These are optional and no
+changes are necessary for how you start Grizzly if you have already been using
+Grizzly.
+
+### Added
+
+- Support for `zipgateway` versions >= 7.14.2
+- `:eeprom_file` to supervisor args (optional)
+- `:database_file` to supervisor args (optional)
+
+Thank you to those who contributed to this release:
+
+- Frank Hunleth
+
 ## v0.17.0 - 2021-1-8
 
 Breaking change with how Grizzly reports water alarms.
