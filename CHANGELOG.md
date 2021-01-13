@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.17.2 - 2021-1-13
+
+### Added
+
+- Decoding the `NodeInfoCacheGet` command
+
+### Fixed
+
+- Incorrect return value for `NodeInfoCacheGet` when decoding the params
+- Issues around firmware updates and `zipgateway` versions >= 7.14.2
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.17.1 - 2021-1-12
 
 Added supported for using `zipgateway` versions >= 7.14.2.
