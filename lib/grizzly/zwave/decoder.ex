@@ -56,6 +56,7 @@ defmodule Grizzly.ZWave.Decoder do
       # Network Management Proxy (0x52)
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
+      {0x52, 0x03, Commands.NodeInfoCachedGet},
       {0x52, 0x04, Commands.NodeInfoCacheReport},
       {0x52, 0x0C, Commands.FailedNodeListReport},
       # Multi Channel
