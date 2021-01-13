@@ -99,7 +99,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
   @spec decode_max_age(byte()) :: {:ok, max_age()} | {:error, DecodeError.t()}
   def decode_max_age(0), do: {:ok, :force_update}
   def decode_max_age(15), do: {:ok, :infinite}
-  def decode_max_age(n) when n > 0 and n < 15, do: n
+  def decode_max_age(n) when n > 0 and n < 15, do: {:ok, n}
 
   def decode_max_age(n),
     do: {:error, %DecodeError{value: n, param: :max_age, command: :node_info_cache_get}}
