@@ -130,4 +130,35 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
     assert Keyword.get(params, :hardware_version) == 4
     assert Keyword.get(params, :other_firmware_versions) == ["4.0", "5.1"]
   end
+
+  test "decodes params correctly - v3 - patch" do
+    params_binary = <<
+      # library type
+      0x01,
+      # protocol version
+      0x02,
+      # protocol sub version
+      0x00,
+      # firmware version
+      0x03,
+      # firmware sub version
+      0x01,
+      # hardware version
+      0x04,
+      # number of other firmware targets is 0 wherby it should be 2
+      0x00,
+      # other firmware versions
+      0x04,
+      0x00,
+      0x05,
+      0x01
+    >>
+
+    {:ok, params} = VersionReport.decode_params(params_binary)
+    assert Keyword.get(params, :library_type) == :static_controller
+    assert Keyword.get(params, :protocol_version) == "2.0"
+    assert Keyword.get(params, :firmware_version) == "3.1"
+    assert Keyword.get(params, :hardware_version) == 4
+    assert Keyword.get(params, :other_firmware_versions) == ["4.0", "5.1"]
+  end
 end
