@@ -367,7 +367,7 @@ defmodule Grizzly.ZWave.CommandClasses do
 
   def maybe_concat_command_classes(binary, _, <<>>), do: binary
 
-  def maybe_concat_command_classes(binary, :non_secure_controlled_bin, ccs_bin),
+  def maybe_concat_command_classes(binary, :non_secure_controlled, ccs_bin),
     do: binary <> <<0xEF, ccs_bin::binary>>
 
   def maybe_concat_command_classes(binary, :secure_supported, ccs_bin),
