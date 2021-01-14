@@ -1,5 +1,16 @@
 ## Changelog
 
+## v0.17.3 - 2021-1-14
+
+### Added
+
+- `Grizzly.Trace` module for logging Z/IP packets that are sent from and
+  received by Grizzly.
+
+### Fixed
+
+- No match error when trying to encode a node id list
+
 ## v0.17.2 - 2021-1-13
 
 ### Added
