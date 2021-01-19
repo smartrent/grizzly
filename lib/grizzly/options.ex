@@ -25,7 +25,8 @@ defmodule Grizzly.Options do
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
           associations_file: Path.t(),
           eeprom_file: Path.t() | nil,
-          database_file: Path.t() | nil
+          database_file: Path.t() | nil,
+          indicator_handler: (Grizzly.Indicator.event() -> :ok)
         }
 
   defstruct run_zipgateway: true,
@@ -48,7 +49,8 @@ defmodule Grizzly.Options do
             unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
             associations_file: nil,
             eeprom_file: "/data/zipeeprom.dat",
-            database_file: "/data/zipgateway.db"
+            database_file: "/data/zipgateway.db",
+            indicator_handler: nil
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

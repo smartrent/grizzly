@@ -4,7 +4,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   # Supervisor for the `zipgateway` system process
   use Supervisor
 
-  alias Grizzly.Options
+  alias Grizzly.{Indicator, Options}
   alias Grizzly.ZIPGateway.Config
   require Logger
 
@@ -42,7 +42,14 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
     priv = Application.app_dir(:grizzly, "priv")
 
+    beam_notify_options = [
+      name: "grizzly indicator",
+      path: "/tmp/grizzly_beam_notify_socket",
+      dispatcher: &Indicator.handle_event(&1, &2, options.indicator_handler)
+    ]
+
     [
+      {BEAMNotify, beam_notify_options},
       {MuonTrap.Daemon,
        [
          options.zipgateway_binary,
