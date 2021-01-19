@@ -43,7 +43,8 @@ defmodule Grizzly.ZIPGateway.Config do
             manufacturer_id: nil,
             extra_classes: [0x85, 0x59, 0x5A, 0x8E, 0x6C, 0x8F],
             unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
-            database_file: nil
+            database_file: nil,
+            identify_script: nil
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -102,6 +103,7 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :unsolicited_destination, nil)
     |> maybe_put_config_item(cfg, :database_file, "ZipGwDatabase")
     |> maybe_put_config_item(cfg, :eeprom_file, "Eepromfile")
+    |> maybe_put_config_item(cfg, :identify_script, "ZipNodeIdentifyScript")
   end
 
   defp maybe_put_config_item(config_string, cfg, :extra_classes = field, cfg_name) do
@@ -126,6 +128,17 @@ defmodule Grizzly.ZIPGateway.Config do
     config_string <>
       "ZipUnsolicitedDestinationIp6=#{ip_string}\n" <>
       "ZipUnsolicitedDestinationPort=#{port}\n"
+  end
+
+  defp maybe_put_config_item(config_string, cfg, :identify_script = field, cfg_name) do
+    case Map.get(cfg, field) do
+      nil ->
+        script_path = Application.app_dir(:grizzly, ["priv", "indicator.sh"])
+        config_string <> "#{cfg_name}=#{script_path}\n"
+
+      script_path ->
+        config_string <> "#{cfg_name}=#{script_path}\n"
+    end
   end
 
   defp maybe_put_config_item(config_string, cfg, field, cfg_name)

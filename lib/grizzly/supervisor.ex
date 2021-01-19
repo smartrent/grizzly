@@ -91,6 +91,9 @@ defmodule Grizzly.Supervisor do
   - `:eeprom_file` - `zipgateway` < 7.14.2 uses an eeprom file to store
     information about the Z-Wave network. This will default to
     "/data/zipeeprom.dat".
+  - `:indicator_handler` - A function to run when an `Grizzly.Indicator.event()`
+    is received from `zipgateway`. The function should accept an event and
+    return `:ok`.
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -118,6 +121,7 @@ defmodule Grizzly.Supervisor do
           | {:unsolicited_data_path, Path.t()}
           | {:eeprom_file, Path.t()}
           | {:database_file, Path.t()}
+          | {:indicator_handler, (Grizzly.Indicator.event() -> :ok)}
 
   @doc """
   Start the Grizzly.Supervisor
@@ -141,8 +145,6 @@ defmodule Grizzly.Supervisor do
       # 0 and 0xFF (255)
       {Grizzly.SeqNumber, Enum.random(0..255)},
       Grizzly.Trace,
-
-      #
       {Registry, [keys: :duplicate, name: Grizzly.Events.Registry]},
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
       {Grizzly.Associations, options},
