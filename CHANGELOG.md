@@ -1,5 +1,12 @@
 ## Changelog
 
+## v0.17.4 - 2021-1-21
+
+### Added
+
+- Support for handling indicator events via the `:indicator_handler` option to
+  the `Grizzly.Supervisor`.
+
 ## v0.17.3 - 2021-1-14
 
 ### Added
