@@ -16,6 +16,10 @@ defmodule Grizzly.Indicator do
   Handles an event from `BEAMNotify`
   """
   @spec handle_event([String.t()], %{String.t() => String.t()}, dispatcher()) :: :ok
+  def handle_event(event, _env, nil) do
+    Logger.debug("Received indicator event: #{inspect(event)}")
+  end
+
   def handle_event(event, _env, dispatcher) do
     case Integer.parse(hd(event)) do
       {0, _} -> dispatcher.(:off)
