@@ -34,6 +34,7 @@ jobs:
       - run: mix compile --warnings-as-errors
       - run: mix test --include inclusion --include integration --include firmware_update
       - run: mix format --check-formatted
+      - run: mix deps.unlock --check-unused
       - run: mix docs
       - run: mix hex.build
       - run: MIX_ENV=test mix credo -a
