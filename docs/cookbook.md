@@ -11,6 +11,7 @@ Below are short notes about using Grizzly.
 1. [Binary Switches](#binary-switches)
 1. [Door Locks](#door-locks)
 1. [DSK](#dsk)
+1. [Indicator Light](#indicator-light)
 
 ## Starting Grizzly
 
@@ -289,4 +290,27 @@ iex> Grizzly.Node.get_dsk(1, :learn)
    transmission_stats: [],
    type: :command
  }}
+```
+
+## Indicator Light
+
+Z-Wave requires that devices be able to identify themselves. Here's how to test
+this:
+
+```elixir
+# Turn the indicator on
+iex> Grizzly.send_command(1, :indicator_set,
+       resources: [
+         [indicator_id: :node_identify, property_id: :toggling_periods, value: 1],
+         [indicator_id: :node_identify, property_id: :toggling_cycles, value: 1]
+       ]
+     )
+
+# Turn off
+iex> Grizzly.send_command(1, :indicator_set,
+       resources: [
+         [indicator_id: :node_identify, property_id: :toggling_periods, value: 0],
+         [indicator_id: :node_identify, property_id: :toggling_cycles, value: 0]
+       ]
+     )
 ```
