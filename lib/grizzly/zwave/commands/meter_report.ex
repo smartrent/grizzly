@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
     value = Command.param!(command, :value)
     precision = precision(value)
     int_value = round(value * :math.pow(10, precision))
-    byte_size = ceil(:math.log2(int_value) / 8)
+    byte_size = if int_value == 0, do: 1, else: ceil(:math.log2(int_value + 1) / 8)
 
     <<meter_type_byte, precision::size(3), scale_byte::size(2), byte_size::size(3),
       int_value::size(byte_size)-unit(8)>>
