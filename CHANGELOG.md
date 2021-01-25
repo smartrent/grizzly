@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.17.5 - 2021-1-26
+
+### Added
+
+- Docs on operating indicator light
+
+### Fixed
+
+- Crash when indicator handler is `nil`
+- Math for `MeterReport`
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.17.4 - 2021-1-21
 
 ### Added
