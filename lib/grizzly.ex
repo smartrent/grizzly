@@ -259,7 +259,7 @@ defmodule Grizzly do
     Table.dump()
     |> Enum.filter(fn {_command, {command_module, _}} ->
       {:ok, command} = command_module.new([])
-      command.command_class.name() == command_class_name
+      command.command_class == command_class_name
     end)
     |> Enum.map(fn {command, _} -> command end)
   end
