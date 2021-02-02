@@ -3,6 +3,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
 
   # This module is useful for moving an inclusion process through
   # the various states
+  use Bitwise
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.{NodeAdd, NodeRemove, NodeAddKeysSet, NodeAddDSKSet, LearnModeSet}
@@ -77,7 +78,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
   inclusion to track the current state of the inclusion
   """
   @spec next_command(t(), state(), Grizzly.seq_number(), keyword()) ::
-          {Command.t() | nil, t()} | {:error, :dsk_required}
+          {Command.t() | nil, t()} | {:error, :invalid_pin_or_dsk}
   def next_command(inclusion, desired_state, seq_number, command_params \\ [])
 
   def next_command(inclusion, :node_adding, seq_number, _command_params) do
@@ -111,20 +112,21 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
 
   def next_command(inclusion, :dsk_set, seq_number, command_params) do
     dsk = Keyword.fetch!(command_params, :dsk)
-    input_dsk_length = byte_size_for_int(dsk)
 
-    if input_dsk_length == inclusion.dsk_input_length do
+    if valid_pin?(dsk, inclusion.dsk_input_length) do
+      # The PIN could be 00000. It's actual byte size is 1 and so can fit in 2 bytes
+      # if this is the inclusion's (max) dsk input length.
       {:ok, command} =
         NodeAddDSKSet.new(
           seq_number: seq_number,
           accept: true,
-          input_dsk_length: input_dsk_length,
+          input_dsk_length: inclusion.dsk_input_length,
           input_dsk: dsk
         )
 
       {command, dsk_set(inclusion)}
     else
-      {:error, :dsk_required}
+      {:error, :invalid_pin_or_dsk}
     end
   end
 
@@ -192,10 +194,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
     %__MODULE__{inclusion | state: :learn_mode_stop}
   end
 
-  # Have not ran into any case for need to check higher than two
-  # bytes. If this happens the guards should fail loudly and we can
-  # add support quickly
-  defp byte_size_for_int(0), do: 0
-  defp byte_size_for_int(integer) when integer in 0x00..0xFF, do: 1
-  defp byte_size_for_int(integer) when integer in 0x0100..0xFFFF, do: 2
+  defp valid_pin?(pin, num_bytes), do: pin >= 0 and pin < max_value(num_bytes)
+
+  defp max_value(num_bytes), do: 1 <<< (num_bytes * 8)
 end

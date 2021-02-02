@@ -99,5 +99,12 @@ defmodule Grizzly.Inclusions.InclusionRunner.InclusionTest do
       assert %Command{name: :node_add_keys_set} = zwave_command
       assert %Inclusion{state: :keys_granted} == new_inclusion
     end
+
+    test "when input dsk size is less than the requested" do
+      inclusion = %Inclusion{state: :dsk_requested, dsk_input_length: 2}
+      {zwave_command, new_inclusion} = Inclusion.next_command(inclusion, :dsk_set, 0x01, dsk: 159)
+      assert %Command{name: :node_add_dsk_set} = zwave_command
+      assert %Inclusion{dsk_input_length: 2, state: :dsk_set} == new_inclusion
+    end
   end
 end
