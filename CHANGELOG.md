@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.17.6 - 2021-2-3
+
+### Fixed
+
+- Grizzly would throw an exception when calling
+  `Grizzly.commands_for_command_class/1`
+- Grizzly would always return an empty list of supported commands for a command
+  class when calling `Grizzly.commands_for_command_class/1` even though Grizzly
+  supports commands for that command class
+- Fix S2 DSK pin setting when the pin was <256
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.17.5 - 2021-1-26
 
 ### Added
