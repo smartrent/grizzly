@@ -52,20 +52,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
     assert Keyword.get(params, :hardware_version) == 4
   end
 
-  test "decodes params correctly - v5-patched " do
-    params_binary =
-      <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x00, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06, 0x04>>
-
-    {:ok, params} = FirmwareMDReport.decode_params(params_binary)
-    assert Keyword.get(params, :manufacturer_id) == 1
-    assert Keyword.get(params, :firmware_id) == 2
-    assert Keyword.get(params, :checksum) == 3
-    assert Keyword.get(params, :firmware_upgradable?)
-    assert Keyword.get(params, :other_firmware_ids) == []
-    assert Keyword.get(params, :max_fragment_size) == 10
-    assert Keyword.get(params, :hardware_version) == 4
-  end
-
   test "decodes params correctly - v6-7 " do
     params_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06, 0x04,
