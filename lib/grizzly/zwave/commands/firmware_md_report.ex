@@ -111,7 +111,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
           checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
           max_fragment_size::size(2)-integer-unsigned-unit(8),
           firmware_target_ids::size(firmware_targets)-binary-unit(16), hardware_version,
-          _reserved::size(6), activation::size(1), cc::size(1)>>
+          _reserved::size(6), activation::size(1), cc::size(1), _rest::binary>>
       ) do
     other_firmware_ids = for <<id::16 <- firmware_target_ids>>, do: id
 
@@ -126,29 +126,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
        hardware_version: hardware_version,
        active_during_transfer?: cc == 0x01,
        activation_supported?: activation == 0x01
-     ]}
-  end
-
-  # Patch for zipgateway 7.14.2
-  # firmware_targets == 0 but two other firmware targets listed when there are none
-  # <<3, 144, 0, 0, 0, 0, 255, 0, 1, 244, 1, 0, 0, 0, 0>>
-  def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          _firmware_target_ids::size(2)-binary-unit(16), hardware_version>>
-      )
-      when firmware_targets == 0x00 do
-    {:ok,
-     [
-       manufacturer_id: manufacturer_id,
-       firmware_id: firmware_id,
-       checksum: checksum,
-       firmware_upgradable?: firmware_upgradable == 0xFF,
-       max_fragment_size: max_fragment_size,
-       other_firmware_ids: [],
-       hardware_version: hardware_version
      ]}
   end
 
