@@ -1,5 +1,16 @@
 ## Changelog
 
+## v0.17.7 - 2021-2-4
+
+### Fixed
+
+- An issue when `zipgateway` sends an invalid `FirmwareMDReport` packet causing
+  invalid hardware version errors during firmware updates.
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.17.6 - 2021-2-3
 
 ### Fixed
