@@ -12,7 +12,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipPrivKey=./ZIPR.key_1024.pem
     TunScript=./zipgateway.tun
     PVSStorageFile=/root/provisioning_list_store.dat
-    ProvisioningConfigFile=/etc/zipgateway_provisioning_list.cfg
+    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
     ExtraClasses= 133 89 90 142 108 143
@@ -35,7 +35,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipPrivKey=./ZIPR.key_1024.pem
     TunScript=./zipgateway.tun
     PVSStorageFile=/root/provisioning_list_store.dat
-    ProvisioningConfigFile=/etc/zipgateway_provisioning_list.cfg
+    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
     ExtraClasses= 133 89 90 142 108 143
@@ -59,7 +59,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipPrivKey=./ZIPR.key_1024.pem
     TunScript=./zipgateway.tun
     PVSStorageFile=/root/provisioning_list_store.dat
-    ProvisioningConfigFile=/etc/zipgateway_provisioning_list.cfg
+    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
     ZipProductID=1
@@ -86,7 +86,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipPrivKey=./ZIPR.key_1024.pem
     TunScript=./zipgateway.tun
     PVSStorageFile=/root/provisioning_list_store.dat
-    ProvisioningConfigFile=/etc/zipgateway_provisioning_list.cfg
+    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
     ZipLanGw6=::1
     ZipPSK=123456789012345678901234567890AA
     ExtraClasses= 133 89 90 142 108 143
