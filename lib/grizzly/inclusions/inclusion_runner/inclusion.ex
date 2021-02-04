@@ -113,21 +113,15 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
   def next_command(inclusion, :dsk_set, seq_number, command_params) do
     dsk = Keyword.fetch!(command_params, :dsk)
 
-    if valid_pin?(dsk, inclusion.dsk_input_length) do
-      # The PIN could be 00000. It's actual byte size is 1 and so can fit in 2 bytes
-      # if this is the inclusion's (max) dsk input length.
-      {:ok, command} =
-        NodeAddDSKSet.new(
-          seq_number: seq_number,
-          accept: true,
-          input_dsk_length: inclusion.dsk_input_length,
-          input_dsk: dsk
-        )
+    {:ok, command} =
+      NodeAddDSKSet.new(
+        seq_number: seq_number,
+        accept: true,
+        input_dsk_length: inclusion.dsk_input_length,
+        input_dsk: dsk
+      )
 
-      {command, dsk_set(inclusion)}
-    else
-      {:error, :invalid_pin_or_dsk}
-    end
+    {command, dsk_set(inclusion)}
   end
 
   def next_command(inclusion, :learn_mode, seq_number, _) do
@@ -193,8 +187,4 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
   def learn_mode_stop(%__MODULE__{state: :learn_mode} = inclusion) do
     %__MODULE__{inclusion | state: :learn_mode_stop}
   end
-
-  defp valid_pin?(pin, num_bytes), do: pin >= 0 and pin < max_value(num_bytes)
-
-  defp max_value(num_bytes), do: 1 <<< (num_bytes * 8)
 end

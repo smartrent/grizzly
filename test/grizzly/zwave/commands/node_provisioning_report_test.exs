@@ -2,11 +2,12 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.NodeProvisioningReport
+  alias GrizzlyTest.Utils
 
   test "creates the command and validates params" do
     params = [
       seq_number: 0x01,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623",
+      dsk: Utils.mkdsk(),
       meta_extensions: []
     ]
 
@@ -16,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
   test "encodes params correctly" do
     params = [
       seq_number: 0x01,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623",
+      dsk: Utils.mkdsk(),
       meta_extensions: []
     ]
 
@@ -28,10 +29,9 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
     assert expected_binary == NodeProvisioningReport.encode_params(command)
   end
 
-  test "encodes params correctly with empty dsk" do
+  test "encodes params correctly with no DSK" do
     params = [
       seq_number: 0x01,
-      dsk: "",
       meta_extensions: []
     ]
 
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
 
     {:ok, params} = NodeProvisioningReport.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
-    assert Keyword.get(params, :dsk) == "50285-18819-09924-30691-15973-33711-04005-03623"
+    assert Keyword.get(params, :dsk) == Utils.mkdsk()
     assert Keyword.get(params, :meta_extensions) == []
   end
 
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
 
     {:ok, params} = NodeProvisioningReport.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
-    assert Keyword.get(params, :dsk) == ""
+    assert Keyword.get(params, :dsk) == nil
     assert Keyword.get(params, :meta_extensions) == []
   end
 end

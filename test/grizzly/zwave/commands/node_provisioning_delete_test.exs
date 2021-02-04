@@ -2,14 +2,15 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDeleteTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.NodeProvisioningDelete
+  alias GrizzlyTest.Utils
 
   test "creates the command and validates params" do
-    params = [seq_number: 0x01, dsk: "50285-18819-09924-30691-15973-33711-04005-03623"]
+    params = [seq_number: 0x01, dsk: Utils.mkdsk()]
     {:ok, _command} = NodeProvisioningDelete.new(params)
   end
 
   test "encodes params correctly" do
-    params = [seq_number: 0x01, dsk: "50285-18819-09924-30691-15973-33711-04005-03623"]
+    params = [seq_number: 0x01, dsk: Utils.mkdsk()]
     {:ok, command} = NodeProvisioningDelete.new(params)
 
     expected_binary =
@@ -24,6 +25,6 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDeleteTest do
 
     {:ok, params} = NodeProvisioningDelete.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
-    assert Keyword.get(params, :dsk) == "50285-18819-09924-30691-15973-33711-04005-03623"
+    assert Keyword.get(params, :dsk) == Utils.mkdsk()
   end
 end

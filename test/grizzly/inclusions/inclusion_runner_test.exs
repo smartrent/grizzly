@@ -2,7 +2,7 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
   use ExUnit.Case
 
   alias Grizzly.Inclusions.InclusionRunner
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DSK}
   alias GrizzlyTest.Utils
 
   defmodule TestHandler do
@@ -139,7 +139,9 @@ defmodule Grizzly.Inclusions.InclusionRunnerTest do
     assert next_report.command.name == :node_add_dsk_report
     assert Command.param!(next_report.command, :input_dsk_length) == 2
 
-    :ok = InclusionRunner.set_dsk(runner, 12345)
+    {:ok, dsk} = DSK.parse("12345")
+
+    :ok = InclusionRunner.set_dsk(runner, dsk)
 
     assert_receive {:grizzly, :report, last_report}, 1000
 

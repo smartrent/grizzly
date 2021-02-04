@@ -6,7 +6,7 @@ defmodule Grizzly.Inclusions.InclusionRunner do
   alias Grizzly.{Connection, Inclusions, Options, SeqNumber, Report}
   alias Grizzly.Inclusions.InclusionRunner.Inclusion
   alias Grizzly.Connections.AsyncConnection
-  alias Grizzly.ZWave.{Security, Command}
+  alias Grizzly.ZWave.{Security, Command, DSK}
 
   @typedoc """
   At any given moment there can only be 1 `InclusionRunner` process going so
@@ -59,8 +59,8 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     GenServer.call(runner, {:grant_keys, security_keys})
   end
 
-  @spec set_dsk(t(), non_neg_integer()) :: :ok
-  def set_dsk(runner \\ __MODULE__, dsk \\ 0) do
+  @spec set_dsk(t(), DSK.t()) :: :ok
+  def set_dsk(runner \\ __MODULE__, dsk \\ DSK.new("")) do
     GenServer.call(runner, {:set_dsk, dsk})
   end
 
@@ -172,9 +172,6 @@ defmodule Grizzly.Inclusions.InclusionRunner do
     seq_number = SeqNumber.get_and_inc()
 
     case Inclusion.next_command(inclusion, :dsk_set, seq_number, dsk: dsk) do
-      {:error, _} = error ->
-        {:reply, error, inclusion}
-
       {command, inclusion} ->
         :ok
 

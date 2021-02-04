@@ -8,8 +8,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
 
     - `:seq_number` - the network command sequence number (required)
     - `:remaining_count` - indicates the remaining amount of entries in the Provisioning List
-    - `:dsk` - a DSK string for the device see `Grizzly.ZWave.DSK` for more
-      more information (optional)
+    - `:dsk` - a `Grizzly.ZWave.DSK.t()` for the device (optional)
     - `:meta_extensions` - a list of `Grizzly.ZWave.SmartStart.MetaExtension.t()`
       (optional default `[]`)
   """
@@ -23,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
   @type param ::
           {:seq_number, Grizzly.ZWave.seq_number()}
           | {:remaining_count, non_neg_integer()}
-          | {:dsk, DSK.dsk_string()}
+          | {:dsk, DSK.t()}
           | {:meta_extensions, [MetaExtension.t()]}
 
   @impl true
@@ -46,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
     seq_number = Command.param!(command, :seq_number)
     remaining_count = Command.param!(command, :remaining_count)
     meta_extensions = Command.param!(command, :meta_extensions)
-    {:ok, dsk_binary} = NodeProvisioning.optional_dsk_to_binary(Command.param!(command, :dsk))
+    dsk_binary = NodeProvisioning.optional_dsk_to_binary(Command.param!(command, :dsk))
     dsk_byte_size = byte_size(dsk_binary)
 
     <<seq_number, remaining_count, 0x00::size(3), dsk_byte_size::size(5)>> <>
@@ -58,25 +57,17 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
         <<seq_number, remaining_count, _::size(3), dsk_byte_size::size(5),
           dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
       ) do
-    with {:ok, dsk_string} <- NodeProvisioning.optional_binary_to_dsk(dsk_binary),
+    with dsk = NodeProvisioning.optional_binary_to_dsk(dsk_binary),
          {:ok, meta_extensions} <- MetaExtension.extensions_from_binary(meta_extensions_binary) do
       {:ok,
        [
          seq_number: seq_number,
          remaining_count: remaining_count,
-         dsk: dsk_string,
+         dsk: dsk,
          meta_extensions: meta_extensions
        ]}
     else
-      {:error, reason} when reason in [:dsk_too_short, :dsk_too_long] ->
-        {:error,
-         %DecodeError{
-           value: dsk_binary,
-           param: :dsk,
-           command: :node_provisioning_list_iteration_report
-         }}
-
-      {:error, _other} ->
+      {:error, _reason} ->
         {:error,
          %DecodeError{
            value: meta_extensions_binary,

@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.LearnModeSetStatus
+  alias GrizzlyTest.Utils
 
   describe "creates the command and validates params" do
     test "v1" do
@@ -21,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
         new_node_id: 10,
         granted_keys: [:s2_authenticated],
         kex_fail_type: :none,
-        dsk: "00000-11111-22222-33333-44444-55555-66666-77777"
+        dsk: Utils.mkdsk()
       ]
 
       {:ok, _command} = LearnModeSetStatus.new(params)
@@ -48,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
         new_node_id: 10,
         granted_keys: [:s2_authenticated],
         kex_fail_type: :none,
-        dsk: "50285-18819-09924-30691-15973-33711-04005-03623"
+        dsk: Utils.mkdsk()
       ]
 
       {:ok, command} = LearnModeSetStatus.new(params)
@@ -80,7 +81,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
       assert Keyword.get(params, :status) == :done
       assert Keyword.get(params, :new_node_id) == 10
       assert Keyword.get(params, :granted_keys) == [:s2_authenticated]
-      assert Keyword.get(params, :dsk) == "50285-18819-09924-30691-15973-33711-04005-03623"
+      assert Keyword.get(params, :dsk) == Utils.mkdsk()
     end
   end
 end

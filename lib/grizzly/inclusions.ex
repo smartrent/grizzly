@@ -168,7 +168,7 @@ defmodule Grizzly.Inclusions do
 
   alias Grizzly.Inclusions.InclusionRunnerSupervisor
   alias Grizzly.Inclusions.InclusionRunner
-  alias Grizzly.ZWave.Security
+  alias Grizzly.ZWave.{DSK, Security}
 
   @type opt ::
           {:controller_id, Grizzly.node_id()} | {:handler, pid() | module() | {module, keyword()}}
@@ -225,11 +225,12 @@ defmodule Grizzly.Inclusions do
   you can pass it as an argument like so:
 
   ```elixir
-  Grizzly.Inclusions.set_input_dsk(12345)
+  {:ok, dsk} = Grizzly.ZWave.DSK.parse("12345")
+  Grizzly.Inclusions.set_input_dsk(dsk)
   ```
   """
-  @spec set_input_dsk(non_neg_integer()) :: :ok
-  def set_input_dsk(input_dsk \\ 0) do
+  @spec set_input_dsk(DSK.t()) :: :ok
+  def set_input_dsk(input_dsk \\ DSK.new(<<>>)) do
     InclusionRunner.set_dsk(InclusionRunner, input_dsk)
   end
 

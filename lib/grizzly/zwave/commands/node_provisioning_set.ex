@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
 
   @type param ::
           {:seq_number, Grizzly.ZWave.seq_number()}
-          | {:dsk, DSK.dsk_string()}
+          | {:dsk, DSK.t()}
           | {:meta_extensions, [MetaExtension.t()]}
 
   @impl true
@@ -43,11 +43,11 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     meta_extensions = Command.param!(command, :meta_extensions)
-    {:ok, dsk_binary} = DSK.string_to_binary(Command.param!(command, :dsk))
-    dsk_byte_size = byte_size(dsk_binary)
+    dsk = Command.param!(command, :dsk)
+    dsk_byte_size = byte_size(dsk.raw)
 
     <<seq_number, 0x00::size(3), dsk_byte_size::size(5)>> <>
-      dsk_binary <> NodeProvisioning.encode_meta_extensions(meta_extensions)
+      dsk.raw <> NodeProvisioning.encode_meta_extensions(meta_extensions)
   end
 
   @impl true
