@@ -3,6 +3,8 @@ defmodule Grizzly.ZIPGateway.Config do
 
   # This module is for making the `zipgateway.cfg` file
 
+  require Logger
+
   @type t :: %__MODULE__{
           ca_cert: Path.t(),
           cert: Path.t(),
@@ -31,7 +33,7 @@ defmodule Grizzly.ZIPGateway.Config do
             eeprom_file: nil,
             tun_script: "./zipgateway.tun",
             pvs_storage_file: "/root/provisioning_list_store.dat",
-            provisioning_config_file: "/etc/zipgateway_provisioning_list.cfg",
+            provisioning_config_file: "/data/zipgateway_provisioning_list.cfg",
             pan_ip: {0xFD00, 0xBBBB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
             lan_ip: {0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
             lan_gw6: "::1",
@@ -104,6 +106,37 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :database_file, "ZipGwDatabase")
     |> maybe_put_config_item(cfg, :eeprom_file, "Eepromfile")
     |> maybe_put_config_item(cfg, :identify_script, "ZipNodeIdentifyScript")
+  end
+
+  @doc """
+  Ensure required files are on disk and contain the correct contents
+
+  This is useful to ensure other tools provided by `zipgateway` can work.
+  """
+  @spec ensure_files(t()) :: t()
+  def ensure_files(config) do
+    :ok = ensure_provisioning_list_config(config.provisioning_config_file)
+
+    config
+  end
+
+  defp ensure_provisioning_list_config(provisioning_list_config_path) do
+    if File.exists?(provisioning_list_config_path) do
+      :ok
+    else
+      contents = """
+      # Provisioning list for Z/IP Gateway Smart Start devices.
+      ZIPGateway Smart Start Provisioning List Configuration, version = 1.0.
+      """
+
+      case File.write(provisioning_list_config_path, contents) do
+        :ok ->
+          :ok
+
+        {:error, reason} ->
+          Logger.warn("Failed to write provision list file: #{inspect(reason)}")
+      end
+    end
   end
 
   defp maybe_put_config_item(config_string, cfg, :extra_classes = field, cfg_name) do

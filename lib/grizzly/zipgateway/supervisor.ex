@@ -36,6 +36,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     :ok =
       options
       |> Options.to_zipgateway_config(use_database?())
+      |> Config.ensure_files()
       |> Config.write(options.zipgateway_config_path)
 
     _ = System.cmd("modprobe", ["tun"])
