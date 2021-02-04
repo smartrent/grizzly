@@ -23,14 +23,31 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
         extensions_bin <> MetaExtension.extension_to_binary(extension)
       end)
 
-  def optional_dsk_to_binary(no_dsk) when no_dsk in [nil, ""] do
-    {:ok, <<>>}
+  @doc """
+  Get the binary representation of the dsk
+
+  If the DSK is `nil` then this will return an empty binary.
+  """
+  @spec optional_dsk_to_binary(DSK.t() | nil) :: binary()
+  def optional_dsk_to_binary(nil) do
+    <<>>
   end
 
   def optional_dsk_to_binary(dsk) do
-    DSK.string_to_binary(dsk)
+    dsk.raw
   end
 
-  def optional_binary_to_dsk(<<>>), do: {:ok, ""}
-  def optional_binary_to_dsk(binary), do: DSK.binary_to_string(binary)
+  @doc """
+  Get the DSK from a raw binary
+
+  If the binary is empty this will return `{:ok, nil}`.
+  """
+  @spec optional_binary_to_dsk(binary()) :: DSK.t() | nil
+  def optional_binary_to_dsk(<<>>) do
+    nil
+  end
+
+  def optional_binary_to_dsk(binary) do
+    DSK.new(binary)
+  end
 end

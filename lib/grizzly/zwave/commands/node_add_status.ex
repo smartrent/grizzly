@@ -17,11 +17,12 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        used only if the device was included securely
     * `:granted_keys` - the security keys granted during S2 inclusion (optional)
     * `:kex_fail_type` - the error that occurred in the S2 bootstrapping (optional)
+    * `:input_dsk` - the device DSK
 
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, Security}
+  alias Grizzly.ZWave.{Command, CommandClasses, DSK, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type status :: :done | :failed | :security_failed
@@ -42,6 +43,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:command_classes, [tagged_command_classes]}
           | {:granted_keys, [Security.key()]}
           | {:kex_fail_type, Security.key_exchange_fail_type()}
+          | {:input_dsk, DSK.t()}
 
   @impl true
   @spec new([param]) :: {:ok, Command.t()}
@@ -194,6 +196,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        ) do
     keys_granted = Security.byte_to_keys(keys_granted_byte)
     kex_failed_type = Security.failed_type_from_byte(kex_failed_type_byte)
+    dsk = DSK.new(dsk)
 
     params ++ [keys_granted: keys_granted, kex_failed_type: kex_failed_type, input_dsk: dsk]
   end

@@ -8,17 +8,18 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
   Params:
 
     * `:seq_number` - the sequence number of the networked command (required)
-    * `:dsk` - the DSK for the entry being requested (required)
+    * `:dsk` - the `Grizzly.ZWave.DSK.t()` for the entry being requested
+      (required)
 
   """
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, DSK}
+  alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave
 
-  @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.dsk_string()}
+  @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.t()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
@@ -38,10 +39,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
-    {:ok, dsk_binary} = DSK.string_to_binary(Command.param!(command, :dsk))
-    dsk_byte_size = byte_size(dsk_binary)
+    dsk = Command.param!(command, :dsk)
+    dsk_byte_size = byte_size(dsk.raw)
 
-    <<seq_number, 0x00::size(3), dsk_byte_size::size(5)>> <> dsk_binary
+    <<seq_number, 0x00::size(3), dsk_byte_size::size(5)>> <> dsk.raw
   end
 
   @impl true
@@ -49,15 +50,12 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
         <<seq_number, _::size(3), dsk_byte_size::size(5),
           dsk_binary::size(dsk_byte_size)-unit(8)-binary>>
       ) do
-    with {:ok, dsk_string} <- DSK.binary_to_string(dsk_binary) do
-      {:ok,
-       [
-         seq_number: seq_number,
-         dsk: dsk_string
-       ]}
-    else
-      {:error, reason} when reason in [:dsk_too_short, :dsk_too_long] ->
-        {:error, %DecodeError{value: dsk_binary, param: :dsk, command: :node_provisioning_get}}
-    end
+    dsk = DSK.new(dsk_binary)
+
+    {:ok,
+     [
+       seq_number: seq_number,
+       dsk: dsk
+     ]}
   end
 end

@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.NodeProvisioningListIterationReport
+  alias GrizzlyTest.Utils
 
   test "creates the command and validates params" do
     params = [
@@ -18,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
     params = [
       seq_number: 0x01,
       remaining_count: 2,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623",
+      dsk: Utils.mkdsk(),
       meta_extensions: []
     ]
 
@@ -39,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
     {:ok, params} = NodeProvisioningListIterationReport.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
     assert Keyword.get(params, :remaining_count) == 2
-    assert Keyword.get(params, :dsk) == "50285-18819-09924-30691-15973-33711-04005-03623"
+    assert Keyword.get(params, :dsk) == Utils.mkdsk()
     assert Keyword.get(params, :meta_extensions) == []
   end
 end

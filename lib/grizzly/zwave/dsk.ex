@@ -3,6 +3,12 @@ defmodule Grizzly.ZWave.DSK do
   Module for working with the SmartStart and S2 DSKs
   """
 
+  import Integer, only: [is_even: 1]
+
+  defstruct raw: <<>>
+
+  @type t() :: %__MODULE__{raw: <<_::128>>}
+
   @typedoc """
   The DSK string is the string version of the DSK
 
@@ -30,41 +36,100 @@ defmodule Grizzly.ZWave.DSK do
   @type dsk_binary :: <<_::128>>
 
   @doc """
+  Make a new DSK
+  """
+  @spec new(binary()) :: t()
+  def new(dsk_binary) when byte_size(dsk_binary) <= 16 and is_even(byte_size(dsk_binary)) do
+    %__MODULE__{raw: dsk_binary}
+  end
+
+  @doc """
+  Parse a textual representation of a DSK
+  """
+  @spec parse(dsk_string()) :: {:ok, t()} | {:error, :invalid_dsk}
+  def parse(dsk_string) do
+    do_parse(dsk_string, <<>>)
+  end
+
+  defp do_parse(<<>>, parts) when parts != <<>> and byte_size(parts) <= 16 do
+    {:ok, %__MODULE__{raw: parts}}
+  end
+
+  defp do_parse(<<sep, rest::binary>>, parts) when sep in [?-, ?\s] do
+    do_parse(rest, parts)
+  end
+
+  defp do_parse(<<s::5-bytes, rest::binary>>, parts) do
+    case Integer.parse(s) do
+      {v, ""} when v < 65536 ->
+        do_parse(rest, parts <> <<v::16>>)
+
+      _anything_else ->
+        {:error, :invalid_dsk}
+    end
+  end
+
+  defp do_parse(_anything_else, _parts) do
+    {:error, :invalid_dsk}
+  end
+
+  @doc """
+  Convert the DSK to a string
+
+  ```
+  iex> {:ok, dsk} = DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
+  iex> DSK.to_string(dsk)
+  "50285-18819-09924-30691-15973-33711-04005-03623"
+  ```
+  """
+  @spec to_string(t()) :: String.t()
+  def to_string(%__MODULE__{raw: raw}) do
+    for(<<b::16 <- raw>>, do: b)
+    |> Enum.map(fn b -> String.slice("00000" <> "#{b}", -5, 5) end)
+    |> Enum.join("-")
+  end
+
+  @doc """
   Take a string representation of the DSK and change it into the
   binary representation
   """
-  @spec string_to_binary(dsk_string()) ::
-          {:ok, dsk_binary()} | {:error, :dsk_too_short | :dsk_too_long}
-  def string_to_binary(dsk_string) when byte_size(dsk_string) > 47, do: {:error, :dsk_too_long}
-  def string_to_binary(dsk_string) when byte_size(dsk_string) < 47, do: {:error, :dsk_too_short}
-
+  @spec string_to_binary(dsk_string()) :: {:ok, dsk_binary()} | {:error, :invalid_dsk}
+  @deprecated "Use DSK.parse/1 instead"
   def string_to_binary(dsk_string) do
-    dsk_binary =
-      dsk_string
-      |> String.split("-")
-      |> Enum.map(&String.to_integer/1)
-      |> Enum.reduce(<<>>, fn dsk_number, binary ->
-        binary <> <<dsk_number::size(16)>>
-      end)
-
-    {:ok, dsk_binary}
+    case parse(dsk_string) do
+      {:ok, dsk} -> {:ok, dsk.raw}
+      error -> error
+    end
   end
 
   @doc """
   Take a binary representation of the DSK and change it into the
   string representation
   """
-  @spec binary_to_string(dsk_binary()) ::
-          {:ok, dsk_string()} | {:error, :dsk_too_short | :dsk_too_long}
-  def binary_to_string(dsk_binary) when byte_size(dsk_binary) > 16, do: {:error, :dsk_too_long}
-  def binary_to_string(dsk_binary) when byte_size(dsk_binary) < 16, do: {:error, :dsk_too_short}
-
+  @spec binary_to_string(dsk_binary()) :: {:ok, dsk_string()}
   def binary_to_string(dsk_binary) do
     dsk_string =
-      for(<<b::16 <- dsk_binary>>, do: b)
-      |> Enum.map(fn b -> String.slice("00000" <> "#{b}", -5, 5) end)
-      |> Enum.join("-")
+      dsk_binary
+      |> new()
+      |> __MODULE__.to_string()
 
     {:ok, dsk_string}
+  end
+
+  defimpl String.Chars do
+    @moduledoc false
+    defdelegate to_string(v), to: Grizzly.ZWave.DSK
+  end
+
+  defimpl Inspect do
+    import Inspect.Algebra
+    alias Grizzly.ZWave.DSK
+
+    @moduledoc false
+
+    @spec inspect(DSK.t(), Inspect.Opts.t()) :: Inspect.Algebra.t()
+    def inspect(v, _opts) do
+      concat(["#DSK<#{to_string(v)}>"])
+    end
   end
 end

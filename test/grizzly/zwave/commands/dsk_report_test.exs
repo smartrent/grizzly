@@ -1,13 +1,17 @@
 defmodule Grizzly.ZWave.Commands.DSKReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.Commands.DSKReport
 
+  @dsk_string "50285-18819-09924-30691-15973-33711-04005-03623"
+
   test "creates the command and validates params" do
+    {:ok, dsk} = DSK.parse(@dsk_string)
+
     params = [
       seq_number: 0x01,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623",
+      dsk: dsk,
       add_mode: :learn
     ]
 
@@ -15,9 +19,11 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
   end
 
   test "encodes params correctly" do
+    {:ok, dsk} = DSK.parse(@dsk_string)
+
     params = [
       seq_number: 0x01,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623",
+      dsk: dsk,
       add_mode: :learn
     ]
 
@@ -30,6 +36,8 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
   end
 
   test "decodes params correctly" do
+    {:ok, dsk} = DSK.parse(@dsk_string)
+
     binary =
       <<0x01, 0x00, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
@@ -37,6 +45,7 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
 
     assert Keyword.get(params, :seq_number) == 0x01
     assert Keyword.get(params, :add_mode) == :learn
-    assert Keyword.get(params, :dsk) == "50285-18819-09924-30691-15973-33711-04005-03623"
+
+    assert Keyword.get(params, :dsk) == dsk
   end
 end

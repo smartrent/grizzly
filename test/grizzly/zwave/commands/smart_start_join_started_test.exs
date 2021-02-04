@@ -2,11 +2,12 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStartedTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.SmartStartJoinStarted
+  alias GrizzlyTest.Utils
 
   test "creates the command and validates params" do
     params = [
       seq_number: 0x01,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623"
+      dsk: Utils.mkdsk()
     ]
 
     {:ok, _command} = SmartStartJoinStarted.new(params)
@@ -15,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStartedTest do
   test "encodes params correctly" do
     params = [
       seq_number: 0x01,
-      dsk: "50285-18819-09924-30691-15973-33711-04005-03623"
+      dsk: Utils.mkdsk()
     ]
 
     {:ok, command} = SmartStartJoinStarted.new(params)
@@ -32,6 +33,6 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStartedTest do
 
     {:ok, params} = SmartStartJoinStarted.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
-    assert Keyword.get(params, :dsk) == "50285-18819-09924-30691-15973-33711-04005-03623"
+    assert Keyword.get(params, :dsk) == Utils.mkdsk()
   end
 end

@@ -14,14 +14,14 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type param ::
           {:seq_number, ZWave.seq_number()}
           | {:accept, boolean()}
           | {:input_dsk_length, 0..0xF}
-          | {:input_dsk, non_neg_integer()}
+          | {:input_dsk, DSK.t()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
@@ -44,9 +44,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
     seq_number = Command.param!(command, :seq_number)
     accept = Command.param!(command, :accept)
     input_dsk_length = Command.param!(command, :input_dsk_length)
-    input_dsk = Command.param(command, :input_dsk, 0)
+    input_dsk = Command.param(command, :input_dsk)
 
-    dsk = <<input_dsk::size(input_dsk_length)-unit(8)>>
+    dsk = dsk_to_binary(input_dsk, input_dsk_length)
 
     <<seq_number, bool_to_bit(accept)::size(1), 0::size(3), input_dsk_length::size(4)>> <> dsk
   end
@@ -55,14 +55,14 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
         <<seq_number, accept::size(1), _::size(3), input_dsk_length::size(4),
-          input_dsk::size(input_dsk_length)-unit(8)>>
+          input_dsk::binary-size(input_dsk_length)-unit(8)>>
       ) do
     {:ok,
      [
        seq_number: seq_number,
        accept: bit_to_bool(accept),
        input_dsk_length: input_dsk_length,
-       input_dsk: input_dsk
+       input_dsk: DSK.new(input_dsk)
      ]}
   end
 
@@ -71,4 +71,16 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
 
   defp bit_to_bool(1), do: true
   defp bit_to_bool(0), do: false
+
+  defp dsk_to_binary(nil, dsk_len) when dsk_len == 0 do
+    <<>>
+  end
+
+  defp dsk_to_binary(0, dsk_len) when dsk_len == 0 do
+    <<>>
+  end
+
+  defp dsk_to_binary(%DSK{} = dsk, _dsk_length) do
+    dsk.raw
+  end
 end
