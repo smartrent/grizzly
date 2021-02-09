@@ -80,13 +80,23 @@ defmodule Grizzly.ZWave.DSK do
   iex> {:ok, dsk} = DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
   iex> DSK.to_string(dsk)
   "50285-18819-09924-30691-15973-33711-04005-03623"
+
+  iex> {:ok, dsk} = DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
+  iex> DSK.to_string(dsk, delimiter: "")
+  "5028518819099243069115973337110400503623"
   ```
+
+  Options:
+
+    * `:delimiter` - character to join the 5 byte sections together (default `"-"`)
   """
-  @spec to_string(t()) :: String.t()
-  def to_string(%__MODULE__{raw: raw}) do
+  @spec to_string(t(), keyword()) :: String.t()
+  def to_string(%__MODULE__{raw: raw}, opts \\ []) do
+    delimiter = Keyword.get(opts, :delimiter, "-")
+
     for(<<b::16 <- raw>>, do: b)
     |> Enum.map(fn b -> String.slice("00000" <> "#{b}", -5, 5) end)
-    |> Enum.join("-")
+    |> Enum.join(delimiter)
   end
 
   @doc """
@@ -114,6 +124,18 @@ defmodule Grizzly.ZWave.DSK do
       |> __MODULE__.to_string()
 
     {:ok, dsk_string}
+  end
+
+  @doc """
+  Generate a DSK that is all zeros
+
+  This is useful for placeholder/default DSKs.
+  """
+  @spec zeros() :: t()
+  def zeros() do
+    %__MODULE__{
+      raw: <<0::size(16)-unit(8)>>
+    }
   end
 
   defimpl String.Chars do
