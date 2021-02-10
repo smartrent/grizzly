@@ -1,5 +1,15 @@
 ## Changelog
 
+## v0.18.1 - 2021-2-10
+
+### Fixes
+
+- Fix up dialyzer types
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.18.0 - 2021-2-10
 
 This release breaks the DSK API and other supporting APIs. If you have not
