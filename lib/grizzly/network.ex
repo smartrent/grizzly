@@ -80,7 +80,7 @@ defmodule Grizzly.Network do
       you might want to issue network commands to that controller. By default
       this option will chose your controller.
   """
-  @spec delete_node_provisioning(Grizzly.ZWave.DSK.dsk_string(), [opt()]) ::
+  @spec delete_node_provisioning(Grizzly.ZWave.DSK.t(), [opt()]) ::
           Grizzly.send_command_response()
   def delete_node_provisioning(dsk, opts \\ []) do
     seq_number = SeqNumber.get_and_inc()
@@ -98,7 +98,7 @@ defmodule Grizzly.Network do
       you might want to issue network commands to that controller. By default
       this option will chose your controller.
   """
-  @spec get_node_provisioning(Grizzly.ZWave.DSK.dsk_string(), [opt()]) ::
+  @spec get_node_provisioning(Grizzly.ZWave.DSK.t(), [opt()]) ::
           Grizzly.send_command_response()
   def get_node_provisioning(dsk, opts \\ []) do
     seq_number = SeqNumber.get_and_inc()
@@ -117,7 +117,7 @@ defmodule Grizzly.Network do
       this option will chose your controller.
   """
   @spec set_node_provisioning(
-          Grizzly.ZWave.DSK.dsk_string(),
+          Grizzly.ZWave.DSK.t(),
           [Grizzly.ZWave.SmartStart.MetaExtension.t()],
           [opt()]
         ) :: Grizzly.send_command_response()
