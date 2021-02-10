@@ -1,5 +1,81 @@
 ## Changelog
 
+## v0.18.0 - 2021-2-10
+
+This release breaks the DSK API and other supporting APIs. If you have not
+supported S2 inclusions, smart start, or use the DSK API for any reason then it
+should be safe to upgrade.
+
+The break to DSKs is the new `Grizzly.ZWave.DSK.t()` struct. All inclusion and
+node provisioning commands now expect a `Grizzly.ZWave.DSK.t()`. There are two
+times you will need to get a `DSK.t()`:
+
+1. User input of a DSK pin (the nicely formatted representation)
+1. The binary (`<<>>`) representation.
+
+For the first case you can use `Grizzly.ZWave.DSK.parse/1` and for the second
+case you can use `Grizzly.ZWave.DSK.new/1`.
+
+A common use case for DSKs is using the DSK pin (the first 5 digits in the DSK)
+to do S2 inclusion. This was done by calling
+`Grizzly.Inclusions.set_input_dsk/1`. Where the input DSK was an
+`non_neg_integer()`. This API has been changed to take a `DSK.t()`.
+
+### Example
+
+```elixir
+dsk_pin = "12345"
+{:ok, dsk} = Grizzly.ZWave.DSK.parse(dsk_pin)
+
+Grizzly.Inclusions.set_input_dsk(dsk)
+```
+
+This API is more useful for taking user input (which the DSK pin is), parsing
+it, and passing the DSK to the inclusion process. Also this pushes validation of
+DSK to the `Grizzly.ZWave.DSK.parse/1` function.
+
+```elixir
+dsk_pin = "123456"
+{:error, :invalid_dsk} = Grizzly.ZWave.DSK.parse(dsk_pin)
+```
+
+The `DSK.t()` has the `String.Chars` protocol implemented so if you want to a
+pretty representation of the DSK, say for logging or displaying the DSK to the
+user, you call the `to_string/1` function on the `DSK.t()`. Also, see
+`Grizzly.ZWave.DSK.to_string/2` for more details.
+
+If you need to access the raw binary form of the DSK you the `DSK.t()` exposes
+the `:raw` field, so you can access that via `dsk.raw`.
+
+This release also added support S2/SmartStart QR code generation. See the
+`Grizzly.ZWave.QRCode` module for more details.
+
+### Changed
+
+- `Grizzly.Inclusions.set_input_dsk/1` use to take `non_neg_integer()` type as
+  an argument, but the type has changed to `Grizzly.ZWave.DSK.t()`
+- `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_dsk_to_binary/1` use
+  to take a string as the DSK input but now it takes `Grizzly.ZWave.DSK.t()`
+- `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_binary_to_dsk/1` use
+  to take a string as the DSK input but now it takes `Grizzly.ZWave.DSK.t()`
+- The following commands had params that took a string for the DSK and now take
+  `Grizzly.ZWave.DSK.t()`:
+  - `Grizzly.ZWave.Commands.DSKReport`
+  - `Grizzly.ZWave.Commands.LearnModeSetStatus`
+  - `Grizzly.ZWave.Commands.NodeAddDSKReport`
+  - `Grizzly.ZWave.Commands.NodeAddDSKSet`
+  - `Grizzly.ZWave.Commands.NodeAddStatus`
+  - `Grizzly.ZWave.Commands.NodeProvisioningDelete`
+  - `Grizzly.ZWave.Commands.NodeProvisioningGet`
+  - `Grizzly.ZWave.Commands.NodeProvisioningListIterationReport`
+  - `Grizzly.ZWave.Commands.NodeProvisioningReport`
+  - `Grizzly.ZWave.Commands.NodeProvisioningSet`
+  - `Grizzly.ZWave.Commands.SmartStartJoinStarted`
+
+### Added
+
+- QR code support via the `Grizzly.ZWave.QRCode` module.
+
 ## v0.17.7 - 2021-2-4
 
 ### Fixed
