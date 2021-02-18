@@ -32,6 +32,7 @@ defmodule Grizzly.MixProject do
 
   defp deps do
     [
+      {:cerlc, "~> 0.2.0"},
       {:dialyxir, "~> 1.0.0", only: [:test, :dev], runtime: false},
       {:muontrap, "~> 0.4"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
