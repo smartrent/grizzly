@@ -76,7 +76,7 @@ defmodule Grizzly.ZWave.QRCodeTest do
 
   defp zwave_decimalize(input) do
     for <<two_bytes::16 <- input>> do
-      Integer.to_string(two_bytes, 10) |> String.pad_leading(5, "0") |> IO.inspect()
+      Integer.to_string(two_bytes, 10) |> String.pad_leading(5, "0")
     end
     |> IO.iodata_to_binary()
   end
