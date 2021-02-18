@@ -1,5 +1,13 @@
 ## Changelog
 
+## v0.18.2 - 2021-2-18
+
+### Improvements
+
+* Use [cerlc](https://github.com/mdsebald/cerlc) library for `Grizzly.ZWave.CRC`
+* Clean up inspects from tests
+* Ensure `zipgateway` files are usable by system untils for `zipgateway`
+
 ## v0.18.1 - 2021-2-10
 
 ### Fixes
