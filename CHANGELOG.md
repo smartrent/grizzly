@@ -1,5 +1,16 @@
 ## Changelog
 
+## v0.18.3 - 2021-3-11
+
+### Added
+
+- `Grizzly.ZWave.DSK.parse_pin/1`
+- `Grizzly.ZWave.DSK.to_pin_string/1`
+
+### Fixes
+
+- Ensure that the DSK binary is 128 bits
+
 ## v0.18.2 - 2021-2-18
 
 ### Improvements
