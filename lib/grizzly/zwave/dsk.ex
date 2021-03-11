@@ -37,10 +37,18 @@ defmodule Grizzly.ZWave.DSK do
 
   @doc """
   Make a new DSK
+
+  If less than 16 bytes are passed in, the rest are initialized to zero.
+  Due to how DSKs are constructed, odd length binaries aren't allowed since
+  they should never be possible.
   """
   @spec new(binary()) :: t()
-  def new(dsk_binary) when byte_size(dsk_binary) <= 16 and is_even(byte_size(dsk_binary)) do
+  def new(dsk_binary) when byte_size(dsk_binary) == 16 do
     %__MODULE__{raw: dsk_binary}
+  end
+
+  def new(dsk_binary) when byte_size(dsk_binary) < 16 and is_even(byte_size(dsk_binary)) do
+    new(dsk_binary <> <<0::16>>)
   end
 
   @doc """
@@ -52,7 +60,7 @@ defmodule Grizzly.ZWave.DSK do
   end
 
   defp do_parse(<<>>, parts) when parts != <<>> and byte_size(parts) <= 16 do
-    {:ok, %__MODULE__{raw: parts}}
+    {:ok, new(parts)}
   end
 
   defp do_parse(<<sep, rest::binary>>, parts) when sep in [?-, ?\s] do
