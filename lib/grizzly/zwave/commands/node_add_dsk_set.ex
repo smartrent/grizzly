@@ -80,7 +80,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
     <<>>
   end
 
-  defp dsk_to_binary(%DSK{} = dsk, _dsk_length) do
-    dsk.raw
+  defp dsk_to_binary(%DSK{} = dsk, dsk_len) do
+    :binary.part(dsk.raw, 0, dsk_len)
   end
 end
