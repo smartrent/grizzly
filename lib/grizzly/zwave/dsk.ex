@@ -82,6 +82,49 @@ defmodule Grizzly.ZWave.DSK do
   end
 
   @doc """
+  Parse a DSK PIN
+
+  PINs can also be parsed by `parse/1`. When working with PINs, though, it's
+  nice to be more forgiving and accept PINs as integers or strings without
+  leading zeros.
+
+  String examples:
+
+  ```
+  iex> {:ok, dsk} = DSK.parse_pin("12345"); dsk
+  #DSK<12345-00000-00000-00000-00000-00000-00000-00000>
+
+
+  iex> {:ok, dsk} = DSK.parse_pin("123"); dsk
+  #DSK<00123-00000-00000-00000-00000-00000-00000-00000>
+  ```
+
+  Integer examples:
+
+  ```
+  iex> {:ok, dsk} = DSK.parse_pin(12345); dsk
+  #DSK<12345-00000-00000-00000-00000-00000-00000-00000>
+
+  iex> {:ok, dsk} = DSK.parse_pin(123); dsk
+  #DSK<00123-00000-00000-00000-00000-00000-00000-00000>
+  ```
+  """
+  @spec parse_pin(String.t() | non_neg_integer()) :: {:ok, t()} | {:error, :invalid_dsk}
+
+  def parse_pin(string) when is_binary(string) do
+    case Integer.parse(string) do
+      {pin, ""} -> parse_pin(pin)
+      _ -> {:error, :invalid_dsk}
+    end
+  end
+
+  def parse_pin(pin) when pin >= 0 and pin < 65536 do
+    {:ok, new(<<pin::16>>)}
+  end
+
+  def parse_pin(_other), do: {:error, :invalid_dsk}
+
+  @doc """
   Convert the DSK to a string
 
   ```
@@ -103,8 +146,30 @@ defmodule Grizzly.ZWave.DSK do
     delimiter = Keyword.get(opts, :delimiter, "-")
 
     for(<<b::16 <- raw>>, do: b)
-    |> Enum.map(fn b -> String.slice("00000" <> "#{b}", -5, 5) end)
+    |> Enum.map(&int_to_five_digits/1)
     |> Enum.join(delimiter)
+  end
+
+  @doc """
+  Return the first five digits of a DSK for use as a PIN
+
+  ```
+  iex> {:ok, dsk} = DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
+  iex> DSK.to_pin_string(dsk)
+  "50285"
+
+  iex> {:ok, dsk} = DSK.parse("00001-18819-09924-30691-15973-33711-04005-03623")
+  iex> DSK.to_pin_string(dsk)
+  "00001"
+  ```
+  """
+  @spec to_pin_string(t()) :: String.t()
+  def to_pin_string(%__MODULE__{raw: <<b::16, _::112>>}) do
+    int_to_five_digits(b)
+  end
+
+  defp int_to_five_digits(b) do
+    String.slice("00000" <> "#{b}", -5, 5)
   end
 
   @doc """

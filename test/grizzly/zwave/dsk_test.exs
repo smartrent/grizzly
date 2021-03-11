@@ -51,6 +51,42 @@ defmodule Grizzly.ZWave.DSKTest do
     assert {:error, :invalid_dsk} == DSK.parse("1")
   end
 
+  test "parse_pin/1 with strings" do
+    assert {:ok, DSK.new(<<12345::16>>)} == DSK.parse_pin("12345")
+    assert {:ok, DSK.new(<<0::16>>)} == DSK.parse_pin("00000")
+    assert {:ok, DSK.new(<<1::16>>)} == DSK.parse_pin("1")
+    assert {:ok, DSK.new(<<12::16>>)} == DSK.parse_pin("12")
+    assert {:ok, DSK.new(<<123::16>>)} == DSK.parse_pin("123")
+    assert {:ok, DSK.new(<<1234::16>>)} == DSK.parse_pin("1234")
+
+    assert {:error, :invalid_dsk} == DSK.parse_pin("")
+    assert {:error, :invalid_dsk} == DSK.parse_pin("70000")
+    assert {:error, :invalid_dsk} == DSK.parse_pin("12ABC")
+    assert {:error, :invalid_dsk} == DSK.parse_pin("123456")
+    assert {:error, :invalid_dsk} == DSK.parse("-1")
+  end
+
+  test "parse_pin/1 with integers" do
+    assert {:ok, DSK.new(<<12345::16>>)} == DSK.parse_pin(12345)
+    assert {:ok, DSK.new(<<0::16>>)} == DSK.parse_pin(0)
+    assert {:ok, DSK.new(<<1::16>>)} == DSK.parse_pin(1)
+    assert {:ok, DSK.new(<<12::16>>)} == DSK.parse_pin(12)
+    assert {:ok, DSK.new(<<123::16>>)} == DSK.parse_pin(123)
+    assert {:ok, DSK.new(<<1234::16>>)} == DSK.parse_pin(1234)
+
+    assert {:error, :invalid_dsk} == DSK.parse_pin(-1)
+    assert {:error, :invalid_dsk} == DSK.parse_pin(70000)
+  end
+
+  test "to_pin_string/1" do
+    assert "33654" == DSK.to_pin_string(@dsk_struct)
+    assert "12345" == DSK.to_pin_string(DSK.new(<<12345::16>>))
+    assert "00001" == DSK.to_pin_string(DSK.new(<<1::16>>))
+    assert "00012" == DSK.to_pin_string(DSK.new(<<12::16>>))
+    assert "00123" == DSK.to_pin_string(DSK.new(<<123::16>>))
+    assert "01234" == DSK.to_pin_string(DSK.new(<<1234::16>>))
+  end
+
   test "to_string/1" do
     assert DSK.to_string(@dsk_struct) == @dsk_string
   end
