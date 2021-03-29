@@ -35,7 +35,14 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   end
 
   @impl true
-  def decode_params(<<seq_number, status, controller_id, node_ids::binary>>) do
+  def decode_params(
+        <<seq_number, status, controller_id, node_ids::size(29)-unit(8)-binary,
+          ex_node_id_len::size(16), ext_node_ids::binary>>
+      ) do
+    require Logger
+
+    Logger.warn("#{inspect(ext_node_ids)}")
+
     case decode_status(status) do
       {:ok, status} ->
         controller_id = decode_controller_id(controller_id)

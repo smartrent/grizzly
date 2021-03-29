@@ -17,11 +17,17 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
   @impl true
   def name(), do: :node_provisioning
 
-  def encode_meta_extensions(meta_extensions),
-    do:
+  def encode_meta_extensions(meta_extensions) do
+    require Logger
+
+    r =
       Enum.reduce(meta_extensions, <<>>, fn extension, extensions_bin ->
         extensions_bin <> MetaExtension.extension_to_binary(extension)
       end)
+
+    Logger.warn("#{inspect(r)}")
+    r
+  end
 
   @doc """
   Get the binary representation of the dsk

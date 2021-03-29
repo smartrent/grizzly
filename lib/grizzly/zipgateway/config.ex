@@ -93,6 +93,7 @@ defmodule Grizzly.ZIPGateway.Config do
     ProvisioningConfigFile=#{cfg.provisioning_config_file}
     ZipLanGw6=#{cfg.lan_gw6}
     ZipPSK=#{cfg.psk}
+    ZWRFRegion=9
     """
     |> maybe_put_config_item(cfg, :serial_log, "SerialLog")
     |> maybe_put_config_item(cfg, :product_id, "ZipProductID")

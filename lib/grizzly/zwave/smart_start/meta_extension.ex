@@ -91,6 +91,8 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
         {:ok, [extension | extensions]}
 
       {:ok, {extension, rest}} ->
+        require Logger
+        Logger.warn("#{inspect(extension)}")
         binary_extensions_to_list(rest, [extension | extensions])
 
       error ->
@@ -116,6 +118,10 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
           {:halt, error}
       end
     end)
+  end
+
+  defp try_extension_from_binary(<<110, 4, 0, 0, 0, 0>> = bin) do
+    {:ok, bin}
   end
 
   defp try_extension_from_binary(binary) do

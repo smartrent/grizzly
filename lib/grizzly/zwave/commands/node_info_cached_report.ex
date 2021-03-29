@@ -101,13 +101,12 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
           basic_device_class_byte, generic_device_class_byte, specific_device_class_byte,
           command_classes::binary>>
       ) do
-    {:ok, basic_device_class} =
-      DeviceClasses.basic_device_class_from_byte(basic_device_class_byte)
+    {_, basic_device_class} = DeviceClasses.basic_device_class_from_byte(basic_device_class_byte)
 
-    {:ok, generic_device_class} =
+    {_, generic_device_class} =
       DeviceClasses.generic_device_class_from_byte(generic_device_class_byte)
 
-    {:ok, specific_device_class} =
+    {_, specific_device_class} =
       DeviceClasses.specific_device_class_from_byte(
         generic_device_class,
         specific_device_class_byte

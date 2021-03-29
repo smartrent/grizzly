@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.BootstrappingMode do
   """
   @behaviour Grizzly.ZWave.SmartStart.MetaExtension
 
-  @type mode :: :security_2 | :smart_start
+  @type mode() :: :security_2 | :smart_start | :long_range
 
   @type t :: %__MODULE__{
           mode: mode()
@@ -23,11 +23,27 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.BootstrappingMode do
   @enforce_keys [:mode]
   defstruct mode: nil
 
+  def doit do
+    {:ok, dsk} = Grizzly.ZWave.DSK.parse("23412-25486-06859-55483-18196-41043-62244-63135")
+
+    meta_exts = [
+      %Grizzly.ZWave.SmartStart.MetaExtension.BootstrappingMode{
+        mode: :long_range
+      },
+      %Grizzly.ZWave.SmartStart.MetaExtension.SmartStartInclusionSetting{
+        setting: :pending
+      },
+      %Grizzly.ZWave.SmartStart.MetaExtension.AdvancedJoining{
+        keys: [:s2_unauthenticated, :s2_authenticated]
+      }
+    ]
+  end
+
   @doc """
   Create a `BootstrappingMode.t()`
   """
   @spec new(mode()) :: {:ok, t()} | {:error, :invalid_mode}
-  def new(mode) when mode in [:security_2, :smart_start] do
+  def new(mode) when mode in [:security_2, :smart_start, :long_range] do
     {:ok, %__MODULE__{mode: mode}}
   end
 
@@ -53,7 +69,12 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.BootstrappingMode do
   def from_binary(<<0x36::size(7), 1::size(1), 0x01, mode_byte>>) do
     case mode_from_byte(mode_byte) do
       {:ok, mode} ->
-        new(mode)
+        r = new(mode)
+        require Logger
+
+        Logger.warn("#{inspect(r)}")
+
+        r
 
       error ->
         error
@@ -68,8 +89,10 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.BootstrappingMode do
 
   defp mode_to_byte(:security_2), do: 0x00
   defp mode_to_byte(:smart_start), do: 0x01
+  defp mode_to_byte(:long_range), do: 0x02
 
   defp mode_from_byte(0x00), do: {:ok, :security_2}
   defp mode_from_byte(0x01), do: {:ok, :smart_start}
+  defp mode_from_byte(0x02), do: {:ok, :long_range}
   defp mode_from_byte(_mode), do: {:error, :invalid_mode}
 end
