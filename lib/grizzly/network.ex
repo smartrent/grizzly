@@ -118,7 +118,7 @@ defmodule Grizzly.Network do
   """
   @spec set_node_provisioning(
           Grizzly.ZWave.DSK.t(),
-          [Grizzly.ZWave.SmartStart.MetaExtension.t()],
+          [Grizzly.ZWave.SmartStart.MetaExtension.extension()],
           [opt()]
         ) :: Grizzly.send_command_response()
   def set_node_provisioning(dsk, meta_extensions, opts \\ []) do

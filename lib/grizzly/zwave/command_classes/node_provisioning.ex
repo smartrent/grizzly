@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
   def encode_meta_extensions(meta_extensions),
     do:
       Enum.reduce(meta_extensions, <<>>, fn extension, extensions_bin ->
-        extensions_bin <> MetaExtension.extension_to_binary(extension)
+        extensions_bin <> MetaExtension.encode(extension)
       end)
 
   @doc """
