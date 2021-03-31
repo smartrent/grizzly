@@ -2,7 +2,6 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
   @moduledoc """
   This is used to advertise 16 bytes of manufactured-defined information that
   is unique for a given product.
-
   Z-Wave UUIDs are not limited to the format outlined in RFC 4122 but can also
   be ASCII characters and a relevant prefix.
   """
@@ -25,24 +24,17 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
   - `sn:Hello Elixir!!!`
   - `UUID:Hello Elixir!!!`
 
-
   Lastly `rfc4122` format looks like `58D5E212-165B-4CA0-909B-C86B9CEE0111`
   where every two digits make up one hex value.
 
   More information about RFC 4122 and the specification format can be
   found [here](https://tools.ietf.org/html/rfc4122#section-4.1.2).
   """
-  @behaviour Grizzly.ZWave.SmartStart.MetaExtension
+  @type format() :: :ascii | :hex | :rfc4122
 
-  @type format :: :ascii | :hex | :rfc4122
+  @type uuid() :: binary()
 
-  @type t :: %__MODULE__{
-          uuid: String.t(),
-          format: format()
-        }
-
-  @enforce_keys [:uuid, :format]
-  defstruct uuid: nil, format: :hex
+  @type t() :: %{uuid: uuid(), format: format()}
 
   defguardp is_format_hex(value) when value in [0, 2, 4]
   defguardp is_format_ascii(value) when value in [1, 3, 5]
@@ -56,44 +48,18 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
     with :ok <- validate_format(format),
          uuid_no_prefix = remove_uuid_prefix(uuid),
          :ok <- validate_uuid_length(uuid_no_prefix, format) do
-      {:ok, %__MODULE__{uuid: uuid, format: format}}
+      {:ok, %{uuid: uuid, format: format}}
     end
   end
-
-  @doc """
-  Take a binary string and try to make a `UUID16.t()` from it
-
-  If the critical bit is set in teh binary this will return
-  `{:error, :critical_bit_set}` and the information should be ignored.
-
-  If the format in the binary is not part of the defined Z-Wave specification
-  this will return `{:error, :invalid_format}`
-  """
-  @impl true
-  @spec from_binary(binary()) ::
-          {:ok, t()} | {:error, :critical_bit_set | :invalid_format | :invalid_binary}
-  def from_binary(<<0x03::size(7), 0x00::size(1), 0x11, presentation_format, uuid::binary>>) do
-    with {:ok, uuid_string} <- uuid_from_binary(presentation_format, uuid),
-         {:ok, format} <- format_from_byte(presentation_format) do
-      new(uuid_string, format)
-    end
-  end
-
-  def from_binary(<<0x03::size(7), 0x01::size(1), _rest::binary>>) do
-    {:error, :critical_bit_set}
-  end
-
-  def from_binary(bin) when is_binary(bin), do: {:error, :invalid_binary}
 
   @doc """
   Make a binary string from a `UUID16.t()`
   """
-  @impl true
-  @spec to_binary(t()) :: {:ok, binary()}
-  def to_binary(%__MODULE__{uuid: uuid, format: format}) do
-    [format_prefix, uuid] = get_format_prefix_and_uuid(uuid)
-    uuid_binary = uuid_to_binary(uuid, format)
-    {:ok, <<0x06, 0x11, format_to_byte(format, format_prefix)>> <> uuid_binary}
+  @spec encode(t()) :: binary()
+  def encode(uuid16) do
+    [format_prefix, uuid] = get_format_prefix_and_uuid(uuid16.uuid)
+    uuid_binary = uuid_to_binary(uuid, uuid16.format)
+    <<0x06, 0x11, format_to_byte(uuid16.format, format_prefix)>> <> uuid_binary
   end
 
   defp get_format_prefix_and_uuid(uuid_string) do
@@ -102,6 +68,27 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
       [prefix, _uuid] = result when prefix in ["sn", "UUID"] -> result
     end
   end
+
+  @doc """
+  Take a binary string and try to make a `UUID16.t()` from it
+  If the critical bit is set in teh binary this will return
+  `{:error, :critical_bit_set}` and the information should be ignored.
+  If the format in the binary is not part of the defined Z-Wave specification
+  this will return `{:error, :invalid_format}`
+  """
+  @spec parse(binary) :: {:ok, t()} | {:error, any()}
+  def parse(<<0x03::size(7), 0::size(1), 0x11, presentation_format, uuid::binary>>) do
+    with {:ok, uuid_string} <- uuid_from_binary(presentation_format, uuid),
+         {:ok, format} <- format_from_byte(presentation_format) do
+      new(uuid_string, format)
+    end
+  end
+
+  def parse(<<0x03::size(7), 0x01::size(1), _rest::binary>>) do
+    {:error, :critical_bit_set}
+  end
+
+  def parse(bin) when is_binary(bin), do: {:error, :invalid_binary}
 
   defp format_from_byte(format_byte) when is_format_hex(format_byte), do: {:ok, :hex}
   defp format_from_byte(format_byte) when is_format_ascii(format_byte), do: {:ok, :ascii}

@@ -19,10 +19,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave.SmartStart.MetaExtension
 
-  @type param ::
+  @type param() ::
           {:seq_number, Grizzly.ZWave.seq_number()}
           | {:dsk, DSK.t()}
-          | {:meta_extensions, [MetaExtension.t()]}
+          | {:meta_extensions, [MetaExtension.extension()]}
 
   @impl true
   @spec new([param]) :: {:ok, Command.t()}
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
           dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
       ) do
     with {:ok, dsk_string} <- DSK.binary_to_string(dsk_binary),
-         {:ok, meta_extensions} <- MetaExtension.extensions_from_binary(meta_extensions_binary) do
+         meta_extensions <- MetaExtension.parse(meta_extensions_binary) do
       {:ok,
        [
          seq_number: seq_number,

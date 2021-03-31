@@ -121,7 +121,7 @@ defmodule Grizzly.ZWave.QRCode do
   defp encode_uuid16(nil), do: []
 
   defp encode_uuid16(uuid16) do
-    {:ok, value} = UUID16.to_binary(uuid16)
+    value = UUID16.encode(uuid16)
     <<0x06, 0x11, presentation, uuid::binary()>> = value
 
     decimalized_uuid =

@@ -15,15 +15,15 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, DSK}
+  alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave.SmartStart.MetaExtension
 
-  @type param ::
+  @type param() ::
           {:seq_number, Grizzly.ZWave.seq_number()}
           | {:remaining_count, non_neg_integer()}
           | {:dsk, DSK.t()}
-          | {:meta_extensions, [MetaExtension.t()]}
+          | {:meta_extensions, [MetaExtension.extension()]}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
@@ -57,24 +57,16 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
         <<seq_number, remaining_count, _::size(3), dsk_byte_size::size(5),
           dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
       ) do
-    with dsk = NodeProvisioning.optional_binary_to_dsk(dsk_binary),
-         {:ok, meta_extensions} <- MetaExtension.extensions_from_binary(meta_extensions_binary) do
-      {:ok,
-       [
-         seq_number: seq_number,
-         remaining_count: remaining_count,
-         dsk: dsk,
-         meta_extensions: meta_extensions
-       ]}
-    else
-      {:error, _reason} ->
-        {:error,
-         %DecodeError{
-           value: meta_extensions_binary,
-           param: :meta_extension,
-           command: :node_provisioning_list_iteration_report
-         }}
-    end
+    dsk = NodeProvisioning.optional_binary_to_dsk(dsk_binary)
+    meta_extensions = MetaExtension.parse(meta_extensions_binary)
+
+    {:ok,
+     [
+       seq_number: seq_number,
+       remaining_count: remaining_count,
+       dsk: dsk,
+       meta_extensions: meta_extensions
+     ]}
   end
 
   defp params_with_defaults(params) do
