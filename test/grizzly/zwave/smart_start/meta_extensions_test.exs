@@ -25,12 +25,20 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
       assert <<0x6D, 0x01, 0x01>> == MetaExtension.encode(bootstrapping_mode: :smart_start)
     end
 
+    test "encodes long_range mode" do
+      assert <<0x6D, 0x01, 0x02>> == MetaExtension.encode(bootstrapping_mode: :long_range)
+    end
+
     test "parses security 2" do
       assert [bootstrapping_mode: :security_2] == MetaExtension.parse(<<0x6D, 0x01, 0x00>>)
     end
 
     test "parses smart start" do
       assert [bootstrapping_mode: :smart_start] == MetaExtension.parse(<<0x6D, 0x01, 0x01>>)
+    end
+
+    test "parses long range" do
+      assert [bootstrapping_mode: :long_range] == MetaExtension.parse(<<0x6D, 0x01, 0x02>>)
     end
   end
 
