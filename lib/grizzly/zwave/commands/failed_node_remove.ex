@@ -16,9 +16,9 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
-  @type param :: {:node_id, byte} | {:seq_number, ZWave.seq_number()}
+  @type param() :: {:node_id, char()} | {:seq_number, ZWave.seq_number()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :failed_node_remove,
@@ -31,15 +31,19 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
     <<seq_number, node_id>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<seq_number, node_id>>) do
+    {:ok, [seq_number: seq_number, node_id: node_id]}
+  end
+
+  def decode_params(<<seq_number, node_id::size(16)>>) do
     {:ok, [seq_number: seq_number, node_id: node_id]}
   end
 end
