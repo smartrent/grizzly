@@ -33,8 +33,11 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     S2 bootstrapping instructions
   - `:smart_start` - the node will use S2 bootstrapping automatically using the
     SmartStart functionality
+  - `:long_range` - included the device using the Z-Waver long range protocol.
+    If no keys are granted in the `:advanced_joining` extension this inclusion
+    will fail.
   """
-  @type bootstrapping_mode() :: :security_2 | :smart_start
+  @type bootstrapping_mode() :: :security_2 | :smart_start | :long_range
 
   @typedoc """
   The different network statuses are:
@@ -205,6 +208,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
       case mode do
         :security_2 -> 0x00
         :smart_start -> 0x01
+        :long_range -> 0x02
       end
 
     [set_circuital_bit(@bootstrapping_mode, 1), 0x01, mode]
@@ -324,6 +328,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
       case mode do
         0x00 -> :security_2
         0x01 -> :smart_start
+        0x02 -> :long_range
       end
 
     ext = {:bootstrapping_mode, mode}
