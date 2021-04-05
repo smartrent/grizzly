@@ -66,6 +66,8 @@ defmodule Grizzly do
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
 
+  require Logger
+
   import Grizzly.VersionReports, only: [is_extra_command: 1]
 
   @typedoc """
@@ -150,6 +152,8 @@ defmodule Grizzly do
     # will not establish a new connection
     including? = Inclusions.inclusion_running?()
     updating_firmware? = FirmwareUpdates.firmware_update_running?()
+
+    :ok = maybe_log_warning(command_name)
 
     with false <- including? or updating_firmware?,
          {command_module, default_opts} <- Table.lookup(command_name),
@@ -263,4 +267,26 @@ defmodule Grizzly do
     end)
     |> Enum.map(fn {command, _} -> command end)
   end
+
+  defp maybe_log_warning(command_name) do
+    deprecated_list = [
+      :switch_binary_get,
+      :switch_binary_set
+    ]
+
+    if command_name in deprecated_list do
+      new_module = get_new_module(command_name)
+
+      Logger.warn("""
+      Calling Grizzly.send_command/4 for command #{inspect(command_name)} is deprecated.
+
+      Please upgrade to using #{inspect(new_module)} to send this command.
+      """)
+    end
+
+    :ok
+  end
+
+  defp get_new_module(:switch_binary_get), do: Grizzly.SwitchBinary
+  defp get_new_module(:switch_binary_set), do: Grizzly.SwitchBinary
 end
