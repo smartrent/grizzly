@@ -44,24 +44,19 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
   def decode_params(binary) do
     channel_bytes = :erlang.binary_to_list(binary)
 
-    result =
-      Enum.reduce_while(channel_bytes, {:ok, []}, fn channel_byte, {:ok, acc} ->
+    channels =
+      Enum.reduce_while(channel_bytes, [], fn channel_byte, acc ->
         case NetworkManagementInstallationMaintenance.rssi_from_byte(channel_byte) do
           {:ok, channel} ->
-            {:cont, {:ok, acc ++ [channel]}}
+            {:cont, acc ++ [channel]}
 
-          {:error, %DecodeError{} = decode_error} ->
-            {:halt,
-             {:error, %DecodeError{decode_error | param: :channels, command: :rssi_report}}}
+          # All other values are reserved and MUST NOT be used by a sending node. Reserved values MUST be
+          # ignored by a receiving node.
+          {:error, %DecodeError{}} ->
+            {:cont, acc}
         end
       end)
 
-    case result do
-      {:ok, channels} ->
-        {:ok, [channels: channels]}
-
-      {:error, %DecodeError{}} = error ->
-        error
-    end
+    {:ok, [channels: channels]}
   end
 end
