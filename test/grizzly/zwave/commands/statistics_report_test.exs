@@ -65,7 +65,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
     neighbors =
       <<0x02, 0x04>> <>
         <<0x05, 0x01::size(1), 0x00::size(2), 0x03::size(5)>> <>
-        <<0x06, 0x00::size(1), 0x00::size(2), 0x02::size(5)>>
+        <<0x06, 0x00::size(1), 0x00::size(2), 0x08::size(5)>>
 
     sum_of_transmission_times = <<0x04, 0x04, 12::integer-unsigned-unit(8)-size(4)>>
     sum_of_transmission_times_squared = <<0x05, 0x04, 144::integer-unsigned-unit(8)-size(4)>>
@@ -88,6 +88,6 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
     assert Keyword.get(n1, :speed) == :"100kbit/s"
     assert Keyword.get(n2, :node_id) == 6
     assert Keyword.get(n2, :repeater?) == false
-    assert Keyword.get(n2, :speed) == :"40kbit/s"
+    assert Keyword.get(n2, :speed) == :reserved
   end
 end

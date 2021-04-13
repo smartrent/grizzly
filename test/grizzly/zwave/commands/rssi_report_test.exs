@@ -20,4 +20,10 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     {:ok, params} = RssiReport.decode_params(params_binary)
     assert [:rssi_max_power_saturated, -94, :rssi_not_available] == Keyword.get(params, :channels)
   end
+
+  test "ignore non-standard channel" do
+    params_binary = <<0x7E, 0xA2, 0x9E>>
+    {:ok, params} = RssiReport.decode_params(params_binary)
+    assert [:rssi_max_power_saturated, -94] == Keyword.get(params, :channels)
+  end
 end

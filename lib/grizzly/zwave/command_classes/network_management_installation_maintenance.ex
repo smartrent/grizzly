@@ -8,7 +8,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
 
   @type route_type ::
           :no_route | :last_working_route | :next_to_last_working_route | :set_by_application
-  @type speed :: :"9.6kbit/s" | :"40kbit/s" | :"100kbit/s"
+  @type speed :: :"9.6kbit/s" | :"40kbit/s" | :"100kbit/s" | :reserved
   @type statistics :: [statistic]
   @type statistic ::
           {:route_changes, byte}
@@ -64,13 +64,15 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  @spec speed_from_byte(any) :: {:error, Grizzly.ZWave.DecodeError.t()} | {:ok, speed}
+  @spec speed_from_byte(any) :: {:ok, speed}
   def speed_from_byte(byte) do
     case byte do
       0x01 -> {:ok, :"9.6kbit/s"}
       0x02 -> {:ok, :"40kbit/s"}
       0x03 -> {:ok, :"100kbit/s"}
-      byte -> {:error, %DecodeError{param: :speed, value: byte}}
+      # All other values are reserved and MUST NOT be used by a sending node.
+      # Reserved values MUST be ignored by a receiving node.
+      _byte -> {:ok, :reserved}
     end
   end
 
