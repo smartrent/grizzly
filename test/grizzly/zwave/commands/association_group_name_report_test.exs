@@ -21,4 +21,11 @@ defmodule Grizzly.ZWave.Commands.AssociationNameReportTest do
     assert Keyword.get(params, :group_id) == 2
     assert Keyword.get(params, :name) == "some_name"
   end
+
+  test "decodes params correctly even if extra bytes" do
+    binary_params = <<0x02, 0x09>> <> "some_name" <> <<0x00>>
+    {:ok, params} = AssociationGroupNameReport.decode_params(binary_params)
+    assert Keyword.get(params, :group_id) == 2
+    assert Keyword.get(params, :name) == "some_name"
+  end
 end
