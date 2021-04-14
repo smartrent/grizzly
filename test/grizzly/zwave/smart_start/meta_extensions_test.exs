@@ -7,26 +7,26 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
   describe "advanced joining" do
     test "encode all keys" do
       assert <<0x6B, 0x01, 0x47>> ==
-               MetaExtension.encode([{:advanced_joining, Security.keys()}])
+               MetaExtension.encode({:advanced_joining, Security.keys()})
     end
 
     test "invalid security keys are ignored" do
       assert <<0x6B, 0x01, 0x02>> ==
-               MetaExtension.encode([{:advanced_joining, [:red, :s2_authenticated]}])
+               MetaExtension.encode({:advanced_joining, [:red, :s2_authenticated]})
     end
   end
 
   describe "bootstrapping mode" do
     test "encodes security_2 mode" do
-      assert <<0x6D, 0x01, 0x00>> == MetaExtension.encode(bootstrapping_mode: :security_2)
+      assert <<0x6D, 0x01, 0x00>> == MetaExtension.encode({:bootstrapping_mode, :security_2})
     end
 
     test "encodes smart_start mode" do
-      assert <<0x6D, 0x01, 0x01>> == MetaExtension.encode(bootstrapping_mode: :smart_start)
+      assert <<0x6D, 0x01, 0x01>> == MetaExtension.encode({:bootstrapping_mode, :smart_start})
     end
 
     test "encodes long_range mode" do
-      assert <<0x6D, 0x01, 0x02>> == MetaExtension.encode(bootstrapping_mode: :long_range)
+      assert <<0x6D, 0x01, 0x02>> == MetaExtension.encode({:bootstrapping_mode, :long_range})
     end
 
     test "parses security 2" do
@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
     test "encodes" do
       expected_bin = <<0x66, 0x0D, 108, 111, 99, 97, 116, 105, 111, 110, 49, 50, 51, 52, 48>>
 
-      assert expected_bin == MetaExtension.encode(location_information: "location12340")
+      assert expected_bin == MetaExtension.encode({:location_information, "location12340"})
     end
 
     test "parses" do
@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
     test "encodes" do
       expected_binary = <<0x04, 0x01, 0x4C>>
 
-      assert expected_binary == MetaExtension.encode(max_inclusion_request_interval: 10368)
+      assert expected_binary == MetaExtension.encode({:max_inclusion_request_interval, 10368})
     end
 
     test "parses" do
@@ -74,7 +74,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
     test "encodes with dot" do
       expected_bin = <<100, 12, 104, 101, 108, 108, 111, 92, 46, 119, 111, 114, 108, 100>>
 
-      assert expected_bin == MetaExtension.encode(name_information: "hello.world")
+      assert expected_bin == MetaExtension.encode({:name_information, "hello.world"})
     end
 
     test "parses" do
@@ -88,19 +88,19 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
     test "encodes when status is :not_in_network" do
       expected_binary = <<0x6E, 0x02, 0x01, 0x00>>
 
-      assert expected_binary == MetaExtension.encode(network_status: {1, :not_in_network})
+      assert expected_binary == MetaExtension.encode({:network_status, {1, :not_in_network}})
     end
 
     test "encodes when status is :included" do
       expected_binary = <<0x6E, 0x02, 0x01, 0x01>>
 
-      assert expected_binary == MetaExtension.encode(network_status: {1, :included})
+      assert expected_binary == MetaExtension.encode({:network_status, {1, :included}})
     end
 
     test "encodes when status is :failing" do
       expected_binary = <<0x6E, 0x02, 0x01, 0x02>>
 
-      assert expected_binary == MetaExtension.encode(network_status: {1, :failing})
+      assert expected_binary == MetaExtension.encode({:network_status, {1, :failing}})
     end
 
     test "parses when status is :not_in_network" do
@@ -127,7 +127,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
       expected_binary = <<0x02, 0x08, 0xFF, 0xFF, 0xEE, 0xEE, 0xAA, 0xAA, 0x01, 0x02>>
       extension_values = {0xFFFF, 0xEEEE, 0xAAAA, "1.2"}
 
-      assert expected_binary == MetaExtension.encode(product_id: extension_values)
+      assert expected_binary == MetaExtension.encode({:product_id, extension_values})
     end
 
     test "parses" do
@@ -142,19 +142,19 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
     test "encode pending setting" do
       expected_binary = <<0x69, 0x01, 0x00>>
 
-      assert expected_binary == MetaExtension.encode(smart_start_inclusion_setting: :pending)
+      assert expected_binary == MetaExtension.encode({:smart_start_inclusion_setting, :pending})
     end
 
     test "encode passive setting" do
       expected_binary = <<0x69, 0x01, 0x02>>
 
-      assert expected_binary == MetaExtension.encode(smart_start_inclusion_setting: :passive)
+      assert expected_binary == MetaExtension.encode({:smart_start_inclusion_setting, :passive})
     end
 
     test "encode ignored setting" do
       expected_binary = <<0x69, 0x01, 0x03>>
 
-      assert expected_binary == MetaExtension.encode(smart_start_inclusion_setting: :ignored)
+      assert expected_binary == MetaExtension.encode({:smart_start_inclusion_setting, :ignored})
     end
 
     test "parses pending setting" do
@@ -181,7 +181,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
       expected_binary = <<0x00, 0x04, 0x20, 0x01, 0x0C, 0x00>>
       extension_values = {:sensor_binary, :routing_sensor_binary, :generic_sensor_notification}
 
-      assert expected_binary == MetaExtension.encode(product_type: extension_values)
+      assert expected_binary == MetaExtension.encode({:product_type, extension_values})
     end
 
     test "parses" do
@@ -194,7 +194,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
 
   describe "unknown extension" do
     test "encodes" do
-      assert <<0xAA, 0x01, 0x04>> == MetaExtension.encode(unknown: <<0xAA, 0x01, 0x04>>)
+      assert <<0xAA, 0x01, 0x04>> == MetaExtension.encode({:unknown, <<0xAA, 0x01, 0x04>>})
     end
 
     test "parses" do

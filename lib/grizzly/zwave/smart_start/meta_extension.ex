@@ -178,16 +178,11 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
           | {:unknown, binary()}
 
   @doc """
-  Encode the list of extensions into a binary
+  Encode an extension into a binary
   """
-  @spec encode([extension()]) :: binary()
-  def encode(extensions) do
-    iodata =
-      Enum.reduce(extensions, [], fn extension, iodata ->
-        iodata ++ encode_extension(extension)
-      end)
-
-    IO.iodata_to_binary(iodata)
+  @spec encode(extension()) :: binary()
+  def encode(extension) do
+    IO.iodata_to_binary(encode_extension(extension))
   end
 
   defp encode_extension({:advanced_joining, keys}) do
