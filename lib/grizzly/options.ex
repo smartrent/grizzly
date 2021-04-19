@@ -4,6 +4,34 @@ defmodule Grizzly.Options do
   alias Grizzly.Supervisor
   alias Grizzly.ZIPGateway.Config
 
+  @typedoc """
+  The RF region code you want the Z-Wave controller to operate at.
+
+  * `:eu` - Europe
+  * `:us` - US
+  * `:anz` - Australia & New Zealand
+  * `:hk` - Hong Kong
+  * `:id` - India
+  * `:il` - Israel
+  * `:ru` - Russia
+  * `:cn` - China
+  * `:us_lr`- US long range
+  * `:jp` - Japan
+  * `:kr` - Korea
+  """
+  @type rf_region() ::
+          :eu
+          | :us
+          | :anz
+          | :hk
+          | :id
+          | :il
+          | :ru
+          | :cn
+          | :us_lr
+          | :jp
+          | :kr
+
   @type t() :: %__MODULE__{
           transport: module(),
           run_zipgateway: boolean(),
@@ -26,7 +54,8 @@ defmodule Grizzly.Options do
           associations_file: Path.t(),
           eeprom_file: Path.t() | nil,
           database_file: Path.t() | nil,
-          indicator_handler: (Grizzly.Indicator.event() -> :ok)
+          indicator_handler: (Grizzly.Indicator.event() -> :ok),
+          rf_region: rf_region()
         }
 
   defstruct run_zipgateway: true,
@@ -50,7 +79,8 @@ defmodule Grizzly.Options do
             associations_file: nil,
             eeprom_file: "/data/zipeeprom.dat",
             database_file: "/data/zipgateway.db",
-            indicator_handler: nil
+            indicator_handler: nil,
+            rf_region: nil
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do
