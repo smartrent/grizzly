@@ -5,6 +5,8 @@ defmodule Grizzly.ZIPGateway.Config do
 
   require Logger
 
+  alias Grizzly.Options
+
   @type t :: %__MODULE__{
           ca_cert: Path.t(),
           cert: Path.t(),
@@ -24,7 +26,8 @@ defmodule Grizzly.ZIPGateway.Config do
           serial_log: String.t() | nil,
           extra_classes: [byte()],
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
-          database_file: Path.t() | nil
+          database_file: Path.t() | nil,
+          rf_region: Options.rf_region() | nil
         }
 
   defstruct ca_cert: "./Portal.ca_x509.pem",
@@ -46,7 +49,8 @@ defmodule Grizzly.ZIPGateway.Config do
             extra_classes: [0x85, 0x59, 0x5A, 0x8E, 0x6C, 0x8F],
             unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
             database_file: nil,
-            identify_script: nil
+            identify_script: nil,
+            rf_region: nil
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -64,7 +68,8 @@ defmodule Grizzly.ZIPGateway.Config do
         :lan_ip,
         :pan_ip,
         :database_file,
-        :eeprom_file
+        :eeprom_file,
+        :rf_region
       ])
 
     struct(__MODULE__, opts)
@@ -106,6 +111,7 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :database_file, "ZipGwDatabase")
     |> maybe_put_config_item(cfg, :eeprom_file, "Eepromfile")
     |> maybe_put_config_item(cfg, :identify_script, "ZipNodeIdentifyScript")
+    |> maybe_put_config_item(cfg, :rf_region, "ZWRFRegion")
   end
 
   @doc """
@@ -185,6 +191,16 @@ defmodule Grizzly.ZIPGateway.Config do
     config_string <> "#{cfg_name}=#{ip}\n"
   end
 
+  defp maybe_put_config_item(config_string, cfg, :rf_region, cfg_name) do
+    case Map.get(cfg, :rf_region) do
+      nil ->
+        config_string
+
+      region ->
+        config_string <> "#{cfg_name}=#{rf_region(region)}\n"
+    end
+  end
+
   defp maybe_put_config_item(config_string, cfg, field, cfg_name) do
     cfg_item = Map.get(cfg, field)
 
@@ -194,4 +210,16 @@ defmodule Grizzly.ZIPGateway.Config do
       config_string
     end
   end
+
+  defp rf_region(:eu), do: 0x00
+  defp rf_region(:us), do: 0x01
+  defp rf_region(:anz), do: 0x02
+  defp rf_region(:hk), do: 0x03
+  defp rf_region(:id), do: 0x05
+  defp rf_region(:il), do: 0x06
+  defp rf_region(:ru), do: 0x07
+  defp rf_region(:cn), do: 0x08
+  defp rf_region(:us_lr), do: 0x09
+  defp rf_region(:jp), do: 0x20
+  defp rf_region(:kr), do: 0x21
 end

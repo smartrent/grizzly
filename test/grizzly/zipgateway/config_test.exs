@@ -77,30 +77,116 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     assert output == Config.to_string(cfg)
   end
 
-  test "write the cfg file to the system" do
-    cfg = Config.new()
+  describe "write the cfg file to the system" do
+    test "default" do
+      cfg = Config.new()
 
-    expected_contents = """
-    ZipCaCert=./Portal.ca_x509.pem
-    ZipCert=./ZIPR.x509_1024.pem
-    ZipPrivKey=./ZIPR.key_1024.pem
-    TunScript=./zipgateway.tun
-    PVSStorageFile=/root/provisioning_list_store.dat
-    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
-    ZipLanGw6=::1
-    ZipPSK=123456789012345678901234567890AA
-    ExtraClasses= 133 89 90 142 108 143
-    ZipPanIp6=fd00:bbbb::1
-    ZipLanIp6=fd00:aaaa::1
-    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
-    ZipUnsolicitedDestinationPort=41230
-    ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
-    """
+      expected_contents = """
+      ZipCaCert=./Portal.ca_x509.pem
+      ZipCert=./ZIPR.x509_1024.pem
+      ZipPrivKey=./ZIPR.key_1024.pem
+      TunScript=./zipgateway.tun
+      PVSStorageFile=/root/provisioning_list_store.dat
+      ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
+      ZipLanGw6=::1
+      ZipPSK=123456789012345678901234567890AA
+      ExtraClasses= 133 89 90 142 108 143
+      ZipPanIp6=fd00:bbbb::1
+      ZipLanIp6=fd00:aaaa::1
+      ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+      ZipUnsolicitedDestinationPort=41230
+      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      """
 
-    assert :ok = Config.write(cfg, cfg_path())
+      assert :ok = Config.write(cfg, cfg_path())
 
-    assert expected_contents == File.read!(cfg_path())
+      assert expected_contents == File.read!(cfg_path())
 
-    :ok = File.rm!(cfg_path())
+      :ok = File.rm!(cfg_path())
+    end
+
+    test "with rf region eu" do
+      cfg = Config.new(%{rf_region: :eu})
+
+      expected_contents = """
+      ZipCaCert=./Portal.ca_x509.pem
+      ZipCert=./ZIPR.x509_1024.pem
+      ZipPrivKey=./ZIPR.key_1024.pem
+      TunScript=./zipgateway.tun
+      PVSStorageFile=/root/provisioning_list_store.dat
+      ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
+      ZipLanGw6=::1
+      ZipPSK=123456789012345678901234567890AA
+      ExtraClasses= 133 89 90 142 108 143
+      ZipPanIp6=fd00:bbbb::1
+      ZipLanIp6=fd00:aaaa::1
+      ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+      ZipUnsolicitedDestinationPort=41230
+      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZWRFRegion=0
+      """
+
+      assert :ok = Config.write(cfg, cfg_path())
+
+      assert expected_contents == File.read!(cfg_path())
+
+      :ok = File.rm!(cfg_path())
+    end
+
+    test "with rf region us" do
+      cfg = Config.new(%{rf_region: :us})
+
+      expected_contents = """
+      ZipCaCert=./Portal.ca_x509.pem
+      ZipCert=./ZIPR.x509_1024.pem
+      ZipPrivKey=./ZIPR.key_1024.pem
+      TunScript=./zipgateway.tun
+      PVSStorageFile=/root/provisioning_list_store.dat
+      ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
+      ZipLanGw6=::1
+      ZipPSK=123456789012345678901234567890AA
+      ExtraClasses= 133 89 90 142 108 143
+      ZipPanIp6=fd00:bbbb::1
+      ZipLanIp6=fd00:aaaa::1
+      ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+      ZipUnsolicitedDestinationPort=41230
+      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZWRFRegion=1
+      """
+
+      assert :ok = Config.write(cfg, cfg_path())
+
+      assert expected_contents == File.read!(cfg_path())
+
+      :ok = File.rm!(cfg_path())
+    end
+
+    test "with rf region us_lr" do
+      cfg = Config.new(%{rf_region: :us_lr})
+
+      expected_contents = """
+      ZipCaCert=./Portal.ca_x509.pem
+      ZipCert=./ZIPR.x509_1024.pem
+      ZipPrivKey=./ZIPR.key_1024.pem
+      TunScript=./zipgateway.tun
+      PVSStorageFile=/root/provisioning_list_store.dat
+      ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
+      ZipLanGw6=::1
+      ZipPSK=123456789012345678901234567890AA
+      ExtraClasses= 133 89 90 142 108 143
+      ZipPanIp6=fd00:bbbb::1
+      ZipLanIp6=fd00:aaaa::1
+      ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+      ZipUnsolicitedDestinationPort=41230
+      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZWRFRegion=9
+      """
+
+      assert :ok = Config.write(cfg, cfg_path())
+
+      assert expected_contents == File.read!(cfg_path())
+
+      :ok = File.rm!(cfg_path())
+    end
   end
 end
