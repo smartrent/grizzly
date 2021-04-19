@@ -1,5 +1,32 @@
 ## Changelog
 
+## v0.19.0 - 2021-4-19
+
+Breaking change in regards to how meta extensions are passed to
+`Grizzly.Network.set_node_provisioning/3`.
+
+The meta extension were once structs that need to be built and passed to the
+function, but now they are a keyword list. Please see
+`Grizzly.ZWave.SmartStart.MetaExtension` module for more details on the keyword
+keys and their values.
+
+## Added
+
+- Added `Grizzly.SwitchBinary` has a higher level helper module to control
+  binary switches
+- Added basic support for including Z-Wave LR devices
+- Added LR command class support for NetworkManagementInclusion
+- Support version 2 of User Number Report command
+
+## Improvements
+
+- Better handling of RSSI channel reports
+- Better handling of Association Group Name Report command
+
+Thank you to those who contributed to this release:
+
+- Jean-Francois Cloutier
+
 ## v0.18.3 - 2021-3-11
 
 ### Added
