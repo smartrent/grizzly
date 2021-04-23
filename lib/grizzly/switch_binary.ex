@@ -36,12 +36,12 @@ defmodule Grizzly.SwitchBinary do
 
   This command will return a `report()` in response.
   """
-  @spec get(ZWave.node_id()) ::
+  @spec get(ZWave.node_id(), [Grizzly.command_opt()]) ::
           {:ok, report()}
           | {:queued, reference(), non_neg_integer()}
           | {:error, :timeout | :including | :updating_firmware | :nack_response | any()}
-  def get(node_id) do
-    case Grizzly.send_command(node_id, :switch_binary_get) do
+  def get(node_id, command_opts \\ []) do
+    case Grizzly.send_command(node_id, :switch_binary_get, [], command_opts) do
       {:ok, %{type: :command} = report} ->
         target_value = Command.param!(report.command, :target_value)
         duration = Command.param(report.command, :duration)
@@ -75,16 +75,19 @@ defmodule Grizzly.SwitchBinary do
   optionally be passed a duration that specifies the duration of the
   transition from the current value to the target value.
   """
-  @spec set(ZWave.node_id(), set_value(), [set_opt()]) ::
+  @spec set(ZWave.node_id(), set_value(), [set_opt() | Grizzly.command_opt()]) ::
           :ok
           | {:queued, reference(), non_neg_integer()}
           | {:error, :timeout | :including | :updating_firmware | :nack_response | any()}
   def set(node_id, target_value, opts \\ []) do
     duration = Keyword.get(opts, :duration)
+    send_opts = Keyword.drop(opts, [:duration])
 
-    case Grizzly.send_command(node_id, :switch_binary_set,
-           target_value: target_value,
-           duration: duration
+    case Grizzly.send_command(
+           node_id,
+           :switch_binary_set,
+           [target_value: target_value, duration: duration],
+           send_opts
          ) do
       {:ok, %{type: :ack_response}} ->
         :ok
