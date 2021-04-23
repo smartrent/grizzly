@@ -55,7 +55,8 @@ defmodule Grizzly.Options do
           eeprom_file: Path.t() | nil,
           database_file: Path.t() | nil,
           indicator_handler: (Grizzly.Indicator.event() -> :ok),
-          rf_region: rf_region()
+          rf_region: rf_region() | nil,
+          power_level: {non_neg_integer(), non_neg_integer()} | nil
         }
 
   defstruct run_zipgateway: true,
@@ -80,7 +81,8 @@ defmodule Grizzly.Options do
             eeprom_file: "/data/zipeeprom.dat",
             database_file: "/data/zipgateway.db",
             indicator_handler: nil,
-            rf_region: nil
+            rf_region: nil,
+            power_level: nil
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do
