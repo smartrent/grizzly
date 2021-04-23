@@ -1,5 +1,19 @@
 ## Changelog
 
+## v0.19.1 - 2021-4-23
+
+### Added
+
+- Configuration option for setting the RF region
+- Configuration option for setting power level settings
+
+### Improvements
+
+- Allow passing send command options to functions in `Grizzly.SwitchBinary`
+  module
+
+Thank you to djantea for testing out the RF configuration changes!
+
 ## v0.19.0 - 2021-4-19
 
 Breaking change in regards to how meta extensions are passed to
