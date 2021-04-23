@@ -94,6 +94,8 @@ defmodule Grizzly.Supervisor do
   - `:indicator_handler` - A function to run when an `Grizzly.Indicator.event()`
     is received from `zipgateway`. The function should accept an event and
     return `:ok`.
+  - `:power_level - A tuple where the first item is the normal TX power level
+    and the second item is the measured 0dBm power configuration
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be

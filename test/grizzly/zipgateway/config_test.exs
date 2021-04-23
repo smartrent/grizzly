@@ -189,4 +189,33 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
       :ok = File.rm!(cfg_path())
     end
   end
+
+  test "config with power level options" do
+    cfg = Config.new(%{power_level: {0, 33}})
+
+    expected_contents = """
+    ZipCaCert=./Portal.ca_x509.pem
+    ZipCert=./ZIPR.x509_1024.pem
+    ZipPrivKey=./ZIPR.key_1024.pem
+    TunScript=./zipgateway.tun
+    PVSStorageFile=/root/provisioning_list_store.dat
+    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
+    ZipLanGw6=::1
+    ZipPSK=123456789012345678901234567890AA
+    ExtraClasses= 133 89 90 142 108 143
+    ZipPanIp6=fd00:bbbb::1
+    ZipLanIp6=fd00:aaaa::1
+    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
+    ZipUnsolicitedDestinationPort=41230
+    ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+    NormalTxPowerLevel=0
+    Measured0dBmPower=33
+    """
+
+    assert :ok = Config.write(cfg, cfg_path())
+
+    assert expected_contents == File.read!(cfg_path())
+
+    :ok = File.rm!(cfg_path())
+  end
 end

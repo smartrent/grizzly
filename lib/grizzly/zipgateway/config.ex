@@ -27,7 +27,8 @@ defmodule Grizzly.ZIPGateway.Config do
           extra_classes: [byte()],
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
           database_file: Path.t() | nil,
-          rf_region: Options.rf_region() | nil
+          rf_region: Options.rf_region() | nil,
+          power_level: {non_neg_integer(), non_neg_integer()} | nil
         }
 
   defstruct ca_cert: "./Portal.ca_x509.pem",
@@ -50,7 +51,8 @@ defmodule Grizzly.ZIPGateway.Config do
             unsolicited_destination: {{0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}, 41230},
             database_file: nil,
             identify_script: nil,
-            rf_region: nil
+            rf_region: nil,
+            power_level: nil
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -69,7 +71,8 @@ defmodule Grizzly.ZIPGateway.Config do
         :pan_ip,
         :database_file,
         :eeprom_file,
-        :rf_region
+        :rf_region,
+        :power_level
       ])
 
     struct(__MODULE__, opts)
@@ -112,6 +115,7 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :eeprom_file, "Eepromfile")
     |> maybe_put_config_item(cfg, :identify_script, "ZipNodeIdentifyScript")
     |> maybe_put_config_item(cfg, :rf_region, "ZWRFRegion")
+    |> maybe_put_config_item(cfg, :power_level, "")
   end
 
   @doc """
@@ -177,6 +181,17 @@ defmodule Grizzly.ZIPGateway.Config do
 
       script_path ->
         config_string <> "#{cfg_name}=#{script_path}\n"
+    end
+  end
+
+  defp maybe_put_config_item(config_string, cfg, :power_level = field, _cfg_name) do
+    case Map.get(cfg, field) do
+      nil ->
+        config_string
+
+      {tx_powerlevel, measured_dbm} ->
+        config_string <>
+          "NormalTxPowerLevel=#{tx_powerlevel}\nMeasured0dBmPower=#{measured_dbm}\n"
     end
   end
 
