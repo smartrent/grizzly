@@ -45,6 +45,34 @@ defmodule Grizzly.Supervisor do
   alias Grizzly.ZIPGateway.ReadyChecker
 
   @typedoc """
+  The RF region code you want the Z-Wave controller to operate at.
+
+  * `:eu` - Europe
+  * `:us` - US
+  * `:anz` - Australia & New Zealand
+  * `:hk` - Hong Kong
+  * `:id` - India
+  * `:il` - Israel
+  * `:ru` - Russia
+  * `:cn` - China
+  * `:us_lr`- US long range
+  * `:jp` - Japan
+  * `:kr` - Korea
+  """
+  @type rf_region() ::
+          :eu
+          | :us
+          | :anz
+          | :hk
+          | :id
+          | :il
+          | :ru
+          | :cn
+          | :us_lr
+          | :jp
+          | :kr
+
+  @typedoc """
   Arguments for running `Grizzly.Supervisor`
 
   - `:run_zipgateway` - boolean flag to set if Grizzly should be running and
@@ -94,8 +122,10 @@ defmodule Grizzly.Supervisor do
   - `:indicator_handler` - A function to run when an `Grizzly.Indicator.event()`
     is received from `zipgateway`. The function should accept an event and
     return `:ok`.
-  - `:power_level - A tuple where the first item is the normal TX power level
-    and the second item is the measured 0dBm power configuration
+  - `:rf_region` - Specify the RF region to be used by `zipgateway`
+  - `:power_level` - A tuple where the first item is the normal TX power level
+    and the second item is the measured 0dBm power configuration. See Silabs
+    INS14664 (MaxPowerCalc) spreadsheet to figure out the power numbers.
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -124,6 +154,20 @@ defmodule Grizzly.Supervisor do
           | {:eeprom_file, Path.t()}
           | {:database_file, Path.t()}
           | {:indicator_handler, (Grizzly.Indicator.event() -> :ok)}
+          | {:rf_region, rf_region()}
+          | {:power_level, {tx_power(), measured_power()}}
+
+  @typedoc """
+  The power level used when transmitting frames at normal power
+
+  See Silabs INS14664 (MaxPowerCalc) spreadsheet to figure out tx power levels.
+  """
+  @type tx_power() :: non_neg_integer()
+
+  @typedoc """
+  The output power measured from the antenna when the `tx_power()` is set to 0dBm
+  """
+  @type measured_power() :: integer()
 
   @doc """
   Start the Grizzly.Supervisor

@@ -5,7 +5,7 @@ defmodule Grizzly.ZIPGateway.Config do
 
   require Logger
 
-  alias Grizzly.Options
+  alias Grizzly.Supervisor
 
   @type t :: %__MODULE__{
           ca_cert: Path.t(),
@@ -27,8 +27,8 @@ defmodule Grizzly.ZIPGateway.Config do
           extra_classes: [byte()],
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
           database_file: Path.t() | nil,
-          rf_region: Options.rf_region() | nil,
-          power_level: {non_neg_integer(), non_neg_integer()} | nil
+          rf_region: Supervisor.rf_region() | nil,
+          power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil
         }
 
   defstruct ca_cert: "./Portal.ca_x509.pem",
