@@ -221,6 +221,10 @@ defmodule Grizzly.ZWave.Decoder do
       # Thermostat operating state
       {0x42, 0x02, Commands.ThermostatOperatingStateGet},
       {0x42, 0x03, Commands.ThermostatOperatingStateReport},
+      # Zip ND
+      {0x58, 0x01, Commands.ZipNodeAdvertisement},
+      {0x58, 0x03, Commands.ZipNodeSolicitation},
+      {0x58, 0x04, Commands.ZipInverseNodeSolicitation},
       # Powerlevel
       {0x73, 0x01, Commands.PowerlevelSet},
       {0x73, 0x02, Commands.PowerlevelGet},

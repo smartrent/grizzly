@@ -315,7 +315,14 @@ defmodule Grizzly.Commands.Table do
       {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssiReport}}},
       # Zwaveplus Info
       {:zwaveplus_info_get,
-       {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}}
+       {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}},
+      # Zip ND
+      {:zip_node_solicitation,
+       {Commands.ZipNodeSolicitation,
+        handler: {WaitReport, complete_report: :zip_node_advertisement}}},
+      {:zip_inverse_node_solicitation,
+       {Commands.ZipInverseNodeSolicitation,
+        handler: {WaitReport, complete_report: :zip_node_advertisement}}}
     ]
 
     defmacro __before_compile__(_) do
