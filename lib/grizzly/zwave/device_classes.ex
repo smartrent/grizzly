@@ -108,6 +108,10 @@ defmodule Grizzly.ZWave.DeviceClasses do
       {:switch_multilevel, 0x06, :class_b_motor_control},
       {:switch_multilevel, 0x07, :class_c_motor_control},
       {:switch_multilevel, 0x08, :fan_switch},
+      # repeater slave
+      {:repeater_slave, 0x00, :not_used},
+      {:repeater_slave, 0x01, :repeater_slave},
+      {:repeater_slave, 0x02, :virtual_node},
       # switch remote (0x13)
       {:switch_remote, 0x00, :not_used},
       {:switch_remote, 0x01, :switch_remote_binary},
@@ -336,6 +340,8 @@ defmodule Grizzly.ZWave.DeviceClasses do
                 | :adv_zensor_net_smoke_sensor
                 | :alarm_sensor
                 | :portable_scene_controller
+                | :repeater_slave
+                | :virtual_node
 
         @doc """
         Try to make a basic device class from a byte
