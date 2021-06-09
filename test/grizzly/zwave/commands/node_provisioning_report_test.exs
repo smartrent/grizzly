@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
 
     {:ok, params} = NodeProvisioningReport.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
-    assert Keyword.get(params, :dsk) == nil
+    assert Keyword.get(params, :dsk) == Grizzly.ZWave.DSK.zeros()
     assert Keyword.get(params, :meta_extensions) == []
   end
 end
