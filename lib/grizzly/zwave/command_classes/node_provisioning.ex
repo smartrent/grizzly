@@ -40,13 +40,9 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
   @doc """
   Get the DSK from a raw binary
 
-  If the binary is empty this will return `{:ok, nil}`.
+  If the binary is empty this will return `{:ok, #DSK<00000-00000-00000-00000-00000-00000-00000-00000>}`.
   """
-  @spec optional_binary_to_dsk(binary()) :: DSK.t() | nil
-  def optional_binary_to_dsk(<<>>) do
-    nil
-  end
-
+  @spec optional_binary_to_dsk(binary()) :: DSK.t()
   def optional_binary_to_dsk(binary) do
     DSK.new(binary)
   end
