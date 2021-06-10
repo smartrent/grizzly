@@ -29,7 +29,6 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSetTest do
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
   end
 
-
   test "decodes v1 params correctly" do
     binary_params = <<0xFF>>
     {:ok, params} = SwitchMultilevelSet.decode_params(binary_params)
