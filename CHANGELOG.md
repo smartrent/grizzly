@@ -1,5 +1,20 @@
 ## Changelog
 
+## v0.20.0 - 2021-6-14
+
+The release breaks the return value of
+`Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_dsk_to_binary/1` from
+returning `nil` to returning a DSK filled will `0`s if an empty binary string
+is passed into the function.
+
+If you have not called this function directly then it is safe to upgrade to
+`v0.20.0`.
+
+## Changes
+
+- Allow values greater than `99` to be passed in
+  `Grizzly.ZWave.Commands.SwitchMultilevelSet.encode_target_value/1`
+
 ## v0.19.1 - 2021-4-23
 
 ### Added
