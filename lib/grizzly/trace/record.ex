@@ -46,9 +46,7 @@ defmodule Grizzly.Trace.Record do
     %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
     {:ok, zip_packet} = ZWave.from_binary(binary)
 
-    "#{Time.to_string(ts)} #{src_dest_to_string(src)} #{src_dest_to_string(dest)} #{
-      command_info_str(zip_packet)
-    }"
+    "#{Time.to_string(ts)} #{src_dest_to_string(src)} #{src_dest_to_string(dest)} #{command_info_str(zip_packet)}"
   end
 
   defp src_dest_to_string(nil) do

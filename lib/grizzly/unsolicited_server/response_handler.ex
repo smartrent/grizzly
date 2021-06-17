@@ -58,9 +58,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
       {:error, reason} ->
         Logger.warn(
-          "Failed to parse: #{inspect(encapsulated_command)} notification for reason: #{
-            inspect(reason)
-          }"
+          "Failed to parse: #{inspect(encapsulated_command)} notification for reason: #{inspect(reason)}"
         )
 
         []

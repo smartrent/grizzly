@@ -177,9 +177,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
   defp handle_continuation({desired_state, delay_msecs}, firmware_update) do
     Logger.debug(
-      "[Grizzly] Handling FW update continuation to desired state #{inspect(desired_state)} after #{
-        delay_msecs
-      } msecs"
+      "[Grizzly] Handling FW update continuation to desired state #{inspect(desired_state)} after #{delay_msecs} msecs"
     )
 
     {command, new_firmware_update} = FirmwareUpdate.next_command(firmware_update, desired_state)
