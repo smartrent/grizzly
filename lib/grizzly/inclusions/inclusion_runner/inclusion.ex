@@ -159,7 +159,7 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
   end
 
   def complete(%__MODULE__{state: state} = inclusion)
-      when not (state in [:started, :complete]) do
+      when state not in [:started, :complete] do
     %__MODULE__{inclusion | state: :complete}
   end
 

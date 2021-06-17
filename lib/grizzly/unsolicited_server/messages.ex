@@ -38,9 +38,7 @@ defmodule Grizzly.UnsolicitedServer.Messages do
     node_id = ZIPGateway.node_id_from_ip(node_ip_address)
 
     Logger.debug(
-      "[GRIZZLY] Unsolicited Message for node #{inspect(node_id)}: #{
-        inspect(zip_packet_or_command)
-      }"
+      "[GRIZZLY] Unsolicited Message for node #{inspect(node_id)}: #{inspect(zip_packet_or_command)}"
     )
 
     command =

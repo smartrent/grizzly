@@ -246,7 +246,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   end
 
   defp complete(%__MODULE__{state: state} = firmware_update, _command)
-       when not (state in [:started, :complete]) do
+       when state not in [:started, :complete] do
     %__MODULE__{firmware_update | state: :complete}
   end
 

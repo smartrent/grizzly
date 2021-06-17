@@ -933,9 +933,7 @@ defmodule Grizzly.ZWave.Notifications do
 
   def encode_event_params(zwave_type, zwave_event, event_params) do
     Logger.info(
-      "[Grizzly] Encoding not implemented for event params #{inspect(event_params)} for zwave_type #{
-        inspect(zwave_type)
-      } and zwave_event #{inspect(zwave_event)}"
+      "[Grizzly] Encoding not implemented for event params #{inspect(event_params)} for zwave_type #{inspect(zwave_type)} and zwave_event #{inspect(zwave_event)}"
     )
 
     <<>>
@@ -1010,9 +1008,7 @@ defmodule Grizzly.ZWave.Notifications do
 
   def decode_event_params(zwave_type, zwave_event, params_binary) do
     Logger.info(
-      "Decoding not implemented for event params #{inspect(params_binary)} for zwave_type #{
-        inspect(zwave_type)
-      } and zwave_event #{inspect(zwave_event)}"
+      "Decoding not implemented for event params #{inspect(params_binary)} for zwave_type #{inspect(zwave_type)} and zwave_event #{inspect(zwave_event)}"
     )
 
     {:ok, []}
