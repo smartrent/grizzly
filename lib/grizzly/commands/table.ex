@@ -315,7 +315,35 @@ defmodule Grizzly.Commands.Table do
       {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssiReport}}},
       # Zwaveplus Info
       {:zwaveplus_info_get,
-       {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}}
+       {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}},
+      # Schedule Entry Lock
+      {:schedule_entry_lock_week_day_get,
+       {Commands.ScheduleEntryLockWeekDayGet,
+        handler: {WaitReport, complete_report: :schedule_entry_lock_week_day_report}}},
+      {:schedule_entry_lock_year_day_get,
+       {Commands.ScheduleEntryLockYearDayGet,
+        handler: {WaitReport, complete_report: :schedule_entry_lock_year_day_report}}},
+      {:schedule_entry_type_supported_get,
+       {Commands.ScheduleEntryTypeSupportedGet,
+        handler: {WaitReport, complete_report: :schedule_entry_type_supported_report}}},
+      {:schedule_entry_lock_time_offset_get,
+       {Commands.ScheduleEntryLockTimeOffsetGet,
+        handler: {WaitReport, complete_report: :schedule_entry_lock_time_offset_report}}},
+      {:schedule_entry_lock_daily_repeating_get,
+       {Commands.ScheduleEntryLockDailyRepeatingGet,
+        handler: {WaitReport, complete_report: :schedule_entry_lock_daily_repeating_report}}},
+      {:schedule_entry_lock_enable_set,
+       {Commands.ScheduleEntryLockEnableSet, handler: AckResponse}},
+      {:schedule_entry_lock_enable_all_set,
+       {Commands.ScheduleEntryLockEnableAllSet, handler: AckResponse}},
+      {:schedule_entry_lock_week_day_set,
+       {Commands.ScheduleEntryLockWeekDaySet, handler: AckResponse}},
+      {:schedule_entry_lock_year_day_set,
+       {Commands.ScheduleEntryLockYearDaySet, handler: AckResponse}},
+      {:schedule_entry_lock_time_offset_set,
+       {Commands.ScheduleEntryLockTimeOffsetSet, handler: AckResponse}},
+      {:schedule_entry_lock_daily_repeating_set,
+       {Commands.ScheduleEntryLockDailyRepeatingSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
