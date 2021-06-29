@@ -148,12 +148,19 @@ defmodule Grizzly do
   end
 
   def send_command(node_id, command_name, args, opts) do
+    :ok = maybe_log_warning(command_name)
+
+    send_command_no_warn(node_id, command_name, args, opts)
+  end
+
+  # This is only to be used by Grizzly as it migrates into the higher
+  # level helper modules, for example Grizzly.SwitchBinary.
+  @doc false
+  def send_command_no_warn(node_id, command_name, args, opts) do
     # always open a connection. If the connection is already opened this
     # will not establish a new connection
     including? = Inclusions.inclusion_running?()
     updating_firmware? = FirmwareUpdates.firmware_update_running?()
-
-    :ok = maybe_log_warning(command_name)
 
     with false <- including? or updating_firmware?,
          {command_module, default_opts} <- Table.lookup(command_name),

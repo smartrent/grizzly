@@ -41,7 +41,7 @@ defmodule Grizzly.SwitchBinary do
           | {:queued, reference(), non_neg_integer()}
           | {:error, :timeout | :including | :updating_firmware | :nack_response | any()}
   def get(node_id, command_opts \\ []) do
-    case Grizzly.send_command(node_id, :switch_binary_get, [], command_opts) do
+    case Grizzly.send_command_no_warn(node_id, :switch_binary_get, [], command_opts) do
       {:ok, %{type: :command} = report} ->
         target_value = Command.param!(report.command, :target_value)
         duration = Command.param(report.command, :duration)
@@ -83,7 +83,7 @@ defmodule Grizzly.SwitchBinary do
     duration = Keyword.get(opts, :duration)
     send_opts = Keyword.drop(opts, [:duration])
 
-    case Grizzly.send_command(
+    case Grizzly.send_command_no_warn(
            node_id,
            :switch_binary_set,
            [target_value: target_value, duration: duration],
