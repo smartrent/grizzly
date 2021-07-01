@@ -1,5 +1,36 @@
 ## Changelog
 
+## v0.20.1 - 2021-7-1
+
+### Adds
+
+- Support for ScheduleEntryLock command class (Grace Yanagida)
+  - `Grizzly.ZWave.CommandClasses.ScheduleEntryLock`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockYearDayGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockYearDaySet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport`
+
+### Fixes
+
+- Invalid warnings when calling function in `Grizzly.SwitchBinary`
+
+### Updates
+
+- CI to support elixir 1.12-otp-24 (Grace Yanagida)
+
 ## v0.20.0 - 2021-6-14
 
 The release breaks the return value of
