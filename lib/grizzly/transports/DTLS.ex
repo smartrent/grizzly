@@ -202,7 +202,8 @@ defmodule Grizzly.Transports.DTLS do
           0x90, 0xAA>>}},
       {:cb_info, {:gen_udp, :udp, :udp_close, :udp_error}},
       :inet6,
-      {:ifaddr, ifaddr}
+      {:ifaddr, ifaddr},
+      {:log_level, :error}
     ]
   end
 
