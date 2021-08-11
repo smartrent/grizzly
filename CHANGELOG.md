@@ -1,5 +1,11 @@
 ## Changelog
 
+## v0.20.2 - 2021-8-11
+
+### Updates
+
+- Turn off TLS warning for connecting with `zipgateway` server
+
 ## v0.20.1 - 2021-7-1
 
 ### Adds
