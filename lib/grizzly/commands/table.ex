@@ -310,9 +310,9 @@ defmodule Grizzly.Commands.Table do
       {:priority_route_get,
        {Commands.PriorityRouteGet, handler: {WaitReport, complete_report: :priorityRouteReport}}},
       {:statistics_get,
-       {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statisticsReport}}},
+       {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statistics_report}}},
       {:statistics_clear, {Commands.StatisticsGet, handler: AckResponse}},
-      {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssiReport}}},
+      {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssi_report}}},
       # Zwaveplus Info
       {:zwaveplus_info_get,
        {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}},
