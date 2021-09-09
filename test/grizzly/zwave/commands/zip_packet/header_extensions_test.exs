@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensionsTest do
     header_ext = HeaderExtensions.from_binary(report_binary)
 
     assert [
-             {:installation_and_maintenance_report,
-              [transmission_time: 1, route_changed: :not_changed]}
+             {:installation_and_maintenance_report, [transmission_time: 1, route_changed: false]}
            ] == header_ext
   end
 

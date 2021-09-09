@@ -202,12 +202,13 @@ defmodule Grizzly.Report do
   @type transmission_stat() ::
           {:transmit_channel, non_neg_integer()}
           | {:ack_channel, non_neg_integer()}
-          | {:rssi, {rssi_value(), rssi_value(), rssi_value(), rssi_value(), rssi_value()}}
-          | {:last_working_route,
-             {ZWave.node_id(), ZWave.node_id(), ZWave.node_id(), ZWave.node_id()},
-             {transmit_speed(), :kbit_sec}}
-          | {:transmission_time, non_neg_integer()}
-          | {:route_changed, :not_changed | :changed}
+          | {:rssi_hops, [rssi_value()]}
+          | {:rssi_4bars, 0..4 | :unknown}
+          | {:rssi_dbm, rssi_value()}
+          | {:last_working_route, [ZWave.node_id()]}
+          | {:transmit_speed, transmit_speed()}
+          | {:transmit_time, non_neg_integer()}
+          | {:route_changed, boolean()}
 
   @enforce_keys [:status, :type, :node_id]
   defstruct status: nil,

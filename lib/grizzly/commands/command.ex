@@ -282,13 +282,36 @@ defmodule Grizzly.Commands.Command do
       stats = get_stats_from_zip_packet(zip_packet)
 
       Enum.reduce(stats, meta, fn
-        {key, value}, m -> Keyword.put(m, key, value)
-        {key, value, value2}, m -> Keyword.put(m, key, {value, value2})
+        {:last_working_route, routes, speed}, m ->
+          Keyword.put(m, :last_working_route, routes) |> Keyword.put(:transmission_speed, speed)
+
+        {key, value}, m ->
+          Keyword.put(m, key, value)
       end)
+      |> calculate_rssi_values()
     else
       meta
     end
   end
+
+  defp calculate_rssi_values(stats) do
+    average =
+      Keyword.get(stats, :rssi_hops)
+      |> Enum.filter(fn rssi -> rssi != :not_available end)
+      |> calculate_average()
+
+    Keyword.put(stats, :rssi_dbm, average)
+    |> Keyword.put(:rssi_4bars, calculate_bars(average))
+  end
+
+  defp calculate_bars(number) when number >= -50, do: 4
+  defp calculate_bars(number) when number >= -60, do: 3
+  defp calculate_bars(number) when number >= -70, do: 2
+  defp calculate_bars(number) when number >= -80, do: 1
+  defp calculate_bars(_number), do: 0
+
+  defp calculate_average(numbers) when numbers == [], do: 0
+  defp calculate_average(numbers), do: round(Enum.sum(numbers) / length(numbers))
 
   defp get_stats_from_zip_packet(zip_packet) do
     case ZIPPacket.extension(zip_packet, :installation_and_maintenance_report) do

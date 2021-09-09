@@ -29,9 +29,14 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
         <<0x03, 0x05, hop1::signed-integer, hop2::signed-integer, hop3::signed-integer,
           hop4::signed-integer, hop5::signed-integer, rest::binary>>
       ) do
-    {{:rssi,
-      {parse_rssi_hop(hop1), parse_rssi_hop(hop2), parse_rssi_hop(hop3), parse_rssi_hop(hop4),
-       parse_rssi_hop(hop5)}}, rest}
+    {{:rssi_hops,
+      [
+        parse_rssi_hop(hop1),
+        parse_rssi_hop(hop2),
+        parse_rssi_hop(hop3),
+        parse_rssi_hop(hop4),
+        parse_rssi_hop(hop5)
+      ]}, rest}
   end
 
   def ime_from_binary(<<0x04, 0x01, ack_channel, rest::binary>>),
@@ -49,8 +54,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
   def ime_from_binary(<<0x08, 0x02, neighbor_node_id_1, neighbor_node_id_2, rest::binary>>),
     do: {{:failed_link, neighbor_node_id_1, neighbor_node_id_2}, rest}
 
-  defp parse_route_change_value(0x00), do: :not_changed
-  defp parse_route_change_value(0x01), do: :changed
+  defp parse_route_change_value(0x00), do: false
+  defp parse_route_change_value(0x01), do: true
 
   defp parse_transmission_speed(0x01), do: {9.6, :kbit_sec}
   defp parse_transmission_speed(0x02), do: {40, :kbit_sec}
