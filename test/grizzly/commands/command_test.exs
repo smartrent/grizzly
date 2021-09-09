@@ -133,4 +133,32 @@ defmodule Grizzly.Commands.CommandTest do
 
     assert expected_binary == Command.to_binary(grizzly_command)
   end
+
+  test "handle when ZIP command reports stats" do
+    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+
+    grizzly_command =
+      Command.from_zwave_command(zwave_command, 1, self(), transmission_stats: true)
+
+    ime = [
+      {:route_changed, true},
+      {:transmit_channel, 4},
+      {:transmission_time, 0},
+      {:last_working_route, [1001, 1002, 1003, 1004], {9999, :kbit}},
+      {:rssi_hops, [-40, -50, -60, :not_available, :not_available]}
+    ]
+
+    ack_response =
+      ZIPPacket.make_ack_response(grizzly_command.seq_number,
+        header_extensions: [installation_and_maintenance_report: ime]
+      )
+
+    {report, _command} = Command.handle_zip_command(grizzly_command, ack_response)
+    transmission_stats = report.transmission_stats
+
+    assert Keyword.get(transmission_stats, :rssi_dbm) == -50
+    assert Keyword.get(transmission_stats, :rssi_4bars) == 4
+    assert Keyword.get(transmission_stats, :last_working_route) == [1001, 1002, 1003, 1004]
+    assert Keyword.get(transmission_stats, :transmission_speed) == {9999, :kbit}
+  end
 end
