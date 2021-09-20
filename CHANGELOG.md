@@ -3,7 +3,7 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.21.0 - 2021-9-20
+## [v0.21.0] - 2021-9-20
 
 ### Added
 
@@ -22,13 +22,13 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Fix error when sending `Grizzly.ZWave.Commands.StatisticsGet`
 
-## v0.20.2 - 2021-8-11
+## [v0.20.2] - 2021-8-11
 
 ### Changed
 
 * Turn off TLS warning for connecting with `zipgateway` server
 
-## v0.20.1 - 2021-7-1
+## [v0.20.1] - 2021-7-1
 
 ### Added
 
@@ -60,7 +60,7 @@ Thank you to those who contributed to this release:
 
 * Invalid warnings when calling function in `Grizzly.SwitchBinary`
 
-## v0.20.0 - 2021-6-14
+## [v0.20.0] - 2021-6-14
 
 The release breaks the return value of
 `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_dsk_to_binary/1` from
@@ -75,7 +75,7 @@ If you have not called this function directly then it is safe to upgrade to
 * Allow values greater than `99` to be passed in
   `Grizzly.ZWave.Commands.SwitchMultilevelSet.encode_target_value/1`
 
-## v0.19.1 - 2021-4-23
+## [v0.19.1] - 2021-4-23
 
 ### Added
 
@@ -86,7 +86,7 @@ If you have not called this function directly then it is safe to upgrade to
 
 Thank you to djantea for testing out the RF configuration changes!
 
-## v0.19.0 - 2021-4-19
+## [v0.19.0] - 2021-4-19
 
 Breaking change in regards to how meta extensions are passed to
 `Grizzly.Network.set_node_provisioning/3`.
@@ -110,7 +110,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.18.3 - 2021-3-11
+## [v0.18.3] - 2021-3-11
 
 ### Added
 
@@ -121,7 +121,7 @@ Thank you to those who contributed to this release:
 
 * Ensure that the DSK binary is 128 bits
 
-## v0.18.2 - 2021-2-18
+## [v0.18.2] - 2021-2-18
 
 ### Added
 
@@ -129,7 +129,7 @@ Thank you to those who contributed to this release:
 * Clean up inspects from tests
 * Ensure `zipgateway` files are usable by system utils for `zipgateway`
 
-## v0.18.1 - 2021-2-10
+## [v0.18.1] - 2021-2-10
 
 ### Fixed
 
@@ -139,7 +139,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.18.0 - 2021-2-10
+## [v0.18.0] - 2021-2-10
 
 This release breaks the DSK API and other supporting APIs. If you have not
 supported S2 inclusions, smart start, or use the DSK API for any reason then it
@@ -215,7 +215,7 @@ This release also added support S2/SmartStart QR code generation. See the
 
 * QR code support via the `Grizzly.ZWave.QRCode` module.
 
-## v0.17.7 - 2021-2-4
+## [v0.17.7] - 2021-2-4
 
 ### Fixed
 
@@ -226,7 +226,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.17.6 - 2021-2-3
+## [v0.17.6] - 2021-2-3
 
 ### Fixed
 
@@ -241,7 +241,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.17.5 - 2021-1-26
+## [v0.17.5] - 2021-1-26
 
 ### Added
 
@@ -256,14 +256,14 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.17.4 - 2021-1-21
+## [v0.17.4] - 2021-1-21
 
 ### Added
 
 * Support for handling indicator events via the `:indicator_handler` option to
   the `Grizzly.Supervisor`.
 
-## v0.17.3 - 2021-1-14
+## [v0.17.3] - 2021-1-14
 
 ### Added
 
@@ -274,7 +274,7 @@ Thank you to those who contributed to this release:
 
 * No match error when trying to encode a node id list
 
-## v0.17.2 - 2021-1-13
+## [v0.17.2] - 2021-1-13
 
 ### Added
 
@@ -289,7 +289,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.17.1 - 2021-1-12
+## [v0.17.1] - 2021-1-12
 
 Added supported for using `zipgateway` versions >= 7.14.2.
 
@@ -312,7 +312,7 @@ Thank you to those who contributed to this release:
 
 * Frank Hunleth
 
-## v0.17.0 - 2021-1-8
+## [v0.17.0] - 2021-1-8
 
 Breaking change with how Grizzly reports water alarms.
 
@@ -341,14 +341,14 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.16.2 - 2020-12-23
+## [v0.16.2] - 2020-12-23
 
 ### Added
 
 * `:list_mode` param for the
   `Grizzly.ZWave.Commands.AssociationGroupInfoReport` command.
 
-## v0.16.1 - 2020-12-22
+## [v0.16.1] - 2020-12-22
 
 ### Added
 
@@ -368,7 +368,7 @@ Thank you to those who contributed to this release:
 
 * Frank Hunleth
 
-## v0.16.0 - 2020-12-21
+## [v0.16.0] - 2020-12-21
 
 This release introduces a breaking change to the naming of the command class get
 and command class report modules. If you are using those modules directly, you
@@ -398,7 +398,7 @@ will need to update to the use the new module names.
 
 * Easier to read stack traces when some GenServers crash
 
-## v0.15.11 - 2020-12-11
+## [v0.15.11] - 2020-12-11
 
 ### Added
 
@@ -413,7 +413,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.10 - 2020-12-8
+## [v0.15.10] - 2020-12-8
 
 ### Added
 
@@ -428,7 +428,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.9 - 2020-12-4
+## [v0.15.9] - 2020-12-4
 
 ### Added
 
@@ -444,7 +444,7 @@ Thank you to those who contributed to this release:
 
 * Frank Hunleth
 
-## v0.15.8 - 2020-12-1
+## [v0.15.8] - 2020-12-1
 
 ### Added
 
@@ -459,7 +459,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.7 - 2020-11-30
+## [v0.15.7] - 2020-11-30
 
 ### Added
 
@@ -475,7 +475,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.6 - 2020-11-19
+## [v0.15.6] - 2020-11-19
 
 ### Added
 
@@ -490,7 +490,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.5 - 2020-11-12
+## [v0.15.5] - 2020-11-12
 
 ### Added
 
@@ -504,7 +504,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.4 - 2020-11-5
+## [v0.15.4] - 2020-11-5
 
 ### Added
 
@@ -527,7 +527,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.3 - 2020-10-27
+## [v0.15.3] - 2020-10-27
 
 ### Fixed
 
@@ -542,7 +542,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.2 - 2020-10-23
+## [v0.15.2] - 2020-10-23
 
 ### Added
 
@@ -560,7 +560,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.15.1 - 2020-10-09
+## [v0.15.1] - 2020-10-09
 
 ### Added
 
@@ -581,7 +581,7 @@ Thank you to those who contributed to this release:
 * `Grizzly.ZWave.Commands.SwitchBinaryReport` did not properly encode and decode
   the version 2 of the switch binary command class
 
-## v0.15.0 - 2020-10-08
+## [v0.15.0] - 2020-10-08
 
 This release does a major overhaul on the `Grizzly.Transport` behaviour. If you
 haven't implemented a custom transport this release should not effect you and
@@ -628,13 +628,13 @@ Thank you to those who contributed to this release:
 * Jean-Francois Cloutier
 * Jon Wood
 
-## v0.14.8 - 2020-09-29
+## [v0.14.8] - 2020-09-29
 
 ### Added
 
 * Support for power management notifications
 
-## v0.14.7 - 2020-09-25
+## [v0.14.7] - 2020-09-25
 
 ### Added
 
@@ -644,7 +644,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.14.6 - 2020-09-18
+## [v0.14.6] - 2020-09-18
 
 ### Added
 
@@ -654,7 +654,7 @@ Thank you to those who contributed to this release:
 
 * Reduced the amount of logging
 
-## v0.14.5 - 2020-09-02
+## [v0.14.5] - 2020-09-02
 
 ### Fixed
 
@@ -663,7 +663,7 @@ Thank you to those who contributed to this release:
   handling another command due to the aggregate handler assuming that only one
   command was being processed at one time
 
-## v0.14.4 - 2020-09-01
+## [v0.14.4] - 2020-09-01
 
 ### Added
 
@@ -673,7 +673,7 @@ Thank you to those who contributed to this release:
 
 * Jean-Francois Cloutier
 
-## v0.14.3 - 2020-08-31
+## [v0.14.3] - 2020-08-31
 
 ### Fixed
 
@@ -1572,7 +1572,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
 [v0.20.1]: https://github.com/smartrent/grizzly/compare/v0.20.0...v0.20.1
 [v0.20.0]: https://github.com/smartrent/grizzly/compare/v0.19.1...v0.20.0
 
-[v0.19.0]: https://github.com/smartrent/grizzly/compare/v0.19.0...v0.19.1
+[v0.19.1]: https://github.com/smartrent/grizzly/compare/v0.19.0...v0.19.1
 [v0.19.0]: https://github.com/smartrent/grizzly/compare/v0.18.3...v0.19.0
 
 [v0.18.3]: https://github.com/smartrent/grizzly/compare/v0.18.2...v0.18.3
