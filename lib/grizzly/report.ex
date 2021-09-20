@@ -207,7 +207,7 @@ defmodule Grizzly.Report do
           | {:rssi_dbm, rssi_value()}
           | {:last_working_route, [ZWave.node_id()]}
           | {:transmit_speed, transmit_speed()}
-          | {:transmit_time, non_neg_integer()}
+          | {:transmission_time, non_neg_integer()}
           | {:route_changed, boolean()}
 
   @enforce_keys [:status, :type, :node_id]
