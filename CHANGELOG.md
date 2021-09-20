@@ -1,5 +1,24 @@
 ## Changelog
 
+## v0.21.0 - 2021-9-20
+
+### Added
+
+* Transmission stats
+  - Added `:rssi_4bars` and `:rssi_dbm`
+
+### Changes
+
+* Transmission stats
+  - `:rssi` is now `:rssi_hops` and has been changed from a tuple to a list
+  - `:last_working_route` and `:transmission_speed` have been seperated
+  - `:last_working_route` is now a list
+  - `:route_changed` is now a boolean
+
+### Fixes
+
+* Fix error when sending `Grizzly.ZWave.Commands.StatisticsGet`
+
 ## v0.20.2 - 2021-8-11
 
 ### Updates
