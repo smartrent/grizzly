@@ -3,6 +3,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.21.1] - 2021-9-21
+
+### Fixed
+
+* Transmission stats
+  * Ensure `:rssi_4bars` and `:rssi_dbm` accurately calculate no signal when `:rssi_hops` are nil
+
 ## [v0.21.0] - 2021-9-20
 
 ### Added
@@ -1567,6 +1574,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   * Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v0.21.1]: https://github.com/smartrent/grizzly/compare/v0.21.0...v0.21.1
 [v0.21.0]: https://github.com/smartrent/grizzly/compare/v0.20.2...v0.21.0
 [v0.20.2]: https://github.com/smartrent/grizzly/compare/v0.20.1...v0.20.2
 [v0.20.1]: https://github.com/smartrent/grizzly/compare/v0.20.0...v0.20.1
