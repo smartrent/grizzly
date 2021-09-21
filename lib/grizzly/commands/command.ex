@@ -296,22 +296,23 @@ defmodule Grizzly.Commands.Command do
 
   defp calculate_rssi_values(stats) do
     average =
-      Keyword.get(stats, :rssi_hops)
+      Keyword.get(stats, :rssi_hops, [])
       |> Enum.filter(fn rssi -> rssi != :not_available end)
-      |> calculate_average()
+      |> calculate_average_dbm()
 
     Keyword.put(stats, :rssi_dbm, average)
     |> Keyword.put(:rssi_4bars, calculate_bars(average))
   end
 
+  # Average RSSI DBM is 0 when no data. So 0 bars.
   defp calculate_bars(number) when number >= -50, do: 4
   defp calculate_bars(number) when number >= -60, do: 3
   defp calculate_bars(number) when number >= -70, do: 2
   defp calculate_bars(number) when number >= -80, do: 1
   defp calculate_bars(_number), do: 0
 
-  defp calculate_average(numbers) when numbers == [], do: 0
-  defp calculate_average(numbers), do: round(Enum.sum(numbers) / length(numbers))
+  defp calculate_average_dbm(numbers) when numbers == [], do: -125
+  defp calculate_average_dbm(numbers), do: round(Enum.sum(numbers) / length(numbers))
 
   defp get_stats_from_zip_packet(zip_packet) do
     case ZIPPacket.extension(zip_packet, :installation_and_maintenance_report) do
