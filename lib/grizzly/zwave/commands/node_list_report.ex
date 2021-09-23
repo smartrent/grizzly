@@ -7,7 +7,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
 
   import Bitwise
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, NodeIdList}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @impl true
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
     case decode_status(status) do
       {:ok, status} ->
         controller_id = decode_controller_id(controller_id)
-        node_ids = decode_node_ids(node_ids)
+        node_ids = NodeIdList.parse(node_ids)
 
         {:ok,
          [
@@ -57,10 +57,6 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   def encode_node_ids(node_ids) do
     mask_bit = node_id_mask(node_ids)
     <<mask_bit::little-integer-size(29)-unit(8)>>
-  end
-
-  def decode_node_ids(node_ids) do
-    unmask(node_ids)
   end
 
   def encode_status(:latest), do: 0x00
@@ -83,36 +79,5 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
       mask_bit = 0 ||| 1 <<< (node_id - 1)
       mask ||| mask_bit
     end)
-  end
-
-  defp unmask(mask) do
-    unmask(0, [], mask)
-  end
-
-  defp unmask(_, xs, <<>>), do: Enum.sort(xs)
-
-  defp unmask(offset, xs, <<byte::binary-size(1), rest::binary>>) do
-    xs = Enum.concat(xs, get_digits(offset, byte))
-    unmask(offset + 8, xs, rest)
-  end
-
-  defp get_digits(_, <<0>>), do: []
-
-  defp get_digits(offset, byte) do
-    Enum.reduce(
-      1..8,
-      [],
-      fn position, acc ->
-        case bit_at?(position, byte) do
-          true -> [position + offset | acc]
-          false -> acc
-        end
-      end
-    )
-  end
-
-  defp bit_at?(position, <<byte>>) do
-    (1 <<<
-       (position - 1) &&& byte) != 0
   end
 end
