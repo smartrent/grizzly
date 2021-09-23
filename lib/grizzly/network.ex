@@ -135,6 +135,20 @@ defmodule Grizzly.Network do
   end
 
   @doc """
+  Add a long range device to the provisioning list
+  """
+  @spec add_long_range_device(Grizzly.ZWave.DSK.t(), [opt()]) :: Grizzly.send_command_response()
+  def add_long_range_device(dsk, opts \\ []) do
+    extensions = [
+      bootstrapping_mode: :long_range,
+      smart_start_inclusion_setting: :pending,
+      advanced_joining: [:s2_unauthenticated, :s2_authenticated]
+    ]
+
+    set_node_provisioning(dsk, extensions, opts)
+  end
+
+  @doc """
   List all the nodes on the provisioning list
 
   Options
