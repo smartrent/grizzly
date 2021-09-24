@@ -8,7 +8,12 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @typedoc """
+
+  """
+  @type node_add_status() :: :done | :failed | :security_failed
+
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x34
 
   @impl true
