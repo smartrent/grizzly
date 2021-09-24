@@ -9,12 +9,12 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReportTest do
   end
 
   test "encodes params correctly" do
-    params = [seq_number: 10, node_ids: [1, 2, 3, 9]]
+    params = [seq_number: 10, node_ids: [1, 2, 3, 9, 256]]
     {:ok, command} = FailedNodeListReport.new(params)
 
     expected_binary =
       <<0x0A, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0>>
+        0, 0, 1, 1>>
 
     assert expected_binary == FailedNodeListReport.encode_params(command)
   end
