@@ -1,6 +1,11 @@
 defmodule Grizzly.ZWave.NodeIdList do
   @moduledoc false
 
+  # This module contains helpers for parsing and encoding a list of node ids
+  # into a binary with bytes that are bitmasks of the node ids contained in the
+  # list. This is common in network commands that contain a list of node ids in
+  # the Z-Wave network.
+
   @node_ids_list_len 29
 
   @doc """
@@ -57,4 +62,66 @@ defmodule Grizzly.ZWave.NodeIdList do
 
   defp node_id_extended_modifier(node_id, byte_offset),
     do: node_id_modifier(node_id, byte_offset) + 255
+
+  @typedoc """
+  Options for when to encode the node list into a the binary mask
+
+  * `:extended` - weather or not the node list contains extended ids
+    (default `true`). For some command classes that predate Z-Wave long range
+    the node list binary only contains 29 bytes. After command class versions
+    that support 16 bit node ids the binary list will at minium contain 31
+    bytes, 29 for the 8 bit node ids and 2 bytes for the byte size of the
+    extended node id binary. If there are no extended node ids then this the
+    byte size bytes will be `0x00000`.
+  """
+  @type to_binary_opt() :: {:extended, boolean()}
+
+  @doc """
+  Make a list of node ids into the binary node id list mask
+  """
+  @spec to_binary([Grizzly.ZWave.node_id()], [to_binary_opt()]) :: binary()
+  def to_binary(node_id_list, opts \\ []) do
+    contains_extended? = Keyword.get(opts, :extended, true)
+    {node_ids, node_ids_extended} = :lists.partition(fn id -> id < 256 end, node_id_list)
+
+    node_ids_binary = node_ids_to_binary(node_ids)
+
+    if contains_extended? do
+      extended_node_ids_binary = extended_node_ids_to_binary(node_ids_extended)
+      extended_node_id_list_len = byte_size(extended_node_ids_binary)
+
+      <<node_ids_binary::binary, <<extended_node_id_list_len::16>>,
+        extended_node_ids_binary::binary>>
+    else
+      node_ids_binary
+    end
+  end
+
+  defp node_ids_to_binary(node_ids, opts \\ []) do
+    number_bytes = opts[:bytes] || 29
+    offset = opts[:offset] || 0
+
+    node_id_map = Enum.reduce(node_ids, %{}, fn id, hash -> Map.put(hash, id, id) end)
+
+    for byte_index <- 0..(number_bytes - 1), into: <<>> do
+      for bit_index <- 8..1, into: <<>> do
+        node_id = byte_index * 8 + bit_index + offset
+        if node_id_map[node_id], do: <<1::size(1)>>, else: <<0::size(1)>>
+      end
+    end
+  end
+
+  defp extended_node_ids_to_binary([]) do
+    <<>>
+  end
+
+  defp extended_node_ids_to_binary(node_ids) do
+    max = Enum.max(node_ids)
+    # Subtract 31 because the extended node ids start at the
+    # 31st byte of a node list binary mask. If we did not subtract
+    # the number of bytes would start at 32.
+    num_bytes = floor(max / 8) - 31
+
+    node_ids_to_binary(node_ids, offset: 255, bytes: num_bytes)
+  end
 end
