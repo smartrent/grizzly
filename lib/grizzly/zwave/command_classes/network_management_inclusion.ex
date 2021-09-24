@@ -16,6 +16,14 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x34
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :network_management_inclusion
+
+  @doc """
+  Parse the node add status byte into an atom
+  """
+  @spec parse_node_add_status(0x06 | 0x07 | 0x09) :: node_add_status()
+  def parse_node_add_status(0x06), do: :done
+  def parse_node_add_status(0x07), do: :failed
+  def parse_node_add_status(0x09), do: :security_failed
 end
