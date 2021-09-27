@@ -30,6 +30,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
           | {:non_secure_controlled, [CommandClasses.command_class()]}
           | {:secure_supported, [CommandClasses.command_class()]}
           | {:secure_controlled, [CommandClasses.command_class()]}
+
   @type param() ::
           {:node_id, Grizzly.node_id()}
           | {:status, NetworkManagementInclusion.node_add_status()}
@@ -47,8 +48,8 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
   def new(params \\ []) do
     # TODO: validate params
     command = %Command{
-      name: :node_add_status,
-      command_byte: 0x02,
+      name: :extended_node_add_status,
+      command_byte: 0x16,
       command_class: NetworkManagementInclusion,
       params: params,
       impl: __MODULE__
