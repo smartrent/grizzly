@@ -94,44 +94,25 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   end
 
   @impl true
-  def decode_params(
-        <<seq_number, status_byte, _reserved, node_id, node_info_length, listening?::size(1),
-          _::size(7), _, basic_device_class, generic_device_class, specific_device_class,
-          command_classes_bin::binary>>
-      ) do
-    # TODO: decode the command classes correctly (currently assuming no extended command classes)
-    # TODO: decode the device classes correctly
+  def decode_params(<<seq_number, status_byte, _reserved, node_id, node_info_bin::binary>>) do
+    node_info = NetworkManagementInclusion.parse_node_info(node_info_bin)
 
-    tagged_command_classes_length = node_info_length - 6
+    params =
+      %{
+        status: NetworkManagementInclusion.parse_node_add_status(status_byte),
+        seq_number: seq_number,
+        node_id: node_id
+      }
+      |> Map.merge(node_info)
+      |> Enum.into([])
 
-    {command_classes, security_info} =
-      case command_classes_bin do
-        <<>> ->
-          {[], ""}
-
-        <<tagged_command_classes::size(tagged_command_classes_length)-binary,
-          security_info::binary>> ->
-          {CommandClasses.command_class_list_from_binary(tagged_command_classes), security_info}
-      end
-
-    {:ok,
-     [
-       status: decode_status(status_byte),
-       seq_number: seq_number,
-       node_id: node_id,
-       listening?: listening? == 1,
-       basic_device_class: basic_device_class,
-       generic_device_class: generic_device_class,
-       specific_device_class: specific_device_class,
-       command_classes: command_classes
-     ]
-     |> maybe_decode_next_versions_fields(security_info)}
+    {:ok, params}
   end
 
   def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
     {:ok,
      [
-       status: decode_status(status_byte),
+       status: NetworkManagementInclusion.parse_node_add_status(status_byte),
        seq_number: seq_number,
        node_id: node_id,
        listening?: false,
@@ -146,11 +127,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   def encode_status(:done), do: 0x06
   def encode_status(:failed), do: 0x07
   def encode_status(:security_failed), do: 0x09
-
-  @spec decode_status(byte()) :: status()
-  def decode_status(0x06), do: :done
-  def decode_status(0x07), do: :failed
-  def decode_status(0x09), do: :security_failed
 
   @spec encode_listening_bit(boolean()) :: byte()
   def encode_listening_bit(true), do: 0x01
@@ -167,38 +143,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
         command_bin <>
           <<Security.keys_to_byte(keys_granted), Security.failed_type_to_byte(kex_failed_type)>>
     end
-  end
-
-  defp maybe_decode_next_versions_fields(params, <<>>) do
-    params
-  end
-
-  defp maybe_decode_next_versions_fields(params, <<keys_granted_byte, kex_failed_type_byte>>) do
-    keys_granted = Security.byte_to_keys(keys_granted_byte)
-    kex_failed_type = Security.failed_type_from_byte(kex_failed_type_byte)
-
-    params ++ [keys_granted: keys_granted, kex_failed_type: kex_failed_type]
-  end
-
-  # in NODE_ADD_STATUS version 3 the input DSK length and input DSK are provided
-  # if no input DSK was given then the input DSK length byte has to be 0.
-  # if an input DSK was given then the length byte has be 16, followed by the 16 byte DSK
-  defp maybe_decode_next_versions_fields(params, <<keys_granted_byte, kex_failed_type_byte, 0>>) do
-    keys_granted = Security.byte_to_keys(keys_granted_byte)
-    kex_failed_type = Security.failed_type_from_byte(kex_failed_type_byte)
-
-    params ++ [keys_granted: keys_granted, kex_failed_type: kex_failed_type]
-  end
-
-  defp maybe_decode_next_versions_fields(
-         params,
-         <<keys_granted_byte, kex_failed_type_byte, 16, dsk::binary-size(16)>>
-       ) do
-    keys_granted = Security.byte_to_keys(keys_granted_byte)
-    kex_failed_type = Security.failed_type_from_byte(kex_failed_type_byte)
-    dsk = DSK.new(dsk)
-
-    params ++ [keys_granted: keys_granted, kex_failed_type: kex_failed_type, input_dsk: dsk]
   end
 
   defp cc_count(tagged_command_classes) do
