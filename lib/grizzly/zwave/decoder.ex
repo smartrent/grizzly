@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x34, 0x13, Commands.NodeAddDSKReport},
       {0x34, 0x14, Commands.NodeAddDSKSet},
       {0x34, 0x15, Commands.SmartStartJoinStarted},
-      {0x43, 0x16, Commands.ExtendedNodeAddStatus},
+      {0x34, 0x16, Commands.ExtendedNodeAddStatus},
       # Network Management Basic Node (0x4D)
       {0x4D, 0x01, Commands.LearnModeSet},
       {0x4D, 0x02, Commands.LearnModeSetStatus},
