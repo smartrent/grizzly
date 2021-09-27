@@ -25,16 +25,14 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   alias Grizzly.ZWave.{Command, CommandClasses, DSK, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
-  @type status :: :done | :failed | :security_failed
-
-  @type tagged_command_classes ::
+  @type tagged_command_classes() ::
           {:non_secure_supported, [CommandClasses.command_class()]}
           | {:non_secure_controlled, [CommandClasses.command_class()]}
           | {:secure_supported, [CommandClasses.command_class()]}
           | {:secure_controlled, [CommandClasses.command_class()]}
   @type param ::
           {:node_id, Grizzly.node_id()}
-          | {:status, status()}
+          | {:status, NetworkManagementInclusion.node_add_status()}
           | {:seq_number, Grizzly.seq_number()}
           | {:listening?, boolean()}
           | {:basic_device_class, byte()}
@@ -123,7 +121,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
      ]}
   end
 
-  @spec encode_status(status()) :: byte()
+  @spec encode_status(NetworkManagementInclusion.node_add_status()) :: byte()
   def encode_status(:done), do: 0x06
   def encode_status(:failed), do: 0x07
   def encode_status(:security_failed), do: 0x09
