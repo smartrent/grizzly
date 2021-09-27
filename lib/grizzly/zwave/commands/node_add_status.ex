@@ -30,7 +30,8 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:non_secure_controlled, [CommandClasses.command_class()]}
           | {:secure_supported, [CommandClasses.command_class()]}
           | {:secure_controlled, [CommandClasses.command_class()]}
-  @type param ::
+
+  @type param() ::
           {:node_id, Grizzly.node_id()}
           | {:status, NetworkManagementInclusion.node_add_status()}
           | {:seq_number, Grizzly.seq_number()}
