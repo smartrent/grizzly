@@ -93,6 +93,20 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   end
 
   @impl true
+  def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
+    {:ok,
+     [
+       status: NetworkManagementInclusion.parse_node_add_status(status_byte),
+       seq_number: seq_number,
+       node_id: node_id,
+       listening?: false,
+       basic_device_class: :unknown,
+       generic_device_class: :unknown,
+       specific_device_class: :unknown,
+       command_classes: []
+     ]}
+  end
+
   def decode_params(<<seq_number, status_byte, _reserved, node_id, node_info_bin::binary>>) do
     node_info = NetworkManagementInclusion.parse_node_info(node_info_bin)
 
@@ -106,20 +120,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       |> Enum.into([])
 
     {:ok, params}
-  end
-
-  def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
-    {:ok,
-     [
-       status: NetworkManagementInclusion.parse_node_add_status(status_byte),
-       seq_number: seq_number,
-       node_id: node_id,
-       listening?: false,
-       basic_device_class: :unknown,
-       generic_device_class: :unknown,
-       specific_device_class: :unknown,
-       command_classes: []
-     ]}
   end
 
   @spec encode_status(NetworkManagementInclusion.node_add_status()) :: byte()
