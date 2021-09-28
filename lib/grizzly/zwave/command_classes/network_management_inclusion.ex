@@ -168,4 +168,37 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
     info
     |> Map.put(:input_dsk, DSK.new(dsk_bin))
   end
+
+  # When encoding for 16 bit node ids in the context of the node remove family of
+  # command (node ids > 255) the 8 bit node id byte of the binary needs to be set
+  # to 0xFF as per the specification.
+
+  # In ZWA_Z-Wave Network Protocol Command Class Specification 12.0.0.pdf:
+
+  # Sections 4.5.13.2 and 4.4.13.3:
+  #   "This field MUST be set to 0xFF if the removed NodeID is greater than 255."
+
+  # This only is used for version 4 parsing and encoding.
+  @remove_node_id_is_16_bit 0xFF
+
+  @doc """
+  Encodes node ids for version 4 of the `NetworkManagementInclusion` command
+  class
+  """
+  @spec encode_node_remove_node_id_v4(Grizzly.ZWave.node_id()) :: binary()
+  def encode_node_remove_node_id_v4(node_id) when node_id < 233 do
+    <<node_id, 0x00::16>>
+  end
+
+  def encode_node_remove_node_id_v4(node_id) when node_id > 255 and node_id <= 65535 do
+    <<@remove_node_id_is_16_bit, node_id::16>>
+  end
+
+  @doc """
+  Parse the node id parameters part of the node remove commands.
+  """
+  @spec parse_node_remove_node_id(binary()) :: Grizzly.ZWave.node_id()
+  def parse_node_remove_node_id(<<node_id>>), do: node_id
+  def parse_node_remove_node_id(<<@remove_node_id_is_16_bit, node_id::16>>), do: node_id
+  def parse_node_remove_node_id(<<node_id, 0x00::16>>), do: node_id
 end
