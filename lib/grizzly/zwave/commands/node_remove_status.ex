@@ -29,16 +29,6 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
-  # When encoding for 16 bit node ids (node ids > 255) the 8 bit node id byte of
-  # the binary needs to be set to 0xFF as per the specification.
-  #
-  # ZWA_Z-Wave Network Protocol Command Class Specification 12.0.0.pdf
-  # Section 4.5.13.2:
-  #   "This field MUST be set to 0xFF if the removed NodeID is greater than 255."
-  #
-  # This only is used for version 4 parsing and encoding.
-  @node_id_is_16_bit_flag 0xFF
-
   @type status() :: :done | :failed
 
   @impl Grizzly.ZWave.Command
@@ -63,42 +53,25 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
 
     case Keyword.get(opts, :command_class_version, 4) do
       4 ->
-        encode_version_four(seq_number, status, node_id)
+        <<seq_number, encode_status(status),
+          NetworkManagementInclusion.encode_node_remove_node_id_v4(node_id)::binary>>
 
       n when n < 4 ->
         <<seq_number, encode_status(status), node_id>>
     end
   end
 
-  defp encode_version_four(seq_number, status, node_id) do
-    <<seq_number, encode_status(status)>> <> version_four_node_id_to_binary(node_id)
-  end
-
-  # Z-Wave network only allows for 232 nodes on the network before it starts to
-  # assign 16 bit node ids.
-  defp version_four_node_id_to_binary(node_id) when node_id < 233, do: <<node_id, 0x00, 0x00>>
-
-  defp version_four_node_id_to_binary(node_id) when node_id > 255 and node_id <= 65535,
-    do: <<@node_id_is_16_bit_flag, node_id::16>>
-
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, status_byte, node_id>>) do
-    do_decode_params(seq_number, status_byte, node_id)
-  end
-
-  def decode_params(<<seq_number, status_byte, node_id, 0x00::16>>) do
-    do_decode_params(seq_number, status_byte, node_id)
-  end
-
-  def decode_params(<<seq_number, status_byte, @node_id_is_16_bit_flag, node_id::16>>) do
-    do_decode_params(seq_number, status_byte, node_id)
-  end
-
-  defp do_decode_params(seq_number, status_byte, node_id) do
+  def decode_params(<<seq_number, status_byte, node_id::binary>>) do
     case decode_status(status_byte) do
       {:ok, status} ->
-        {:ok, [seq_number: seq_number, status: status, node_id: node_id]}
+        {:ok,
+         [
+           seq_number: seq_number,
+           status: status,
+           node_id: NetworkManagementInclusion.parse_node_remove_node_id(node_id)
+         ]}
 
       {:error, %DecodeError{}} = error ->
         error
