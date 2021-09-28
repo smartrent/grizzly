@@ -9,19 +9,40 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
 
     * `:seq_number` - the sequence number from the original node remove command
     * `:status` - the status of the result of the node removal
-    * `:node_id` the node id of the removed node
+    * `:node_id` - the node id of the removed node
+    * `:command_class_version` - explicitly set the command class version used
+      to encode the command (optional - defaults to NetworkManagementInclusion v4)
 
-  All the parameters are required
+  When encoding the params you can encode for a specific command class version
+  by passing the `:command_class_version` to the encode options
+
+  ```elixir
+  Grizzly.ZWave.Commands.NodeRemoveStatus.encode_params(node_remove_status, command_class_version: 3)
+  ```
+
+  If there is no command class version specified this will encode to version 4 of the
+  `NetworkManagementInclusion` command class. This version supports the use of 16 bit node
+  ids.
   """
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
+  # When encoding for 16 bit node ids (node ids > 255) the 8 bit node id byte of
+  # the binary needs to be set to 0xFF as per the specification.
+  #
+  # ZWA_Z-Wave Network Protocol Command Class Specification 12.0.0.pdf
+  # Section 4.5.13.2:
+  #   "This field MUST be set to 0xFF if the removed NodeID is greater than 255."
+  #
+  # This only is used for version 4 parsing and encoding.
+  @node_id_is_16_bit_flag 0xFF
+
   @type status() :: :done | :failed
 
-  @impl true
-  def new(params) do
+  @impl Grizzly.ZWave.Command
+  def new(params \\ []) do
     # TODO validate params
     command = %Command{
       name: :node_remove_status,
@@ -35,13 +56,30 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(command, opts \\ []) do
     seq_number = Command.param!(command, :seq_number)
     status = Command.param!(command, :status)
     node_id = Command.param!(command, :node_id)
 
-    <<seq_number, encode_status(status), node_id>>
+    case Keyword.get(opts, :command_class_version, 4) do
+      4 ->
+        encode_version_four(seq_number, status, node_id)
+
+      n when n < 4 ->
+        <<seq_number, encode_status(status), node_id>>
+    end
   end
+
+  defp encode_version_four(seq_number, status, node_id) do
+    <<seq_number, encode_status(status)>> <> version_four_node_id_to_binary(node_id)
+  end
+
+  # Z-Wave network only allows for 232 nodes on the network before it starts to
+  # assign 16 bit node ids.
+  defp version_four_node_id_to_binary(node_id) when node_id < 233, do: <<node_id, 0x00, 0x00>>
+
+  defp version_four_node_id_to_binary(node_id) when node_id > 255 and node_id <= 65535,
+    do: <<@node_id_is_16_bit_flag, node_id::16>>
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
@@ -49,7 +87,11 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
     do_decode_params(seq_number, status_byte, node_id)
   end
 
-  def decode_params(<<seq_number, status_byte, node_id::size(16)>>) do
+  def decode_params(<<seq_number, status_byte, node_id, 0x00::16>>) do
+    do_decode_params(seq_number, status_byte, node_id)
+  end
+
+  def decode_params(<<seq_number, status_byte, @node_id_is_16_bit_flag, node_id::16>>) do
     do_decode_params(seq_number, status_byte, node_id)
   end
 
