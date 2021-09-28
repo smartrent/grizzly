@@ -5,9 +5,7 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSet do
   Params:
 
     * `:encoding` - one of :ascii, :extended_ascii, :utf_16
-
     * `:location` - a string location for the node
-
   """
 
   @behaviour Grizzly.ZWave.Command

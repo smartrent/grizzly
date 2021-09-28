@@ -1,7 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupGet do
   @moduledoc """
-  This command allows a portable controller to interactively create associations from a multi-button
-  device to a destination that is out of direct range.
+  This command allows a portable controller to interactively create associations
+  from a multi-button device to a destination that is out of direct range.
 
   Params: -none-
 

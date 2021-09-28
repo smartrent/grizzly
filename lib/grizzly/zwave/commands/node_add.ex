@@ -11,7 +11,8 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   If your controller does not support the `NETWORK_MANAGEMENT_INCLUSION`
   version 2, you will ned to pass `:node_add_any` as the `:mode` parameter.
 
-  This command should return the `NodeAddStatus` report after inclusion is complete
+  This command should return the `NodeAddStatus` report after inclusion is
+  complete.
   """
   @behaviour Grizzly.ZWave.Command
 

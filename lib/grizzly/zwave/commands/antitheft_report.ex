@@ -4,15 +4,15 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
 
   Params:
 
-    * `:status` - the antitheft status of the device, one of :protection_disabled_unlocked , :protection_enabled_locked_fully_functional,
-                  :protection_enabled_locked_restricted (required v2+)
-
-    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the company’s product that has locked the node (required v2+)
-
-    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key value to help retriving the Magic Code (required v2+)
-
-    * `:locking_entity_id` - This field MUST specify a unique Z-Wave Alliance identifier for the entity that has locked the node (required v3 only)
-
+    * `:status` - the antitheft status of the device, one of
+      :protection_disabled_unlocked, :protection_enabled_locked_fully_functional,
+      :protection_enabled_locked_restricted (required v2+)
+    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the
+      company’s product that has locked the node (required v2+)
+    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key
+      value to help retriving the Magic Code (required v2+)
+    * `:locking_entity_id` - This field MUST specify a unique Z-Wave Alliance
+      identifier for the entity that has locked the node (required v3 only)
   """
 
   @behaviour Grizzly.ZWave.Command

@@ -1,7 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AssociationGroupingsReport do
   @moduledoc """
-  This command is used to advertise the maximum number of association groups implemented by this
-  node.
+  This command is used to advertise the maximum number of association groups
+  implemented by this node.
 
   Params:
 

@@ -1,12 +1,14 @@
 defmodule Grizzly.ZWave.Commands.AssociationGroupInfoGet do
   @moduledoc """
-  This command is used to request the properties of one or more association group.
+  This command is used to request the properties of one or more association
+  group.
 
   Params:
 
     * `:refresh_cache` - Whether to refresh cached info
     * `:all` - Get info on all assocation groups
-    * `:group_id` - get info on this association group (required if `all` is false)
+    * `:group_id` - get info on this association group (required if `all` is
+      false)
 
   """
 

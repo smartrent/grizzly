@@ -1,13 +1,14 @@
 defmodule Grizzly.ZWave.Commands.BasicReport do
   @moduledoc """
-  This module implements the BASIC_REPORT command of the COMMAND_CLASS_BASIC command class
+  This module implements the BASIC_REPORT command of the COMMAND_CLASS_BASIC
+  command class
 
   Params:
 
     * `:value` - the current value (:on or :off or :unknown)
     * `:target_value` - the target value (:on or :off or :unknown) - v2
-    * `:duration` - the time in seconds needed to reach the Target Value at the actual transition rate - v2
-
+    * `:duration` - the time in seconds needed to reach the Target Value at the
+      actual transition rate - v2
   """
 
   @behaviour Grizzly.ZWave.Command

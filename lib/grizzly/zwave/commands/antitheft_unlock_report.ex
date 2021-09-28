@@ -1,20 +1,20 @@
 defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
   @moduledoc """
-  This command is used to advertise the current locked/unlocked state of the node with some additional
-  information.
+  This command is used to advertise the current locked/unlocked state of the
+  node with some additional information.
 
   Params:
 
-    * `:state` - This field MUST indicate the current :locked/:unlocked state of the device (required)
-
-    * `:restricted` - This boolean field indicates whether the node currently runs in restricted mode (required)
-
-    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the company’s product that has locked the node (required)
-
-    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key value to help retriving the Magic Code (required)
-
-    * `:locking_entity_id` - This field specifies a unique Z-Wave Alliance identifier for the entity that has locked the node (required)
-
+    * `:state` - This field MUST indicate the current :locked/:unlocked state of
+      the device (required)
+    * `:restricted` - This boolean field indicates whether the node currently
+      runs in restricted mode (required)
+    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of
+      the company’s product that has locked the node (required)
+    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key
+      value to help retriving the Magic Code (required)
+    * `:locking_entity_id` - This field specifies a unique Z-Wave Alliance
+      identifier for the entity that has locked the node (required)
   """
 
   @behaviour Grizzly.ZWave.Command

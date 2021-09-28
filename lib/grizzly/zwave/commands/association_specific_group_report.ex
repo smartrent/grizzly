@@ -1,12 +1,12 @@
 defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupReport do
   @moduledoc """
-  This command is used to advertise the association group that represents the most recently detected
-  button.
+  This command is used to advertise the association group that represents the
+  most recently detected button.
 
   Params:
 
-    * `:group` - the association group that represents the most recently detected button
-
+    * `:group` - the association group that represents the most recently
+      detected button
   """
 
   @behaviour Grizzly.ZWave.Command

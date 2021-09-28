@@ -5,7 +5,6 @@ defmodule Grizzly.ZWave.Commands.AssociationRemove do
   Params:
 
     * `:grouping_identifiers` - the association grouping identifier (required)
-
     * `:nodes` - list of nodes to add the grouping identifier (required)
 
   """

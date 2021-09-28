@@ -1,9 +1,9 @@
 defmodule Grizzly.ZWave.Commands.BasicGet do
   @moduledoc """
-  This module implements the BASIC_GET command form the COMMAND_CLASS_BASIC command class
+  This module implements the BASIC_GET command form the COMMAND_CLASS_BASIC
+  command class
 
   Params: - none
-
   """
 
   @behaviour Grizzly.ZWave.Command

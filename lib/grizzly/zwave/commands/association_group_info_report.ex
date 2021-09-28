@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
   @moduledoc """
-  This command is used to advertise the properties of one or more association groups.
+  This command is used to advertise the properties of one or more association
+  groups.
 
   Params:
 

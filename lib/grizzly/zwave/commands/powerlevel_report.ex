@@ -4,10 +4,10 @@ defmodule Grizzly.ZWave.Commands.PowerlevelReport do
 
   Params:
 
-    * `:power_level` - This field indicates the power level value that the receiving node MUST set.
-
-    * `:timeout` - The time in seconds the node should keep the Power level before resetting to normalPower level.
-
+    * `:power_level` - This field indicates the power level value that the
+      receiving node MUST set.
+    * `:timeout` - The time in seconds the node should keep the Power level
+      before resetting to normalPower level.
   """
 
   @behaviour Grizzly.ZWave.Command

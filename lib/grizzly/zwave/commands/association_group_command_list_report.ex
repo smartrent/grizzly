@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   @moduledoc """
-  This command is used to advertise the commands that are sent via an actual association group.
+  This command is used to advertise the commands that are sent via an actual
+  association group.
 
   Params:
 

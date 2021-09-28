@@ -5,9 +5,7 @@ defmodule Grizzly.ZWave.Commands.NodeNameSet do
   Params:
 
     * `:encoding` - one of :ascii, :extended_ascii, :utf_16
-
     * `:name` - a string name for the node
-
   """
 
   @behaviour Grizzly.ZWave.Command

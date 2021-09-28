@@ -1,13 +1,12 @@
 defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReport do
   @moduledoc """
-  This command is used to advertise supported events/states for a specified Notification Type.
+  This command is used to advertise supported events/states for a specified
+  Notification Type.
 
   Params:
 
     * `:type` - a Notification type
-
     * `:events` - the Notification events supported for that type
-
   """
 
   @behaviour Grizzly.ZWave.Command

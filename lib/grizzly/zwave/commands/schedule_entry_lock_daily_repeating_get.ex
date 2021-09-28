@@ -1,10 +1,11 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingGet do
   @moduledoc """
-  ScheduleEntryLockDailyRepeatingGet command is used to request a daily repeating schedule slot for a identified user and specified schedule slot ID.
+  ScheduleEntryLockDailyRepeatingGet command is used to request a daily
+  repeating schedule slot for a identified user and specified schedule slot ID.
 
   Params:
-  * `:user_identifier` is used to recognize the user identity. A valid User Identifier MUST be a value starting from 1 to the maximum number of users supported by the device;
-
+  * `:user_identifier` is used to recognize the user identity. A valid User
+    Identifier MUST be a value starting from 1 to the maximum number of users supported by the device;
   * `:schedule_slot_id` a value from 1 to Number of Slots Daily Repeating Supported.
   """
 
