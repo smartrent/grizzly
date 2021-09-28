@@ -5,10 +5,20 @@ defmodule Grizzly.ZWave.Command do
 
   alias Grizzly.ZWave.{CommandClass, DecodeError}
 
-  @type delay_seconds :: non_neg_integer()
+  @type delay_seconds() :: non_neg_integer()
 
-  @type params :: Keyword.t()
+  @type params() :: Keyword.t()
 
+  @typedoc """
+  Command struct
+
+  * `:name` - the name of the command
+  * `:command_class` - the command class module for the command
+  * `:command_byte` - the byte representation of the command
+  * `:params` - the parameters for the command as outlined by the Z-Wave
+    specification
+  * `:impl` - the module that implements the Command behaviour
+  """
   @type t() :: %__MODULE__{
           name: atom(),
           command_class: CommandClass.t(),
@@ -43,9 +53,21 @@ defmodule Grizzly.ZWave.Command do
   @callback encode_params(t()) :: binary()
 
   @doc """
+  Encode the command parameters with encoding options
+
+  The encoding options help pass extra context to how the parameters for the
+  command should be encoded.
+
+  This is an optional callback.
+  """
+  @callback encode_params(t(), opts :: keyword()) :: binary()
+
+  @doc """
   Decode the binary string of command params
   """
   @callback decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
+
+  @optional_callbacks encode_params: 2
 
   @doc """
   Encode the `Command.t()` into it's binary representation
