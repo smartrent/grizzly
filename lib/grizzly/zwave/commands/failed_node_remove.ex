@@ -8,6 +8,16 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
     * `:seq_number` - the sequence number of the networked command (required)
     * `:node_id` - The id of the node to be removed if failed as presumed (required)
 
+  When encoding the params you can encode for a specific command class version
+  by passing the `:command_class_version` to the encode options
+
+  ```elixir
+  Grizzly.ZWave.Commands.FailedNodeRemove.encode_params(failed_node_remove, command_class_version: 3)
+  ```
+
+  If there is no command class version specified this will encode to version 4 of the
+  `NetworkManagementInclusion` command class. This version supports the use of 16 bit node
+  ids.
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -32,18 +42,25 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   end
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(command, opts \\ []) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
-    <<seq_number, node_id>>
+
+    case Keyword.get(opts, :command_class_version, 4) do
+      4 ->
+        <<seq_number, NetworkManagementInclusion.encode_node_remove_node_id_v4(node_id)::binary>>
+
+      n when n < 4 ->
+        <<seq_number, node_id>>
+    end
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, node_id>>) do
-    {:ok, [seq_number: seq_number, node_id: node_id]}
-  end
-
-  def decode_params(<<seq_number, node_id::size(16)>>) do
-    {:ok, [seq_number: seq_number, node_id: node_id]}
+  def decode_params(<<seq_number, node_id::binary>>) do
+    {:ok,
+     [
+       seq_number: seq_number,
+       node_id: NetworkManagementInclusion.parse_node_remove_node_id(node_id)
+     ]}
   end
 end
