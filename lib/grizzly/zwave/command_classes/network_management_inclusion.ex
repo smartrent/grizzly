@@ -200,5 +200,5 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   @spec parse_node_remove_node_id(binary()) :: Grizzly.ZWave.node_id()
   def parse_node_remove_node_id(<<node_id>>), do: node_id
   def parse_node_remove_node_id(<<@remove_node_id_is_16_bit, node_id::16>>), do: node_id
-  def parse_node_remove_node_id(<<node_id, 0x00::16>>), do: node_id
+  def parse_node_remove_node_id(<<node_id, _ignored::16>>), do: node_id
 end
