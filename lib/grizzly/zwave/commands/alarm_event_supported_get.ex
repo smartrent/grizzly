@@ -1,11 +1,11 @@
 defmodule Grizzly.ZWave.Commands.AlarmEventSupportedGet do
   @moduledoc """
-  This command is used to request the supported Notifications for a specified Notification Type.
+  This command is used to request the supported Notifications for a specified
+  Notification Type.
 
   Params:
 
     * `:type` - a type of notification
-
   """
 
   @behaviour Grizzly.ZWave.Command

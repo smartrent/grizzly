@@ -1,6 +1,8 @@
 defmodule Grizzly.ZWave.Commands.FirmwareMDGet do
   @moduledoc """
-  This module implements command FIRMWARE_MD_GET of command class COMMAND_CLASS_FIRMWARE_UPDATE_MD
+  This module implements command FIRMWARE_MD_GET of command class
+  COMMAND_CLASS_FIRMWARE_UPDATE_MD
+
   The command requests a FIRMWARE_MD_REPORT
 
   Params: -none-

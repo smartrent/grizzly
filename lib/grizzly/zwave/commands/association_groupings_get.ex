@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AssociationGroupingsGet do
   @moduledoc """
-  This command is used to request the number of association groups that this node supports.
+  This command is used to request the number of association groups that this
+  node supports.
 
   Params: - none -
 

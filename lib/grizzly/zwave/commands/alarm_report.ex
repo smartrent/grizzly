@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AlarmReport do
   @moduledoc """
-  This command notifies the application of the alarm state (v1, v2) or the notification state (v8).
+  This command notifies the application of the alarm state (v1, v2) or the
+  notification state (v8).
 
   Params:
 
@@ -13,8 +14,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     * `:zwave_status` - if the device alarm status is :enabled or :disabled (v2)
     * `:zwave_type` - part of `Grizzly.ZWave.Notifications` spec (v2)
     * `:zwave_event` - part of the `Grizzly.ZWave.Notifications` spec (v2)
-    * `:event_parameters` - additional parameters for the event as keyword list, see user
-      manual for more information (v2+, optional, default `[]`)
+    * `:event_parameters` - additional parameters for the event as keyword list,
+      see user manual for more information (v2+, optional, default `[]`)
   """
 
   @behaviour Grizzly.ZWave.Command

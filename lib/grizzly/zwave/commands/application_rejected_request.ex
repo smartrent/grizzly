@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ApplicationRejectedRequest do
   @moduledoc """
-  This command is used to instruct a node that the command was rejected by the application in the receiving node.
+  This command is used to instruct a node that the command was rejected by the
+  application in the receiving node.
 
   Params: - none -
 

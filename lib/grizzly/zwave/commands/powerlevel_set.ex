@@ -1,15 +1,15 @@
 defmodule Grizzly.ZWave.Commands.PowerlevelSet do
   @moduledoc """
-  This command is used to set the power level indicator value, which should be used by the node when
-  transmitting RF, and the timeout for this power level indicator value before returning the power level
-  defined by the application.
+  This command is used to set the power level indicator value, which should be
+  used by the node when transmitting RF, and the timeout for this power level
+  indicator value before returning the power level defined by the application.
 
   Params:
 
-    * `:power_level` - This field indicates the power level value that the receiving node MUST set.
-
-    * `:timeout` - The time in seconds the node should keep the Power level before resetting to normalPower level.
-
+    * `:power_level` - This field indicates the power level value that the
+      receiving node MUST set.
+    * `:timeout` - The time in seconds the node should keep the Power level
+      before resetting to normalPower level.
   """
 
   @behaviour Grizzly.ZWave.Command

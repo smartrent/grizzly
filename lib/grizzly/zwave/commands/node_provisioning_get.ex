@@ -1,9 +1,10 @@
 defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
   @moduledoc """
-  This module implements command COMMAND_NODE_PROVISIONING_GET of the COMMAND_CLASS_NODE_PROVISIONING command class
+  This module implements command COMMAND_NODE_PROVISIONING_GET of the
+  COMMAND_CLASS_NODE_PROVISIONING command class
 
-  This command is used to request the metadata information associated to an entry in the node
-  Provisioning List
+  This command is used to request the metadata information associated to an
+  entry in the node Provisioning List
 
   Params:
 

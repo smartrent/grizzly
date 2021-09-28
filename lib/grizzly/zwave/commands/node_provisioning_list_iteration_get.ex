@@ -7,7 +7,8 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGet do
   Params:
 
     - `:seq_number` - the network command sequence number (required)
-    - `:remaining_counter` - indicates the remaining amount of entries in the Provisioning List, not provided if starting (optional)
+    - `:remaining_counter` - indicates the remaining amount of entries in the
+      Provisioning List, not provided if starting (optional)
 
   """
 

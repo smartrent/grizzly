@@ -4,16 +4,16 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
 
   Params:
 
-    * `:state` - This field MUST indicate the desired :locked or :unlocked state for the receiving node (required v2+)
-
-    * `:magic_code` - This field contains the 1 to 10 byte Magic Code used to lock or unlock the node (required v2+)
-
-    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the company’s product that has locked the node (required v2+)
-
-    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key value to help retriving the Magic Code (required v2+)
-
-    * `:locking_entity_id` - This field MUST specify a unique Z-Wave Alliance identifier for the entity that has locked the node (required v3)
-
+    * `:state` - This field MUST indicate the desired :locked or :unlocked state
+      for the receiving node (required v2+)
+    * `:magic_code` - This field contains the 1 to 10 byte Magic Code used to
+      lock or unlock the node (required v2+)
+    * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of the
+      company’s product that has locked the node (required v2+)
+    * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key
+      value to help retriving the Magic Code (required v2+)
+    * `:locking_entity_id` - This field MUST specify a unique Z-Wave Alliance
+      identifier for the entity that has locked the node (required v3)
   """
 
   @behaviour Grizzly.ZWave.Command

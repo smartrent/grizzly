@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AntitheftGet do
   @moduledoc """
-  This command is used to request the locked/unlocked state of a supporting node.
+  This command is used to request the locked/unlocked state of a supporting
+  node.
 
   Params: - none -
 

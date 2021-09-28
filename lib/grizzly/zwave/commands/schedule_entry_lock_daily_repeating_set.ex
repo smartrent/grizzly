@@ -1,25 +1,25 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingSet do
   @moduledoc """
-  This command is used to set or erase a daily repeating schedule for an identified user who already has valid user access code.
+  This command is used to set or erase a daily repeating schedule for an
+  identified user who already has valid user access code.
 
   Params:
 
     * `:set_action` - Indicates whether to erase or modify
-
-    * `:user_identifier` - The User Identifier is used to recognize the user identity. A valid User Identifier MUST be a value starting from 1 to the maximum number of users supported by the device
-
-    * `:schedule_slot_id` - A value from 1 to Number of Slots Daily Repeating Supported
-
-    * `:week_days - a list of scheduled week day's names
-
-    * `:start_hour` - A value from 0 to 23 representing the starting hour of the time fence.
-
-    * `:start_minute` - A value from 0 to 59 representing the starting minute of the time fence.
-
-    * `:duration_hour` - A value from 0 to 23 representing how many hours the time fence will last
-
-    * `:duration_minute` - A value from 0 to 59 representing how many minutes the time fence will last past the Duration Hour field.
-
+    * `:user_identifier` - The User Identifier is used to recognize the user
+      identity. A valid User Identifier MUST be a value starting from 1 to the
+      maximum number of users supported by the device
+    * `:schedule_slot_id` - A value from 1 to Number of Slots Daily Repeating
+      Supported
+    * `:week_days` - a list of scheduled week day's names
+    * `:start_hour` - A value from 0 to 23 representing the starting hour of the
+      time fence.
+    * `:start_minute` - A value from 0 to 59 representing the starting minute of
+      the time fence.
+    * `:duration_hour` - A value from 0 to 23 representing how many hours the
+      time fence will last
+    * `:duration_minute` - A value from 0 to 59 representing how many minutes
+      the time fence will last past the Duration Hour field.
   """
 
   @behaviour Grizzly.ZWave.Command

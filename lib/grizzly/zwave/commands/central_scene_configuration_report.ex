@@ -1,11 +1,12 @@
 defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationReport do
   @moduledoc """
-  This command is used to advertise the configuration of optional node capabilities for scene
-  notifications.
+  This command is used to advertise the configuration of optional node
+  capabilities for scene notifications.
 
   Params:
 
-    * `:slow_refresh` - This boolean field indicates whether the scene launching node must use Slow Refresh.
+    * `:slow_refresh` - This boolean field indicates whether the scene launching
+      node must use Slow Refresh.
 
   """
 

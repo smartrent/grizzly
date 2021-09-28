@@ -2,12 +2,14 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
   @moduledoc """
   Module for working with the `NODE_PROVISIONING_LIST_ITERATION_REPORT` command
 
-  This command is used to advertise the contents of an entry in the Provisioning List of the sending node.
+  This command is used to advertise the contents of an entry in the Provisioning
+  List of the sending node.
 
   Params:
 
     - `:seq_number` - the network command sequence number (required)
-    - `:remaining_count` - indicates the remaining amount of entries in the Provisioning List
+    - `:remaining_count` - indicates the remaining amount of entries in the
+      Provisioning List
     - `:dsk` - a `Grizzly.ZWave.DSK.t()` for the device (optional)
     - `:meta_extensions` - a list of `Grizzly.ZWave.SmartStart.MetaExtension.t()`
       (optional default `[]`)

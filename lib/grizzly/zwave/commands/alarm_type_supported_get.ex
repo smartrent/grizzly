@@ -3,7 +3,6 @@ defmodule Grizzly.ZWave.Commands.AlarmTypeSupportedGet do
   This command is used to request supported Alarm/Notification Types.
 
   Params: -none-
-
   """
 
   @behaviour Grizzly.ZWave.Command

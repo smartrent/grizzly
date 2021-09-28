@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.BatteryGet do
   @moduledoc """
-  This module implements the BATTERY_GET command in the COMMAND_CLASS_BATTERY command class.
+  This module implements the BATTERY_GET command in the COMMAND_CLASS_BATTERY
+  command class.
 
   Params: - none -
 

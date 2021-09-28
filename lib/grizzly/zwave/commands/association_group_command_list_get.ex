@@ -1,11 +1,13 @@
 defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListGet do
   @moduledoc """
-  This command is used to request the commands that are sent via a given association group.
+  This command is used to request the commands that are sent via a given
+  association group.
 
   Params:
 
-    * `:allow_cache` - This field indicates that a Z-Wave Gateway device is allowed to intercept the request and return a
-                       cached response on behalf of the specified target. (required)
+    * `:allow_cache` - This field indicates that a Z-Wave Gateway device is
+      allowed to intercept the request and return a cached response on behalf of
+      the specified target. (required)
     * `:group_id` - The group identifier (required)
   """
 

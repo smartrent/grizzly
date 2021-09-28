@@ -1,9 +1,9 @@
 defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationGet do
   @moduledoc """
-  This command is used to query the configuration of optional node capabilities for scene notifications
+  This command is used to query the configuration of optional node capabilities
+  for scene notifications
 
   Params: - none -
-
   """
 
   @behaviour Grizzly.ZWave.Command

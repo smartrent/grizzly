@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.BasicSet do
   @moduledoc """
-  This module implements the BASIC_SET command of the COMMAND_CLASS_BASIC command class
+  This module implements the BASIC_SET command of the COMMAND_CLASS_BASIC
+  command class
 
   Params:
 

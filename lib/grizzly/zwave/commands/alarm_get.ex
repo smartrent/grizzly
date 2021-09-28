@@ -5,11 +5,8 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
   Params:
 
     * `:type` - v1 alarm type (required for v1 only)
-
     * `:zwave_type` - Z-Wave alarm/notification type (required for v2+)
-
     * `:zwave_event` - Z-Wave event/state (optional)
-
   """
 
   @behaviour Grizzly.ZWave.Command

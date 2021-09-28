@@ -1,14 +1,12 @@
 defmodule Grizzly.ZWave.Commands.AlarmSet do
   @moduledoc """
-  This command is used to enable or disable the unsolicited transmission of a specific
-  Notification/Alarm Type.
+  This command is used to enable or disable the unsolicited transmission of a
+  specific Notification/Alarm Type.
 
   Params:
 
     * `:zwave_type` - the type of alarm, e.g. :home_security
-
     * `:status` - the status of the alarm, either :enabled or :disabled
-
   """
 
   @behaviour Grizzly.ZWave.Command
