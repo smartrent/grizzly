@@ -127,4 +127,29 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
              }
     end
   end
+
+  describe "node remove node ids parsing" do
+    test "when version 1-3 - only 8 bit node ids" do
+      assert NetworkManagementInclusion.parse_node_remove_node_id(<<0x04>>) == 0x04
+    end
+
+    test "when version 4 - 8 bit node id provided" do
+      assert NetworkManagementInclusion.parse_node_remove_node_id(<<0x04, 0x00::16>>) == 0x04
+    end
+
+    test "when version 4 - 16 bit node id provided" do
+      assert NetworkManagementInclusion.parse_node_remove_node_id(<<0xFF, 0x01, 0x10>>) == 0x0110
+    end
+  end
+
+  describe "node remove node ids encoding for v4 command class" do
+    test "when version 4 - 8 bit node id provided" do
+      assert NetworkManagementInclusion.encode_node_remove_node_id_v4(0xA0) == <<0xA0, 0x00::16>>
+    end
+
+    test "when version 4 - 16 bit node id provided" do
+      assert NetworkManagementInclusion.encode_node_remove_node_id_v4(0xA030) ==
+               <<0xFF, 0xA0, 0x30>>
+    end
+  end
 end
