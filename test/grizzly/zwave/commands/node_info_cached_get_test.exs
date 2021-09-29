@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
     test "version 4 - 8 bit node id" do
       {:ok, cmd} = NodeInfoCachedGet.new(seq_number: 0x01, node_id: 0x04, max_age: 0x03)
 
-      expected_bin = <<0x01, 0x03, 0x04, 0x00, 0x00>>
+      expected_bin = <<0x01, 0x03, 0x04, 0x04::16>>
 
       assert NodeInfoCachedGet.encode_params(cmd) == expected_bin
     end

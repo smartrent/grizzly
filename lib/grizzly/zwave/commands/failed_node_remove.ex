@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, NodeId}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type param() :: {:node_id, char()} | {:seq_number, ZWave.seq_number()}
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
 
     case Keyword.get(opts, :command_class_version, 4) do
       4 ->
-        <<seq_number, NetworkManagementInclusion.encode_node_remove_node_id_v4(node_id)::binary>>
+        <<seq_number, NodeId.encode_extended(node_id)::binary>>
 
       n when n < 4 ->
         <<seq_number, node_id>>
@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
     {:ok,
      [
        seq_number: seq_number,
-       node_id: NetworkManagementInclusion.parse_node_remove_node_id(node_id)
+       node_id: NodeId.parse(node_id)
      ]}
   end
 end
