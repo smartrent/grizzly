@@ -26,4 +26,38 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     {:ok, params} = RssiReport.decode_params(params_binary)
     assert [:rssi_max_power_saturated, -94] == Keyword.get(params, :channels)
   end
+
+  test "encode version 4 - long range channels" do
+    {:ok, cmd} =
+      RssiReport.new(
+        channels: [
+          :rssi_max_power_saturated,
+          -94,
+          :rssi_not_available
+        ],
+        long_range_primary_channel: -94,
+        long_range_secondary_channel: :rssi_not_available
+      )
+
+    assert RssiReport.encode_params(cmd) == <<0x7E, 0xA2, 0x7F, 0xA2, 0x7F>>
+  end
+
+  test "parses version 4 - long range channels" do
+    expected_params = [
+      channels: [
+        :rssi_max_power_saturated,
+        -94,
+        :rssi_not_available
+      ],
+      long_range_primary_channel: -94,
+      long_range_secondary_channel: :rssi_not_available
+    ]
+
+    binary = <<0x7E, 0xA2, 0x7F, 0xA2, 0x7F>>
+    {:ok, params} = RssiReport.decode_params(binary)
+
+    for {param, value} <- expected_params do
+      assert params[param] == value
+    end
+  end
 end
