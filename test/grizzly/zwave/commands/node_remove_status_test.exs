@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
     test "version 4 - with 8 bit node id" do
       {:ok, cmd} = NodeRemoveStatus.new(seq_number: 0x01, node_id: 0x05, status: :done)
 
-      expected_binary = <<0x01, 0x06, 0x05, 0x00, 0x00>>
+      expected_binary = <<0x01, 0x06, 0x05, 0x05::16>>
 
       assert NodeRemoveStatus.encode_params(cmd) == expected_binary
     end

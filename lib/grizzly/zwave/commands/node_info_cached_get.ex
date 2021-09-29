@@ -41,15 +41,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  # For version 4 of this command, if the node id is a 16 bit node ID we set the
-  # the node id byte in the binary to `0xFF` as per the specification.
-  #
-  # In ZWA_Z-Wave Network Protocol Command Class Specification 12.0.0.pdf:
-  #
-  # Section 4.5.7.3
-  #  "The value 0xFF MUST indicate that the queried NodeID is indicated in the Extended NodeID field"
-  @node_id_is_16_bit 0xFF
-
   @type max_age() :: 1..14 | :infinite | :force_update
 
   @type param() ::
@@ -57,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
           | {:node_id, Grizzly.ZWave.node_id()}
           | {:max_age, max_age()}
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, NodeId}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @impl Grizzly.ZWave.Command
@@ -85,23 +76,18 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
     case Keyword.get(opts, :command_class_version, 4) do
       4 ->
-        <<seq_number, encode_max_age(max_age), encode_node_id_v4(node_id)::binary>>
+        <<seq_number, encode_max_age(max_age), NodeId.encode_extended(node_id)::binary>>
 
       v when v < 4 ->
         <<seq_number, encode_max_age(max_age), node_id>>
     end
   end
 
-  defp encode_node_id_v4(node_id) when node_id < 233, do: <<node_id, 0x00::16>>
-
-  defp encode_node_id_v4(node_id) when node_id > 255 and node_id <= 65535,
-    do: <<@node_id_is_16_bit, node_id::16>>
-
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(params_binary) do
     <<seq_number, max_age_byte, node_id_bin::binary>> = params_binary
-    node_id = parse_node_id_bin(node_id_bin)
+    node_id = NodeId.parse(node_id_bin)
 
     case decode_max_age(max_age_byte) do
       {:ok, max_age} ->
@@ -111,10 +97,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
         error
     end
   end
-
-  defp parse_node_id_bin(<<node_id>>), do: node_id
-  defp parse_node_id_bin(<<@node_id_is_16_bit, node_id::16>>), do: node_id
-  defp parse_node_id_bin(<<node_id, _rest::16>>), do: node_id
 
   @spec encode_max_age(max_age()) :: 0..15
   def encode_max_age(n) when n > 0 and n < 15, do: n

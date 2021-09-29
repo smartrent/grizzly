@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemoveTest do
     test "version 4 - with 8 bit node id" do
       {:ok, command} = FailedNodeRemove.new(seq_number: 0x01, node_id: 0x04)
 
-      assert FailedNodeRemove.encode_params(command) == <<0x01, 0x04, 0x00, 0x00>>
+      assert FailedNodeRemove.encode_params(command) == <<0x01, 0x04, 0x04::16>>
     end
 
     test "version 4 - with 16 bit node id" do

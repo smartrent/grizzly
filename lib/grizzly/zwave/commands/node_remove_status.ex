@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, NodeId}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type status() :: :done | :failed
@@ -53,8 +53,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
 
     case Keyword.get(opts, :command_class_version, 4) do
       4 ->
-        <<seq_number, encode_status(status),
-          NetworkManagementInclusion.encode_node_remove_node_id_v4(node_id)::binary>>
+        <<seq_number, encode_status(status), NodeId.encode_extended(node_id)::binary>>
 
       n when n < 4 ->
         <<seq_number, encode_status(status), node_id>>
@@ -70,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
          [
            seq_number: seq_number,
            status: status,
-           node_id: NetworkManagementInclusion.parse_node_remove_node_id(node_id)
+           node_id: NodeId.parse(node_id)
          ]}
 
       {:error, %DecodeError{}} = error ->
