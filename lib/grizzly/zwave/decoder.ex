@@ -136,6 +136,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x67, 0x07, Commands.RssiGet},
       {0x67, 0x08, Commands.RssiReport},
       {0x67, 0x09, Commands.S2ResynchronizationEvent},
+      {0x67, 0x0E, Commands.ZWaveLongRangeChannelReport},
 
       # Supervision
       {0x6C, 0x01, Commands.SupervisionGet},
