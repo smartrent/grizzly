@@ -313,6 +313,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statistics_report}}},
       {:statistics_clear, {Commands.StatisticsGet, handler: AckResponse}},
       {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssi_report}}},
+      {:zwave_long_range_channel_set, {Commands.ZWaveLongRangeChannelSet, handler: AckResponse}},
       {:zwave_long_range_channel_get,
        {Commands.ZWaveLongRangeChannelGet,
         handler: {WaitReport, complete_report: :zwave_long_range_channel_report}}},
