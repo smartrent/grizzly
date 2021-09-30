@@ -317,10 +317,17 @@ defmodule Grizzly.ZWave.CommandClasses do
     secure_supported_bin = for cc <- secure_supported, into: <<>>, do: <<to_byte(cc)>>
     secure_controlled_bin = for cc <- secure_controlled, into: <<>>, do: <<to_byte(cc)>>
 
-    non_secure_supported_bin
-    |> maybe_concat_command_classes(:non_secure_controlled, non_secure_controlled_bin)
-    |> maybe_concat_command_classes(:secure_supported, secure_supported_bin)
-    |> maybe_concat_command_classes(:secure_controlled, secure_controlled_bin)
+    bin =
+      non_secure_supported_bin
+      |> maybe_concat_command_classes(:non_secure_controlled, non_secure_controlled_bin)
+      |> maybe_concat_command_classes(:secure_supported, secure_supported_bin)
+      |> maybe_concat_command_classes(:secure_controlled, secure_controlled_bin)
+
+    if bin == <<>> do
+      <<0>>
+    else
+      bin
+    end
   end
 
   @doc """

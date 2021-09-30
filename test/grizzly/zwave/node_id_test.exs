@@ -47,5 +47,11 @@ defmodule Grizzly.ZWave.NodeIdTest do
 
       assert NodeId.parse(bin, delimiter_size: 3) == 0x10
     end
+
+    test "with extra bytes after the 16 bit node id" do
+      bin = <<0xFF, 0x01, 0x00, 0x01, 0x02, 0x03>>
+
+      assert NodeId.parse(bin) == 0x0100
+    end
   end
 end
