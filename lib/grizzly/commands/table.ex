@@ -71,6 +71,9 @@ defmodule Grizzly.Commands.Table do
       {:network_update_request,
        {Commands.NetworkUpdateRequest,
         handler: {WaitReport, complete_report: :network_update_request_status}}},
+      {:network_management_multi_channel_end_point_get,
+       {Commands.NetworkManagementMultiChannelEndPointGet,
+        handler: {WaitReport, complete_report: :network_management_multi_channel_end_point_report}}},
 
       # DSKs
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},

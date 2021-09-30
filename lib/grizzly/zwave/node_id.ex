@@ -1,7 +1,7 @@
 defmodule Grizzly.ZWave.NodeId do
   @moduledoc false
 
-  # helper mode for encoding and parsing node ids
+  # helper module for encoding and parsing node ids
 
   alias Grizzly.ZWave
 
