@@ -128,6 +128,8 @@ defmodule Grizzly.ZWave.NodeId do
   end
 
   defp do_parse(<<node_id>>), do: node_id
-  defp do_parse(<<@node_id_is_16_bit, node_id::16>>), do: node_id
-  defp do_parse(<<node_id, _ignored::16>>), do: node_id
+  # sometimes packets will have extra bytes after the 16 bit node id, we can
+  # ignore those
+  defp do_parse(<<@node_id_is_16_bit, node_id::16, _ignore::binary>>), do: node_id
+  defp do_parse(<<node_id, _ignored::binary>>), do: node_id
 end
