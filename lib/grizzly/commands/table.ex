@@ -74,6 +74,10 @@ defmodule Grizzly.Commands.Table do
       {:network_management_multi_channel_end_point_get,
        {Commands.NetworkManagementMultiChannelEndPointGet,
         handler: {WaitReport, complete_report: :network_management_multi_channel_end_point_report}}},
+      {:network_management_multi_channel_capability_get,
+       {Commands.NetworkManagementMultiChannelCapabilityGet,
+        handler:
+          {WaitReport, complete_report: :network_management_multi_channel_capability_report}}},
 
       # DSKs
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
