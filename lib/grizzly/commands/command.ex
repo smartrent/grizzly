@@ -285,6 +285,26 @@ defmodule Grizzly.Commands.Command do
         {:last_working_route, routes, speed}, m ->
           Keyword.put(m, :last_working_route, routes) |> Keyword.put(:transmission_speed, speed)
 
+        # Note: `zipgateway` >= v7.15 does not support the dynamic power level stats
+        # and all will be marked as `:not_available`.
+
+        # These stats include:
+
+        # * `:outgoing_rssi_hops`
+        # * `:local_noise_floor`
+        # * `:remote_noise_floor`
+        # * `:local_node_tx_power`
+        # * `:remote_node_tx_power`
+        #
+        # So we just filter these fields out here not to confuse users as to
+        # which stats to use.
+        {local_power_field, _value, _power_field, _remote_value}, meta
+        when local_power_field in [:local_node_tx_power, :local_noise_floor] ->
+          meta
+
+        {:outgoing_rssi_hops, _hops}, meta ->
+          meta
+
         {key, value}, m ->
           Keyword.put(m, key, value)
       end)

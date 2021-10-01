@@ -145,7 +145,10 @@ defmodule Grizzly.Commands.CommandTest do
       {:transmit_channel, 4},
       {:transmission_time, 0},
       {:last_working_route, [1001, 1002, 1003, 1004], {9999, :kbit}},
-      {:rssi_hops, [-40, -50, -60, :not_available, :not_available]}
+      {:rssi_hops, [-40, -50, -60, :not_available, :not_available]},
+      {:local_node_tx_power, -80, :remote_node_tx_power, -90},
+      {:local_noise_floor, -85, :remote_noise_floor, -91},
+      {:outgoing_rssi_hops, [-40, -50, :max_power_saturated, :not_available, :not_available]}
     ]
 
     ack_response =
@@ -160,5 +163,11 @@ defmodule Grizzly.Commands.CommandTest do
     assert Keyword.get(transmission_stats, :rssi_4bars) == 4
     assert Keyword.get(transmission_stats, :last_working_route) == [1001, 1002, 1003, 1004]
     assert Keyword.get(transmission_stats, :transmission_speed) == {9999, :kbit}
+    # ensure filtering of unused transmission stats
+    assert Keyword.get(transmission_stats, :local_node_tx_power) == nil
+    assert Keyword.get(transmission_stats, :remote_node_tx_power) == nil
+    assert Keyword.get(transmission_stats, :local_noise_floor) == nil
+    assert Keyword.get(transmission_stats, :remote_noise_floor) == nil
+    assert Keyword.get(transmission_stats, :outgoing_rssi_hops) == nil
   end
 end
