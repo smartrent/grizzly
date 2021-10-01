@@ -27,4 +27,32 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
     assert Keyword.get(params, :scale) == :fahrenheit
     assert Keyword.get(params, :value) == 75.5
   end
+
+  test "encodes :na type" do
+    {:ok, command} =
+      ThermostatSetpointReport.new(
+        type: :na,
+        value: 70,
+        scale: :fahrenheit
+      )
+
+    expected_bin = <<0x00::4, 0x00::4, 0x00::3, 0x01::2, 0x01::3, 0x00>>
+
+    assert ThermostatSetpointReport.encode_params(command) == expected_bin
+  end
+
+  test "parses :na type" do
+    binary = <<0x00::4, 0x00::4, 0x01::3, 0x01::2, 0x02::3, 0x00, 0x00>>
+
+    expected_params = [
+      type: :na,
+      value: 0
+    ]
+
+    {:ok, params} = ThermostatSetpointReport.decode_params(binary)
+
+    for {param, value} <- expected_params do
+      assert params[param] == value
+    end
+  end
 end
