@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
   @type param :: {:type | ThermostatSetpoint.type()}
@@ -39,12 +39,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointGet do
   end
 
   @impl true
-  def decode_params(<<0x00::size(4), type_byte::size(4)>>) do
-    with {:ok, type} <- ThermostatSetpoint.decode_type(type_byte) do
-      {:ok, [type: type]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
-    end
+  def decode_params(<<0x00::size(4), type::size(4)>>) do
+    {:ok, [type: ThermostatSetpoint.decode_type(type)]}
   end
 end

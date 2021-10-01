@@ -57,11 +57,13 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
         <<_::size(4), type_byte::size(4), precision::size(3), scale_byte::size(2),
           byte_size::size(3), int_value::size(byte_size)-unit(8)>>
       ) do
-    with {:ok, type} <- ThermostatSetpoint.decode_type(type_byte),
-         {:ok, scale} <- ThermostatSetpoint.decode_scale(scale_byte) do
-      value = int_value / :math.pow(10, precision)
-      {:ok, [type: type, scale: scale, value: value]}
-    else
+    type = ThermostatSetpoint.decode_type(type_byte)
+
+    case ThermostatSetpoint.decode_scale(scale_byte) do
+      {:ok, scale} ->
+        value = int_value / :math.pow(10, precision)
+        {:ok, [type: type, scale: scale, value: value]}
+
       {:error, %DecodeError{}} = error ->
         error
     end

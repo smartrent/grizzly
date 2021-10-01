@@ -8,7 +8,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   What type of commands does this command class support?
   """
 
-  @type type :: :heating | :cooling | :furnace | :dry_air | :moist_air | :auto_changeover
+  @type type :: :na | :heating | :cooling | :furnace | :dry_air | :moist_air | :auto_changeover
   @type scale :: :celsius | :fahrenheit
 
   @behaviour Grizzly.ZWave.CommandClass
@@ -22,6 +22,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   def name(), do: :thermostat_setpoint
 
   @spec encode_type(type) :: byte
+  def encode_type(:na), do: 0x00
   def encode_type(:heating), do: 0x01
   def encode_type(:cooling), do: 0x02
   def encode_type(:furnace), do: 0x07
@@ -29,16 +30,14 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   def encode_type(:moist_air), do: 0x09
   def encode_type(:auto_changeover), do: 0x0A
 
-  @spec decode_type(any) :: {:ok, type} | {:error, Grizzly.ZWave.DecodeError.t()}
-  def decode_type(0x01), do: {:ok, :heating}
-  def decode_type(0x02), do: {:ok, :cooling}
-  def decode_type(0x07), do: {:ok, :furnace}
-  def decode_type(0x08), do: {:ok, :dry_air}
-  def decode_type(0x09), do: {:ok, :moist_air}
-  def decode_type(0x0A), do: {:ok, :auto_changeover}
-
-  def decode_type(byte),
-    do: {:error, %DecodeError{value: byte, param: :type, command: :thermostat_setpoint}}
+  @spec decode_type(byte()) :: type()
+  def decode_type(0x01), do: :heating
+  def decode_type(0x02), do: :cooling
+  def decode_type(0x07), do: :furnace
+  def decode_type(0x08), do: :dry_air
+  def decode_type(0x09), do: :moist_air
+  def decode_type(0x0A), do: :auto_changeover
+  def decode_type(_na_type), do: :na
 
   @spec encode_scale(scale) :: byte
   def encode_scale(:celcius), do: 0x00
