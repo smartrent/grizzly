@@ -96,13 +96,13 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
     end
   end
 
-  # Version 3 - patch for zipgateway 7.14.2
+  # Version 3 - patch for zipgateway 7.14.2 and 7.15
   def decode_params(
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version, hardware_version, firmware_targets,
           other_firmware_version_data::size(2)-binary-unit(16)>>
       )
-      when firmware_targets == 0 do
+      when firmware_targets <= 1 do
     with {:ok, library_type} <- decode_library_type(library_type) do
       other_firmware_versions = for <<v::8, s::8 <- other_firmware_version_data>>, do: "#{v}.#{s}"
 
@@ -120,9 +120,10 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
     end
   end
 
+  # Safe fallback
   def decode_params(
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
-          firmware_sub_version>>
+          firmware_sub_version, _ignore::binary>>
       ) do
     with {:ok, library_type} <- decode_library_type(library_type) do
       {:ok,
