@@ -3,6 +3,59 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.22.0] - 2021-10-01
+
+This release brings Grizzly up to speed to support command classes that have
+been updated to support extended node ids. This allows Grizzly to support
+zipgateway versions that have Z-Wave Long Range support. That is zipgateway
+`>= v7.15`.
+
+## Changed
+
+* Removed `Grizzly.ZWave.Commands.NodeAddStatus.status()` type
+  * Now is `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_add_status()`
+* Changed return type of
+  `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.decode_type/1` function from
+  `{:ok, Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()}` to
+  `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()`
+
+### Added
+
+* Support version 4 `Grizzly.ZWave.Commands.NodeListReport` command (Z-Wave LR)
+* Support version 4 `Grizzly.ZWave.Commands.NodeRemoveStatus` command (Z-Wave LR)
+* Support version 4 `Grizzly.ZWave.Commands.FailedNodeListReport` command (Z-Wave LR)
+* Support version 4 `Grizzly.ZWave.Commands.FailedNodeRemove` command (Z-Wave LR)
+* Support version 4 `Grizzly.ZWave.Commands.FailedNodeRemoveStatus` command (Z-Wave LR)
+* Support version 4 `Grizzly.ZWave.Commands.NodeInfoCachedGet` command (Z-Wave LR)
+* Support version 4 `Grizzly.ZWave.Commands.RssiReport` command (Z-Wave LR)
+* `Grizzly.ZWave.Commands.ZWaveLongRangeChannelGet` command
+* `Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport` command
+* `Grizzly.ZWave.Commands.ZWaveLongRangeChannelSet` command
+* `Grizzly.ZWave.Commands.ExtendedNodeAddStatus` command
+* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet` command
+* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport` command
+* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGet` command
+* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport` command
+* `Grizzly.Network.add_long_range_device/2` function
+* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.parse_node_add_status/1`
+  function
+* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.parse_node_info/1`
+function
+* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_add_status()` type
+* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.extended_node_info_report()`
+  type
+* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_info_report()` type
+* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.tagged_command_classes()`
+  type
+* `Grizzly.ZWave.Command.encode_params/2` optional callback
+* Support parsing header new IME report stats from version 5 of ZIP command class
+* The atom `:na` to `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()` type
+
+### Fixed
+
+* Parsing thermostat setpoint types that are considered NA by the specification
+* Version report command parsing for zipgateway >= 7.14
+
 ## [v0.21.1] - 2021-9-21
 
 ### Fixed
@@ -1574,8 +1627,11 @@ Same change found in `Grizzly.Node.get_command_class_version`
   * Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v0.22.0]: https://github.com/smartrent/grizzly/compare/v0.21.1...v0.22.0
+
 [v0.21.1]: https://github.com/smartrent/grizzly/compare/v0.21.0...v0.21.1
 [v0.21.0]: https://github.com/smartrent/grizzly/compare/v0.20.2...v0.21.0
+
 [v0.20.2]: https://github.com/smartrent/grizzly/compare/v0.20.1...v0.20.2
 [v0.20.1]: https://github.com/smartrent/grizzly/compare/v0.20.0...v0.20.1
 [v0.20.0]: https://github.com/smartrent/grizzly/compare/v0.19.1...v0.20.0
