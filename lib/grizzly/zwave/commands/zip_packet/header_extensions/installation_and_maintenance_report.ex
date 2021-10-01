@@ -54,6 +54,39 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
   def ime_from_binary(<<0x08, 0x02, neighbor_node_id_1, neighbor_node_id_2, rest::binary>>),
     do: {{:failed_link, neighbor_node_id_1, neighbor_node_id_2}, rest}
 
+  def ime_from_binary(
+        <<0x09, 0x02, local_tx_power::signed, remote_tx_power::signed, rest::binary>>
+      ) do
+    {{:local_node_tx_power, parse_tx_power(local_tx_power), :remote_node_tx_power,
+      parse_tx_power(remote_tx_power)}, rest}
+  end
+
+  def ime_from_binary(
+        <<0x0A, 0x02, local_noise_floor::signed, remote_noise_floor::signed, rest::binary>>
+      ) do
+    {{:local_noise_floor, parse_noise_floor(local_noise_floor), :remote_noise_floor,
+      parse_noise_floor(remote_noise_floor)}, rest}
+  end
+
+  def ime_from_binary(<<0x0B, 0x05, hop1, hop2, hop3, hop4, hop5, rest::binary>>) do
+    {{:outgoing_rssi_hops,
+      [
+        parse_rssi_hop(hop1),
+        parse_rssi_hop(hop2),
+        parse_rssi_hop(hop3),
+        parse_rssi_hop(hop4),
+        parse_rssi_hop(hop5)
+      ]}, rest}
+  end
+
+  defp parse_tx_power(0x7F), do: :not_available
+  defp parse_tx_power(tx_power), do: tx_power
+
+  defp parse_noise_floor(0x7F), do: :not_available
+  defp parse_noise_floor(0x7E), do: :max_power_saturated
+  defp parse_noise_floor(0x7D), do: :below_sensitivity
+  defp parse_noise_floor(floor), do: floor
+
   defp parse_route_change_value(0x00), do: false
   defp parse_route_change_value(0x01), do: true
 
