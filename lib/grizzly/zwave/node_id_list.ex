@@ -16,6 +16,10 @@ defmodule Grizzly.ZWave.NodeIdList do
     unmask(node_ids, &node_id_modifier/2)
   end
 
+  def parse(<<node_ids::binary-size(@node_ids_list_len), 0x00::16, _rest::binary>>) do
+    unmask(node_ids, &node_id_modifier/2)
+  end
+
   def parse(
         <<node_ids::binary-size(@node_ids_list_len), extended_node_ids_list_len::16,
           extended_node_ids_list::binary-size(extended_node_ids_list_len)>>

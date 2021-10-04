@@ -28,4 +28,14 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReportTest do
     assert Keyword.get(params, :seq_number) == 10
     assert Keyword.get(params, :node_ids) == [1, 2, 3, 9]
   end
+
+  test "decodes params version 4 with empty extended node ids" do
+    binary =
+      <<0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0>>
+
+    {:ok, params} = FailedNodeListReport.decode_params(binary)
+
+    assert params[:node_ids] == [38]
+  end
 end
