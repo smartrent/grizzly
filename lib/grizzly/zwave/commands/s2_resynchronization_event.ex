@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, NodeId}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
 
   @impl Command
@@ -50,7 +50,9 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
   end
 
   @impl Command
-  def decode_params(<<node_id, reason>>) do
+  def decode_params(<<_node_id_8, reason, _node_id_16::binary>> = params) do
+    node_id = NodeId.parse(params, delimiter_size: 1)
+
     {:ok, [node_id: node_id, reason: reason]}
   end
 end

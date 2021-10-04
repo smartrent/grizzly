@@ -21,4 +21,22 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEventTest do
     assert Keyword.get(params, :node_id) == 5
     assert Keyword.get(params, :reason) == 0
   end
+
+  test "parse version 3 - 8 bit node id" do
+    binary = <<0x04, 0x00, 0x00, 0x00>>
+
+    {:ok, params} = S2ResynchronizationEvent.decode_params(binary)
+
+    assert params[:node_id] == 0x04
+    assert params[:reason] == 0x00
+  end
+
+  test "parse version 3 - 16 bit node id" do
+    binary = <<0xFF, 0x00, 0x01, 0x00>>
+
+    {:ok, params} = S2ResynchronizationEvent.decode_params(binary)
+
+    assert params[:node_id] == 0x0100
+    assert params[:reason] == 0x00
+  end
 end
