@@ -6,7 +6,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   @behaviour Grizzly.ZWave.CommandClass
   alias Grizzly.ZWave.DecodeError
 
-  @type sensor_type ::
+  @type sensor_type() ::
           :general_purpose
           | :smoke
           | :co
@@ -21,12 +21,16 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
           | :motion
           | :glass_break
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x30
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :sensor_binary
 
+  @doc """
+  Encode the type value for the sensor report
+  """
+  @spec encode_type(sensor_type()) :: byte()
   def encode_type(:general_purpose), do: 0x01
   def encode_type(:smoke), do: 0x02
   def encode_type(:co), do: 0x03
@@ -41,6 +45,10 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   def encode_type(:motion), do: 0x0C
   def encode_type(:glass_break), do: 0x0D
 
+  @doc """
+  Parse the type value from a byte
+  """
+  @spec decode_type(byte()) :: {:ok, sensor_type()} | {:error, DecodeError.t()}
   def decode_type(0x01), do: {:ok, :general_purpose}
   def decode_type(0x02), do: {:ok, :smoke}
   def decode_type(0x03), do: {:ok, :co}
@@ -52,7 +60,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   def decode_type(0x09), do: {:ok, :aux}
   def decode_type(0x0A), do: {:ok, :door_window}
   def decode_type(0x0B), do: {:ok, :tilt}
-  def decode_type(0x0C), do: {:ok, :glass_break}
+  def decode_type(0x0C), do: {:ok, :motion}
   def decode_type(0x0D), do: {:ok, :glass_break}
 
   def decode_type(byte),
