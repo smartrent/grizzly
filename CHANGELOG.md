@@ -3,6 +3,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.22.2] - 2021-10-12
+
+### Fixes
+
+- Incorrect parsing of `:motion` type from a SensorBinaryReport
+
 ## [v0.22.1] - 2021-10-4
 
 ### Added
@@ -1639,7 +1645,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   * Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
-[v0.22.1]: https://github.com/smartrent/grizzly/compare/v0.21.0...v0.22.1
+[v0.22.2]: https://github.com/smartrent/grizzly/compare/v0.22.1...v0.22.2
+[v0.22.1]: https://github.com/smartrent/grizzly/compare/v0.22.0...v0.22.1
 [v0.22.0]: https://github.com/smartrent/grizzly/compare/v0.21.1...v0.22.0
 
 [v0.21.1]: https://github.com/smartrent/grizzly/compare/v0.21.0...v0.21.1
