@@ -109,5 +109,26 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       assert Keyword.get(params, :bit_mask_bytes) == 1
       assert Keyword.get(params, :supported_key_attributes) == [[:key_pressed_1_time]]
     end
+
+    test "identical and superfluous" do
+      params_binary = <<2, 3, 31, 0, 0, 0>>
+
+      {:ok, params} = CentralSceneSupportedReport.decode_params(params_binary)
+
+      assert Keyword.get(params, :supported_scenes) == 2
+      assert Keyword.get(params, :slow_refresh_support) == false
+      assert Keyword.get(params, :identical) == true
+      assert Keyword.get(params, :bit_mask_bytes) == 1
+
+      assert Keyword.get(params, :supported_key_attributes) == [
+               [
+                 :key_pressed_3_times,
+                 :key_pressed_2_times,
+                 :key_held_down,
+                 :key_released,
+                 :key_pressed_1_time
+               ]
+             ]
+    end
   end
 end

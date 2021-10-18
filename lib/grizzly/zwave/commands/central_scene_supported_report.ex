@@ -142,13 +142,23 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
          identical?
        ) do
     # [ [0,2,3], [], [1,4], ...]
+    # [[4, 3, 2, 1, 0], [], [], []]
     all_bit_masks_as_lists = bit_masks_from_binary(supported_key_attributes_binary)
     # [ [ [0,2,3], [] ], ...]
     per_scene_bit_indices = Enum.chunk_every(all_bit_masks_as_lists, bit_mask_bytes)
     scene_count = Enum.count(per_scene_bit_indices)
-    valid? = if identical?, do: scene_count == 1, else: scene_count == supported_scenes
+
+    # Some devices may return more than one set of scene bit indices though they are meant to identical (the superfluous will be ignored)
+    valid? = if identical?, do: scene_count >= 1, else: scene_count == supported_scenes
 
     if valid? do
+      per_scene_bit_indices =
+        if identical? do
+          Enum.take(per_scene_bit_indices, 1)
+        else
+          per_scene_bit_indices
+        end
+
       supported_key_attributes =
         for scene_bit_indices <- per_scene_bit_indices do
           # [{[0,2,3], 1}, {[], 2}]
