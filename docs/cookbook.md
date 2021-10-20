@@ -12,6 +12,7 @@ Below are short notes about using Grizzly.
 1. [Door Locks](#door-locks)
 1. [DSK](#dsk)
 1. [Indicator Light](#indicator-light)
+1. [Firmware Information](#firmware-information)
 
 ## Starting Grizzly
 
@@ -313,4 +314,65 @@ iex> Grizzly.send_command(1, :indicator_set,
          [indicator_id: :node_identify, property_id: :toggling_cycles, value: 0]
        ]
      )
+```
+
+## Firmware Information
+
+To check firmware version information
+
+```elixir
+iex> Grizzly.send_command(node_id, :version_get)
+{:ok,
+ %Grizzly.Report{
+   command: %Grizzly.ZWave.Command{
+     command_byte: 2,
+     command_class: Grizzly.ZWave.CommandClasses.FirmwareUpdateMD,
+     impl: Grizzly.ZWave.Commands.FirmwareMDReport,
+     name: :firmware_md_report,
+     params: [
+       manufacturer_id: 297,
+       firmware_id: 769,
+       checksum: 16143,
+       firmware_upgradable?: true,
+       max_fragment_size: 40,
+       other_firmware_ids: [32778]
+     ]
+   },
+   command_ref: #Reference<0.1607448711.4278714369.34043>,
+   node_id: 10,
+   queued: false,
+   queued_delay: 0,
+   status: :complete,
+   transmission_stats: [],
+   type: :command
+ }}
+```
+
+To check what firmware version is running on a node:
+
+```elixir
+iex> Grizzly.send_command(node_id, :firmware_md_get)
+{:ok,
+ %Grizzly.Report{
+   command: %Grizzly.ZWave.Command{
+     command_byte: 18,
+     command_class: Grizzly.ZWave.CommandClasses.Version,
+     impl: Grizzly.ZWave.Commands.VersionReport,
+     name: :version_report,
+     params: [
+       library_type: :enhanced_slave,
+       protocol_version: "4.24",
+       firmware_version: "1.78",
+       hardware_version: 255,
+       other_firmware_versions: ["24.0"]
+     ]
+   },
+   command_ref: #Reference<0.1607448711.4278714369.35718>,
+   node_id: 10,
+   queued: false,
+   queued_delay: 0,
+   status: :complete,
+   transmission_stats: [],
+   type: :command
+ }}
 ```
