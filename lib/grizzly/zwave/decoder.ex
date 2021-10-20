@@ -227,6 +227,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x43, 0x01, Commands.ThermostatSetpointSet},
       {0x43, 0x02, Commands.ThermostatSetpointGet},
       {0x43, 0x03, Commands.ThermostatSetpointReport},
+      {0x43, 0x04, Commands.ThermostatSetpointSupportedGet},
+      {0x43, 0x05, Commands.ThermostatSetpointSupportedReport},
       # Thermostat fan mode
       {0x44, 0x01, Commands.ThermostatFanModeSet},
       {0x44, 0x02, Commands.ThermostatFanModeGet},
