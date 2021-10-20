@@ -7,9 +7,9 @@ defmodule <%= inspect command_class_module %> do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: # add byte here
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: <%= inspect command_class_name %>
 end

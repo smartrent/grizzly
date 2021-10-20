@@ -15,7 +15,7 @@ defmodule <%= inspect command_module %> do
 
   @type param :: # give me some type specs for your params
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -29,13 +29,13 @@ defmodule <%= inspect command_module %> do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(_binary) do
     {:ok, []}
