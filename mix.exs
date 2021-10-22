@@ -37,7 +37,7 @@ defmodule Grizzly.MixProject do
       {:muontrap, "~> 0.4"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:beam_notify, "~> 0.2.0"}
+      {:beam_notify, "~> 1.0.0"}
     ]
   end
 
