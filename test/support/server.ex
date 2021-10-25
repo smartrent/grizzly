@@ -91,6 +91,14 @@ defmodule GrizzlyTest.Server do
         400 ->
           :ok
 
+        500 ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          send_garbage(state.socket, return_port, zip_packet)
+
+        501 ->
+          send_ack_response(state.socket, return_port, zip_packet)
+          send_command_not_to_spec(state.socket, return_port, zip_packet)
+
         _rest ->
           send_ack_response(state.socket, return_port, zip_packet)
           maybe_send_a_report(state.socket, return_port, zip_packet)
@@ -218,6 +226,17 @@ defmodule GrizzlyTest.Server do
     else
       :ok
     end
+  end
+
+  defp send_garbage(socket, port, _zip_packet) do
+    :gen_udp.send(socket, {0, 0, 0, 0}, port, <<0x12, 0x12>>)
+  end
+
+  defp send_command_not_to_spec(socket, port, _zip_packet) do
+    # Door lock report with invalid mode (0xAA)
+    command = <<98, 3, 0xAA, 0, 0, 0, 0>>
+
+    :gen_udp.send(socket, {0, 0, 0, 0}, port, command)
   end
 
   defp send_firmware_update_md_get_command(socket, port,

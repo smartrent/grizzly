@@ -47,6 +47,9 @@ defmodule GrizzlyTest.Transport.UDP do
       case ZWave.from_binary(binary) do
         {:ok, command} ->
           {:ok, %Response{ip_address: ip, command: command}}
+
+        {:error, _type} = error ->
+          error
       end
     end
   end
