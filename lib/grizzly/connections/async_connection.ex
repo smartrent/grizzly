@@ -157,6 +157,11 @@ defmodule Grizzly.Connections.AsyncConnection do
       {:ok, transport_response} ->
         updated_state = handle_commands(transport_response.command, state)
         {:noreply, updated_state}
+
+      {:error, error} ->
+        error_message = Exception.message(error)
+        Logger.warn("[Grizzly] #{inspect(error_message)}")
+        {:noreply, state}
     end
   end
 

@@ -5,6 +5,8 @@ defmodule Grizzly.Test do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, ZIPPacket}
 
+  import ExUnit.CaptureLog, only: [capture_log: 2]
+
   describe "SwitchBinary Commands" do
     @tag :integration
     test "SwitchBinarySet version 1" do
@@ -67,6 +69,23 @@ defmodule Grizzly.Test do
 
     assert_receive {:grizzly, :binary_response,
                     <<0x23, 0x2, 0x80, 0x50, _seq_no, 0x0, 0x0, 0x25, 0x3, 0x0>>}
+  end
+
+  @tag :integration
+  test "handle garbage from Z-Wave network" do
+    log = capture_log([], fn -> Grizzly.send_command(500, :door_lock_operation_get) end)
+
+    assert String.contains?(log, "unexpected Z-Wave binary")
+  end
+
+  @tag :integration
+  test "handles a command who contains a field that cannot be parsed" do
+    log = capture_log([], fn -> Grizzly.send_command(501, :door_lock_operation_get) end)
+
+    assert String.contains?(
+             log,
+             "unexpected value 0xAA for param :mode when decoding binary for :door_lock_operation_report"
+           )
   end
 
   describe "version get" do

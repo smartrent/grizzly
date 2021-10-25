@@ -59,6 +59,9 @@ defmodule Grizzly.Transports.DTLS do
            ip_address: ip,
            command: command
          }}
+
+      error ->
+        error
     end
   end
 
@@ -98,6 +101,9 @@ defmodule Grizzly.Transports.DTLS do
          %Response{
            command: command
          }}
+
+      error ->
+        error
     end
   end
 
@@ -124,6 +130,9 @@ defmodule Grizzly.Transports.DTLS do
 
       {:ok, command} ->
         {:ok, %Response{ip_address: ip, command: command}}
+
+      error ->
+        error
     end
   end
 

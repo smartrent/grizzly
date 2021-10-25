@@ -3,7 +3,7 @@ defmodule Grizzly.ZWave.Decoder do
 
   defmodule Generate do
     @moduledoc false
-    alias Grizzly.ZWave.{Command, Commands, DecodeError}
+    alias Grizzly.ZWave.{Command, Commands, DecodeError, ZWaveError}
 
     @mappings [
       # {command_class_byte, command_byte, command_module}
@@ -325,6 +325,8 @@ defmodule Grizzly.ZWave.Decoder do
         # No Operation (0x00) - There is no command byte or args for this command, only the command class byte
         def from_binary(<<0x00>>), do: decode(Commands.NoOperation, [])
 
+        def from_binary(other), do: {:error, %ZWaveError{binary: other}}
+
         @spec command_module(byte, byte) :: {:ok, module} | {:error, :unsupported_command}
         unquote(command_module)
         def command_module(_cc_byte, _c_byte), do: {:error, :unsupported_command}
@@ -336,6 +338,9 @@ defmodule Grizzly.ZWave.Decoder do
 
             {:error, %DecodeError{}} = error ->
               error
+
+            %DecodeError{} = error ->
+              {:error, error}
           end
         end
       end
