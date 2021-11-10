@@ -13,6 +13,7 @@ Below are short notes about using Grizzly.
 1. [DSK](#dsk)
 1. [Indicator Light](#indicator-light)
 1. [Firmware Information](#firmware-information)
+1. [Network Update](#network-update)
 
 ## Starting Grizzly
 
@@ -88,7 +89,7 @@ command.
 
 That command's param `:status` will tell you if inclusion failed or not:
 
-``` elixir
+```elixir
 alias Grizzly.ZWave.Command
 
 #... code ...
@@ -375,4 +376,13 @@ iex> Grizzly.send_command(node_id, :firmware_md_get)
    transmission_stats: [],
    type: :command
  }}
+```
+
+## Network Update
+
+Sometimes the Z-Wave can get into a funny state and devices stop communicating
+with the controller. One thing that could help fix this issue is running:
+
+```elixir
+Grizzly.Network.request_network_update()
 ```
