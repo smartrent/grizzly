@@ -179,6 +179,9 @@ defmodule Grizzly.Commands.Table do
       {:thermostat_mode_get,
        {Commands.ThermostatModeGet,
         handler: {WaitReport, complete_report: :thermostat_mode_report}}},
+      {:thermostat_mode_supported_get,
+       {Commands.ThermostatModeSupportedGet,
+        handler: {WaitReport, complete_report: :thermostat_mode_supported_report}}},
       # Thermostat setpoint
       {:thermostat_setpoint_set, {Commands.ThermostatSetpointSet, handler: AckResponse}},
       {:thermostat_setpoint_get,
