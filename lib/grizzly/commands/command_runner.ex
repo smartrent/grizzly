@@ -75,6 +75,9 @@ defmodule Grizzly.Commands.CommandRunner do
       {:error, :nack_response, new_command} ->
         {:stop, :normal, {:error, :nack_response}, new_command}
 
+      {:error, reason, new_command} ->
+        {:stop, :normal, {:error, reason}, new_command}
+
       {:retry, new_command} ->
         {:reply, :retry, new_command}
     end

@@ -82,6 +82,14 @@ defmodule Grizzly do
   Three reasons that Grizzly supports for all commands are `:nack_response`,
   `:update_firmware`, and `:including`.
 
+  In you receive the reason for the error to be `:including` that means the
+  controller is in an inclusion state and your command will be dropped if we
+  tried to send it. So we won't allow sending a Z-Wave command during an
+  inclusion. It's best to wait and try again once your application is done
+  trying to include.
+
+  ### Nack response
+
   A `:nack_response` normally means that the Z-Wave node that you were trying
   to send a command to is unreachable and did not receive your command at all.
   This could mean that the Z-Wave network is overloaded and you should reissue
@@ -93,15 +101,20 @@ defmodule Grizzly do
   the `Grizzly.send_command/4` function. This is useful if you are going to
   have a known spike in Z-Wave traffic.
 
-  In you receive the reason for the error to be `:including` that means the
-  controller is in an inclusion state and your command will be dropped if we
-  tried to send it. So we won't allow sending a Z-Wave command during an
-  inclusion. It's best to wait and try again once your application is done
-  trying to include.
+  ### Queue full
+
+  When send commands to a device that sleeps (normally these are sensor type of
+  devices) and the sleeping device is not awake these commands get queued up to
+  be sent once the device wakes up and tells the Z-Wave network that it is awake.
+  However, there is only a limited amount of commands that can be queued at once.
+  When sending a command to a device when the queue is full you will receive the
+  `{:error, :queue_full}` return from `Grizzly.send_command/4`. The reason this
+  is an error is because the device will never receive the command that you
+  tried to send.
   """
   @type send_command_response() ::
           {:ok, Report.t()}
-          | {:error, :including | :updating_firmware | :nack_response | any()}
+          | {:error, :including | :updating_firmware | :nack_response | :queue_full | any()}
 
   @type seq_number() :: non_neg_integer()
 
