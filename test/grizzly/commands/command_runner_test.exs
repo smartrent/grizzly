@@ -74,6 +74,17 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     assert {:error, :nack_response} == CommandRunner.handle_zip_command(runner, nack_response)
   end
 
+  test "handles :nack_queue_full response" do
+    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, runner} = CommandRunner.start_link(command, 1, retries: 0)
+
+    {:ok, nack_queue_full} =
+      ZIPPacket.new(seq_number: CommandRunner.seq_number(runner), flag: :nack_queue_full)
+
+    assert {:error, :queue_full} == CommandRunner.handle_zip_command(runner, nack_queue_full)
+    refute Process.alive?(runner)
+  end
+
   test "ignores nack_response not for command" do
     {:ok, command} = SwitchBinaryGet.new()
     {:ok, runner} = CommandRunner.start_link(command, 1)

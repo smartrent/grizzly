@@ -88,7 +88,7 @@ defmodule Grizzly.Commands.Command do
 
   @spec handle_zip_command(t(), ZWaveCommand.t()) ::
           {Report.t(), t()}
-          | {:error, :nack_response, t()}
+          | {:error, :nack_response | :queue_full, t()}
           | {:retry, t()}
           | {:continue, t()}
   def handle_zip_command(command, zip_command) do
@@ -101,6 +101,9 @@ defmodule Grizzly.Commands.Command do
 
       :nack_waiting ->
         handle_nack_waiting(command, zip_command)
+
+      :nack_queue_full ->
+        {:error, :queue_full, zip_command}
 
       flag when flag in [nil, :ack_request] ->
         do_handle_zip_command(command, zip_command)
