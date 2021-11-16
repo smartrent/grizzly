@@ -10,7 +10,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 0.22.2"}
+    {:grizzly, "~> 0.22.4"}
   ]
 end
 ```
@@ -18,11 +18,11 @@ end
 ## Hardware Requirements
 
 - Z-Wave Bridge Controller
-    * [Z-Wave 500](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)
-    * [Z-Wave 700](https://www.digikey.com/product-detail/en/silicon-labs/SLUSB001A/336-5899-ND/9867108)
+  - [Z-Wave 500](https://www.digikey.com/products/en?mpart=ACC-UZB3-U-BRG&v=336)
+  - [Z-Wave 700](https://www.digikey.com/product-detail/en/silicon-labs/SLUSB001A/336-5899-ND/9867108)
 - Compatible System
-    * [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
-    * [zipgateway-env](https://github.com/mattludwigs/zipgateway-env)
+  - [Nerves Compatible System](https://hexdocs.pm/nerves/targets.html#content)
+  - [zipgateway-env](https://github.com/mattludwigs/zipgateway-env)
 - [Silicon Labs zipgateway binary](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
 
 The `zipgateway` binary allows Grizzly to use Z-Wave over IP or Z/IP. Using the
@@ -130,10 +130,10 @@ For more documentation on what `Grizzly.send_command/4` can return see the
 ### When things go wrong
 
 1. `{:error, :nack_response}` - for when the node is not responding to the
-    command. Grizzly has automatic retries, so if you got this message that
-    might mean the node is reachable, your Z-Wave network is experiencing a of
-    traffic, or the node has recently been hit with a lot of commands and
-    cannot handle anymore at this moment.
+   command. Grizzly has automatic retries, so if you got this message that
+   might mean the node is reachable, your Z-Wave network is experiencing a of
+   traffic, or the node has recently been hit with a lot of commands and
+   cannot handle anymore at this moment.
 1. `{:error, :including}` - the Z-Wave controller is currently in the inclusion
    state and the controller cannot send any commands currently
 1. `{:error, :firmware_updating}` - the Z-Wave controller is currently in the
@@ -218,13 +218,13 @@ information, logging, and network interface set up.
 
 Supported configuration fields are:
 
-* `:tun_script` - a path to the `.tun` script (default priv dir of Grizzly)
-* `:manufacturer_id`: Id to set in the version report (default `0`)
-* `:hardware_version` - Hardware version to set in the version report (default `1`)
-* `:product_id` - Id to set in the version report (default `1`)
-* `:product_type` - Id to set in the version report (default `1`)
-* `:serial_log` - Log file for serial communication. Used for debugging. If this
-   option is not set the no logging is done (default none)
+- `:tun_script` - a path to the `.tun` script (default priv dir of Grizzly)
+- `:manufacturer_id`: Id to set in the version report (default `0`)
+- `:hardware_version` - Hardware version to set in the version report (default `1`)
+- `:product_id` - Id to set in the version report (default `1`)
+- `:product_type` - Id to set in the version report (default `1`)
+- `:serial_log` - Log file for serial communication. Used for debugging. If this
+  option is not set the no logging is done (default none)
 
 For the most part if you are using Grizzly to run zipgateway the defaults should
 just work.
@@ -255,6 +255,6 @@ and you will need to pass in the location to your configuration like so:
 
 ## Resources
 
-* [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)
-* [Z-Wave Learning Resources](https://www.silabs.com/products/wireless/learning-center/mesh-networking/z-wave)
-* [Specific Z-Wave product information](https://products.z-wavealliance.org/regions)
+- [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)
+- [Z-Wave Learning Resources](https://www.silabs.com/products/wireless/learning-center/mesh-networking/z-wave)
+- [Specific Z-Wave product information](https://products.z-wavealliance.org/regions)
