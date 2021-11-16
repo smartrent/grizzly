@@ -1,7 +1,24 @@
 <!-- markdownlint-disable-file MD024 -->
+
 # Changelog
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.22.4] - 2021-11-16
+
+### Added
+
+- `Grizzly.ZWave.Commands.ThermostatSetpointSupportedGet` (@bjyoungblood)
+- `Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport` (@bjyoungblood)
+- `Grizzly.ZWave.Commands.ThermostatModeSupportedGet` (@bjyoungblood)
+- `Grizzly.ZWave.Commands.ThermostatModeSupportedReport` (@bjyoungblood)
+- Add how to heal Z-Wave network to cookbook
+
+### Fixes
+
+- No longer hard crashs on Z/IP Packets that don't follow Z-Wave spec
+- Fix crash when zipgateway's mailbox queue is full when trying to send command
+  to a sleeping device
 
 ## [v0.22.3] - 2021-10-22
 
@@ -19,12 +36,12 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Support version 3 `Grizzly.ZWave.Commands.S2ResynchronizationEvent` command
+- Support version 3 `Grizzly.ZWave.Commands.S2ResynchronizationEvent` command
   (Z-Wave LR)
 
 ### Fixes
 
-* `Grizzly.ZWave.Commands.FailedNodeListReport` command not able to parse empty
+- `Grizzly.ZWave.Commands.FailedNodeListReport` command not able to parse empty
   extended node id list
 
 ## [v0.22.0] - 2021-10-01
@@ -36,113 +53,113 @@ zipgateway versions that have Z-Wave Long Range support. That is zipgateway
 
 ## Changed
 
-* Removed `Grizzly.ZWave.Commands.NodeAddStatus.status()` type
-  * Now is `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_add_status()`
-* Changed return type of
+- Removed `Grizzly.ZWave.Commands.NodeAddStatus.status()` type
+  - Now is `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_add_status()`
+- Changed return type of
   `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.decode_type/1` function from
   `{:ok, Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()}` to
   `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()`
 
 ### Added
 
-* Support version 4 `Grizzly.ZWave.Commands.NodeListReport` command (Z-Wave LR)
-* Support version 4 `Grizzly.ZWave.Commands.NodeRemoveStatus` command (Z-Wave LR)
-* Support version 4 `Grizzly.ZWave.Commands.FailedNodeListReport` command (Z-Wave LR)
-* Support version 4 `Grizzly.ZWave.Commands.FailedNodeRemove` command (Z-Wave LR)
-* Support version 4 `Grizzly.ZWave.Commands.FailedNodeRemoveStatus` command (Z-Wave LR)
-* Support version 4 `Grizzly.ZWave.Commands.NodeInfoCachedGet` command (Z-Wave LR)
-* Support version 4 `Grizzly.ZWave.Commands.RssiReport` command (Z-Wave LR)
-* `Grizzly.ZWave.Commands.ZWaveLongRangeChannelGet` command
-* `Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport` command
-* `Grizzly.ZWave.Commands.ZWaveLongRangeChannelSet` command
-* `Grizzly.ZWave.Commands.ExtendedNodeAddStatus` command
-* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet` command
-* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport` command
-* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGet` command
-* `Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport` command
-* `Grizzly.Network.add_long_range_device/2` function
-* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.parse_node_add_status/1`
+- Support version 4 `Grizzly.ZWave.Commands.NodeListReport` command (Z-Wave LR)
+- Support version 4 `Grizzly.ZWave.Commands.NodeRemoveStatus` command (Z-Wave LR)
+- Support version 4 `Grizzly.ZWave.Commands.FailedNodeListReport` command (Z-Wave LR)
+- Support version 4 `Grizzly.ZWave.Commands.FailedNodeRemove` command (Z-Wave LR)
+- Support version 4 `Grizzly.ZWave.Commands.FailedNodeRemoveStatus` command (Z-Wave LR)
+- Support version 4 `Grizzly.ZWave.Commands.NodeInfoCachedGet` command (Z-Wave LR)
+- Support version 4 `Grizzly.ZWave.Commands.RssiReport` command (Z-Wave LR)
+- `Grizzly.ZWave.Commands.ZWaveLongRangeChannelGet` command
+- `Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport` command
+- `Grizzly.ZWave.Commands.ZWaveLongRangeChannelSet` command
+- `Grizzly.ZWave.Commands.ExtendedNodeAddStatus` command
+- `Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet` command
+- `Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport` command
+- `Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGet` command
+- `Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport` command
+- `Grizzly.Network.add_long_range_device/2` function
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.parse_node_add_status/1`
   function
-* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.parse_node_info/1`
-function
-* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_add_status()` type
-* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.extended_node_info_report()`
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.parse_node_info/1`
+  function
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_add_status()` type
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.extended_node_info_report()`
   type
-* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_info_report()` type
-* `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.tagged_command_classes()`
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.node_info_report()` type
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInclusion.tagged_command_classes()`
   type
-* `Grizzly.ZWave.Command.encode_params/2` optional callback
-* Support parsing header new IME report stats from version 5 of ZIP command class
-* The atom `:na` to `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()` type
+- `Grizzly.ZWave.Command.encode_params/2` optional callback
+- Support parsing header new IME report stats from version 5 of ZIP command class
+- The atom `:na` to `Grizzly.ZWave.CommandClasses.ThermostatSetpoint.type()` type
 
 ### Fixed
 
-* Parsing thermostat setpoint types that are considered NA by the specification
-* Version report command parsing for zipgateway >= 7.14
+- Parsing thermostat setpoint types that are considered NA by the specification
+- Version report command parsing for zipgateway >= 7.14
 
 ## [v0.21.1] - 2021-9-21
 
 ### Fixed
 
-* Transmission stats
-  * Ensure `:rssi_4bars` and `:rssi_dbm` accurately calculate no signal when `:rssi_hops` are nil
+- Transmission stats
+  - Ensure `:rssi_4bars` and `:rssi_dbm` accurately calculate no signal when `:rssi_hops` are nil
 
 ## [v0.21.0] - 2021-9-20
 
 ### Added
 
-* Transmission stats
-  * Added `:rssi_4bars` and `:rssi_dbm`
+- Transmission stats
+  - Added `:rssi_4bars` and `:rssi_dbm`
 
 ### Changed
 
-* Transmission stats
-  * `:rssi` is now `:rssi_hops` and has been changed from a tuple to a list
-  * `:last_working_route` and `:transmission_speed` have been separated
-  * `:last_working_route` is now a list
-  * `:route_changed` is now a boolean
+- Transmission stats
+  - `:rssi` is now `:rssi_hops` and has been changed from a tuple to a list
+  - `:last_working_route` and `:transmission_speed` have been separated
+  - `:last_working_route` is now a list
+  - `:route_changed` is now a boolean
 
 ### Fixed
 
-* Fix error when sending `Grizzly.ZWave.Commands.StatisticsGet`
+- Fix error when sending `Grizzly.ZWave.Commands.StatisticsGet`
 
 ## [v0.20.2] - 2021-8-11
 
 ### Changed
 
-* Turn off TLS warning for connecting with `zipgateway` server
+- Turn off TLS warning for connecting with `zipgateway` server
 
 ## [v0.20.1] - 2021-7-1
 
 ### Added
 
-* Support for ScheduleEntryLock command class
-  * `Grizzly.ZWave.CommandClasses.ScheduleEntryLock`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingGet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingSet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetGet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetReport`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockYearDayGet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport`
-  * `Grizzly.ZWave.Commands.ScheduleEntryLockYearDaySet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedGet`
-  * `Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport`
-* Support for elixir 1.12-otp-24
+- Support for ScheduleEntryLock command class
+  - `Grizzly.ZWave.CommandClasses.ScheduleEntryLock`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockYearDayGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport`
+  - `Grizzly.ZWave.Commands.ScheduleEntryLockYearDaySet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedGet`
+  - `Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport`
+- Support for elixir 1.12-otp-24
 
 Thank you to those who contributed to this release:
 
-* Grace Yanagida
+- Grace Yanagida
 
 ### Fixed
 
-* Invalid warnings when calling function in `Grizzly.SwitchBinary`
+- Invalid warnings when calling function in `Grizzly.SwitchBinary`
 
 ## [v0.20.0] - 2021-6-14
 
@@ -156,16 +173,16 @@ If you have not called this function directly then it is safe to upgrade to
 
 ### Changed
 
-* Allow values greater than `99` to be passed in
+- Allow values greater than `99` to be passed in
   `Grizzly.ZWave.Commands.SwitchMultilevelSet.encode_target_value/1`
 
 ## [v0.19.1] - 2021-4-23
 
 ### Added
 
-* Configuration option for setting the RF region
-* Configuration option for setting power level settings
-* Allow passing send command options to functions in `Grizzly.SwitchBinary`
+- Configuration option for setting the RF region
+- Configuration option for setting power level settings
+- Allow passing send command options to functions in `Grizzly.SwitchBinary`
   module
 
 Thank you to djantea for testing out the RF configuration changes!
@@ -182,46 +199,46 @@ keys and their values.
 
 ## Added
 
-* Added `Grizzly.SwitchBinary` has a higher level helper module to control
-* binary switches
-* Added basic support for including Z-Wave LR devices
-* Added LR command class support for NetworkManagementInclusion
-* Support version 2 of User Number Report command
-* Better handling of RSSI channel reports
-* Better handling of Association Group Name Report command
+- Added `Grizzly.SwitchBinary` has a higher level helper module to control
+- binary switches
+- Added basic support for including Z-Wave LR devices
+- Added LR command class support for NetworkManagementInclusion
+- Support version 2 of User Number Report command
+- Better handling of RSSI channel reports
+- Better handling of Association Group Name Report command
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.18.3] - 2021-3-11
 
 ### Added
 
-* `Grizzly.ZWave.DSK.parse_pin/1`
-* `Grizzly.ZWave.DSK.to_pin_string/1`
+- `Grizzly.ZWave.DSK.parse_pin/1`
+- `Grizzly.ZWave.DSK.to_pin_string/1`
 
 ### Fixed
 
-* Ensure that the DSK binary is 128 bits
+- Ensure that the DSK binary is 128 bits
 
 ## [v0.18.2] - 2021-2-18
 
 ### Added
 
-* Use [cerlc](https://github.com/mdsebald/cerlc) library for `Grizzly.ZWave.CRC`
-* Clean up inspects from tests
-* Ensure `zipgateway` files are usable by system utils for `zipgateway`
+- Use [cerlc](https://github.com/mdsebald/cerlc) library for `Grizzly.ZWave.CRC`
+- Clean up inspects from tests
+- Ensure `zipgateway` files are usable by system utils for `zipgateway`
 
 ## [v0.18.1] - 2021-2-10
 
 ### Fixed
 
-* Fix up dialyzer types
+- Fix up dialyzer types
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.18.0] - 2021-2-10
 
@@ -275,103 +292,103 @@ This release also added support S2/SmartStart QR code generation. See the
 
 ### Changed
 
-* `Grizzly.Inclusions.set_input_dsk/1` use to take `non_neg_integer()` type as
-* an argument, but the type has changed to `Grizzly.ZWave.DSK.t()`
-* `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_dsk_to_binary/1` use
+- `Grizzly.Inclusions.set_input_dsk/1` use to take `non_neg_integer()` type as
+- an argument, but the type has changed to `Grizzly.ZWave.DSK.t()`
+- `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_dsk_to_binary/1` use
   to take a string as the DSK input but now it takes `Grizzly.ZWave.DSK.t()`
-* `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_binary_to_dsk/1` use
+- `Grizzly.ZWave.CommandClasses.NodeProvisioning.optional_binary_to_dsk/1` use
   to take a string as the DSK input but now it takes `Grizzly.ZWave.DSK.t()`
-* The following commands had params that took a string for the DSK and now take
+- The following commands had params that took a string for the DSK and now take
   `Grizzly.ZWave.DSK.t()`:
-  * `Grizzly.ZWave.Commands.DSKReport`
-  * `Grizzly.ZWave.Commands.LearnModeSetStatus`
-  * `Grizzly.ZWave.Commands.NodeAddDSKReport`
-  * `Grizzly.ZWave.Commands.NodeAddDSKSet`
-  * `Grizzly.ZWave.Commands.NodeAddStatus`
-  * `Grizzly.ZWave.Commands.NodeProvisioningDelete`
-  * `Grizzly.ZWave.Commands.NodeProvisioningGet`
-  * `Grizzly.ZWave.Commands.NodeProvisioningListIterationReport`
-  * `Grizzly.ZWave.Commands.NodeProvisioningReport`
-  * `Grizzly.ZWave.Commands.NodeProvisioningSet`
-  * `Grizzly.ZWave.Commands.SmartStartJoinStarted`
+  - `Grizzly.ZWave.Commands.DSKReport`
+  - `Grizzly.ZWave.Commands.LearnModeSetStatus`
+  - `Grizzly.ZWave.Commands.NodeAddDSKReport`
+  - `Grizzly.ZWave.Commands.NodeAddDSKSet`
+  - `Grizzly.ZWave.Commands.NodeAddStatus`
+  - `Grizzly.ZWave.Commands.NodeProvisioningDelete`
+  - `Grizzly.ZWave.Commands.NodeProvisioningGet`
+  - `Grizzly.ZWave.Commands.NodeProvisioningListIterationReport`
+  - `Grizzly.ZWave.Commands.NodeProvisioningReport`
+  - `Grizzly.ZWave.Commands.NodeProvisioningSet`
+  - `Grizzly.ZWave.Commands.SmartStartJoinStarted`
 
 ### Added
 
-* QR code support via the `Grizzly.ZWave.QRCode` module.
+- QR code support via the `Grizzly.ZWave.QRCode` module.
 
 ## [v0.17.7] - 2021-2-4
 
 ### Fixed
 
-* An issue when `zipgateway` sends an invalid `FirmwareMDReport` packet causing
+- An issue when `zipgateway` sends an invalid `FirmwareMDReport` packet causing
   invalid hardware version errors during firmware updates.
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.17.6] - 2021-2-3
 
 ### Fixed
 
-* Grizzly would throw an exception when calling
+- Grizzly would throw an exception when calling
   `Grizzly.commands_for_command_class/1`
-* Grizzly would always return an empty list of supported commands for a command
+- Grizzly would always return an empty list of supported commands for a command
   class when calling `Grizzly.commands_for_command_class/1` even though Grizzly
   supports commands for that command class
-* Fix S2 DSK pin setting when the pin was <256
+- Fix S2 DSK pin setting when the pin was <256
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.17.5] - 2021-1-26
 
 ### Added
 
-* Docs on operating indicator light
+- Docs on operating indicator light
 
 ### Fixed
 
-* Crash when indicator handler is `nil`
-* Math for `MeterReport`
+- Crash when indicator handler is `nil`
+- Math for `MeterReport`
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.17.4] - 2021-1-21
 
 ### Added
 
-* Support for handling indicator events via the `:indicator_handler` option to
+- Support for handling indicator events via the `:indicator_handler` option to
   the `Grizzly.Supervisor`.
 
 ## [v0.17.3] - 2021-1-14
 
 ### Added
 
-* `Grizzly.Trace` module for logging Z/IP packets that are sent from and
+- `Grizzly.Trace` module for logging Z/IP packets that are sent from and
   received by Grizzly.
 
 ### Fixed
 
-* No match error when trying to encode a node id list
+- No match error when trying to encode a node id list
 
 ## [v0.17.2] - 2021-1-13
 
 ### Added
 
-* Decoding the `NodeInfoCacheGet` command
+- Decoding the `NodeInfoCacheGet` command
 
 ### Fixed
 
-* Incorrect return value for `NodeInfoCacheGet` when decoding the params
-* Issues around firmware updates and `zipgateway` versions >= 7.14.2
+- Incorrect return value for `NodeInfoCacheGet` when decoding the params
+- Issues around firmware updates and `zipgateway` versions >= 7.14.2
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.17.1] - 2021-1-12
 
@@ -388,13 +405,13 @@ Grizzly.
 
 ### Added
 
-* Support for `zipgateway` versions >= 7.14.2
-* `:eeprom_file` to supervisor args (optional)
-* `:database_file` to supervisor args (optional)
+- Support for `zipgateway` versions >= 7.14.2
+- `:eeprom_file` to supervisor args (optional)
+- `:database_file` to supervisor args (optional)
 
 Thank you to those who contributed to this release:
 
-* Frank Hunleth
+- Frank Hunleth
 
 ## [v0.17.0] - 2021-1-8
 
@@ -406,51 +423,51 @@ specification.
 
 ### Added
 
-* Complete support for all notification events
-* Support for version 2 of the Antitheft command class
-* Support for SceneActuatorConf command class
-* Support for SceneActivation command class
-* More support for Erlang 23.2 DSL messages
+- Complete support for all notification events
+- Support for version 2 of the Antitheft command class
+- Support for SceneActuatorConf command class
+- Support for SceneActivation command class
+- More support for Erlang 23.2 DSL messages
 
 ### Changed
 
-* `:water` is not `:water_alarm` notification
+- `:water` is not `:water_alarm` notification
 
 ### Fixed
 
-* When receiving the supervision command class with a command encapsulated
+- When receiving the supervision command class with a command encapsulated
   Grizzly was not actually processing the encapsulated command.
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.16.2] - 2020-12-23
 
 ### Added
 
-* `:list_mode` param for the
+- `:list_mode` param for the
   `Grizzly.ZWave.Commands.AssociationGroupInfoReport` command.
 
 ## [v0.16.1] - 2020-12-22
 
 ### Added
 
-* `Grizzly.ZWave.Commands.S2ResynchronizationEvent`
+- `Grizzly.ZWave.Commands.S2ResynchronizationEvent`
 
 ### Fixed
 
-* Data structure change in the associations file when deleting all associations
-* Wrong `MultiChannelAssociation` version number being reported to devices
-* Ensure ack responses are sent when extra commands are received
-* Force bind to `fd00::aaaa::2` since `zipgateway` forces that all acks come
+- Data structure change in the associations file when deleting all associations
+- Wrong `MultiChannelAssociation` version number being reported to devices
+- Ensure ack responses are sent when extra commands are received
+- Force bind to `fd00::aaaa::2` since `zipgateway` forces that all acks come
   from this address
-* Crash when receiving errors other than timeouts when trying to establish
+- Crash when receiving errors other than timeouts when trying to establish
   connections to `zipgateway`
 
 Thank you to those who contributed to this release:
 
-* Frank Hunleth
+- Frank Hunleth
 
 ## [v0.16.0] - 2020-12-21
 
@@ -460,209 +477,209 @@ will need to update to the use the new module names.
 
 ### Changed
 
-* `Grizzly.ZWave.Commands.CommandClassGet` is now
+- `Grizzly.ZWave.Commands.CommandClassGet` is now
   `Grizzly.ZWave.Commands.VersionCommandClassGet`
-* The `:name` field for `:command_class_get` is now `:version_command_class_get`
-* `Grizzly.ZWave.Commands.CommandClassReport` is now
+- The `:name` field for `:command_class_get` is now `:version_command_class_get`
+- `Grizzly.ZWave.Commands.CommandClassReport` is now
   `Grizzly.ZWave.Commands.VersionCommandClassReport`
-* The `:name` field for `:command_class_report` is now
+- The `:name` field for `:command_class_report` is now
   `:version_command_class_report`
 
 ### Added
 
-* Added support for forcing the Z-Wave cache to update when fetching node
+- Added support for forcing the Z-Wave cache to update when fetching node
   information. See `Grizzly.Node.get_info/2` for more information.
-* Support for OTP 23.2
+- Support for OTP 23.2
 
 ### Fixed
 
-* In some GenServers an exception would cascade
+- In some GenServers an exception would cascade
 
 ### Changed
 
-* Easier to read stack traces when some GenServers crash
+- Easier to read stack traces when some GenServers crash
 
 ## [v0.15.11] - 2020-12-11
 
 ### Added
 
-* Support for DoorLock command class version 4
+- Support for DoorLock command class version 4
 
 ### Fixed
 
-* Querying command class versions for extra commands on the LAN will return the
+- Querying command class versions for extra commands on the LAN will return the
   version report correctly now.
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.10] - 2020-12-8
 
 ### Added
 
-* Support for querying the gateway about the command class versions it supports
+- Support for querying the gateway about the command class versions it supports
   when querying extra supported command classes.
 
 ### Fixed
 
-* Spelling error fix for the `WakeUpNoMoreInformation` command name
+- Spelling error fix for the `WakeUpNoMoreInformation` command name
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.9] - 2020-12-4
 
 ### Added
 
-* Sending commands directly to the Z-Wave Gateway by passing
+- Sending commands directly to the Z-Wave Gateway by passing
   `Grizzly.send_command/4` `:gateway` as the node id.
-* How to get DSK for a device in the cookbook docs
+- How to get DSK for a device in the cookbook docs
 
 ### Fixed
 
-* Spelling, whitespace and markdown issues in docs
+- Spelling, whitespace and markdown issues in docs
 
 Thank you to those who contributed to this release:
 
-* Frank Hunleth
+- Frank Hunleth
 
 ## [v0.15.8] - 2020-12-1
 
 ### Added
 
-* Support for `ZwavePlusInfo` command class
+- Support for `ZwavePlusInfo` command class
 
 ### Fixed
 
-* No function clause matching error when a connection closes
-* Missing support for `:undefined` indicator
+- No function clause matching error when a connection closes
+- Missing support for `:undefined` indicator
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.7] - 2020-11-30
 
 ### Added
 
-* Add `Grizzly.send_binary/2`
+- Add `Grizzly.send_binary/2`
 
 ### Fixed
 
-* Error when handling older Z-Wave devices that use CRC16 checksums over any
+- Error when handling older Z-Wave devices that use CRC16 checksums over any
   security schema
-* Internal typo
+- Internal typo
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.6] - 2020-11-19
 
 ### Added
 
-* Add support for `NetworkUpdateRequest` command
-* Add `Grizzly.Network.request_network_update/0`
+- Add support for `NetworkUpdateRequest` command
+- Add `Grizzly.Network.request_network_update/0`
 
 ### Changed
 
-* Drop support for Elixir 1.8 and 1.9
+- Drop support for Elixir 1.8 and 1.9
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.5] - 2020-11-12
 
 ### Added
 
-* Support multi-channel associations in the unsolicited destination
+- Support multi-channel associations in the unsolicited destination
 
 ### Fixed
 
-* Add the `:aggregated_endpoints` params to the `MultiChannelEndpointReport`
+- Add the `:aggregated_endpoints` params to the `MultiChannelEndpointReport`
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.4] - 2020-11-5
 
 ### Added
 
-* Network management installation and maintenance command class
-* Clock command class
-* Unsolicited server support for the extra command classes:
-  * Association group command class list
-  * Association group name get
-  * Association group info get
-  * Device reset locally notification
+- Network management installation and maintenance command class
+- Clock command class
+- Unsolicited server support for the extra command classes:
+  - Association group command class list
+  - Association group name get
+  - Association group info get
+  - Device reset locally notification
 
 ### Changed
 
-* When a supervision get command is received in the unsolicited destination we
+- When a supervision get command is received in the unsolicited destination we
   send the supervision report for that command back to the sender.
-* Dev deps updates
-* Code clean up
+- Dev deps updates
+- Code clean up
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.3] - 2020-10-27
 
 ### Fixed
 
-* Documentation fixes
-* Internal firmware update runner bug
+- Documentation fixes
+- Internal firmware update runner bug
 
 ### Changed
 
-* Updates in internal association persistence
+- Updates in internal association persistence
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.2] - 2020-10-23
 
 ### Added
 
-* Support for the `unknown_event` notification event for the `access_control`
+- Support for the `unknown_event` notification event for the `access_control`
   notification type
 
 ### Fixed
 
-* Support `SupervisionGet` command for notifications.
-* Tried to send `:ack_response` via unsolicited server which the unsolicited
+- Support `SupervisionGet` command for notifications.
+- Tried to send `:ack_response` via unsolicited server which the unsolicited
   server should not be sending anything directly.
-* Fix typo in code
+- Fix typo in code
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.15.1] - 2020-10-09
 
 ### Added
 
-* Support for getting association grouping report via the Z-Wave PAN
-* Support for setting associations via the Z-Wave PAN
-* Support for removing associations via the Z-Wave PAN
-* Support for getting specific associations via the Z-Wave PAN
-* Added option to `Grizzly.Supervisor` for where to store data used by the
-* unsolicited server for support of extra command classes
+- Support for getting association grouping report via the Z-Wave PAN
+- Support for setting associations via the Z-Wave PAN
+- Support for removing associations via the Z-Wave PAN
+- Support for getting specific associations via the Z-Wave PAN
+- Added option to `Grizzly.Supervisor` for where to store data used by the
+- unsolicited server for support of extra command classes
 
 ### Changed
 
-* When getting the associations via the Z-Wave PAN, Grizzly will now look at the
+- When getting the associations via the Z-Wave PAN, Grizzly will now look at the
   stored data and respond accordingly.
 
 ### Fixed
 
-* `Grizzly.ZWave.Commands.SwitchBinaryReport` did not properly encode and decode
+- `Grizzly.ZWave.Commands.SwitchBinaryReport` did not properly encode and decode
   the version 2 of the switch binary command class
 
 ## [v0.15.0] - 2020-10-08
@@ -676,74 +693,74 @@ transports are now implemented.
 
 ### Added
 
-* How to resetting the controller to the cook book
-* The `:unsolicited_destination` option to the `Grizzly.Supervisor`
-* Support for the association get command via the Z-Wave PAN network
-* Support proper ack response when a command is delivered through the Z-Wave
+- How to resetting the controller to the cook book
+- The `:unsolicited_destination` option to the `Grizzly.Supervisor`
+- Support for the association get command via the Z-Wave PAN network
+- Support proper ack response when a command is delivered through the Z-Wave
   PAN
-* `Grizzly.Transports.UDP` - This is experimental and is subject to change.
-* `Grizzly.ZWave.CommandClasses.CRC16Encap`
-* `Grizzly.ZWave.Commands.CRC16Encap`
-* `Grizzly.ZWave.CommandClasses.PowerLevel`
-* `Grizzly.ZWave.Commands.PowerlevelGet`
-* `Grizzly.ZWave.Commands.PowerlevelReport`
-* `Grizzly.ZWave.Commands.PowerlevelSet`
-* `Grizzly.ZWave.Commands.PowerlevelTestNodeGet`
-* `Grizzly.ZWave.Commands.PowerlevelTestNodeReport`
-* `Grizzly.ZWave.Commands.PowerlevelTestNodeSet`
+- `Grizzly.Transports.UDP` - This is experimental and is subject to change.
+- `Grizzly.ZWave.CommandClasses.CRC16Encap`
+- `Grizzly.ZWave.Commands.CRC16Encap`
+- `Grizzly.ZWave.CommandClasses.PowerLevel`
+- `Grizzly.ZWave.Commands.PowerlevelGet`
+- `Grizzly.ZWave.Commands.PowerlevelReport`
+- `Grizzly.ZWave.Commands.PowerlevelSet`
+- `Grizzly.ZWave.Commands.PowerlevelTestNodeGet`
+- `Grizzly.ZWave.Commands.PowerlevelTestNodeReport`
+- `Grizzly.ZWave.Commands.PowerlevelTestNodeSet`
 
 ### Changed
 
-* Refactored the `Grizzly.Transport` behaviour - please see documentation to see
+- Refactored the `Grizzly.Transport` behaviour - please see documentation to see
   how to use the behaviour now.
 
 ### Removed
 
-* `Grizzly.Node.get_node_info/1`
+- `Grizzly.Node.get_node_info/1`
 
 ### Fixed
 
-* `MultiChannelAssociationGet` command name fix
-* Documentation
-* Command class fixes for the `Grizzly.ZWave.CommandClasses.Time`
+- `MultiChannelAssociationGet` command name fix
+- Documentation
+- Command class fixes for the `Grizzly.ZWave.CommandClasses.Time`
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
-* Jon Wood
+- Jean-Francois Cloutier
+- Jon Wood
 
 ## [v0.14.8] - 2020-09-29
 
 ### Added
 
-* Support for power management notifications
+- Support for power management notifications
 
 ## [v0.14.7] - 2020-09-25
 
 ### Added
 
-* Added `Grizzly.ZWave.Commands.FailedNodeListReport` command
+- Added `Grizzly.ZWave.Commands.FailedNodeListReport` command
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.14.6] - 2020-09-18
 
 ### Added
 
-* Cookbook documentation for common uses of Grizzly
+- Cookbook documentation for common uses of Grizzly
 
 ### Changed
 
-* Reduced the amount of logging
+- Reduced the amount of logging
 
 ## [v0.14.5] - 2020-09-02
 
 ### Fixed
 
-* Commands with aggregated reports did not aggregate the results as expected
-* Commands with aggregated reports would crash if that device was also
+- Commands with aggregated reports did not aggregate the results as expected
+- Commands with aggregated reports would crash if that device was also
   handling another command due to the aggregate handler assuming that only one
   command was being processed at one time
 
@@ -751,39 +768,42 @@ Thank you to those who contributed to this release:
 
 ### Added
 
-* Full support for `ThermostatFanMode` mode types
+- Full support for `ThermostatFanMode` mode types
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
+- Jean-Francois Cloutier
 
 ## [v0.14.3] - 2020-08-31
 
 ### Fixed
 
-* Fix the start order of the connection supervisor and Z-Wave ready checker
+- Fix the start order of the connection supervisor and Z-Wave ready checker
   to ensure the supervisor process is alive before trying to test the
   connection
 
 ## v0.14.2
 
 Added
-  * `Grizzly.ZWave.CRC` module for CRC functions related to the Z-Wave protocol
+
+- `Grizzly.ZWave.CRC` module for CRC functions related to the Z-Wave protocol
 
 Removed
-  * `crc` dependency
+
+- `crc` dependency
 
 ## v0.14.1
 
 Enhancements
-  * Support `zipgateway` 7.14.01
-  * Add `Grizzly.ZWave.CommandClasses.CentralScene`
-  * Add `Grizzly.ZWave.Commands.CentralSceneConfigurationGet`
-  * Add `Grizzly.ZWave.Commands.CentralSceneConfigurationSet`
-  * Add `Grizzly.ZWave.Commands.CentralSceneConfigurationReport`
-  * Add `Grizzly.ZWave.Commands.CentralSceneNotification`
-  * Add `Grizzly.ZWave.Commands.CentralSceneSupportedGet`
-  * Add `Grizzly.ZWave.Commands.CentralSceneSupportedReport`
+
+- Support `zipgateway` 7.14.01
+- Add `Grizzly.ZWave.CommandClasses.CentralScene`
+- Add `Grizzly.ZWave.Commands.CentralSceneConfigurationGet`
+- Add `Grizzly.ZWave.Commands.CentralSceneConfigurationSet`
+- Add `Grizzly.ZWave.Commands.CentralSceneConfigurationReport`
+- Add `Grizzly.ZWave.Commands.CentralSceneNotification`
+- Add `Grizzly.ZWave.Commands.CentralSceneSupportedGet`
+- Add `Grizzly.ZWave.Commands.CentralSceneSupportedReport`
 
 Thank you to those who contributed to this release:
 
@@ -799,33 +819,35 @@ See the [upgrade guide](https://gist.github.com/mattludwigs/bb312906b1bf85a02108
 for more specifics on how to upgrade.
 
 Breaking Changes
-  * Grizzly is not an OTP application anymore and will need to be started
-    manually via the new `Grizzly.Supervisor` module
-  * All application config/mix config options are not used
-  * Removed the `Grizzly.Runtime` module
+
+- Grizzly is not an OTP application anymore and will need to be started
+  manually via the new `Grizzly.Supervisor` module
+- All application config/mix config options are not used
+- Removed the `Grizzly.Runtime` module
 
 Enhancements
-  * Add `Grizzly.Supervisor` module
-  * Add `Grizzly.ZWave.CommandClasses.Indicator`
-  * Add `Grizzly.ZWave.Commands.IndicatorGet`
-  * Add `Grizzly.ZWave.Commands.IndicatorSet`
-  * Add `Grizzly.ZWave.Commands.IndicatorReport`
-  * Add `Grizzly.ZWave.Commands.IndicatorSupportedGet`
-  * Add `Grizzly.ZWave.Commands.IndicatorSupportedReport`
-  * Add `Grizzly.ZWave.CommandClasses.Antitheft`
-  * Add `Grizzly.ZWave.Commands.AntitheftGet`
-  * Add `Grizzly.ZWave.Commands.AntitheftReport`
-  * Add `Grizzly.ZWave.CommandClasses.AntitheftUnlock`
-  * Add `Grizzly.ZWave.Commands.AntitheftUnlockSet`
-  * Add `Grizzly.ZWave.Commands.AntitheftUnlockGet`
-  * Add `Grizzly.ZWave.Commands.AntitheftUnlockReport`
-  * Add `Grizzly.ZWave.Commands.ConfigurationBulkGet`
-  * Add `Grizzly.ZWave.Commands.ConfigurationBulkSet`
-  * Add `Grizzly.ZWave.Commands.ConfigurationBulkReport`
-  * Add `Grizzly.ZWave.Commands.ConfigurationPropertiesGet`
-  * Add `Grizzly.ZWave.CommandClasses.ApplicationStatus`
-  * Add `Grizzly.ZWave.Commands.ApplicationBusy`
-  * Add `Grizzly.ZWave.Commands.ApplicationRejectedRequest`
+
+- Add `Grizzly.Supervisor` module
+- Add `Grizzly.ZWave.CommandClasses.Indicator`
+- Add `Grizzly.ZWave.Commands.IndicatorGet`
+- Add `Grizzly.ZWave.Commands.IndicatorSet`
+- Add `Grizzly.ZWave.Commands.IndicatorReport`
+- Add `Grizzly.ZWave.Commands.IndicatorSupportedGet`
+- Add `Grizzly.ZWave.Commands.IndicatorSupportedReport`
+- Add `Grizzly.ZWave.CommandClasses.Antitheft`
+- Add `Grizzly.ZWave.Commands.AntitheftGet`
+- Add `Grizzly.ZWave.Commands.AntitheftReport`
+- Add `Grizzly.ZWave.CommandClasses.AntitheftUnlock`
+- Add `Grizzly.ZWave.Commands.AntitheftUnlockSet`
+- Add `Grizzly.ZWave.Commands.AntitheftUnlockGet`
+- Add `Grizzly.ZWave.Commands.AntitheftUnlockReport`
+- Add `Grizzly.ZWave.Commands.ConfigurationBulkGet`
+- Add `Grizzly.ZWave.Commands.ConfigurationBulkSet`
+- Add `Grizzly.ZWave.Commands.ConfigurationBulkReport`
+- Add `Grizzly.ZWave.Commands.ConfigurationPropertiesGet`
+- Add `Grizzly.ZWave.CommandClasses.ApplicationStatus`
+- Add `Grizzly.ZWave.Commands.ApplicationBusy`
+- Add `Grizzly.ZWave.Commands.ApplicationRejectedRequest`
 
 Thank you to those who contributed to this release:
 
@@ -851,14 +873,16 @@ report.transmission_stats
 See the `Grizzly.Report` module for full details.
 
 Enhancements
-  * Add `Grizzly.Report`
-  * Add getting transmission stats for sent commands
-  * Docs and type spec updates
+
+- Add `Grizzly.Report`
+- Add getting transmission stats for sent commands
+- Docs and type spec updates
 
 ## v0.12.3
 
 Fixes
-  * Handle multichannel commands that are not appropriately encapsulated
+
+- Handle multichannel commands that are not appropriately encapsulated
 
 Thank you to those who contributed to this release:
 
@@ -867,41 +891,44 @@ Thank you to those who contributed to this release:
 ## v0.12.2
 
 Enhancements
-  * Add `Grizzly.ZWave.CommandClasses.Hail`
-  * Add `Grizzly.ZWave.Commands.Hail`
-  * Support updated Z-Wave spec command params for
-    `Grizzly.ZWave.Commands.DoorLockOperationReport`
+
+- Add `Grizzly.ZWave.CommandClasses.Hail`
+- Add `Grizzly.ZWave.Commands.Hail`
+- Support updated Z-Wave spec command params for
+  `Grizzly.ZWave.Commands.DoorLockOperationReport`
 
 ## v0.12.1
 
 Enhancements
-  * Add `Grizzly.ZWave.Commands.MultiChannelAggregatedMemberGet`
-  * Add `Grizzly.ZWave.Commands.MultiChannelAggregatedMemberReport`
-  * Add `Grizzly.ZWave.Commands.MultiChannelCapabilityGet`
-  * Add `Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation`
-  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointFind`
-  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointFindReport`
-  * Add `Grizzly.ZWave.CommandClasses.MultiCommand`
-  * Add `Grizzly.ZWave.Commands.MultiCommandEncapsulation`
-  * Add `Grizzly.ZWave.CommandClasses.Time`
-  * Add `Grizzly.ZWave.Commands.DateGet`
-  * Add `Grizzly.ZWave.Commands.DateReport`
-  * Add `Grizzly.ZWave.Commands.TimeGet`
-  * Add `Grizzly.ZWave.Commands.TimeReport`
-  * Add `Grizzly.ZWave.Commands.TimeOffsetGet`
-  * Add `Grizzly.ZWave.Commands.TimeOffsetReport`
-  * Add `Grizzly.ZWave.Commands.TimeOffsetSet`
-  * Add `Grizzly.ZWave.CommandsClasses.TimeParameters`
-  * Add `Grizzly.ZWave.Commands.TimeParametersGet`
-  * Add `Grizzly.ZWave.Commands.TimeParametersReport`
-  * Add `Grizzly.ZWave.Commands.TimeParametersSet`
-  * Documentation updates
+
+- Add `Grizzly.ZWave.Commands.MultiChannelAggregatedMemberGet`
+- Add `Grizzly.ZWave.Commands.MultiChannelAggregatedMemberReport`
+- Add `Grizzly.ZWave.Commands.MultiChannelCapabilityGet`
+- Add `Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation`
+- Add `Grizzly.ZWave.Commands.MultiChannelEndpointFind`
+- Add `Grizzly.ZWave.Commands.MultiChannelEndpointFindReport`
+- Add `Grizzly.ZWave.CommandClasses.MultiCommand`
+- Add `Grizzly.ZWave.Commands.MultiCommandEncapsulation`
+- Add `Grizzly.ZWave.CommandClasses.Time`
+- Add `Grizzly.ZWave.Commands.DateGet`
+- Add `Grizzly.ZWave.Commands.DateReport`
+- Add `Grizzly.ZWave.Commands.TimeGet`
+- Add `Grizzly.ZWave.Commands.TimeReport`
+- Add `Grizzly.ZWave.Commands.TimeOffsetGet`
+- Add `Grizzly.ZWave.Commands.TimeOffsetReport`
+- Add `Grizzly.ZWave.Commands.TimeOffsetSet`
+- Add `Grizzly.ZWave.CommandsClasses.TimeParameters`
+- Add `Grizzly.ZWave.Commands.TimeParametersGet`
+- Add `Grizzly.ZWave.Commands.TimeParametersReport`
+- Add `Grizzly.ZWave.Commands.TimeParametersSet`
+- Documentation updates
 
 Fixes
-  * Some devices send alarm reports that do not match the specification in a
-    minor way. So, we allow for parsing of these reports now.
-  * Fixed internal command class name to module implementation mapping issue
-    for `:switch_multilevel_set` and `:switch_multilevel_get` commands.
+
+- Some devices send alarm reports that do not match the specification in a
+  minor way. So, we allow for parsing of these reports now.
+- Fixed internal command class name to module implementation mapping issue
+  for `:switch_multilevel_set` and `:switch_multilevel_get` commands.
 
 Thank you to those who contributed to this release:
 
@@ -921,53 +948,55 @@ introspection, a handful of new commands and command classes, and helpful
 configuration items.
 
 Enhancements
-  * Add `Grizzly.ZWave.Commands.ApplicationNodeInfoReport`
-  * Add `Grizzly.ZWave.CommandClass.NodeNaming`
-  * Add `Grizzly.ZWave.Commands.NodeLocationGet`
-  * Add `Grizzly.ZWave.Commands.NodeLocationReport`
-  * Add `Grizzly.ZWave.Commands.NodeLocationSet`
-  * Add `Grizzly.ZWave.Commands.NodeNameGet`
-  * Add `Grizzly.ZWave.Commands.NodeNameReport`
-  * Add `Grizzly.ZWave.Commands.NodeNameSet`
-  * Add `Grizzly.ZWave.Commands.AlarmGet`
-  * Add `Grizzly.ZWave.Commands.AlarmSet`
-  * Add `Grizzly.ZWave.Commands.AlarmEventSupportedGet`
-  * Add `Grizzly.ZWave.Commands.AlarmEventSupportedReport`
-  * Add `Grizzly.ZWave.Commands.AlarmTypeSupportedGet`
-  * Add `Grizzly.ZWave.Commands.AlarmTypeSupportedReport`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupingsGet`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupingsReport`
-  * Add `Grizzly.ZWave.Commands.AssociationRemove`
-  * Add `Grizzly.ZWave.Commands.AssociationReport`
-  * Add `Grizzly.ZWave.Commands.AssociationSpecificGroupingsGet`
-  * Add `Grizzly.ZWave.Commands.AssociationSpecificGroupingsReport`
-  * Add `Grizzly.ZWave.CommandClasses.MultiChannelAssociation`
-  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsGet`
-  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport`
-  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationRemove`
-  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationReport`
-  * Add `Grizzly.ZWave.Commands.MultiChannelAssociationSet`
-  * Add `Grizzly.ZWave.CommandClass.DeviceResetLocally`
-  * Add `Grizzly.ZWave.Commands.DeviceResetLocallyNotification`
-  * Add `Grizzly.ZWave.Commands.LearnModeSet`
-  * Add `Grizzly.ZWave.Commands.LearnModeSetStatus`
-  * Add `Grizzly.Inclusions.learn_mode/1`
-  * Add `Grizzly.Inclusions.learn_mode_stop/0`
-  * Support version 8 of the `Grizzly.ZWave.Commands.AlarmReport`
-  * Support parsing naming and location parameters from Z-Wave notifications
-  * Add `mix zipgateway.cfg` to print out the zipgateway config that Grizzly
-    is configured to use.
-  * Add `Grizzly.list_commands/0` to list all support Z-Wave commands in
-    Grizzly.
-  * Add `Grizzly.commands_for_command_class/1` for listing the Z-Wave commands
-    support by Grizzly for a particular command class.
-  * Add `:handlers` to `:grizzly` configuration options for firmware update and
-    inclusion handlers.
-  * Documentation updates
+
+- Add `Grizzly.ZWave.Commands.ApplicationNodeInfoReport`
+- Add `Grizzly.ZWave.CommandClass.NodeNaming`
+- Add `Grizzly.ZWave.Commands.NodeLocationGet`
+- Add `Grizzly.ZWave.Commands.NodeLocationReport`
+- Add `Grizzly.ZWave.Commands.NodeLocationSet`
+- Add `Grizzly.ZWave.Commands.NodeNameGet`
+- Add `Grizzly.ZWave.Commands.NodeNameReport`
+- Add `Grizzly.ZWave.Commands.NodeNameSet`
+- Add `Grizzly.ZWave.Commands.AlarmGet`
+- Add `Grizzly.ZWave.Commands.AlarmSet`
+- Add `Grizzly.ZWave.Commands.AlarmEventSupportedGet`
+- Add `Grizzly.ZWave.Commands.AlarmEventSupportedReport`
+- Add `Grizzly.ZWave.Commands.AlarmTypeSupportedGet`
+- Add `Grizzly.ZWave.Commands.AlarmTypeSupportedReport`
+- Add `Grizzly.ZWave.Commands.AssociationGroupingsGet`
+- Add `Grizzly.ZWave.Commands.AssociationGroupingsReport`
+- Add `Grizzly.ZWave.Commands.AssociationRemove`
+- Add `Grizzly.ZWave.Commands.AssociationReport`
+- Add `Grizzly.ZWave.Commands.AssociationSpecificGroupingsGet`
+- Add `Grizzly.ZWave.Commands.AssociationSpecificGroupingsReport`
+- Add `Grizzly.ZWave.CommandClasses.MultiChannelAssociation`
+- Add `Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsGet`
+- Add `Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport`
+- Add `Grizzly.ZWave.Commands.MultiChannelAssociationRemove`
+- Add `Grizzly.ZWave.Commands.MultiChannelAssociationReport`
+- Add `Grizzly.ZWave.Commands.MultiChannelAssociationSet`
+- Add `Grizzly.ZWave.CommandClass.DeviceResetLocally`
+- Add `Grizzly.ZWave.Commands.DeviceResetLocallyNotification`
+- Add `Grizzly.ZWave.Commands.LearnModeSet`
+- Add `Grizzly.ZWave.Commands.LearnModeSetStatus`
+- Add `Grizzly.Inclusions.learn_mode/1`
+- Add `Grizzly.Inclusions.learn_mode_stop/0`
+- Support version 8 of the `Grizzly.ZWave.Commands.AlarmReport`
+- Support parsing naming and location parameters from Z-Wave notifications
+- Add `mix zipgateway.cfg` to print out the zipgateway config that Grizzly
+  is configured to use.
+- Add `Grizzly.list_commands/0` to list all support Z-Wave commands in
+  Grizzly.
+- Add `Grizzly.commands_for_command_class/1` for listing the Z-Wave commands
+  support by Grizzly for a particular command class.
+- Add `:handlers` to `:grizzly` configuration options for firmware update and
+  inclusion handlers.
+- Documentation updates
 
 Fixes
-  * Parsing the wrong byte for into the wrong notification type
-  * Invalid type spec for `Grizzly.ZWave.Security.failed_type_from_byte/1`
+
+- Parsing the wrong byte for into the wrong notification type
+- Invalid type spec for `Grizzly.ZWave.Security.failed_type_from_byte/1`
 
 Thank you to those who contributed to this release:
 
@@ -983,7 +1012,8 @@ We only support lock and keypad event parameters currently, but this puts into
 place the start of being able to support event parameters.
 
 Enhancements
-  * Support parsing event parameters for lock and keypad operations
+
+- Support parsing event parameters for lock and keypad operations
 
 Thank you to those who contributed to this release:
 
@@ -992,16 +1022,18 @@ Thank you to those who contributed to this release:
 ## v0.10.3
 
 Enhancements
-  * Add `handle_timeout/2` to the `Grizzly.InclusionHandler` behaviour. This
-    allows for handling when an inclusion process timesout.
-  * Add `Grizzly.Inclusions.stop/0` force stop any type of inclusion process.
-  * Add `Grizzly.FirmwareUpdates` module for updating the Z-Wave firmware on
-    Z-Wave hardware
+
+- Add `handle_timeout/2` to the `Grizzly.InclusionHandler` behaviour. This
+  allows for handling when an inclusion process timesout.
+- Add `Grizzly.Inclusions.stop/0` force stop any type of inclusion process.
+- Add `Grizzly.FirmwareUpdates` module for updating the Z-Wave firmware on
+  Z-Wave hardware
 
 Fixes
-  * not parsing command classes correctly on `Grizzly.ZWave.Commands.NodeAddStatus`
-  * Not stopping an inclusion process correctly when calling
-    `Grizzly.Inclusions.add_node_stop/0`
+
+- not parsing command classes correctly on `Grizzly.ZWave.Commands.NodeAddStatus`
+- Not stopping an inclusion process correctly when calling
+  `Grizzly.Inclusions.add_node_stop/0`
 
 Thank you to those who contributed to this release:
 
@@ -1010,12 +1042,14 @@ Thank you to those who contributed to this release:
 ## v.0.10.2
 
 Enhancements
-  * Add `Grizzly.ZWave.Commands.FailedNodeRemove`
-  * Add `Grizzly.ZWave.Commands.FailedNodeRemoveStatus`
+
+- Add `Grizzly.ZWave.Commands.FailedNodeRemove`
+- Add `Grizzly.ZWave.Commands.FailedNodeRemoveStatus`
 
 Fixes
-  * Sensor types returned from the support sensors report
-  * Broken link in docs
+
+- Sensor types returned from the support sensors report
+- Broken link in docs
 
 Thank you to those who contributed to this release:
 
@@ -1024,8 +1058,9 @@ Thank you to those who contributed to this release:
 ## v.0.10.1
 
 Enhancements
-  * Add `Grizzly.ZWave.Commands.ConfigurationGet`
-  * Add `Grizzly.ZWave.Commands.ConfigurationReport`
+
+- Add `Grizzly.ZWave.Commands.ConfigurationGet`
+- Add `Grizzly.ZWave.Commands.ConfigurationReport`
 
 Thank you to those who contributed to this release:
 
@@ -1039,10 +1074,11 @@ Removed the parameter `:secure_command_classes` from
 the node can have.
 
 The fields in the keyword list are:
-  * `:non_secure_supported`
-  * `:non_secure_controlled`
-  * `:secure_supported`
-  * `:secure_controlled`
+
+- `:non_secure_supported`
+- `:non_secure_controlled`
+- `:secure_supported`
+- `:secure_controlled`
 
 If you are using `:secure_command_classes` for checking if the device is
 securely added you can update like this:
@@ -1055,17 +1091,19 @@ Keyword.get(Grizzly.ZWave.Command.param!(node_info, :command_classes), :secure_c
 ```
 
 Enhancements
-  * Add `Grizzly.ZWave.Commands.AssociationGroupCommandListGet`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupCommandListReport`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupInfoGet`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupInfoReport`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupNameGet`
-  * Add `Grizzly.ZWave.Commands.AssociationGroupNameReport`
-  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointGet`
-  * Add `Grizzly.ZWave.Commands.MultiChannelEndpointReport`
+
+- Add `Grizzly.ZWave.Commands.AssociationGroupCommandListGet`
+- Add `Grizzly.ZWave.Commands.AssociationGroupCommandListReport`
+- Add `Grizzly.ZWave.Commands.AssociationGroupInfoGet`
+- Add `Grizzly.ZWave.Commands.AssociationGroupInfoReport`
+- Add `Grizzly.ZWave.Commands.AssociationGroupNameGet`
+- Add `Grizzly.ZWave.Commands.AssociationGroupNameReport`
+- Add `Grizzly.ZWave.Commands.MultiChannelEndpointGet`
+- Add `Grizzly.ZWave.Commands.MultiChannelEndpointReport`
 
 Fixes
-  * Internal command class name discrepancies
+
+- Internal command class name discrepancies
 
 Thank you to those who contributed to this release:
 
@@ -1081,11 +1119,13 @@ guide and follow the Changelog from the initial `v0.9.0-rc.0` release.
 Changes from the last `rc` are:
 
 Enhancements
-  * Support Erlang 23.0 with Elixir 1.10
-  * Dep updates and tooling enhancements
+
+- Support Erlang 23.0 with Elixir 1.10
+- Dep updates and tooling enhancements
 
 Fixes
-  * miss spellings of command names
+
+- miss spellings of command names
 
 Thank you to those who contributed to this release:
 
@@ -1094,20 +1134,22 @@ Thank you to those who contributed to this release:
 ## v0.9.0-rc.4
 
 Enhancements
-  * Add `Grizzly.ZWave.Commands.FirmwareMDGet`
-  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet`
-  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport`
-  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport`
-  * Add `Grizzly.ZWave.Commands.FirmwareUpdateMDReport`
-  * Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationSet`
-  * Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationReport`
-  * Remove some dead code
+
+- Add `Grizzly.ZWave.Commands.FirmwareMDGet`
+- Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet`
+- Add `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport`
+- Add `Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport`
+- Add `Grizzly.ZWave.Commands.FirmwareUpdateMDReport`
+- Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationSet`
+- Add `Grizzly.ZWave.Commands.FirmwareUpdateActivationReport`
+- Remove some dead code
 
 Fixes
-  * When resetting the controller we were not closing the connections to
-    the nodes. This caused some error logging in `zipgateway` and also left
-    open unused resources. This could cause problems later when reconnecting
-    devices to resources that were already in the system.
+
+- When resetting the controller we were not closing the connections to
+  the nodes. This caused some error logging in `zipgateway` and also left
+  open unused resources. This could cause problems later when reconnecting
+  devices to resources that were already in the system.
 
 Thank you to those who contributed to this release:
 
@@ -1116,12 +1158,14 @@ Thank you to those who contributed to this release:
 ## v0.9.0-rc.3
 
 Enhancements
-  * Some Z-Wave devices report the wrong value for the switch multilevel
-    report so we added support for those values.
+
+- Some Z-Wave devices report the wrong value for the switch multilevel
+  report so we added support for those values.
 
 Fixes
-  * When two processes quickly sent the same command to the same device only
-    one process would receive the response
+
+- When two processes quickly sent the same command to the same device only
+  one process would receive the response
 
 Thank you to those who contributed to this release:
 
@@ -1130,22 +1174,26 @@ Thank you to those who contributed to this release:
 ## v0.9.0-rc.2
 
 Deprecated
-  * `Grizzly.Node.get_node_info/1` - use `Grizzly.Node.get_info/1` instead
+
+- `Grizzly.Node.get_node_info/1` - use `Grizzly.Node.get_info/1` instead
 
 Added
-  * `Grizzly.Node.get_info/1`
-  * `Grizzly.ZWave.CommandClasses.Supervision`
-  * `Grizzly.ZWave.Commands.SupervisionGet`
-  * `Grizzly.ZWave.Commands.SupervisionReport`
-  * `Grizzly.ZWave.CommandClasses.SensorBinary`
-  * `Grizzly.ZWave.Commands.SensorBinaryGet`
-  * `Grizzly.ZWave.Commands.SensorBinaryReport`
+
+- `Grizzly.Node.get_info/1`
+- `Grizzly.ZWave.CommandClasses.Supervision`
+- `Grizzly.ZWave.Commands.SupervisionGet`
+- `Grizzly.ZWave.Commands.SupervisionReport`
+- `Grizzly.ZWave.CommandClasses.SensorBinary`
+- `Grizzly.ZWave.Commands.SensorBinaryGet`
+- `Grizzly.ZWave.Commands.SensorBinaryReport`
 
 Enhancements
-  * Support for `DoorLockOperationReport` >= V3 parsing
+
+- Support for `DoorLockOperationReport` >= V3 parsing
 
 Fixes
-  * Bad parsing of `NodAddStatus` `:failed` value
+
+- Bad parsing of `NodAddStatus` `:failed` value
 
 Thank you to those who contributed to this release:
 
@@ -1154,21 +1202,23 @@ Thank you to those who contributed to this release:
 ## v0.9.0-rc.1
 
 Breaking Changes
-  * `Grizzly.ZWave.IconTypes` removed `icon_type` from the atom values of the
-    icon name.
-  * `Grizzly.ZWave.DeciveTypes.icon_name()` ->
-    `Grizzly.ZWave.DeviceTypes.name()`
-  * `Grizzly.ZWave.DeciveTypes.icon_integer()` ->
-    `Grizzly.ZWave.DeviceTypes.value()`
+
+- `Grizzly.ZWave.IconTypes` removed `icon_type` from the atom values of the
+  icon name.
+- `Grizzly.ZWave.DeciveTypes.icon_name()` ->
+  `Grizzly.ZWave.DeviceTypes.name()`
+- `Grizzly.ZWave.DeciveTypes.icon_integer()` ->
+  `Grizzly.ZWave.DeviceTypes.value()`
 
 Enhancements
-  * Doc updates
-  * Internal code quality
-  * Deps updates
-  * Better types around DSKs
-  * CI support for elixir versions 1.8, 1.9, and 1.10
-  * Support all versions of the meter report
-  * Support a low battery report
+
+- Doc updates
+- Internal code quality
+- Deps updates
+- Better types around DSKs
+- CI support for elixir versions 1.8, 1.9, and 1.10
+- Support all versions of the meter report
+- Support a low battery report
 
 ## v0.9.0-rc.0
 
@@ -1180,60 +1230,60 @@ and resolves all open issues on Grizzly that were reported as bugs.
 
 ### Removed APIs
 
-* `Grizzly.Node` struct
-* `Grizzly.Conn` module
-* `Grizzly.Notifications` module
-* `Grizzly.Packet` module
-* `Grizzly.close_connection`
-* `Grizzly.command_class_versions_known?`
-* `Grizzly.update_command_class_versions`
-* `Grizzly.start_learn_mode`
-* `Grizzly.get_command_class_version`
-* `Grizzly.has_command_class`
-* `Grizzly.connected?`
-* `Grizzly.has_command_class_names`
-* `Grizzly.config`
-* `Grizzly.Network.busy?`
-* `Grizzly.Network.ready?`
-* `Grizzly.Network.get_state`
-* `Grizzly.Network.set_state`
-* `Grizzly.Network.get_node`
-* `Grizzly.Node.new`
-* `Grizzly.Node.update`
-* `Grizzly.Node.put_ip`
-* `Grizzly.Node.get_ip`
-* `Grizzly.Node.connect`
-* `Grizzly.Node.disconnect`
-* `Grizzly.Node.make_config`
-* `Grizzly.Node.has_command_class?`
-* `Grizzly.Node.connected?`
-* `Grizzly.Node.command_class_names`
-* `Grizzly.Node.update_command_class_versions`
-* `Grizzly.Node.get_command_class_version`
-* `Grizzly.Node.command_class_version_known?`
-* `Grizzly.Node.update_command_class`
-* `Grizzly.Node.put_association`
-* `Grizzly.Node.get_association_list`
-* `Grizzly.Node.configure_association`
-* `Grizzly.Node.get_network_information`
-* `Grizzly.Node.initialize_command_versions`
+- `Grizzly.Node` struct
+- `Grizzly.Conn` module
+- `Grizzly.Notifications` module
+- `Grizzly.Packet` module
+- `Grizzly.close_connection`
+- `Grizzly.command_class_versions_known?`
+- `Grizzly.update_command_class_versions`
+- `Grizzly.start_learn_mode`
+- `Grizzly.get_command_class_version`
+- `Grizzly.has_command_class`
+- `Grizzly.connected?`
+- `Grizzly.has_command_class_names`
+- `Grizzly.config`
+- `Grizzly.Network.busy?`
+- `Grizzly.Network.ready?`
+- `Grizzly.Network.get_state`
+- `Grizzly.Network.set_state`
+- `Grizzly.Network.get_node`
+- `Grizzly.Node.new`
+- `Grizzly.Node.update`
+- `Grizzly.Node.put_ip`
+- `Grizzly.Node.get_ip`
+- `Grizzly.Node.connect`
+- `Grizzly.Node.disconnect`
+- `Grizzly.Node.make_config`
+- `Grizzly.Node.has_command_class?`
+- `Grizzly.Node.connected?`
+- `Grizzly.Node.command_class_names`
+- `Grizzly.Node.update_command_class_versions`
+- `Grizzly.Node.get_command_class_version`
+- `Grizzly.Node.command_class_version_known?`
+- `Grizzly.Node.update_command_class`
+- `Grizzly.Node.put_association`
+- `Grizzly.Node.get_association_list`
+- `Grizzly.Node.configure_association`
+- `Grizzly.Node.get_network_information`
+- `Grizzly.Node.initialize_command_versions`
 
 ### Moved APIs
 
-* `Grizzly.reset_controller` -> `Grizzly.Network.reset_controller`
-* `Grizzly.get_nodes` -> `Grizzly.Network.get_node_ids`
-* `Grizzly.get_node_info` -> `Grizzly.Node.get_node_info`
-* `Grizzly.Notifications.subscribe` -> `Grizzly.subscribe_command` and
+- `Grizzly.reset_controller` -> `Grizzly.Network.reset_controller`
+- `Grizzly.get_nodes` -> `Grizzly.Network.get_node_ids`
+- `Grizzly.get_node_info` -> `Grizzly.Node.get_node_info`
+- `Grizzly.Notifications.subscribe` -> `Grizzly.subscribe_command` and
   `Grizzly.subscribe_commands`
-* `Grizzly.Notifications.unsubscribe` -> `Grizzly.unsubscribe`
-* `Grizzly.add_node` -> `Grizzly.Inclusions.add_node`
-* `Grizzly.remove_node` -> `Grizzly.Inclusions.remove_node`
-* `Grizzly.add_node_stop` -> `Grizzly.Inclusions.add_node_stop`
-* `Grizzly.remove_node_stop` -> `Grizzly.Inclusions.remove_node_stop`
-* `Grizzly.Client` -> `Grizzly.Transport`
-* `Grizzly.Security` -> `Grizzly.ZWave.Security`
-* `Grizzly.DSK` -> `Grizzly.ZWave.DSK`
-* `Grizzly.Node.add_lifeline_group` -> `Grizzly.Node.set_lifeline_association`
+- `Grizzly.Notifications.unsubscribe` -> `Grizzly.unsubscribe`
+- `Grizzly.add_node` -> `Grizzly.Inclusions.add_node`
+- `Grizzly.remove_node` -> `Grizzly.Inclusions.remove_node`
+- `Grizzly.add_node_stop` -> `Grizzly.Inclusions.add_node_stop`
+- `Grizzly.remove_node_stop` -> `Grizzly.Inclusions.remove_node_stop`
+- `Grizzly.Client` -> `Grizzly.Transport`
+- `Grizzly.Security` -> `Grizzly.ZWave.Security`
+- `Grizzly.DSK` -> `Grizzly.ZWave.DSK`
+- `Grizzly.Node.add_lifeline_group` -> `Grizzly.Node.set_lifeline_association`
 
 We moved all the commands and command classes to be under the the
 `Grizzly.ZWave` module namespace and refactored the command behaviour.
@@ -1308,55 +1358,55 @@ Thank you to Jean-Francois Cloutier for contributing so much to this release.
 
 ## v0.8.8
 
-* Enhancements
-  * Make Z-Wave versions standard version formatting
-* Fixes
-  * Paring the FirmwareMD report for version 5
-  * Fix spec for queued commands
+- Enhancements
+  - Make Z-Wave versions standard version formatting
+- Fixes
+  - Paring the FirmwareMD report for version 5
+  - Fix spec for queued commands
 
 ## v0.8.7
 
-* Enhancements
-  * Support `FIRMWARE_UPDATE_MD` meta data report command v5
+- Enhancements
+  - Support `FIRMWARE_UPDATE_MD` meta data report command v5
 
 ## v0.8.6
 
-* Fixes
-  * duplicate fields on the `Grizzly.Node` struct
+- Fixes
+  - duplicate fields on the `Grizzly.Node` struct
 
 ## v0.8.5
 
-* Fixes
-  * various spelling and documentation fixes
-  * dialzyer fixes
+- Fixes
+  - various spelling and documentation fixes
+  - dialzyer fixes
 
 ## v0.8.4
 
-* Fixes
-  * Handle when there are no nodes in the node provisioning list when
+- Fixes
+  - Handle when there are no nodes in the node provisioning list when
     requesting all the DSKs.
 
 ## v0.8.3
 
-* Enhancements
-  * Support Wake Up v2 and Multi Channel Association v3
+- Enhancements
+  - Support Wake Up v2 and Multi Channel Association v3
 
 ## v0.8.2
 
-* Enhancements
-  * Support SWITCH_BINARY_REPORT version 2
+- Enhancements
+  - Support SWITCH_BINARY_REPORT version 2
 
 ## v0.8.1
 
-* Enhancements
-  * Update docs and resources
-* Fixes
-  * An issue when the unsolicited message server would cause a
+- Enhancements
+  - Update docs and resources
+- Fixes
+  - An issue when the unsolicited message server would cause a
     no match error that propagated up the supervision tree
 
 Thank you to those who contributed to this release:
 
-* Ryan Winchester
+- Ryan Winchester
 
 ## v0.8.0
 
@@ -1375,19 +1425,19 @@ There are two breaking changes:
    This breaks the pervious behaviour of `to_binary/1` functions in perviously
    implemented meta extensions.
 
-* Enhancements
-  * Full support for SmartStart meta extensions
-  * Add `meta_extensions` field to `Grizzly.CommandClass.NodeProvisioning`
+- Enhancements
+  - Full support for SmartStart meta extensions
+  - Add `meta_extensions` field to `Grizzly.CommandClass.NodeProvisioning`
     commands that can handle meta extensions
-  * Update `Grizzly.Conn.Server.Config` docs
-* Fixes
-  * Invalid keep alive (heart beat) interval
-  * Set correct constraints on `Time` command offset values
+  - Update `Grizzly.Conn.Server.Config` docs
+- Fixes
+  - Invalid keep alive (heart beat) interval
+  - Set correct constraints on `Time` command offset values
 
 Thank you to those who contributed to this release:
 
-* Jean-Francois Cloutier
-* Ryan Winchester
+- Jean-Francois Cloutier
+- Ryan Winchester
 
 ## v0.7.0
 
@@ -1419,51 +1469,51 @@ When using that function `send_command` would return
 `{:ok, {:node_ip, node_id, ip_address}}` but now it returns
 `{:ok, %{ip_address: ip_address, node_id: node_id, home_id: home_id}}`.
 
-* Enhancements
-  * SmartStart support through the `NodeProvisioning` command class
-  * Added `home_id` field to `Grizzly.Node.t()`
-  * Support fetching `home_id` of the Z-Wave nodes when fetching
+- Enhancements
+  - SmartStart support through the `NodeProvisioning` command class
+  - Added `home_id` field to `Grizzly.Node.t()`
+  - Support fetching `home_id` of the Z-Wave nodes when fetching
     Z-Wave information about the node
 
 ## v0.6.6
 
-* Fixes
-  * Application start failure when providing the correct
+- Fixes
+  - Application start failure when providing the correct
     data structure to the `zipgateway_cfg` configuration
     field
 
 ## v0.6.5
 
-* Enhancements
-  * Support `GetDSK` command
-  * Support `FailedNodeRemove` command
-  * Allow `zipgateway_path` configuration
-  * Generate the `zipgateway.cfg` to allow device specific
+- Enhancements
+  - Support `GetDSK` command
+  - Support `FailedNodeRemove` command
+  - Allow `zipgateway_path` configuration
+  - Generate the `zipgateway.cfg` to allow device specific
     information to be passed into the `zipgateway` runtime.
 
 ## v0.6.4
 
-* Enhancements
-  * Validation of UserCode arguments to help ensure usage of Grizzly
+- Enhancements
+  - Validation of UserCode arguments to help ensure usage of Grizzly
     follows the Z-Wave specification
 
 ## v0.6.3
 
-* Enhancements
-  * Supports AssociationGroupInformation Command Class
+- Enhancements
+  - Supports AssociationGroupInformation Command Class
 
 ## v0.6.2
 
-* Enhancements
-  * Remove the dependence on `pidof` allowing `grizzly` to work on any nerves
+- Enhancements
+  - Remove the dependence on `pidof` allowing `grizzly` to work on any nerves
     device without the need of `busybox`
 
 ### v0.6.1
 
-* Enhancements
-  * Update commands `IntervalGet` and `ManufacturerSpecificGet` to be more
+- Enhancements
+  - Update commands `IntervalGet` and `ManufacturerSpecificGet` to be more
     consistent
-  * Better handling of invalid `ManufacturerSpecific` info received from
+  - Better handling of invalid `ManufacturerSpecific` info received from
     devices
 
 ### v0.6.0
@@ -1476,16 +1526,16 @@ specification better.
 If you only have used `Grizzly.get_command_class_version/2` and the related function
 in `Grizzly.Node` module this change should not effect you.
 
-* Enhancements
-  * Add support for:
-    * MultiChannelAssociation Command Class
-    * WakeUp Command Class NoMoreInformation command
-    * Complete Association Command Class
-    * ZwaveplusInfo Command Class
-    * Version Get Command
-  * Clean up docs
-  * Renamed `Grizzly.CommandClass.CommandClassVersion` to `Grizzly.CommandClass.Version`
-  * Renamed `Grizzly.CommandClass.CommandClassVersion.Get` to
+- Enhancements
+  - Add support for:
+    - MultiChannelAssociation Command Class
+    - WakeUp Command Class NoMoreInformation command
+    - Complete Association Command Class
+    - ZwaveplusInfo Command Class
+    - Version Get Command
+  - Clean up docs
+  - Renamed `Grizzly.CommandClass.CommandClassVersion` to `Grizzly.CommandClass.Version`
+  - Renamed `Grizzly.CommandClass.CommandClassVersion.Get` to
     `Grizzly.CommandClass.Version.CommandClassGet`
 
 ### v0.5.0
@@ -1507,34 +1557,34 @@ to improve the usability of and robustness your command. The new
 `Grizzly.Command.Encoding` module provides some useful functionality for
 validating specs for command arguments.
 
-* Enhancements
-  * Provide command argument validation and error handling via
+- Enhancements
+  - Provide command argument validation and error handling via
     `Grizzly.Command.EncodeError.()`
-  * Update all the command arg encoder/decoder to use tagged
+  - Update all the command arg encoder/decoder to use tagged
     tuples for better handling of invalid command arguments
-  * Introduces new `Grizzly.Command.Encoding` modules for helping
+  - Introduces new `Grizzly.Command.Encoding` modules for helping
     validate command arugment specifications
-* Fixes
-  * Crashes when providing invalid command arguments
+- Fixes
+  - Crashes when providing invalid command arguments
 
 ### v0.4.3
 
-* Enhancements
-  * Support Powerlevel command class
-  * Doc clean up
-  * `Grizzly.send_command/2` and `Grizzly.send_command/3`
+- Enhancements
+  - Support Powerlevel command class
+  - Doc clean up
+  - `Grizzly.send_command/2` and `Grizzly.send_command/3`
     can be passed a node id instead of a node.
 
 ### v0.4.2
 
-* Enhancements
-  * Support NoOperation command class
+- Enhancements
+  - Support NoOperation command class
 
 ### v0.4.1
 
-* Enhancements
-  * Add support for Network Management Installation Maintenance
-  * Updates to docs and examples
+- Enhancements
+  - Add support for Network Management Installation Maintenance
+  - Updates to docs and examples
 
 ### v0.4.0
 
@@ -1567,8 +1617,8 @@ Changed `run_grizzly_bin` to `run_zipgateway_bin`.
 
 ## v0.3.1
 
-* Enhancements
-  * Implement multilevel sensor command to get supported sensor types
+- Enhancements
+  - Implement multilevel sensor command to get supported sensor types
 
 ## v0.3.0
 
@@ -1619,58 +1669,54 @@ Removed the `use_cache` param as there is no longer a cache.
 
 Same change found in `Grizzly.Node.get_command_class_version`
 
-* Enhancements
-  * Support `Grizzly.CommandClass.Time` command class
-  * Support `Grizzly.CommandClass.TimeParameters` `GET` and `SET` commands
-  * Support `Grizzly.CommandClass.ScheduleEntryLock` command class
-  * `Grizzly.Notifications.subscribe_all/1` - subscribe to many notifications at once
-  * `Grizzly.CommandClass.name/1` - get the name of the command class
-  * `Grizzly.CommandClass.version/1` - get the version of the command class
-  * `Grizzly.Network.get_nodes/0` - get the nodes on the network
-  * `Grizzly.Network.get_node/1` - get a node by node id from the network
-  * `Grizzly.Network.get_node_info/1` - get node information about a node via node id
-  * `Grizzly.Node.get_ip/1` - can now take either a `Node.t()` or a node id
-* Updates
-  * Docs and type clean up
-* Fixes
-  * Timeout when getting command class versions
+- Enhancements
+  - Support `Grizzly.CommandClass.Time` command class
+  - Support `Grizzly.CommandClass.TimeParameters` `GET` and `SET` commands
+  - Support `Grizzly.CommandClass.ScheduleEntryLock` command class
+  - `Grizzly.Notifications.subscribe_all/1` - subscribe to many notifications at once
+  - `Grizzly.CommandClass.name/1` - get the name of the command class
+  - `Grizzly.CommandClass.version/1` - get the version of the command class
+  - `Grizzly.Network.get_nodes/0` - get the nodes on the network
+  - `Grizzly.Network.get_node/1` - get a node by node id from the network
+  - `Grizzly.Network.get_node_info/1` - get node information about a node via node id
+  - `Grizzly.Node.get_ip/1` - can now take either a `Node.t()` or a node id
+- Updates
+  - Docs and type clean up
+- Fixes
+  - Timeout when getting command class versions
 
 ## v0.2.1
 
-* Updates
-  * Support for the time command class
-* Fixes
-  * Time-boxing of getting a command class version
+- Updates
+  - Support for the time command class
+- Fixes
+  - Time-boxing of getting a command class version
 
 ## v0.2.0
 
-* Fixes
-  * Logging with old `ZipGateway` label is now `Grizzly`
-  * Fix queued API from `{ZipGateway, :queued_response, ref, response}`
+- Fixes
+  - Logging with old `ZipGateway` label is now `Grizzly`
+  - Fix queued API from `{ZipGateway, :queued_response, ref, response}`
     to `{Grizzly, :queued_response, ref, response}`
-  * Fix timeout error when waiting for DTLS server from the
+  - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v0.22.4]: https://github.com/smartrent/grizzly/compare/v0.22.3...v0.22.4
 [v0.22.3]: https://github.com/smartrent/grizzly/compare/v0.22.2...v0.22.3
 [v0.22.2]: https://github.com/smartrent/grizzly/compare/v0.22.1...v0.22.2
 [v0.22.1]: https://github.com/smartrent/grizzly/compare/v0.22.0...v0.22.1
 [v0.22.0]: https://github.com/smartrent/grizzly/compare/v0.21.1...v0.22.0
-
 [v0.21.1]: https://github.com/smartrent/grizzly/compare/v0.21.0...v0.21.1
 [v0.21.0]: https://github.com/smartrent/grizzly/compare/v0.20.2...v0.21.0
-
 [v0.20.2]: https://github.com/smartrent/grizzly/compare/v0.20.1...v0.20.2
 [v0.20.1]: https://github.com/smartrent/grizzly/compare/v0.20.0...v0.20.1
 [v0.20.0]: https://github.com/smartrent/grizzly/compare/v0.19.1...v0.20.0
-
 [v0.19.1]: https://github.com/smartrent/grizzly/compare/v0.19.0...v0.19.1
 [v0.19.0]: https://github.com/smartrent/grizzly/compare/v0.18.3...v0.19.0
-
 [v0.18.3]: https://github.com/smartrent/grizzly/compare/v0.18.2...v0.18.3
 [v0.18.2]: https://github.com/smartrent/grizzly/compare/v0.18.1...v0.18.2
 [v0.18.1]: https://github.com/smartrent/grizzly/compare/v0.18.0...v0.18.1
 [v0.18.0]: https://github.com/smartrent/grizzly/compare/v0.17.8...v0.18.0
-
 [v0.17.8]: https://github.com/smartrent/grizzly/compare/v0.17.7...v0.17.8
 [v0.17.7]: https://github.com/smartrent/grizzly/compare/v0.17.6...v0.17.7
 [v0.17.6]: https://github.com/smartrent/grizzly/compare/v0.17.5...v0.17.6
@@ -1680,11 +1726,9 @@ Same change found in `Grizzly.Node.get_command_class_version`
 [v0.17.2]: https://github.com/smartrent/grizzly/compare/v0.17.1...v0.17.2
 [v0.17.1]: https://github.com/smartrent/grizzly/compare/v0.17.0...v0.17.1
 [v0.17.0]: https://github.com/smartrent/grizzly/compare/v0.16.2...v0.17.0
-
 [v0.16.2]: https://github.com/smartrent/grizzly/compare/v0.16.1...v0.16.2
 [v0.16.1]: https://github.com/smartrent/grizzly/compare/v0.16.0...v0.16.1
 [v0.16.0]: https://github.com/smartrent/grizzly/compare/v0.15.11...v0.16.0
-
 [v0.15.11]: https://github.com/smartrent/grizzly/compare/v0.15.10...v0.15.11
 [v0.15.10]: https://github.com/smartrent/grizzly/compare/v0.15.9...v0.15.10
 [v0.15.9]: https://github.com/smartrent/grizzly/compare/v0.15.8...v0.15.9
@@ -1697,7 +1741,6 @@ Same change found in `Grizzly.Node.get_command_class_version`
 [v0.15.2]: https://github.com/smartrent/grizzly/compare/v0.15.1...v0.15.2
 [v0.15.1]: https://github.com/smartrent/grizzly/compare/v0.15.0...v0.15.1
 [v0.15.0]: https://github.com/smartrent/grizzly/compare/v0.14.8...v0.15.0
-
 [v0.14.8]: https://github.com/smartrent/grizzly/compare/v0.14.7...v0.14.8
 [v0.14.7]: https://github.com/smartrent/grizzly/compare/v0.14.6...v0.14.7
 [v0.14.6]: https://github.com/smartrent/grizzly/compare/v0.14.5...v0.14.6
