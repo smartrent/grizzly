@@ -57,6 +57,9 @@ defmodule Grizzly.Commands.Table do
       # Node management
       {:node_list_get,
        {Commands.NodeListGet, handler: {WaitReport, complete_report: :node_list_report}}},
+      {:failed_node_list_get,
+       {Commands.FailedNodeListGet,
+        handler: {WaitReport, complete_report: :failed_node_list_report}}},
       {:node_add, {Commands.NodeAdd, handler: {WaitReport, complete_report: :node_add_status}}},
       {:node_info_cached_get,
        {Commands.NodeInfoCachedGet,
