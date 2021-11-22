@@ -189,6 +189,29 @@ defmodule Grizzly.Network do
   end
 
   @doc """
+  Get the list of ids of all failed nodes.
+  """
+  @spec report_failed_node_ids() :: {:ok, [Grizzly.ZWave.node_id()]} | {:error, :timeout}
+  def report_failed_node_ids() do
+    seq_number = Grizzly.SeqNumber.get_and_inc()
+
+    case Grizzly.send_command(1, :failed_node_list_get, seq_number: seq_number) do
+      {:ok,
+       %Grizzly.Report{
+         command: %Grizzly.ZWave.Command{
+           name: :failed_node_list_report,
+           params: params
+         },
+         status: :complete
+       }} ->
+        {:ok, Keyword.fetch!(params, :node_ids)}
+
+      {:ok, %Grizzly.Report{type: :timeout}} ->
+        {:error, :timeout}
+    end
+  end
+
+  @doc """
   Request a network update (network healing)
 
   Options

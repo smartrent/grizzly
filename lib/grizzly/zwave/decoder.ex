@@ -79,6 +79,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x52, 0x06, Commands.NetworkManagementMultiChannelEndPointReport},
       {0x52, 0x07, Commands.NetworkManagementMultiChannelCapabilityGet},
       {0x52, 0x08, Commands.NetworkManagementMultiChannelCapabilityReport},
+      {0x52, 0x0B, Commands.FailedNodeListGet},
       {0x52, 0x0C, Commands.FailedNodeListReport},
       # Multi Channel
       {0x60, 0x07, Commands.MultiChannelEndpointGet},
