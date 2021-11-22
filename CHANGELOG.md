@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.22.5] - 2021-11-22
+
+### Added
+
+- `Grizzly.ZWave.Commands.FailedNodeListGet` (@jfcloutier)
+- `Grizzly.Network.report_failed_node_ids/0` (@jfcloutier)
+
 ## [v0.22.4] - 2021-11-16
 
 ### Added
@@ -1701,6 +1708,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v0.22.5]: https://github.com/smartrent/grizzly/compare/v0.22.4...v0.22.5
 [v0.22.4]: https://github.com/smartrent/grizzly/compare/v0.22.3...v0.22.4
 [v0.22.3]: https://github.com/smartrent/grizzly/compare/v0.22.2...v0.22.3
 [v0.22.2]: https://github.com/smartrent/grizzly/compare/v0.22.1...v0.22.2
