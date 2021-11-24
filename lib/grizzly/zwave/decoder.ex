@@ -131,6 +131,16 @@ defmodule Grizzly.ZWave.Decoder do
       {0x63, 0x03, Commands.UserCodeReport},
       {0x63, 0x04, Commands.UserCodeUsersNumberGet},
       {0x63, 0x05, Commands.UserCodeUsersNumberReport},
+      # Barrier Operator
+      {0x66, 0x01, Commands.BarrierOperatorSet},
+      {0x66, 0x02, Commands.BarrierOperatorGet},
+      {0x66, 0x03, Commands.BarrierOperatorReport},
+      {0x66, 0x04, Commands.BarrierOperatorSignalSupportedGet},
+      {0x66, 0x05, Commands.BarrierOperatorSignalSupportedReport},
+      {0x66, 0x06, Commands.BarrierOperatorSignalSet},
+      {0x66, 0x07, Commands.BarrierOperatorSignalGet},
+      {0x66, 0x08, Commands.BarrierOperatorSignalReport},
+
       # Network management installation maintenance
       {0x67, 0x02, Commands.PriorityRouteGet},
       {0x67, 0x03, Commands.PriorityRouteReport},

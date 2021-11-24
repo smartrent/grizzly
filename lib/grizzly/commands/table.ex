@@ -363,7 +363,19 @@ defmodule Grizzly.Commands.Table do
       {:schedule_entry_lock_time_offset_set,
        {Commands.ScheduleEntryLockTimeOffsetSet, handler: AckResponse}},
       {:schedule_entry_lock_daily_repeating_set,
-       {Commands.ScheduleEntryLockDailyRepeatingSet, handler: AckResponse}}
+       {Commands.ScheduleEntryLockDailyRepeatingSet, handler: AckResponse}},
+      # Barrier Operator
+      {:barrier_operator_get,
+       {Commands.BarrierOperatorGet,
+        handler: {WaitReport, complete_report: :barrier_operator_report}}},
+      {:barrier_operator_set, {Commands.BarrierOperatorSet, handler: AckResponse}},
+      {:barrier_operator_signal_supported_get,
+       {Commands.BarrierOperatorSignalSupportedGet,
+        handler: {WaitReport, complete_report: :barrier_operator_signal_supported_report}}},
+      {:barrier_operator_signal_get,
+       {Commands.BarrierOperatorSignalGet,
+        handler: {WaitReport, complete_report: :barrier_operator_signal_report}}},
+      {:barrier_operator_signal_set, {Commands.BarrierOperatorSignalSet, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
