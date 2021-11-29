@@ -4,6 +4,20 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.22.6] - 2021-11-29
+
+### Added
+
+- `Grizzly.ZWave.CommandClasses.BarrierOperator` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorGet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorReport` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorSet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorSignalGet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorSignalReport` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorSignalSet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorSignalSupportedGet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.BarrierOperatorSignalSupportedReport` (@jfcloutier)
+
 ## [v0.22.5] - 2021-11-22
 
 ### Added
@@ -1708,6 +1722,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v0.22.6]: https://github.com/smartrent/grizzly/compare/v0.22.5...v0.22.6
 [v0.22.5]: https://github.com/smartrent/grizzly/compare/v0.22.4...v0.22.5
 [v0.22.4]: https://github.com/smartrent/grizzly/compare/v0.22.3...v0.22.4
 [v0.22.3]: https://github.com/smartrent/grizzly/compare/v0.22.2...v0.22.3
