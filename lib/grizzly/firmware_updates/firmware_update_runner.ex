@@ -126,6 +126,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     end
   end
 
+  def handle_info({:error, :nack_response}, firmware_update) do
+    Logger.info(
+      "[Grizzly] Received :nack_response while updating firmware of device #{firmware_update.device_id}. Ignoring it."
+    )
+
+    {:noreply, firmware_update}
+  end
+
   @impl true
   def terminate(:normal, firmware_update) do
     :ok = AsyncConnection.stop(firmware_update.device_id)
