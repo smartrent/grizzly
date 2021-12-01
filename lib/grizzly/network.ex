@@ -191,7 +191,7 @@ defmodule Grizzly.Network do
   @doc """
   Get the list of ids of all failed nodes.
   """
-  @spec report_failed_node_ids() :: {:ok, [Grizzly.ZWave.node_id()]} | {:error, :timeout}
+  @spec report_failed_node_ids() :: {:ok, [Grizzly.ZWave.node_id()]} | {:error, atom}
   def report_failed_node_ids() do
     seq_number = Grizzly.SeqNumber.get_and_inc()
 
@@ -208,6 +208,9 @@ defmodule Grizzly.Network do
 
       {:ok, %Grizzly.Report{type: :timeout}} ->
         {:error, :timeout}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
