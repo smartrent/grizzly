@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.22.7] - 2021-12-2
+
+### Fixed
+
+- Unhandled errors when trying to firmware upgrade (@jfcloutier)
+- Unhandled errors when trying to get failed node list (@jfcloutier)
+
 ## [v0.22.6] - 2021-11-29
 
 ### Added
@@ -1722,6 +1729,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v0.22.7]: https://github.com/smartrent/grizzly/compare/v0.22.6...v0.22.7
 [v0.22.6]: https://github.com/smartrent/grizzly/compare/v0.22.5...v0.22.6
 [v0.22.5]: https://github.com/smartrent/grizzly/compare/v0.22.4...v0.22.5
 [v0.22.4]: https://github.com/smartrent/grizzly/compare/v0.22.3...v0.22.4
