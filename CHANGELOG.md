@@ -4,6 +4,15 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.0] - 2021-12-20
+
+This release bumps Grizzly to v1.0.0. Grizzly has been used for many years now
+and has helped a product pass Z-Wave certification. Most the work that gone
+into Grizzly for the last little while has been minor changes and bug fixes, but
+core API has remained stable.
+
+Thank you to everyone who has contributed over the years!
+
 ## [v0.22.7] - 2021-12-2
 
 ### Fixed
@@ -1729,6 +1738,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v1.0.0]: https://github.com/smartrent/grizzly/compare/v0.22.7...v1.0.0
 [v0.22.7]: https://github.com/smartrent/grizzly/compare/v0.22.6...v0.22.7
 [v0.22.6]: https://github.com/smartrent/grizzly/compare/v0.22.5...v0.22.6
 [v0.22.5]: https://github.com/smartrent/grizzly/compare/v0.22.4...v0.22.5
