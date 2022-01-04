@@ -189,24 +189,24 @@ defmodule Grizzly.Connections.SyncConnection do
   defp do_handle_commands(zip_packet, state) do
     updated_state =
       case CommandList.response_for_zip_packet(state.commands, zip_packet) do
-        {:retry, command_runner, new_comamnd_list} ->
+        {:retry, command_runner, new_command_list} ->
           :ok = do_send_command(command_runner, state)
-          %State{state | commands: new_comamnd_list}
+          %State{state | commands: new_command_list}
 
-        {:continue, new_comamnd_list} ->
-          %State{state | commands: new_comamnd_list}
+        {:continue, new_command_list} ->
+          %State{state | commands: new_command_list}
 
-        {waiter, {:error, :nack_response, new_comamnd_list}} ->
+        {waiter, {:error, :nack_response, new_command_list}} ->
           GenServer.reply(waiter, {:error, :nack_response})
-          %State{state | commands: new_comamnd_list}
+          %State{state | commands: new_command_list}
 
-        {waiter, {%Report{} = report, new_comamnd_list}} when is_pid(waiter) ->
+        {waiter, {%Report{} = report, new_command_list}} when is_pid(waiter) ->
           send(waiter, {:grizzly, :report, report})
-          %State{state | commands: new_comamnd_list}
+          %State{state | commands: new_command_list}
 
-        {waiter, {%Report{} = report, new_comamnd_list}} ->
+        {waiter, {%Report{} = report, new_command_list}} ->
           GenServer.reply(waiter, {:ok, report})
-          %State{state | commands: new_comamnd_list}
+          %State{state | commands: new_command_list}
       end
 
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
