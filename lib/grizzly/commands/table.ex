@@ -375,7 +375,19 @@ defmodule Grizzly.Commands.Table do
       {:barrier_operator_signal_get,
        {Commands.BarrierOperatorSignalGet,
         handler: {WaitReport, complete_report: :barrier_operator_signal_report}}},
-      {:barrier_operator_signal_set, {Commands.BarrierOperatorSignalSet, handler: AckResponse}}
+      {:barrier_operator_signal_set, {Commands.BarrierOperatorSignalSet, handler: AckResponse}},
+      # Window Covering
+      {:window_covering_supported_get,
+       {Commands.WindowCoveringSupportedGet,
+        handler: {WaitReport, complete_report: :window_covering_supported_report}}},
+      {:window_covering_get,
+       {Commands.WindowCoveringGet,
+        handler: {WaitReport, complete_report: :window_covering_report}}},
+      {:window_covering_set, {Commands.WindowCoveringSet, handler: AckResponse}},
+      {:window_covering_start_level_change,
+       {Commands.WindowCoveringStartLevelChange, handler: AckResponse}},
+      {:window_covering_stop_level_change,
+       {Commands.WindowCoveringStopLevelChange, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do

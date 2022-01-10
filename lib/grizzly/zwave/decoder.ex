@@ -152,6 +152,15 @@ defmodule Grizzly.ZWave.Decoder do
       {0x67, 0x09, Commands.S2ResynchronizationEvent},
       {0x67, 0x0E, Commands.ZWaveLongRangeChannelReport},
 
+      # Window Covering
+      {0x6A, 0x01, WindowCoveringSupportedGet},
+      {0x6A, 0x02, WindowCoveringSupportedReport},
+      {0x6A, 0x03, WindowCoveringGet},
+      {0x6A, 0x04, WindowCoveringReport},
+      {0x6A, 0x05, WindowCoveringSet},
+      {0x6A, 0x06, WindowCoveringStartLevelChange},
+      {0x6A, 0x07, WindowCoveringStopLevelChange},
+
       # Supervision
       {0x6C, 0x01, Commands.SupervisionGet},
       {0x6C, 0x02, Commands.SupervisionReport},
