@@ -31,6 +31,9 @@ defmodule Grizzly.ZWave.Commands.BasicReportTest do
     binary_params = <<0xFF>>
     {:ok, params} = BasicReport.decode_params(binary_params)
     assert Keyword.get(params, :value) == :on
+    binary_params = <<0x63>>
+    {:ok, params} = BasicReport.decode_params(binary_params)
+    assert Keyword.get(params, :value) == :on
   end
 
   test "decodes v2 params correctly" do

@@ -51,6 +51,7 @@ defmodule Grizzly.ZWave.Commands.BasicSet do
 
   defp value_from_byte(0x00), do: {:ok, :off}
   defp value_from_byte(0xFF), do: {:ok, :on}
+  defp value_from_byte(byte) when byte in 0x01..0x63, do: {:ok, :on}
 
   defp value_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :value, command: :basic_set}}

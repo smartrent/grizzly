@@ -18,5 +18,8 @@ defmodule Grizzly.ZWave.Commands.BasicSetTest do
     binary_params = <<0xFF>>
     {:ok, params} = BasicSet.decode_params(binary_params)
     assert Keyword.get(params, :value) == :on
+    binary_params = <<0x01>>
+    {:ok, params} = BasicSet.decode_params(binary_params)
+    assert Keyword.get(params, :value) == :on
   end
 end
