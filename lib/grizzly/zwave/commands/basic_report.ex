@@ -77,9 +77,9 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   defp encode_value(:off), do: 0x00
   defp encode_value(:unknown), do: 0xFE
 
-  defp encode_duration(secs) when is_number(secs) and secs in 0..127, do: secs
+  defp encode_duration(secs) when is_integer(secs) and secs in 0..127, do: secs
 
-  defp encode_duration(secs) when is_number(secs) and secs in 128..(126 * 60),
+  defp encode_duration(secs) when is_integer(secs) and secs in 128..(126 * 60),
     do: 0x80 + div(secs, 60)
 
   defp encode_duration(:unknown), do: 0xFE
@@ -88,6 +88,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   defp value_from_byte(0x00, _param), do: {:ok, :off}
   defp value_from_byte(0xFF, _param), do: {:ok, :on}
   defp value_from_byte(0xFE, _param), do: {:ok, :unknown}
+  defp value_from_byte(byte, _param) when byte in 0x01..0x63, do: {:ok, :on}
 
   defp value_from_byte(byte, param),
     do: {:error, %DecodeError{value: byte, param: param, command: :basic_report}}
