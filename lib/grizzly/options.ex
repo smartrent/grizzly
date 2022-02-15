@@ -4,6 +4,17 @@ defmodule Grizzly.Options do
   alias Grizzly.Supervisor
   alias Grizzly.ZIPGateway.Config
 
+  require Logger
+
+  @typedoc """
+  Manifest item for hub Z-Wave firmware updates. Each item identifies a target a chip type, the path
+  of the firmware image file, and the firmware version upgrade.
+  """
+  @type firmware_info() :: %{chip_type: non_neg_integer(), path: String.t(), version: String.t()}
+
+  @typedoc """
+  See Grizzly.Supervisor
+  """
   @type t() :: %__MODULE__{
           transport: module(),
           run_zipgateway: boolean(),
@@ -28,7 +39,10 @@ defmodule Grizzly.Options do
           indicator_handler: (Grizzly.Indicator.event() -> :ok),
           rf_region: Supervisor.rf_region() | nil,
           power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
-          status_reporter: module()
+          status_reporter: module(),
+          update_zwave_firmware: boolean(),
+          zwave_firmware: [firmware_info()],
+          zw_programmer_path: Path.t()
         }
 
   defstruct run_zipgateway: true,
@@ -54,7 +68,10 @@ defmodule Grizzly.Options do
             indicator_handler: nil,
             rf_region: nil,
             power_level: nil,
-            status_reporter: Grizzly.StatusReporter.Console
+            status_reporter: Grizzly.StatusReporter.Console,
+            update_zwave_firmware: false,
+            zwave_firmware: [],
+            zw_programmer_path: "/usr/bin/zw_programmer"
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

@@ -25,6 +25,7 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
     case Connection.open(:gateway) do
       {:ok, _} ->
         state.reporter.ready()
+
         {:stop, :normal, state}
 
       {:error, _reason} ->
