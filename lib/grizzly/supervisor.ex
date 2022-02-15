@@ -41,8 +41,11 @@ defmodule Grizzly.Supervisor do
   """
   use Supervisor
 
-  alias Grizzly.Options
+  require Logger
+
+  alias Grizzly.{Options, ZwaveFirmware}
   alias Grizzly.ZIPGateway.ReadyChecker
+  alias Grizzly.ZwaveFirmware
 
   @typedoc """
   The RF region code you want the Z-Wave controller to operate at.
@@ -123,6 +126,12 @@ defmodule Grizzly.Supervisor do
   - `:power_level` - A tuple where the first item is the normal TX power level
     and the second item is the measured 0dBm power configuration. See Silabs
     INS14664 (MaxPowerCalc) spreadsheet to figure out the power numbers.
+  - `:update_zwave_firmware` - If set to `true`, Grizzly will attempt to update
+    the firmware on the Z-Wave module when it starts
+  - `:zwave_firmware` - If `:update_zwave_firmware` is `true`, then this is a list
+    of firmware files for expected Z-Wave module types.
+  - `:zw_programmer_path` - If `:update_zwave_firmware` is `true`, then this is
+    the path to the `zw_programmer` application.
   - `:status_reporter` - a module that implements the `Grizzly.StatusReporter`
     behaviour. In no reporter is provided this will use
     `Grizzly.Status.Reporter.Console` by default.
@@ -156,6 +165,9 @@ defmodule Grizzly.Supervisor do
           | {:rf_region, rf_region()}
           | {:power_level, {tx_power(), measured_power()}}
           | {:status_reporter, module()}
+          | {:update_zwave_firmware, boolean()}
+          | {:zwave_firmware, [Options.firmware_info()]}
+          | {:zw_programmer_path, Path.t()}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -179,12 +191,13 @@ defmodule Grizzly.Supervisor do
 
   @impl Supervisor
   def init(init_args) do
-    Supervisor.init(children(init_args), strategy: :one_for_one)
+    options = Options.new(init_args)
+    ZwaveFirmware.maybe_run_zwave_firmware_update(options)
+
+    Supervisor.init(children(options), strategy: :one_for_one)
   end
 
-  defp children(init_args) do
-    options = Options.new(init_args)
-
+  defp children(options) do
     [
       # According to Z-Wave specification we need to have a global
       # sequence number counter that starts at a random number between
