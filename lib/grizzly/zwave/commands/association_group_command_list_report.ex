@@ -73,7 +73,8 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   end
 
   defp decode_commands(length, encoded_commands_list) do
-    byte_list = :erlang.binary_to_list(encoded_commands_list)
+    # Ignore extraneous bytes, e.g. trailing 0s
+    byte_list = :erlang.binary_to_list(encoded_commands_list) |> Enum.take(length)
 
     if Enum.count(byte_list) != length do
       Logger.warn("[Grizzly] Invalid length #{length} for list of commands")
