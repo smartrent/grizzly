@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatMode do
   def encode_mode(:full_power), do: 0x0F
   def encode_mode(:manufacturer_specific), do: 0x1F
 
-  @spec decode_mode(byte) :: {:ok, mode} | {:error, %DecodeError{}}
+  @spec decode_mode(byte) :: {:ok, mode} | {:error, DecodeError.t()}
   def decode_mode(0x00), do: {:ok, :off}
   def decode_mode(0x01), do: {:ok, :heat}
   def decode_mode(0x02), do: {:ok, :cool}

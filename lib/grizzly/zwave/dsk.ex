@@ -146,8 +146,7 @@ defmodule Grizzly.ZWave.DSK do
     delimiter = Keyword.get(opts, :delimiter, "-")
 
     for(<<b::16 <- raw>>, do: b)
-    |> Enum.map(&int_to_five_digits/1)
-    |> Enum.join(delimiter)
+    |> Enum.map_join(delimiter, &int_to_five_digits/1)
   end
 
   @doc """

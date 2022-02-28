@@ -25,7 +25,8 @@
         {Credo.Check.Refactor.WithClauses, false},
         {Credo.Check.Refactor.LongQuoteBlocks, false},
         {Credo.Check.Refactor.CyclomaticComplexity, false},
-        {Credo.Check.Consistency.SpaceAroundOperators, false}
+        {Credo.Check.Consistency.SpaceAroundOperators, false},
+        {Credo.Check.Readability.WithSingleClause, false}
       ]
     }
   ]
