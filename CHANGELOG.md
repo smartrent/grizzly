@@ -4,6 +4,14 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.1] - 2022-02-28
+
+### Fixed
+
+- Ignore extra bytes reported in association group list by some devices (@jfcloutier)
+- Decode `0x00..0x063` as `:on` in Basic command class to align with Z-Wave
+  specification (@jfcloutier)
+
 ## [v1.0.0] - 2021-12-20
 
 This release bumps Grizzly to v1.0.0. Grizzly has been used for many years now
@@ -1738,6 +1746,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v1.0.1]: https://github.com/smartrent/grizzly/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/smartrent/grizzly/compare/v0.22.7...v1.0.0
 [v0.22.7]: https://github.com/smartrent/grizzly/compare/v0.22.6...v0.22.7
 [v0.22.6]: https://github.com/smartrent/grizzly/compare/v0.22.5...v0.22.6
