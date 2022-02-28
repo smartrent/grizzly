@@ -213,7 +213,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
     do:
       {:error, %DecodeError{value: byte, param: :sensor_type, command: :sensor_multilevel_report}}
 
-  @spec decode_sensor_types(binary) :: {:ok, [sensor_types: [atom]]} | {:error, %DecodeError{}}
+  @spec decode_sensor_types(binary) :: {:ok, [sensor_types: [atom]]} | {:error, DecodeError.t()}
   def decode_sensor_types(binary) do
     sensor_types =
       :binary.bin_to_list(binary)

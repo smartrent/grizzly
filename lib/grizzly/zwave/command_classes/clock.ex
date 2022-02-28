@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.CommandClasses.Clock do
     end
   end
 
-  @spec decode_weekday(byte()) :: {:ok, weekday()} | {:error, %DecodeError{}}
+  @spec decode_weekday(byte()) :: {:ok, weekday()} | {:error, DecodeError.t()}
   def decode_weekday(byte) do
     case byte do
       0x01 -> {:ok, :monday}

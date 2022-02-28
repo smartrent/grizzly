@@ -180,8 +180,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
         clock_seq,
         node
       ]
-      |> Enum.map(&Base.encode16/1)
-      |> Enum.join("-")
+      |> Enum.map_join("-", &Base.encode16/1)
 
     {:ok, formatted}
   end
