@@ -84,9 +84,6 @@ defmodule Grizzly.Supervisor do
     `"/usr/sbin/zipgateway`
   - `:zipgateway_config_path` - the path write the zipgateway config file.
      Default to `"/tmp/zipgateway.cfg"`
-  - `:on_ready` - Module, function, args to run after Grizzly can establish
-    that zipgateway is up and running. If not passed nothing will be called.
-    Defaults to `nil`.
   - `:transport` - a module that implements the `Grizzly.Transport` behaviour.
     Defaults to `Grizzly.Transports.DTLS`
   - `:zipgateway_port` - the port number of the Z/IP Gateway server. Defaults 41230.
@@ -126,6 +123,9 @@ defmodule Grizzly.Supervisor do
   - `:power_level` - A tuple where the first item is the normal TX power level
     and the second item is the measured 0dBm power configuration. See Silabs
     INS14664 (MaxPowerCalc) spreadsheet to figure out the power numbers.
+  - `:status_reporter` - a module that implements the `Grizzly.StatusReporter`
+    behaviour. In no reporter is provided this will use
+    `Grizzly.Status.Reporter.Console` by default.
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -136,7 +136,6 @@ defmodule Grizzly.Supervisor do
           | {:serial_port, String.t()}
           | {:zipgateway_binary, String.t()}
           | {:zipgateway_config_path, Path.t()}
-          | {:on_ready, mfa()}
           | {:transport, module()}
           | {:zipgateway_port, :inet.port_number()}
           | {:manufacturer_id, non_neg_integer()}
@@ -156,6 +155,7 @@ defmodule Grizzly.Supervisor do
           | {:indicator_handler, (Grizzly.Indicator.event() -> :ok)}
           | {:rf_region, rf_region()}
           | {:power_level, {tx_power(), measured_power()}}
+          | {:status_reporter, module()}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -211,24 +211,16 @@ defmodule Grizzly.Supervisor do
       {Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor, options},
 
       # Supervisor for running commands
-      Grizzly.Commands.CommandRunnerSupervisor
+      Grizzly.Commands.CommandRunnerSupervisor,
+      {ReadyChecker, [status_reporter: options.status_reporter]}
     ]
     |> maybe_run_zipgateway_supervisor(options)
-    |> maybe_start_on_ready_checker(options)
   end
 
   defp maybe_run_zipgateway_supervisor(children, options) do
     if options.run_zipgateway do
       # Supervisor for the zipgateway binary
       [{Grizzly.ZIPGateway.Supervisor, options} | children]
-    else
-      children
-    end
-  end
-
-  defp maybe_start_on_ready_checker(children, opts) do
-    if opts.on_ready do
-      children ++ [{ReadyChecker, opts.on_ready}]
     else
       children
     end
