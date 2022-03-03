@@ -10,7 +10,6 @@ defmodule Grizzly.Options do
           serial_port: String.t(),
           zipgateway_binary: Path.t(),
           zipgateway_config_path: Path.t(),
-          on_ready: mfa() | nil,
           zipgateway_port: :inet.port_number(),
           manufacturer_id: non_neg_integer() | nil,
           hardware_version: byte() | nil,
@@ -28,14 +27,14 @@ defmodule Grizzly.Options do
           database_file: Path.t() | nil,
           indicator_handler: (Grizzly.Indicator.event() -> :ok),
           rf_region: Supervisor.rf_region() | nil,
-          power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil
+          power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
+          status_reporter: module()
         }
 
   defstruct run_zipgateway: true,
             serial_port: "/dev/ttyUSB0",
             zipgateway_binary: "/usr/sbin/zipgateway",
             zipgateway_config_path: "/tmp/zipgateway.cfg",
-            on_ready: nil,
             transport: Grizzly.Transports.DTLS,
             zipgateway_port: 41230,
             manufacturer_id: nil,
@@ -54,7 +53,8 @@ defmodule Grizzly.Options do
             database_file: "/data/zipgateway.db",
             indicator_handler: nil,
             rf_region: nil,
-            power_level: nil
+            power_level: nil,
+            status_reporter: Grizzly.StatusReporter.Console
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

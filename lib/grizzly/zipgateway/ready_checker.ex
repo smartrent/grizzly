@@ -8,32 +8,31 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   alias Grizzly.Connection
 
-  @type on_ready() :: mfa()
+  @type init_arg() :: {:status_reporter, module()}
 
-  @spec start_link(on_ready()) :: GenServer.on_start()
-  def start_link(on_ready) do
-    GenServer.start_link(__MODULE__, on_ready, name: __MODULE__)
+  @spec start_link([init_arg()]) :: GenServer.on_start()
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @impl GenServer
-  def init(on_ready) do
-    {:ok, on_ready, {:continue, :try_connect}}
+  def init(args) do
+    {:ok, %{reporter: args[:status_reporter]}, {:continue, :try_connect}}
   end
 
   @impl GenServer
-  def handle_continue(:try_connect, on_ready) do
+  def handle_continue(:try_connect, state) do
     case Connection.open(:gateway) do
       {:ok, _} ->
-        {m, f, a} = on_ready
-        :ok = apply(m, f, a)
-        {:stop, :normal, on_ready}
+        apply(state.reporter, :ready, [])
+        {:stop, :normal, state}
 
       {:error, _reason} ->
         # give a little breathing space
         :timer.sleep(500)
 
         # try again
-        {:noreply, on_ready, {:continue, :try_connect}}
+        {:noreply, state, {:continue, :try_connect}}
     end
   end
 end
