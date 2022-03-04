@@ -4,7 +4,7 @@ defmodule Grizzly.ConnectionTest do
   alias Grizzly.{Connection, Report}
 
   test "open a connection" do
-    assert {:ok, _connection} = Connection.open(1)
+    assert {:ok, _connection} = Connection.open(1200)
   end
 
   @tag :integration

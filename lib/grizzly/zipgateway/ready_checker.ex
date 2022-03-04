@@ -24,7 +24,7 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
   def handle_continue(:try_connect, state) do
     case Connection.open(:gateway) do
       {:ok, _} ->
-        apply(state.reporter, :ready, [])
+        state.reporter.ready()
         {:stop, :normal, state}
 
       {:error, _reason} ->
