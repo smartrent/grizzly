@@ -155,6 +155,7 @@ defmodule Grizzly.Supervisor do
           | {:indicator_handler, (Grizzly.Indicator.event() -> :ok)}
           | {:rf_region, rf_region()}
           | {:power_level, {tx_power(), measured_power()}}
+          | {:on_ready, mfa()}
           | {:status_reporter, module()}
 
   @typedoc """
@@ -212,7 +213,7 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for running commands
       Grizzly.Commands.CommandRunnerSupervisor,
-      {ReadyChecker, [status_reporter: options.status_reporter]}
+      {ReadyChecker, [status_reporter: options.status_reporter, on_ready: options.on_ready]}
     ]
     |> maybe_run_zipgateway_supervisor(options)
   end

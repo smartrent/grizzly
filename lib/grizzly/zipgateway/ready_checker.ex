@@ -8,7 +8,7 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   alias Grizzly.Connection
 
-  @type init_arg() :: {:status_reporter, module()}
+  @type init_arg() :: {:status_reporter, module()} | {:on_ready, mfa()}
 
   @spec start_link([init_arg()]) :: GenServer.on_start()
   def start_link(args) do
@@ -17,7 +17,8 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   @impl GenServer
   def init(args) do
-    {:ok, %{reporter: args[:status_reporter]}, {:continue, :try_connect}}
+    {:ok, %{reporter: args[:status_reporter], on_ready: args[:on_ready]},
+     {:continue, :try_connect}}
   end
 
   @impl GenServer
@@ -25,6 +26,15 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
     case Connection.open(:gateway) do
       {:ok, _} ->
         state.reporter.ready()
+
+        case state.on_ready do
+          {m, f, a} ->
+            :ok = apply(m, f, a)
+
+          nil ->
+            :ok
+        end
+
         {:stop, :normal, state}
 
       {:error, _reason} ->

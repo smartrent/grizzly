@@ -28,6 +28,7 @@ defmodule Grizzly.Options do
           indicator_handler: (Grizzly.Indicator.event() -> :ok),
           rf_region: Supervisor.rf_region() | nil,
           power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
+          on_ready: mfa(),
           status_reporter: module()
         }
 
@@ -54,6 +55,7 @@ defmodule Grizzly.Options do
             indicator_handler: nil,
             rf_region: nil,
             power_level: nil,
+            on_ready: nil,
             status_reporter: Grizzly.StatusReporter.Console
 
   @spec new([Supervisor.arg()]) :: t()
