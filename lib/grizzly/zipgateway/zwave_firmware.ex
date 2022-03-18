@@ -54,7 +54,7 @@ defmodule Grizzly.ZIPGateway.ZwaveFirmware do
           "[Grizzly] No firmware upgrade path found in #{inspect(firmware_info_list)} for current firmware #{inspect(zwave_module_info)}"
         )
 
-        :no_fw_image_file
+        raise FirmwareError, message: :no_fw_image_file
     end
   end
 
