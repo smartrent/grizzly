@@ -137,7 +137,7 @@ defmodule Grizzly.ZIPGateway.ZwaveFirmware do
       Logger.info("[Grizzly] Hub firmware upgrade successful")
       :ok
     else
-      raise FirmwareError, message: :upgrade_failed
+      raise FirmwareError, message: "upgrade_failed"
     end
   end
 
