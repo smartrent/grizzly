@@ -58,7 +58,7 @@ defmodule Grizzly.ZIPGateway.ZwaveFirmware do
           "[Grizzly] No firmware upgrade path found in #{inspect(firmware_info_list)} for current firmware #{inspect(zwave_module_info)}"
         )
 
-        raise FirmwareError, message: :no_fw_image_file
+        raise FirmwareError, message: "no_fw_image_file"
     end
   end
 
@@ -82,7 +82,7 @@ defmodule Grizzly.ZIPGateway.ZwaveFirmware do
     {answer, 0} = System.cmd(options.zw_programmer_path, ["-s", options.serial_port, "-t"])
 
     if String.contains?(answer, "Serial Init failed") do
-      raise FirmwareError, message: :upgrade_failed
+      raise FirmwareError, message: "upgrade_failed"
     else
       extract_zwave_module_info(answer)
     end
