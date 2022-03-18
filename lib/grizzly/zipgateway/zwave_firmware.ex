@@ -30,7 +30,11 @@ defmodule Grizzly.ZIPGateway.ZwaveFirmware do
     end
   rescue
     e in FirmwareError ->
-      report(options, {:error, Exception.format(:error, e, __STACKTRACE__)})
+      reason = Exception.format(:error, e, __STACKTRACE__)
+      Logger.error(
+        "[Grizzly] SKIPPING firmware update due to #{inspect reason}"
+      )
+      report(options, {:error, reason})
 
     # Firmware update not possible due to code error. Skip it.
     e in RuntimeError ->
