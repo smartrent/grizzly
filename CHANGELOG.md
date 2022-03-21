@@ -4,6 +4,67 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.0.0] - 2022-03-21
+
+### Breaking change
+
+For this release we removed the `on_ready` option for Grizzly and added the
+`Grizzly.StatusReporter` behaviour. This is a module that the consuming
+application can implement to get a more specific type of ready status. There are
+a handful of moving parts to getting Z-Wave and Grizzly up, so this behaviour
+can be extended over time to handle more ready cases.
+
+To use the status reporter:
+
+```elixir
+defmodule MyApp.StatusReporter do
+  @behaviour Grizzly.StatusReporter
+
+  @impl Grizzly.StatusReporter
+  def read() do
+    # Grizzly and Z-Wave are set up!
+    :ok
+  end
+
+  @impl Grizzly.StatusReporter
+  def zwave_firmware_update_status(status) do
+    # Grizzly is trying informing you if it tried to update teh Z-Wave firmware
+    # and what the status of that attempt is
+    :ok
+  end
+end
+```
+
+### New feature
+
+The newest feature is automatic Z-Wave firmware update. This feature is opt-in
+and will only try to run if configured. This is useful if you need to update
+the Z-Wave firmware when Grizzly starts. Here's the configuration:
+
+```elixir
+grizzly_opts = [
+  # enables the updating the Z-Wave chip
+  update_zwave_firmware: true, 
+  # configure which firmwares you might want to flash to the Z-Wave chip.
+  zwave_firmware: [%{chip_type: 7, path: "/path/to/firmware_file", version: "7.16.03"}], 
+  # path the Z-Wave programmer program provided by Silicon Labs
+  zw_programmer_path: "/usr/sbin/zw_programmer",
+  # ..other options
+]
+
+{Grizzly, grizzly_opts}
+```
+
+### Changed
+
+- removed `:on_ready` Grizzly option
+
+### Added
+
+- Z-Wave firmware updates on Grizzly start (@jfcloutier)
+- Ability to get the Z-Wave chip version information (@jfcloutier)
+- Add `Grizzly.StatusReporter` behaviour
+
 ## [v1.0.1] - 2022-02-28
 
 ### Fixed
@@ -1746,6 +1807,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v2.0.0]: https://github.com/smartrent/grizzly/compare/v1.0.1...v2.0.0
 [v1.0.1]: https://github.com/smartrent/grizzly/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/smartrent/grizzly/compare/v0.22.7...v1.0.0
 [v0.22.7]: https://github.com/smartrent/grizzly/compare/v0.22.6...v0.22.7
