@@ -20,6 +20,16 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor do
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
+  @doc """
+  Get the controller firmware upgrade info.
+  Note: The FirmwareUpdateRunnerSupervisor runs the only process that has this information once the hub is fully started.
+  """
+  @spec controller_firmware_upgrade_info :: [Grizzly.ZwaveFirmware.firmware_info()]
+  def controller_firmware_upgrade_info() do
+    state = :sys.get_state(__MODULE__)
+    Map.get(state.args, :zwave_firmware, [])
+  end
+
   @impl DynamicSupervisor
   def init(grizzly_options) do
     # Only one firmware update runner can be running at a time
