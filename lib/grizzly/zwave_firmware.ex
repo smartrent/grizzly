@@ -5,6 +5,8 @@ defmodule Grizzly.ZwaveFirmware do
 
   require Logger
 
+  @type firmware_info :: %{chip_type: non_neg_integer(), version: String.t(), path: Path.t()}
+
   @doc """
   Update the firmware on the Z-Wave module if an update is available
   """
