@@ -947,6 +947,17 @@ defmodule Grizzly.ZWave.Notifications do
     {:ok, []}
   end
 
+  # Some locks do not encode an encapsulated UserCodeReport as event parameters; they only give the user id
+  def decode_event_params(:access_control, zwave_event, <<user_id>>)
+      when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
+    {:ok,
+     [
+       user_id: user_id,
+       user_id_status: :status_not_available,
+       user_code: 0
+     ]}
+  end
+
   def decode_event_params(:access_control, zwave_event, params_binary)
       when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
     with {:ok, user_code_report} <- Decoder.from_binary(params_binary) do
