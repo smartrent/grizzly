@@ -954,7 +954,7 @@ defmodule Grizzly.ZWave.Notifications do
      [
        user_id: user_id,
        user_id_status: :status_not_available,
-       user_code: 0
+       user_code: ""
      ]}
   end
 
