@@ -4,6 +4,25 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.0] - 2022-04-27
+
+### Added
+
+- `Grizzly.ZWave.CommandClasses.WindowCovering` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringGet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringReport` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringSet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringStartLevelChange` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringStopLevelChange` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringSupportedGet` (@jfcloutier)
+- `Grizzly.ZWave.Commands.WindowCoveringSupportedReport` (@jfcloutier)
+
+### Fixed
+
+- When a lock does not encode an `UserCodeReport` as an event parameter (@jfcloutier)
+- When an unknown user code is encoded as a empty string (@jfcloutier)
+
+
 ## [v2.0.0] - 2022-03-21
 
 ### Breaking change
@@ -1807,6 +1826,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v2.1.0]: https://github.com/smartrent/grizzly/compare/v2.0.0...v2.1.0
 [v2.0.0]: https://github.com/smartrent/grizzly/compare/v1.0.1...v2.0.0
 [v1.0.1]: https://github.com/smartrent/grizzly/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/smartrent/grizzly/compare/v0.22.7...v1.0.0
