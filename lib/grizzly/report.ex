@@ -117,7 +117,7 @@ defmodule Grizzly.Report do
   the example for illustration purposes
   """
 
-  alias Grizzly.ZWave
+  alias Grizzly.{VirtualDevices, ZWave}
   alias Grizzly.ZWave.Command
 
   @typedoc """
@@ -148,7 +148,7 @@ defmodule Grizzly.Report do
           transmission_stats: [transmission_stat()],
           queued_delay: non_neg_integer(),
           command_ref: reference() | nil,
-          node_id: ZWave.node_id(),
+          node_id: ZWave.node_id() | VirtualDevices.id(),
           queued: boolean()
         }
 
@@ -223,7 +223,7 @@ defmodule Grizzly.Report do
   @doc """
   Make a new `Grizzly.Report`
   """
-  @spec new(status(), type(), ZWave.node_id(), [opt()]) :: t()
+  @spec new(status(), type(), ZWave.node_id() | VirtualDevices.id(), [opt()]) :: t()
   def new(status, type, node_id, opts \\ []) do
     %__MODULE__{
       status: status,

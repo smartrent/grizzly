@@ -261,6 +261,36 @@ and you will need to pass in the location to your configuration like so:
 
 `zipgateway -c /path/to/zipgateway.cfg`
 
+### Virtual devices
+
+Grizzly provides a way to work with virtual devices. These devices should work
+as their hardware counterparts, however, the state of these devices are held in
+memory and managed by the Grizzly runtime.
+
+To add a new virtual device you can call the
+`Grizzly.VirtualDevices.add_device/1` function passing the a module that
+implements the `Grizzly.VirtualDevices.Device` behaviour.
+
+After adding the device you can call the `Grizzly.send_command/5` function to
+send the device a command.
+
+```elixir
+{:ok, virtual_device_id} = Grizzly.VirtualDevices.add_device(Grizzly.VirtualDevices.Thermostat)
+
+Grizzly.send_command(virtual_device_id, :thermostat_setpoint_get)
+```
+
+Virtual device ids are tuples where the first item is the atom `:virtual` and
+the second item an integer of the device id, for example:
+`{:virtual, device_id}`. Grizzly provides a guard and a helper function for any
+checking you might have to do:
+
+1. `Grizzly.is_virtual_device/1` (guard)
+1. `Grizzly.virtual_device/1` (function)
+
+Also, the documentation for functions in `Grizzly.Node` and `Grizzly.Network`
+should indicate if they work with virtual devices.
+
 ## Resources
 
 - [Z-Wave Specification Documentation](https://www.silabs.com/products/wireless/mesh-networking/z-wave/specification)
