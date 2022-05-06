@@ -3,7 +3,7 @@ defmodule Grizzly.Network do
   Module for working with the Z-Wave network
   """
 
-  alias Grizzly.{Associations, Connections, Report, SeqNumber, ZWave}
+  alias Grizzly.{Associations, Connections, Report, SeqNumber, VirtualDevices, ZWave}
   alias Grizzly.ZWave.Command
 
   @typedoc """
@@ -14,10 +14,10 @@ defmodule Grizzly.Network do
   """
   @type reset_opt() :: {:notify, boolean()}
 
-  @type opt() :: {:node_id, ZWave.node_id()}
+  @type opt() :: {:node_id, ZWave.node_id()} | {:seq_number, integer()}
 
   @doc """
-  Get a list of node ids from the network
+  Get a list of node ids from the Z-Wave network
 
   Just because a node id might be in the list does not mean the node is on the
   network. A device might have been reset or unpaired from the controller with
@@ -32,10 +32,35 @@ defmodule Grizzly.Network do
   """
   @spec get_node_ids([opt()]) :: Grizzly.send_command_response()
   def get_node_ids(opts \\ []) do
-    seq_number = SeqNumber.get_and_inc()
+    seq_number = opts[:seq_number] || SeqNumber.get_and_inc()
     node_id = node_id_from_opts(opts)
 
     Grizzly.send_command(node_id, :node_list_get, seq_number: seq_number)
+  end
+
+  @doc """
+  Gets all the node ids both from the Z-Wave network and any virtual nodes
+
+  If everything is okay the response will be `{:ok, list_of_node_ids}` where the
+  list of node ids will be a combination of actual Z-Wave devices and virtual
+  device ids.
+  """
+  @doc since: "3.0.0"
+  @spec get_all_node_ids([opt()]) ::
+          {:ok, [ZWave.node_id() | VirtualDevices.id()]} | {:error, :timeout | :nack_response}
+  def get_all_node_ids(opts \\ []) do
+    case get_node_ids(opts) do
+      {:ok, %Report{type: :command, status: :complete, command: node_id_list}} ->
+        zwave_node_ids = Command.param!(node_id_list, :node_ids)
+        virtual_node_ids = VirtualDevices.list_nodes()
+        {:ok, zwave_node_ids ++ virtual_node_ids}
+
+      {:ok, %Report{type: :timeout}} ->
+        {:error, :timeout}
+
+      {:error, :nack_response} = error ->
+        error
+    end
   end
 
   @doc """

@@ -3,8 +3,7 @@ defmodule Grizzly.Node do
   Functions for working directly with a Z-Wave node
   """
 
-  alias Grizzly.SeqNumber
-  alias Grizzly.ZWave
+  alias Grizzly.{SeqNumber, VirtualDevices, ZWave}
 
   @type id :: non_neg_integer()
 
@@ -18,15 +17,31 @@ defmodule Grizzly.Node do
     can pass `[force_update: true]` to force the cache to update the device
     info. By default this is `false`
   """
-  @type info_opt() :: {:force_update, boolean()}
+  @type info_opt() :: {:force_update, boolean()} | info_opt()
+
+  @type opt() :: {:seq_number, integer()}
 
   @doc """
   Get the information for a node by its id
 
   The response to this command is the `NodeInfoCacheReport` command
   """
-  @spec get_info(ZWave.node_id(), [info_opt()]) :: Grizzly.send_command_response()
-  def get_info(node_id, info_opt \\ []) do
+  @spec get_info(ZWave.node_id() | VirtualDevices.id(), [opt()]) ::
+          Grizzly.send_command_response()
+  def get_info(node_id, opts \\ [])
+
+  def get_info({:virtual, _} = node_id, opts) do
+    seq_number = opts[:seq_number] || SeqNumber.get_and_inc()
+
+    params = [
+      seq_number: seq_number,
+      node_id: node_id
+    ]
+
+    Grizzly.send_command(node_id, :node_info_cached_get, params)
+  end
+
+  def get_info(node_id, info_opt) do
     seq_number = SeqNumber.get_and_inc()
 
     params = [

@@ -61,7 +61,7 @@ defmodule Grizzly do
 
   """
 
-  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Report, VersionReports}
+  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Report, VersionReports, VirtualDevices}
   alias Grizzly.Commands.Table
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
@@ -136,6 +136,19 @@ defmodule Grizzly do
   @type command :: atom()
 
   @doc """
+  Guard for checking if device is a virtual device or not
+  """
+  defguard is_virtual_device(device_id) when is_tuple(device_id)
+
+  @doc """
+  Check to if the device id is a virtual device or a regular Z-Wave devices
+  """
+  @spec virtual_device?(:gateway | ZWave.node_id() | VirtualDevices.id()) :: boolean()
+  def virtual_device?(device_id) do
+    is_virtual_device(device_id)
+  end
+
+  @doc """
   Send a command to the node via the node id or to Z/IP Gateway
 
   To talk to your controller directly you can pass `:gateway` as the node id.
@@ -145,9 +158,21 @@ defmodule Grizzly do
   are many Z-Wave functions a controller do. There are helper functions for
   these functions in `Grizzly.Network` and `Grizzly.Node`.
   """
-  @spec send_command(ZWave.node_id() | :gateway, command(), args :: list(), [command_opt()]) ::
+  @spec send_command(
+          ZWave.node_id() | :gateway | VirtualDevices.id(),
+          command(),
+          args :: list(),
+          [command_opt()]
+        ) ::
           send_command_response()
   def send_command(node_id, command_name, args \\ [], opts \\ [])
+
+  def send_command(node_id, command_name, args, _opts) when is_virtual_device(node_id) do
+    with {command_module, _default_opts} <- Table.lookup(command_name),
+         {:ok, command} <- command_module.new(args) do
+      VirtualDevices.send_command(node_id, command)
+    end
+  end
 
   def send_command(
         :gateway,

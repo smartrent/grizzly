@@ -67,7 +67,47 @@ defmodule Grizzly.MixProject do
       logo: "./assets/grizzly-icon-yellow.png",
       source_ref: "v#{@version}",
       source_url: "https://github.com/smartrent/grizzly",
-      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+      groups_for_modules: [
+        Core: [
+          Grizzly.Supervisor,
+          Grizzly,
+          Grizzly.Inclusions,
+          Grizzly.Indicator,
+          Grizzly.Network,
+          Grizzly.Node,
+          Grizzly.Trace,
+          Grizzly.Trace.Record,
+          Grizzly.StatusReporter,
+          Grizzly.StatusReporter.Console,
+          Grizzly.Report
+        ],
+        "Grizzly Command Modules": [
+          Grizzly.SwitchBinary
+        ],
+        "Virtual Devices": [
+          Grizzly.VirtualDevices,
+          Grizzly.VirtualDevices.Device,
+          Grizzly.VirtualDevices.Thermostat
+        ],
+        ZWave: [
+          Grizzly.ZWave,
+          Grizzly.ZWave.CRC,
+          Grizzly.ZWave.DeviceClass,
+          Grizzly.ZWave.DeviceClasses,
+          Grizzly.ZWave.DSK,
+          Grizzly.ZWave.IconType,
+          Grizzly.ZWave.Notifications,
+          Grizzly.ZWave.QRCode,
+          Grizzly.ZWave.Security
+        ],
+        Transports: [
+          Grizzly.Transport,
+          Grizzly.Transport.Response,
+          Grizzly.Transports.DTLS,
+          Grizzly.Transports.UDP
+        ]
+      ]
     ]
   end
 
