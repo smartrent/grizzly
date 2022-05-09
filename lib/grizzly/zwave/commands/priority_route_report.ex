@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
 
     * `:repeaters` - node ids of repeaters for the route (required)
 
-    * `:speed` - speed used for the route (required)
+    * `:speed` - speeds used for the route (required)
 
   """
 
@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
           {:node_id, byte}
           | {:type, NetworkManagementInstallationMaintenance.route_type()}
           | {:repeaters, [byte]}
-          | {:speed, NetworkManagementInstallationMaintenance.speed()}
+          | {:speed, NetworkManagementInstallationMaintenance.speeds()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
@@ -52,22 +52,22 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
       Command.param!(command, :repeaters)
       |> NetworkManagementInstallationMaintenance.repeaters_to_bytes()
 
-    speed_byte =
-      Command.param!(command, :speed) |> NetworkManagementInstallationMaintenance.speed_to_byte()
+    speeds_byte =
+      Command.param!(command, :speed) |> NetworkManagementInstallationMaintenance.speeds_to_byte()
 
-    <<node_id, type_byte>> <> repeater_bytes <> <<speed_byte>>
+    <<node_id, type_byte>> <> repeater_bytes <> <<speeds_byte>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<node_id, type_byte, repeater_bytes::binary-size(4), speed_byte>>) do
     with {:ok, type} <- NetworkManagementInstallationMaintenance.route_type_from_byte(type_byte),
-         {:ok, speed} <- NetworkManagementInstallationMaintenance.speed_from_byte(speed_byte) do
+         {:ok, speeds} <- NetworkManagementInstallationMaintenance.speeds_from_byte(speed_byte) do
       {:ok,
        [
          node_id: node_id,
          type: type,
-         speed: speed,
+         speed: speeds,
          repeaters: NetworkManagementInstallationMaintenance.repeaters_from_bytes(repeater_bytes)
        ]}
     else
