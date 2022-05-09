@@ -8,8 +8,8 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
       route_changes: 2,
       transmission_count: 10,
       neighbors: [
-        [node_id: 5, repeater?: true, speed: :"100kbit/s"],
-        [node_id: 6, repeater?: false, speed: :"40kbit/s"]
+        [node_id: 5, repeater?: true, speed: [:"100kbit/s"]],
+        [node_id: 6, repeater?: false, speed: [:"40kbit/s"]]
       ],
       packet_error_count: 5,
       sum_of_transmission_times: 12,
@@ -25,8 +25,8 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
       route_changes: 2,
       transmission_count: 10,
       neighbors: [
-        [node_id: 5, repeater?: true, speed: :"100kbit/s"],
-        [node_id: 6, repeater?: false, speed: :"40kbit/s"]
+        [node_id: 5, repeater?: true, speed: [:"100kbit/s"]],
+        [node_id: 6, repeater?: false, speed: [:"40kbit/s"]]
       ],
       packet_error_count: 5,
       sum_of_transmission_times: 12,
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
 
     neighbors =
       <<0x02, 0x04>> <>
-        <<0x05, 0x01::size(1), 0x00::size(2), 0x03::size(5)>> <>
+        <<0x05, 0x01::size(1), 0x00::size(2), 0x04::size(5)>> <>
         <<0x06, 0x00::size(1), 0x00::size(2), 0x02::size(5)>>
 
     packet_error_count = <<0x03, 0x01, 0x05>>
@@ -85,9 +85,9 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
     [n1, n2] = Keyword.get(statistics, :neighbors)
     assert Keyword.get(n1, :node_id) == 5
     assert Keyword.get(n1, :repeater?) == true
-    assert Keyword.get(n1, :speed) == :"100kbit/s"
+    assert Keyword.get(n1, :speed) == [:"9.6kbit/s", :"40kbit/s"]
     assert Keyword.get(n2, :node_id) == 6
     assert Keyword.get(n2, :repeater?) == false
-    assert Keyword.get(n2, :speed) == :reserved
+    assert Keyword.get(n2, :speed) == []
   end
 end

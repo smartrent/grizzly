@@ -6,8 +6,11 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   data.
   """
 
+  use Bitwise, only_operators: true
+
   @type route_type ::
           :no_route | :last_working_route | :next_to_last_working_route | :set_by_application
+  @type speeds :: [speed()]
   @type speed :: :"9.6kbit/s" | :"40kbit/s" | :"100kbit/s" | :reserved
   @type statistics :: [statistic]
   @type statistic ::
@@ -21,7 +24,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   @type neighbor_param ::
           {:node_id, byte}
           | {:repeater?, boolean}
-          | {:speed, speed}
+          | {:speed, speeds}
   @type rssi ::
           :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -94..-32
 
@@ -55,24 +58,24 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  @spec speed_to_byte(speed) :: byte
-  def speed_to_byte(speed) do
-    case speed do
-      :"9.6kbit/s" -> 0x01
-      :"40kbit/s" -> 0x02
-      :"100kbit/s" -> 0x03
-    end
+  @spec speeds_to_byte(speeds()) :: byte()
+  def speeds_to_byte(speeds) do
+    byte = if :"9.6kbit/s" in speeds, do: 0x01, else: 0x00
+    byte = if :"40kbit/s" in speeds, do: byte ||| 0x02, else: byte
+    if :"100kbit/s" in speeds, do: byte ||| 0x04, else: byte
   end
 
-  @spec speed_from_byte(any) :: {:ok, speed}
-  def speed_from_byte(byte) do
+  @spec speeds_from_byte(byte) :: {:ok, speeds}
+  def speeds_from_byte(byte) do
     case byte do
-      0x01 -> {:ok, :"9.6kbit/s"}
-      0x02 -> {:ok, :"40kbit/s"}
-      0x03 -> {:ok, :"100kbit/s"}
-      # All other values are reserved and MUST NOT be used by a sending node.
-      # Reserved values MUST be ignored by a receiving node.
-      _byte -> {:ok, :reserved}
+      0x01 -> {:ok, [:"9.6kbit/s"]}
+      0x02 -> {:ok, [:"40kbit/s"]}
+      0x03 -> {:ok, [:"9.6kbit/s", :"40kbit/s"]}
+      0x04 -> {:ok, [:"100kbit/s"]}
+      0x05 -> {:ok, [:"9.6kbit/s", :"100kbit/s"]}
+      0x06 -> {:ok, [:"40kbit/s", :"100kbit/s"]}
+      0x07 -> {:ok, [:"9.6kbit/s", :"40kbit/s", :"100kbit/s"]}
+      _other -> {:ok, []}
     end
   end
 
@@ -192,18 +195,19 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   defp neighbor_to_binary(neighbor) do
     node_id = Keyword.get(neighbor, :node_id)
     repeater_bit = if Keyword.get(neighbor, :repeater?), do: 0x01, else: 0x00
-    speed_bits = Keyword.get(neighbor, :speed) |> speed_to_byte()
-    <<node_id, repeater_bit::size(1), 0x00::size(2), speed_bits::size(5)>>
+    speeds_bits = Keyword.get(neighbor, :speed) |> speeds_to_byte()
+    <<node_id, repeater_bit::size(1), 0x00::size(2), speeds_bits::size(5)>>
   end
 
   defp neighbors_from_binary(<<>>), do: {:ok, []}
 
   defp neighbors_from_binary(
-         <<node_id, repeater_bit::size(1), _reserved::size(2), speed_bits::size(5), rest::binary>>
+         <<node_id, repeater_bit::size(1), _reserved::size(2), speeds_bits::size(5),
+           rest::binary>>
        ) do
-    with {:ok, speed} <- speed_from_byte(speed_bits),
+    with {:ok, speeds} <- speeds_from_byte(speeds_bits),
          {:ok, other_neighbors} <- neighbors_from_binary(rest) do
-      neighbor = [node_id: node_id, repeater?: repeater_bit == 1, speed: speed]
+      neighbor = [node_id: node_id, repeater?: repeater_bit == 1, speed: speeds]
       {:ok, [neighbor | other_neighbors]}
     else
       {:error, %DecodeError{}} = error ->
