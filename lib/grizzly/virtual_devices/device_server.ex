@@ -5,8 +5,21 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
 
   alias Grizzly.{Report, VirtualDevices}
   alias Grizzly.VirtualDevices.Device
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses}
   alias Grizzly.ZWave.Commands.NodeInfoCacheReport
+
+  @type tagged_command_classes() ::
+          {:non_secure_supported, [CommandClasses.command_class()]}
+          | {:non_secure_controlled, [CommandClasses.command_class()]}
+          | {:secure_supported, [CommandClasses.command_class()]}
+          | {:secure_controlled, [CommandClasses.command_class()]}
+
+  @type device_class_info() :: %{
+          command_classes: tagged_command_classes(),
+          basic_device_class: DeviceClasses.basic_device_class(),
+          specific_device_class: DeviceClasses.specific_device_class(),
+          generic_device_class: DeviceClasses.generic_device_class()
+        }
 
   @typedoc """
   Initial arguments to the device server
@@ -47,6 +60,14 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
     GenServer.call(name(id), {:send_command, command})
   end
 
+  @doc """
+  Get the basic device class info
+  """
+  @spec device_class_info(VirtualDevices.id()) :: device_class_info()
+  def device_class_info(id) do
+    GenServer.call(name(id), :info)
+  end
+
   def stop(id) do
     GenServer.stop(name(id))
   end
@@ -67,12 +88,17 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   end
 
   @impl GenServer
+  def handle_call(:info, _from, state) do
+    {:reply, make_info(state), state}
+  end
+
   def handle_call(
         {:send_command, %Command{name: :node_info_cache_get} = node_info_get},
         _from,
         state
       ) do
     seq_number = Command.param!(node_info_get, :seq_number)
+    info = make_info(state)
 
     {:ok, node_info_report} =
       NodeInfoCacheReport.new(
@@ -80,10 +106,10 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
         status: :ok,
         age: 1,
         listening?: true,
-        command_classes: command_classes_for_device(state.device_class),
-        basic_device_class: state.device_class.basic_device_class,
-        specific_device_class: state.device_class.specific_device_class,
-        generic_device_class: state.device_class.generic_device_class
+        command_classes: info.command_classes,
+        basic_device_class: info.basic_device_class,
+        specific_device_class: info.specific_device_class,
+        generic_device_class: info.generic_device_class
       )
 
     {:reply, build_report(node_info_report, state), state}
@@ -101,5 +127,14 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   # helper function that builds the expected grizzly report
   defp build_report(command, state) do
     Report.new(:complete, :command, state.node_id, command: command)
+  end
+
+  defp make_info(state) do
+    %{
+      command_classes: command_classes_for_device(state.device_class),
+      basic_device_class: state.device_class.basic_device_class,
+      specific_device_class: state.device_class.specific_device_class,
+      generic_device_class: state.device_class.generic_device_class
+    }
   end
 end
