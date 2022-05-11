@@ -9,6 +9,25 @@ defmodule Grizzly.VirtualDevices do
   alias Grizzly.ZWave.Command
 
   @typedoc """
+  Options for adding a virtual devices
+
+  * `:inclusion_handler` - if an inclusion handler is provider via the add
+    options it will override the initial inclusion handle argument to the
+    network server if one was provided only for that one call to `add_device/2`.
+  """
+  @type add_opt() :: {:inclusion_handler, Grizzly.handler()}
+
+  @typedoc """
+  Options for removing virtual devices
+
+  * `:inclusion_handler` - if an inclusion handler is provider via the add
+    options it will override the initial inclusion handle argument to the
+    network server if one was provided only for that one call to
+    `remove_device/2`.
+  """
+  @type remove_opt() :: {:inclusion_handler, Grizzly.handler()}
+
+  @typedoc """
   Id for a virtual device
   """
   @type id() :: {:virtual, integer()}
@@ -19,9 +38,9 @@ defmodule Grizzly.VirtualDevices do
   To add a virtual device you must supply a module that implements the
   `Grizzly.VirtualDevices.Device` behaviour.
   """
-  @spec add_device(Device.t()) :: {:ok, id()}
-  def add_device(device) do
-    Network.add_device(device)
+  @spec add_device(Device.t(), [add_opt()]) :: {:ok, id()}
+  def add_device(device, opts \\ []) do
+    Network.add_device(device, opts)
   end
 
   @doc """
@@ -35,9 +54,9 @@ defmodule Grizzly.VirtualDevices do
   @doc """
   Remove a virtual device from the virtual device network
   """
-  @spec remove_device(id()) :: :ok
-  def remove_device(virtual_device_id) do
-    Network.remove_device(virtual_device_id)
+  @spec remove_device(id(), [remove_opt()]) :: :ok
+  def remove_device(virtual_device_id, opts \\ []) do
+    Network.remove_device(virtual_device_id, opts)
   end
 
   @doc """

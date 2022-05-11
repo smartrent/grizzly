@@ -4,13 +4,32 @@ defmodule GrizzlyTest.Utils do
   alias Grizzly.Options
   alias Grizzly.ZWave.DSK
 
+  defmodule TestInclusionHandler do
+    @moduledoc false
+
+    @behaviour Grizzly.InclusionHandler
+
+    require Logger
+
+    def handle_report(report, _opts) do
+      Logger.info("Inclusion Handler: #{inspect(report)}")
+
+      :ok
+    end
+
+    def handle_timeout(_, _) do
+      :ok
+    end
+  end
+
   @spec default_options_args() :: [Grizzly.Supervisor.arg()]
   def default_options_args() do
     [
       transport: GrizzlyTest.Transport.UDP,
       lan_ip: {0, 0, 0, 1},
       pan_ip: {0, 0, 0, 0},
-      run_zipgateway: false
+      run_zipgateway: false,
+      inclusion_handler: TestInclusionHandler
     ]
   end
 

@@ -227,7 +227,7 @@ defmodule Grizzly.Supervisor do
       Grizzly.Commands.CommandRunnerSupervisor,
 
       # Supervisor for virtual devices
-      Grizzly.VirtualDevicesSupervisor,
+      {Grizzly.VirtualDevicesSupervisor, options},
       {ReadyChecker, [status_reporter: options.status_reporter]}
     ]
     |> maybe_run_zipgateway_supervisor(options)
