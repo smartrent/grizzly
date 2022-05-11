@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
-  @type param :: {:type | ThermostatSetpoint.type()}
+  @type param() :: {:type, ThermostatSetpoint.type()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}

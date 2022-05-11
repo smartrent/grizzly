@@ -1,5 +1,5 @@
 defmodule Grizzly.VirtualDeviceTest do
-  use Grizzly.VirtualDeviceCase, async: true
+  use Grizzly.VirtualDeviceCase
 
   import ExUnit.CaptureLog
 
@@ -27,15 +27,14 @@ defmodule Grizzly.VirtualDeviceTest do
     with_virtual_devices(Thermostat, fn ids ->
       network_ids = VirtualDevices.list_nodes()
 
-      for nid <- network_ids do
-        assert nid in ids
+      for nid <- ids do
+        assert nid in network_ids
       end
     end)
   end
 
   test "Add and remove device ensure status reports are sent to configured handler" do
     log = capture_log(fn -> VirtualDevices.add_device(Thermostat) end)
-
     device_id = parse_node_id_from_log(log)
 
     assert {:virtual, _id} = device_id
@@ -68,7 +67,7 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   defp parse_node_id_from_log(log) do
-    [[vid_str] | _rest] = Regex.scan(~r/\{\:virtual, [0-9]\}/, log)
+    [[vid_str] | _rest] = Regex.scan(~r/\{\:virtual, \d+\}/, log)
 
     [_, id_str] = String.split(vid_str)
 

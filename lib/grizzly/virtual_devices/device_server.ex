@@ -5,8 +5,13 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
 
   alias Grizzly.{Report, VirtualDevices}
   alias Grizzly.VirtualDevices.Device
-  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses}
-  alias Grizzly.ZWave.Commands.NodeInfoCacheReport
+  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClass, DeviceClasses}
+
+  alias Grizzly.ZWave.Commands.{
+    ManufacturerSpecificReport,
+    NodeInfoCacheReport,
+    VersionCommandClassReport
+  }
 
   @type tagged_command_classes() ::
           {:non_secure_supported, [CommandClasses.command_class()]}
@@ -112,21 +117,73 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
         generic_device_class: info.generic_device_class
       )
 
-    {:reply, {:ok, build_report(node_info_report, state)}, state}
+    {:reply, build_report(node_info_report, state), state}
+  end
+
+  def handle_call({:send_command, %Command{name: :manufacturer_specific_get}}, _from, state) do
+    {:ok, manufacturer_report} =
+      ManufacturerSpecificReport.new(
+        manufacturer_id: state.device_class.manufacturer_id,
+        product_id: state.device_class.product_id,
+        product_type_id: state.device_class.product_type_id
+      )
+
+    {:reply, build_report(manufacturer_report, state), state}
+  end
+
+  def handle_call(
+        {:send_command, %Command{name: :version_command_class_get} = command},
+        _from,
+        state
+      ) do
+    command_class = Command.param!(command, :command_class)
+
+    case DeviceClass.get_command_class_version(state.device_class, command_class) do
+      nil ->
+        {:reply, build_timeout_report(state), state}
+
+      version ->
+        {:ok, version_report} =
+          VersionCommandClassReport.new(command_class: command_class, version: version)
+
+        {:reply, build_report(version_report, state), state}
+    end
+  end
+
+  def handle_call({:send_command, zwave_command}, _from, state) do
+    case state.device.handle_command(zwave_command, state.device_state) do
+      {:reply, :ack_response, new_device_state} ->
+        {:reply, build_report(:ack_response, state), %{state | device_state: new_device_state}}
+
+      {:reply, zwave_command_report, new_device_state} ->
+        {:reply, build_report(zwave_command_report, state),
+         %{state | device_state: new_device_state}}
+
+      {:noreply, new_state} ->
+        {:reply, build_timeout_report(state), %{state | device_state: new_state}}
+    end
   end
 
   # helper function to transform a device class command class specification into
   # a format that NodeInfoCacheReport expects
   defp command_classes_for_device(device_class) do
     [
-      non_secure_supported: device_class.command_classes.support,
-      non_secure_controlled: device_class.command_classes.control
+      non_secure_supported: Map.keys(device_class.command_classes.support),
+      non_secure_controlled: Map.keys(device_class.command_classes.control)
     ]
   end
 
   # helper function that builds the expected grizzly report
+  defp build_report(:ack_response, state) do
+    {:ok, Report.new(:complete, :ack_response, state.node_id)}
+  end
+
   defp build_report(command, state) do
-    Report.new(:complete, :command, state.node_id, command: command)
+    {:ok, Report.new(:complete, :command, state.node_id, command: command)}
+  end
+
+  defp build_timeout_report(state) do
+    {:ok, Report.new(:complete, :timeout, state.node_id)}
   end
 
   defp make_info(state) do
