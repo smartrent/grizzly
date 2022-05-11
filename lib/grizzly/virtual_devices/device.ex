@@ -19,5 +19,5 @@ defmodule Grizzly.VirtualDevices.Device do
   Handle a Z-Wave command
   """
   @callback handle_command(Command.t(), state :: term()) ::
-              {:ok, Command.t(), state :: term()} | {:error, term()}
+              {:reply, Command.t() | :ack_response, state :: term()} | {:noreply, state :: term()}
 end
