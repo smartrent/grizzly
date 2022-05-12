@@ -89,7 +89,7 @@ defmodule Grizzly.Node do
     * `:extra_node_ids` - any extra nodes to set add to the association
       group
   """
-  @spec set_lifeline_association(ZWave.node_id(), [lifeline_opts()]) ::
+  @spec set_lifeline_association(ZWave.node_id() | VirtualDevices.id(), [lifeline_opts()]) ::
           Grizzly.send_command_response()
   def set_lifeline_association(node_id, opts \\ []) do
     controller_id = Keyword.get(opts, :controller_id, 1)

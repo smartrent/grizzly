@@ -3,8 +3,9 @@ defmodule Grizzly.VirtualDeviceTest do
 
   import ExUnit.CaptureLog
 
-  alias Grizzly.VirtualDevices
+  alias Grizzly.{Node, Report, VirtualDevices}
   alias Grizzly.VirtualDevices.Thermostat
+  alias Grizzly.ZWave.Command
 
   defmodule Handler do
     @moduledoc false
@@ -54,6 +55,22 @@ defmodule Grizzly.VirtualDeviceTest do
       VirtualDevices.remove_device(device_id,
         inclusion_handler: {Handler, [test: &remove_test(device_id, &1)]}
       )
+  end
+
+  test "associate virtual device to lifeline association" do
+    with_virtual_device(Thermostat, fn id ->
+      {:ok, %Report{type: :command, command: command}} =
+        Grizzly.send_command(id, :association_get, grouping_identifier: 1)
+
+      assert Command.param!(command, :nodes) == []
+
+      {:ok, %Report{type: :ack_response}} = Node.set_lifeline_association(id)
+
+      {:ok, %Report{type: :command, command: command}} =
+        Grizzly.send_command(id, :association_get, grouping_identifier: 1)
+
+      assert Command.param!(command, :nodes) == [1]
+    end)
   end
 
   defp add_test(%{name: :node_add_status, params: params}) do

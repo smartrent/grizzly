@@ -8,6 +8,7 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   alias Grizzly.ZWave.{Command, CommandClasses, DeviceClass, DeviceClasses}
 
   alias Grizzly.ZWave.Commands.{
+    AssociationReport,
     ManufacturerSpecificReport,
     NodeInfoCacheReport,
     VersionCommandClassReport
@@ -88,7 +89,8 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
        device_class: device_class,
        device_state: device_state,
        device: device_impl,
-       node_id: node_id
+       node_id: node_id,
+       notifications: false
      }}
   end
 
@@ -150,6 +152,24 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
     end
   end
 
+  def handle_call({:send_command, %Command{name: :association_set}}, _from, state) do
+    {:reply, build_report(:ack_response, state), %{state | notifications: true}}
+  end
+
+  def handle_call({:send_command, %Command{name: :association_get}}, _from, state) do
+    associated_nodes = get_associated_nodes(state)
+
+    {:ok, report} =
+      AssociationReport.new(
+        nodes: associated_nodes,
+        grouping_identifier: 1,
+        max_nodes_supported: 1,
+        reports_to_follow: 0
+      )
+
+    {:reply, build_report(report, state), state}
+  end
+
   def handle_call({:send_command, zwave_command}, _from, state) do
     case state.device.handle_command(zwave_command, state.device_state) do
       {:reply, :ack_response, new_device_state} ->
@@ -194,4 +214,7 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
       generic_device_class: state.device_class.generic_device_class
     }
   end
+
+  defp get_associated_nodes(%{notifications: false}), do: []
+  defp get_associated_nodes(%{notifications: true}), do: [1]
 end
