@@ -12,7 +12,8 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     ThermostatSetpointReport,
     ThermostatModeReport,
     ThermostatFanModeReport,
-    SensorMultilevelReport
+    SensorMultilevelReport,
+    SensorMultilevelSupportedSensorReport
   }
 
   @impl Grizzly.VirtualDevices.Device
@@ -92,6 +93,11 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   def handle_command(%Command{name: :thermostat_mode_set} = command, state) do
     new_mode = Command.param!(command, :mode)
     {:reply, :ack_response, %{state | mode: new_mode}}
+  end
+
+  def handle_command(%Command{name: :sensor_multilevel_supported_sensor_get}, state) do
+    {:ok, report} = SensorMultilevelSupportedSensorReport.new(sensor_types: [:temperature])
+    {:reply, report, state}
   end
 
   def handle_command(%Command{name: :basic_get}, state) do
