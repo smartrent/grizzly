@@ -112,7 +112,7 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
         generic_device_class: info.generic_device_class
       )
 
-    {:reply, build_report(node_info_report, state), state}
+    {:reply, {:ok, build_report(node_info_report, state)}, state}
   end
 
   # helper function to transform a device class command class specification into
