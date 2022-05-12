@@ -76,6 +76,12 @@ defmodule Grizzly.Supervisor do
           | :kr
 
   @typedoc """
+  Manifest item for hub Z-Wave firmware updates. Each item identifies a target a chip type, the path
+  of the firmware image file, and the firmware version upgrade.
+  """
+  @type firmware_info() :: %{chip_type: non_neg_integer(), path: String.t(), version: String.t()}
+
+  @typedoc """
   Arguments for running `Grizzly.Supervisor`
 
   - `:run_zipgateway` - boolean flag to set if Grizzly should be running and
@@ -166,7 +172,7 @@ defmodule Grizzly.Supervisor do
           | {:power_level, {tx_power(), measured_power()}}
           | {:status_reporter, module()}
           | {:update_zwave_firmware, boolean()}
-          | {:zwave_firmware, [Options.firmware_info()]}
+          | {:zwave_firmware, [firmware_info()]}
           | {:zw_programmer_path, Path.t()}
 
   @typedoc """

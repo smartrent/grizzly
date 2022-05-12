@@ -10,7 +10,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 2.0"}
+    {:grizzly, "~> 3.0"}
   ]
 end
 ```
@@ -271,7 +271,7 @@ To add a new virtual device you can call the
 `Grizzly.VirtualDevices.add_device/1` function passing the a module that
 implements the `Grizzly.VirtualDevices.Device` behaviour.
 
-After adding the device you can call the `Grizzly.send_command/5` function to
+After adding the device you can call the `Grizzly.send_command/4` function to
 send the device a command.
 
 ```elixir
@@ -286,7 +286,7 @@ the second item an integer of the device id, for example:
 checking you might have to do:
 
 1. `Grizzly.is_virtual_device/1` (guard)
-1. `Grizzly.virtual_device/1` (function)
+1. `Grizzly.virtual_device?/1` (function)
 
 Also, the documentation for functions in `Grizzly.Node` and `Grizzly.Network`
 should indicate if they work with virtual devices.
