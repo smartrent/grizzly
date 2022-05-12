@@ -7,12 +7,6 @@ defmodule Grizzly.Options do
   require Logger
 
   @typedoc """
-  Manifest item for hub Z-Wave firmware updates. Each item identifies a target a chip type, the path
-  of the firmware image file, and the firmware version upgrade.
-  """
-  @type firmware_info() :: %{chip_type: non_neg_integer(), path: String.t(), version: String.t()}
-
-  @typedoc """
   See Grizzly.Supervisor
   """
   @type t() :: %__MODULE__{
@@ -41,7 +35,7 @@ defmodule Grizzly.Options do
           power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
           status_reporter: module(),
           update_zwave_firmware: boolean(),
-          zwave_firmware: [firmware_info()],
+          zwave_firmware: [Supervisor.firmware_info()],
           zw_programmer_path: Path.t()
         }
 

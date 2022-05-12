@@ -4,6 +4,52 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0] - 2022-05-12
+
+Breaking change in these modules:
+
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance`
+- `Grizzly.ZWave.Commands.PriorityRouteReport`
+
+In `NetworkManagementInstallationMaintenance` command class the `:speed` type
+is now a list of `speed()` rather than a single speed. This effects the command
+`PriorityRouteReport` parameter `:speed`. This parameter is now a list of
+`speed()` rather than a single value.
+
+If you do not use this command you can safely upgrade with no changes.
+
+If you do use this command you will need to update code that assumes the
+`:speed` parameter is single value.
+
+This change was made to better aline with the Z-Wave specification.
+
+### Changed
+
+- `Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance.neighbor_param()`
+  type's `:speed` param returns a list of type `speed()`. (@jfcloutier)
+- `Grizzly.ZWave.Commands.PriorityRouteReport.params()`'s `:speed` param is now
+  a list of `speed()` than than a single `speed()`. (@jfcloutier)
+
+### Added
+
+- `Grizzly.VirtualDevices` module to allow virtual devices
+- `Grizzly.VirtualDevices.Device` behaviour to allow custom virtual devices to
+  be used with Grizzly
+- `Grizzly.VirtualDevices.Thermostat` virtual device implementation for a basic
+  virtual thermostat device
+- `Grizzly.ZWave.DeviceClass` module for defining common device class
+  specifications
+- `Grizzly.send_command/4` virtual device support, so you can send commands to
+  virtual devices just like you would a regular Z-Wave device
+- `Grizzly.Network.opt()` type now allows for a `:seq_number` option
+- `Grizzly.Network.get_all_node_ids/1` to get a list of both regular and virtual
+  device ids
+- `Grizzly.Node.get_info/2` support for virtual device
+
+### Fixed
+
+- Error when the primary route report would try to be handled (@jfcloutier)
+
 ## [v2.1.0] - 2022-04-27
 
 ### Added
