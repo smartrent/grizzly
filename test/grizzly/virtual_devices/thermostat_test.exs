@@ -79,4 +79,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
       end)
     end
   end
+
+  describe "sensor multilevel" do
+    test "supported get" do
+      with_virtual_device(Thermostat, fn id ->
+        {:ok, %Report{type: :command, command: command}} =
+          Grizzly.send_command(id, :sensor_multilevel_supported_sensor_get)
+
+        assert command.name == :sensor_multilevel_supported_sensor_report
+        assert Command.param!(command, :sensor_types) == [:temperature]
+      end)
+    end
+  end
 end
