@@ -110,6 +110,8 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     {:reply, :ack_response, %{state | basic: value}}
   end
 
+  def handle_command(_other, state), do: {:noreply, state}
+
   defp maybe_convert_value(value, scale, state) do
     if state.scale == scale do
       value
