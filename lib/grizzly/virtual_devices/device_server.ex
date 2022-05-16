@@ -9,6 +9,7 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
 
   alias Grizzly.ZWave.Commands.{
     AssociationReport,
+    BatteryReport,
     ManufacturerSpecificReport,
     NodeInfoCacheReport,
     VersionCommandClassReport
@@ -84,14 +85,25 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
     device_impl = Keyword.fetch!(args, :device)
     {:ok, device_state, device_class} = device_impl.init()
 
-    {:ok,
-     %{
-       device_class: device_class,
-       device_state: device_state,
-       device: device_impl,
-       node_id: node_id,
-       notifications: false
-     }}
+    state =
+      %{
+        device_class: device_class,
+        device_state: device_state,
+        device: device_impl,
+        node_id: node_id,
+        notifications: false
+      }
+      |> include_battery_support()
+
+    {:ok, state}
+  end
+
+  defp include_battery_support(state) do
+    if DeviceClass.has_command_class?(state.device_class, :battery) do
+      Map.put(state, :battery_level, 100)
+    else
+      state
+    end
   end
 
   @impl GenServer
@@ -168,6 +180,18 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
       )
 
     {:reply, build_report(report, state), state}
+  end
+
+  def handle_call({:send_command, %Command{name: :battery_get}}, _from, state) do
+    case Map.get(state, :battery_level) do
+      nil ->
+        {:reply, build_timeout_report(state), state}
+
+      battery_level ->
+        {:ok, report} = BatteryReport.new(level: battery_level)
+
+        {:reply, build_report(report, state), state}
+    end
   end
 
   def handle_call({:send_command, zwave_command}, _from, state) do
