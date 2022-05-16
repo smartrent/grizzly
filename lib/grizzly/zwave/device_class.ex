@@ -40,6 +40,19 @@ defmodule Grizzly.ZWave.DeviceClass do
   end
 
   @doc """
+  Check if the device class specification includes a particular command class
+  """
+  @spec has_command_class?(t(), CommandClasses.command_class()) :: boolean()
+  def has_command_class?(device_class, command_class) do
+    device_class.command_classes.control
+    |> Map.merge(device_class.command_classes.support)
+    |> Enum.find_value(fn
+      {^command_class, _version} -> true
+      _ -> false
+    end)
+  end
+
+  @doc """
   A device class for a HVAC thermostat
   """
   @spec thermostat_hvac() :: t()

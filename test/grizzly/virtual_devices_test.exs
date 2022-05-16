@@ -73,6 +73,17 @@ defmodule Grizzly.VirtualDeviceTest do
     end)
   end
 
+  describe "battery reports" do
+    test "getting a battery report" do
+      with_virtual_device(Thermostat, fn id ->
+        {:ok, %Report{type: :command, command: command}} = Grizzly.send_command(id, :battery_get)
+
+        assert command.name == :battery_report
+        assert Command.param!(command, :level) == 100
+      end)
+    end
+  end
+
   defp add_test(%{name: :node_add_status, params: params}) do
     assert {:virtual, _} = Keyword.fetch!(params, :node_id)
     assert :done == Keyword.fetch!(params, :status)
