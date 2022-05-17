@@ -10,6 +10,7 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   alias Grizzly.ZWave.Commands.{
     AssociationReport,
     BatteryReport,
+    ManufacturerSpecificDeviceSpecificReport,
     ManufacturerSpecificReport,
     NodeInfoCacheReport,
     VersionCommandClassReport,
@@ -206,6 +207,26 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
       )
 
     {:reply, build_report(report, state), state}
+  end
+
+  def handle_call(
+        {:send_command, %Command{name: :manufacturer_specific_device_specific_get} = command},
+        _from,
+        state
+      ) do
+    case Command.param!(command, :device_id_type) do
+      :serial_number ->
+        {:ok, report} =
+          ManufacturerSpecificDeviceSpecificReport.new(
+            device_id_type: :serial_number,
+            device_id: "0000"
+          )
+
+        {:reply, build_report(report, state), state}
+
+      _other ->
+        {:reply, build_timeout_report(state), state}
+    end
   end
 
   def handle_call({:send_command, zwave_command}, _from, state) do
