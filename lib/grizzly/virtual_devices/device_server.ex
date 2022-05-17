@@ -12,7 +12,8 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
     BatteryReport,
     ManufacturerSpecificReport,
     NodeInfoCacheReport,
-    VersionCommandClassReport
+    VersionCommandClassReport,
+    VersionReport
   }
 
   @type tagged_command_classes() ::
@@ -192,6 +193,19 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
 
         {:reply, build_report(report, state), state}
     end
+  end
+
+  def handle_call({:send_command, %Command{name: :version_get}}, _from, state) do
+    {:ok, report} =
+      VersionReport.new(
+        library_type: state.device_class.library_type,
+        protocol_version: "7.16",
+        firmware_version: "7.16",
+        hardware_version: 1,
+        other_firmware_versions: ["7.16"]
+      )
+
+    {:reply, build_report(report, state), state}
   end
 
   def handle_call({:send_command, zwave_command}, _from, state) do

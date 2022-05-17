@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.DeviceClass do
   provide mandatory and recommended command class support.
   """
 
+  alias Grizzly.ZWave.Commands.VersionReport
   alias Grizzly.ZWave.{DeviceClasses, CommandClasses}
 
   @type command_class_version() :: integer()
@@ -23,7 +24,8 @@ defmodule Grizzly.ZWave.DeviceClass do
           command_classes: command_class_spec(),
           manufacturer_id: non_neg_integer(),
           product_id: non_neg_integer(),
-          product_type_id: non_neg_integer()
+          product_type_id: non_neg_integer(),
+          library_type: VersionReport.library_type()
         }
 
   @doc """
@@ -84,7 +86,8 @@ defmodule Grizzly.ZWave.DeviceClass do
       },
       manufacturer_id: 0x0000,
       product_id: 0x0000,
-      product_type_id: 0x0000
+      product_type_id: 0x0000,
+      library_type: :routing_slave
     }
   end
 end
