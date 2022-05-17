@@ -84,6 +84,17 @@ defmodule Grizzly.VirtualDeviceTest do
     end
   end
 
+  describe "version get reports" do
+    test "routing slave" do
+      with_virtual_device(Thermostat, fn id ->
+        {:ok, %Report{type: :command, command: command}} = Grizzly.send_command(id, :version_get)
+
+        assert command.name == :version_report
+        assert Command.param!(command, :library_type) == :routing_slave
+      end)
+    end
+  end
+
   defp add_test(%{name: :node_add_status, params: params}) do
     assert {:virtual, _} = Keyword.fetch!(params, :node_id)
     assert :done == Keyword.fetch!(params, :status)
