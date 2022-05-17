@@ -95,6 +95,17 @@ defmodule Grizzly.VirtualDeviceTest do
     end
   end
 
+  test "handles device specific get for device id type serial number" do
+    with_virtual_device(Thermostat, fn id ->
+      {:ok, %Report{type: :command, command: command}} =
+        Grizzly.send_command(id, :manufacturer_specific_device_specific_get,
+          device_id_type: :serial_number
+        )
+
+      assert command.name == :manufacturer_specific_device_specific_report
+    end)
+  end
+
   defp add_test(%{name: :node_add_status, params: params}) do
     assert {:virtual, _} = Keyword.fetch!(params, :node_id)
     assert :done == Keyword.fetch!(params, :status)
