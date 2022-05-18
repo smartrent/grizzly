@@ -320,7 +320,9 @@ defmodule Grizzly.Commands.Command do
   defp calculate_rssi_values(stats) do
     average =
       Keyword.get(stats, :rssi_hops, [])
-      |> Enum.filter(fn rssi -> rssi != :not_available end)
+      |> Enum.reject(fn rssi ->
+        rssi in [:not_available, :max_power_saturated, :below_sensitivity]
+      end)
       |> calculate_average_dbm()
 
     Keyword.put(stats, :rssi_dbm, average)
