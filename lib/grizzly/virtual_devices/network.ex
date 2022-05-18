@@ -58,6 +58,9 @@ defmodule Grizzly.VirtualDevices.Network do
         :ok = send_node_add_status({:virtual, id}, opts, state)
 
         {:reply, {:ok, {:virtual, id}}, %{state | network: updated_network, current_id: id}}
+
+      {:error, _reason} = error ->
+        {:reply, error, state}
     end
   end
 

@@ -86,19 +86,29 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   def init(args) do
     node_id = Keyword.fetch!(args, :id)
     {device_impl, opts} = get_device_impl(args)
-    {:ok, device_state, device_class} = device_impl.init(opts)
 
-    state =
-      %{
-        device_class: device_class,
-        device_state: device_state,
-        device: device_impl,
-        node_id: node_id,
-        notifications: false
-      }
-      |> include_battery_support()
+    try do
+      case device_impl.init(opts) do
+        {:ok, device_state, device_class} ->
+          state =
+            %{
+              device_class: device_class,
+              device_state: device_state,
+              device: device_impl,
+              node_id: node_id,
+              notifications: false
+            }
+            |> include_battery_support()
 
-    {:ok, state}
+          {:ok, state}
+
+        error ->
+          {:stop, error}
+      end
+    rescue
+      _e in UndefinedFunctionError ->
+        {:stop, :invalid_device}
+    end
   end
 
   defp include_battery_support(state) do
