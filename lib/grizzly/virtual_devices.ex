@@ -37,8 +37,10 @@ defmodule Grizzly.VirtualDevices do
 
   To add a virtual device you must supply a module that implements the
   `Grizzly.VirtualDevices.Device` behaviour.
+
+  If the device takes any options you can pass a tuple of `{device, opts}`.
   """
-  @spec add_device(Device.t(), [add_opt()]) :: {:ok, id()}
+  @spec add_device(Device.t() | {Device.t(), term()}, [add_opt()]) :: {:ok, id()}
   def add_device(device, opts \\ []) do
     Network.add_device(device, opts)
   end

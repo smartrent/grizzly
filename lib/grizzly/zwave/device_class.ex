@@ -90,4 +90,36 @@ defmodule Grizzly.ZWave.DeviceClass do
       library_type: :routing_slave
     }
   end
+
+  @doc """
+  Device class spec for a generic multilevel sensor
+  """
+  @spec multilevel_sensor() :: t()
+  def multilevel_sensor() do
+    %{
+      basic_device_class: :routing_slave,
+      generic_device_class: :sensor_multilevel,
+      specific_device_class: :routing_sensor_multilevel,
+      command_classes: %{
+        support: %{
+          alarm: 3,
+          association: 2,
+          association_group_information: 1,
+          basic: 1,
+          battery: 1,
+          device_reset_locally: 1,
+          manufacturer_specific: 2,
+          security_2: 1,
+          sensor_multilevel: 5,
+          version: 2,
+          zwave_plus_info: 2
+        },
+        control: %{}
+      },
+      manufacturer_id: 0x0000,
+      product_id: 0x0000,
+      product_type_id: 0x0000,
+      library_type: :routing_slave
+    }
+  end
 end
