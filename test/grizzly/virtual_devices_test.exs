@@ -4,7 +4,8 @@ defmodule Grizzly.VirtualDeviceTest do
   import ExUnit.CaptureLog
 
   alias Grizzly.{Node, Report, VirtualDevices}
-  alias Grizzly.VirtualDevices.Thermostat
+  alias Grizzly.UnsolicitedServer.Messages
+  alias Grizzly.VirtualDevices.{TemperatureSensor, Thermostat}
   alias Grizzly.ZWave.Command
 
   defmodule Handler do
@@ -103,6 +104,19 @@ defmodule Grizzly.VirtualDeviceTest do
         )
 
       assert command.name == :manufacturer_specific_device_specific_report
+    end)
+  end
+
+  test "receives notification for sensor report" do
+    Messages.subscribe(:sensor_multilevel_report)
+    on_exit(fn -> Messages.unsubscribe(:sensor_multilevel_report) end)
+
+    with_virtual_device({TemperatureSensor, report_interval: 1_000, force_report: true}, fn id ->
+      Node.set_lifeline_association(id)
+
+      assert_receive {:grizzly, :report, report}, 5_000
+
+      assert report.command.name == :sensor_multilevel_report
     end)
   end
 

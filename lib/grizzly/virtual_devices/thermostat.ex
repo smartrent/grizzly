@@ -17,7 +17,7 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   }
 
   @impl Grizzly.VirtualDevices.Device
-  def init() do
+  def init(_) do
     state = %{
       setpoints: %{
         heating: 22.0,

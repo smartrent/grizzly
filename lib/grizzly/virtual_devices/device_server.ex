@@ -4,6 +4,7 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   use GenServer
 
   alias Grizzly.{Report, VirtualDevices}
+  alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.VirtualDevices.Device
   alias Grizzly.ZWave.{Command, CommandClasses, DeviceClass, DeviceClasses}
 
@@ -84,8 +85,8 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
   @impl GenServer
   def init(args) do
     node_id = Keyword.fetch!(args, :id)
-    device_impl = Keyword.fetch!(args, :device)
-    {:ok, device_state, device_class} = device_impl.init()
+    {device_impl, opts} = get_device_impl(args)
+    {:ok, device_state, device_class} = device_impl.init(opts)
 
     state =
       %{
@@ -105,6 +106,13 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
       Map.put(state, :battery_level, 100)
     else
       state
+    end
+  end
+
+  defp get_device_impl(args) do
+    case Keyword.fetch!(args, :device) do
+      {_device, _opts} = impl -> impl
+      device -> {device, []}
     end
   end
 
@@ -238,9 +246,36 @@ defmodule Grizzly.VirtualDevices.DeviceServer do
         {:reply, build_report(zwave_command_report, state),
          %{state | device_state: new_device_state}}
 
+      {:notify, command, new_device_state} ->
+        maybe_send_notification(command, state)
+        {:reply, build_report(:ack_response, state), %{state | device_state: new_device_state}}
+
       {:noreply, new_state} ->
         {:reply, build_timeout_report(state), %{state | device_state: new_state}}
     end
+  end
+
+  @impl GenServer
+  def handle_info(msg, state) do
+    case state.device.handle_info(msg, state.device_state) do
+      {:noreply, new_state} ->
+        {:noreply, %{state | device_state: new_state}}
+
+      {:notify, command, new_state} ->
+        maybe_send_notification(command, state)
+        {:noreply, %{state | device_state: new_state}}
+    end
+  end
+
+  defp maybe_send_notification(command, state) do
+    # to keep with how Z-Wave is suppose to work we do not send
+    # notifications unless the devices as been told to via association
+    # to the lifeline group.
+    if state.notifications do
+      :ok = Messages.broadcast(state.node_id, command)
+    end
+
+    :ok
   end
 
   # helper function to transform a device class command class specification into
