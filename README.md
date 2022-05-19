@@ -10,7 +10,7 @@ An Elixir library for Z-Wave
 ```elixir
 def deps do
   [
-    {:grizzly, "~> 3.0"}
+    {:grizzly, "~> 4.0"}
   ]
 end
 ```
