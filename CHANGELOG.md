@@ -4,6 +4,51 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v4.0.0] - 2022-05-19
+
+Breaking change in the `Grizzly.VirtualDevices.Device` behaviour. If you have
+not implemented a custom virtual device then you can safely upgrade.
+
+If you have implemented a custom virtual device the `init/0` callback is now
+`init/1`. To upgrade change your implementation to:
+
+```elixir
+@impl Grizzly.VirtualDevice.Device
+def init(_) do
+  {:ok, my_state, my_device_class}
+end
+```
+
+The change is to add the `_` as the argument to your `init` implementation.
+
+### Changed
+
+- `Grizzly.VirtualDevice.Devices` behaviour `init/0` callback is now `init/1`
+
+### Added
+
+- Support for the sensor multilevel get command for the
+  `Grizzly.VirtualDevices.Thermostat` virtual device implementation
+- Virtual device support for `Grizzly.Node.set_lifeline_association/2`
+- Add virtual device support for the battery get command
+- Add virtual device support for the version get command
+- Add `handle_info/2` callback in `Grizzly.VirtualDevices.Device` behaviour to
+  allow asynchronous events to broadcast Z-Wave reports
+- Add return value for `handle_command/2` callback in
+  `Grizzly.VirtualDevices.Device` behaviour to allow broadcasts Z-Wave reports
+  based off incoming commands
+- `Grizzly.VirtualDevices.add_device/2` now allows a tuple
+  `{my_device_impl, my_device_opts}` has the first argument
+- `Grizzly.VirtualDevices.TemperatureSensor` virtual device
+
+### Fixed
+
+- Ensure `Grizzly.VirtualDevices.Thermostat` device implementation returns
+  `:noreply` for unsupported command classes. (@jfcloutier)
+- Fix to calculating RSSI averages (@jfcloutier)
+- Crashing the initialization of a new virtual device caused the virtual device
+  network to get in a bad state
+
 ## [v3.0.0] - 2022-05-12
 
 Breaking change in these modules:
@@ -1872,6 +1917,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v4.0.0]: https://github.com/smartrent/grizzly/compare/v3.0.0...v4.0.0
+[v3.0.0]: https://github.com/smartrent/grizzly/compare/v2.1.0...v3.0.0
 [v2.1.0]: https://github.com/smartrent/grizzly/compare/v2.0.0...v2.1.0
 [v2.0.0]: https://github.com/smartrent/grizzly/compare/v1.0.1...v2.0.0
 [v1.0.1]: https://github.com/smartrent/grizzly/compare/v1.0.0...v1.0.1
