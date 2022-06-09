@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.ClockReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :clock_set,
+      name: :clock_report,
       command_byte: 0x06,
       command_class: Clock,
       params: params,
