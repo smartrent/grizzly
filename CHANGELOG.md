@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v4.0.1] - 2022-06-13
+
+### Fixed
+
+- Fix ClockReport command `:name` field (@jfcloutier)
+- Fix forcing `zipgateway` cache update when calling `Grizzly.Node.get_info/2`
+
 ## [v4.0.0] - 2022-05-19
 
 Breaking change in the `Grizzly.VirtualDevices.Device` behaviour. If you have
