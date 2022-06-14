@@ -239,6 +239,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     [set_circuital_bit(@name_information, 0), length(name), name]
   end
 
+  # Encodes for Long Range not enabled
   defp encode_extension({:network_status, {node_id, status}}) do
     status =
       case status do
@@ -368,16 +369,25 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     do_parse(rest, [ext | extensions])
   end
 
+  # When Long Range is enabled
   defp do_parse(
-         <<@network_status::size(7), 0::size(1), 0x02, node_id, status, rest::binary>>,
+         <<@network_status::size(7), 0::size(1), 0x04, node_id, status_byte,
+           _long_range_node_id::size(16), rest::binary>>,
          extensions
        ) do
-    status =
-      case status do
-        0x00 -> :not_in_network
-        0x01 -> :included
-        0x02 -> :failing
-      end
+    status = decode_status(status_byte)
+
+    ext = {:network_status, {node_id, status}}
+
+    do_parse(rest, [ext | extensions])
+  end
+
+  # When Long Range is NOT enabled
+  defp do_parse(
+         <<@network_status::size(7), 0::size(1), 0x02, node_id, status_byte, rest::binary>>,
+         extensions
+       ) do
+    status = decode_status(status_byte)
 
     ext = {:network_status, {node_id, status}}
 
@@ -460,5 +470,13 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
 
   defp set_circuital_bit(byte, cbit) do
     <<byte::size(7), cbit::size(1)>>
+  end
+
+  defp decode_status(status_byte) do
+    case status_byte do
+      0x00 -> :not_in_network
+      0x01 -> :included
+      0x02 -> :failing
+    end
   end
 end
