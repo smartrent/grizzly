@@ -103,19 +103,37 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtensionTest do
       assert expected_binary == MetaExtension.encode({:network_status, {1, :failing}})
     end
 
-    test "parses when status is :not_in_network" do
+    test "parses when status is :not_in_network - LR enabled" do
+      binary = <<0x6E, 0x04, 0x01, 0x00, 0x00, 0x0A>>
+
+      assert [network_status: {1, :not_in_network}] == MetaExtension.parse(binary)
+    end
+
+    test "parses when status is :not_in_network - LR NOT enabled" do
       binary = <<0x6E, 0x02, 0x01, 0x00>>
 
       assert [network_status: {1, :not_in_network}] == MetaExtension.parse(binary)
     end
 
-    test "parses when status is :included" do
+    test "parses when status is :included - LR enabled" do
+      binary = <<0x6E, 0x04, 0x01, 0x01, 0x00, 0x0A>>
+
+      assert [network_status: {1, :included}] == MetaExtension.parse(binary)
+    end
+
+    test "parses when status is :included - LR NOT enabled" do
       binary = <<0x6E, 0x02, 0x01, 0x01>>
 
       assert [network_status: {1, :included}] == MetaExtension.parse(binary)
     end
 
-    test "parses when status is :failing" do
+    test "parses when status is :failing - LR enabled" do
+      binary = <<0x6E, 0x04, 0x01, 0x02, 0x00, 0x0A>>
+
+      assert [network_status: {1, :failing}] == MetaExtension.parse(binary)
+    end
+
+    test "parses when status is :failing - LR NOT enabled" do
       binary = <<0x6E, 0x02, 0x01, 0x02>>
 
       assert [network_status: {1, :failing}] == MetaExtension.parse(binary)
