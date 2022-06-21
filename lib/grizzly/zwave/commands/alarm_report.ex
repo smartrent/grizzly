@@ -146,6 +146,36 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     end
   end
 
+  # Params sent by Schlage 468ZP 
+  def decode_params(
+        <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte>>
+      ) do
+    with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
+         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
+         {:ok, zwave_status} <- Notifications.status_from_byte(status_byte) do
+      {:ok,
+       [
+         type: type,
+         level: level,
+         zensor_net_node_id: zensor_node_id,
+         zwave_status: zwave_status,
+         zwave_type: zwave_type,
+         zwave_event: zwave_event,
+         event_parameters: []
+       ]}
+    else
+      {:error, :invalid_type_byte} ->
+        {:error, %DecodeError{value: zwave_type_byte, param: :zwave_type, command: :alarm_report}}
+
+      {:error, :invalid_event_byte} ->
+        {:error,
+         %DecodeError{value: zwave_event_byte, param: :zwave_event, command: :alarm_report}}
+
+      error ->
+        error
+    end
+  end
+
   defp encode_v1(command) do
     type = Command.param!(command, :type)
     level = Command.param!(command, :level)
