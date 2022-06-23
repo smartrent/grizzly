@@ -265,17 +265,25 @@ and you will need to pass in the location to your configuration like so:
 
 Grizzly provides a way to work with virtual devices. These devices should work
 as their hardware counterparts, however, the state of these devices are held in
-memory and managed by the Grizzly runtime.
+memory.
 
-To add a new virtual device you can call the
-`Grizzly.VirtualDevices.add_device/1` function passing the a module that
-implements the `Grizzly.VirtualDevices.Device` behaviour.
+Grizzly provides to example virtual devices:
 
-After adding the device you can call the `Grizzly.send_command/4` function to
+1. `Grizzly.VirtualDevices.Thermostat`
+1. `Grizzly.VirtualDevices.TemperatureSensor`
+
+To use These virtual devices you will have to start them using the
+`start_link/1` call. These are not supervised by Grizzly, so you will need to
+add them to your supervision tree. The reason for this is to provide the maximum
+flexibility to the consumer application in terms of how processes are started
+and supervised.
+
+After starting the device you can call the `Grizzly.send_command/4` function to
 send the device a command.
 
 ```elixir
-{:ok, virtual_device_id} = Grizzly.VirtualDevices.add_device(Grizzly.VirtualDevices.Thermostat)
+{:ok, _pid} = Grizzly.VirtualDevices.Thermostat.start_link([])
+{:ok, [{:virtual, _id} = virtual_device_id]} = Grizzly.Network.get_all_node_ids()
 
 Grizzly.send_command(virtual_device_id, :thermostat_setpoint_get)
 ```

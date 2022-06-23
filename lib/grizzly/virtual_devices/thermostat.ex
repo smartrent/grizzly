@@ -3,8 +3,11 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   Implementation of a virtual device for a thermostat
   """
 
+  use GenServer
+
   @behaviour Grizzly.VirtualDevices.Device
 
+  alias Grizzly.VirtualDevices
   alias Grizzly.ZWave.{Command, DeviceClass}
 
   alias Grizzly.ZWave.Commands.{
@@ -17,7 +20,22 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   }
 
   @impl Grizzly.VirtualDevices.Device
+  def device_spec(_device_opts) do
+    DeviceClass.thermostat_hvac()
+  end
+
+  @doc """
+  Start a thermostat device
+  """
+  @spec start_link(keyword()) :: GenServer.on_start()
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
+  end
+
+  @impl GenServer
   def init(_) do
+    id = VirtualDevices.add_device(__MODULE__, server: self())
+
     state = %{
       setpoints: %{
         heating: 22.0,
@@ -27,27 +45,46 @@ defmodule Grizzly.VirtualDevices.Thermostat do
       temperature: 24.0,
       mode: :cooling,
       basic: :on,
-      scale: :celsius
+      scale: :celsius,
+      device_id: id
     }
 
-    {:ok, state, DeviceClass.thermostat_hvac()}
+    {:ok, state}
   end
 
   @impl Grizzly.VirtualDevices.Device
-  def handle_command(%Command{name: :thermostat_setpoint_get} = command, state) do
+  def handle_command(command, device_opts) do
+    server = Keyword.fetch!(device_opts, :server)
+    GenServer.call(server, {:handle_command, command})
+  end
+
+  @impl GenServer
+  def handle_call(:get_device_id, _from, state) do
+    {:ok, state.device_id, state}
+  end
+
+  def handle_call(
+        {:handle_command, %Command{name: :thermostat_setpoint_get} = command},
+        _from,
+        state
+      ) do
     type = Command.param!(command, :type)
 
     case Map.get(state.setpoints, type) do
       nil ->
-        {:noreply, state}
+        {:reply, {:error, :timeout}, state}
 
       value ->
-        {:ok, report} = ThermostatSetpointReport.new(type: type, value: value, scale: state.scale)
-        {:reply, report, state}
+        response = ThermostatSetpointReport.new(type: type, value: value, scale: state.scale)
+        {:reply, response, state}
     end
   end
 
-  def handle_command(%Command{name: :thermostat_setpoint_set} = command, state) do
+  def handle_call(
+        {:handle_command, %Command{name: :thermostat_setpoint_set} = command},
+        _from,
+        state
+      ) do
     scale = Command.param!(command, :scale)
     type = Command.param!(command, :type)
 
@@ -58,59 +95,71 @@ defmodule Grizzly.VirtualDevices.Thermostat do
 
     case Map.get(state.setpoints, type) do
       nil ->
-        {:reply, :ack_response, state}
+        {:reply, :ok, state}
 
       _old_value ->
         new_setpoints = Map.put(state.setpoints, type, value)
-        {:reply, :ack_response, %{state | setpoints: new_setpoints}}
+        {:reply, :ok, %{state | setpoints: new_setpoints}}
     end
   end
 
-  def handle_command(%Command{name: :thermostat_fan_mode_get}, state) do
-    {:ok, report} = ThermostatFanModeReport.new(mode: state.fan_mode)
+  def handle_call({:handle_command, %Command{name: :thermostat_fan_mode_get}}, _from, state) do
+    response = ThermostatFanModeReport.new(mode: state.fan_mode)
 
-    {:reply, report, state}
+    {:reply, response, state}
   end
 
-  def handle_command(%Command{name: :thermostat_fan_mode_set} = command, state) do
+  def handle_call(
+        {:handle_command, %Command{name: :thermostat_fan_mode_set} = command},
+        _from,
+        state
+      ) do
     mode = Command.param!(command, :mode)
 
-    {:reply, :ack_response, %{state | fan_mode: mode}}
+    {:reply, :ok, %{state | fan_mode: mode}}
   end
 
-  def handle_command(%Command{name: :sensor_multilevel_get}, state) do
-    {:ok, report} =
+  def handle_call({:handle_command, %Command{name: :sensor_multilevel_get}}, _from, state) do
+    response =
       SensorMultilevelReport.new(sensor_type: :temperature, scale: 1, value: state.temperature)
 
-    {:reply, report, state}
+    {:reply, response, state}
   end
 
-  def handle_command(%Command{name: :thermostat_mode_get}, state) do
-    {:ok, report} = ThermostatModeReport.new(mode: state.mode)
-    {:reply, report, state}
+  def handle_call({:handle_command, %Command{name: :thermostat_mode_get}}, _from, state) do
+    response = ThermostatModeReport.new(mode: state.mode)
+    {:reply, response, state}
   end
 
-  def handle_command(%Command{name: :thermostat_mode_set} = command, state) do
+  def handle_call(
+        {:handle_command, %Command{name: :thermostat_mode_set} = command},
+        _from,
+        state
+      ) do
     new_mode = Command.param!(command, :mode)
-    {:reply, :ack_response, %{state | mode: new_mode}}
+    {:reply, :ok, %{state | mode: new_mode}}
   end
 
-  def handle_command(%Command{name: :sensor_multilevel_supported_sensor_get}, state) do
-    {:ok, report} = SensorMultilevelSupportedSensorReport.new(sensor_types: [:temperature])
-    {:reply, report, state}
+  def handle_call(
+        {:handle_command, %Command{name: :sensor_multilevel_supported_sensor_get}},
+        _from,
+        state
+      ) do
+    response = SensorMultilevelSupportedSensorReport.new(sensor_types: [:temperature])
+    {:reply, response, state}
   end
 
-  def handle_command(%Command{name: :basic_get}, state) do
-    {:ok, report} = BasicReport.new(value: state.basic)
-    {:reply, report, state}
+  def handle_call({:handle_command, %Command{name: :basic_get}}, _from, state) do
+    response = BasicReport.new(value: state.basic)
+    {:reply, response, state}
   end
 
-  def handle_command(%Command{name: :basic_set} = command, state) do
+  def handle_call({:handle_command, %Command{name: :basic_set} = command}, _from, state) do
     value = Command.param!(command, :value)
-    {:reply, :ack_response, %{state | basic: value}}
+    {:reply, :ok, %{state | basic: value}}
   end
 
-  def handle_command(_other, state), do: {:noreply, state}
+  def handle_call({:handle_command, _other}, state), do: {{:error, :timeout}, state}
 
   defp maybe_convert_value(value, scale, state) do
     if state.scale == scale do

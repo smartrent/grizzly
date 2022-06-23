@@ -3,7 +3,7 @@ defmodule Grizzly.VirtualDevicesSupervisor do
 
   use Supervisor
 
-  alias Grizzly.VirtualDevices.{DevicesSupervisor, Network}
+  alias Grizzly.VirtualDevicesRegistry
 
   @doc """
   Start the VirtualDevices Supervisor
@@ -16,9 +16,7 @@ defmodule Grizzly.VirtualDevicesSupervisor do
   @impl Supervisor
   def init(grizzly_opts) do
     children = [
-      {Registry, [keys: :unique, name: Grizzly.VirtualDevicesRegistry]},
-      {Network, [inclusion_handler: grizzly_opts.inclusion_handler]},
-      {DevicesSupervisor, []}
+      {Registry, VirtualDevicesRegistry.start_options(grizzly_opts)}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
