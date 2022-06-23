@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:secure_controlled, [CommandClasses.command_class()]}
 
   @type param() ::
-          {:node_id, Grizzly.node_id()}
+          {:node_id, Grizzly.node_id() | Grizzly.VirtualDevices.id()}
           | {:status, NetworkManagementInclusion.node_add_status()}
           | {:seq_number, Grizzly.seq_number()}
           | {:listening?, boolean()}

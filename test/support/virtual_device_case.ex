@@ -10,7 +10,7 @@ defmodule Grizzly.VirtualDeviceCase do
   alias Grizzly.VirtualDevices
 
   def with_virtual_device(virtual_device_impl, test) do
-    {:ok, virtual_device_id} = VirtualDevices.add_device(virtual_device_impl)
+    virtual_device_id = VirtualDevices.add_device(virtual_device_impl)
 
     test.(virtual_device_id)
 

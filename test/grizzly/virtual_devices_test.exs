@@ -26,13 +26,16 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   test "Adding devices to the network and getting them back" do
-    with_virtual_devices(Thermostat, fn ids ->
-      network_ids = VirtualDevices.list_nodes()
+    device_ids =
+      Enum.map(1..5, fn _ ->
+        VirtualDevices.add_device(Thermostat)
+      end)
 
-      for nid <- ids do
-        assert nid in network_ids
-      end
-    end)
+    expected_devices = VirtualDevices.list_nodes()
+
+    for id <- device_ids do
+      assert id in expected_devices
+    end
   end
 
   test "Add and remove device ensure status reports are sent to configured handler" do
@@ -49,7 +52,7 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   test "Add and device with ensure status reports are sent with function inclusion handler" do
-    {:ok, device_id} =
+    device_id =
       VirtualDevices.add_device(Thermostat, inclusion_handler: {Handler, [test: &add_test/1]})
 
     :ok =
@@ -60,11 +63,6 @@ defmodule Grizzly.VirtualDeviceTest do
 
   test "associate virtual device to lifeline association" do
     with_virtual_device(Thermostat, fn id ->
-      {:ok, %Report{type: :command, command: command}} =
-        Grizzly.send_command(id, :association_get, grouping_identifier: 1)
-
-      assert Command.param!(command, :nodes) == []
-
       {:ok, %Report{type: :ack_response}} = Node.set_lifeline_association(id)
 
       {:ok, %Report{type: :command, command: command}} =
@@ -108,16 +106,15 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   test "receives notification for sensor report" do
+    {:ok, _pid} =
+      start_supervised({TemperatureSensor, report_interval: 1_000, force_report: true})
+
     Messages.subscribe(:sensor_multilevel_report)
     on_exit(fn -> Messages.unsubscribe(:sensor_multilevel_report) end)
 
-    with_virtual_device({TemperatureSensor, report_interval: 1_000, force_report: true}, fn id ->
-      Node.set_lifeline_association(id)
+    assert_receive {:grizzly, :report, report}, 5_000
 
-      assert_receive {:grizzly, :report, report}, 5_000
-
-      assert report.command.name == :sensor_multilevel_report
-    end)
+    assert report.command.name == :sensor_multilevel_report
   end
 
   defp add_test(%{name: :node_add_status, params: params}) do
