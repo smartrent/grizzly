@@ -4,6 +4,51 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.0.0] - 2022-06-24
+
+Refactored the `Grizzly.VirtualDevices.Device` behaviour. The behavior no longer
+has an `init/1` callback. Moreover, the `handle_command/2` callback still exists  
+but second parameter is not `Grizzly.VirtualDevices.Device.device_opts()` type.
+Lastly, a new callback `device_spec/1` was added.
+
+The change to `handle_command/2` also changes the return value expected by the
+behaviour. If you have implemented this behaviour see the documentation for
+`Grizzly.VirtualDevices.Device.handle_command/2` for new return values.
+
+The `Grizzly.VirtualDevices.Thermostat` and
+`Grizzly.VirtualDevices.TemperatureSensor` have both been updated to reflect the
+changes to the virtual device behaviour. In order to use either of these virtual
+devices you will need to call `start_link/1` on them before you're able to send
+commands to them.
+
+This change requires process based device implementations to be supervised
+outside of the Grizzly supervision tree. This allows the consuming application
+the ability to control how the virtual devices are started and when and how they
+should be shut down.
+
+### Changed
+
+- Deleted `Grizzly.VirtualDevices.init/1` callback
+- Changed parameters and return values from
+  `Grizzly.VirtualDevices.Device.handle_command/2`
+- Deleted `Grizzly.VirtualDevices.handle_info/2` callback
+- `Grizzly.VirtualDevices.Thermostat` (see module docs)
+- `Grizzly.VirtualDevices.TemperatureSensor` (see module docs)
+
+### Added
+
+- `Grizzly.VirtualDevices.Device.device_opts()` type
+- `Grizzly.VirtualDevices.Device.device_spec/1` callback
+- Support for empty alarm report event params (@jfcloutier)
+- Support long range node ids in the smart start meta extension field
+  `:network_status` (@jfcloutier)
+- `Grizzly.VirtualDevices.whereis/1`
+
+### Fixed
+
+- `Grizzly.ZWave.Commands.NodeAddStatus.param()` value `:node_id` type now
+  reflects virtual device ids
+
 ## [v4.0.1] - 2022-06-13
 
 ### Fixed
@@ -1924,6 +1969,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.0.0]: https://github.com/smartrent/grizzly/compare/v4.0.1...v5.0.0
+[v4.0.1]: https://github.com/smartrent/grizzly/compare/v4.0.0...v4.0.1
 [v4.0.0]: https://github.com/smartrent/grizzly/compare/v3.0.0...v4.0.0
 [v3.0.0]: https://github.com/smartrent/grizzly/compare/v2.1.0...v3.0.0
 [v2.1.0]: https://github.com/smartrent/grizzly/compare/v2.0.0...v2.1.0
