@@ -82,7 +82,7 @@ defmodule Grizzly.ZWave.DeviceClass do
           version: 2,
           zwave_plus_info: 2
         },
-        control: %{wake_up: 1}
+        control: %{}
       },
       manufacturer_id: 0x0000,
       product_id: 0x0000,
