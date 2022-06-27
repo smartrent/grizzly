@@ -15,6 +15,7 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     ThermostatSetpointReport,
     ThermostatModeReport,
     ThermostatFanModeReport,
+    ThermostatFanStateReport,
     SensorMultilevelReport,
     SensorMultilevelSupportedSensorReport
   }
@@ -42,6 +43,7 @@ defmodule Grizzly.VirtualDevices.Thermostat do
         cooling: 26.0
       },
       fan_mode: :auto_low,
+      fan_state: :off,
       temperature: 24.0,
       mode: :cooling,
       basic: :on,
@@ -109,6 +111,12 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     {:reply, response, state}
   end
 
+  def handle_call({:handle_command, %Command{name: :thermostat_fan_state_get}}, _from, state) do
+    response = ThermostatFanStateReport.new(state: state.fan_state)
+
+    {:reply, response, state}
+  end
+
   def handle_call(
         {:handle_command, %Command{name: :thermostat_fan_mode_set} = command},
         _from,
@@ -117,6 +125,16 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     mode = Command.param!(command, :mode)
 
     {:reply, :ok, %{state | fan_mode: mode}}
+  end
+
+  def handle_call(
+        {:handle_command, %Command{name: :thermostat_fan_state_set} = command},
+        _from,
+        state
+      ) do
+    fan_state = Command.param!(command, :state)
+
+    {:reply, :ok, %{state | fan_state: fan_state}}
   end
 
   def handle_call({:handle_command, %Command{name: :sensor_multilevel_get}}, _from, state) do
