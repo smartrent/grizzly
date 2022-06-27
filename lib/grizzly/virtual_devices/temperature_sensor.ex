@@ -49,7 +49,7 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
 
   @impl GenServer
   def init(opts) do
-    id = VirtualDevices.add_device(__MODULE__, server: self())
+    id = VirtualDevices.add_device(__MODULE__, Keyword.merge(opts, server: self()))
 
     report_interval = opts[:report_interval] || 60_000
     force_report = opts[:force_report] || false

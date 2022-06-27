@@ -33,8 +33,8 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   end
 
   @impl GenServer
-  def init(_) do
-    id = VirtualDevices.add_device(__MODULE__, server: self())
+  def init(opts) do
+    id = VirtualDevices.add_device(__MODULE__, Keyword.merge(opts, server: self()))
 
     state = %{
       setpoints: %{
