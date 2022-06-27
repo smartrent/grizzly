@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.0.1] - 2022-06-27
+
+### Fixed
+
+- Virtual thermostat reporting fan state command class did not actually support
+  that command class (@jfcloutier)
+
 ## [v5.0.0] - 2022-06-24
 
 Refactored the `Grizzly.VirtualDevices.Device` behaviour. The behavior no longer
@@ -1969,6 +1976,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.0.1]: https://github.com/smartrent/grizzly/compare/v5.0.0...v5.0.1
 [v5.0.0]: https://github.com/smartrent/grizzly/compare/v4.0.1...v5.0.0
 [v4.0.1]: https://github.com/smartrent/grizzly/compare/v4.0.0...v4.0.1
 [v4.0.0]: https://github.com/smartrent/grizzly/compare/v3.0.0...v4.0.0
