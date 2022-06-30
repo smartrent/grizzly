@@ -167,8 +167,18 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
     %__MODULE__{inclusion | state: :keys_requested}
   end
 
+  def keys_requested(%__MODULE__{state: state} = inclusion)
+      when state in [:node_adding_stop, :learn_mode_stop] do
+    %__MODULE__{inclusion | state: :learn_mode_stop}
+  end
+
   def keys_granted(%__MODULE__{state: :keys_requested} = inclusion) do
     %__MODULE__{inclusion | state: :keys_granted}
+  end
+
+  def keys_granted(%__MODULE__{state: state} = inclusion)
+      when state in [:node_adding_stop, :learn_mode_stop] do
+    %__MODULE__{inclusion | state: :learn_mode_stop}
   end
 
   def dsk_requested(%__MODULE__{state: :keys_granted} = inclusion, opts) do
@@ -176,8 +186,18 @@ defmodule Grizzly.Inclusions.InclusionRunner.Inclusion do
     %__MODULE__{inclusion | state: :dsk_requested, dsk_input_length: dsk_input_length}
   end
 
+  def dsk_requested(%__MODULE__{state: state} = inclusion, _opts)
+      when state in [:node_adding_stop, :learn_mode_stop] do
+    %__MODULE__{inclusion | state: :learn_mode_stop}
+  end
+
   def dsk_set(%__MODULE__{state: :dsk_requested} = inclusion) do
     %__MODULE__{inclusion | state: :dsk_set}
+  end
+
+  def dsk_set(%__MODULE__{state: state} = inclusion)
+      when state in [:node_adding_stop, :learn_mode_stop] do
+    %__MODULE__{inclusion | state: :learn_mode_stop}
   end
 
   def learn_mode(%__MODULE__{state: :started} = inclusion) do

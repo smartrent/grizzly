@@ -76,6 +76,8 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
     <<>>
   end
 
+  defp dsk_to_binary(_dsk, nil), do: <<>>
+
   defp dsk_to_binary(0, dsk_len) when dsk_len == 0 do
     <<>>
   end
