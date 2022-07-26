@@ -41,14 +41,34 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
       assert <<0x0F, 0x02, 0x73, 0x17>> == ConfigurationSet.encode_params(command)
     end
 
-    test "when a 3 byte neg value is set" do
-      {:ok, command} = ConfigurationSet.new(value: -3_664_127, param_number: 15, size: 3)
-      assert <<0x0F, 0x03, 0xC8, 0x17, 0x01>> == ConfigurationSet.encode_params(command)
+    test "when a 4 byte neg value is set" do
+      {:ok, command} = ConfigurationSet.new(value: -3_664_127, param_number: 15, size: 4)
+      assert <<0x0F, 0x04, 0xFF, 0xC8, 0x17, 0x01>> == ConfigurationSet.encode_params(command)
     end
 
-    test "when a 3 byte pos value is set" do
+    test "when a 4 byte pos value is set" do
+      {:ok, command} = ConfigurationSet.new(value: 7_542_529, param_number: 15, size: 4)
+      assert <<0x0F, 0x04, 0x00, 0x73, 0x17, 0x01>> == ConfigurationSet.encode_params(command)
+    end
+
+    test "when an illegal 3 byte value is set" do
       {:ok, command} = ConfigurationSet.new(value: 7_542_529, param_number: 15, size: 3)
-      assert <<0x0F, 0x03, 0x73, 0x17, 0x01>> == ConfigurationSet.encode_params(command)
+
+      assert %ArgumentError{
+               __exception__: true,
+               message: "Invalid parameter. 7542529 will not fit in 3 bytes"
+             } ==
+               catch_error(ConfigurationSet.encode_params(command))
+    end
+
+    test "when an out-of-range byte value is set" do
+      {:ok, command} = ConfigurationSet.new(value: 128, param_number: 15, size: 1)
+
+      assert %ArgumentError{
+               __exception__: true,
+               message: "Invalid parameter. 128 will not fit in 1 bytes"
+             } ==
+               catch_error(ConfigurationSet.encode_params(command))
     end
   end
 

@@ -80,8 +80,16 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
     param_num = Command.param!(command, :param_number)
     size = Command.param!(command, :size)
     value = Command.param!(command, :value)
+    validate!(value, size)
     value_bin = <<value::signed-integer-size(size)-unit(8)>>
 
     <<param_num, size>> <> value_bin
   end
+
+  defp validate!(value, 1) when value in -128..127, do: :ok
+  defp validate!(value, 2) when value in -32768..32767, do: :ok
+  defp validate!(value, 4) when value in -2_147_483_648..2_147_483_647, do: :ok
+
+  defp validate!(value, byte),
+    do: raise(ArgumentError, message: "Invalid parameter. #{value} will not fit in #{byte} bytes")
 end
