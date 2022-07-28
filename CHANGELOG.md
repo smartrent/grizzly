@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.0.2] - 2022-07-28
+
+## Fixed
+
+- Passing a configuration set `value` parameter that is bigger than the supplied
+  `size` parameter. (@jfcloutier)
+
 ## [v5.0.1] - 2022-06-27
 
 ### Fixed
