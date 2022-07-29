@@ -36,7 +36,8 @@ defmodule Grizzly.Options do
           status_reporter: module(),
           update_zwave_firmware: boolean(),
           zwave_firmware: [Supervisor.firmware_info()],
-          zw_programmer_path: Path.t()
+          zw_programmer_path: Path.t(),
+          inclusion_adapter: module()
         }
 
   defstruct run_zipgateway: true,
@@ -65,7 +66,8 @@ defmodule Grizzly.Options do
             status_reporter: Grizzly.StatusReporter.Console,
             update_zwave_firmware: false,
             zwave_firmware: [],
-            zw_programmer_path: "/usr/bin/zw_programmer"
+            zw_programmer_path: "/usr/bin/zw_programmer",
+            inclusion_adapter: Grizzly.Inclusions.ZWaveAdapter
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

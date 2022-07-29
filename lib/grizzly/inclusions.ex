@@ -166,22 +166,24 @@ defmodule Grizzly.Inclusions do
   wraps `Grizzly.Inclusions`.
   """
 
-  alias Grizzly.Inclusions.InclusionRunnerSupervisor
-  alias Grizzly.Inclusions.InclusionRunner
+  alias Grizzly.InclusionServer
   alias Grizzly.ZWave.{DSK, Security}
 
-  @type opt ::
-          {:controller_id, Grizzly.node_id()} | {:handler, pid() | module() | {module, keyword()}}
+  @typedoc """
+  Options for inclusion
+  """
+  @type opt() ::
+          {:controller_id, Grizzly.node_id()}
+          | {:timeout, non_neg_integer()}
+          | {:handler, pid() | module() | {module, keyword()}}
+          | {atom(), term()}
 
   @doc """
   Start the process to add a Z-Wave node to the network
   """
   @spec add_node([opt()]) :: :ok
   def add_node(opts \\ []) do
-    case InclusionRunnerSupervisor.start_runner(opts) do
-      {:ok, runner} ->
-        InclusionRunner.add_node(runner)
-    end
+    InclusionServer.add_node(opts)
   end
 
   @doc """
@@ -189,10 +191,11 @@ defmodule Grizzly.Inclusions do
   """
   @spec remove_node([opt()]) :: :ok
   def remove_node(opts \\ []) do
-    case InclusionRunnerSupervisor.start_runner(opts) do
-      {:ok, runner} ->
-        InclusionRunner.remove_node(runner)
-    end
+    InclusionServer.remove_node(opts)
+  end
+
+  def status() do
+    InclusionServer.status()
   end
 
   @doc """
@@ -205,7 +208,7 @@ defmodule Grizzly.Inclusions do
   """
   @spec grant_keys([Security.key()]) :: :ok
   def grant_keys(s2_keys) do
-    InclusionRunner.grant_keys(InclusionRunner, s2_keys)
+    InclusionServer.grant_keys(s2_keys)
   end
 
   @doc """
@@ -231,7 +234,7 @@ defmodule Grizzly.Inclusions do
   """
   @spec set_input_dsk(DSK.t()) :: :ok
   def set_input_dsk(input_dsk \\ DSK.new(<<>>)) do
-    InclusionRunner.set_dsk(InclusionRunner, input_dsk)
+    InclusionServer.set_input_dsk(input_dsk)
   end
 
   @doc """
@@ -239,7 +242,7 @@ defmodule Grizzly.Inclusions do
   """
   @spec add_node_stop() :: :ok
   def add_node_stop() do
-    InclusionRunner.add_node_stop(InclusionRunner)
+    InclusionServer.add_node_stop()
   end
 
   @doc """
@@ -247,34 +250,32 @@ defmodule Grizzly.Inclusions do
   """
   @spec remove_node_stop() :: :ok
   def remove_node_stop() do
-    InclusionRunner.remove_node_stop(InclusionRunner)
+    InclusionServer.remove_node_stop()
   end
 
   @doc """
   Start learn mode on the controller
   """
-  @spec learn_mode([opt()]) :: any
+  @spec learn_mode([opt()]) :: :ok
   def learn_mode(opts \\ []) do
-    case InclusionRunnerSupervisor.start_runner(opts) do
-      {:ok, runner} ->
-        InclusionRunner.learn_mode(runner)
-    end
+    InclusionServer.learn_mode(opts)
   end
 
   @doc """
   Stop learn mode on the controller
   """
-  @spec learn_mode_stop :: any
+  @spec learn_mode_stop() :: :ok
   def learn_mode_stop() do
-    InclusionRunner.learn_mode_stop(InclusionRunner)
+    InclusionServer.learn_mode_stop()
   end
 
   @doc """
   Stop the inclusion runner
   """
-  @spec stop :: :ok
+  @deprecated "Use either remove_node_stop/0, add_node_stop/0, or learn_mode_stop/0"
+  @spec stop() :: :ok
   def stop() do
-    InclusionRunner.stop(InclusionRunner)
+    :ok
   end
 
   @doc """
@@ -282,7 +283,6 @@ defmodule Grizzly.Inclusions do
   """
   @spec inclusion_running?() :: boolean()
   def inclusion_running?() do
-    child_count = DynamicSupervisor.count_children(InclusionRunnerSupervisor)
-    child_count.active == 1
+    InclusionServer.status() != :idle
   end
 end

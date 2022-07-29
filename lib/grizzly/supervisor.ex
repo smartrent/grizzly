@@ -141,6 +141,8 @@ defmodule Grizzly.Supervisor do
   - `:status_reporter` - a module that implements the `Grizzly.StatusReporter`
     behaviour. In no reporter is provided this will use
     `Grizzly.Status.Reporter.Console` by default.
+  - `:inclusion_adapter` - the network adapter for including and excluding
+    devices
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -174,6 +176,7 @@ defmodule Grizzly.Supervisor do
           | {:update_zwave_firmware, boolean()}
           | {:zwave_firmware, [firmware_info()]}
           | {:zw_programmer_path, Path.t()}
+          | {:inclusion_adapter, module()}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -222,9 +225,7 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for starting connections to Z-Wave nodes
       {Grizzly.Connections.Supervisor, options},
-
-      # Supervisor for starting and stopping Z-Wave inclusions
-      {Grizzly.Inclusions.InclusionRunnerSupervisor, options},
+      {Grizzly.InclusionServer, options},
 
       # Supervisor for updating firmware
       {Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor, options},

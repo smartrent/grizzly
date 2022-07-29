@@ -29,7 +29,8 @@ defmodule GrizzlyTest.Utils do
       lan_ip: {0, 0, 0, 1},
       pan_ip: {0, 0, 0, 0},
       run_zipgateway: false,
-      inclusion_handler: TestInclusionHandler
+      inclusion_handler: TestInclusionHandler,
+      inclusion_adapter: GrizzlyTest.InclusionAdapter
     ]
   end
 
