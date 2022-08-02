@@ -4,6 +4,23 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.1.0] - 2022-08-02
+
+### Changed
+
+- Deprecated `Grizzly.Inclusions.stop/0`, please use `remove_node_stop/0`,
+  `add_node_stop/0`, or `learn_mode_stop/0` instead.
+
+### Added
+
+- `Grizzly.Inclusions.NetworkAdapter` behaviour
+- `Grizzly.Inclusions.ZWaveAdapter` implementation of the network adapter
+  behaviour (default adapter Grizzly uses).
+
+### Fixed
+
+- Issues around canceling the inclusion process
+
 ## [v5.0.2] - 2022-07-28
 
 ## Fixed
@@ -1983,6 +2000,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.1.0]: https://github.com/smartrent/grizzly/compare/v5.0.2...v5.1.0
+[v5.0.2]: https://github.com/smartrent/grizzly/compare/v5.0.1...v5.0.2
 [v5.0.1]: https://github.com/smartrent/grizzly/compare/v5.0.0...v5.0.1
 [v5.0.0]: https://github.com/smartrent/grizzly/compare/v4.0.1...v5.0.0
 [v4.0.1]: https://github.com/smartrent/grizzly/compare/v4.0.0...v4.0.1
