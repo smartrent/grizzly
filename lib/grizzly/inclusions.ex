@@ -167,7 +167,24 @@ defmodule Grizzly.Inclusions do
   """
 
   alias Grizzly.InclusionServer
+  alias Grizzly.Inclusions.StatusServer
   alias Grizzly.ZWave.{DSK, Security}
+
+  @typedoc """
+  Status of the inclusion server
+  """
+  @type status() ::
+          :idle
+          | :node_adding
+          | :node_add_stopping
+          | :node_removing
+          | :node_remove_stopping
+          | :waiting_dsk
+          | :waiting_s2_keys
+          | :s2_keys_granted
+          | :dsk_input_set
+          | :learn_mode
+          | :learn_mode_stopping
 
   @typedoc """
   Options for inclusion
@@ -194,8 +211,12 @@ defmodule Grizzly.Inclusions do
     InclusionServer.remove_node(opts)
   end
 
+  @doc """
+  Get the current status of the inclusion process
+  """
+  @spec status() :: status()
   def status() do
-    InclusionServer.status()
+    StatusServer.get()
   end
 
   @doc """
@@ -283,6 +304,6 @@ defmodule Grizzly.Inclusions do
   """
   @spec inclusion_running?() :: boolean()
   def inclusion_running?() do
-    InclusionServer.status() != :idle
+    StatusServer.get() != :idle
   end
 end

@@ -149,6 +149,10 @@ defmodule GrizzlyTest.InclusionAdapter do
     {:grizzly, :report, Report.new(:complete, :command, 1, command: command)}
   end
 
+  defp cancel_timer(%{timer_ref: nil} = state) do
+    state
+  end
+
   defp cancel_timer(state) do
     Process.cancel_timer(state.timer_ref)
 

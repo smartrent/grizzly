@@ -6,23 +6,10 @@ defmodule Grizzly.InclusionServer do
   use GenServer
 
   alias Grizzly.{Inclusions, Report}
+  alias Grizzly.Inclusions.StatusServer
   alias Grizzly.ZWave.{Command, DSK, Security}
 
-  @typedoc """
-  Status of the inclusion server
-  """
-  @type status() ::
-          :idle
-          | :node_adding
-          | :node_add_stopping
-          | :node_remove
-          | :node_remove_stopping
-          | :waiting_dsk
-          | :waiting_s2_keys
-          | :s2_keys_granted
-          | :dsk_input_set
-
-  defguardp is_idle(state) when state == :idle
+  require Logger
 
   @doc """
   Start the inclusion server
@@ -30,30 +17,6 @@ defmodule Grizzly.InclusionServer do
   @spec start_link(Grizzly.Options.t()) :: GenServer.on_start()
   def start_link(grizzly_opts) do
     GenServer.start_link(__MODULE__, grizzly_opts, name: __MODULE__)
-  end
-
-  @impl GenServer
-  def init(grizzly_opts) do
-    adapter = grizzly_opts.inclusion_adapter
-
-    {:ok, adapter_state} = adapter.init()
-
-    {:ok,
-     %{
-       state: :idle,
-       adapter: adapter,
-       handler: nil,
-       adapter_state: adapter_state,
-       dsk_requested_length: 0
-     }}
-  end
-
-  @doc """
-  Get the status of the inclusion server
-  """
-  @spec status() :: status()
-  def status() do
-    GenServer.call(__MODULE__, :status)
   end
 
   @doc """
@@ -127,93 +90,171 @@ defmodule Grizzly.InclusionServer do
   end
 
   @impl GenServer
-  def handle_call({:add_node, opts}, _from, %{state: status} = state) when is_idle(status) do
-    :ok = state.adapter.connect(1)
+  def init(grizzly_opts) do
+    # check status and preform recovery steps if necessary
 
-    case state.adapter.add_node(state.adapter_state, opts) do
-      {:ok, new_adapter_state} ->
-        state =
-          state
-          |> set_state(:node_adding)
-          |> put_new_handler(opts)
+    adapter = grizzly_opts.inclusion_adapter
 
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    {:ok, adapter_state} = adapter.init()
+
+    state = %{
+      adapter: adapter,
+      handler: nil,
+      adapter_state: adapter_state,
+      dsk_requested_length: 0
+    }
+
+    case StatusServer.get() do
+      :idle ->
+        {:ok, state}
+
+      other_status ->
+        # this happens if the inclusion server crashed in middle some type of
+        # inclusion process. We will send the Z-Wave command to get the Z-Wave
+        # control back into the normal operation state.
+        #
+        # If we do not do this the Z-Wave controller would think it is in an
+        # inclusion process rendering it non-operable for operating Z-Wave
+        # devices.
+        {:ok, state, {:continue, {:cancel_inclusion, other_status}}}
     end
   end
 
-  def handle_call({:remove_node, opts}, _from, %{state: status} = state) when is_idle(status) do
-    :ok = state.adapter.connect(1)
+  @impl GenServer
+  def handle_continue({:cancel_inclusion, :learn_mode}, state) do
+    {:ok, new_state} = run_learn_mode_stop(state)
 
-    case state.adapter.remove_node(state.adapter_state, opts) do
-      {:ok, new_adapter_state} ->
-        state =
-          state
-          |> set_state(:node_removing)
-          |> put_new_handler(opts)
+    {:noreply, new_state}
+  end
 
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+  def handle_continue({:cancel_inclusion, :node_removing}, state) do
+    {:ok, new_state} = run_remove_node_stop(state)
+
+    {:noreply, new_state}
+  end
+
+  def handle_continue({:cancel_inclusion, status}, state)
+      when status in [
+             :node_adding,
+             :waiting_dsk,
+             :waiting_s2_keys,
+             :s2_keys_granted,
+             :dsk_input_set
+           ] do
+    {:ok, new_state} = run_add_node_stop(state)
+
+    {:noreply, new_state}
+  end
+
+  def handle_continue({:cancel_inclusion, status}, state)
+      when status in [:node_remove_stopping, :node_add_stopping] do
+    # if the status is currently in on of these the controller is already in the
+    # process of going back to an operational state
+    {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_call({:add_node, opts}, _from, state) do
+    with :idle <- StatusServer.get(),
+         :ok <- state.adapter.connect(1),
+         {:ok, new_adapter_state} <- state.adapter.add_node(state.adapter_state, opts) do
+      state =
+        state
+        |> set_status(:node_adding)
+        |> put_new_handler(opts)
+
+      {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    else
+      error ->
+        {:reply, error, state}
     end
   end
 
-  def handle_call(:add_node_stop, _from, %{state: server_state} = state)
-      when server_state in [:node_adding, :waiting_s2_keys, :waiting_dsk] do
-    case state.adapter.add_node_stop(state.adapter_state) do
-      {:ok, new_adapter_state} ->
-        {:reply, :ok, %{state | state: :node_add_stopping, adapter_state: new_adapter_state}}
+  def handle_call({:remove_node, opts}, _from, state) do
+    with :idle <- StatusServer.get(),
+         :ok <- state.adapter.connect(1),
+         {:ok, new_adapter_state} <- state.adapter.remove_node(state.adapter_state, opts) do
+      state =
+        state
+        |> set_status(:node_removing)
+        |> put_new_handler(opts)
+
+      {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    else
+      error ->
+        {:reply, error, state}
     end
   end
 
-  def handle_call(:remove_node_stop, _from, %{state: :node_removing} = state) do
-    case state.adapter.remove_node_stop(state.adapter_state) do
-      {:ok, new_adapter_state} ->
-        state = set_state(state, :node_remove_stopping)
+  def handle_call(:add_node_stop, _from, state) do
+    with status when status in [:node_adding, :waiting_s2_keys, :waiting_dsk] <-
+           StatusServer.get(),
+         {:ok, new_state} <- run_add_node_stop(state) do
+      {:reply, :ok, new_state}
+    else
+      error -> {:reply, error, state}
+    end
+  end
 
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+  def handle_call(:remove_node_stop, _from, state) do
+    with :node_removing <- StatusServer.get(),
+         {:ok, new_state} <- run_remove_node_stop(state) do
+      {:reply, :ok, new_state}
+    else
+      error -> {:reply, error, state}
     end
   end
 
   def handle_call({:learn_mode, opts}, _from, state) do
-    case state.adapter.learn_mode(state.adapter_state, opts) do
-      {:ok, new_adapter_state} ->
-        state =
-          state
-          |> set_state(:learn_mode)
-          |> put_new_handler(opts)
+    with :idle <- StatusServer.get(),
+         {:ok, new_adapter_state} <- state.adapter.learn_mode(state.adapter_state, opts) do
+      state =
+        state
+        |> set_status(:learn_mode)
+        |> put_new_handler(opts)
 
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+      {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    else
+      error -> {:reply, error, state}
     end
   end
 
   def handle_call(:learn_mode_stop, _from, state) do
-    case state.adapter.learn_mode_stop(state.adapter_state) do
-      {:ok, new_adapter_state} ->
-        state = set_state(state, :learn_mode_stopping)
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    with :learn_mode <- StatusServer.get(),
+         {:ok, new_state} <- run_learn_mode_stop(state) do
+      {:reply, :ok, new_state}
+    else
+      error ->
+        {:reply, error, state}
     end
   end
 
-  def handle_call({:grant_s2_keys, s2_keys}, _from, %{state: :waiting_s2_keys} = state) do
-    case state.adapter.grant_s2_keys(s2_keys, state.adapter_state) do
-      {:ok, new_adapter_state} ->
-        state = set_state(state, :s2_keys_granted)
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+  def handle_call({:grant_s2_keys, s2_keys}, _from, state) do
+    with :waiting_s2_keys <- StatusServer.get(),
+         {:ok, new_adapter_state} <- state.adapter.grant_s2_keys(s2_keys, state.adapter_state) do
+      state = set_status(state, :s2_keys_granted)
+      {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    else
+      error ->
+        {:reply, error, state}
     end
   end
 
-  def handle_call({:set_input_dsk, dsk}, _from, %{state: :waiting_dsk} = state) do
-    case state.adapter.set_input_dsk(dsk, state.dsk_requested_length, state.adapter_state) do
-      {:ok, new_adapter_state} ->
-        state = set_state(state, :dsk_input_set)
-        {:reply, :ok, %{state | adapter_state: new_adapter_state}}
-    end
-  end
+  def handle_call({:set_input_dsk, dsk}, _from, state) do
+    with :waiting_dsk <- StatusServer.get(),
+         {:ok, new_adapter_state} <-
+           state.adapter.set_input_dsk(dsk, state.dsk_requested_length, state.adapter_state) do
+      state = set_status(state, :dsk_input_set)
 
-  def handle_call(:status, _from, state) do
-    {:reply, state.state, state}
+      {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+    else
+      error ->
+        {:reply, error, state}
+    end
   end
 
   def handle_call(_, _from, state) do
-    if is_idle(state.state) do
+    if StatusServer.get() == :idle do
       {:reply, :ok, state}
     else
       {:reply, {:error, :already_including}, state}
@@ -230,10 +271,12 @@ defmodule Grizzly.InclusionServer do
   end
 
   def handle_info({:grizzly, :report, %Report{type: :timeout, command_ref: command_ref}}, state) do
-    {new_server_state, new_adapter_state} =
-      state.adapter.handle_timeout(state.state, command_ref, state.adapter_state)
+    status = StatusServer.get()
 
-    new_state = set_state(state, new_server_state)
+    {new_server_status, new_adapter_state} =
+      state.adapter.handle_timeout(status, command_ref, state.adapter_state)
+
+    new_state = set_status(state, new_server_status)
 
     {:noreply, %{new_state | adapter_state: new_adapter_state}}
   end
@@ -245,7 +288,7 @@ defmodule Grizzly.InclusionServer do
     state =
       state
       |> remove_handler()
-      |> set_state(:idle)
+      |> set_status(:idle)
 
     {:noreply, state}
   end
@@ -257,7 +300,7 @@ defmodule Grizzly.InclusionServer do
     state =
       state
       |> remove_handler()
-      |> set_state(:idle)
+      |> set_status(:idle)
 
     {:noreply, state}
   end
@@ -269,7 +312,7 @@ defmodule Grizzly.InclusionServer do
     state =
       state
       |> remove_handler()
-      |> set_state(:idle)
+      |> set_status(:idle)
 
     {:noreply, state}
   end
@@ -278,7 +321,7 @@ defmodule Grizzly.InclusionServer do
     report = Report.new(:complete, :command, 1, command: command)
     send_to_handler(state.handler, report)
 
-    state = set_state(state, :waiting_s2_keys)
+    state = set_status(state, :waiting_s2_keys)
 
     {:noreply, state}
   end
@@ -289,13 +332,54 @@ defmodule Grizzly.InclusionServer do
     report = Report.new(:complete, :command, 1, command: command)
     send_to_handler(state.handler, report)
 
-    state = set_state(state, :waiting_dsk)
+    state = set_status(state, :waiting_dsk)
 
     {:noreply, %{state | dsk_requested_length: requested_length}}
   end
 
-  defp set_state(server_state, inclusion_state) do
-    %{server_state | state: inclusion_state}
+  defp run_remove_node_stop(state) do
+    :ok = state.adapter.connect(1)
+
+    case state.adapter.remove_node_stop(state.adapter_state) do
+      {:ok, new_adapter_state} ->
+        state = set_status(state, :node_remove_stopping)
+        {:ok, %{state | adapter_state: new_adapter_state}}
+
+      error ->
+        {:reply, error, state}
+    end
+  end
+
+  defp run_learn_mode_stop(state) do
+    :ok = state.adapter.connect(1)
+
+    case state.adapter.learn_mode_stop(state.adapter_state) do
+      {:ok, new_adapter_state} ->
+        state = set_status(state, :learn_mode_stopping)
+        {:ok, %{state | adapter_state: new_adapter_state}}
+
+      error ->
+        {:error, error}
+    end
+  end
+
+  defp run_add_node_stop(state) do
+    :ok = state.adapter.connect(1)
+
+    case state.adapter.add_node_stop(state.adapter_state) do
+      {:ok, new_adapter_state} ->
+        state = set_status(state, :node_add_stopping)
+        {:ok, %{state | adapter_state: new_adapter_state}}
+
+      error ->
+        {:error, error}
+    end
+  end
+
+  defp set_status(state, status) do
+    :ok = StatusServer.set(status)
+
+    state
   end
 
   defp remove_handler(state) do
@@ -308,6 +392,12 @@ defmodule Grizzly.InclusionServer do
 
   defp put_new_handler(state, _opts) do
     state
+  end
+
+  def send_to_handler(nil, report) do
+    Logger.debug("[Grizzly]: unhandled inclusion report: #{inspect(report)}")
+
+    :ok
   end
 
   def send_to_handler(handler, report) when is_pid(handler) do
