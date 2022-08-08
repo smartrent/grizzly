@@ -225,7 +225,7 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for starting connections to Z-Wave nodes
       {Grizzly.Connections.Supervisor, options},
-      {Grizzly.InclusionServer, options},
+      {Grizzly.Inclusions.Supervisor, options},
 
       # Supervisor for updating firmware
       {Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor, options},

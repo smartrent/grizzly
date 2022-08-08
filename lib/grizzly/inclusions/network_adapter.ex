@@ -3,7 +3,7 @@ defmodule Grizzly.Inclusions.NetworkAdapter do
   Behaviour for inclusions to use to talk to the network
   """
 
-  alias Grizzly.{Inclusions, InclusionServer}
+  alias Grizzly.Inclusions
   alias Grizzly.ZWave.{DSK, Security}
 
   @typedoc """
@@ -68,6 +68,6 @@ defmodule Grizzly.Inclusions.NetworkAdapter do
 
   This function returns the new status of the inclusion server
   """
-  @callback handle_timeout(InclusionServer.status(), reference(), state()) ::
-              {InclusionServer.status(), state()}
+  @callback handle_timeout(Inclusions.status(), reference(), state()) ::
+              {Inclusions.status(), state()}
 end

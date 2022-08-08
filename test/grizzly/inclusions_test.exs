@@ -153,4 +153,30 @@ defmodule Grizzly.InclusionsTest do
 
     assert_receive %Grizzly.ZWave.Command{name: :node_add_status}, 1_500
   end
+
+  test "crashing inclusion should return server back into idle state" do
+    :ok = Inclusions.add_node()
+
+    inclusions_pid = Process.whereis(Grizzly.InclusionServer)
+
+    assert :node_adding = Inclusions.status()
+
+    Process.exit(inclusions_pid, :kill)
+    Process.sleep(500)
+
+    assert :idle == Inclusions.status()
+  end
+
+  test "crashing exclusion should return server back into idle state" do
+    :ok = Inclusions.remove_node()
+
+    inclusions_pid = Process.whereis(Grizzly.InclusionServer)
+
+    assert :node_removing = Inclusions.status()
+
+    Process.exit(inclusions_pid, :kill)
+    Process.sleep(500)
+
+    assert :idle == Inclusions.status()
+  end
 end
