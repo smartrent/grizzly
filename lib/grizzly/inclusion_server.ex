@@ -244,7 +244,7 @@ defmodule Grizzly.InclusionServer do
 
     state =
       state
-      |> remove_pid_handler()
+      |> remove_handler()
       |> set_state(:idle)
 
     {:noreply, state}
@@ -256,7 +256,7 @@ defmodule Grizzly.InclusionServer do
 
     state =
       state
-      |> remove_pid_handler()
+      |> remove_handler()
       |> set_state(:idle)
 
     {:noreply, state}
@@ -268,7 +268,7 @@ defmodule Grizzly.InclusionServer do
 
     state =
       state
-      |> remove_pid_handler()
+      |> remove_handler()
       |> set_state(:idle)
 
     {:noreply, state}
@@ -298,11 +298,9 @@ defmodule Grizzly.InclusionServer do
     %{server_state | state: inclusion_state}
   end
 
-  defp remove_pid_handler(%{handler: handler} = state) when is_pid(handler) do
+  defp remove_handler(state) do
     %{state | handler: nil}
   end
-
-  defp remove_pid_handler(state), do: state
 
   defp put_new_handler(%{handler: nil} = state, opts) do
     %{state | handler: opts[:handler]}
@@ -317,10 +315,14 @@ defmodule Grizzly.InclusionServer do
   end
 
   def send_to_handler({handler, handler_opts}, report) when is_atom(handler) do
-    handler.handle_report(report, handler_opts)
+    send_to_module_handler(handler, report, handler_opts)
   end
 
   def send_to_handler(handler, report) when is_atom(handler) do
-    handler.handle_report(report, [])
+    send_to_module_handler(handler, report, [])
+  end
+
+  def send_to_module_handler(handler, report, opts) do
+    spawn_link(fn -> handler.handle_report(report, opts) end)
   end
 end
