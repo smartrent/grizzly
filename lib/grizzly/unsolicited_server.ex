@@ -45,7 +45,7 @@ defmodule Grizzly.UnsolicitedServer do
 
       _error ->
         # wait 2 seconds to try again
-        _ = Logger.warn("[Grizzly]: Unsolicited server unable to listen")
+        Logger.warn("[Grizzly]: Unsolicited server unable to listen")
         :timer.sleep(2000)
         {:noreply, state, {:continue, :listen}}
     end
