@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.1.1] - 2022-08-09
+
+### Fixed
+
+- GenServer calling its self during S2 inclusion
+
 ## [v5.1.0] - 2022-08-02
 
 ### Changed
@@ -2000,6 +2006,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.1.1]: https://github.com/smartrent/grizzly/compare/v5.1.0...v5.1.1
 [v5.1.0]: https://github.com/smartrent/grizzly/compare/v5.0.2...v5.1.0
 [v5.0.2]: https://github.com/smartrent/grizzly/compare/v5.0.1...v5.0.2
 [v5.0.1]: https://github.com/smartrent/grizzly/compare/v5.0.0...v5.0.1
