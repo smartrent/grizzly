@@ -151,7 +151,7 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   defp handle_commands(zip_packet, state) do
-    _ = Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
+    Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
 
     case Command.param!(zip_packet, :flag) do
       :ack_request ->
