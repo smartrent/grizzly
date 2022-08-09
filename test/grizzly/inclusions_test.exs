@@ -4,6 +4,40 @@ defmodule Grizzly.InclusionsTest do
   alias Grizzly.{Inclusions, Report}
   alias Grizzly.ZWave.Command
 
+  defmodule TestHandler do
+    @moduledoc false
+
+    @behaviour Grizzly.InclusionHandler
+
+    alias Grizzly.{Inclusions, Report}
+    alias Grizzly.ZWave.Command
+
+    @impl Grizzly.InclusionHandler
+    def handle_report(%Report{command: %Command{name: :node_add_keys_report}}, _opts) do
+      Inclusions.grant_keys([:s2_unauthenticated])
+    end
+
+    def handle_report(%Report{command: %Command{name: :node_add_dsk_report}}, _opts) do
+      Inclusions.set_input_dsk()
+    end
+
+    def handle_report(%Report{command: %Command{name: command_name} = command}, opts)
+        when command_name in [:node_add_status, :node_remove_status] do
+      test_pid = opts[:test_pid]
+
+      send(test_pid, command)
+    end
+
+    def handle_report(_report, _opts) do
+      :ok
+    end
+
+    @impl Grizzly.InclusionHandler
+    def handle_timeout(_, _) do
+      :ok
+    end
+  end
+
   test "remove a node" do
     :ok = Inclusions.remove_node()
 
@@ -112,5 +146,11 @@ defmodule Grizzly.InclusionsTest do
 
     assert command.name == :node_add_status
     assert Command.param!(command, :status) == :done
+  end
+
+  test "S2 inclusions with handler" do
+    :ok = Inclusions.add_node(s2: true, handler: {TestHandler, test_pid: self()})
+
+    assert_receive %Grizzly.ZWave.Command{name: :node_add_status}, 1_500
   end
 end
