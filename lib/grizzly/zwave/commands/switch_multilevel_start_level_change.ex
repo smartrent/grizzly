@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
         # Start level is ignored
         _start_level,
         duration,
-        _rest::binary()
+        _rest::binary
       >>) do
     {:ok, [up_down: decode_up_down(up_down), duration: duration]}
   end

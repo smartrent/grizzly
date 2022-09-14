@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
     device_id_type_byte = encode_device_id_type(device_id_type)
 
     <<0x00::size(5), device_id_type_byte::size(3), device_id_data_format::size(3),
-      device_id_data_length::size(5), device_id_bytes::binary()>>
+      device_id_data_length::size(5), device_id_bytes::binary>>
   end
 
   defp device_id_type_from_byte(0x00), do: {:ok, :oem_factory_default_device_id_type}
