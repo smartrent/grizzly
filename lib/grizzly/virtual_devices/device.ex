@@ -24,6 +24,11 @@ defmodule Grizzly.VirtualDevices.Device do
   @callback device_spec([device_opt()]) :: DeviceClass.t()
 
   @doc """
+  Set the virtual device's id once added to the (virtual) Z-Wave network.
+  """
+  @callback set_device_id(pid(), Grizzly.VirtualDevices.id()) :: :ok
+
+  @doc """
   Handle a Z-Wave command
 
   When handling a command you can reply, notify, or do nothing.

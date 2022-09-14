@@ -32,7 +32,11 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
   """
   @type opt() :: {:report_interval, non_neg_integer()} | {:force_report, boolean()}
 
-  @type state() :: %{temp: non_neg_integer(), force_report: boolean()}
+  @type state() :: %{
+          temp: non_neg_integer(),
+          force_report: boolean(),
+          device_id: Grizzly.VirtualDevices.id()
+        }
 
   @impl Grizzly.VirtualDevices.Device
   def device_spec(_device_opts) do
@@ -49,13 +53,16 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
 
   @impl GenServer
   def init(opts) do
-    id = VirtualDevices.add_device(__MODULE__, Keyword.merge(opts, server: self()))
-
     report_interval = opts[:report_interval] || 60_000
     force_report = opts[:force_report] || false
 
     _ = :timer.send_interval(report_interval, :send_temp)
-    {:ok, %{temp: 0, force_report: force_report, device_id: id}}
+    {:ok, %{temp: 0, force_report: force_report, device_id: nil}}
+  end
+
+  @impl Grizzly.VirtualDevices.Device
+  def set_device_id(server, device_id) do
+    GenServer.cast(server, {:set_device_id, device_id})
   end
 
   @impl Grizzly.VirtualDevices.Device
@@ -66,10 +73,15 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
   end
 
   @impl GenServer
+  def handle_cast({:set_device_id, device_id}, state) do
+    {:noreply, %{state | device_id: device_id}}
+  end
+
+  @impl GenServer
   def handle_info(:send_temp, state) do
     new_temp = read_temp(state)
 
-    if !state.force_report && new_temp == state.temp do
+    if state.device_id == nil or (!state.force_report && new_temp == state.temp) do
       {:noreply, state}
     else
       {:ok, command} = build_multilevel_sensor_report(new_temp)

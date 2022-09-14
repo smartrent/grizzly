@@ -6,7 +6,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
   alias Grizzly.ZWave.Command
 
   test "get thermostat node info" do
-    start_supervised({Thermostat, []})
+    {:ok, pid} = start_supervised({Thermostat, []})
+
+    device_id =
+      Grizzly.VirtualDevices.add_device(
+        Thermostat,
+        module: Thermostat,
+        server: pid
+      )
+
+    Thermostat.set_device_id(pid, device_id)
 
     [device_id] = Grizzly.VirtualDevices.list_nodes()
 
@@ -16,7 +25,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
   end
 
   test "get thermostat manufacture info" do
-    start_supervised({Thermostat, []})
+    {:ok, pid} = start_supervised({Thermostat, []})
+
+    device_id =
+      Grizzly.VirtualDevices.add_device(
+        Thermostat,
+        module: Thermostat,
+        server: pid
+      )
+
+    Thermostat.set_device_id(pid, device_id)
 
     [device_id] = Grizzly.VirtualDevices.list_nodes()
 
@@ -30,7 +48,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
   end
 
   test "getting a command class version" do
-    start_supervised({Thermostat, []})
+    {:ok, pid} = start_supervised({Thermostat, []})
+
+    device_id =
+      Grizzly.VirtualDevices.add_device(
+        Thermostat,
+        module: Thermostat,
+        server: pid
+      )
+
+    Thermostat.set_device_id(pid, device_id)
 
     [device_id] = Grizzly.VirtualDevices.list_nodes()
 
@@ -46,8 +73,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
 
   describe "thermostat setpoints" do
     test "get cooling setpoint" do
-      start_supervised({Thermostat, []})
+      {:ok, pid} = start_supervised({Thermostat, []})
 
+      device_id =
+        Grizzly.VirtualDevices.add_device(
+          Thermostat,
+          module: Thermostat,
+          server: pid
+        )
+
+      Thermostat.set_device_id(pid, device_id)
       [device_id] = Grizzly.VirtualDevices.list_nodes()
 
       assert {:ok, %Report{type: :command, command: command}} =
@@ -60,8 +95,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
     end
 
     test "get heating setpoint" do
-      start_supervised({Thermostat, []})
+      {:ok, pid} = start_supervised({Thermostat, []})
 
+      device_id =
+        Grizzly.VirtualDevices.add_device(
+          Thermostat,
+          module: Thermostat,
+          server: pid
+        )
+
+      Thermostat.set_device_id(pid, device_id)
       [device_id] = Grizzly.VirtualDevices.list_nodes()
 
       assert {:ok, %Report{type: :command, command: command}} =
@@ -74,8 +117,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
     end
 
     test "set heating setpoint" do
-      start_supervised({Thermostat, []})
+      {:ok, pid} = start_supervised({Thermostat, []})
 
+      device_id =
+        Grizzly.VirtualDevices.add_device(
+          Thermostat,
+          module: Thermostat,
+          server: pid
+        )
+
+      Thermostat.set_device_id(pid, device_id)
       [device_id] = Grizzly.VirtualDevices.list_nodes()
 
       assert {:ok, %Report{type: :ack_response}} =
@@ -94,7 +145,16 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
 
   describe "sensor multilevel" do
     test "supported get" do
-      start_supervised({Thermostat, []})
+      {:ok, pid} = start_supervised({Thermostat, []})
+
+      device_id =
+        Grizzly.VirtualDevices.add_device(
+          Thermostat,
+          module: Thermostat,
+          server: pid
+        )
+
+      Thermostat.set_device_id(pid, device_id)
       [device_id] = Grizzly.VirtualDevices.list_nodes()
 
       {:ok, %Report{type: :command, command: command}} =

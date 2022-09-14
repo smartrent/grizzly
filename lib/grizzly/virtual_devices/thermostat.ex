@@ -7,7 +7,6 @@ defmodule Grizzly.VirtualDevices.Thermostat do
 
   @behaviour Grizzly.VirtualDevices.Device
 
-  alias Grizzly.VirtualDevices
   alias Grizzly.ZWave.{Command, DeviceClass}
 
   alias Grizzly.ZWave.Commands.{
@@ -33,10 +32,19 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     GenServer.start_link(__MODULE__, args)
   end
 
-  @impl GenServer
-  def init(opts) do
-    id = VirtualDevices.add_device(__MODULE__, Keyword.merge(opts, server: self()))
+  @impl Grizzly.VirtualDevices.Device
+  def set_device_id(server, device_id) do
+    GenServer.cast(server, {:set_device_id, device_id})
+  end
 
+  @impl Grizzly.VirtualDevices.Device
+  def handle_command(command, device_opts) do
+    server = Keyword.fetch!(device_opts, :server)
+    GenServer.call(server, {:handle_command, command})
+  end
+
+  @impl GenServer
+  def init(_opts) do
     state = %{
       setpoints: %{
         heating: 22.0,
@@ -48,16 +56,15 @@ defmodule Grizzly.VirtualDevices.Thermostat do
       mode: :cooling,
       basic: :on,
       scale: :celsius,
-      device_id: id
+      device_id: nil
     }
 
     {:ok, state}
   end
 
-  @impl Grizzly.VirtualDevices.Device
-  def handle_command(command, device_opts) do
-    server = Keyword.fetch!(device_opts, :server)
-    GenServer.call(server, {:handle_command, command})
+  @impl GenServer
+  def handle_cast({:set_device_id, device_id}, state) do
+    {:noreply, %{state | device_id: device_id}}
   end
 
   @impl GenServer
