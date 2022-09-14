@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupNameReport do
 
   @impl true
   # We've seen at least one device that sends an extraneous byte that needs to be ignored
-  def decode_params(<<group_id, length, name::size(length)-binary(), _ignore::binary()>>) do
+  def decode_params(<<group_id, length, name::size(length)-binary, _ignore::binary>>) do
     {:ok, [group_id: group_id, name: name]}
   end
 end

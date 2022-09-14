@@ -156,7 +156,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
       other_firmware_version_data = encode_other_firmware_versions(other_firmware_versions)
 
       <<library_type_byte, protocol_v, protocol_s, firmware_v, firmware_s, hardware_version,
-        number_of_firmware_targets, other_firmware_version_data::binary()>>
+        number_of_firmware_targets, other_firmware_version_data::binary>>
     end
   end
 
