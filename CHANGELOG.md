@@ -4,6 +4,22 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.0] - 2022-09-15
+
+### Added
+
+- `Grizzly.VirtualDevices.Device.set_device_id/2` callback function (@jfcloutier)
+- `Grizzly.VirtualDevices.TemperatureSensor.state()` now has a `:device_id`
+  field (@jfcloutier)
+- `Grizzly.VirtualDevices.TemperatureSensor.set_device_id/2` implementation
+  (@jfcloutier)
+- `Grizzly.VirtualDevices.Thermostat.set_device_id/2` implementation (@jfcloutier)
+
+### Fixed
+
+- When a virtual device is started outside of Grizzly, Grizzly would still
+  automatically add them to virtual network (@jfcloutier)
+
 ## [v5.1.2] - 2022-08-09
 
 ### Fixed
@@ -2012,6 +2028,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.0]: https://github.com/smartrent/grizzly/compare/v5.1.2...v5.2.0
 [v5.1.2]: https://github.com/smartrent/grizzly/compare/v5.1.1...v5.1.2
 [v5.1.1]: https://github.com/smartrent/grizzly/compare/v5.1.0...v5.1.1
 [v5.1.0]: https://github.com/smartrent/grizzly/compare/v5.0.2...v5.1.0
