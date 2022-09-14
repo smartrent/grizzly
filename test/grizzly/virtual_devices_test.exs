@@ -106,8 +106,16 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   test "receives notification for sensor report" do
-    {:ok, _pid} =
-      start_supervised({TemperatureSensor, report_interval: 1_000, force_report: true})
+    {:ok, pid} = start_supervised({TemperatureSensor, report_interval: 1_000, force_report: true})
+
+    device_id =
+      Grizzly.VirtualDevices.add_device(
+        Thermostat,
+        module: Thermostat,
+        server: pid
+      )
+
+    Thermostat.set_device_id(pid, device_id)
 
     Messages.subscribe(:sensor_multilevel_report)
     on_exit(fn -> Messages.unsubscribe(:sensor_multilevel_report) end)
