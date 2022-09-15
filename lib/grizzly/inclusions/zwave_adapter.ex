@@ -140,7 +140,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
   @impl Grizzly.Inclusions.NetworkAdapter
   def handle_timeout(state, _old_ref, adapter_state)
-      when state in [:node_adding, :waiting_s2_keys, :waiting_dsk] do
+      when state in [:node_adding, :waiting_s2_keys, :waiting_dsk, :dsk_input_set] do
     {:ok, new_state} = add_node_stop(adapter_state)
 
     {:node_add_stopping, new_state}
