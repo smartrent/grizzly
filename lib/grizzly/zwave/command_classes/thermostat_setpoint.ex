@@ -63,11 +63,11 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   def decode_type(_na_type), do: :na
 
   @spec encode_scale(scale) :: byte
-  def encode_scale(:celcius), do: 0x00
+  def encode_scale(:celsius), do: 0x00
   def encode_scale(:fahrenheit), do: 0x01
 
   @spec decode_scale(byte) :: {:ok, scale} | {:error, DecodeError.t()}
-  def decode_scale(0x00), do: {:ok, :celcius}
+  def decode_scale(0x00), do: {:ok, :celsius}
   def decode_scale(0x01), do: {:ok, :fahrenheit}
 
   def decode_scale(byte),

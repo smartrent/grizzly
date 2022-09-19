@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSetTest do
   alias Grizzly.ZWave.Commands.ThermostatSetpointSet
 
   test "creates the command and validates params" do
-    params = [type: :heating, scale: :celcius, value: 75.5]
+    params = [type: :heating, scale: :celsius, value: 75.5]
     {:ok, _command} = ThermostatSetpointSet.new(params)
   end
 
