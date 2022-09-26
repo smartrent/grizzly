@@ -4,6 +4,14 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.1] - 2022-09-26
+
+### Fixed
+
+- Fix typo for celsius (@jwdotjs)
+- Handle timeout on DSK input during inclusion (@jfcloutier)
+- Fix inclusion crash leading to invalid in-memory controller state
+
 ## [v5.2.0] - 2022-09-15
 
 ### Added
@@ -2028,6 +2036,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.1]: https://github.com/smartrent/grizzly/compare/v5.2.0...v5.2.1
 [v5.2.0]: https://github.com/smartrent/grizzly/compare/v5.1.2...v5.2.0
 [v5.1.2]: https://github.com/smartrent/grizzly/compare/v5.1.1...v5.1.2
 [v5.1.1]: https://github.com/smartrent/grizzly/compare/v5.1.0...v5.1.1
