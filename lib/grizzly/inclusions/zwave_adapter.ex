@@ -146,7 +146,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:node_add_stopping, new_state}
   end
 
-  def handle_timeout(:node_removing, command_ref, %{command_ref: command_ref} = state) do
+  def handle_timeout(:node_removing, _command_ref, state) do
     {:ok, new_state} = remove_node_stop(state)
 
     {:node_remove_stopping, new_state}
