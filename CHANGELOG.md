@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.2] - 2022-09-27
+
+### Fixed
+
+- Handling timeout of node removing (@jfcloutier)
+
 ## [v5.2.1] - 2022-09-26
 
 ### Fixed
@@ -2036,6 +2042,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.2]: https://github.com/smartrent/grizzly/compare/v5.2.1..v5.2.2
 [v5.2.1]: https://github.com/smartrent/grizzly/compare/v5.2.0...v5.2.1
 [v5.2.0]: https://github.com/smartrent/grizzly/compare/v5.1.2...v5.2.0
 [v5.1.2]: https://github.com/smartrent/grizzly/compare/v5.1.1...v5.1.2
