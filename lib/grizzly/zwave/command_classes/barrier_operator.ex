@@ -9,7 +9,7 @@ defmodule Grizzly.ZWave.CommandClasses.BarrierOperator do
 
   alias Grizzly.ZWave.DecodeError
 
-  use Bitwise
+  import Bitwise
 
   @type target_value :: :open | :close
   @type state :: :closed | 0x01..0x63 | :closing | :stopped | :opening | :open
