@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  use Bitwise, only_operators: true
+  import Bitwise
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint

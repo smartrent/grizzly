@@ -6,7 +6,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   data.
   """
 
-  use Bitwise, only_operators: true
+  import Bitwise
 
   @type route_type ::
           :no_route | :last_working_route | :next_to_last_working_route | :set_by_application
