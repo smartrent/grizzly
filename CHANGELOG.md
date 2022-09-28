@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.3] - 2022-09-28
+
+### Fixed
+
+- Fix Elixir 1.14 deprecation warnings (@bjyoungblood)
+
 ## [v5.2.2] - 2022-09-27
 
 ### Fixed
@@ -80,7 +86,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [v5.0.0] - 2022-06-24
 
 Refactored the `Grizzly.VirtualDevices.Device` behaviour. The behavior no longer
-has an `init/1` callback. Moreover, the `handle_command/2` callback still exists  
+has an `init/1` callback. Moreover, the `handle_command/2` callback still exists
 but second parameter is not `Grizzly.VirtualDevices.Device.device_opts()` type.
 Lastly, a new callback `device_spec/1` was added.
 
@@ -279,9 +285,9 @@ the Z-Wave firmware when Grizzly starts. Here's the configuration:
 ```elixir
 grizzly_opts = [
   # enables the updating the Z-Wave chip
-  update_zwave_firmware: true, 
+  update_zwave_firmware: true,
   # configure which firmwares you might want to flash to the Z-Wave chip.
-  zwave_firmware: [%{chip_type: 7, path: "/path/to/firmware_file", version: "7.16.03"}], 
+  zwave_firmware: [%{chip_type: 7, path: "/path/to/firmware_file", version: "7.16.03"}],
   # path the Z-Wave programmer program provided by Silicon Labs
   zw_programmer_path: "/usr/sbin/zw_programmer",
   # ..other options
@@ -2042,6 +2048,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.3]: https://github.com/smartrent/grizzly/compare/v5.2.2..v5.2.3
 [v5.2.2]: https://github.com/smartrent/grizzly/compare/v5.2.1..v5.2.2
 [v5.2.1]: https://github.com/smartrent/grizzly/compare/v5.2.0...v5.2.1
 [v5.2.0]: https://github.com/smartrent/grizzly/compare/v5.1.2...v5.2.0
