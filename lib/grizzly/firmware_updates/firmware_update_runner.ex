@@ -61,20 +61,25 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     max_fragment_size = Keyword.fetch!(opts, :max_fragment_size)
     activation_may_be_delayed? = Keyword.fetch!(opts, :activation_may_be_delayed?)
 
-    # {:ok, _} = AsyncConnection.start_link(Keyword.fetch!(opts, :device_id))
-    {:ok, _} = Connection.open(Keyword.fetch!(opts, :device_id), mode: :async)
+    if device_id in [1, :gateway] do
+      Logger.warn("[Grizzly] Can't update Z-Wave firmware on controller via commands")
+      {:error, :not_supported}
+    else
+      # {:ok, _} = AsyncConnection.start_link(Keyword.fetch!(opts, :device_id))
+      {:ok, _} = Connection.open(Keyword.fetch!(opts, :device_id), mode: :async)
 
-    {:ok,
-     %FirmwareUpdate{
-       handler: handler,
-       device_id: device_id,
-       manufacturer_id: manufacturer_id,
-       firmware_id: firmware_id,
-       firmware_target: firmware_target,
-       hardware_version: hardware_version,
-       max_fragment_size: max_fragment_size,
-       activation_may_be_delayed?: activation_may_be_delayed?
-     }}
+      {:ok,
+       %FirmwareUpdate{
+         handler: handler,
+         device_id: device_id,
+         manufacturer_id: manufacturer_id,
+         firmware_id: firmware_id,
+         firmware_target: firmware_target,
+         hardware_version: hardware_version,
+         max_fragment_size: max_fragment_size,
+         activation_may_be_delayed?: activation_may_be_delayed?
+       }}
+    end
   end
 
   @spec start_firmware_update(t(), FirmwareUpdates.image_path()) :: :ok

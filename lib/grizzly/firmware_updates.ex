@@ -63,15 +63,15 @@ defmodule Grizzly.FirmwareUpdates do
   Starts the firmware update process
   """
   @spec start_firmware_update(image_path(), [opt()]) ::
-          :ok | {:error, :image_not_found} | {:error, :busy}
+          :ok | {:error, :image_not_found} | {:error, :not_supported} | {:error, :busy}
   def start_firmware_update(firmware_image_path, opts) do
     with {:ok, runner} <-
            FirmwareUpdateRunnerSupervisor.start_runner(opts) do
       FirmwareUpdateRunner.start_firmware_update(runner, firmware_image_path)
     else
-      {:error, :imgae_not_found} ->
-        Logger.warn("[Grizzly] Firmware image file not found")
-        {:error, :image_not_found}
+      {:error, reason} ->
+        Logger.warn("[Grizzly] Failed to start firmware update: #{reason}")
+        {:error, reason}
 
       other ->
         Logger.warn("[Grizzly] Failed to start firmware update: #{inspect(other)}")
