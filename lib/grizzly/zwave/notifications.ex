@@ -987,6 +987,20 @@ defmodule Grizzly.ZWave.Notifications do
     end
   end
 
+  def decode_event_params(:home_security, :state_idle, <<byte::8>>) do
+    case event_from_byte(:home_security, byte) do
+      {:ok, event} ->
+        {:ok, [state: event]}
+
+      {:error, :invalid_event_byte} ->
+        Logger.warn(
+          "[Grizzly] Failed to decode state variable from home_security state_idle event"
+        )
+
+        {:ok, []}
+    end
+  end
+
   def decode_event_params(:water_alarm, zwave_event, params_binary)
       when zwave_event in [
              :water_leak_detected_location_provided,
