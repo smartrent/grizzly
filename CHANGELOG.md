@@ -4,6 +4,10 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.4] - 2022-10-14
+
+- Implement event parameter decoding for home security idle notifications ([#671](https://github.com/smartrent/grizzly/pull/671))
+
 ## [v5.2.3] - 2022-09-28
 
 ### Fixed
