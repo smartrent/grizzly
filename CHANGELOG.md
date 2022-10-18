@@ -4,6 +4,10 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.5] - 2022-10-18
+
+- Support unknown weekday in clock command class (@jfcloutier)
+
 ## [v5.2.4] - 2022-10-14
 
 - Implement event parameter decoding for home security idle notifications ([#671](https://github.com/smartrent/grizzly/pull/671))
@@ -2052,6 +2056,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.5]: https://github.com/smartrent/grizzly/compare/v5.2.4..v5.2.5
+[v5.2.4]: https://github.com/smartrent/grizzly/compare/v5.2.3..v5.2.4
 [v5.2.3]: https://github.com/smartrent/grizzly/compare/v5.2.2..v5.2.3
 [v5.2.2]: https://github.com/smartrent/grizzly/compare/v5.2.1..v5.2.2
 [v5.2.1]: https://github.com/smartrent/grizzly/compare/v5.2.0...v5.2.1
