@@ -9,7 +9,8 @@ defmodule Grizzly.ZWave.CommandClasses.Clock do
 
   alias Grizzly.ZWave.DecodeError
 
-  @type weekday :: :sunday | :monday | :tuesday | :wednesday | :thursday | :friday | :saturday
+  @type weekday ::
+          :sunday | :monday | :tuesday | :wednesday | :thursday | :friday | :saturday | :unknown
 
   @impl true
   def byte(), do: 0x81
@@ -20,6 +21,7 @@ defmodule Grizzly.ZWave.CommandClasses.Clock do
   @spec encode_weekday(weekday()) :: byte
   def encode_weekday(weekday) do
     case weekday do
+      :unknown -> 0x00
       :monday -> 0x01
       :tuesday -> 0x02
       :wednesday -> 0x03
@@ -33,6 +35,7 @@ defmodule Grizzly.ZWave.CommandClasses.Clock do
   @spec decode_weekday(byte()) :: {:ok, weekday()} | {:error, DecodeError.t()}
   def decode_weekday(byte) do
     case byte do
+      0x00 -> {:ok, :unknown}
       0x01 -> {:ok, :monday}
       0x02 -> {:ok, :tuesday}
       0x03 -> {:ok, :wednesday}
