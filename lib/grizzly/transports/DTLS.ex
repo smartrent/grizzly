@@ -218,7 +218,7 @@ defmodule Grizzly.Transports.DTLS do
 
   defp maybe_write_trace(in_or_out, ip, port, binary) do
     ip_port_str = make_ip_port_str(ip, port)
-    grizzly_ip_port_string = "#{@grizzly_ip}:#{@grizzly_ip}"
+    grizzly_ip_port_string = "#{@grizzly_ip}:#{@grizzly_port}"
 
     case in_or_out do
       :incoming ->
