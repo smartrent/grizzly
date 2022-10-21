@@ -33,7 +33,7 @@ defmodule Grizzly.Transports.DTLS do
     # `:trace` can explicitly be set to false to disable tracing on a particular
     # command
     if Keyword.get(opts, :trace, true) do
-      _ = maybe_write_trace(:outgoing, to_string(@grizzly_ip), @grizzly_port, binary)
+      maybe_write_trace(:outgoing, to_string(@grizzly_ip), @grizzly_port, binary)
     end
 
     :ssl.send(socket, binary)
@@ -47,7 +47,7 @@ defmodule Grizzly.Transports.DTLS do
       ) do
     binary = :erlang.list_to_binary(bin_list)
 
-    _ = maybe_write_trace(:incoming, ip, port, binary)
+    maybe_write_trace(:incoming, ip, port, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -90,7 +90,7 @@ defmodule Grizzly.Transports.DTLS do
 
     {:ok, {ip, port}} = get_sockname(transport)
 
-    _ = maybe_write_trace(:incoming, ip, port, binary)
+    maybe_write_trace(:incoming, ip, port, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -122,7 +122,7 @@ defmodule Grizzly.Transports.DTLS do
 
   defp handle_ssl_message_with_ip(ip, port, binary_list, opts) do
     binary = :erlang.list_to_binary(binary_list)
-    _ = maybe_write_trace(:incoming, ip, port, binary)
+    maybe_write_trace(:incoming, ip, port, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
