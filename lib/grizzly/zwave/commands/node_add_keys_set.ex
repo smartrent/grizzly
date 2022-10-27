@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
      [
        seq_number: seq_number,
        csa: decode_csa(csa),
-       accepted: decode_accepted(accepted),
+       accept: decode_accepted(accepted),
        granted_keys: decode_granted_keys(granted_keys)
      ]}
   end

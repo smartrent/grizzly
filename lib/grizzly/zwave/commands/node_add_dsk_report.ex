@@ -51,10 +51,10 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     input_dsk_length = Command.param!(command, :input_dsk_length)
-    dsk = Command.param!(command, :dsk)
-    {:ok, dsk} = DSK.parse(dsk)
 
-    <<seq_number, input_dsk_length>> <> dsk.raw
+    dsk = encode_dsk(Command.param!(command, :dsk))
+
+    <<seq_number, input_dsk_length>> <> dsk
   end
 
   @impl true
@@ -62,6 +62,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   def decode_params(<<seq_number, _::size(4), input_dsk_length::size(4), dsk_bin::binary>>) do
     {:ok, [seq_number: seq_number, input_dsk_length: input_dsk_length, dsk: DSK.new(dsk_bin)]}
   end
+
+  defp encode_dsk(%DSK{raw: raw}), do: raw
+  defp encode_dsk(dsk_bin) when is_binary(dsk_bin), do: dsk_bin
 
   defp validate_seq_number(params) do
     case Keyword.get(params, :seq_number) do
