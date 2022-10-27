@@ -19,7 +19,7 @@ defmodule Grizzly.Transports.DTLS do
 
     case :ssl.connect(ip_address, port, dtls_opts(ifaddr), 10_000) do
       {:ok, socket} ->
-        {:ok, Transport.new(__MODULE__, %{socket: socket, port: port})}
+        {:ok, Transport.new(__MODULE__, %{socket: socket, port: port, ip_address: ip_address})}
 
       {:error, _} = error ->
         error
@@ -33,7 +33,9 @@ defmodule Grizzly.Transports.DTLS do
     # `:trace` can explicitly be set to false to disable tracing on a particular
     # command
     if Keyword.get(opts, :trace, true) do
-      maybe_write_trace(:outgoing, to_string(@grizzly_ip), @grizzly_port, binary)
+      ip = Transport.assign(transport, :ip_address, "")
+      port = Transport.assign(transport, :port)
+      maybe_write_trace(:outgoing, ip, port, binary)
     end
 
     :ssl.send(socket, binary)
