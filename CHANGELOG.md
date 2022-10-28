@@ -4,11 +4,23 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.6] - 2022-10-28
+
+### Fixed
+
+- Format IPv6 addresses in traces using standard port notation ([#677](https://github.com/smartrent/grizzly/pull/677))
+- Record correct node IP for outgoing traces ([#679](https://github.com/smartrent/grizzly/pull/679))
+- Prevent a crash in `Grizzly.Trace.dump/1` when an S2 device has recently been included ([#680](https://github.com/smartrent/grizzly/pull/680))
+
 ## [v5.2.5] - 2022-10-18
+
+### Fixed
 
 - Support unknown weekday in clock command class (@jfcloutier)
 
 ## [v5.2.4] - 2022-10-14
+
+### Added
 
 - Implement event parameter decoding for home security idle notifications ([#671](https://github.com/smartrent/grizzly/pull/671))
 
@@ -2056,6 +2068,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.6]: https://github.com/smartrent/grizzly/compare/v5.2.5..v5.2.6
 [v5.2.5]: https://github.com/smartrent/grizzly/compare/v5.2.4..v5.2.5
 [v5.2.4]: https://github.com/smartrent/grizzly/compare/v5.2.3..v5.2.4
 [v5.2.3]: https://github.com/smartrent/grizzly/compare/v5.2.2..v5.2.3
