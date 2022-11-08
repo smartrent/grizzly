@@ -143,6 +143,12 @@ defmodule Grizzly.Commands.Table do
       # Version
       {:version_get,
        {Commands.VersionGet, handler: {WaitReport, complete_report: :version_report}}},
+      {:version_capabilities_get,
+       {Commands.VersionCapabilitiesGet,
+        handler: {WaitReport, complete_report: :version_capabilities_report}}},
+      {:version_zwave_software_get,
+       {Commands.VersionZWaveSoftwareGet,
+        handler: {WaitReport, complete_report: :version_zwave_software_report}}},
       {:version_command_class_get,
        {Commands.VersionCommandClassGet,
         handler: {WaitReport, complete_report: :version_command_class_report}}},
