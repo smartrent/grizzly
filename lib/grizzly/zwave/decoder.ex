@@ -218,6 +218,10 @@ defmodule Grizzly.ZWave.Decoder do
       {0x86, 0x12, Commands.VersionReport},
       {0x86, 0x13, Commands.VersionCommandClassGet},
       {0x86, 0x14, Commands.VersionCommandClassReport},
+      {0x86, 0x15, Commands.VersionCapabilitiesGet},
+      {0x86, 0x16, Commands.VersionCapabilitiesReport},
+      {0x86, 0x17, Commands.VersionZWaveSoftwareGet},
+      {0x86, 0x18, Commands.VersionZWaveSoftwareReport},
       # Firmware Update Metadata
       {0x7A, 0x01, Commands.FirmwareMDGet},
       {0x7A, 0x02, Commands.FirmwareMDReport},

@@ -61,6 +61,7 @@ defmodule Grizzly.ZWave.DeviceClasses do
       {:static_controller, 0x07, :gateway},
       # av control point (0x03)
       {:av_control_point, 0x00, :not_used},
+      {:av_control_point, 0x01, :sound_switch},
       {:av_control_point, 0x04, :satellite_receiver},
       {:av_control_point, 0x11, :satellite_receiver_v2},
       {:av_control_point, 0x12, :doorbell},
