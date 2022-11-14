@@ -1068,7 +1068,7 @@ transports are now implemented.
 - `Grizzly.Transports.UDP` - This is experimental and is subject to change.
 - `Grizzly.ZWave.CommandClasses.CRC16Encap`
 - `Grizzly.ZWave.Commands.CRC16Encap`
-- `Grizzly.ZWave.CommandClasses.PowerLevel`
+- `Grizzly.ZWave.CommandClasses.Powerlevel`
 - `Grizzly.ZWave.Commands.PowerlevelGet`
 - `Grizzly.ZWave.Commands.PowerlevelReport`
 - `Grizzly.ZWave.Commands.PowerlevelSet`
@@ -2038,7 +2038,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
 
 - Enhancements
   - Support `Grizzly.CommandClass.Time` command class
-  - Support `Grizzly.CommandClass.TimeParameters` `GET` and `SET` commands
+  - Support `Grizzly.CommandClass.TimeParameters` GET and SET commands
   - Support `Grizzly.CommandClass.ScheduleEntryLock` command class
   - `Grizzly.Notifications.subscribe_all/1` - subscribe to many notifications at once
   - `Grizzly.CommandClass.name/1` - get the name of the command class
