@@ -72,6 +72,7 @@ defmodule Grizzly.MixProject do
         Core: [
           Grizzly.Supervisor,
           Grizzly,
+          Grizzly.FirmwareUpdates,
           Grizzly.Inclusions,
           Grizzly.Indicator,
           Grizzly.Network,
@@ -80,7 +81,14 @@ defmodule Grizzly.MixProject do
           Grizzly.Trace.Record,
           Grizzly.StatusReporter,
           Grizzly.StatusReporter.Console,
-          Grizzly.Report
+          Grizzly.Report,
+          ~r/^Grizzly\.CommandHandlers/
+        ],
+        Behaviours: [
+          Grizzly.CommandHandler,
+          Grizzly.FirmwareUpdateHandler,
+          Grizzly.InclusionHandler,
+          Grizzly.Inclusions.NetworkAdapter
         ],
         "Grizzly Command Modules": [
           Grizzly.SwitchBinary
@@ -88,10 +96,13 @@ defmodule Grizzly.MixProject do
         "Virtual Devices": [
           Grizzly.VirtualDevices,
           Grizzly.VirtualDevices.Device,
+          Grizzly.VirtualDevices.TemperatureSensor,
           Grizzly.VirtualDevices.Thermostat
         ],
-        ZWave: [
+        "Z-Wave": [
           Grizzly.ZWave,
+          Grizzly.ZWave.Command,
+          Grizzly.ZWave.CommandClass,
           Grizzly.ZWave.CRC,
           Grizzly.ZWave.DeviceClass,
           Grizzly.ZWave.DeviceClasses,
@@ -99,14 +110,25 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.IconType,
           Grizzly.ZWave.Notifications,
           Grizzly.ZWave.QRCode,
-          Grizzly.ZWave.Security
+          Grizzly.ZWave.Security,
+          ~r/^Grizzly\.ZWave\.SmartStart/,
+          Grizzly.Inclusions.ZWaveAdapter
         ],
         Transports: [
           Grizzly.Transport,
           Grizzly.Transport.Response,
           Grizzly.Transports.DTLS,
           Grizzly.Transports.UDP
+        ],
+        "Z-Wave Protocol": [
+          ~r/^Grizzly\.ZWave\.CommandClasses/,
+          ~r/^Grizzly\.ZWave\.Commands/
         ]
+      ],
+      nest_modules_by_prefix: [
+        Grizzly.CommandHandlers,
+        Grizzly.ZWave.CommandClasses,
+        Grizzly.ZWave.Commands
       ]
     ]
   end
