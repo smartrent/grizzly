@@ -67,7 +67,7 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
 
   @impl Grizzly.VirtualDevices.Device
   def handle_command(command, device_opts) do
-    server = Keyword.fetch!(device_opts, :pid)
+    server = Keyword.fetch!(device_opts, :server)
 
     GenServer.call(server, {:handle_command, command})
   end
