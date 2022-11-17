@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.7] - 2022-11-17
+
+### Fixed
+
+- Fix virtual temperature sensor command handling ([#685](https://github.com/smartrent/grizzly/pull/685))
+
 ## [v5.2.6] - 2022-10-28
 
 ### Fixed
@@ -2068,6 +2074,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.7]: https://github.com/smartrent/grizzly/compare/v5.2.6..v5.2.7
 [v5.2.6]: https://github.com/smartrent/grizzly/compare/v5.2.5..v5.2.6
 [v5.2.5]: https://github.com/smartrent/grizzly/compare/v5.2.4..v5.2.5
 [v5.2.4]: https://github.com/smartrent/grizzly/compare/v5.2.3..v5.2.4
