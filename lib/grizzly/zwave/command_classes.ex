@@ -149,134 +149,14 @@ defmodule Grizzly.ZWave.CommandClasses do
           end
         end
 
+      command_classes =
+        @mappings
+        |> Enum.map(&elem(&1, 1))
+        |> Enum.reverse()
+        |> Enum.reduce(&{:|, [], [&1, &2]})
+
       quote do
-        @type command_class ::
-                :zensor_net
-                | :basic
-                | :controller_replication
-                | :application_status
-                | :zip
-                | :security_panel_mode
-                | :switch_binary
-                | :switch_multilevel
-                | :switch_all
-                | :switch_toggle_binary
-                | :chimney_fan
-                | :scene_activation
-                | :scene_actuator_conf
-                | :scene_controller_conf
-                | :security_panel_zone
-                | :security_panel_zone_sensor
-                | :sensor_binary
-                | :sensor_multilevel
-                | :meter
-                | :switch_color
-                | :network_management_inclusion
-                | :meter_pulse
-                | :basic_tariff_info
-                | :hrv_status
-                | :thermostat_heating
-                | :hrv_control
-                | :dcp_config
-                | :dcp_monitor
-                | :meter_tbl_config
-                | :meter_tbl_monitor
-                | :meter_tbl_push
-                | :prepayment
-                | :thermostat_mode
-                | :prepayment_encapsulation
-                | :operating_state
-                | :thermostat_setpoint
-                | :thermostat_fan_mode
-                | :thermostat_fan_state
-                | :climate_control_schedule
-                | :thermostat_setback
-                | :rate_tbl_config
-                | :rate_tbl_monitor
-                | :tariff_config
-                | :tariff_tbl_monitor
-                | :door_lock_logging
-                | :network_management_basic
-                | :schedule_entry_lock
-                | :zip_6lowpan
-                | :basic_window_covering
-                | :mtp_window_covering
-                | :network_management_proxy
-                | :schedule
-                | :network_management_primary
-                | :transport_service
-                | :crc_16_encap
-                | :application_capability
-                | :zip_nd
-                | :association_group_info
-                | :device_reset_locally
-                | :central_scene
-                | :ip_association
-                | :antitheft
-                | :zwaveplus_info
-                | :zip_gateway
-                | :zip_portal
-                | :door_lock
-                | :user_code
-                | :humidity_control_setpoint
-                | :dmx
-                | :barrier_operator
-                | :network_management_installation_maintenance
-                | :zip_naming
-                | :mailbox
-                | :window_covering
-                | :irrigation
-                | :supervision
-                | :humidity_control_mode
-                | :humidity_control_operating_state
-                | :entry_control
-                | :configuration
-                | :alarm
-                | :manufacturer_specific
-                | :powerlevel
-                | :inclusion_controller
-                | :protection
-                | :lock
-                | :node_naming
-                | :node_provisioning
-                | :firmware_update_md
-                | :grouping_name
-                | :remote_association_activate
-                | :remote_association
-                | :battery
-                | :clock
-                | :hail
-                | :wake_up
-                | :association
-                | :version
-                | :indicator
-                | :proprietary
-                | :language
-                | :time
-                | :time_parameters
-                | :geographic_location
-                | :multi_channel
-                | :multi_channel_association
-                | :multi_cmd
-                | :energy_production
-                | :manufacturer_proprietary
-                | :screen_md
-                | :screen_attributes
-                | :simple_av_control
-                | :av_content_directory_md
-                | :av_content_renderer_status
-                | :av_content_search_md
-                | :security
-                | :av_tagging_md
-                | :ip_configuration
-                | :association_command_configuration
-                | :sensor_alarm
-                | :silence_alarm
-                | :sensor_configuration
-                | :security_2
-                | :mark
-                | :non_interoperable
-                | :no_operation
+        @type command_class :: unquote(command_classes)
 
         @doc """
         Try to parse the byte into a command class

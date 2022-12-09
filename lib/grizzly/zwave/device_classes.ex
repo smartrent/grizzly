@@ -224,124 +224,29 @@ defmodule Grizzly.ZWave.DeviceClasses do
           end
         end
 
+      basic_classes_union =
+        @basic_mappings
+        |> Enum.map(&elem(&1, 1))
+        |> Enum.reverse()
+        |> Enum.reduce(&{:|, [], [&1, &2]})
+
+      generic_classes_union =
+        @generic_mappings
+        |> Enum.map(&elem(&1, 1))
+        |> Enum.reverse()
+        |> Enum.reduce(&{:|, [], [&1, &2]})
+
+      specific_classes_union =
+        @specific_mappings
+        |> Enum.map(&elem(&1, 2))
+        |> Enum.reverse()
+        |> Enum.uniq()
+        |> Enum.reduce(&{:|, [], [&1, &2]})
+
       quote do
-        @type basic_device_class :: :controller | :static_controller | :slave | :routing_slave
-
-        @type generic_device_class ::
-                :generic_controller
-                | :static_controller
-                | :av_control_point
-                | :display
-                | :network_extender
-                | :appliance
-                | :sensor_notification
-                | :thermostat
-                | :window_covering
-                | :repeater_slave
-                | :switch_binary
-                | :switch_multilevel
-                | :switch_remote
-                | :switch_toggle
-                | :zip_node
-                | :ventilation
-                | :security_panel
-                | :wall_controller
-                | :sensor_binary
-                | :sensor_multilevel
-                | :meter_pulse
-                | :meter
-                | :entry_control
-                | :semi_interoperable
-                | :sensor_alarm
-                | :non_interoperable
-
-        @type specific_device_class ::
-                :not_used
-                | :portable_remote_controller
-                | :portable_scene_controller
-                | :installer_tool
-                | :remote_control_av
-                | :remote_control_simple
-                | :pc_controller
-                | :scene_controller
-                | :static_installer_tool
-                | :set_top_box
-                | :sub_system_controller
-                | :tv
-                | :gateway
-                | :satellite_receiver
-                | :satellite_receiver_v2
-                | :doorbell
-                | :simple_display
-                | :secure_extender
-                | :general_appliance
-                | :kitchen_appliance
-                | :laundry_appliance
-                | :notification_sensor
-                | :thermostat_heating
-                | :thermostat_general
-                | :setback_schedule_thermostat
-                | :setpoint_thermostat
-                | :setback_thermostat
-                | :thermostat_general_v2
-                | :simple_window_covering
-                | :power_switch_binary
-                | :color_tunable_binary
-                | :scene_switch_binary
-                | :power_strip
-                | :siren
-                | :valve_open_close
-                | :irrigation_controller
-                | :power_switch_multilevel
-                | :color_tunable_multilevel
-                | :motor_multipositions
-                | :scene_switch_multilevel
-                | :class_a_motor_control
-                | :class_b_motor_control
-                | :class_c_motor_control
-                | :fan_switch
-                | :switch_remote_binary
-                | :switch_remote_multilevel
-                | :switch_remote_toggle_binary
-                | :switch_remote_toggle_multilevel
-                | :switch_toggle_binary
-                | :switch_toggle_multilevel
-                | :zip_adv_node
-                | :zip_tun_node
-                | :zoned_security_panel
-                | :basic_wall_controller
-                | :routing_sensor_binary
-                | :routing_sensor_multilevel
-                | :chimney_fan
-                | :simple_meter
-                | :adv_energy_meter
-                | :whole_home_meter_simple
-                | :door_lock
-                | :advanced_door_lock
-                | :secure_door_lock
-                | :secure_keypad_door_lock
-                | :secure_keypad_door_lock_deadbolt
-                | :secure_door
-                | :secure_gate
-                | :secure_barrier_addon
-                | :secure_barrier_open_only
-                | :secure_barrier_close_only
-                | :secure_lockbox
-                | :energy_production
-                | :basic_routing_alarm_sensor
-                | :routing_alarm_sensor
-                | :basic_zensor_net_alarm_sensor
-                | :zensor_net_alarm_sensor
-                | :adv_zensor_net_alarm_sensor
-                | :basic_routing_smoke_sensor
-                | :routing_smoke_sensor
-                | :basic_zensor_net_smoke_sensor
-                | :zensor_net_smoke_sensor
-                | :adv_zensor_net_smoke_sensor
-                | :alarm_sensor
-                | :portable_scene_controller
-                | :repeater_slave
-                | :virtual_node
+        @type basic_device_class :: unquote(basic_classes_union)
+        @type generic_device_class :: unquote(generic_classes_union)
+        @type specific_device_class :: unquote(specific_classes_union)
 
         @doc """
         Try to make a basic device class from a byte
