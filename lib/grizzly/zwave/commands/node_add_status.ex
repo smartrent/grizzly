@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, CommandClasses, DSK, Security}
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
 
   @type tagged_command_classes() ::
           {:non_secure_supported, [CommandClasses.command_class()]}
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
 
   @type param() ::
           {:node_id, Grizzly.node_id() | Grizzly.VirtualDevices.id()}
-          | {:status, NetworkManagementInclusion.node_add_status()}
+          | {:status, NMI.node_add_status()}
           | {:seq_number, Grizzly.seq_number()}
           | {:listening?, boolean()}
           | {:basic_device_class, byte()}
@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     command = %Command{
       name: :node_add_status,
       command_byte: 0x02,
-      command_class: NetworkManagementInclusion,
+      command_class: NMI,
       params: params,
       impl: __MODULE__
     }
@@ -66,7 +66,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     seq_number = Command.param!(command, :seq_number)
 
     if status == :failed do
-      <<seq_number, encode_status(status), 0x00, node_id, 0x01>>
+      <<seq_number, NMI.node_add_status_to_byte(status), 0x00, node_id, 0x01>>
     else
       listening? = Command.param!(command, :listening?)
       basic_device_class = Command.param!(command, :basic_device_class)
@@ -82,7 +82,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
 
       # TODO: fix opt func bit (after the listening bit)
       binary =
-        <<seq_number, encode_status(status), 0x00, node_id, node_info_length,
+        <<seq_number, NMI.node_add_status_to_byte(status), 0x00, node_id, node_info_length,
           encode_listening_bit(listening?)::size(1), 0x00::size(7), 0x00, basic_device_class,
           generic_device_class,
           specific_device_class>> <>
@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
     {:ok,
      [
-       status: NetworkManagementInclusion.parse_node_add_status(status_byte),
+       status: NMI.parse_node_add_status(status_byte),
        seq_number: seq_number,
        node_id: node_id,
        listening?: false,
@@ -108,11 +108,11 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   end
 
   def decode_params(<<seq_number, status_byte, _reserved, node_id, node_info_bin::binary>>) do
-    node_info = NetworkManagementInclusion.parse_node_info(node_info_bin)
+    node_info = NMI.parse_node_info(node_info_bin)
 
     params =
       %{
-        status: NetworkManagementInclusion.parse_node_add_status(status_byte),
+        status: NMI.parse_node_add_status(status_byte),
         seq_number: seq_number,
         node_id: node_id
       }
@@ -121,11 +121,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
 
     {:ok, params}
   end
-
-  @spec encode_status(NetworkManagementInclusion.node_add_status()) :: byte()
-  def encode_status(:done), do: 0x06
-  def encode_status(:failed), do: 0x07
-  def encode_status(:security_failed), do: 0x09
 
   @spec encode_listening_bit(boolean()) :: byte()
   def encode_listening_bit(true), do: 0x01

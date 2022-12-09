@@ -1,6 +1,6 @@
-defmodule Grizzly.ZWave.Commands.NodeAdd do
+defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
   @moduledoc """
-  Command for NODE_ADD
+  Command for FAILED_NODE_REPLACE
 
   Params:
 
@@ -19,19 +19,19 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
 
-  @type mode :: :node_add_any | :node_add_stop | :node_add_any_s2
+  @type mode ::
+          :start_failed_node_replace | :stop_failed_node_replace | :start_failed_node_replace_s2
 
   @type tx_opt :: :null | :low_power | :explore
 
   @type param :: {:mode, mode()} | {:tx_opt, tx_opt()} | {:seq_number, Grizzly.seq_number()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param]) :: {:ok, Command.t()}
   def new(params) do
-    # TODO validate params
     command = %Command{
-      name: :node_add,
-      command_byte: 0x01,
+      name: :failed_node_replace,
+      command_byte: 0x09,
       command_class: NMI,
       params: params,
       impl: __MODULE__
@@ -40,31 +40,34 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
-    mode = Command.param(command, :mode, :node_add_s2_any)
+    node_id = Command.param!(command, :node_id)
+    mode = Command.param(command, :mode, :start_failed_node_replace_s2)
     tx_opt = Command.param(command, :tx_opt, :explore)
 
-    <<seq_number, 0x00, encode_mode(mode), NMI.tx_opt_to_byte(tx_opt)>>
+    <<seq_number, node_id, NMI.tx_opt_to_byte(tx_opt), encode_mode(mode)>>
   end
 
-  @impl true
-  def decode_params(<<seq_number, _reserved, mode_byte, tx_opt_byte>>) do
+  @impl Grizzly.ZWave.Command
+  def decode_params(<<seq_number, node_id, tx_opt_byte, mode_byte>>) do
     with {:ok, mode} <- decode_mode(mode_byte),
          {:ok, tx_opt} <- NMI.tx_opt_from_byte(tx_opt_byte) do
-      {:ok, [mode: mode, seq_number: seq_number, tx_opt: tx_opt]}
+      {:ok, [mode: mode, seq_number: seq_number, node_id: node_id, tx_opt: tx_opt]}
     end
   end
 
   @spec encode_mode(mode()) :: byte()
-  def encode_mode(:node_add_any), do: 0x01
-  def encode_mode(:node_add_stop), do: 0x05
-  def encode_mode(:node_add_s2_any), do: 0x07
+  def encode_mode(:start_failed_node_replace), do: 0x01
+  def encode_mode(:stop_failed_node_replace), do: 0x05
+  def encode_mode(:start_failed_node_replace_s2), do: 0x07
 
   @spec decode_mode(byte()) :: {:ok, mode()} | {:error, DecodeError.t()}
-  def decode_mode(0x01), do: {:ok, :node_add_any}
-  def decode_mode(0x05), do: {:ok, :node_add_stop}
-  def decode_mode(0x07), do: {:ok, :node_add_s2_any}
-  def decode_mode(byte), do: {:error, %DecodeError{value: byte, param: :mode, command: :node_add}}
+  def decode_mode(0x01), do: {:ok, :start_failed_node_replace}
+  def decode_mode(0x05), do: {:ok, :stop_failed_node_replace}
+  def decode_mode(0x07), do: {:ok, :start_failed_node_replace_s2}
+
+  def decode_mode(byte),
+    do: {:error, %DecodeError{value: byte, param: :mode, command: :failed_node_replace}}
 end
