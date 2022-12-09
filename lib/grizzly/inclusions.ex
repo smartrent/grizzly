@@ -198,7 +198,7 @@ defmodule Grizzly.Inclusions do
   @doc """
   Start the process to add a Z-Wave node to the network
   """
-  @spec add_node([opt()]) :: :ok
+  @spec add_node([opt()]) :: :ok | status()
   def add_node(opts \\ []) do
     InclusionServer.add_node(opts)
   end
@@ -206,7 +206,7 @@ defmodule Grizzly.Inclusions do
   @doc """
   Start the process to remove a Z-Wave node from the network
   """
-  @spec remove_node([opt()]) :: :ok
+  @spec remove_node([opt()]) :: :ok | status()
   def remove_node(opts \\ []) do
     InclusionServer.remove_node(opts)
   end
@@ -253,7 +253,7 @@ defmodule Grizzly.Inclusions do
   Grizzly.Inclusions.set_input_dsk(dsk)
   ```
   """
-  @spec set_input_dsk(DSK.t()) :: :ok
+  @spec set_input_dsk(DSK.t()) :: :ok | status()
   def set_input_dsk(input_dsk \\ DSK.new(<<>>)) do
     InclusionServer.set_input_dsk(input_dsk)
   end
@@ -261,7 +261,7 @@ defmodule Grizzly.Inclusions do
   @doc """
   Stop an add node inclusion process
   """
-  @spec add_node_stop() :: :ok
+  @spec add_node_stop() :: :ok | status()
   def add_node_stop() do
     InclusionServer.add_node_stop()
   end
@@ -269,7 +269,7 @@ defmodule Grizzly.Inclusions do
   @doc """
   Stop a remove node inclusion process
   """
-  @spec remove_node_stop() :: :ok
+  @spec remove_node_stop() :: :ok | status()
   def remove_node_stop() do
     InclusionServer.remove_node_stop()
   end
@@ -277,7 +277,7 @@ defmodule Grizzly.Inclusions do
   @doc """
   Start learn mode on the controller
   """
-  @spec learn_mode([opt()]) :: :ok
+  @spec learn_mode([opt()]) :: :ok | status()
   def learn_mode(opts \\ []) do
     InclusionServer.learn_mode(opts)
   end
@@ -285,7 +285,7 @@ defmodule Grizzly.Inclusions do
   @doc """
   Stop learn mode on the controller
   """
-  @spec learn_mode_stop() :: :ok
+  @spec learn_mode_stop() :: :ok | status()
   def learn_mode_stop() do
     InclusionServer.learn_mode_stop()
   end
