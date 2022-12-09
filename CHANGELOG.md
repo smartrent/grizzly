@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.2.8] - 2022-12-09
+
+### Changed
+
+- Attempting to stop add/remove/learn mode while the inclusion server is idle returns `:ok` ([688](https://github.com/smartrent/grizzly/pull/688))
+- Types for command classes and device classes are now generated from their mapping tables ([#689](https://github.com/smartrent/grizzly/pull/689))
+
 ## [v5.2.7] - 2022-11-17
 
 ### Fixed
@@ -2074,6 +2081,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.2.8]: https://github.com/smartrent/grizzly/compare/v5.2.7..v5.2.8
 [v5.2.7]: https://github.com/smartrent/grizzly/compare/v5.2.6..v5.2.7
 [v5.2.6]: https://github.com/smartrent/grizzly/compare/v5.2.5..v5.2.6
 [v5.2.5]: https://github.com/smartrent/grizzly/compare/v5.2.4..v5.2.5
