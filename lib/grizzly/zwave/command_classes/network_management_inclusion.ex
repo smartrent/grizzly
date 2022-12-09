@@ -8,7 +8,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.{CommandClasses, DSK, Security}
+  alias Grizzly.ZWave.{CommandClasses, DecodeError, DSK, Security}
 
   @typedoc """
   The status of the inclusion process
@@ -21,6 +21,8 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
     functionality will be degraded.
   """
   @type node_add_status() :: :done | :failed | :security_failed
+
+  @type tx_opt :: :null | :low_power | :explore
 
   @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x34
@@ -43,6 +45,19 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   def node_add_status_to_byte(:done), do: 0x06
   def node_add_status_to_byte(:failed), do: 0x07
   def node_add_status_to_byte(:security_failed), do: 0x09
+
+  @spec tx_opt_to_byte(tx_opt()) :: byte()
+  def tx_opt_to_byte(:null), do: 0x00
+  def tx_opt_to_byte(:low_power), do: 0x02
+  def tx_opt_to_byte(:explore), do: 0x20
+
+  @spec tx_opt_from_byte(byte()) :: {:ok, tx_opt()} | {:error, DecodeError.t()}
+  def tx_opt_from_byte(0x00), do: {:ok, :null}
+  def tx_opt_from_byte(0x02), do: {:ok, :low_power}
+  def tx_opt_from_byte(0x20), do: {:ok, :explore}
+
+  def tx_opt_from_byte(byte),
+    do: {:error, %DecodeError{value: byte, param: :tx_opt}}
 
   @typedoc """
   Command classes have different ways they are support for each device
