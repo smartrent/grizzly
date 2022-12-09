@@ -22,7 +22,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Set the control into inclusion state
   """
-  @spec add_node([Inclusions.opt()]) :: :ok
+  @spec add_node([Inclusions.opt()]) :: :ok | Inclusions.status()
   def add_node(opts) do
     opts = Keyword.put_new(opts, :handler, self())
 
@@ -32,7 +32,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Stop the controller from being in the inclusion process
   """
-  @spec add_node_stop() :: :ok
+  @spec add_node_stop() :: :ok | Inclusions.status()
   def add_node_stop() do
     GenServer.call(__MODULE__, :add_node_stop)
   end
@@ -40,7 +40,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Set the controller to remove a Z-Wave device
   """
-  @spec remove_node([Inclusions.opt()]) :: :ok
+  @spec remove_node([Inclusions.opt()]) :: :ok | Inclusions.status()
   def remove_node(opts) do
     opts = Keyword.put_new(opts, :handler, self())
 
@@ -50,7 +50,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Stop the remove node process
   """
-  @spec remove_node_stop() :: :ok
+  @spec remove_node_stop() :: :ok | Inclusions.status()
   def remove_node_stop() do
     GenServer.call(__MODULE__, :remove_node_stop)
   end
@@ -58,7 +58,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Set the controller to learn mode
   """
-  @spec learn_mode([Inclusions.opt()]) :: :ok
+  @spec learn_mode([Inclusions.opt()]) :: :ok | Inclusions.status()
   def learn_mode(opts) do
     opts = Keyword.put_new(opts, :handler, self())
 
@@ -68,7 +68,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Stop the controller from being in learn mode
   """
-  @spec learn_mode_stop() :: :ok
+  @spec learn_mode_stop() :: :ok | Inclusions.status()
   def learn_mode_stop() do
     GenServer.call(__MODULE__, :learn_mode_stop)
   end
@@ -76,7 +76,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Grant S2 keys during an inclusion
   """
-  @spec grant_keys([Security.key()]) :: :ok
+  @spec grant_keys([Security.key()]) :: :ok | Inclusions.status()
   def grant_keys(s2_keys) do
     GenServer.call(__MODULE__, {:grant_s2_keys, s2_keys})
   end
@@ -84,7 +84,7 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Set the input DSK
   """
-  @spec set_input_dsk(DSK.t()) :: :ok
+  @spec set_input_dsk(DSK.t()) :: :ok | Inclusions.status()
   def set_input_dsk(input_dsk) do
     GenServer.call(__MODULE__, {:set_input_dsk, input_dsk})
   end
@@ -192,6 +192,7 @@ defmodule Grizzly.InclusionServer do
          {:ok, new_state} <- run_add_node_stop(state) do
       {:reply, :ok, new_state}
     else
+      :idle -> {:reply, :ok, state}
       error -> {:reply, error, state}
     end
   end
@@ -201,6 +202,7 @@ defmodule Grizzly.InclusionServer do
          {:ok, new_state} <- run_remove_node_stop(state) do
       {:reply, :ok, new_state}
     else
+      :idle -> {:reply, :ok, state}
       error -> {:reply, error, state}
     end
   end
@@ -224,8 +226,8 @@ defmodule Grizzly.InclusionServer do
          {:ok, new_state} <- run_learn_mode_stop(state) do
       {:reply, :ok, new_state}
     else
-      error ->
-        {:reply, error, state}
+      :idle -> {:reply, :ok, state}
+      error -> {:reply, error, state}
     end
   end
 
