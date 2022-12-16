@@ -38,6 +38,10 @@ defmodule Grizzly.Commands.Table do
       {:configuration_properties_get,
        {Commands.ConfigurationPropertiesGet,
         handler: {WaitReport, complete_report: :configuration_properties_report}}},
+      {:configuration_name_get,
+       {Commands.ConfigurationNameGet,
+        handler:
+          {AggregateReport, complete_report: :configuration_name_report, aggregate_param: :name}}},
       # Manufacturer specific
       {:manufacturer_specific_get,
        {Commands.ManufacturerSpecificGet,
