@@ -40,15 +40,21 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
 
     new_aggregate_values = Command.param!(command, aggregate_param)
 
-    %{state | aggregates: aggregates ++ new_aggregate_values}
+    %{state | aggregates: do_aggregate(aggregates, new_aggregate_values)}
   end
 
   defp prepare_aggregate_data(command, state) do
     %{aggregate_param: aggregate_param, aggregates: aggregates} = state
     final_values = Command.param!(command, aggregate_param)
 
-    Command.put_param(command, aggregate_param, aggregates ++ final_values)
+    Command.put_param(command, aggregate_param, do_aggregate(aggregates, final_values))
   end
+
+  defp do_aggregate(aggregates, new_aggregate_values) when is_list(aggregates),
+    do: aggregates ++ new_aggregate_values
+
+  defp do_aggregate(aggregates, new_aggregate_values) when is_binary(aggregates),
+    do: aggregates <> new_aggregate_values
 
   defp do_handle_command(command, state) do
     rtf = Command.param!(command, :reports_to_follow)
