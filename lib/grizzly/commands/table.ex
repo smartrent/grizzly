@@ -179,6 +179,9 @@ defmodule Grizzly.Commands.Table do
       {:user_code_users_number_get,
        {Commands.UserCodeUsersNumberGet,
         handler: {WaitReport, complete_report: :user_code_users_number_report}}},
+      {:master_code_set, {Commands.MasterCodeSet, handler: AckResponse}},
+      {:master_code_get,
+       {Commands.MasterCodeGet, handler: {WaitReport, complete_report: :master_code_report}}},
       # Meter
       {:meter_get, {Commands.MeterGet, handler: {WaitReport, complete_report: :meter_report}}},
       # Thermostat mode
