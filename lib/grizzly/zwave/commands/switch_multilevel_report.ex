@@ -90,7 +90,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   defp value_from_byte(byte) when byte in 0..100, do: {:ok, byte}
   defp value_from_byte(0xFE), do: {:ok, :unknown}
   # deprecated
-  defp value_from_byte(0xFF), do: {:ok, 99}
+  defp value_from_byte(0xFF), do: {:ok, 100}
 
   defp value_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :value, command: :switch_multilevel_report}}
