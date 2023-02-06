@@ -4,6 +4,16 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.4.0] - 2022-02-06
+
+### Added
+
+- Support for Master Code Set/Get/Report commands from User Codes command class ([#693](https://github.com/smartrent/grizzly/pull/693))
+
+### Fixed
+
+- Parse multilevel switch level 0xFF as 100 (instead of 99) ([695](https://github.com/smartrent/grizzly/pull/695))
+
 ## [v5.3.0] - 2022-12-16
 
 ### Added
@@ -2087,6 +2097,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.4.0]: https://github.com/smartrent/grizzly/compare/v5.3.0..v5.4.0
 [v5.3.0]: https://github.com/smartrent/grizzly/compare/v5.2.8..v5.3.0
 [v5.2.8]: https://github.com/smartrent/grizzly/compare/v5.2.7..v5.2.8
 [v5.2.7]: https://github.com/smartrent/grizzly/compare/v5.2.6..v5.2.7
