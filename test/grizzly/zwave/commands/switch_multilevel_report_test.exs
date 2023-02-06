@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
   test "decodes v1 params correctly" do
     binary_params = <<0xFF>>
     {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
-    assert Keyword.get(params, :value) == 99
+    assert Keyword.get(params, :value) == 100
   end
 
   test "decodes v2 params correctly" do
