@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.MailboxQueue do
 
   @behaviour Grizzly.ZWave.Command
 
-  import Grizzly.ZWave.Utils
+  import Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Mailbox
 

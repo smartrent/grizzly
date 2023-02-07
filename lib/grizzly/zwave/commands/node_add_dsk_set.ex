@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  import Grizzly.ZWave.Utils
+  import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, DSK}

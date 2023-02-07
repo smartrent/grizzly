@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   @behaviour Grizzly.ZWave.Command
 
   import Bitwise
-  import Grizzly.ZWave.Utils
+  import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy

@@ -6,7 +6,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   @behaviour Grizzly.ZWave.Command
 
   import Bitwise
-  import Grizzly.ZWave.Utils
+  import Grizzly.ZWave.Encoding
   alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, Decoder}
   alias Grizzly.ZWave.CommandClasses.ZIP
