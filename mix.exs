@@ -125,11 +125,11 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.DeviceClass,
           Grizzly.ZWave.DeviceClasses,
           Grizzly.ZWave.DSK,
+          Grizzly.ZWave.Encoding,
           Grizzly.ZWave.IconType,
           Grizzly.ZWave.Notifications,
           Grizzly.ZWave.QRCode,
           Grizzly.ZWave.Security,
-          Grizzly.ZWave.Utils,
           ~r/^Grizzly\.ZWave\.SmartStart/,
           Grizzly.Inclusions.ZWaveAdapter
         ],

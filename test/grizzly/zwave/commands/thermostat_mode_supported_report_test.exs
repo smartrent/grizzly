@@ -80,23 +80,21 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
   test "decodes params correctly" do
     assert {:ok, [modes: modes]} = ThermostatModeSupportedReport.decode_params(<<0x1F, 0x18>>)
 
-    assert modes == [
-             off: true,
-             heat: true,
-             cool: true,
-             auto: true,
-             auxiliary: true,
-             resume_on: false,
-             fan: false,
-             furnace: false,
-             dry: false,
-             moist: false,
-             auto_changeover: false,
-             energy_heat: true,
-             energy_cool: true,
-             away: false,
-             full_power: false,
-             manufacturer_specific: false
-           ]
+    assert modes[:off]
+    assert modes[:heat]
+    assert modes[:cool]
+    assert modes[:auto]
+    assert modes[:auxiliary]
+    refute modes[:resume_on]
+    refute modes[:fan]
+    refute modes[:furnace]
+    refute modes[:dry]
+    refute modes[:moist]
+    refute modes[:auto_changeover]
+    assert modes[:energy_heat]
+    assert modes[:energy_cool]
+    refute modes[:away]
+    refute modes[:full_power]
+    refute modes[:manufacturer_specific]
   end
 end

@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
 
   @type param ::
@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeSet do
           | {:user_id_status, UserCode.user_id_status()}
           | {:user_code, String.t()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_id = Command.param!(command, :user_id)
@@ -43,20 +43,14 @@ defmodule Grizzly.ZWave.Commands.UserCodeSet do
     <<user_id, UserCode.user_id_status_to_byte(user_id_status)>> <> user_code
   end
 
-  @impl true
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+  @impl Grizzly.ZWave.Command
+  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(<<user_id, user_id_status_byte, user_code_binary::binary>>) do
-    case UserCode.user_id_status_from_byte(user_id_status_byte) do
-      {:ok, user_id_status} ->
-        {:ok,
-         [
-           user_id: user_id,
-           user_id_status: user_id_status,
-           user_code: user_code_binary
-         ]}
-
-      {:error, %DecodeError{}} = error ->
-        error
-    end
+    {:ok,
+     [
+       user_id: user_id,
+       user_id_status: UserCode.user_id_status_from_byte(user_id_status_byte),
+       user_code: user_code_binary
+     ]}
   end
 end

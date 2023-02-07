@@ -130,7 +130,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x5D, 0x02, Commands.AntitheftGet},
       {0x5D, 0x03, Commands.AntitheftReport},
 
-      # Zwabeplus Info
+      # Z-Wave Plus Info
       {0x5E, 0x01, Commands.ZwaveplusInfoGet},
       {0x5E, 0x02, Commands.ZwaveplusInfoReport},
 
@@ -154,9 +154,19 @@ defmodule Grizzly.ZWave.Decoder do
       {0x63, 0x03, Commands.UserCodeReport},
       {0x63, 0x04, Commands.UserCodeUsersNumberGet},
       {0x63, 0x05, Commands.UserCodeUsersNumberReport},
+      {0x63, 0x06, Commands.UserCodeCapabilitiesGet},
+      {0x63, 0x07, Commands.UserCodeCapabilitiesReport},
+      {0x63, 0x08, Commands.UserCodeKeypadModeSet},
+      {0x63, 0x09, Commands.UserCodeKeypadModeGet},
+      {0x63, 0x0A, Commands.UserCodeKeypadModeReport},
+      {0x63, 0x0B, Commands.ExtendedUserCodeSet},
+      {0x63, 0x0C, Commands.ExtendedUserCodeGet},
+      {0x63, 0x0D, Commands.ExtendedUserCodeReport},
       {0x63, 0x0E, Commands.MasterCodeSet},
       {0x63, 0x0F, Commands.MasterCodeGet},
       {0x63, 0x10, Commands.MasterCodeReport},
+      {0x63, 0x11, Commands.UserCodeChecksumGet},
+      {0x63, 0x12, Commands.UserCodeChecksumReport},
 
       # Barrier Operator
       {0x66, 0x01, Commands.BarrierOperatorSet},
