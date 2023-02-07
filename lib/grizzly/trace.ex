@@ -22,8 +22,9 @@ defmodule Grizzly.Trace do
 
   alias Grizzly.Trace.{Record, RecordQueue}
 
-  @type src() :: String.t()
-  @type dest() :: String.t()
+  @type src() :: {:inet.ip_address(), :inet.port_number()}
+  @type dest() :: {:inet.ip_address(), :inet.port_number()}
+  @type format() :: :text | :pcap
 
   @type log_opt() :: {:src, src()} | {:dest, dest()}
 
@@ -46,9 +47,9 @@ defmodule Grizzly.Trace do
   @doc """
   Dump the trace records into a file
   """
-  @spec dump(Path.t()) :: :ok
-  def dump(file) do
-    GenServer.call(__MODULE__, {:dump, file})
+  @spec dump(Path.t(), format() | nil) :: :ok
+  def dump(file, format \\ nil) do
+    GenServer.call(__MODULE__, {:dump, file, format})
   end
 
   @doc """
@@ -80,9 +81,14 @@ defmodule Grizzly.Trace do
   end
 
   @impl GenServer
-  def handle_call({:dump, file}, _from, records) do
+  def handle_call({:dump, file, format}, _from, records) do
     records_list = RecordQueue.to_list(records)
-    file_contents = records_to_contents(records_list)
+
+    file_contents =
+      case detect_format(file, format) do
+        :pcap -> records_to_pcap(records_list)
+        :text -> records_to_text(records_list)
+      end
 
     case File.write(file, file_contents) do
       :ok ->
@@ -101,9 +107,45 @@ defmodule Grizzly.Trace do
     {:reply, RecordQueue.to_list(records), records}
   end
 
-  defp records_to_contents(records) do
+  def records_to_pcap(records) do
+    # pcap global header
+    header = <<
+      # magic number
+      0xA1B2C3D4::32,
+      # major version
+      2::16,
+      # minor version
+      4::16,
+      # UTC offset
+      0::32,
+      # Sigfigs (set to 0 by most tools)
+      0::32,
+      # max length of any one captured packet
+      65535::32,
+      # link-layer network type
+      101::32
+    >>
+
+    records_binary =
+      Enum.reduce(records, <<>>, fn record, acc ->
+        acc <> Record.to_pcap(record)
+      end)
+
+    header <> records_binary
+  end
+
+  defp records_to_text(records) do
     Enum.reduce(records, "", fn record, str ->
-      str <> Record.to_string(record) <> "\n"
+      str <> to_string(record) <> "\n"
     end)
+  end
+
+  @spec detect_format(binary(), format()) :: format()
+  defp detect_format(filename, format) do
+    cond do
+      not is_nil(format) -> format
+      String.ends_with?(filename, ".pcap") -> :pcap
+      true -> :text
+    end
   end
 end

@@ -8,7 +8,7 @@ defmodule Grizzly.Transports.DTLS do
   alias Grizzly.{Trace, Transport, ZWave}
   alias Grizzly.Transport.Response
 
-  @grizzly_ip :inet.ntoa({0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02})
+  @grizzly_ip {0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02}
   @grizzly_port 41230
 
   @impl Grizzly.Transport
@@ -219,27 +219,12 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   defp maybe_write_trace(in_or_out, ip, port, binary) do
-    ip_port_str = make_ip_port_str(ip, port)
-    grizzly_ip_port_string = "[#{@grizzly_ip}]:#{@grizzly_port}"
-
     case in_or_out do
       :incoming ->
-        Trace.log(binary, src: ip_port_str, dest: grizzly_ip_port_string)
+        Trace.log(binary, src: {ip, port}, dest: {@grizzly_ip, @grizzly_port})
 
       :outgoing ->
-        Trace.log(binary, src: grizzly_ip_port_string, dest: ip_port_str)
+        Trace.log(binary, src: {@grizzly_ip, @grizzly_port}, dest: {ip, port})
     end
-  end
-
-  defp make_ip_port_str("", port) do
-    ":#{port}"
-  end
-
-  defp make_ip_port_str(ip, port) when is_binary(ip) do
-    "[#{ip}]:#{port}"
-  end
-
-  defp make_ip_port_str(ip, port) do
-    "[#{:inet.ntoa(ip)}]:#{port}"
   end
 end
