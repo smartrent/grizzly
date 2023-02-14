@@ -4,6 +4,10 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.4.1] - 2022-02-14
+
+- Improve InclusionServer crash recovery from non-idle status ([#699](https://github.com/smartrent/grizzly/pull/699))
+
 ## [v5.4.0] - 2022-02-06
 
 ### Added
@@ -2097,6 +2101,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v5.4.1]: https://github.com/smartrent/grizzly/compare/v5.4.0..v5.4.1
 [v5.4.0]: https://github.com/smartrent/grizzly/compare/v5.3.0..v5.4.0
 [v5.3.0]: https://github.com/smartrent/grizzly/compare/v5.2.8..v5.3.0
 [v5.2.8]: https://github.com/smartrent/grizzly/compare/v5.2.7..v5.2.8
