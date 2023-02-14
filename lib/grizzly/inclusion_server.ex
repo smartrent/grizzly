@@ -106,6 +106,7 @@ defmodule Grizzly.InclusionServer do
 
     case StatusServer.get() do
       :idle ->
+        Logger.debug("[Grizzly.InclusionServer] init status: :idle")
         {:ok, state}
 
       other_status ->
@@ -116,18 +117,21 @@ defmodule Grizzly.InclusionServer do
         # If we do not do this the Z-Wave controller would think it is in an
         # inclusion process rendering it non-operable for operating Z-Wave
         # devices.
+        Logger.debug("[Grizzly.InclusionServer] init status: #{inspect(other_status)}")
         {:ok, state, {:continue, {:cancel_inclusion, other_status}}}
     end
   end
 
   @impl GenServer
-  def handle_continue({:cancel_inclusion, :learn_mode}, state) do
+  def handle_continue({:cancel_inclusion, status}, state)
+      when status in [:learn_mode, :learn_mode_stopping] do
     {:ok, new_state} = run_learn_mode_stop(state)
 
     {:noreply, new_state}
   end
 
-  def handle_continue({:cancel_inclusion, :node_removing}, state) do
+  def handle_continue({:cancel_inclusion, status}, state)
+      when status in [:node_removing, :node_remove_stopping] do
     {:ok, new_state} = run_remove_node_stop(state)
 
     {:noreply, new_state}
@@ -139,15 +143,16 @@ defmodule Grizzly.InclusionServer do
              :waiting_dsk,
              :waiting_s2_keys,
              :s2_keys_granted,
-             :dsk_input_set
+             :dsk_input_set,
+             :node_add_stopping
            ] do
     {:ok, new_state} = run_add_node_stop(state)
 
     {:noreply, new_state}
   end
 
-  def handle_continue({:cancel_inclusion, status}, state)
-      when status in [:node_remove_stopping, :node_add_stopping] do
+  def handle_continue({:cancel_inclusion, status}, state) do
+    Logger.warning("[Grizzly.InclusionServer] Unknown status at init: #{inspect(status)}")
     # if the status is currently in on of these the controller is already in the
     # process of going back to an operational state
     {:noreply, state}

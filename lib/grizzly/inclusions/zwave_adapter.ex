@@ -104,7 +104,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, command} =
       LearnModeSet.new(seq_number: seq_number, mode: :disable, return_interview_status: :off)
 
-    {:ok, command_ref} = AsyncConnection.send_command(1, command, timeout: @inclusion_timeout)
+    {:ok, command_ref} = AsyncConnection.send_command(1, command)
 
     {:ok, %{state | command_ref: command_ref}}
   end
@@ -140,20 +140,33 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
   @impl Grizzly.Inclusions.NetworkAdapter
   def handle_timeout(state, _old_ref, adapter_state)
-      when state in [:node_adding, :waiting_s2_keys, :waiting_dsk, :dsk_input_set] do
+      when state in [
+             :node_adding,
+             :waiting_s2_keys,
+             :waiting_dsk,
+             :dsk_input_set,
+             :node_add_stopping
+           ] do
     {:ok, new_state} = add_node_stop(adapter_state)
 
     {:node_add_stopping, new_state}
   end
 
-  def handle_timeout(:node_removing, _command_ref, state) do
-    {:ok, new_state} = remove_node_stop(state)
+  def handle_timeout(state, _command_ref, adapter_state)
+      when state in [:node_removing, :node_remove_stopping] do
+    {:ok, new_state} = remove_node_stop(adapter_state)
 
     {:node_remove_stopping, new_state}
   end
 
-  def handle_timeout(inclusion_state, _command_ref, state)
-      when inclusion_state in [:idle, :node_add_stopping] do
-    {inclusion_state, state}
+  def handle_timeout(state, _command_ref, adapter_state)
+      when state in [:learn_mode, :learn_mode_stopping] do
+    {:ok, new_state} = learn_mode_stop(adapter_state)
+
+    {:learn_mode_stopping, new_state}
+  end
+
+  def handle_timeout(:idle, _command_ref, adapter_state) do
+    {:idle, adapter_state}
   end
 end

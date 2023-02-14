@@ -129,6 +129,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
     |> parse_additional_node_info(more_info, command_class_length)
   end
 
+  defp parse_additional_node_info(node_info, additional_info, command_class_length)
+       when command_class_length <= 0 or byte_size(additional_info) == 0,
+       do: node_info
+
   defp parse_additional_node_info(node_info, additional_info, command_class_length) do
     <<command_classes_bin::binary-size(command_class_length), more_info::binary>> =
       additional_info
