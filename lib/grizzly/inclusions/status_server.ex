@@ -14,6 +14,8 @@ defmodule Grizzly.Inclusions.StatusServer do
 
   use GenServer
 
+  require Logger
+
   alias Grizzly.Inclusions
 
   def start_link(args) do
@@ -42,7 +44,8 @@ defmodule Grizzly.Inclusions.StatusServer do
   end
 
   @impl GenServer
-  def handle_call({:set, status}, _from, _old_status) do
+  def handle_call({:set, status}, _from, old_status) do
+    Logger.debug("[Grizzly.Inclusions.StatusServer] #{old_status} -> #{status}")
     {:reply, :ok, status}
   end
 
