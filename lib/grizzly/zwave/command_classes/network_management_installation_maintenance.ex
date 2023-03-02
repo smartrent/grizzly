@@ -89,7 +89,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   def rssi_from_byte(0x7D), do: {:ok, :rssi_below_sensitivity}
   def rssi_from_byte(0x7E), do: {:ok, :rssi_max_power_saturated}
   def rssi_from_byte(0x7F), do: {:ok, :rssi_not_available}
-  def rssi_from_byte(byte) when byte in 0xE0..0xA2, do: {:ok, byte - 256}
+  # 0 is reserved in the spec, but Z/IP Gateway sends it for the secondary long
+  # range channel when the primary long range channel is 0x7F / not available
+  def rssi_from_byte(0x00), do: {:ok, :rssi_not_available}
+  def rssi_from_byte(byte) when byte in 0xE0..0x80, do: {:ok, byte - 256}
   def rssi_from_byte(byte), do: {:error, %DecodeError{value: byte}}
 
   def repeaters_to_bytes(repeaters) do
