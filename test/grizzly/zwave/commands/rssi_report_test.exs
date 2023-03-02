@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
   test "ignore non-standard channel" do
     params_binary = <<0x7E, 0xA2, 0x9E>>
     {:ok, params} = RssiReport.decode_params(params_binary)
-    assert [:rssi_max_power_saturated, -94] == Keyword.get(params, :channels)
+    assert [:rssi_max_power_saturated, -94, -98] == Keyword.get(params, :channels)
   end
 
   test "encode version 4 - long range channels" do
@@ -59,5 +59,18 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     for {param, value} <- expected_params do
       assert params[param] == value
     end
+  end
+
+  test "handles z/ip gateway erroneously sending an illegal value for LR secondary" do
+    expected_params = [
+      channels: [-99, -102, -102],
+      long_range_primary_channel: :rssi_not_available,
+      long_range_secondary_channel: :rssi_not_available
+    ]
+
+    binary = <<0x9D, 0x9A, 0x9A, 0x7F, 0x00>>
+    {:ok, params} = RssiReport.decode_params(binary)
+
+    assert expected_params == params
   end
 end
