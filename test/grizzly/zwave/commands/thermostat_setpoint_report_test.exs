@@ -4,12 +4,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
   alias Grizzly.ZWave.Commands.ThermostatSetpointReport
 
   test "creates the command and validates params" do
-    params = [type: :heating, scale: :fahrenheit, value: 75.5]
+    params = [type: :heating, scale: :f, value: 75.5]
     {:ok, _command} = ThermostatSetpointReport.new(params)
   end
 
   test "encodes params correctly" do
-    params = [type: :heating, scale: :fahrenheit, value: 75.5]
+    params = [type: :heating, scale: :f, value: 75.5]
     {:ok, command} = ThermostatSetpointReport.new(params)
 
     expected_binary =
@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
 
     {:ok, params} = ThermostatSetpointReport.decode_params(binary_params)
     assert Keyword.get(params, :type) == :heating
-    assert Keyword.get(params, :scale) == :fahrenheit
+    assert Keyword.get(params, :scale) == :f
     assert Keyword.get(params, :value) == 75.5
   end
 
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
       ThermostatSetpointReport.new(
         type: :na,
         value: 70,
-        scale: :fahrenheit
+        scale: :f
       )
 
     expected_bin = <<0x00::4, 0x00::4, 0x00::3, 0x01::2, 0x01::3, 0x00>>

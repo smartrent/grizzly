@@ -55,7 +55,7 @@ defmodule Grizzly.VirtualDevices.Thermostat do
       temperature: 24.0,
       mode: :cooling,
       basic: :on,
-      scale: :celsius,
+      scale: :c,
       device_id: nil
     }
 
@@ -194,7 +194,7 @@ defmodule Grizzly.VirtualDevices.Thermostat do
     end
   end
 
-  defp convert_value(value, :celsius, :fahrenheit) do
+  defp convert_value(value, :c, :f) do
     celsius_to_fahrenheit(value)
   end
 

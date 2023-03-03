@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
           | :away_cooling
           | :full_power
 
-  @type scale :: :celsius | :fahrenheit
+  @type scale :: :c | :f
 
   @behaviour Grizzly.ZWave.CommandClass
 
@@ -63,12 +63,12 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   def decode_type(_na_type), do: :na
 
   @spec encode_scale(scale) :: byte
-  def encode_scale(:celsius), do: 0x00
-  def encode_scale(:fahrenheit), do: 0x01
+  def encode_scale(:c), do: 0x00
+  def encode_scale(:f), do: 0x01
 
   @spec decode_scale(byte) :: {:ok, scale} | {:error, DecodeError.t()}
-  def decode_scale(0x00), do: {:ok, :celsius}
-  def decode_scale(0x01), do: {:ok, :fahrenheit}
+  def decode_scale(0x00), do: {:ok, :c}
+  def decode_scale(0x01), do: {:ok, :f}
 
   def decode_scale(byte),
     do: {:error, %DecodeError{value: byte, param: :type, command: :thermostat_setpoint}}

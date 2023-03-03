@@ -63,7 +63,7 @@ defmodule Example do
   def set_thermostat_heating_setpoint(thermostat_id) do
     params = [
       type: :heating,
-      scale: :fahrenheit,
+      scale: :f,
       value: 78
     ]
 
@@ -80,7 +80,7 @@ defmodule Example do
   def set_thermostat_cooling_setpoint(thermostat_id) do
     params = [
       type: :cooling,
-      scale: :fahrenheit,
+      scale: :f,
       value: 76
     ]
 
