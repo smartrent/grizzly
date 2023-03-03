@@ -4,6 +4,16 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.0.0] - 2022-03-03
+
+### Fixed
+
+- Handle illegal values from Z/IP Gateway in RSSI_REPORT ([#705](https://github.com/smartrent/grizzly/pull/705))
+
+### BREAKING CHANGES
+
+- Use abbreviations (`:f` and `:c`) for temperature scales ([#706](https://github.com/smartrent/grizzly/pull/706))
+
 ## [v5.4.1] - 2022-02-14
 
 - Improve InclusionServer crash recovery from non-idle status ([#699](https://github.com/smartrent/grizzly/pull/699))
@@ -2101,6 +2111,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.0.0]: https://github.com/smartrent/grizzly/compare/v5.4.1..v6.0.0
 [v5.4.1]: https://github.com/smartrent/grizzly/compare/v5.4.0..v5.4.1
 [v5.4.0]: https://github.com/smartrent/grizzly/compare/v5.3.0..v5.4.0
 [v5.3.0]: https://github.com/smartrent/grizzly/compare/v5.2.8..v5.3.0
