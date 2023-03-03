@@ -132,7 +132,7 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
       assert {:ok, %Report{type: :ack_response}} =
                Grizzly.send_command(device_id, :thermostat_setpoint_set,
                  type: :heating,
-                 scale: :celsius,
+                 scale: :c,
                  value: 21
                )
 
