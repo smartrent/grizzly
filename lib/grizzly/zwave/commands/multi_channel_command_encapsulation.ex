@@ -58,10 +58,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
     destination_end_point_byte = encode_destination_end_point(destination_end_point, bit_address?)
     encoded_command_class = CommandClasses.to_byte(command_class)
     encapsulated_command = make_command(encapsulated_command_name, parameters)
-
-    encapsulated_parameters =
-      apply(encapsulated_command.impl, :encode_params, [encapsulated_command])
-
+    encapsulated_parameters = encapsulated_command.impl.encode_params(encapsulated_command)
     encapsulated_command_byte = encapsulated_command.command_byte
 
     if encapsulated_command_byte == nil do
@@ -125,7 +122,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   defp make_command(command_name, parameters) do
     {command_module, _} = Table.lookup(command_name)
 
-    {:ok, command} = apply(command_module, :new, [parameters])
+    {:ok, command} = command_module.new(parameters)
     command
   end
 

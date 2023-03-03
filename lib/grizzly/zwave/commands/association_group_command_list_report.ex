@@ -61,7 +61,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
 
     for command <- commands, into: <<>> do
       command_class_module = command.command_class
-      command_class_byte = apply(command_class_module, :byte, [])
+      command_class_byte = command_class_module.byte()
       <<command_class_byte, command.command_byte>>
     end
   end
@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   defp make_command(command_name) do
     {command_module, _} = Table.lookup(command_name)
 
-    apply(command_module, :new, [[]])
+    command_module.new([])
   end
 
   defp decode_commands(length, encoded_commands_list) do
@@ -127,7 +127,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
         :unknown
 
       {:ok, command_module} ->
-        {:ok, command} = apply(command_module, :new, [[]])
+        {:ok, command} = command_module.new([])
         command.name
     end
   end
