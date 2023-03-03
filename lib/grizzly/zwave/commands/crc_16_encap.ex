@@ -34,9 +34,9 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     command = Command.param!(command, :command)
-    command_class_byte = apply(command.command_class, :byte, [])
+    command_class_byte = command.command_class.byte()
     command_byte = command.command_byte
-    encoded_params = apply(command.impl, :encode_params, [command])
+    encoded_params = command.impl.encode_params(command)
     command_binary = <<command_class_byte, command_byte>> <> encoded_params
     checksum = CRC.crc16_aug_ccitt(command_binary)
     command_binary <> <<checksum::size(2)-integer-unsigned-unit(8)>>

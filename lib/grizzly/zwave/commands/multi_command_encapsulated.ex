@@ -43,9 +43,9 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
   end
 
   defp encode_command(command) do
-    command_class_byte = apply(command.command_class, :byte, [])
+    command_class_byte = command.command_class.byte()
     command_byte = command.command_byte
-    encoded_params = apply(command.impl, :encode_params, [command])
+    encoded_params = command.impl.encode_params(command)
     encoded_command = <<command_class_byte, command_byte>> <> encoded_params
     <<byte_size(encoded_command)>> <> encoded_command
   end
