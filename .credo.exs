@@ -13,6 +13,7 @@
         ],
         excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/"]
       },
+      strict: true,
       checks: [
         {Credo.Check.Refactor.MapInto, false},
         {Credo.Check.Warning.LazyLogging, false},
@@ -20,12 +21,11 @@
         {Credo.Check.Readability.ParenthesesOnZeroArityDefs, parens: true},
         {Credo.Check.Warning.RaiseInsideRescue, false},
         {Credo.Check.Design.TagTODO, false},
+        {Credo.Check.Refactor.LongQuoteBlocks, []},
 
         ### Below are checks we will want to enable at later date ###
         {Credo.Check.Refactor.WithClauses, false},
-        {Credo.Check.Refactor.LongQuoteBlocks, false},
         {Credo.Check.Refactor.CyclomaticComplexity, false},
-        {Credo.Check.Consistency.SpaceAroundOperators, false},
         {Credo.Check.Readability.WithSingleClause, false}
       ]
     }

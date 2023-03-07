@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, CRC, Decoder}
+  alias Grizzly.ZWave.{Command, CRC, DecodeError, Decoder}
   alias Grizzly.ZWave.CommandClasses.CRC16Encap
 
   @type param :: {:command, Command.t()}

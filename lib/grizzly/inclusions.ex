@@ -166,8 +166,8 @@ defmodule Grizzly.Inclusions do
   wraps `Grizzly.Inclusions`.
   """
 
-  alias Grizzly.InclusionServer
   alias Grizzly.Inclusions.StatusServer
+  alias Grizzly.InclusionServer
   alias Grizzly.ZWave.{DSK, Security}
 
   @typedoc """

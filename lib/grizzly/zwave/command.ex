@@ -102,18 +102,16 @@ defmodule Grizzly.ZWave.Command do
   """
   @spec param!(t(), atom()) :: term() | no_return()
   def param!(command, param) do
-    try do
-      Keyword.fetch!(command.params, param)
-    rescue
-      KeyError ->
-        raise KeyError,
-              """
-              It looks like you tried to get the #{inspect(param)} from your command.
+    Keyword.fetch!(command.params, param)
+  rescue
+    KeyError ->
+      raise KeyError,
+            """
+            It looks like you tried to get the #{inspect(param)} from your command.
 
-              Here is a list of available params for your command:
+            Here is a list of available params for your command:
 
-              """ <> list_of_command_params(command)
-    end
+            """ <> list_of_command_params(command)
   end
 
   @doc """

@@ -3,8 +3,8 @@ defmodule Grizzly.Commands.Command do
 
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
-  alias Grizzly.{Report, SeqNumber, ZWave}
   alias Grizzly.Commands.Table
+  alias Grizzly.{Report, SeqNumber, ZWave}
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands.ZIPPacket
 

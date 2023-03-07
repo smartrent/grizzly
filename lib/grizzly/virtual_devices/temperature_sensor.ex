@@ -18,8 +18,8 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
 
   alias Grizzly.ZWave.Commands.{
     BasicReport,
-    SensorMultilevelSupportedSensorReport,
-    SensorMultilevelReport
+    SensorMultilevelReport,
+    SensorMultilevelSupportedSensorReport
   }
 
   @typedoc """

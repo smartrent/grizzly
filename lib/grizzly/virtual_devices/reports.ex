@@ -4,13 +4,13 @@ defmodule Grizzly.VirtualDevices.Reports do
   # Helper module for building various general reports for a virtual device
 
   alias Grizzly.{Report, VirtualDevices, VirtualDevicesRegistry}
-  alias Grizzly.ZWave.{Command, DeviceClass}
+  alias Grizzly.ZWave.{Command, DeviceClass, DSK}
 
   alias Grizzly.ZWave.Commands.{
     AssociationReport,
     BatteryReport,
-    ManufacturerSpecificReport,
     ManufacturerSpecificDeviceSpecificReport,
+    ManufacturerSpecificReport,
     NodeAddStatus,
     NodeInfoCacheReport,
     NodeRemoveStatus,
@@ -37,7 +37,7 @@ defmodule Grizzly.VirtualDevices.Reports do
         command_classes: command_classes_for_device(device_entry.device_class),
         granted_keys: [],
         kex_fail_type: :none,
-        input_dsk: Grizzly.ZWave.DSK.new("")
+        input_dsk: DSK.new("")
       )
 
     report = Report.new(:complete, :command, device_entry.id, command: node_add_status)

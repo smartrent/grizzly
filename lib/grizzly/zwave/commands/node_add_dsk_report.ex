@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{DSK, Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, DSK}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
 
   @type param ::

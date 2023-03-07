@@ -7,9 +7,9 @@ defmodule Grizzly.Connections.SyncConnection do
 
   require Logger
 
-  alias Grizzly.{Transport, ZIPGateway, Connections, Options, Report}
   alias Grizzly.Commands.CommandRunner
-  alias Grizzly.Connections.{KeepAlive, CommandList}
+  alias Grizzly.Connections.{CommandList, KeepAlive}
+  alias Grizzly.{Connections, Options, Report, Transport, ZIPGateway}
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket

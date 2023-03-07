@@ -6,10 +6,10 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   alias Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.{
-    ExpectedDelay,
     BinaryParser,
-    InstallationAndMaintenanceReport,
-    EncapsulationFormatInfo
+    EncapsulationFormatInfo,
+    ExpectedDelay,
+    InstallationAndMaintenanceReport
   }
 
   @type encapsulation_format_info :: :crc16 | EncapsulationFormatInfo.security()

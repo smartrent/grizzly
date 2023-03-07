@@ -8,7 +8,7 @@ defmodule Grizzly.ZWave.DeviceClass do
   """
 
   alias Grizzly.ZWave.Commands.VersionReport
-  alias Grizzly.ZWave.{DeviceClasses, CommandClasses}
+  alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
 
   @type command_class_version() :: integer()
 

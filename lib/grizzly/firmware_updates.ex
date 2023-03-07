@@ -42,8 +42,8 @@ defmodule Grizzly.FirmwareUpdates do
 
   """
 
-  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor
 
   @type opt ::
           {:manufacturer_id, non_neg_integer}
@@ -69,7 +69,7 @@ defmodule Grizzly.FirmwareUpdates do
            FirmwareUpdateRunnerSupervisor.start_runner(opts) do
       FirmwareUpdateRunner.start_firmware_update(runner, firmware_image_path)
     else
-      {:error, :imgae_not_found} ->
+      {:error, :image_not_found} ->
         Logger.warn("[Grizzly] Firmware image file not found")
         {:error, :image_not_found}
 

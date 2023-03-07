@@ -20,8 +20,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, CommandClasses, Decoder}
   alias Grizzly.Commands.Table
+  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError, Decoder}
   alias Grizzly.ZWave.CommandClasses.MultiChannel
 
   @type param ::

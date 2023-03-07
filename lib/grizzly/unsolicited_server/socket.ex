@@ -5,10 +5,10 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
   require Logger
 
-  alias Grizzly.{Report, SeqNumber, Transport, ZWave, ZIPGateway}
+  alias Grizzly.{Report, SeqNumber, Transport, ZIPGateway, ZWave}
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
-  alias Grizzly.UnsolicitedServer.{Messages, SocketSupervisor, ResponseHandler}
+  alias Grizzly.UnsolicitedServer.{Messages, ResponseHandler, SocketSupervisor}
 
   @spec child_spec(Transport.t()) :: map()
   def child_spec(transport) do

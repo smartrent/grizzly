@@ -6,7 +6,7 @@ defmodule Grizzly.UnsolicitedServer do
 
   alias Grizzly.{Options, Report, SeqNumber, Transport, ZWave}
   alias Grizzly.ZWave.Commands.ZIPPacket
-  alias Grizzly.UnsolicitedServer.{SocketSupervisor, ResponseHandler, Messages}
+  alias Grizzly.UnsolicitedServer.{Messages, ResponseHandler, SocketSupervisor}
 
   defmodule State do
     @moduledoc false
@@ -111,11 +111,9 @@ defmodule Grizzly.UnsolicitedServer do
   end
 
   def listen(transport) do
-    try do
-      Transport.listen(transport)
-    rescue
-      error -> error
-    end
+    Transport.listen(transport)
+  rescue
+    error -> error
   end
 
   def maybe_start_accept_sockets(listening_transport, listen_opts) do

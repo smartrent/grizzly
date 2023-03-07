@@ -8,8 +8,8 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.SmartStart.MetaExtension
   alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.SmartStart.MetaExtension
 
   @impl true
   def byte(), do: 0x78

@@ -11,9 +11,9 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
 
   @behaviour Grizzly.ZWave.Command
 
+  alias Grizzly.Commands.Table
   alias Grizzly.ZWave.{Command, DecodeError, Decoder}
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
-  alias Grizzly.Commands.Table
 
   require Logger
 

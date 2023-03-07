@@ -3,8 +3,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   use GenServer
 
   alias Grizzly.{Connection, FirmwareUpdates, Options, Report}
-  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.{FirmwareUpdate, Image}
   alias Grizzly.Connections.AsyncConnection
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.{FirmwareUpdate, Image}
   require Logger
 
   @typedoc """

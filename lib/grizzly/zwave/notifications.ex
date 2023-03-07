@@ -1,7 +1,7 @@
 defmodule Grizzly.ZWave.Notifications do
-  alias Grizzly.ZWave.Commands.{UserCodeReport, NodeLocationReport}
-  alias Grizzly.ZWave.CommandClasses.{UserCode, NodeNaming}
-  alias Grizzly.ZWave.{Decoder, DecodeError}
+  alias Grizzly.ZWave.Commands.{NodeLocationReport, UserCodeReport}
+  alias Grizzly.ZWave.CommandClasses.{NodeNaming, UserCode}
+  alias Grizzly.ZWave.{DecodeError, Decoder}
   require Logger
 
   @alarm_types [

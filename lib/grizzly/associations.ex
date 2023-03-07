@@ -213,17 +213,15 @@ defmodule Grizzly.Associations do
   end
 
   defp try_create_file(path) do
-    try do
-      write_associations(path, %{})
-      {:ok, %State{file_path: path}}
-    rescue
-      _e ->
-        raise ArgumentError, """
-        Unable to create the file for associations
+    write_associations(path, %{})
+    {:ok, %State{file_path: path}}
+  rescue
+    _e ->
+      raise ArgumentError, """
+      Unable to create the file for associations
 
-        file_path: #{inspect(path)}
-        """
-    end
+      file_path: #{inspect(path)}
+      """
   end
 
   defp write_associations(file_path, associations) do
