@@ -21,7 +21,7 @@ install_system_deps: &install_system_deps
 jobs:
   build_elixir_1_14_otp_25:
     docker:
-      - image: hexpm/elixir:1.14.0-erlang-25.1-alpine-3.15.6
+      - image: hexpm/elixir:1.14.3-erlang-25.2.3-alpine-3.15.6
     <<: *defaults
     steps:
       - checkout
@@ -30,10 +30,13 @@ jobs:
       - restore_cache:
           keys:
             - v1-mix-cache-{{ checksum "mix.lock" }}
+            - v1-mix-cache-
       - run: mix deps.get
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
       - run: mix test --include inclusion --include integration --include firmware_update
+      - store_test_results:
+          path: test-junit-report.xml
       - run: mix deps.unlock --check-unused
       - run: mix docs
       - run: mix hex.build
@@ -81,18 +84,6 @@ jobs:
       - run: mix compile
       - run: mix test
 
-  build_elixir_1_10_otp_23:
-    docker:
-      - image: hexpm/elixir:1.10.4-erlang-23.1.2-alpine-3.12.1
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix compile
-      - run: mix test
-
 workflows:
   version: 2
   build_test:
@@ -101,4 +92,3 @@ workflows:
       - build_elixir_1_13_otp_24
       - build_elixir_1_12_otp_24
       - build_elixir_1_11_otp_23
-      - build_elixir_1_10_otp_23
