@@ -146,7 +146,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     end
   end
 
-  # Params sent by Schlage 468ZP 
+  # Params sent by Schlage 468ZP
   def decode_params(
         <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte>>
       ) do

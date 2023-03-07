@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, CommandClasses, DeviceClasses}
+  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError, DeviceClasses}
   alias Grizzly.ZWave.CommandClasses.MultiChannel
 
   @type param ::

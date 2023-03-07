@@ -5,8 +5,8 @@ defmodule Grizzly.Commands.CommandRunner do
 
   use GenServer
 
-  alias Grizzly.Report
   alias Grizzly.Commands.Command
+  alias Grizzly.Report
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 
   def child_spec([_command, _node_id, _opts] = args) do

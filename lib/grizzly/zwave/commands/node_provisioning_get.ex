@@ -16,9 +16,9 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
 
   @behaviour Grizzly.ZWave.Command
 
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
-  alias Grizzly.ZWave
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.t()}
 

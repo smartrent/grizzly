@@ -11,12 +11,12 @@ defmodule Grizzly.VirtualDevices.Thermostat do
 
   alias Grizzly.ZWave.Commands.{
     BasicReport,
-    ThermostatSetpointReport,
-    ThermostatModeReport,
+    SensorMultilevelReport,
+    SensorMultilevelSupportedSensorReport,
     ThermostatFanModeReport,
     ThermostatFanStateReport,
-    SensorMultilevelReport,
-    SensorMultilevelSupportedSensorReport
+    ThermostatModeReport,
+    ThermostatSetpointReport
   }
 
   @impl Grizzly.VirtualDevices.Device

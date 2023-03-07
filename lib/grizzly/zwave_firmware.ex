@@ -84,7 +84,11 @@ defmodule Grizzly.ZwaveFirmware do
     end
   end
 
-  # "Using serial device /dev/ttyS4\nConnected to Serial device: OK\nSerial version: 9, Chip type: 7, Chip version: 0, SDK: 7.15.02, ..."
+  # """
+  # Using serial device /dev/ttyS4
+  # Connected to Serial device: OK
+  # Serial version: 9, Chip type: 7, Chip version: 0, SDK: 7.15.02, ...
+  # """
   # {:ok, %{chip_type: chip_type, version: current_version}}
   defp extract_zwave_module_info(answer) do
     Logger.info("[Grizzly] Extracting current version from #{inspect(answer)}")

@@ -1,26 +1,32 @@
 defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
   @moduledoc """
-  This command is used to report the maximum number of supported scenes and the Key Attributes
-  supported for each scene.
+  This command is used to report the maximum number of supported scenes and the
+  Key Attributes supported for each scene.
 
   Versions 1 and 2 are obsolete. Version 3+ fields are required.
 
   Params:
 
-    * `:supported_scenes` - This field indicates the maximum number of scenes supported by the requested device. (required)
+    * `:supported_scenes` - This field indicates the maximum number of scenes
+      supported by the requested device. (required)
 
-    * `:slow_refresh_support` - This field indicates whether the node supports the Slow Refresh capability. (required)
+    * `:slow_refresh_support` - This field indicates whether the node supports
+      the Slow Refresh capability. (required)
 
-    * `:identical` - This field indicates if all scenes are supporting the same Key Attributes (required)
+    * `:identical` - This field indicates if all scenes are supporting the same
+      Key Attributes (required)
 
-    * `:bit_mask_bytes` - This field advertises the size of each “Supported Key Attributes” field measured in bytes. Must be 1..3. (required)
+    * `:bit_mask_bytes` - This field advertises the size of each “Supported Key Attributes”
+      field measured in bytes. Must be 1..3. (required)
 
-    * `:supported_key_attributes` - This field advertises the attributes supported by the corresponding scene (required)
-                                    A list of lists of key attributes where a key attribute
-                                    is one of :key_pressed_1_time | :key_released | :key_held_down | :key_pressed_2_times
-                                    | :key_pressed_3_times | :key_pressed_4_times | :key_pressed_5_times.
-                                    If not identical, the first list of key attributes corresponds to scene 1, the second to scene 2 etc. for each of supported_scenes
-                                    If identical, only the key attributes of scene 1 are to be listed
+    * `:supported_key_attributes` - This field advertises the attributes supported
+      by the corresponding scene (required)
+      * A list of lists of key attributes where a key attribute is one of
+        `:key_pressed_1_time` | `:key_released` | `:key_held_down` | `:key_pressed_2_times`
+        | `:key_pressed_3_times` | `:key_pressed_4_times` | `:key_pressed_5_times`.
+      * If not identical, the first list of key attributes corresponds to scene 1, the
+        second to scene 2 etc. for each of supported_scenes
+      * If identical, only the key attributes of scene 1 are to be listed
 
   """
 
@@ -148,7 +154,8 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
     per_scene_bit_indices = Enum.chunk_every(all_bit_masks_as_lists, bit_mask_bytes)
     scene_count = Enum.count(per_scene_bit_indices)
 
-    # Some devices may return more than one set of scene bit indices though they are meant to identical (the superfluous will be ignored)
+    # Some devices may return more than one set of scene bit indices though they are meant to
+    # identical (the superfluous will be ignored)
     valid? = if identical?, do: scene_count >= 1, else: scene_count == supported_scenes
 
     if valid? do

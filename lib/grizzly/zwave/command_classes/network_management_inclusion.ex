@@ -8,7 +8,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.{DSK, CommandClasses, Security}
+  alias Grizzly.ZWave.{CommandClasses, DSK, Security}
 
   @typedoc """
   The status of the inclusion process

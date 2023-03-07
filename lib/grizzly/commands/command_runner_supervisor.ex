@@ -5,9 +5,9 @@ defmodule Grizzly.Commands.CommandRunnerSupervisor do
 
   use DynamicSupervisor
 
+  alias Grizzly.Commands.{Command, CommandRunner}
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command, as: ZWaveCommand
-  alias Grizzly.Commands.{CommandRunner, Command}
 
   def start_link(_) do
     DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)

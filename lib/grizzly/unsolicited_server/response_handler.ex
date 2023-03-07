@@ -11,11 +11,11 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   alias Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Commands.{
-    AssociationReport,
-    AssociationGroupingsReport,
-    AssociationGroupNameReport,
     AssociationGroupCommandListReport,
     AssociationGroupInfoReport,
+    AssociationGroupingsReport,
+    AssociationGroupNameReport,
+    AssociationReport,
     AssociationSpecificGroupReport,
     MultiChannelAssociationGroupingsReport,
     MultiChannelAssociationReport,

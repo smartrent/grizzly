@@ -11,9 +11,9 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   use GenServer
 
-  alias Grizzly.{Connections, Connection, Options, Report, Transport, ZIPGateway, ZWave}
   alias Grizzly.Commands.CommandRunner
-  alias Grizzly.Connections.{KeepAlive, CommandList}
+  alias Grizzly.Connections.{CommandList, KeepAlive}
+  alias Grizzly.{Connection, Connections, Options, Report, Transport, ZIPGateway, ZWave}
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 

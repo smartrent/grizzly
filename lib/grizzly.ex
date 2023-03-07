@@ -61,8 +61,8 @@ defmodule Grizzly do
 
   """
 
-  alias Grizzly.{Connection, Inclusions, FirmwareUpdates, Report, VersionReports, VirtualDevices}
   alias Grizzly.Commands.Table
+  alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
 

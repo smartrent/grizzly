@@ -15,11 +15,11 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
   alias Grizzly.SeqNumber
 
   alias Grizzly.ZWave.Commands.{
+    LearnModeSet,
     NodeAdd,
-    NodeRemove,
-    NodeAddKeysSet,
     NodeAddDSKSet,
-    LearnModeSet
+    NodeAddKeysSet,
+    NodeRemove
   }
 
   @impl Grizzly.Inclusions.NetworkAdapter

@@ -4,13 +4,13 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   # This module holds the state of the FirmwareUpdateRunner and
   # knows how to move the process along (which commmand follows which)
 
-  alias Grizzly.ZWave.{Command, CRC}
   alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
+  alias Grizzly.ZWave.{Command, CRC}
 
   alias Grizzly.ZWave.Commands.{
-    FirmwareUpdateMDRequestGet,
-    FirmwareUpdateMDReport
+    FirmwareUpdateMDReport,
+    FirmwareUpdateMDRequestGet
   }
 
   require Logger
