@@ -1,5 +1,5 @@
 defmodule Grizzly.InclusionsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Grizzly.{Inclusions, Report}
   alias Grizzly.ZWave.Command
