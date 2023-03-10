@@ -4,9 +4,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
 
   Params:
 
-    * `:target_value` - '`:off`, `:previous` or a value betweem 1 and 99
+    * `:target_value` - '`:off`, `:previous` or a value between 0 and 99
     * `:duration` - How long the switch should take to reach target value,
-      0 -> instantly, 1..127 -> seconds, 128..254 -> minutes, 256 -> factory default (option v2)
+      * 0 -> instantly
+      * 1..127 -> seconds
+      * 128..254 -> minutes + 127
+      * 255 -> factory default (option v2)
 
   """
 
@@ -15,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
 
-  @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
+  @type param :: {:target_value, :off | :previous | 0..99} | {:duration, 0..255}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
