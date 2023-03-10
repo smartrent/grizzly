@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelSet do
       {:ok, [power_level: power_level, timeout: timeout]}
     else
       {:error, %DecodeError{} = error} ->
-        %DecodeError{error | command: :powerlevel_set}
+        {:error, %DecodeError{error | command: :powerlevel_set}}
     end
   end
 end

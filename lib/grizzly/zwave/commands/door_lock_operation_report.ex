@@ -160,7 +160,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
        ]}
     else
       {:error, %DecodeError{} = decode_error} ->
-        %DecodeError{decode_error | command: :door_lock_operation_report}
+        {:error, %DecodeError{decode_error | command: :door_lock_operation_report}}
     end
   end
 
@@ -254,6 +254,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   defp duration_to_byte(secs) when secs in 128..(126 * 60), do: round(secs / 60) + 0x7F
   defp duration_to_byte(:unknown), do: 0xFE
 
+  @spec door_handles_modes_from_byte(byte()) :: %{(1..4) => :enabled | :disabled}
   defp door_handles_modes_from_byte(byte) do
     <<_::size(4), handle_4::size(1), handle_3::size(1), handle_2::size(1), handle_1::size(1)>> =
       <<byte>>
@@ -266,12 +267,14 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     }
   end
 
+  @spec door_handle_enable_value_from_bit(0 | 1) :: :enabled | :disabled
   defp door_handle_enable_value_from_bit(1), do: :enabled
   defp door_handle_enable_value_from_bit(0), do: :disabled
 
   defp door_handle_value_to_bit(:enabled), do: 1
   defp door_handle_value_to_bit(:disabled), do: 0
 
+  @spec latch_position_from_byte(byte()) :: latch_position()
   defp latch_position_from_byte(byte) do
     <<_::size(5), latch_bit::size(1), _::size(2)>> = <<byte>>
 
@@ -282,6 +285,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
+  @spec bolt_position_from_byte(byte()) :: bolt_position()
   defp bolt_position_from_byte(byte) do
     <<_::size(5), _::size(1), bolt_bit::size(1), _::size(1)>> = <<byte>>
 
@@ -292,6 +296,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
+  @spec door_state_from_byte(byte()) :: door_state()
   defp door_state_from_byte(byte) do
     <<_::size(5), _::size(2), door_state_bit::size(1)>> = <<byte>>
 
@@ -302,21 +307,25 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
+  @spec timeout_minutes_from_byte(byte()) :: {:ok, timeout_minutes()} | {:error, DecodeError.t()}
   defp timeout_minutes_from_byte(m) when m >= 0 and m <= 0xFD, do: {:ok, m}
   defp timeout_minutes_from_byte(0xFE), do: {:ok, :undefined}
 
   defp timeout_minutes_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :timeout_minute, command: :operation_report}}
 
+  @spec timeout_seconds_from_byte(byte()) :: {:ok, timeout_seconds()} | {:error, DecodeError.t()}
   defp timeout_seconds_from_byte(s) when s >= 0 and s <= 0x3B, do: {:ok, s}
   defp timeout_seconds_from_byte(0xFE), do: {:ok, :undefined}
 
   defp timeout_seconds_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :timeout_second, command: :operation_report}}
 
+  @spec duration_from_byte(byte()) ::
+          {:ok, :unknown | non_neg_integer()} | {:error, DecodeError.t()}
   defp duration_from_byte(byte) when byte in 0x00..0x7F, do: {:ok, byte}
   defp duration_from_byte(byte) when byte in 0x80..0xFD, do: {:ok, (byte - 0x7F) * 60}
-  defp duration_from_byte(0xFE), do: :unknown
+  defp duration_from_byte(0xFE), do: {:ok, :unknown}
 
   defp duration_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :duration, command: :supervision_report}}

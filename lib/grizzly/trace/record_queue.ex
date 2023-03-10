@@ -3,7 +3,7 @@ defmodule Grizzly.Trace.RecordQueue do
 
   alias Grizzly.Trace.Record
 
-  @opaque t() :: :queue.queue(Record.t())
+  @type t() :: :queue.queue(Record.t())
 
   @doc """
   Create a new `RecordQueue.t()`

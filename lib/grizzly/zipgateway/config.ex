@@ -124,7 +124,7 @@ defmodule Grizzly.ZIPGateway.Config do
   This is useful to ensure other tools provided by `zipgateway` can work.
   """
   @spec ensure_files(t()) :: t()
-  def ensure_files(config) do
+  def ensure_files(%__MODULE__{} = config) do
     :ok = ensure_provisioning_list_config(config.provisioning_config_file)
 
     config
@@ -145,6 +145,7 @@ defmodule Grizzly.ZIPGateway.Config do
 
         {:error, reason} ->
           Logger.warn("Failed to write provision list file: #{inspect(reason)}")
+          :ok
       end
     end
   end
