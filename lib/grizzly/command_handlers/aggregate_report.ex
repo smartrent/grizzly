@@ -48,7 +48,6 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
     final_values = Command.param!(command, aggregate_param)
 
     Command.put_param(command, aggregate_param, do_aggregate(aggregates, final_values))
-    |> IO.inspect()
   end
 
   defp do_aggregate(aggregates, new_aggregate_values) when is_list(aggregates),

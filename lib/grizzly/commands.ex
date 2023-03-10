@@ -27,9 +27,7 @@ defmodule Grizzly.Commands do
   @spec handle_zip_packet_for_command(pid(), Command.t()) ::
           :continue
           | :retry
-          | {:complete, any()}
           | {:error, :nack_response}
-          | {:queued, non_neg_integer()}
           | Report.t()
   def handle_zip_packet_for_command(command, zip_packet) do
     CommandRunner.handle_zip_command(command, zip_packet)
