@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
 
   Params:
 
-    * `:value` - '`:off` or a value betweem 1 and 100
+    * `:value` - `:off`, 0 (off) and 99 (100% on), or `:unknown`
     * `:duration` - How long the switch should take to reach target value, 0 -> instantly, 1..127 -> seconds, 128..253 -> minutes, 255 -> unknown (optional v2)
   """
 
@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
 
-  @type param :: {:value, non_neg_integer() | :off | :unknown} | {:duration, non_neg_integer()}
+  @type param :: {:value, 0..99 | :off | :unknown} | {:duration, non_neg_integer()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
@@ -44,9 +44,8 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   def encode_value(:off), do: 0x00
-  def encode_value(value) when value in 0..100, do: value
+  def encode_value(value) when value in 0..99, do: value
   def encode_value(:unknown), do: 0xFE
-  def encode_value(:previous), do: 0xFF
 
   @impl true
   def decode_params(<<value_byte>>) do
@@ -87,10 +86,11 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   defp value_from_byte(0x00), do: {:ok, :off}
-  defp value_from_byte(byte) when byte in 0..100, do: {:ok, byte}
+  defp value_from_byte(byte) when byte in 1..99, do: {:ok, byte}
   defp value_from_byte(0xFE), do: {:ok, :unknown}
   # deprecated
-  defp value_from_byte(0xFF), do: {:ok, 100}
+  # 99 means 100% hardware level
+  defp value_from_byte(0xFF), do: {:ok, 99}
 
   defp value_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :value, command: :switch_multilevel_report}}
