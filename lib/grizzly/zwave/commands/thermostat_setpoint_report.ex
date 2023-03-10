@@ -19,10 +19,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
-  @type param :: {:type, ThermostatSetpoint.type()} | {:scale, ThermostatSetpoint.scale()}
-
-  @impl true
-  @spec new([param()]) :: {:ok, Command.t()}
+  @impl Command
+  @spec new([ThermostatSetpoint.param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
       name: :thermostat_setpoint_report,
@@ -35,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Command
   def encode_params(command) do
     type = Command.param!(command, :type)
     scale_byte = Command.param!(command, :scale) |> ThermostatSetpoint.encode_scale()
@@ -59,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   defp encode_size(:na, _value), do: 1
   defp encode_size(_type, value), do: ceil(:math.log2(value) / 8)
 
-  @impl true
+  @impl Command
   def decode_params(
         <<_::size(4), type_byte::size(4), precision::size(3), scale_byte::size(2),
           byte_size::size(3), int_value::size(byte_size)-unit(8)>>
