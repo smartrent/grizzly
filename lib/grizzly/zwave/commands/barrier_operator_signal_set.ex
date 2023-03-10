@@ -16,8 +16,8 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalSet do
   alias Grizzly.ZWave.CommandClasses.BarrierOperator
 
   @type param ::
-          {:subsystem, BarrierOperator.subsystem_type()}
-          | {:state, BarrierOperator.subsystem_state()}
+          {:subsystem_type, BarrierOperator.subsystem_type()}
+          | {:subsystem_state, BarrierOperator.subsystem_state()}
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}

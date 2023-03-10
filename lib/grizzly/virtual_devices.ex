@@ -113,7 +113,8 @@ defmodule Grizzly.VirtualDevices do
   @doc """
   Send a Z-Wave command to the virtual device
   """
-  @spec send_command(id(), Command.t()) :: {:ok, Grizzly.Report.t()}
+  @spec send_command(id(), Command.t()) ::
+          {:ok, Grizzly.Report.t()} | {:error, :device_not_found | Grizzly.Report.t()}
   def send_command(device_id, %Command{name: :node_info_cache_get} = node_info_get) do
     with_entry(device_id, &Reports.build_node_info_cache_report(&1, node_info_get))
   end

@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeSet do
        [test_node_id: test_node_id, power_level: power_level, test_frame_count: test_frame_count]}
     else
       {:error, %DecodeError{} = error} ->
-        %DecodeError{error | command: :powerlevel_test_node_set}
+        {:error, %DecodeError{error | command: :powerlevel_test_node_set}}
     end
   end
 end

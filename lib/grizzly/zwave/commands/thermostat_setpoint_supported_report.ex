@@ -72,7 +72,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
   end
 
   @spec bitmask_field_to_setpoint_type(pos_integer(), 0..7) ::
-          ThermostatSetpoint.type() | :reserved
+          ThermostatSetpoint.type() | :reserved | nil
   defp bitmask_field_to_setpoint_type(byte_index, bit_index)
 
   defp bitmask_field_to_setpoint_type(1, 1), do: :heating

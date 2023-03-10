@@ -227,7 +227,7 @@ defmodule Grizzly.Inclusions do
   useful for passing back to the node which keys it is allowed to use and
   depending on that answer the including node might request more information.
   """
-  @spec grant_keys([Security.key()]) :: :ok
+  @spec grant_keys([Security.key()]) :: :ok | status()
   def grant_keys(s2_keys) do
     InclusionServer.grant_keys(s2_keys)
   end

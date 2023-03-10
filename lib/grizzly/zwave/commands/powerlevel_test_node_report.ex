@@ -62,7 +62,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeReport do
        ]}
     else
       {:error, %DecodeError{} = error} ->
-        %DecodeError{error | command: :powerlevel_test_node_report}
+        {:error, %DecodeError{error | command: :powerlevel_test_node_report}}
     end
   end
 end

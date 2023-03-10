@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStopLevelChange do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.WindowCovering
 
-  @type param :: {:parameter_id, byte()}
+  @type param :: {:parameter_name, WindowCovering.parameter_name()}
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}

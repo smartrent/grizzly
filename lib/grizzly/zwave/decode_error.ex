@@ -2,7 +2,7 @@ defmodule Grizzly.ZWave.DecodeError do
   @moduledoc """
   Exception for when decoding a Z-Wave Command goes wrong
   """
-  @type t :: %__MODULE__{value: byte(), param: atom(), command: atom()}
+  @type t :: %__MODULE__{value: binary() | byte() | nil, param: atom(), command: atom()}
 
   defexception [:value, :param, :command]
 

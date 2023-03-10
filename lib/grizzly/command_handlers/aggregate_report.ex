@@ -26,7 +26,7 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
   def handle_ack(state), do: {:continue, state}
 
   @spec handle_command(Command.t(), state()) ::
-          {:continue, state} | {:complete, {:ok, Command.t()}}
+          {:continue, state} | {:complete, Command.t()}
   def handle_command(command, state) do
     if command.name == state.complete_report do
       do_handle_command(command, state)
@@ -48,6 +48,7 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
     final_values = Command.param!(command, aggregate_param)
 
     Command.put_param(command, aggregate_param, do_aggregate(aggregates, final_values))
+    |> IO.inspect()
   end
 
   defp do_aggregate(aggregates, new_aggregate_values) when is_list(aggregates),

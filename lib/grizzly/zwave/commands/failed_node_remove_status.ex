@@ -67,7 +67,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemoveStatus do
       {:ok, [seq_number: seq_number, node_id: node_id, status: status]}
     else
       {:error, %DecodeError{} = error} ->
-        error
+        {:error, error}
     end
   end
 
