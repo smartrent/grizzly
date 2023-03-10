@@ -44,7 +44,7 @@ defmodule Grizzly.MixProject do
 
   defp dialyzer() do
     [
-      flags: [:unmatched_returns, :error_handling, :missing_return],
+      flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return],
       plt_add_apps: [:eex, :mix],
       ignore_warnings: "dialyzer_ignore_warnings.exs"
     ]

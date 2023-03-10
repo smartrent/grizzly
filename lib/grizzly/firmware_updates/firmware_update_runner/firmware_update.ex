@@ -129,7 +129,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   end
 
   @doc "Whether a next command needs to be followed by another to achieve a possibly new desired state"
-  @spec continuation(t) :: nil | {state, non_neg_integer}
+  @spec continuation(t) :: nil | {:uploading, non_neg_integer}
   def continuation(%__MODULE__{state: :uploading, fragments_wanted: fragments_wanted})
       when fragments_wanted > 0 do
     {:uploading, @transmission_delay}
