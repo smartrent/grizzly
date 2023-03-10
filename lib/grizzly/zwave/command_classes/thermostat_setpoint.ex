@@ -24,6 +24,12 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
 
   @type scale :: :c | :f
 
+  @typedoc "Shared parameters for ThermostatSetpointSet and ThermostatSetpointReport."
+  @type param ::
+          {:type, type()}
+          | {:scale, scale()}
+          | {:value, float()}
+
   @behaviour Grizzly.ZWave.CommandClass
 
   alias Grizzly.ZWave.DecodeError
