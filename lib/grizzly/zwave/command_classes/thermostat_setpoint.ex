@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   @type param ::
           {:type, type()}
           | {:scale, scale()}
-          | {:value, float()}
+          | {:value, number()}
 
   @behaviour Grizzly.ZWave.CommandClass
 
