@@ -4,6 +4,14 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.0.1] - 2023-03-13
+
+### Fixed
+
+- Typespec for `ThermostatSetpointReport` params now includes all params ([#712](https://github.com/smartrent/grizzly/pull/712))
+- Enabled Dialyzer `:extra_return` and `:missing_return` options and fixed some incorrect return values ([#714](https://github.com/smartrent/grizzly/pull/714))
+- Fixed interpretation of `:target_value` param in `SwitchMultilevel{Set,Report}` ([#715](https://github.com/smartrent/grizzly/pull/715))
+
 ## [v6.0.0] - 2022-03-03
 
 ### Fixed
