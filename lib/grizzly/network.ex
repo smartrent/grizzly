@@ -240,9 +240,23 @@ defmodule Grizzly.Network do
   end
 
   @doc """
+  Request a node to peform a neighbor update operation.
+  """
+  @spec node_neighbor_update_request(Grizzly.node_id(), [Grizzly.command_opt()]) ::
+          Grizzly.send_command_response()
+  def node_neighbor_update_request(node_id, opts) do
+    Grizzly.send_command(
+      :gateway,
+      :node_neighbor_update_request,
+      [node_id: node_id, seq_number: SeqNumber.get_and_inc()],
+      opts
+    )
+  end
+
+  @doc """
   Request a network update (network healing)
 
-  Options
+  ### Options
 
     * `:node_id` - If your controller is part of another controller's network
       you might want to issue network commands to that controller. By default
