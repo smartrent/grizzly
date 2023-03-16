@@ -85,6 +85,9 @@ defmodule Grizzly.Commands.Table do
        {Commands.NetworkManagementMultiChannelCapabilityGet,
         handler:
           {WaitReport, complete_report: :network_management_multi_channel_capability_report}}},
+      {:node_neighbor_update_request,
+       {Commands.NodeNeighborUpdateRequest,
+        handler: {WaitReport, complete_report: :node_neighbor_update_status}}},
 
       # DSKs
       {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
