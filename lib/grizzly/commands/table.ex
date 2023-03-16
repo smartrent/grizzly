@@ -394,7 +394,13 @@ defmodule Grizzly.Commands.Table do
       {:window_covering_start_level_change,
        {Commands.WindowCoveringStartLevelChange, handler: AckResponse}},
       {:window_covering_stop_level_change,
-       {Commands.WindowCoveringStopLevelChange, handler: AckResponse}}
+       {Commands.WindowCoveringStopLevelChange, handler: AckResponse}},
+      {:zip_nd_node_solicitation,
+       {Commands.ZipNdNodeSolicitation,
+        handler: {WaitReport, complete_report: :zip_nd_node_advertisement}}},
+      {:zip_nd_inverse_node_solicitation,
+       {Commands.ZipNdInverseNodeSolicitation,
+        handler: {WaitReport, complete_report: :zip_nd_node_advertisement}}}
     ]
 
     defmacro __before_compile__(_) do

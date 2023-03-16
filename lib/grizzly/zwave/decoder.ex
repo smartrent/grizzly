@@ -324,7 +324,11 @@ defmodule Grizzly.ZWave.Decoder do
       # Scene actuator configuration
       {0x2C, 0x01, Commands.SceneActuatorConfSet},
       {0x2C, 0x02, Commands.SceneActuatorConfGet},
-      {0x2C, 0x03, Commands.SceneActuatorConfReport}
+      {0x2C, 0x03, Commands.SceneActuatorConfReport},
+      # Z/IP ND
+      {0x58, 0x01, Commands.ZipNdNodeAdvertisement},
+      {0x58, 0x03, Commands.ZipNdNodeSolicitation},
+      {0x58, 0x04, Commands.ZipNdInverseNodeSolicitation}
     ]
 
     defmacro __before_compile__(_) do

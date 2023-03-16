@@ -22,7 +22,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
     report = Report.new(:complete, :ack_response, 1, command_ref: ref)
 
-    assert report == CommandRunner.handle_zip_command(runner, ack_response)
+    assert report == CommandRunner.handle_zwave_command(runner, ack_response)
   end
 
   test "runs a network command that has the seq number as part of the command" do
@@ -47,7 +47,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(node_list_report, SeqNumber.get_and_inc())
 
-    assert report == CommandRunner.handle_zip_command(runner, zip_packet)
+    assert report == CommandRunner.handle_zwave_command(runner, zip_packet)
   end
 
   test "runs a basic application command that expects a report" do
@@ -62,7 +62,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     {:ok, zip_packet} =
       ZIPPacket.with_zwave_command(switch_binary_report, SeqNumber.get_and_inc())
 
-    assert report == CommandRunner.handle_zip_command(runner, zip_packet)
+    assert report == CommandRunner.handle_zwave_command(runner, zip_packet)
   end
 
   test "runs command that will receive a nack response" do
@@ -71,7 +71,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
-    assert {:error, :nack_response} == CommandRunner.handle_zip_command(runner, nack_response)
+    assert {:error, :nack_response} == CommandRunner.handle_zwave_command(runner, nack_response)
   end
 
   test "handles :nack_queue_full response" do
@@ -81,7 +81,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     {:ok, nack_queue_full} =
       ZIPPacket.new(seq_number: CommandRunner.seq_number(runner), flag: :nack_queue_full)
 
-    assert {:error, :queue_full} == CommandRunner.handle_zip_command(runner, nack_queue_full)
+    assert {:error, :queue_full} == CommandRunner.handle_zwave_command(runner, nack_queue_full)
     refute Process.alive?(runner)
   end
 
@@ -91,7 +91,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner) + 1)
 
-    assert :continue == CommandRunner.handle_zip_command(runner, nack_response)
+    assert :continue == CommandRunner.handle_zwave_command(runner, nack_response)
   end
 
   test "handles a queued command" do
@@ -108,7 +108,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
         queued_delay: 3
       )
 
-    assert report == CommandRunner.handle_zip_command(runner, nack_waiting)
+    assert report == CommandRunner.handle_zwave_command(runner, nack_waiting)
   end
 
   test "handles queued complete command" do
@@ -123,7 +123,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
              queued_delay: 3,
              command_ref: command_ref
            ) ==
-             CommandRunner.handle_zip_command(runner, nack_waiting)
+             CommandRunner.handle_zwave_command(runner, nack_waiting)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
@@ -134,7 +134,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
       )
 
     assert report ==
-             CommandRunner.handle_zip_command(runner, ack_response)
+             CommandRunner.handle_zwave_command(runner, ack_response)
   end
 
   @tag :integration
@@ -150,14 +150,14 @@ defmodule Grizzly.Commands.CommandRunnerTest do
              queued: true,
              command_ref: command_ref
            ) ==
-             CommandRunner.handle_zip_command(runner, nack_waiting)
+             CommandRunner.handle_zwave_command(runner, nack_waiting)
 
     Process.sleep(10_000)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
     assert Report.new(:complete, :ack_response, 1, command_ref: command_ref, queued: true) ==
-             CommandRunner.handle_zip_command(runner, ack_response)
+             CommandRunner.handle_zwave_command(runner, ack_response)
   end
 
   test "encodes a command" do

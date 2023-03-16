@@ -21,13 +21,13 @@ defmodule Grizzly.Commands.CommandRunner do
     GenServer.start_link(__MODULE__, [command, node_id, opts])
   end
 
-  @spec handle_zip_command(pid(), ZWaveCommand.t()) ::
+  @spec handle_zwave_command(pid(), ZWaveCommand.t()) ::
           Report.t()
           | :continue
           | {:error, :nack_response}
           | :retry
-  def handle_zip_command(runner, zip_packet) do
-    GenServer.call(runner, {:handle_zip_command, zip_packet})
+  def handle_zwave_command(runner, zwave_command) do
+    GenServer.call(runner, {:handle_zwave_command, zwave_command})
   end
 
   @spec encode_command(pid()) :: binary()
@@ -60,8 +60,8 @@ defmodule Grizzly.Commands.CommandRunner do
   @impl true
   def handle_call(:seq_number, _from, command), do: {:reply, command.seq_number, command}
 
-  def handle_call({:handle_zip_command, zip_packet}, _from, command) do
-    case Command.handle_zip_command(command, zip_packet) do
+  def handle_call({:handle_zwave_command, zwave_command}, _from, command) do
+    case Command.handle_zwave_command(command, zwave_command) do
       {%Report{status: :inflight} = report, new_command} ->
         new_command = update_timeout(new_command, report.queued_delay)
         {:reply, report, new_command}

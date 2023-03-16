@@ -13,6 +13,7 @@ defmodule Grizzly.Connections.SyncConnection do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave.CommandClasses.ZipNd
 
   @type send_opt() :: {:timeout, non_neg_integer()} | {:retries, non_neg_integer()}
 
@@ -150,6 +151,10 @@ defmodule Grizzly.Connections.SyncConnection do
     %State{state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
   end
 
+  defp handle_commands(%Command{command_class: ZipNd}, state) do
+    state
+  end
+
   defp handle_commands(zip_packet, state) do
     Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
 
@@ -186,9 +191,9 @@ defmodule Grizzly.Connections.SyncConnection do
     end
   end
 
-  defp do_handle_commands(zip_packet, state) do
+  defp do_handle_commands(command, state) do
     updated_state =
-      case CommandList.response_for_zip_packet(state.commands, zip_packet) do
+      case CommandList.response_for_zwave_command(state.commands, command) do
         {:retry, command_runner, new_command_list} ->
           :ok = do_send_command(command_runner, state)
           %State{state | commands: new_command_list}

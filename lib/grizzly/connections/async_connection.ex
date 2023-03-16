@@ -171,7 +171,7 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   defp handle_commands(zip_packet, state) do
     updated_state =
-      case CommandList.response_for_zip_packet(state.commands, zip_packet) do
+      case CommandList.response_for_zwave_command(state.commands, zip_packet) do
         {:retry, command_runner, new_command_list} ->
           :ok = do_send_command(command_runner, state)
           %State{state | commands: new_command_list}

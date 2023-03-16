@@ -24,13 +24,13 @@ defmodule Grizzly.Commands do
   @doc """
   For a running command try to handle the Z/IP Packet
   """
-  @spec handle_zip_packet_for_command(pid(), Command.t()) ::
+  @spec handle_zwave_command_for_command(pid(), Command.t()) ::
           :continue
           | :retry
           | {:error, :nack_response}
           | Report.t()
-  def handle_zip_packet_for_command(command, zip_packet) do
-    CommandRunner.handle_zip_command(command, zip_packet)
+  def handle_zwave_command_for_command(command, zwave_command) do
+    CommandRunner.handle_zwave_command(command, zwave_command)
   end
 
   @doc """

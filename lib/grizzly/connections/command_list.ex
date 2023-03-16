@@ -43,12 +43,12 @@ defmodule Grizzly.Connections.CommandList do
     end
   end
 
-  @spec response_for_zip_packet(t(), ZWaveCommand.t()) ::
+  @spec response_for_zwave_command(t(), ZWaveCommand.t()) ::
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
           | {command_waiter(), {Report.t(), t()}}
           | {command_waiter(), {:error, :nack_response, t()}}
-  def response_for_zip_packet(command_list, zip_packet) do
+  def response_for_zwave_command(command_list, zip_packet) do
     case get_response_for_command(command_list, zip_packet) do
       {{:retry, command_runner}, command_list} ->
         {:retry, command_runner, %__MODULE__{commands: command_list}}
@@ -140,7 +140,7 @@ defmodule Grizzly.Connections.CommandList do
     end)
   end
 
-  defp get_response_for_command(command_list, zip_packet) do
+  defp get_response_for_command(command_list, zwave_command) do
     Enum.reduce(command_list.commands, {nil, []}, fn
       # if a command has already completed we don't need to commands anymore, so
       # we just put this one back into the list in for future incoming commands
@@ -148,7 +148,7 @@ defmodule Grizzly.Connections.CommandList do
         {{report, completed_command}, [command | new_command_list]}
 
       {command_runner, _command_waiter, _ref} = command, {_result, new_command_list} ->
-        case CommandRunner.handle_zip_command(command_runner, zip_packet) do
+        case CommandRunner.handle_zwave_command(command_runner, zwave_command) do
           # if the command says to continue we put it back into the command list
           :continue ->
             {:continue, [command | new_command_list]}

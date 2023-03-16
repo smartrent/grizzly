@@ -27,7 +27,7 @@ defmodule Grizzly.Connections.CommandListTest do
     report = Report.new(:complete, :ack_response, 1, command_ref: ref)
 
     assert {self(), {report, CommandList.empty()}} ==
-             CommandList.response_for_zip_packet(command_list, ack_response)
+             CommandList.response_for_zwave_command(command_list, ack_response)
   end
 
   test "response for nack response" do
@@ -39,7 +39,7 @@ defmodule Grizzly.Connections.CommandListTest do
     ack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
     assert {self(), {:error, :nack_response, CommandList.empty()}} ==
-             CommandList.response_for_zip_packet(command_list, ack_response)
+             CommandList.response_for_zwave_command(command_list, ack_response)
 
     refute Process.alive?(runner)
   end
@@ -56,7 +56,7 @@ defmodule Grizzly.Connections.CommandListTest do
       Report.new(:inflight, :queued_delay, 1, command_ref: ref, queued: true, queued_delay: 3)
 
     assert {self(), {report, command_list}} ==
-             CommandList.response_for_zip_packet(command_list, queued_response)
+             CommandList.response_for_zwave_command(command_list, queued_response)
 
     assert Process.alive?(runner)
   end
@@ -70,7 +70,7 @@ defmodule Grizzly.Connections.CommandListTest do
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
     assert {:retry, runner, command_list} ==
-             CommandList.response_for_zip_packet(command_list, nack_response)
+             CommandList.response_for_zwave_command(command_list, nack_response)
 
     assert Process.alive?(runner)
   end
@@ -84,7 +84,7 @@ defmodule Grizzly.Connections.CommandListTest do
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
     assert {:continue, command_list} ==
-             CommandList.response_for_zip_packet(command_list, ack_response)
+             CommandList.response_for_zwave_command(command_list, ack_response)
 
     assert Process.alive?(runner)
   end

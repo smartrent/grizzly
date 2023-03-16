@@ -67,12 +67,19 @@ defmodule Grizzly.Commands.Command do
     }
   end
 
+  @no_zip_packet_commands [
+    :keep_alive,
+    :zip_nd_node_solicitation,
+    :zip_nd_inverse_node_solicitation,
+    :zip_nd_node_advertisement
+  ]
+
   @spec to_binary(t()) :: binary()
   def to_binary(command) do
     zwave_command = command.source
 
     case zwave_command.name do
-      :keep_alive ->
+      cmd when cmd in @no_zip_packet_commands ->
         <<zwave_command.command_class.byte(), zwave_command.command_byte>> <>
           ZWaveCommand.encode_params(zwave_command)
 
@@ -86,12 +93,23 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  @spec handle_zip_command(t(), ZWaveCommand.t()) ::
+  @zip_nd_commands [
+    :zip_nd_node_solicitation,
+    :zip_nd_inverse_node_solicitation,
+    :zip_nd_node_advertisement
+  ]
+
+  @spec handle_zwave_command(t(), ZWaveCommand.t()) ::
           {Report.t(), t()}
           | {:error, :nack_response | :queue_full, t()}
           | {:retry, t()}
           | {:continue, t()}
-  def handle_zip_command(command, zip_command) do
+  def handle_zwave_command(command, %ZWaveCommand{name: name} = zwave_command)
+      when name in @zip_nd_commands do
+    do_handle_zwave_command(command, zwave_command)
+  end
+
+  def handle_zwave_command(command, zip_command) do
     case ZWaveCommand.param!(zip_command, :flag) do
       :ack_response ->
         handle_ack_response(command, zip_command)
@@ -106,7 +124,8 @@ defmodule Grizzly.Commands.Command do
         {:error, :queue_full, zip_command}
 
       flag when flag in [nil, :ack_request] ->
-        do_handle_zip_command(command, zip_command)
+        zwave_command = ZWaveCommand.param!(zip_command, :command)
+        do_handle_zwave_command(command, zwave_command)
     end
   end
 
@@ -168,9 +187,7 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp do_handle_zip_command(command, zip_packet_command) do
-    zwave_command = ZWaveCommand.param!(zip_packet_command, :command)
-
+  defp do_handle_zwave_command(command, zwave_command) do
     case command.handler.handle_command(zwave_command, command.handler_state) do
       {:continue, new_handler_state} ->
         {:continue, %__MODULE__{command | handler_state: new_handler_state}}

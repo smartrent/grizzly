@@ -1,17 +1,19 @@
 defmodule Grizzly.Commands.CommandTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands.ZipNdNodeAdvertisement
   alias Grizzly.Report
   alias Grizzly.Commands.Command
 
-  alias Grizzly.ZWave.CommandClasses.ZIP
+  alias Grizzly.ZWave.CommandClasses.{ZIP, ZipNd}
 
   alias Grizzly.ZWave.Commands.{
     SwitchBinaryGet,
     SwitchBinaryReport,
     SwitchBinarySet,
     ZIPKeepAlive,
-    ZIPPacket
+    ZIPPacket,
+    ZipNdInverseNodeSolicitation
   }
 
   alias Grizzly.CommandHandlers.AckResponse
@@ -52,7 +54,7 @@ defmodule Grizzly.Commands.CommandTest do
     report = Report.new(:complete, :ack_response, 1, command_ref: grizzly_command.ref)
 
     assert {report, %Command{grizzly_command | status: :complete}} ==
-             Command.handle_zip_command(grizzly_command, ack_response)
+             Command.handle_zwave_command(grizzly_command, ack_response)
   end
 
   test "handles Z/IP Packet for an report" do
@@ -66,10 +68,10 @@ defmodule Grizzly.Commands.CommandTest do
     report =
       Report.new(:complete, :command, 1, command: switch_report, command_ref: grizzly_command.ref)
 
-    assert {:continue, %Command{}} = Command.handle_zip_command(grizzly_command, ack_response)
+    assert {:continue, %Command{}} = Command.handle_zwave_command(grizzly_command, ack_response)
 
     assert {report, %Command{grizzly_command | status: :complete}} ==
-             Command.handle_zip_command(grizzly_command, zip_report)
+             Command.handle_zwave_command(grizzly_command, zip_report)
   end
 
   test "handles Z/IP Packet for queued" do
@@ -86,7 +88,7 @@ defmodule Grizzly.Commands.CommandTest do
       )
 
     assert {report, %Command{grizzly_command | status: :queued}} ==
-             Command.handle_zip_command(grizzly_command, nack_waiting)
+             Command.handle_zwave_command(grizzly_command, nack_waiting)
   end
 
   test "handles when a queued command is completed" do
@@ -101,7 +103,7 @@ defmodule Grizzly.Commands.CommandTest do
       Report.new(:complete, :ack_response, 1, command_ref: grizzly_command.ref, queued: true)
 
     assert {report, %Command{grizzly_command | status: :complete}} ==
-             Command.handle_zip_command(grizzly_command, ack_response)
+             Command.handle_zwave_command(grizzly_command, ack_response)
   end
 
   test "handles Z/IP Packet for nack response with retires" do
@@ -113,7 +115,7 @@ defmodule Grizzly.Commands.CommandTest do
     expected_new_command = %Command{grizzly_command | retries: grizzly_command.retries - 1}
 
     assert {:retry, expected_new_command} ==
-             Command.handle_zip_command(grizzly_command, nack_response)
+             Command.handle_zwave_command(grizzly_command, nack_response)
   end
 
   test "handles Z/IP Packet for nack response with no retires" do
@@ -123,7 +125,7 @@ defmodule Grizzly.Commands.CommandTest do
     nack_response = ZIPPacket.make_nack_response(grizzly_command.seq_number)
 
     assert {:error, :nack_response, grizzly_command} ==
-             Command.handle_zip_command(grizzly_command, nack_response)
+             Command.handle_zwave_command(grizzly_command, nack_response)
   end
 
   test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do
@@ -156,7 +158,7 @@ defmodule Grizzly.Commands.CommandTest do
         header_extensions: [installation_and_maintenance_report: ime]
       )
 
-    {report, _command} = Command.handle_zip_command(grizzly_command, ack_response)
+    {report, _command} = Command.handle_zwave_command(grizzly_command, ack_response)
     transmission_stats = report.transmission_stats
 
     assert Keyword.get(transmission_stats, :rssi_dbm) == -50
@@ -169,5 +171,43 @@ defmodule Grizzly.Commands.CommandTest do
     assert Keyword.get(transmission_stats, :local_noise_floor) == nil
     assert Keyword.get(transmission_stats, :remote_noise_floor) == nil
     assert Keyword.get(transmission_stats, :outgoing_rssi_hops) == nil
+  end
+
+  test "handles a ZIP ND command" do
+    {:ok, zwave_command} = ZipNdInverseNodeSolicitation.new(node_id: 1, local: false)
+    grizzly_command = Command.from_zwave_command(zwave_command, 1, self())
+
+    expected_binary = <<ZipNd.byte(), 0x04, 0x0::8, 0x1::8>>
+    assert expected_binary == Command.to_binary(grizzly_command)
+
+    {report, _command} = Command.handle_zwave_command(grizzly_command, zwave_command)
+    assert report == :continue
+
+    {:ok, response_zwave_cmd} =
+      ZipNdNodeAdvertisement.new(
+        node_id: 1,
+        local: true,
+        validity: :information_ok,
+        ipv6_address: {0xFD00, 0xBBBB, 0, 0, 0, 0, 0, 0x1},
+        home_id: 0xDEADBEEF
+      )
+
+    {report, grizzly_command} = Command.handle_zwave_command(grizzly_command, response_zwave_cmd)
+
+    assert %Grizzly.Report{
+             status: :complete,
+             command: %Grizzly.ZWave.Command{
+               name: :zip_nd_node_advertisement,
+               params: [
+                 node_id: 1,
+                 local: true,
+                 validity: :information_ok,
+                 ipv6_address: {0xFD00, 0xBBBB, 0, 0, 0, 0, 0, 0x1},
+                 home_id: 0xDEADBEEF
+               ]
+             }
+           } = report
+
+    assert grizzly_command.status == :complete
   end
 end

@@ -91,7 +91,10 @@ defmodule Grizzly.ZWave.Command do
   @spec param(t(), atom(), term()) :: term() | nil
   def param(command, param, default \\ nil) do
     if command do
-      Keyword.get(command.params, param) || default
+      case Keyword.fetch(command.params, param) do
+        :error -> default
+        {:ok, value} -> value
+      end
     else
       default
     end
