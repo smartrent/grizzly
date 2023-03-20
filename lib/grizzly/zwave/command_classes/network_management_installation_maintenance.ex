@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
           | {:repeater?, boolean}
           | {:speed, speeds}
   @type rssi ::
-          :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -94..-32
+          :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -128..-32
 
   alias Grizzly.ZWave.DecodeError
   @behaviour Grizzly.ZWave.CommandClass
@@ -83,7 +83,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   def rssi_to_byte(:rssi_below_sensitivity), do: 0x7D
   def rssi_to_byte(:rssi_max_power_saturated), do: 0x7E
   def rssi_to_byte(:rssi_not_available), do: 0x7F
-  def rssi_to_byte(value) when value in -94..-32, do: 256 + value
+  def rssi_to_byte(value) when value in -128..-32, do: 256 + value
 
   @spec rssi_from_byte(byte) :: {:ok, rssi} | {:error, DecodeError.t()}
   def rssi_from_byte(0x7D), do: {:ok, :rssi_below_sensitivity}
