@@ -22,6 +22,7 @@
         {Credo.Check.Warning.RaiseInsideRescue, false},
         {Credo.Check.Design.TagTODO, false},
         {Credo.Check.Refactor.LongQuoteBlocks, []},
+        {Credo.Check.Refactor.Nesting, max_nesting: 3},
 
         ### Below are checks we will want to enable at later date ###
         {Credo.Check.Refactor.WithClauses, false},
