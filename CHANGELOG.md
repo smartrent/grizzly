@@ -4,6 +4,25 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.1.0] - 2023-03-22
+
+### Added
+
+- Network Management Inclusion CC ([#718](https://github.com/smartrent/grizzly/pull/718))
+  - Neighbor Update Request
+  - Neighbor Update Status
+- Version CC ([#718](https://github.com/smartrent/grizzly/pull/718))
+  - Capabilities Get
+  - Capabilities Report
+  - Z-Wave Software Get
+  - Z-Wave Software Report
+
+### Fixed
+
+- Fix encoding of RSSI values in RSSI_REPORT ([#722](https://github.com/smartrent/grizzly/pull/722))
+- Rescue errors in `Grizzly.Trace.dump/1` ([#723](https://github.com/smartrent/grizzly/pull/723))
+- Fix command name for Wake Up Notification ([#725](https://github.com/smartrent/grizzly/pull/725))
+
 ## [v6.0.1] - 2023-03-13
 
 ### Fixed
@@ -2119,6 +2138,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.0.2]: https://github.com/smartrent/grizzly/compare/v6.0.1..v6.0.2
+[v6.0.1]: https://github.com/smartrent/grizzly/compare/v6.0.0..v6.0.1
 [v6.0.0]: https://github.com/smartrent/grizzly/compare/v5.4.1..v6.0.0
 [v5.4.1]: https://github.com/smartrent/grizzly/compare/v5.4.0..v5.4.1
 [v5.4.0]: https://github.com/smartrent/grizzly/compare/v5.3.0..v5.4.0
