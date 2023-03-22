@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpNotification do
   @impl true
   def new(_opts \\ []) do
     command = %Command{
-      name: :wake_up_interval_get,
+      name: :wake_up_notification,
       command_byte: 0x07,
       command_class: WakeUp,
       impl: __MODULE__
