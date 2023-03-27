@@ -1,12 +1,15 @@
 defmodule Grizzly.Commands.Command do
   @moduledoc false
 
+  require Logger
+
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
+  alias Grizzly.CommandHandlers.SupervisionReport
   alias Grizzly.Commands.Table
   alias Grizzly.{Report, SeqNumber, ZWave}
   alias Grizzly.ZWave.Command, as: ZWaveCommand
-  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave.Commands.{SupervisionGet, ZIPPacket}
 
   @type status :: :inflight | :queued | :complete
 
@@ -22,7 +25,9 @@ defmodule Grizzly.Commands.Command do
           status: status(),
           with_transmission_stats: boolean(),
           transmission_stats: keyword(),
-          node_id: ZWave.node_id()
+          node_id: ZWave.node_id(),
+          supervision?: boolean(),
+          session_id: non_neg_integer() | nil
         }
 
   @type opt ::
@@ -42,16 +47,38 @@ defmodule Grizzly.Commands.Command do
             status: :inflight,
             with_transmission_stats: false,
             transmission_stats: [],
-            node_id: nil
+            node_id: nil,
+            supervision?: false,
+            session_id: nil
 
   @spec from_zwave_command(ZWaveCommand.t(), ZWave.node_id(), pid(), [opt()]) :: t()
   def from_zwave_command(zwave_command, node_id, owner, opts \\ []) do
-    {handler, handler_init_args} = get_handler_spec(zwave_command, opts)
-    {:ok, handler_state} = handler.init(handler_init_args)
     retries = Keyword.get(opts, :retries, 2)
     command_ref = Keyword.get(opts, :reference, make_ref())
     timeout_ref = Keyword.get(opts, :timeout_ref)
     with_transmission_stats = Keyword.get(opts, :transmission_stats, false)
+
+    {zwave_command, handler, handler_init_args, supervision?, session_id} =
+      if use_supervision?(zwave_command, opts) do
+        zwave_command = add_supervision_encapsulation(zwave_command, node_id, opts)
+        session_id = ZWaveCommand.param!(zwave_command, :session_id)
+
+        handler_init_args = [
+          session_id: session_id,
+          node_id: node_id,
+          command_ref: command_ref,
+          waiter: Keyword.get(opts, :waiter),
+          status_updates?: Keyword.get(opts, :status_updates?, false)
+        ]
+
+        {zwave_command, SupervisionReport, handler_init_args, true, session_id}
+      else
+        _ = maybe_warn_supervision(zwave_command, opts[:supervision?])
+        {handler, handler_init_args} = get_handler_spec(zwave_command, opts)
+        {zwave_command, handler, handler_init_args, false, nil}
+      end
+
+    {:ok, handler_state} = handler.init(handler_init_args)
 
     %__MODULE__{
       handler: handler,
@@ -63,7 +90,9 @@ defmodule Grizzly.Commands.Command do
       retries: retries,
       ref: command_ref,
       with_transmission_stats: with_transmission_stats,
-      node_id: node_id
+      node_id: node_id,
+      supervision?: supervision?,
+      session_id: session_id
     }
   end
 
@@ -183,15 +212,41 @@ defmodule Grizzly.Commands.Command do
   defp get_handler_spec(zwave_command, opts) do
     case Keyword.get(opts, :handler) do
       nil ->
-        format_handler_spec(Table.handler(zwave_command.name))
+        Table.handler(zwave_command.name)
 
       handler ->
-        format_handler_spec(handler)
+        Table.format_handler_spec(handler)
     end
   end
 
-  defp format_handler_spec({_handler, _args} = spec), do: spec
-  defp format_handler_spec(handler), do: {handler, []}
+  defp maybe_warn_supervision(command, true) do
+    Logger.warning(
+      "[Grizzly] Supervision was requested for command #{command.name} but is not supported"
+    )
+  end
+
+  defp maybe_warn_supervision(_, _), do: :ok
+
+  defp use_supervision?(zwave_command, opts) do
+    opts[:supervision?] == true && Table.supports_supervision?(zwave_command.name)
+  end
+
+  defp add_supervision_encapsulation(zwave_command, node_id, opts) do
+    if Keyword.get(opts, :supervision?) do
+      encapsulated_command = ZWaveCommand.to_binary(zwave_command)
+
+      {:ok, command} =
+        SupervisionGet.new(
+          status_updates: :one_now_more_later,
+          session_id: Grizzly.SessionId.get_and_inc(node_id),
+          encapsulated_command: encapsulated_command
+        )
+
+      command
+    else
+      zwave_command
+    end
+  end
 
   defp get_seq_number(zwave_command) do
     case ZWaveCommand.param(zwave_command, :seq_number) do

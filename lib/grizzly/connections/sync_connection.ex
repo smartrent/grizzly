@@ -212,9 +212,9 @@ defmodule Grizzly.Connections.SyncConnection do
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
   end
 
-  defp do_send_command(command_runner, state, opts \\ []) do
+  defp do_send_command(command, state, opts \\ []) do
     %State{transport: transport} = state
-    binary = CommandRunner.encode_command(command_runner)
+    binary = CommandRunner.encode_command(command)
 
     Transport.send(transport, binary, opts)
   end

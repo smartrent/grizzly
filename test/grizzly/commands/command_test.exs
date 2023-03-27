@@ -29,7 +29,8 @@ defmodule Grizzly.Commands.CommandTest do
       retries: 2,
       seq_number: grizzly_command.seq_number,
       ref: grizzly_command.ref,
-      node_id: 1
+      node_id: 1,
+      supervision?: false
     }
 
     assert expected_grizzly_command == grizzly_command

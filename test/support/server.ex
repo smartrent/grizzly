@@ -16,7 +16,8 @@ defmodule GrizzlyTest.Server do
     NodeRemoveStatus,
     FirmwareUpdateMDRequestReport,
     FirmwareUpdateMDGet,
-    FirmwareUpdateMDStatusReport
+    FirmwareUpdateMDStatusReport,
+    SupervisionReport
   }
 
   require Logger
@@ -34,77 +35,98 @@ defmodule GrizzlyTest.Server do
     node_id = return_port - 5000
     {:ok, zip_packet} = ZWave.from_binary(msg)
 
-    if zip_packet.name == :keep_alive do
-      handle_keep_alive(state.socket, return_port, zip_packet)
-    else
-      case node_id do
-        # ignore all commands
-        100 ->
-          :ok
+    cond do
+      zip_packet.name == :keep_alive ->
+        handle_keep_alive(state.socket, return_port, zip_packet)
 
-        # nack response only
-        101 ->
-          send_nack_response(state.socket, return_port, zip_packet)
+      Command.param(zip_packet, :flag) == :ack_response ->
+        :ok
 
-        # mark as sleeping node
-        102 ->
-          send_nack_waiting(state.socket, return_port, zip_packet)
+      true ->
+        case node_id do
+          # ignore all commands
+          100 ->
+            :ok
 
-        # Node 201 is for testing starting a firmware update and uploading an image
-        201 ->
-          send_ack_response(state.socket, return_port, zip_packet)
-          maybe_send_a_report(state.socket, return_port, zip_packet)
-          # the device asks for image fragments
+          # nack response only
+          101 ->
+            send_nack_response(state.socket, return_port, zip_packet)
 
-          send_firmware_update_md_get_command(state.socket, return_port,
-            number_of_reports: 1,
-            # Change this to be the last fragment
-            report_number: 1
-          )
+          # mark as sleeping node
+          102 ->
+            send_nack_waiting(state.socket, return_port, zip_packet)
 
-        202 ->
-          send_ack_response(state.socket, return_port, zip_packet)
-          maybe_send_a_report(state.socket, return_port, zip_packet)
-          # the device asks for image fragments
-          send_firmware_update_md_get_command(state.socket, return_port,
-            number_of_reports: 2,
-            # change this to the before last fragment
-            report_number: 1
-            # TODO only expect an update status report on the last fragment
-          )
+          # Node 201 is for testing starting a firmware update and uploading an image
+          201 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            maybe_send_a_report(state.socket, return_port, zip_packet)
+            # the device asks for image fragments
+            send_firmware_update_md_get_command(state.socket, return_port,
+              number_of_reports: 1,
+              # Change this to be the last fragment
+              report_number: 1
+            )
 
-        # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
-        301 ->
-          send_ack_response(state.socket, return_port, zip_packet)
+          202 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            maybe_send_a_report(state.socket, return_port, zip_packet)
+            # the device asks for image fragments
+            send_firmware_update_md_get_command(state.socket, return_port,
+              number_of_reports: 2,
+              # change this to the before last fragment
+              report_number: 1
+              # TODO only expect an update status report on the last fragment
+            )
 
-          only_send_report_for_node_add_or_remove_stop(state.socket, return_port, zip_packet)
+          # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
+          301 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            only_send_report_for_node_add_or_remove_stop(state.socket, return_port, zip_packet)
 
-        # this controller id is for testing happy S2 inclusion
-        302 ->
-          send_ack_response(state.socket, return_port, zip_packet)
-          handle_inclusion_packet(state.socket, return_port, zip_packet)
-          :ok
+          # this controller id is for testing happy S2 inclusion
+          302 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            handle_inclusion_packet(state.socket, return_port, zip_packet)
+            :ok
 
-        # this controller id is for testing sad S2 inclusion
-        303 ->
-          :ok
+          # this controller id is for testing sad S2 inclusion
+          303 ->
+            :ok
 
-        # async ignore all
-        400 ->
-          :ok
+          # async ignore all
+          400 ->
+            :ok
 
-        500 ->
-          send_ack_response(state.socket, return_port, zip_packet)
-          send_garbage(state.socket, return_port, zip_packet)
+          500 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            send_garbage(state.socket, return_port, zip_packet)
 
-        501 ->
-          send_ack_response(state.socket, return_port, zip_packet)
-          send_command_not_to_spec(state.socket, return_port, zip_packet)
+          501 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            send_command_not_to_spec(state.socket, return_port, zip_packet)
 
-        _rest ->
-          send_ack_response(state.socket, return_port, zip_packet)
-          maybe_send_a_report(state.socket, return_port, zip_packet)
-      end
+          # node 600 times out in `GrizzlyTest.Transport.UDP`
+          600 ->
+            :ok
+
+          # node 700 expects supervised commands and will send 2 status reports
+          # before the final supervision report
+          700 ->
+            send_ack_response(state.socket, return_port, zip_packet)
+
+            {:ok, out_packet} = build_supervision_report(zip_packet, :working)
+            send_packet(state.socket, return_port, out_packet)
+
+            {:ok, out_packet} = build_supervision_report(zip_packet, :working)
+            send_packet(state.socket, return_port, out_packet)
+
+            {:ok, out_packet} = build_supervision_report(zip_packet, :success)
+            send_packet(state.socket, return_port, out_packet)
+
+          _rest ->
+            send_ack_response(state.socket, return_port, zip_packet)
+            maybe_send_a_report(state.socket, return_port, zip_packet)
+        end
     end
 
     {:noreply, state}
@@ -196,14 +218,25 @@ defmodule GrizzlyTest.Server do
   end
 
   defp maybe_send_a_report(socket, port, zip_packet) do
-    with false <- Command.param!(zip_packet, :flag) == :ack_response,
-         encapsulated_command = Command.param!(zip_packet, :command),
-         true <- expects_a_report(encapsulated_command.name) do
-      {:ok, out_packet} = build_report(zip_packet)
+    encapsulated_command = Command.param!(zip_packet, :command)
 
-      _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+    cond do
+      encapsulated_command && expects_a_report(encapsulated_command.name) ->
+        {:ok, out_packet} = build_report(zip_packet)
+
+        send_packet(socket, port, out_packet)
+
+      encapsulated_command && encapsulated_command.name == :supervision_get ->
+        {:ok, out_packet} = build_supervision_report(zip_packet, :success)
+        send_packet(socket, port, out_packet)
+
+      true ->
+        :ok
     end
+  end
 
+  defp send_packet(socket, port, out_packet) do
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
     :ok
   end
 
@@ -322,6 +355,27 @@ defmodule GrizzlyTest.Server do
   defp expects_a_report(:firmware_update_md_report), do: true
 
   defp expects_a_report(_), do: false
+
+  defp build_supervision_report(zip_packet, status) do
+    encapsulated_command = Command.param!(zip_packet, :command)
+    session_id = Command.param!(encapsulated_command, :session_id)
+
+    more_status_updates =
+      case status do
+        status when status in [:success, :fail, :no_support] -> :last_report
+        _ -> :more_reports
+      end
+
+    {:ok, report} =
+      SupervisionReport.new(
+        more_status_updates: more_status_updates,
+        status: status,
+        duration: 100,
+        session_id: session_id
+      )
+
+    ZIPPacket.with_zwave_command(report, SeqNumber.get_and_inc(), flag: :ack_request)
+  end
 
   defp build_report(zip_packet) do
     encapsulated_command = Command.param!(zip_packet, :command)

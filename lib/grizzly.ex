@@ -125,13 +125,30 @@ defmodule Grizzly do
 
   See `Grizzly.CommandHandler` behaviour for more documentation.
   """
-  @type handler() :: module() | {module(), args :: any()}
+  @type handler_spec() :: {module(), args :: any()}
 
+  @type handler() :: module() | handler_spec()
+
+  @typedoc """
+  Options for `Grizzly.send_command/4`.
+
+  * `:timeout` - Time (in milliseconds) to wait for an ACK or report before timing out.
+    Maximum 140 seconds. Default `5_000`.
+  * `:retries` - Number of retries in case the node responds with a NACK. Default `0`.
+  * `:handler` - A custom response handler (see `Grizzly.CommandHandler`).
+  * `:transmission_stats` - If true, transmission stats will be included with the
+    returned report (if available). Default `false`.
+  * `:supervision?` - Whether to use Supervision CC encapsulation. Default `false`.
+  * `:status_updates?` - If true, the calling process will receive messages when
+    a supervision status update is received from the destination node. Default `false`.
+  """
   @type command_opt() ::
           {:timeout, non_neg_integer()}
           | {:retries, non_neg_integer()}
-          | {:handler, handler()}
+          | {:handler, module() | handler_spec()}
           | {:transmission_stats, boolean()}
+          | {:supervision?, boolean()}
+          | {:status_updates?, boolean()}
 
   @type command :: atom()
 
@@ -157,6 +174,9 @@ defmodule Grizzly do
   you will still be able to query it and make it perform Z-Wave functions. There
   are many Z-Wave functions a controller do. There are helper functions for
   these functions in `Grizzly.Network` and `Grizzly.Node`.
+
+  **NOTE:** The `:handler` and `:supervision?` options are not compatible. If
+  `:supervision?` is true, any custom handler will be ignored.
   """
   @spec send_command(
           ZWave.node_id() | :gateway | VirtualDevices.id(),
@@ -312,6 +332,14 @@ defmodule Grizzly do
     end)
     |> Enum.map(fn {command, _} -> command end)
   end
+
+  @doc """
+  Whether Grizzly supports sending the given command with supervision.
+  """
+  @spec can_supervise_command?(Grizzly.command()) :: boolean()
+  defdelegate can_supervise_command?(command_name),
+    to: Grizzly.Commands.Table,
+    as: :supports_supervision?
 
   defp maybe_log_warning(command_name) do
     deprecated_list = [
