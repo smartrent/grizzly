@@ -157,4 +157,80 @@ defmodule Grizzly.Test do
       refute Grizzly.virtual_device?(:gateway)
     end
   end
+
+  describe "supervision" do
+    test "success" do
+      {:ok, report} =
+        Grizzly.send_command(15, :door_lock_operation_set, [mode: :secured], supervision?: true)
+
+      assert report.type == :command
+      assert report.status == :complete
+
+      assert [more_status_updates: :last_report, session_id: _, status: :success, duration: _] =
+               report.command.params
+    end
+
+    test "multiple status updates when enabled" do
+      {:ok, report} =
+        Grizzly.send_command(700, :door_lock_operation_set, [mode: :secured],
+          supervision?: true,
+          status_updates?: true
+        )
+
+      assert report.type == :command
+      assert report.status == :complete
+
+      assert [more_status_updates: :last_report, session_id: _, status: :success, duration: _] =
+               report.command.params
+
+      assert_receive {:grizzly, :report,
+                      %Grizzly.Report{
+                        status: :inflight,
+                        command: %Grizzly.ZWave.Command{
+                          name: :supervision_report,
+                          params: [
+                            more_status_updates: :more_reports,
+                            session_id: _,
+                            status: :working,
+                            duration: _
+                          ]
+                        },
+                        node_id: 700,
+                        type: :supervision_status,
+                        queued: false
+                      }}
+
+      assert_receive {:grizzly, :report,
+                      %Grizzly.Report{
+                        status: :inflight,
+                        command: %Grizzly.ZWave.Command{
+                          name: :supervision_report,
+                          params: [
+                            more_status_updates: :more_reports,
+                            session_id: _,
+                            status: :working,
+                            duration: _
+                          ]
+                        },
+                        node_id: 700,
+                        type: :supervision_status,
+                        queued: false
+                      }}
+
+      refute_receive _
+    end
+  end
+
+  test "no status updates if not enabled" do
+    {:ok, report} =
+      Grizzly.send_command(700, :door_lock_operation_set, [mode: :secured], supervision?: true)
+
+    assert report.type == :command
+    assert report.status == :complete
+
+    assert [more_status_updates: :last_report, session_id: _, status: :success, duration: _] =
+             report.command.params
+
+    refute_receive _
+  end
 end

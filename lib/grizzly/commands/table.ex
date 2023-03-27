@@ -1,5 +1,6 @@
 defmodule Grizzly.Commands.Table do
   @moduledoc false
+  alias Grizzly.CommandHandlers.AckResponse
 
   # look up support for supported command classes and their default Grizzly
   # runtime related options. This where Grizzly and Z-Wave meet in regards to
@@ -90,8 +91,10 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :node_neighbor_update_status}}},
 
       # DSKs
-      {:node_add_keys_set, {Commands.NodeAddKeysSet, handler: AckResponse}},
-      {:node_add_dsk_set, {Commands.NodeAddDSKSet, handler: AckResponse}},
+      {:node_add_keys_set,
+       {Commands.NodeAddKeysSet, handler: {AckResponse, [supports_supervision?: false]}}},
+      {:node_add_dsk_set,
+       {Commands.NodeAddDSKSet, handler: {AckResponse, [supports_supervision?: false]}}},
       {:dsk_get, {Commands.DSKGet, handler: {WaitReport, complete_report: :dsk_report}}},
       # Door Lock
       {:door_lock_operation_set, {Commands.DoorLockOperationSet, handler: AckResponse}},
@@ -461,10 +464,26 @@ defmodule Grizzly.Commands.Table do
   @doc """
   Get the handler spec for the command
   """
-  @spec handler(Grizzly.command()) :: module() | {module(), args :: list()}
+  @spec handler(Grizzly.command()) :: Grizzly.handler_spec()
   def handler(command_name) do
     {_, opts} = lookup(command_name)
 
-    Keyword.fetch!(opts, :handler)
+    opts
+    |> Keyword.fetch!(:handler)
+    |> format_handler_spec()
   end
+
+  @doc """
+  Whether the command can be supervised (only commands that use the AckResponse
+  handler can be supervised).
+  """
+  @spec supports_supervision?(Grizzly.command()) :: boolean()
+  def supports_supervision?(command_name) do
+    {module, default_opts} = handler(command_name)
+    module == AckResponse && default_opts[:supports_supervision?] != false
+  end
+
+  @spec format_handler_spec(module() | Grizzly.handler_spec()) :: Grizzly.handler_spec()
+  def format_handler_spec({_handler, _args} = spec), do: spec
+  def format_handler_spec(handler), do: {handler, []}
 end

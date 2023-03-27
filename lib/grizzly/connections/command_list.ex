@@ -180,6 +180,7 @@ defmodule Grizzly.Connections.CommandList do
     # only create a new reference if we are going to need it
     command_ref = Keyword.get_lazy(command_opts, :reference, fn -> make_ref() end)
     command_opts = Keyword.put_new(command_opts, :reference, command_ref)
+    command_opts = Keyword.put_new(command_opts, :waiter, waiter)
 
     case Commands.create_command(command, node_id, command_opts) do
       {:ok, command_runner} ->

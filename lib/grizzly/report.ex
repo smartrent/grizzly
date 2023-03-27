@@ -159,6 +159,7 @@ defmodule Grizzly.Report do
           | :unsolicited
           | :queued_delay
           | :timeout
+          | :supervision_status
 
   @type status() :: :inflight | :complete
 

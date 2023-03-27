@@ -8,5 +8,7 @@ config =
     _ -> [formatters: [ExUnit.CLIFormatter, JUnitFormatter]]
   end
 
+Logger.configure(level: :debug)
+
 ExUnit.configure(Keyword.merge(config, capture_log: true))
 ExUnit.start()
