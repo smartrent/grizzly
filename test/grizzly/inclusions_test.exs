@@ -2,7 +2,7 @@ defmodule Grizzly.InclusionsTest do
   use ExUnit.Case, async: false
 
   alias Grizzly.{Inclusions, Report}
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DSK}
 
   defmodule TestHandler do
     @moduledoc false
@@ -138,6 +138,7 @@ defmodule Grizzly.InclusionsTest do
     assert_receive {:grizzly, :report, %Report{type: :command, command: dsk_report}}, 1_000
 
     assert dsk_report.name == :node_add_dsk_report
+    assert %DSK{} = Command.param!(dsk_report, :dsk)
     assert :waiting_dsk == Inclusions.status()
 
     :ok = Inclusions.set_input_dsk()

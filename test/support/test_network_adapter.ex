@@ -116,8 +116,8 @@ defmodule GrizzlyTest.InclusionAdapter do
   def grant_s2_keys(_s2_keys, state) do
     new_state = cancel_timer(state)
 
-    {:ok, command} =
-      NodeAddDSKReport.new(seq_number: 1, input_dsk_length: 5, dsk: DSK.parse_pin("12345"))
+    {:ok, dsk} = DSK.parse_pin("12345")
+    {:ok, command} = NodeAddDSKReport.new(seq_number: 1, input_dsk_length: 5, dsk: dsk)
 
     timer_ref = Process.send_after(self(), build_report_msg(command), 200)
 
@@ -149,15 +149,12 @@ defmodule GrizzlyTest.InclusionAdapter do
     {:grizzly, :report, Report.new(:complete, :command, 1, command: command)}
   end
 
-  defp cancel_timer(%{timer_ref: nil} = state) do
-    state
-  end
-
-  defp cancel_timer(state) do
-    Process.cancel_timer(state.timer_ref)
-
+  defp cancel_timer(%{timer_ref: timer_ref} = state) when is_reference(timer_ref) do
+    _ = Process.cancel_timer(state.timer_ref)
     %{state | timer_ref: nil}
   end
+
+  defp cancel_timer(state), do: state
 
   @impl Grizzly.Inclusions.NetworkAdapter
   def handle_timeout(status, _command_ref, state) do

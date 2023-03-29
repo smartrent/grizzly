@@ -55,6 +55,7 @@ defmodule GrizzlyTest.Server do
           send_ack_response(state.socket, return_port, zip_packet)
           maybe_send_a_report(state.socket, return_port, zip_packet)
           # the device asks for image fragments
+
           send_firmware_update_md_get_command(state.socket, return_port,
             number_of_reports: 1,
             # Change this to be the last fragment
@@ -75,6 +76,7 @@ defmodule GrizzlyTest.Server do
         # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
         301 ->
           send_ack_response(state.socket, return_port, zip_packet)
+
           only_send_report_for_node_add_or_remove_stop(state.socket, return_port, zip_packet)
 
         # this controller id is for testing happy S2 inclusion
@@ -112,33 +114,23 @@ defmodule GrizzlyTest.Server do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_ack_response(seq_number)
 
-    :gen_udp.send(
-      socket,
-      {0, 0, 0, 0},
-      port,
-      ZWave.to_binary(out_packet)
-    )
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+
+    :ok
   end
 
   def only_send_report_for_node_add_or_remove_stop(socket, port, zip_packet) do
     command = Command.param!(zip_packet, :command)
 
-    case get_node_add_remove_command(command, zip_packet) do
-      {:ok, status_failed} ->
-        seq_number = SeqNumber.get_and_inc()
+    with {:ok, status_failed} <- get_node_add_remove_command(command, zip_packet) do
+      seq_number = SeqNumber.get_and_inc()
 
-        {:ok, out_packet} = ZIPPacket.with_zwave_command(status_failed, seq_number, flag: nil)
+      {:ok, out_packet} = ZIPPacket.with_zwave_command(status_failed, seq_number, flag: nil)
 
-        :gen_udp.send(
-          socket,
-          {0, 0, 0, 0},
-          port,
-          ZWave.to_binary(out_packet)
-        )
-
-      _ ->
-        :ok
+      _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
     end
+
+    :ok
   end
 
   defp get_node_add_remove_command(%Command{name: :node_add} = command, zip_packet) do
@@ -174,69 +166,58 @@ defmodule GrizzlyTest.Server do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_response(seq_number)
 
-    :gen_udp.send(
-      socket,
-      {0, 0, 0, 0},
-      port,
-      ZWave.to_binary(out_packet)
-    )
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+
+    :ok
   end
 
   defp send_nack_waiting(socket, port, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_waiting_response(seq_number, 2)
 
-    :gen_udp.send(
-      socket,
-      {0, 0, 0, 0},
-      port,
-      ZWave.to_binary(out_packet)
-    )
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
 
     spawn(fn ->
       Process.sleep(2_000)
       maybe_send_a_report(socket, port, incoming_zip_packet)
     end)
+
+    :ok
   end
 
   defp handle_keep_alive(socket, port, keep_alive) do
-    if Command.param!(keep_alive, :ack_flag) == :ack_request do
+    with :ack_request <- Command.param!(keep_alive, :ack_flag) do
       {:ok, response} = ZIPKeepAlive.new(ack_flag: :ack_response)
 
-      :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(response))
+      _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(response))
     end
+
+    :ok
   end
 
   defp maybe_send_a_report(socket, port, zip_packet) do
-    if Command.param!(zip_packet, :flag) != :ack_response do
-      encapsulated_command = Command.param!(zip_packet, :command)
+    with false <- Command.param!(zip_packet, :flag) == :ack_response,
+         encapsulated_command = Command.param!(zip_packet, :command),
+         true <- expects_a_report(encapsulated_command.name) do
+      {:ok, out_packet} = build_report(zip_packet)
 
-      if expects_a_report(encapsulated_command.name) do
-        {:ok, out_packet} = build_report(zip_packet)
-
-        :gen_udp.send(
-          socket,
-          {0, 0, 0, 0},
-          port,
-          ZWave.to_binary(out_packet)
-        )
-      else
-        :ok
-      end
-    else
-      :ok
+      _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
     end
+
+    :ok
   end
 
   defp send_garbage(socket, port, _zip_packet) do
-    :gen_udp.send(socket, {0, 0, 0, 0}, port, <<0x12, 0x12>>)
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, <<0x12, 0x12>>)
+    :ok
   end
 
   defp send_command_not_to_spec(socket, port, _zip_packet) do
     # Door lock report with invalid mode (0xAA)
     command = <<98, 3, 0xAA, 0, 0, 0, 0>>
 
-    :gen_udp.send(socket, {0, 0, 0, 0}, port, command)
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, command)
+    :ok
   end
 
   defp send_firmware_update_md_get_command(socket, port,
@@ -250,31 +231,31 @@ defmodule GrizzlyTest.Server do
 
     {:ok, out_packet} = ZIPPacket.with_zwave_command(command, seq_number, flag: nil)
 
-    :gen_udp.send(
-      socket,
-      {0, 0, 0, 0},
-      port,
-      ZWave.to_binary(out_packet)
-    )
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+
+    :ok
   end
 
   def handle_inclusion_packet(socket, port, incoming_zip_packet) do
     encapsulated_command = Command.param!(incoming_zip_packet, :command)
 
-    case encapsulated_command.name do
-      :node_add ->
-        send_node_add_keys_report(socket, port, incoming_zip_packet)
+    _ =
+      case encapsulated_command.name do
+        :node_add ->
+          send_node_add_keys_report(socket, port, incoming_zip_packet)
 
-      :node_add_keys_set ->
-        send_add_node_dsk_report(socket, port, incoming_zip_packet)
+        :node_add_keys_set ->
+          send_add_node_dsk_report(socket, port, incoming_zip_packet)
 
-      :node_add_dsk_set ->
-        {:ok, command} = build_s2_node_add_status(incoming_zip_packet)
+        :node_add_dsk_set ->
+          {:ok, command} = build_s2_node_add_status(incoming_zip_packet)
 
-        {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc())
+          {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc())
 
-        :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
-    end
+          _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
+      end
+
+    :ok
   end
 
   def send_node_add_keys_report(socket, port, incoming_zip_packet) do
@@ -289,12 +270,9 @@ defmodule GrizzlyTest.Server do
 
     {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(keys_report, SeqNumber.get_and_inc())
 
-    :gen_udp.send(
-      socket,
-      {0, 0, 0, 0},
-      port,
-      ZWave.to_binary(out_zip_packet)
-    )
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
+
+    :ok
   end
 
   def send_add_node_dsk_report(socket, port, incoming_zip_packet) do
@@ -303,41 +281,35 @@ defmodule GrizzlyTest.Server do
     case Command.param!(command, :granted_keys) do
       [:s2_unauthenticated] ->
         seq_number = SeqNumber.get_and_inc()
+        {:ok, dsk} = Grizzly.ZWave.DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
 
         {:ok, dsk_report} =
           NodeAddDSKReport.new(
             seq_number: seq_number,
             input_dsk_length: 0,
-            dsk: "50285-18819-09924-30691-15973-33711-04005-03623"
+            dsk: dsk
           )
 
         {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(dsk_report, seq_number)
 
-        :gen_udp.send(
-          socket,
-          {0, 0, 0, 0},
-          port,
-          ZWave.to_binary(out_zip_packet)
-        )
+        _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
+        :ok
 
       [:s2_authenticated] ->
         seq_number = SeqNumber.get_and_inc()
+        {:ok, dsk} = Grizzly.ZWave.DSK.parse("00000-18819-09924-30691-15973-33711-04005-03623")
 
         {:ok, dsk_report} =
           NodeAddDSKReport.new(
             seq_number: seq_number,
             input_dsk_length: 2,
-            dsk: "00000-18819-09924-30691-15973-33711-04005-03623"
+            dsk: dsk
           )
 
         {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(dsk_report, seq_number)
 
-        :gen_udp.send(
-          socket,
-          {0, 0, 0, 0},
-          port,
-          ZWave.to_binary(out_zip_packet)
-        )
+        _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
+        :ok
     end
   end
 
@@ -439,7 +411,7 @@ defmodule GrizzlyTest.Server do
           generic_device_class: 0x12,
           specific_device_class: 0x15,
           command_classes: command_classes,
-          keys_granted: [:s2_unauthenticated],
+          granted_keys: [:s2_unauthenticated],
           kex_fail_type: :none
         )
 
@@ -453,7 +425,7 @@ defmodule GrizzlyTest.Server do
           generic_device_class: 0x12,
           specific_device_class: 0x15,
           command_classes: command_classes,
-          keys_granted: [:s2_authenticated],
+          granted_keys: [:s2_authenticated],
           kex_fail_type: :none
         )
     end
