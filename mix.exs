@@ -16,7 +16,7 @@ defmodule Grizzly.MixProject do
       description: description(),
       package: package(),
       docs: docs(),
-      preferred_cli_env: [docs: :docs, "hex.publish": :docs],
+      preferred_cli_env: [docs: :docs, "hex.publish": :docs, dialyzer: :test],
       xref: [exclude: EEx]
     ]
   end
@@ -45,7 +45,7 @@ defmodule Grizzly.MixProject do
   defp dialyzer() do
     [
       flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return],
-      plt_add_apps: [:eex, :mix],
+      plt_add_apps: [:eex, :mix, :ex_unit],
       ignore_warnings: "dialyzer_ignore_warnings.exs"
     ]
   end

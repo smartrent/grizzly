@@ -18,12 +18,7 @@ defmodule Grizzly.VirtualDeviceCase do
   end
 
   def with_virtual_devices(virtual_device_impls, test) when is_list(virtual_device_impls) do
-    virtual_device_ids =
-      Enum.map(virtual_device_impls, fn impl ->
-        {:ok, id} = VirtualDevices.add_device(impl)
-
-        id
-      end)
+    virtual_device_ids = Enum.map(virtual_device_impls, &VirtualDevices.add_device/1)
 
     test.(virtual_device_ids)
 
