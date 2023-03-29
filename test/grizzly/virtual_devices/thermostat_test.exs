@@ -63,7 +63,7 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
 
     assert {:ok, %Report{type: :command, command: command}} =
              Grizzly.send_command(device_id, :version_command_class_get,
-               command_class: :thermostat_set_point
+               command_class: :thermostat_setpoint
              )
 
     assert command.name == :version_command_class_report
