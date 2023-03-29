@@ -300,7 +300,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.IndicatorSupportedGet,
         handler: {WaitReport, complete_report: :indicator_supported_report}}},
       {:indicator_description_get,
-       {Commands.IndicatorSupportedGet,
+       {Commands.IndicatorDescriptionGet,
         handler: {WaitReport, complete_report: :indicator_description_report}}},
       # Antitheft
       {:antitheft_get,
@@ -343,7 +343,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.PriorityRouteGet, handler: {WaitReport, complete_report: :priority_route_report}}},
       {:statistics_get,
        {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statistics_report}}},
-      {:statistics_clear, {Commands.StatisticsGet, handler: AckResponse}},
+      {:statistics_clear, {Commands.StatisticsClear, handler: AckResponse}},
       {:rssi_get, {Commands.RssiGet, handler: {WaitReport, complete_report: :rssi_report}}},
       {:zwave_long_range_channel_set, {Commands.ZWaveLongRangeChannelSet, handler: AckResponse}},
       {:zwave_long_range_channel_get,
@@ -408,9 +408,9 @@ defmodule Grizzly.Commands.Table do
 
     defmacro __before_compile__(_) do
       lookup =
-        for {command_class, spec} <- @table do
+        for {command_name, spec} <- @table do
           quote location: :keep do
-            def lookup(unquote(command_class)), do: unquote(spec)
+            def lookup(unquote(command_name)), do: unquote(spec)
           end
         end
 
@@ -422,9 +422,9 @@ defmodule Grizzly.Commands.Table do
         @spec lookup(Grizzly.command()) :: {module(), [Grizzly.command_opt()]}
         unquote(lookup)
 
-        def lookup(command_class) do
+        def lookup(command_name) do
           raise ArgumentError, """
-          The command #{inspect(command_class)} you are trying to send is not supported
+          The command #{inspect(command_name)} you are trying to send is not supported
           """
         end
 
@@ -436,9 +436,27 @@ defmodule Grizzly.Commands.Table do
         end
       end
     end
+
+    @no_validate [:multi_channel_get_command_encapsulation]
+
+    defmacro __after_compile__(_, _) do
+      for {table_name, {command_module, _}} <- @table, table_name not in @no_validate do
+        {:ok, command} = command_module.new([])
+
+        if table_name != command.name do
+          raise """
+          The command named #{inspect(table_name)} does not match the name returned from `#{inspect(command_module)}.new/1`.
+          """
+        end
+      end
+
+      quote do
+      end
+    end
   end
 
   @before_compile Generate
+  @after_compile Generate
 
   @doc """
   Get the handler spec for the command

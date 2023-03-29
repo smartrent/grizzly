@@ -115,7 +115,7 @@ defmodule Grizzly.VirtualDevices do
   """
   @spec send_command(id(), Command.t()) ::
           {:ok, Grizzly.Report.t()} | {:error, :device_not_found | Grizzly.Report.t()}
-  def send_command(device_id, %Command{name: :node_info_cache_get} = node_info_get) do
+  def send_command(device_id, %Command{name: :node_info_cached_get} = node_info_get) do
     with_entry(device_id, &Reports.build_node_info_cache_report(&1, node_info_get))
   end
 
