@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
   test "ensure correct name" do
     {:ok, cmd} = NodeInfoCachedGet.new()
 
-    assert cmd.name == :node_info_cache_get
+    assert cmd.name == :node_info_cached_get
   end
 
   describe "encoding" do

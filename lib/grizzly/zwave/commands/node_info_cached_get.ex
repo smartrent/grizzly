@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
     params = set_defaults(params)
     # TODO: validate params
     command = %Command{
-      name: :node_info_cache_get,
+      name: :node_info_cached_get,
       command_byte: 0x03,
       command_class: NetworkManagementProxy,
       params: params,
@@ -109,7 +109,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
   def decode_max_age(n) when n > 0 and n < 15, do: {:ok, n}
 
   def decode_max_age(n),
-    do: {:error, %DecodeError{value: n, param: :max_age, command: :node_info_cache_get}}
+    do: {:error, %DecodeError{value: n, param: :max_age, command: :node_info_cached_get}}
 
   defp set_defaults(params) do
     Keyword.put_new(params, :max_age, 10)
