@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.1.1] - 2023-03-29
+
+### Fixed
+
+- Adds simple command name validation to Grizzly.Commands.Table to ensure correct naming in implementation modules
+- Fixed the command class versions list for the HVAC virtual thermostat
+
 ## [v6.1.0] - 2023-03-22
 
 ### Added
