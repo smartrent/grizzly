@@ -72,18 +72,6 @@ jobs:
       - run: mix compile
       - run: mix test
 
-  build_elixir_1_11_otp_23:
-    docker:
-      - image: hexpm/elixir:1.11.3-erlang-23.2.2-alpine-3.12.1
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix compile
-      - run: mix test
-
 workflows:
   version: 2
   build_test:
@@ -91,4 +79,3 @@ workflows:
       - build_elixir_1_14_otp_25
       - build_elixir_1_13_otp_24
       - build_elixir_1_12_otp_24
-      - build_elixir_1_11_otp_23
