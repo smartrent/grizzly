@@ -65,11 +65,14 @@ defmodule Grizzly.Trace.Record do
     seq_number = Command.param!(zip_packet, :seq_number)
     flag = Command.param!(zip_packet, :flag)
 
-    case flag do
-      f when f in [:ack_response, :nack_response, :nack_waiting] ->
+    cond do
+      flag in [:ack_response, :nack_response, :nack_waiting] ->
         command_info_empty_response(seq_number, flag)
 
-      _ ->
+      Command.param(zip_packet, :command) == nil ->
+        "    no_operation"
+
+      true ->
         command_info_with_encapsulated_command(seq_number, zip_packet, binary)
     end
   end
