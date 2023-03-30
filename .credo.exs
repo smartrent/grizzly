@@ -13,8 +13,10 @@
         ],
         excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/"]
       },
+      requires: ["./dev/command_module_name_match.ex"],
       strict: true,
       checks: [
+        {GrizzlyDev.CommandModuleNameMatch, []},
         {Credo.Check.Refactor.MapInto, false},
         {Credo.Check.Warning.LazyLogging, false},
         {Credo.Check.Readability.LargeNumbers, only_greater_than: 86400},
