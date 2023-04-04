@@ -167,19 +167,28 @@ defmodule Grizzly.Connections.SyncConnection do
     header_extensions = Command.param!(zip_packet, :header_extensions)
     seq_number = Command.param!(zip_packet, :seq_number)
     secure = Command.param!(zip_packet, :secure)
+    command = Command.param!(zip_packet, :command)
+
+    more_info =
+      if command && command.name == :supervision_get do
+        true
+      else
+        false
+      end
 
     {:ok, ack_response} =
       ZIPPacket.new(
         secure: secure,
         header_extensions: header_extensions,
         seq_number: seq_number,
+        more_info: more_info,
         flag: :ack_response
       )
 
     binary = ZWave.to_binary(ack_response)
     Transport.send(transport, binary)
 
-    if Command.param!(zip_packet, :command) != nil do
+    if command != nil do
       do_handle_commands(zip_packet, state)
     else
       state
