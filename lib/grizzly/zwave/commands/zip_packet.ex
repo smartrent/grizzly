@@ -28,6 +28,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
           | {:dest, ZWave.node_id()}
           | {:header_extensions, [HeaderExtensions.extension()]}
           | {:secure, boolean()}
+          | {:more_info, boolean()}
 
   @default_params [
     source: 0x00,
@@ -35,7 +36,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     secure: true,
     header_extensions: [],
     flag: nil,
-    command: nil
+    command: nil,
+    more_info: false
   ]
 
   @impl true
@@ -62,8 +64,9 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     dest = Command.param!(command, :dest)
     header_extensions = Command.param!(command, :header_extensions)
     secure = Command.param!(command, :secure)
+    more_info = Command.param!(command, :more_info)
 
-    meta_byte = meta_to_byte(secure, zwave_command, header_extensions)
+    meta_byte = meta_to_byte(secure, zwave_command, header_extensions, more_info)
 
     <<flag_to_byte(flag), meta_byte, seq_number, source, dest>>
     |> maybe_add_header_extensions(header_extensions)
@@ -86,6 +89,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
        source: source,
        dest: dest,
        secure: meta.secure,
+       more_info: meta.more_info,
        header_extensions: header_extensions,
        command: command,
        flag: flag
@@ -102,11 +106,12 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   def flag_to_byte(:nack_option_error), do: 0x24
   def flag_to_byte(:invalid), do: raise(ArgumentError, "Z/IP flag is invalid, cannot encode")
 
-  def meta_to_byte(secure, command, extensions) do
+  def meta_to_byte(secure, command, extensions, more_info \\ false) do
     meta_map = %{
       secure: secure,
       command: command,
-      header_extensions: extensions
+      header_extensions: extensions,
+      more_info: more_info
     }
 
     Enum.reduce(meta_map, 0, fn
@@ -116,6 +121,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
       {:secure, false}, acc -> acc
       {:header_extensions, []}, acc -> acc
       {:header_extensions, _extensions}, acc -> acc ||| 0x80
+      {:more_info, true}, acc -> acc ||| 0x20
+      {:more_info, _}, acc -> acc
     end)
   end
 
@@ -127,9 +134,15 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   @spec make_ack_response(ZWave.seq_number(), keyword()) :: Command.t()
   def make_ack_response(seq_number, opts \\ []) do
     header_extensions = Keyword.get(opts, :header_extensions, [])
+    more_info = Keyword.get(opts, :more_info, [])
 
     {:ok, command} =
-      new(seq_number: seq_number, flag: :ack_response, header_extensions: header_extensions)
+      new(
+        seq_number: seq_number,
+        flag: :ack_response,
+        header_extensions: header_extensions,
+        more_info: more_info
+      )
 
     command
   end

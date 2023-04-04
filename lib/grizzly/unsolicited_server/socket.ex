@@ -127,12 +127,30 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   defp send_ack_response(node_id, zippacket) do
     header_extensions = Command.param!(zippacket, :header_extensions)
     seq = Command.param!(zippacket, :seq_number)
+    more_info = more_info?(zippacket)
+
+    if more_info do
+      Logger.debug("[Grizzly] Adding More Information flag to ACK response")
+    end
 
     ack_bin =
       seq
-      |> ZIPPacket.make_ack_response(header_extensions: header_extensions)
+      |> ZIPPacket.make_ack_response(
+        header_extensions: header_extensions,
+        more_info: more_info
+      )
       |> ZWave.to_binary()
 
     Grizzly.send_binary(node_id, ack_bin)
+  end
+
+  defp more_info?(zip_packet) do
+    encapsulated_command = Command.param(zip_packet, :command)
+
+    if encapsulated_command && encapsulated_command.name == :supervision_get do
+      true
+    else
+      false
+    end
   end
 end
