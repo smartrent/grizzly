@@ -4,6 +4,19 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.2.0] - 2023-04-05
+
+**NOTE**: Dropped support for Elixir 1.11.
+
+### Added
+
+- Add support for sending supervised commands ([#727](https://github.com/smartrent/grizzly/pull/727))
+
+### Fixed
+
+- Set more info flag when ACKing supervision get commands ([#735](https://github.com/smartrent/grizzly/pull/735))
+- Fix trace dump for `:no_operation` commands ([#733](https://github.com/smartrent/grizzly/pull/733))
+
 ## [v6.1.1] - 2023-03-29
 
 ### Fixed
@@ -2145,7 +2158,9 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
-[v6.0.2]: https://github.com/smartrent/grizzly/compare/v6.0.1..v6.0.2
+[v6.2.0]: https://github.com/smartrent/grizzly/compare/v6.1.1..v6.2.0
+[v6.1.1]: https://github.com/smartrent/grizzly/compare/v6.1.0..v6.1.1
+[v6.1.0]: https://github.com/smartrent/grizzly/compare/v6.0.1..v6.1.0
 [v6.0.1]: https://github.com/smartrent/grizzly/compare/v6.0.0..v6.0.1
 [v6.0.0]: https://github.com/smartrent/grizzly/compare/v5.4.1..v6.0.0
 [v5.4.1]: https://github.com/smartrent/grizzly/compare/v5.4.0..v5.4.1
