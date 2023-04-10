@@ -341,6 +341,10 @@ defmodule Grizzly do
     to: Grizzly.Commands.Table,
     as: :supports_supervision?
 
+  @doc "Restarts the Z/IP Gateway process if it is running."
+  @spec restart_zipgateway :: :ok
+  defdelegate restart_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+
   defp maybe_log_warning(command_name) do
     deprecated_list = [
       :switch_binary_get,
