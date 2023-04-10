@@ -10,6 +10,14 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
   @zgw_eeprom_to_sqlite "/usr/bin/zgw_eeprom_to_sqlite"
 
+  @doc "Restarts the Z/IP Gateway process if it is running."
+  @spec restart_zipgateway() :: :ok
+  def restart_zipgateway() do
+    _ = Supervisor.terminate_child(__MODULE__, MuonTrap.Daemon)
+    {:ok, _} = Supervisor.restart_child(__MODULE__, MuonTrap.Daemon)
+    :ok
+  end
+
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do
     Supervisor.start_link(__MODULE__, options, name: __MODULE__)
