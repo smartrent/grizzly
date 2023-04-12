@@ -15,18 +15,23 @@ defmodule Grizzly.Commands.Table do
     @table [
       {:default_set,
        {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}}},
+
       # Noop
       {:no_operation, {Commands.NoOperation, handler: AckResponse}},
+
       # Basic
       {:basic_get, {Commands.BasicGet, handler: {WaitReport, complete_report: :basic_report}}},
       {:basic_set, {Commands.BasicSet, handler: AckResponse}},
+
       # Battery
       {:battery_get,
        {Commands.BatteryGet, handler: {WaitReport, complete_report: :battery_report}}},
+
       # Binary switches
       {:switch_binary_get,
        {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}}},
       {:switch_binary_set, {Commands.SwitchBinarySet, handler: AckResponse}},
+
       # Configuration
       {:configuration_set, {Commands.ConfigurationSet, handler: AckResponse}},
       {:configuration_get,
@@ -43,6 +48,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.ConfigurationNameGet,
         handler:
           {AggregateReport, complete_report: :configuration_name_report, aggregate_param: :name}}},
+
       # Manufacturer specific
       {:manufacturer_specific_get,
        {Commands.ManufacturerSpecificGet,
@@ -50,6 +56,7 @@ defmodule Grizzly.Commands.Table do
       {:manufacturer_specific_device_specific_get,
        {Commands.ManufacturerSpecificDeviceSpecificGet,
         handler: {WaitReport, complete_report: :manufacturer_specific_device_specific_report}}},
+
       # Multilevel switches
       {:switch_multilevel_get,
        {Commands.SwitchMultilevelGet,
@@ -59,6 +66,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.SwitchMultilevelStartLevelChange, handler: AckResponse}},
       {:switch_multilevel_stop_level_change,
        {Commands.SwitchMultilevelStopLevelChange, handler: AckResponse}},
+
       # Node management
       {:node_list_get,
        {Commands.NodeListGet, handler: {WaitReport, complete_report: :node_list_report}}},
@@ -93,12 +101,24 @@ defmodule Grizzly.Commands.Table do
        {Commands.NodeNeighborUpdateRequest,
         handler: {WaitReport, complete_report: :node_neighbor_update_status}}},
 
+      # Security
+      # security_commands_supported_get should technically use AggregateReport, but it would
+      # require changes to AggregateReport. Few devices support so many CCs that they
+      # don't all fit into one frame.
+      {:security_commands_supported_get,
+       {Commands.SecurityCommandsSupportedGet,
+        handler: {WaitReport, complete_report: :security_commands_supported_report}}},
+      {:security_2_commands_supported_get,
+       {Commands.Security2CommandsSupportedGet,
+        handler: {WaitReport, complete_report: :security_2_commands_supported_report}}},
+
       # DSKs
       {:node_add_keys_set,
        {Commands.NodeAddKeysSet, handler: {AckResponse, [supports_supervision?: false]}}},
       {:node_add_dsk_set,
        {Commands.NodeAddDSKSet, handler: {AckResponse, [supports_supervision?: false]}}},
       {:dsk_get, {Commands.DSKGet, handler: {WaitReport, complete_report: :dsk_report}}},
+
       # Door Lock
       {:door_lock_operation_set, {Commands.DoorLockOperationSet, handler: AckResponse}},
       {:door_lock_operation_get,
@@ -124,6 +144,7 @@ defmodule Grizzly.Commands.Table do
       {:association_specific_group_get,
        {Commands.AssociationSpecificGroupGet,
         handler: {WaitReport, complete_report: :association_specific_group_report}}},
+
       # Multi Channel Associations
       {:multi_channel_association_set,
        {Commands.MultiChannelAssociationSet, handler: AckResponse}},
@@ -137,6 +158,7 @@ defmodule Grizzly.Commands.Table do
       {:multi_channel_association_groupings_get,
        {Commands.MultiChannelAssociationGroupingsGet,
         handler: {WaitReport, complete_report: :multi_channel_association_groupings_report}}},
+
       # Association Group Info
       {:association_group_name_get,
        {Commands.AssociationGroupNameGet,
@@ -147,8 +169,10 @@ defmodule Grizzly.Commands.Table do
       {:association_group_command_list_get,
        {Commands.AssociationGroupCommandListGet,
         handler: {WaitReport, complete_report: :association_group_command_list_report}}},
+
       # Keep alive
       {:keep_alive, {Commands.ZIPKeepAlive, handler: AckResponse}},
+
       # Version
       {:version_get,
        {Commands.VersionGet, handler: {WaitReport, complete_report: :version_report}}},
@@ -171,6 +195,7 @@ defmodule Grizzly.Commands.Table do
       {:firmware_update_activation_set,
        {Commands.FirmwareUpdateActivationSet,
         handler: {WaitReport, complete_report: :firmware_update_activation_report}}},
+
       # Wake up
       {:wake_up_interval_get,
        {Commands.WakeUpIntervalGet,
@@ -180,6 +205,7 @@ defmodule Grizzly.Commands.Table do
       {:wake_up_interval_capabilities_get,
        {Commands.WakeUpIntervalCapabilitiesGet,
         handler: {WaitReport, complete_report: :wake_up_interval_capabilities_report}}},
+
       # Sensor Multilevel
       {:sensor_multilevel_get,
        {Commands.SensorMultilevelGet,
@@ -187,6 +213,7 @@ defmodule Grizzly.Commands.Table do
       {:sensor_multilevel_supported_sensor_get,
        {Commands.SensorMultilevelSupportedSensorGet,
         handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}},
+
       # User code
       {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}},
       {:user_code_get,
@@ -197,8 +224,10 @@ defmodule Grizzly.Commands.Table do
       {:master_code_set, {Commands.MasterCodeSet, handler: AckResponse}},
       {:master_code_get,
        {Commands.MasterCodeGet, handler: {WaitReport, complete_report: :master_code_report}}},
+
       # Meter
       {:meter_get, {Commands.MeterGet, handler: {WaitReport, complete_report: :meter_report}}},
+
       # Thermostat mode
       {:thermostat_mode_set, {Commands.ThermostatModeSet, handler: AckResponse}},
       {:thermostat_mode_get,
@@ -207,6 +236,7 @@ defmodule Grizzly.Commands.Table do
       {:thermostat_mode_supported_get,
        {Commands.ThermostatModeSupportedGet,
         handler: {WaitReport, complete_report: :thermostat_mode_supported_report}}},
+
       # Thermostat setpoint
       {:thermostat_setpoint_set, {Commands.ThermostatSetpointSet, handler: AckResponse}},
       {:thermostat_setpoint_get,
@@ -215,24 +245,29 @@ defmodule Grizzly.Commands.Table do
       {:thermostat_setpoint_supported_get,
        {Commands.ThermostatSetpointSupportedGet,
         handler: {WaitReport, complete_report: :thermostat_setpoint_supported_report}}},
+
       # Thermostat fan mode
       {:thermostat_fan_mode_set, {Commands.ThermostatFanModeSet, handler: AckResponse}},
       {:thermostat_fan_mode_get,
        {Commands.ThermostatFanModeGet,
         handler: {WaitReport, complete_report: :thermostat_fan_mode_report}}},
+
       # Thermostat fan state
       {:thermostat_fan_state_get,
        {Commands.ThermostatFanStateGet,
         handler: {WaitReport, complete_report: :thermostat_fan_state_report}}},
+
       # Thermostat setback
       {:thermostat_setback_set, {Commands.ThermostatSetbackSet, handler: AckResponse}},
       {:thermostat_setback_get,
        {Commands.ThermostatSetbackGet,
         handler: {WaitReport, complete_report: :thermostat_setback_report}}},
+
       # Thermostat operating state
       {:thermostat_operating_state_get,
        {Commands.ThermostatOperatingStateGet,
         handler: {WaitReport, complete_report: :thermostat_operating_state_report}}},
+
       # Node provisioning
       {:node_provisioning_set, {Commands.NodeProvisioningSet, handler: AckResponse}},
       {:node_provisioning_get,
@@ -242,12 +277,15 @@ defmodule Grizzly.Commands.Table do
       {:node_provisioning_list_iteration_get,
        {Commands.NodeProvisioningListIterationGet,
         handler: {WaitReport, complete_report: :node_provisioning_list_iteration_report}}},
+
       # Supervision
       {:supervision_get,
        {Commands.SupervisionGet, handler: {WaitReport, complete_report: :supervision_report}}},
+
       # Sensor binary
       {:sensor_binary_get,
        {Commands.SensorBinaryGet, handler: {WaitReport, complete_report: :sensor_binary_report}}},
+
       # Multi Channel
       {:multi_channel_endpoint_get,
        {Commands.MultiChannelEndpointGet,
@@ -267,10 +305,12 @@ defmodule Grizzly.Commands.Table do
        {Commands.MultiChannelCommandEncapsulation, handler: {WaitReport, complete_report: :any}}},
       {:multi_channel_command_encapsulation,
        {Commands.MultiChannelCommandEncapsulation, handler: AckResponse}},
-      #
+
+      # Application
       {:application_node_info_get,
        {Commands.ApplicationNodeInfoGet,
         handler: {WaitReport, complete_report: :application_node_info_report}}},
+
       # Node Naming and Location
       {:node_name_get,
        {Commands.NodeNameGet, handler: {WaitReport, complete_report: :node_name_report}}},
@@ -278,11 +318,13 @@ defmodule Grizzly.Commands.Table do
       {:node_location_get,
        {Commands.NodeLocationGet, handler: {WaitReport, complete_report: :node_location_report}}},
       {:node_location_set, {Commands.NodeLocationSet, handler: AckResponse}},
+
       # Time parameters
       {:time_parameters_get,
        {Commands.TimeParametersGet,
         handler: {WaitReport, complete_report: :time_parameters_report}}},
       {:time_parameters_set, {Commands.TimeParametersSet, handler: AckResponse}},
+
       # Alarm
       {:alarm_get, {Commands.AlarmGet, handler: {WaitReport, complete_report: :alarm_report}}},
       {:alarm_set, {Commands.AlarmSet, handler: AckResponse}},
@@ -292,12 +334,14 @@ defmodule Grizzly.Commands.Table do
       {:alarm_event_supported_get,
        {Commands.AlarmEventSupportedGet,
         handler: {WaitReport, complete_report: :alarm_event_supported_report}}},
+
       # Time
       {:time_get, {Commands.TimeGet, handler: {WaitReport, complete_report: :time_report}}},
       {:date_get, {Commands.DateGet, handler: {WaitReport, complete_report: :date_report}}},
       {:time_offset_get,
        {Commands.TimeOffsetGet, handler: {WaitReport, complete_report: :time_offset_report}}},
       {:time_offset_set, {Commands.TimeOffsetSet, handler: AckResponse}},
+
       # Indicator
       {:indicator_get,
        {Commands.IndicatorGet, handler: {WaitReport, complete_report: :indicator_report}}},
@@ -308,15 +352,18 @@ defmodule Grizzly.Commands.Table do
       {:indicator_description_get,
        {Commands.IndicatorDescriptionGet,
         handler: {WaitReport, complete_report: :indicator_description_report}}},
+
       # Antitheft
       {:antitheft_get,
        {Commands.AntitheftGet, handler: {WaitReport, complete_report: :antitheft_report}}},
       {:antitheft_set, {Commands.AntitheftSet, handler: AckResponse}},
+
       # Antitheft unlock
       {:antitheft_unlock_get,
        {Commands.AntitheftUnlockGet,
         handler: {WaitReport, complete_report: :antitheft_unlock_report}}},
       {:antitheft_unlock_set, {Commands.AntitheftUnlockSet, handler: AckResponse}},
+
       # Central scene
       {:central_scene_supported_get,
        {Commands.CentralSceneSupportedGet,
@@ -324,13 +371,16 @@ defmodule Grizzly.Commands.Table do
       {:central_scene_configuration_get,
        {Commands.CentralSceneConfigurationGet,
         handler: {WaitReport, complete_report: :central_scene_configuration_report}}},
+
       # Scene actuator configuration
       {:scene_actuator_conf_get,
        {Commands.SceneActuatorConfGet,
         handler: {WaitReport, complete_report: :scene_actuator_conf_report}}},
       {:scene_actuator_conf_set, {Commands.SceneActuatorConfSet, handler: AckResponse}},
+
       # Scene activation
       {:scene_activation_set, {Commands.SceneActivationSet, handler: AckResponse}},
+
       # Powerlevel
       {:powerlevel_get,
        {Commands.PowerlevelGet, handler: {WaitReport, complete_report: :powerlevel_report}}},
@@ -341,9 +391,11 @@ defmodule Grizzly.Commands.Table do
       {:powerlevel_test_node_set, {Commands.PowerlevelTestNodeSet, handler: AckResponse}},
       {:device_reset_locally_notification,
        {Commands.DeviceResetLocallyNotification, handler: AckResponse}},
+
       # Clock
       {:clock_get, {Commands.ClockGet, handler: {WaitReport, complete_report: :clock_report}}},
       {:clock_set, {Commands.ClockSet, handler: AckResponse}},
+
       # Network Management Installation Maintenance
       {:priority_route_get,
        {Commands.PriorityRouteGet, handler: {WaitReport, complete_report: :priority_route_report}}},
@@ -355,9 +407,11 @@ defmodule Grizzly.Commands.Table do
       {:zwave_long_range_channel_get,
        {Commands.ZWaveLongRangeChannelGet,
         handler: {WaitReport, complete_report: :zwave_long_range_channel_report}}},
+
       # Zwaveplus Info
       {:zwaveplus_info_get,
        {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}}},
+
       # Schedule Entry Lock
       {:schedule_entry_lock_week_day_get,
        {Commands.ScheduleEntryLockWeekDayGet,
@@ -386,6 +440,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.ScheduleEntryLockTimeOffsetSet, handler: AckResponse}},
       {:schedule_entry_lock_daily_repeating_set,
        {Commands.ScheduleEntryLockDailyRepeatingSet, handler: AckResponse}},
+
       # Barrier Operator
       {:barrier_operator_get,
        {Commands.BarrierOperatorGet,
@@ -398,6 +453,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.BarrierOperatorSignalGet,
         handler: {WaitReport, complete_report: :barrier_operator_signal_report}}},
       {:barrier_operator_signal_set, {Commands.BarrierOperatorSignalSet, handler: AckResponse}},
+
       # Window Covering
       {:window_covering_supported_get,
        {Commands.WindowCoveringSupportedGet,
@@ -446,7 +502,7 @@ defmodule Grizzly.Commands.Table do
     @no_validate [:multi_channel_get_command_encapsulation]
 
     defmacro __after_compile__(_, _) do
-      for {table_name, {command_module, _}} <- @table, table_name not in @no_validate do
+      for {table_name, {command_module, opts}} <- @table, table_name not in @no_validate do
         {:ok, command} = command_module.new([])
 
         if table_name != command.name do
@@ -454,10 +510,35 @@ defmodule Grizzly.Commands.Table do
           The command named #{inspect(table_name)} does not match the name returned from `#{inspect(command_module)}.new/1`.
           """
         end
+
+        case opts[:handler] do
+          {WaitReport, handler_opts} ->
+            if handler_opts[:complete_report] == nil do
+              raise """
+              The command named #{inspect(table_name)} has a handler of WaitReport with no
+              `complete_report` option.
+              """
+            end
+
+            # ensure handler_opts[:complete_report] is an atom, but not a module name
+            if module?(handler_opts[:complete_report]) do
+              raise """
+              The command named #{inspect(table_name)} has a module name as its `:complete_report`
+              option, but an atom is expected.
+              """
+            end
+
+          _ ->
+            nil
+        end
       end
 
       quote do
       end
+    end
+
+    defp module?(atom) do
+      function_exported?(atom, :__info__, 1)
     end
   end
 
