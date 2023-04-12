@@ -11,28 +11,35 @@ defmodule Grizzly.ZWave.Decoder do
       {0x20, 0x01, Commands.BasicSet},
       {0x20, 0x02, Commands.BasicGet},
       {0x20, 0x03, Commands.BasicReport},
+
       # Application status
       {0x22, 0x01, Commands.ApplicationBusy},
       {0x22, 0x02, Commands.ApplicationRejectedRequest},
+
       # Battery
       {0x80, 0x02, Commands.BatteryGet},
       {0x80, 0x03, Commands.BatteryReport},
+
       # Z/IP (0x23)
       {0x23, 0x02, Commands.ZIPPacket},
       {0x23, 0x03, Commands.ZIPKeepAlive},
+
       # Switch Binary (0x25)
       {0x25, 0x01, Commands.SwitchBinarySet},
       {0x25, 0x02, Commands.SwitchBinaryGet},
       {0x25, 0x03, Commands.SwitchBinaryReport},
+
       # Switch Multilevel (0x26)
       {0x26, 0x01, Commands.SwitchMultilevelSet},
       {0x26, 0x02, Commands.SwitchMultilevelGet},
       {0x26, 0x03, Commands.SwitchMultilevelReport},
       {0x26, 0x04, Commands.SwitchMultilevelStartLevelChange},
       {0x26, 0x05, Commands.SwitchMultiLevelStopLevelChange},
+
       # Sensor binary
       {0x30, 0x02, Commands.SensorBinaryGet},
       {0x30, 0x03, Commands.SensorBinaryReport},
+
       # Network Management Inclusion (0x34)
       {0x34, 0x01, Commands.NodeAdd},
       {0x34, 0x02, Commands.NodeAddStatus},
@@ -48,6 +55,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x34, 0x14, Commands.NodeAddDSKSet},
       {0x34, 0x15, Commands.SmartStartJoinStarted},
       {0x34, 0x16, Commands.ExtendedNodeAddStatus},
+
       # Network Management Basic Node (0x4D)
       {0x4D, 0x01, Commands.LearnModeSet},
       {0x4D, 0x02, Commands.LearnModeSetStatus},
@@ -56,6 +64,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x4D, 0x07, Commands.DefaultSetComplete},
       {0x4D, 0x08, Commands.DSKGet},
       {0x4D, 0x09, Commands.DSKReport},
+
       # Schedule Entry Lock
       {0x4E, 0x01, Commands.ScheduleEntryLockEnableSet},
       {0x4E, 0x02, Commands.ScheduleEntryLockEnableAllSet},
@@ -73,6 +82,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x4E, 0x0E, Commands.ScheduleEntryLockDailyRepeatingGet},
       {0x4E, 0x0F, Commands.ScheduleEntryLockDailyRepeatingReport},
       {0x4E, 0x10, Commands.ScheduleEntryLockDailyRepeatingSet},
+
       # Network Management Proxy (0x52)
       {0x52, 0x01, Commands.NodeListGet},
       {0x52, 0x02, Commands.NodeListReport},
@@ -83,6 +93,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x52, 0x08, Commands.NetworkManagementMultiChannelCapabilityReport},
       {0x52, 0x0B, Commands.FailedNodeListGet},
       {0x52, 0x0C, Commands.FailedNodeListReport},
+
       # Multi Channel
       {0x60, 0x07, Commands.MultiChannelEndpointGet},
       {0x60, 0x08, Commands.MultiChannelEndpointReport},
@@ -93,6 +104,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x60, 0x0D, Commands.MultiChannelCommandEncapsulation},
       {0x60, 0x0E, Commands.MultiChannelAggregatedMembersGet},
       {0x60, 0x0F, Commands.MultiChannelAggregatedMembersReport},
+
       # Association group info
       {0x59, 0x01, Commands.AssociationGroupNameGet},
       {0x59, 0x02, Commands.AssociationGroupNameReport},
@@ -100,6 +112,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x59, 0x04, Commands.AssociationGroupInfoReport},
       {0x59, 0x05, Commands.AssociationGroupCommandListGet},
       {0x59, 0x06, Commands.AssociationGroupCommandListReport},
+
       # Central scene
       {0x5B, 0x01, Commands.CentralSceneSupportedGet},
       {0x5B, 0x02, Commands.CentralSceneSupportedReport},
@@ -107,16 +120,20 @@ defmodule Grizzly.ZWave.Decoder do
       {0x5B, 0x04, Commands.CentralSceneConfigurationSet},
       {0x5B, 0x05, Commands.CentralSceneConfigurationGet},
       {0x5B, 0x06, Commands.CentralSceneConfigurationReport},
+
       # Antitheft
       {0x5D, 0x01, Commands.AntitheftSet},
       {0x5D, 0x02, Commands.AntitheftGet},
       {0x5D, 0x03, Commands.AntitheftReport},
+
       # Zwabeplus Info
       {0x5E, 0x01, Commands.ZwaveplusInfoGet},
       {0x5E, 0x02, Commands.ZwaveplusInfoReport},
+
       # Z/IP Gateway
       {0x5F, 0x0C, Commands.ApplicationNodeInfoGet},
       {0x5F, 0x0D, Commands.ApplicationNodeInfoReport},
+
       # Door Lock
       {0x62, 0x01, Commands.DoorLockOperationSet},
       {0x62, 0x02, Commands.DoorLockOperationGet},
@@ -136,6 +153,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x63, 0x0E, Commands.MasterCodeSet},
       {0x63, 0x0F, Commands.MasterCodeGet},
       {0x63, 0x10, Commands.MasterCodeReport},
+
       # Barrier Operator
       {0x66, 0x01, Commands.BarrierOperatorSet},
       {0x66, 0x02, Commands.BarrierOperatorGet},
@@ -157,6 +175,12 @@ defmodule Grizzly.ZWave.Decoder do
       {0x67, 0x09, Commands.S2ResynchronizationEvent},
       {0x67, 0x0E, Commands.ZWaveLongRangeChannelReport},
 
+      # Security, Security2
+      {0x98, 0x02, Commands.SecurityCommandsSupportedGet},
+      {0x98, 0x03, Commands.SecurityCommandsSupportedReport},
+      {0x9F, 0x0D, Commands.Security2CommandsSupportedGet},
+      {0x9F, 0x0E, Commands.Security2CommandsSupportedReport},
+
       # Window Covering
       {0x6A, 0x01, Commands.WindowCoveringSupportedGet},
       {0x6A, 0x02, Commands.WindowCoveringSupportedReport},
@@ -169,6 +193,7 @@ defmodule Grizzly.ZWave.Decoder do
       # Supervision
       {0x6C, 0x01, Commands.SupervisionGet},
       {0x6C, 0x02, Commands.SupervisionReport},
+
       # Configuration
       {0x70, 0x04, Commands.ConfigurationSet},
       {0x70, 0x05, Commands.ConfigurationGet},
@@ -180,6 +205,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x70, 0x0B, Commands.ConfigurationNameReport},
       {0x70, 0x0E, Commands.ConfigurationPropertiesGet},
       {0x70, 0x0F, Commands.ConfigurationPropertiesReport},
+
       # Alarm
       {0x71, 0x01, Commands.AlarmEventSupportedGet},
       {0x71, 0x02, Commands.AlarmEventSupportedReport},
@@ -188,17 +214,21 @@ defmodule Grizzly.ZWave.Decoder do
       {0x71, 0x06, Commands.AlarmSet},
       {0x71, 0x07, Commands.AlarmTypeSupportedGet},
       {0x71, 0x08, Commands.AlarmTypeSupportedReport},
+
       # Manufacturer Specific
       {0x72, 0x04, Commands.ManufacturerSpecificGet},
       {0x72, 0x05, Commands.ManufacturerSpecificReport},
       {0x72, 0x06, Commands.ManufacturerSpecificDeviceSpecificGet},
       {0x72, 0x07, Commands.ManufacturerSpecificDeviceSpecificReport},
+
       # Antitheft unlock
       {0x7E, 0x01, Commands.AntitheftUnlockGet},
       {0x7E, 0x02, Commands.AntitheftUnlockReport},
       {0x7E, 0x03, Commands.AntitheftUnlockSet},
+
       # Hail
       {0x82, 0x01, Commands.Hail},
+
       # Association (0x85)
       {0x85, 0x01, Commands.AssociationSet},
       {0x85, 0x02, Commands.AssociationGet},
@@ -208,6 +238,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x85, 0x06, Commands.AssociationGroupingsReport},
       {0x85, 0x0B, Commands.AssociationSpecificGroupGet},
       {0x85, 0x0C, Commands.AssociationSpecificGroupReport},
+
       # Multi Channel Association (0x8E)
       {0x8E, 0x01, Commands.MultiChannelAssociationSet},
       {0x8E, 0x02, Commands.MultiChannelAssociationGet},
@@ -215,6 +246,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x8E, 0x04, Commands.MultiChannelAssociationRemove},
       {0x8E, 0x05, Commands.MultiChannelAssociationGroupingsGet},
       {0x8E, 0x06, Commands.MultiChannelAssociationGroupingsReport},
+
       # Version (0x86)
       {0x86, 0x11, Commands.VersionGet},
       {0x86, 0x12, Commands.VersionReport},
@@ -224,6 +256,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x86, 0x16, Commands.VersionCapabilitiesReport},
       {0x86, 0x17, Commands.VersionZWaveSoftwareGet},
       {0x86, 0x18, Commands.VersionZWaveSoftwareReport},
+
       # Firmware Update Metadata
       {0x7A, 0x01, Commands.FirmwareMDGet},
       {0x7A, 0x02, Commands.FirmwareMDReport},
@@ -234,6 +267,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x7A, 0x07, Commands.FirmwareUpdateMDStatusReport},
       {0x7A, 0x08, Commands.FirmwareUpdateActivationSet},
       {0x7A, 0x09, Commands.FirmwareUpdateActivationReport},
+
       # Wake Up
       {0x84, 0x04, Commands.WakeUpIntervalSet},
       {0x84, 0x05, Commands.WakeUpIntervalSet},
@@ -242,42 +276,52 @@ defmodule Grizzly.ZWave.Decoder do
       {0x84, 0x08, Commands.WakeUpNoMoreInformation},
       {0x84, 0x09, Commands.WakeUpIntervalCapabilitiesGet},
       {0x84, 0x0A, Commands.WakeUpIntervalCapabilitiesReport},
+
       # Sensor multilevel
       {0x31, 0x01, Commands.SensorMultilevelSupportedSensorGet},
       {0x31, 0x02, Commands.SensorMultilevelSupportedSensorReport},
       {0x31, 0x04, Commands.SensorMultilevelGet},
       {0x31, 0x05, Commands.SensorMultilevelReport},
+
       # Meter
       {0x32, 0x01, Commands.MeterGet},
       {0x32, 0x02, Commands.MeterReport},
+
       # Thermostat mode
       {0x40, 0x01, Commands.ThermostatModeSet},
       {0x40, 0x02, Commands.ThermostatModeGet},
       {0x40, 0x03, Commands.ThermostatModeReport},
       {0x40, 0x04, Commands.ThermostatModeSupportedGet},
       {0x40, 0x05, Commands.ThermostatModeSupportedReport},
+
       # Thermostat setpoint
       {0x43, 0x01, Commands.ThermostatSetpointSet},
       {0x43, 0x02, Commands.ThermostatSetpointGet},
       {0x43, 0x03, Commands.ThermostatSetpointReport},
       {0x43, 0x04, Commands.ThermostatSetpointSupportedGet},
       {0x43, 0x05, Commands.ThermostatSetpointSupportedReport},
+
       # Thermostat fan mode
       {0x44, 0x01, Commands.ThermostatFanModeSet},
       {0x44, 0x02, Commands.ThermostatFanModeGet},
       {0x44, 0x03, Commands.ThermostatFanModeReport},
+
       # Thermostat fan state
       {0x45, 0x02, Commands.ThermostatFanStateGet},
       {0x45, 0x03, Commands.ThermostatFanStateReport},
+
       # Thermostat setback
       {0x47, 0x01, Commands.ThermostatSetbackSet},
       {0x47, 0x02, Commands.ThermostatSetbackGet},
       {0x47, 0x03, Commands.ThermostatSetbackReport},
+
       # CRC 16 encapsulation
       {0x56, 0x01, Commands.CRC16Encap},
+
       # Thermostat operating state
       {0x42, 0x02, Commands.ThermostatOperatingStateGet},
       {0x42, 0x03, Commands.ThermostatOperatingStateReport},
+
       # Powerlevel
       {0x73, 0x01, Commands.PowerlevelSet},
       {0x73, 0x02, Commands.PowerlevelGet},
@@ -285,6 +329,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x73, 0x04, Commands.PowerlevelTestNodeSet},
       {0x73, 0x05, Commands.PowerlevelTestNodeGet},
       {0x73, 0x06, Commands.PowerlevelTestNodeReport},
+
       # Node provisioning
       {0x78, 0x01, Commands.NodeProvisioningSet},
       {0x78, 0x02, Commands.NodeProvisioningDelete},
@@ -292,6 +337,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x78, 0x04, Commands.NodeProvisioningListIterationReport},
       {0x78, 0x05, Commands.NodeProvisioningGet},
       {0x78, 0x06, Commands.NodeProvisioningReport},
+
       # Node naming and location
       {0x77, 0x01, Commands.NodeNameSet},
       {0x77, 0x02, Commands.NodeNameGet},
@@ -299,16 +345,20 @@ defmodule Grizzly.ZWave.Decoder do
       {0x77, 0x04, Commands.NodeLocationSet},
       {0x77, 0x05, Commands.NodeLocationGet},
       {0x77, 0x06, Commands.NodeLocationReport},
+
       # Clock
       {0x81, 0x04, Commands.ClockSet},
       {0x81, 0x05, Commands.ClockGet},
       {0x81, 0x06, Commands.ClockReport},
+
       # Time parameters
       {0x8B, 0x01, Commands.TimeParametersSet},
       {0x8B, 0x02, Commands.TimeParametersGet},
       {0x8B, 0x03, Commands.TimeParametersReport},
+
       # Device reset locally
       {0x5A, 0x01, Commands.DeviceResetLocallyNotification},
+
       # Time
       {0x8A, 0x01, Commands.TimeGet},
       {0x8A, 0x02, Commands.TimeReport},
@@ -317,6 +367,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x8A, 0x05, Commands.TimeOffsetSet},
       {0x8A, 0x06, Commands.TimeOffsetGet},
       {0x8A, 0x07, Commands.TimeOffsetReport},
+
       # Indicator
       {0x87, 0x01, Commands.IndicatorSet},
       {0x87, 0x02, Commands.IndicatorGet},
@@ -325,8 +376,10 @@ defmodule Grizzly.ZWave.Decoder do
       {0x87, 0x05, Commands.IndicatorSupportedReport},
       {0x87, 0x06, Commands.IndicatorDescriptionGet},
       {0x87, 0x07, Commands.IndicatorDescriptionReport},
+
       # Scene activation
       {0x2B, 0x01, Commands.SceneActovationSet},
+
       # Scene actuator configuration
       {0x2C, 0x01, Commands.SceneActuatorConfSet},
       {0x2C, 0x02, Commands.SceneActuatorConfGet},
