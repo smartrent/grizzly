@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
           | {:repeater?, boolean}
           | {:speed, speeds}
   @type rssi ::
-          :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -128..-32
+          :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -124..127
 
   alias Grizzly.ZWave.DecodeError
   @behaviour Grizzly.ZWave.CommandClass
@@ -79,21 +79,40 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  @spec rssi_to_byte(rssi) :: byte
+  @doc """
+  Encodes the given RSSI value to an 8-bit signed integer.
+
+  **NOTE:** In order to support Z/IP Gateway quirks, this function accepts values
+  outside of the range specified in the spec (-32..-128). Values out of range for
+  an 8-bit signed integer will overflow.
+  """
+  @spec rssi_to_byte(rssi()) :: byte()
   def rssi_to_byte(:rssi_below_sensitivity), do: 0x7D
   def rssi_to_byte(:rssi_max_power_saturated), do: 0x7E
   def rssi_to_byte(:rssi_not_available), do: 0x7F
-  def rssi_to_byte(value) when value in -128..-32, do: 256 + value
 
-  @spec rssi_from_byte(byte) :: {:ok, rssi} | {:error, DecodeError.t()}
-  def rssi_from_byte(0x7D), do: {:ok, :rssi_below_sensitivity}
-  def rssi_from_byte(0x7E), do: {:ok, :rssi_max_power_saturated}
-  def rssi_from_byte(0x7F), do: {:ok, :rssi_not_available}
-  # 0 is reserved in the spec, but Z/IP Gateway sends it for the secondary long
-  # range channel when the primary long range channel is 0x7F / not available
-  def rssi_from_byte(0x00), do: {:ok, :rssi_not_available}
-  def rssi_from_byte(byte) when byte in 0xE0..0x80, do: {:ok, byte - 256}
-  def rssi_from_byte(byte), do: {:error, %DecodeError{value: byte}}
+  def rssi_to_byte(rssi) do
+    <<byte::8>> = <<rssi::signed-size(8)>>
+    byte
+  end
+
+  @doc """
+  Decodes the given byte to an 8-bit signed integer (or one of the special values
+  defined in the spec).
+
+  **NOTE:** In order to support Z/IP Gateway quirks, this function accepts values
+  outside of the range specified in the spec (-32..-128). This function may return
+  any value in the range -128..124.
+  """
+  @spec rssi_from_byte(byte()) :: rssi()
+  def rssi_from_byte(0x7D), do: :rssi_below_sensitivity
+  def rssi_from_byte(0x7E), do: :rssi_max_power_saturated
+  def rssi_from_byte(0x7F), do: :rssi_not_available
+
+  def rssi_from_byte(byte) do
+    <<rssi::signed-size(8)>> = <<byte::8>>
+    rssi
+  end
 
   def repeaters_to_bytes(repeaters) do
     full_repeaters = (repeaters ++ [0, 0, 0, 0]) |> Enum.take(4)
