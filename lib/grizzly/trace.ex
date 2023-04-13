@@ -27,6 +27,8 @@ defmodule Grizzly.Trace do
 
   @type log_opt() :: {:src, src()} | {:dest, dest()}
 
+  @type format() :: :text | :term
+
   @doc """
   Start the trace server
   """
@@ -36,19 +38,36 @@ defmodule Grizzly.Trace do
   end
 
   @doc """
+  Serializes a list of trace records into a binary. The format can be one of:
+
+  * `:text` - Each record is on a new line and is
+    formatted as `timestamp source destination sequence_number command_name
+    command_parameters`. This is the default format.
+
+  * `:term` - The trace is serialized as a list of `Record.t()` structs in
+    Erlang external term format. This is useful if you want to load the trace
+    on another machine.
+  """
+  @spec format([Record.t()], format()) :: binary()
+  def format(records, format \\ :text)
+  def format(records, :text), do: records_to_contents(records)
+  def format(records, :term), do: :erlang.term_to_binary(records)
+
+  @doc """
+  Dump the trace records into a file. See `format/2` for the available formats.
+  """
+  @spec dump(binary(), format()) :: :ok | {:error, atom()}
+  def dump(file, format \\ :text) do
+    file_contents = format(list(), format)
+    File.write(file, file_contents)
+  end
+
+  @doc """
   Log the trace information
   """
   @spec log(binary(), [log_opt()]) :: :ok
   def log(binary, opts \\ []) do
     GenServer.cast(__MODULE__, {:log, binary, opts})
-  end
-
-  @doc """
-  Dump the trace records into a file
-  """
-  @spec dump(Path.t()) :: :ok
-  def dump(file) do
-    GenServer.call(__MODULE__, {:dump, file})
   end
 
   @doc """
@@ -80,19 +99,6 @@ defmodule Grizzly.Trace do
   end
 
   @impl GenServer
-  def handle_call({:dump, file}, _from, records) do
-    records_list = RecordQueue.to_list(records)
-    file_contents = records_to_contents(records_list)
-
-    case File.write(file, file_contents) do
-      :ok ->
-        {:reply, :ok, records}
-
-      {:error, _reason} = error ->
-        {:reply, error, records}
-    end
-  end
-
   def handle_call(:clear, _from, _records) do
     {:reply, :ok, RecordQueue.new()}
   end
