@@ -76,35 +76,28 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
   def decode_params(<<channels_bin::binary-size(3), lr_primary, lr_secondary>>) do
     channels = parse_channels(channels_bin)
 
-    with {:ok, parsed_lr_primary} <-
-           NetworkManagementInstallationMaintenance.rssi_from_byte(lr_primary),
-         {:ok, parsed_lr_secondary} <-
-           NetworkManagementInstallationMaintenance.rssi_from_byte(lr_secondary) do
-      {:ok,
-       [
-         channels: channels,
-         long_range_primary_channel: parsed_lr_primary,
-         long_range_secondary_channel: parsed_lr_secondary
-       ]}
-    end
+    parsed_lr_primary = NetworkManagementInstallationMaintenance.rssi_from_byte(lr_primary)
+
+    # if LR Primary and Secondary are both unavailable, Z/IP Gateway will (currently)
+    # send 0x7F, 0x00 instead of the expected 0x7F, 0x7F.
+    parsed_lr_secondary =
+      case {parsed_lr_primary, lr_secondary} do
+        {:rssi_not_available, 0} -> :rssi_not_available
+        _ -> NetworkManagementInstallationMaintenance.rssi_from_byte(lr_secondary)
+      end
+
+    {:ok,
+     [
+       channels: channels,
+       long_range_primary_channel: parsed_lr_primary,
+       long_range_secondary_channel: parsed_lr_secondary
+     ]}
   end
 
   defp parse_channels(<<channel_1, channel_2, channel_3>>) do
-    channel_bytes = [channel_1, channel_2, channel_3]
-
-    channels =
-      Enum.reduce_while(channel_bytes, [], fn channel_byte, acc ->
-        case NetworkManagementInstallationMaintenance.rssi_from_byte(channel_byte) do
-          {:ok, channel} ->
-            {:cont, acc ++ [channel]}
-
-          # All other values are reserved and MUST NOT be used by a sending node. Reserved values MUST be
-          # ignored by a receiving node.
-          {:error, %DecodeError{}} ->
-            {:cont, acc}
-        end
-      end)
-
-    channels
+    Enum.map(
+      [channel_1, channel_2, channel_3],
+      &NetworkManagementInstallationMaintenance.rssi_from_byte/1
+    )
   end
 end

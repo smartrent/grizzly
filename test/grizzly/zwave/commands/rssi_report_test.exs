@@ -55,10 +55,35 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
 
     binary = <<0x7E, 0xA2, 0x7F, 0xA2, 0x7F>>
     {:ok, params} = RssiReport.decode_params(binary)
+    assert expected_params == params
 
-    for {param, value} <- expected_params do
-      assert params[param] == value
-    end
+    expected_params = [
+      channels: [
+        :rssi_max_power_saturated,
+        -94,
+        :rssi_not_available
+      ],
+      long_range_primary_channel: :rssi_not_available,
+      long_range_secondary_channel: :rssi_not_available
+    ]
+
+    binary = <<0x7E, 0xA2, 0x7F, 0x7F, 0x00>>
+    {:ok, params} = RssiReport.decode_params(binary)
+    assert expected_params == params
+
+    expected_params = [
+      channels: [
+        :rssi_max_power_saturated,
+        -94,
+        :rssi_not_available
+      ],
+      long_range_primary_channel: :rssi_not_available,
+      long_range_secondary_channel: -94
+    ]
+
+    binary = <<0x7E, 0xA2, 0x7F, 0x7F, 0xA2>>
+    {:ok, params} = RssiReport.decode_params(binary)
+    assert expected_params == params
   end
 
   test "handles z/ip gateway erroneously sending an illegal value for LR secondary" do
@@ -72,5 +97,48 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     {:ok, params} = RssiReport.decode_params(binary)
 
     assert expected_params == params
+  end
+
+  test "decodes out-of-spec (but technically valid) values" do
+    expected_params = [
+      channels: [-98, -25, -25],
+      long_range_primary_channel: -10,
+      long_range_secondary_channel: :rssi_max_power_saturated
+    ]
+
+    # Received this from Z/IP Gateway sending this while I was jamming channels
+    # 1 and 2 with a dev kit
+    binary = <<0x9E, 0xE7, 0xE7, 0xF6, 0x7E>>
+    {:ok, params} = RssiReport.decode_params(binary)
+
+    assert expected_params == params
+  end
+
+  test "encodes out-of-spec (but technically valid) values" do
+    {:ok, cmd} =
+      RssiReport.new(
+        channels: [-98, -25, -25],
+        long_range_primary_channel: -10,
+        long_range_secondary_channel: :rssi_max_power_saturated
+      )
+
+    # Received this from Z/IP Gateway sending this while I was jamming channels
+    # 1 and 2 with a dev kit
+    expected_binary = <<0x9E, 0xE7, 0xE7, 0xF6, 0x7E>>
+
+    assert expected_binary == RssiReport.encode_params(cmd)
+
+    {:ok, cmd} =
+      RssiReport.new(
+        channels: [100, -106, 20],
+        long_range_primary_channel: 50,
+        long_range_secondary_channel: :rssi_max_power_saturated
+      )
+
+    # Received this from Z/IP Gateway sending this while I was jamming channels
+    # 1 and 2 with a dev kit
+    expected_binary = <<0x64, 0x96, 0x14, 0x32, 0x7E>>
+
+    assert expected_binary == RssiReport.encode_params(cmd)
   end
 end
