@@ -4,6 +4,20 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.3.0] - 2023-04-13
+
+### Added
+
+- Add API to restart Z/IP Gateway ([#739](https://github.com/smartrent/grizzly/pull/738))
+- Implement S0/S2 Security Commands Supported Get/Report ([#739](https://github.com/smartrent/grizzly/pull/739))
+- Implement Network Management Inclusion Failed Node Replace ([#741](https://github.com/smartrent/grizzly/pull/741))
+- Optionally dump traces in Erlang external term format ([#742](https://github.com/smartrent/grizzly/pull/742))
+
+### Changed/Fixed
+
+- Allow all out-of-spec values in RSSI_REPORT ([#740](https://github.com/smartrent/grizzly/pull/740))
+- Trace dumps are now formatted in the calling process instead of the trace server process ([#742](https://github.com/smartrent/grizzly/pull/742))
+
 ## [v6.2.0] - 2023-04-05
 
 **NOTE**: Dropped support for Elixir 1.11.
@@ -2158,6 +2172,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.3.0]: https://github.com/smartrent/grizzly/compare/v6.2.0..v6.3.0
 [v6.2.0]: https://github.com/smartrent/grizzly/compare/v6.1.1..v6.2.0
 [v6.1.1]: https://github.com/smartrent/grizzly/compare/v6.1.0..v6.1.1
 [v6.1.0]: https://github.com/smartrent/grizzly/compare/v6.0.1..v6.1.0
