@@ -37,7 +37,8 @@ defmodule Grizzly.Options do
           update_zwave_firmware: boolean(),
           zwave_firmware: [Supervisor.firmware_info()],
           zw_programmer_path: Path.t(),
-          inclusion_adapter: module()
+          inclusion_adapter: module(),
+          extra_config: String.t() | nil
         }
 
   defstruct run_zipgateway: true,
@@ -67,7 +68,8 @@ defmodule Grizzly.Options do
             update_zwave_firmware: false,
             zwave_firmware: [],
             zw_programmer_path: "/usr/bin/zw_programmer",
-            inclusion_adapter: Grizzly.Inclusions.ZWaveAdapter
+            inclusion_adapter: Grizzly.Inclusions.ZWaveAdapter,
+            extra_config: nil
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

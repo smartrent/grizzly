@@ -28,7 +28,8 @@ defmodule Grizzly.ZIPGateway.Config do
           unsolicited_destination: {:inet.ip_address(), :inet.port_number()},
           database_file: Path.t() | nil,
           rf_region: Supervisor.rf_region() | nil,
-          power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil
+          power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
+          extra_config: String.t() | nil
         }
 
   defstruct ca_cert: "./Portal.ca_x509.pem",
@@ -52,7 +53,8 @@ defmodule Grizzly.ZIPGateway.Config do
             database_file: nil,
             identify_script: nil,
             rf_region: nil,
-            power_level: nil
+            power_level: nil,
+            extra_config: nil
 
   @doc """
   Make a new `ZipgatewayCfg.t()` from the supplied options
@@ -72,7 +74,8 @@ defmodule Grizzly.ZIPGateway.Config do
         :database_file,
         :eeprom_file,
         :rf_region,
-        :power_level
+        :power_level,
+        :extra_config
       ])
 
     struct(__MODULE__, opts)
@@ -116,6 +119,7 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :identify_script, "ZipNodeIdentifyScript")
     |> maybe_put_config_item(cfg, :rf_region, "ZWRFRegion")
     |> maybe_put_config_item(cfg, :power_level, "")
+    |> maybe_put_extra_config(cfg)
   end
 
   @doc """
@@ -222,6 +226,14 @@ defmodule Grizzly.ZIPGateway.Config do
 
     if cfg_item != nil do
       config_string <> "#{cfg_name}=#{cfg_item}\n"
+    else
+      config_string
+    end
+  end
+
+  defp maybe_put_extra_config(config_string, cfg) do
+    if cfg.extra_config != nil do
+      config_string <> cfg.extra_config
     else
       config_string
     end
