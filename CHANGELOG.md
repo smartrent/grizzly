@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.4.0] - 2023-04-18
+
+### Added
+
+- Support arbitrary extra items in Z/IP Gateway config ([#744](https://github.com/smartrent/grizzly/pull/744))
+- Support signed integer, unsigned integer, enum, and bit field formats in Configuration Set ([#744](https://github.com/smartrent/grizzly/pull/744))
+
 ## [v6.3.0] - 2023-04-13
 
 ### Added
@@ -2172,6 +2179,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.4.0]: https://github.com/smartrent/grizzly/compare/v6.3.0..v6.4.0
 [v6.3.0]: https://github.com/smartrent/grizzly/compare/v6.2.0..v6.3.0
 [v6.2.0]: https://github.com/smartrent/grizzly/compare/v6.1.1..v6.2.0
 [v6.1.1]: https://github.com/smartrent/grizzly/compare/v6.1.0..v6.1.1
