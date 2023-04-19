@@ -354,7 +354,7 @@ defmodule Grizzly do
     if command_name in deprecated_list do
       new_module = get_new_module(command_name)
 
-      Logger.warn("""
+      Logger.debug("""
       Calling Grizzly.send_command/4 for command #{inspect(command_name)} is deprecated.
 
       Please upgrade to using #{inspect(new_module)} to send this command.
