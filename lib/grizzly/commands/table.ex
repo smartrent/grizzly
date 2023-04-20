@@ -100,6 +100,7 @@ defmodule Grizzly.Commands.Table do
       {:node_neighbor_update_request,
        {Commands.NodeNeighborUpdateRequest,
         handler: {WaitReport, complete_report: :node_neighbor_update_status}}},
+      {:node_information_send, {Commands.NodeInformationSend, handler: AckResponse}},
 
       # Security
       # security_commands_supported_get should technically use AggregateReport, but it would
