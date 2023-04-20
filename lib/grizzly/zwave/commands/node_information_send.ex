@@ -73,7 +73,7 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
       if((tx_options &&& 0x10) == 0x10, do: :no_route),
       if((tx_options &&& 0x20) == 0x20, do: :explore)
     ]
-    |> Enum.filter(& &1)
+    |> Enum.filter(&Function.identity/1)
   end
 
   @spec tx_opt_to_byte(tx_opt()) :: byte()
