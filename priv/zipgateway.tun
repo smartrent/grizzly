@@ -9,6 +9,7 @@ ROUTING_PID="/tmp/zipgateway.routing.pid"
 
 case "$1" in
   up)
+    ip link set dev $TUNDEV down
     ip link set dev $TUNDEV up
     ip addr add fd00:aaaa::2 dev $TUNDEV
 
@@ -42,5 +43,6 @@ case "$1" in
     ;;
   down)
     ip -6 route del $HANPREFIX via $LANIP
+    ip link set dev $TUNDEV down
     ;;
 esac
