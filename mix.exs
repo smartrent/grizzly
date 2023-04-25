@@ -40,7 +40,9 @@ defmodule Grizzly.MixProject do
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:sweet_xml, "~> 0.7", only: [:dev, :test]},
       {:junit_formatter, "~> 3.3", only: :test},
-      {:beam_notify, "~> 1.0 or ~> 0.2.0"}
+      {:beam_notify, "~> 1.0 or ~> 0.2.0"},
+      {:telemetry, "~> 0.4.3 or ~> 1.0"},
+      {:telemetry_registry, "~> 0.3"}
     ]
   end
 

@@ -12,7 +12,10 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
   @zgw_eeprom_to_sqlite "/usr/bin/zgw_eeprom_to_sqlite"
 
-  @doc "Restarts the Z/IP Gateway process if it is running."
+  @doc """
+  Restarts the Z/IP Gateway process. An error will be raised if `Grizzly.ZIPGateway.Supervisor`
+  is not running.
+  """
   @spec restart_zipgateway() :: :ok
   def restart_zipgateway() do
     _ = Supervisor.terminate_child(__MODULE__, MuonTrap.Daemon)
@@ -34,7 +37,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
   @impl Supervisor
   def init(options) do
-    Supervisor.init(child_specs(options), strategy: :one_for_one)
+    Supervisor.init(child_specs(options), strategy: :rest_for_one)
   end
 
   defp child_specs(options) do
@@ -76,7 +79,8 @@ defmodule Grizzly.ZIPGateway.Supervisor do
          [
            cd: priv,
            log_output: :debug,
-           log_transform: &zipgateway_log_transform/1
+           log_transform: &zipgateway_log_transform/1,
+           exit_status_to_reason: &zipgateway_exit_status/1
          ]
        ]}
     ]
@@ -167,5 +171,14 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     end
 
     message
+  end
+
+  defp zipgateway_exit_status(status) do
+    :telemetry.execute(
+      [:grizzly, :zipgateway, :crash],
+      %{exit_status: status}
+    )
+
+    :error_exit_status
   end
 end
