@@ -313,6 +313,19 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
+  defp handle_command(%Command{name: :s2_resynchronization_event} = command, _opts) do
+    node_id = Command.param!(command, :node_id)
+    reason = Command.param!(command, :reason)
+
+    :telemetry.execute(
+      [:grizzly, :zwave, :s2_resynchronization],
+      %{},
+      %{node_id: node_id, reason: reason}
+    )
+
+    [{:notify, command}]
+  end
+
   defp handle_command(command, _opts), do: [{:notify, command}]
 
   def make_supervision_report(%Command{name: :supervision_get} = command) do

@@ -1,64 +1,40 @@
 defmodule Grizzly do
+  use TelemetryRegistry
+
+  telemetry_event %{
+    event: [:grizzly, :zip_gateway, :crash],
+    description: "Emitted when the Z/IP Gateway process exits abnormally.",
+    measurements: "N/A",
+    metadata: "N/A"
+  }
+
+  telemetry_event %{
+    event: [:grizzly, :zwave, :s2_resynchronization],
+    description: "Emitted when an S2 resynchronization event occurs.",
+    measurements: "%{system_time: non_neg_integer()}",
+    metadata: "%{node_id: non_neg_integer(), reason: non_neg_integer()}"
+  }
+
   @moduledoc """
-  Send commands to Z-Wave devices
+  Send commands, subscribe to unsolicited events, and other helpers.
 
-  Grizzly provides the `send_command` function as the way to send a command to
-  Z-Wave devices.
+  ## Unsolicited Events
 
-  The `send_command` function takes the node id that you are trying to send a
-  command to, the command name, and optionally command arguments and command
-  options.
+  In order to receive unsolicited events from the Z-Wave network you must subscribe to the
+  corresponding command (e.g. `:battery_report`, `:alarm_report`, etc.).
 
-  A basic command that has no options or arguments looks like this:
+  Whenever an unsolicited event is received from a device, subscribers will receive messages
+  in the following format:
 
-  ```elixir
-  Grizzly.send_command(node_id, :switch_binary_get)
-  ```
+      {:grizzly, :event, %Grizzly.Report{}}
 
-  A command with command arguments:
+  The `Grizzly.Report` struct will contain the id of the sending node, a `Grizzly.ZWave.Command`
+  struct with the command name and arguments, and any additional metadata. Refer to `Grizzly.Report`
+  and `Grizzly.ZWave.Command` for details.
 
-  ```elixir
-  Grizzly.send_command(node_id, :switch_binary_set, value: :off)
-  ```
+  ## Telemetry
 
-  Also, a command can have options.
-
-  ```elixir
-  Grizzly.send_command(node_id, :switch_binary_get, [], timeout: 10_000, retries: 5)
-  ```
-
-  Some possible return values from `send_command` are:
-
-  1. `{:ok, Grizzly.Report.t()}` - the command was sent and the Z-Wave device
-     responded with a report. See `Grizzly.Report` for more information.
-  1. `{:error, :including}` - current the Z-Wave controller is adding or
-     removing a device and commands cannot be processed right now
-  1. `{:error, :firmware_updating}` - current the Z-Wave controller is updating firmware and commands cannot be processed right now
-  1. `{:error, reason}` - there was some other reason for an error, two
-     common ones are: `:nack_response`
-
-  For a more detailed explanation of the responses from a `send_command` call
-  see the typedoc for `Grizzly.send_command_response()`.
-
-  # Events from Z-Wave
-
-  Events generating from a Z-Wave device, for example a motion detected event,
-  can be handled via the `Grizzly.subscribe_command/1` and
-  `Grizzly.subscribe_commands/1` functions. This will allow you to subscribe
-  to specific commands. When the command is received from the Z-Wave network
-  it will placed in a `Grizzly.Report` and set to the subscribing process. The
-  node that generated the report can be accessed with the `:node_id` field in
-  the report.
-
-  ```elixir
-  iex> Grizzly.subscribe_command(:battery_report)
-
-  # sometime latter
-
-  iex> flush
-  {:grizzly, :event, %Grizzly.Report{command: %Grizzly.ZWave.Command{name: :battery_report}}}
-  ```
-
+  #{telemetry_docs()}
   """
 
   alias Grizzly.Commands.Table
@@ -72,7 +48,7 @@ defmodule Grizzly do
   import Grizzly.VersionReports, only: [is_extra_command: 1]
 
   @typedoc """
-  The response from sending a Z-Wave command
+  The response from sending a Z-Wave command.
 
   When everything is okay the response will be `{:ok, Grizzly.Report{}}`. For
   documentation about a report see `Grizzly.Report` module.
@@ -83,11 +59,11 @@ defmodule Grizzly do
   Three reasons that Grizzly supports for all commands are `:nack_response`,
   `:update_firmware`, and `:including`.
 
-  In you receive the reason for the error to be `:including` that means the
-  controller is in an inclusion state and your command will be dropped if we
-  tried to send it. So we won't allow sending a Z-Wave command during an
-  inclusion. It's best to wait and try again once your application is done
-  trying to include.
+  ### Including
+
+  An `:including` response means that the controller is in inclusion, exclusion,
+  or learn mode and cannot process any commands. Either cancel the inclusion (see
+  `Grizzly.Inclusions`) or wait until the inclusion is complete before trying again.
 
   ### Nack response
 
@@ -95,23 +71,19 @@ defmodule Grizzly do
   to send a command to is unreachable and did not receive your command at all.
   This could mean that the Z-Wave network is overloaded and you should reissue
   the command, the device is too far from the controller, or the device is no
-  longer part of the Z-Wave network.
+  longer part of the Z-Wave network (e.g. due to a factory reset).
 
-  Grizzly by default will try a command 3 times before sending returning a
+  By default, Grizzly will retry the command twice before sending returning a
   `:nack_response`. This is configurable via the `:retries` command option in
-  the `Grizzly.send_command/4` function. This is useful if you are going to
-  have a known spike in Z-Wave traffic.
+  the `Grizzly.send_command/4` function. This helps increase the reliability of
+  sending commands during Z-Wave network congestion.
 
   ### Queue full
 
-  When send commands to a device that sleeps (normally these are sensor type of
-  devices) and the sleeping device is not awake these commands get queued up to
-  be sent once the device wakes up and tells the Z-Wave network that it is awake.
-  However, there is only a limited amount of commands that can be queued at once.
-  When sending a command to a device when the queue is full you will receive the
-  `{:error, :queue_full}` return from `Grizzly.send_command/4`. The reason this
-  is an error is because the device will never receive the command that you
-  tried to send.
+  Sleeping devices can only receive commands when they are wake up, so Z/IP Gateway
+  queues commands to be sent when it receives a wake up notification from the device.
+  However, it will only queue a limited number of commands. A `:queue_full` response
+  is returned in this situation.
   """
   @type send_command_response() ::
           {:ok, Report.t()}
@@ -124,7 +96,7 @@ defmodule Grizzly do
   @typedoc """
   A custom handler for the command.
 
-  See `Grizzly.CommandHandler` behaviour for more documentation.
+  See the `Grizzly.CommandHandler` behaviour for more documentation.
   """
   @type handler_spec() :: {module(), args :: any()}
 
@@ -136,7 +108,8 @@ defmodule Grizzly do
   * `:timeout` - Time (in milliseconds) to wait for an ACK or report before timing out.
     Maximum 140 seconds. Default `15_000`.
   * `:retries` - Number of retries in case the node responds with a NACK. Default `0`.
-  * `:handler` - A custom response handler (see `Grizzly.CommandHandler`).
+  * `:handler` - A custom response handler (see `Grizzly.CommandHandler`). Ignored if
+    `supervision?` is true.
   * `:transmission_stats` - If true, transmission stats will be included with the
     returned report (if available). Default `false`.
   * `:supervision?` - Whether to use Supervision CC encapsulation. Default `false`.
@@ -171,17 +144,45 @@ defmodule Grizzly do
   end
 
   @doc """
-  Send a command to the node via the node id or to Z/IP Gateway
+  Send a command to the node via the node id or to Z/IP Gateway.
 
-  To talk to your controller directly you can pass `:gateway` as the node id.
-  This is helpful because your controller might not always be the same node id
-  on any given network. This ensures that not matter node id your controller is
-  you will still be able to query it and make it perform Z-Wave functions. There
-  are many Z-Wave functions a controller do. There are helper functions for
-  these functions in `Grizzly.Network` and `Grizzly.Node`.
+  ## Arguments
 
-  **NOTE:** The `:handler` and `:supervision?` options are not compatible. If
-  `:supervision?` is true, any custom handler will be ignored.
+  * `node_id` - The node id to send the command to. If `:gateway` is passed, the command
+    will be sent to the locally running Z/IP Gateway -- this is useful if this controller
+    has a node id other than 1.
+
+  * `command` - The command to send. See `Grizzly.Commands.Table` for a list of available commands
+    and their associated modules.
+
+  * `args` - A list of arguments to pass to the command. See the associated command module
+    for details.
+
+  * `opts` - A keyword list of options to control how the command is sent and processed.
+    See `t:Grizzly.command_opt/0` for details.
+
+  ## Usage
+
+      # A command with no arguments or options:
+      Grizzly.send_command(node_id, :switch_binary_get)
+
+      # ... with arguments:
+      Grizzly.send_command(node_id, :switch_binary_set, value: :off)
+
+      # ... with arguments and options:
+      Grizzly.send_command(node_id, :switch_binary_get, [], timeout: 10_000, retries: 5)
+
+
+  ## Return values and errors
+
+  Following are the most common return values and errors that you will see. For a
+  complete list, see `t:Grizzly.send_command_response/0`.
+
+  * `{:ok, Grizzly.Report.t()}` - the command was sent and the Z-Wave device
+      responded with an ACK or a report. See `Grizzly.Report` for more information.
+  * `{:error, :including}` - the Z-Wave controller is currently in inclusion or exclusion mode
+  * `{:error, :firmware_updating}` - the Z-Wave controller is undergoing a firmware update
+  * `{:error, reason}` - see `t:Grizzly.send_command_response/0`
   """
   @spec send_command(
           ZWave.node_id() | :gateway | VirtualDevices.id(),
@@ -243,39 +244,30 @@ defmodule Grizzly do
   end
 
   @doc """
-  Send a raw binary to the Z-Wave node
+  Send a raw binary to the Z-Wave node.
 
   This function does not block and expects the sending process to handle the
   lifecycle of the command being sent. This maximizes control but minimizes
   safety and puts things such as timeouts, retries, and response handling in
   the hand of the calling process.
 
-  When sending the binary ensure the binary is the encoded
-  `Grizzly.ZWave.Commands.ZIPPacket`.
+  When sending a binary command to a Z-Wave node, the binary must be encapsulated
+  in a Z/IP Packet (see `Grizzly.ZWave.Commands.ZIPPacket`).
 
-  ```elixir
-  seq_no = 0x01
-  {:ok, my_command} = Grizzly.ZWave.Commands.SwitchBinaryGet.new()
-  {:ok, packet} = Grizzly.ZWave.Commands.ZIPPacket.with_zwave_command(my_command, seq_no)
-  binary = Grizzly.ZWave.to_binary(packet)
+      seq_no = 0x01
+      {:ok, my_command} = Grizzly.ZWave.Commands.SwitchBinaryGet.new()
+      {:ok, packet} = Grizzly.ZWave.Commands.ZIPPacket.with_zwave_command(my_command, seq_no)
+      binary = Grizzly.ZWave.to_binary(packet)
 
-  Grizzly.send_binary(node_id, binary)
-  ```
+      Grizzly.send_binary(node_id, binary)
 
-  This is helpful when you need very fine grade control of the Z/IP Packet or if
-  you not expecting a response from a Z-Wave network to handle the back and
-  forth between your application and the Z-Wave network. Also, this can be useful
-  for debugging purposes.
+  This can be useful when you need very fine-grained control of the outgoing Z/IP Packet,
+  if you need to send a command that has not been implemented in Grizzly yet (contributions
+  are welcome!), or for debugging purposes.
 
-  First check if `send_command/4` will provide the functionality that is needed
-  before using this function.
+  After sending a binary packet the calling process will receive a message in the form of:
 
-  After sending a binary packet the calling process will receive messages in
-  the form of:
-
-  ```elixir
-  {:grizzly, :binary_response, binary}
-  ```
+      {:grizzly, :binary_response, <<...>>}
   """
   @spec send_binary(ZWave.node_id(), binary()) :: :ok | {:error, :including | :firmware_updating}
   def send_binary(node_id, binary) do
@@ -296,19 +288,19 @@ defmodule Grizzly do
   end
 
   @doc """
-  Subscribe to a command event from a Z-Wave device.
+  Subscribe to unsolicited events for the given command.
   """
   @spec subscribe_command(command()) :: :ok
   defdelegate subscribe_command(command_name), to: Messages, as: :subscribe
 
   @doc """
-  Unsubscribe from an event.
+  Unsubscribe from an unsolicited event.
   """
   @spec unsubscribe_command(command()) :: :ok
   defdelegate unsubscribe_command(command_name), to: Messages, as: :unsubscribe
 
   @doc """
-  Subscribe to many events from a Z-Wave device.
+  Subscribe to unsolicited events for multiple commands.
   """
   @spec subscribe_commands([command()]) :: :ok
   def subscribe_commands(command_names) do
@@ -340,7 +332,7 @@ defmodule Grizzly do
   defdelegate unsubscribe_node(node_id), to: Messages
 
   @doc """
-  List the support commands
+  List all supported Z-Wave commands.
   """
   @spec list_commands() :: [atom()]
   def list_commands() do
@@ -348,7 +340,7 @@ defmodule Grizzly do
   end
 
   @doc """
-  List the command for a particular command class
+  List the supported Z-Wave commands for a particular command class.
   """
   @spec commands_for_command_class(atom()) :: [atom()]
   def commands_for_command_class(command_class_name) do
@@ -395,7 +387,10 @@ defmodule Grizzly do
     to: Grizzly.Commands.Table,
     as: :supports_supervision?
 
-  @doc "Restarts the Z/IP Gateway process if it is running."
+  @doc """
+  Restarts the Z/IP Gateway process. An error will be raised if `Grizzly.ZIPGateway.Supervisor`
+  is not running.
+  """
   @spec restart_zipgateway :: :ok
   defdelegate restart_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
 
