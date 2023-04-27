@@ -384,12 +384,27 @@ defmodule Grizzly.Commands.Command do
     |> Keyword.put(:rssi_4bars, calculate_bars(average))
   end
 
-  # Average RSSI DBM is 0 when no data. So 0 bars.
-  defp calculate_bars(number) when number >= -50, do: 4
-  defp calculate_bars(number) when number >= -60, do: 3
-  defp calculate_bars(number) when number >= -70, do: 2
-  defp calculate_bars(number) when number >= -80, do: 1
-  defp calculate_bars(_number), do: 0
+  # These values were determined based on -78dBm being the lowest RSSI considered
+  # to be 4 bars, and -97 being the lowest value for 1 bar. The thresholds for
+  # 2 and 3 bars were calculated using a logarithmic regression model represented
+  # in the following R script:
+  #
+  #     rssi <- c(-78, -97)
+  #     bars <- c(4, 1)
+  #     model <- lm(bars ~ log(abs(rssi), 2))
+  #     coeffs <- coef(model)
+  #     a <- coeffs[1]
+  #     b <- coeffs[2]
+  #     bars_to_rssi <- function(bars) round((2 ^ ((bars - a) / b)) * -1)
+  #     cat("1 bar  >=", bars_to_rssi(1), "dBm\n")
+  #     cat("2 bars >=", bars_to_rssi(2), "dBm\n")
+  #     cat("3 bars >=", bars_to_rssi(3), "dBm\n")
+  #     cat("4 bars >=", bars_to_rssi(4), "dBm\n")
+  defp calculate_bars(rssi) when rssi >= -78, do: 4
+  defp calculate_bars(rssi) when rssi >= -84, do: 3
+  defp calculate_bars(rssi) when rssi >= -90, do: 2
+  defp calculate_bars(rssi) when rssi >= -97, do: 1
+  defp calculate_bars(_rssi), do: 0
 
   defp calculate_average_dbm(numbers) when numbers == [], do: -125
   defp calculate_average_dbm(numbers), do: round(Enum.sum(numbers) / length(numbers))
