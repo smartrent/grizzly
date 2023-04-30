@@ -34,4 +34,13 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
     assert Keyword.get(params, :value) == 0x32
     assert Keyword.get(params, :duration) == 0x0A
   end
+
+  test "decodes Leviton DZ1KD-1BZ dimmer" do
+    binary_params = <<100, 100>>
+    {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
+
+    # Fix the 100% report to 99
+    assert Keyword.get(params, :value) == 99
+    assert Keyword.get(params, :duration) == 100
+  end
 end
