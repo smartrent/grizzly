@@ -91,6 +91,8 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   # deprecated
   # 99 means 100% hardware level
   defp value_from_byte(0xFF), do: {:ok, 99}
+  # Leviton DZ1KD-1BZ dimmer
+  defp value_from_byte(100), do: {:ok, 99}
 
   defp value_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :value, command: :switch_multilevel_report}}
