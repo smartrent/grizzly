@@ -393,7 +393,7 @@ defmodule Grizzly do
   Returns the network encryption keys. Returns nil if Grizzly is started with
   `run_zipgateway: false` or if Z/IP Gateway has not yet logged the network keys.
   """
-  @spec network_keys() :: [{ZIPGateway.network_key_type(), binary()}] | nil
+  @spec network_keys() :: [{ZIPGateway.LogMonitor.network_key_type(), binary()}] | nil
   def network_keys() do
     case GenServer.whereis(ZIPGateway.LogMonitor) do
       nil -> nil
@@ -403,7 +403,7 @@ defmodule Grizzly do
 
   @doc """
   Returns the network encryption keys formatted for use with the Zniffer application.
-  See `Grizzly.ZIPGateway.Logmonitor.zniffer_network_keys/1` for more information.
+  See `Grizzly.ZIPGateway.LogMonitor.zniffer_network_keys/1` for more information.
   """
   @spec zniffer_network_keys() :: binary() | nil
   def zniffer_network_keys() do

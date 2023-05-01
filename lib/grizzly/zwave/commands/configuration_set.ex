@@ -9,7 +9,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
                  the parameter back to the factory default value (required)
     * `:size` - specifies the size of the configuration parameter
                (required if not resetting to default)
-    * `:format - one of :signed_integer, :unsigned_integer, :enumerated or :bit_field (defaults to :signed_integer)
+    * `:format` - one of :signed_integer, :unsigned_integer, :enumerated or :bit_field (defaults to :signed_integer)
 
 
   ## Size

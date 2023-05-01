@@ -100,6 +100,10 @@ defmodule Grizzly.MixProject do
           Grizzly.VirtualDevices.TemperatureSensor,
           Grizzly.VirtualDevices.Thermostat
         ],
+        "Z/IP Gateway": [
+          Grizzly.ZIPGateway,
+          ~r/^Grizzly\.ZIPGateway/
+        ],
         "Z-Wave": [
           Grizzly.ZWave,
           Grizzly.ZWave.Command,

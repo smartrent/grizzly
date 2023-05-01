@@ -1,5 +1,7 @@
 defmodule Grizzly.ZIPGateway.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Supervisor for the Z/IP Gateway process.
+  """
 
   # Supervisor for the `zipgateway` system process
   use Supervisor

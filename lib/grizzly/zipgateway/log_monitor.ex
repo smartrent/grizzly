@@ -7,6 +7,14 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
 
   require Logger
 
+  @type network_key_type ::
+          :s0
+          | :s2_unauthenticated
+          | :s2_authenticated
+          | :s2_access_control
+          | :s2_authenticated_long_range
+          | :s2_access_control_long_range
+
   @doc """
   Returns the network home id as extracted from the Z/IP Gateway logs.
   """
@@ -18,7 +26,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   @doc """
   Returns a keyword list of the network keys extracted from the Z/IP Gateway logs.
   """
-  @spec network_keys(GenServer.name()) :: [{Grizzly.ZIPGateway.network_key_type(), binary()}]
+  @spec network_keys(GenServer.name()) :: [{network_key_type(), binary()}]
   def network_keys(name \\ __MODULE__) do
     GenServer.call(name, :network_keys)
   end
