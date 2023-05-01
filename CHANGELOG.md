@@ -4,12 +4,26 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.5.0] - 2023-05-01
+
+### Added
+
+- Implement Network Management Basic Node / Node Information Send command ([#749](https://github.com/smartrent/grizzly/pull/749))
+- Add helper functions for some common debugging tasks ([#754](https://github.com/smartrent/grizzly/pull/754))
+- Extract Home ID and network keys from Z/IP Gateway logs ([#755](https://github.com/smartrent/grizzly/pull/755))
+
+### Changed / Fixed
+
+- Reset tun/tap interface in Z/IP Gateway tunnel script ([#750](https://github.com/smartrent/grizzly/pull/750))
+- Update RSSI to signal bar calculation ([#752](https://github.com/smartrent/grizzly/pull/752))
+- Normalize multilevel switch report for Leviton DZ1KD-1BZ ([#753](https://github.com/smartrent/grizzly/pull/753))
+
 ## [v6.4.0] - 2023-04-18
 
 ### Added
 
 - Support arbitrary extra items in Z/IP Gateway config ([#744](https://github.com/smartrent/grizzly/pull/744))
-- Support signed integer, unsigned integer, enum, and bit field formats in Configuration Set ([#744](https://github.com/smartrent/grizzly/pull/744))
+- Support signed integer, unsigned integer, enum, and bit field formats in Configuration Set ([#745](https://github.com/smartrent/grizzly/pull/745))
 
 ## [v6.3.0] - 2023-04-13
 
@@ -2179,6 +2193,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.5.0]: https://github.com/smartrent/grizzly/compare/v6.4.0..v6.5.0
 [v6.4.0]: https://github.com/smartrent/grizzly/compare/v6.3.0..v6.4.0
 [v6.3.0]: https://github.com/smartrent/grizzly/compare/v6.2.0..v6.3.0
 [v6.2.0]: https://github.com/smartrent/grizzly/compare/v6.1.1..v6.2.0
