@@ -64,7 +64,7 @@ defmodule Grizzly do
   alias Grizzly.Commands.Table
   alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
   alias Grizzly.UnsolicitedServer.Messages
-  alias Grizzly.ZWave
+  alias Grizzly.{ZIPGateway, ZWave}
   alias Grizzly.ZWave.Commands.RssiReport
 
   require Logger
@@ -376,6 +376,42 @@ defmodule Grizzly do
   @doc "Get the current inclusion status."
   @spec inclusion_status() :: Inclusions.status()
   defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get
+
+  @doc """
+  Returns the network's home id. Returns nil if Grizzly is started with `run_zipgateway: false`
+  or if Z/IP Gateway has not yet logged the home id.
+  """
+  @spec home_id() :: binary() | nil
+  def home_id() do
+    case GenServer.whereis(ZIPGateway.LogMonitor) do
+      nil -> nil
+      pid -> ZIPGateway.LogMonitor.home_id(pid)
+    end
+  end
+
+  @doc """
+  Returns the network encryption keys. Returns nil if Grizzly is started with
+  `run_zipgateway: false` or if Z/IP Gateway has not yet logged the network keys.
+  """
+  @spec network_keys() :: [{ZIPGateway.network_key_type(), binary()}] | nil
+  def network_keys() do
+    case GenServer.whereis(ZIPGateway.LogMonitor) do
+      nil -> nil
+      pid -> ZIPGateway.LogMonitor.network_keys(pid)
+    end
+  end
+
+  @doc """
+  Returns the network encryption keys formatted for use with the Zniffer application.
+  See `Grizzly.ZIPGateway.Logmonitor.zniffer_network_keys/1` for more information.
+  """
+  @spec zniffer_network_keys() :: binary() | nil
+  def zniffer_network_keys() do
+    case GenServer.whereis(ZIPGateway.LogMonitor) do
+      nil -> nil
+      pid -> ZIPGateway.LogMonitor.zniffer_network_keys(pid)
+    end
+  end
 
   defp maybe_log_warning(command_name) do
     deprecated_list = [

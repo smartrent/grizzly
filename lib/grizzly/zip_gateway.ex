@@ -5,6 +5,14 @@ defmodule Grizzly.ZIPGateway do
 
   alias Grizzly.{Options, ZWave}
 
+  @type network_key_type ::
+          :s0
+          | :s2_unauthenticated
+          | :s2_authenticated
+          | :s2_access_control
+          | :s2_authenticated_long_range
+          | :s2_access_control_long_range
+
   # the host base is different for the LAN and PAN networks, we need to
   # probably handle this a little nicer
   @default_lan_host_base {0xFD00, 0xAAAA, 0, 0, 0, 0, 0}
