@@ -65,6 +65,7 @@ defmodule Grizzly do
   alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
   alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.ZWave
+  alias Grizzly.ZWave.Commands.RssiReport
 
   require Logger
 
@@ -334,6 +335,33 @@ defmodule Grizzly do
   end
 
   @doc """
+  Sends a no-op command to the given node to check its reachability. Transmission
+  stats are enabled by default.
+  """
+  @spec ping(ZWave.node_id(), [command_opt()]) :: send_command_response()
+  def ping(node_id, opts \\ []) do
+    opts = Keyword.put_new(opts, :transmission_stats, true)
+    send_command(node_id, :no_operation, [], opts)
+  end
+
+  @doc """
+  Reports the gateway's current background RSSI (noise).
+  """
+  @spec background_rssi() :: {:ok, [RssiReport.param()]} | {:error, any()}
+  def background_rssi() do
+    case send_command(:gateway, :rssi_get) do
+      {:ok, %Report{command: %ZWave.Command{params: params}}} ->
+        {:ok, params}
+
+      {_, %Grizzly.Report{type: :timeout}} ->
+        {:error, :timeout}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @doc """
   Whether Grizzly supports sending the given command with supervision.
   """
   @spec can_supervise_command?(Grizzly.command()) :: boolean()
@@ -344,6 +372,10 @@ defmodule Grizzly do
   @doc "Restarts the Z/IP Gateway process if it is running."
   @spec restart_zipgateway :: :ok
   defdelegate restart_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+
+  @doc "Get the current inclusion status."
+  @spec inclusion_status() :: Inclusions.status()
+  defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get
 
   defp maybe_log_warning(command_name) do
     deprecated_list = [
