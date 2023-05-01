@@ -3,7 +3,8 @@ defmodule Grizzly.Node do
   Functions for working directly with a Z-Wave node
   """
 
-  alias Grizzly.{SeqNumber, VirtualDevices, ZWave}
+  alias Grizzly.{Report, SeqNumber, VirtualDevices, ZWave, ZWave.Command}
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance, as: NMIM
 
   @type id :: non_neg_integer()
 
@@ -114,5 +115,27 @@ defmodule Grizzly.Node do
     nodes = [controller_id | extra_node_ids]
 
     Grizzly.send_command(node_id, :association_set, grouping_identifier: 0x01, nodes: nodes)
+  end
+
+  @doc """
+  Gets a node's statistics from Z/IP Gateway.
+  """
+  @spec get_statistics(ZWave.node_id() | VirtualDevices.id()) ::
+          {:ok, NMIM.statistics()} | {:error, any()}
+  def get_statistics(node_id) do
+    with {:ok, %Report{command: %Command{} = cmd}} <-
+           Grizzly.send_command(:gateway, :statistics_get, node_id: node_id),
+         stats when is_list(stats) <- Command.param(cmd, :statistics) do
+      {:ok, stats}
+    else
+      nil ->
+        {:error, :unavailable}
+
+      {_, %Grizzly.Report{type: :timeout}} ->
+        {:error, :timeout}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end
