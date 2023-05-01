@@ -28,6 +28,9 @@ defmodule Grizzly.ZWave.QRCodeTest do
 
     assert encoded ==
              "900132782003515253545541424344453132333435212223242500100435301537022065520001000000300578"
+
+    info = %QRCode{info | application_version: {2, 66}}
+    assert {:ok, ^info} = QRCode.decode(encoded)
   end
 
   test "code with UUID" do
@@ -44,8 +47,9 @@ defmodule Grizzly.ZWave.QRCodeTest do
       manufacturer_id: 0xFFF1,
       product_type: 0x3E8,
       product_id: 0x11,
-      application_version: 0x0120,
-      uuid16: uuid16
+      application_version: {1, 32},
+      uuid16: uuid16,
+      supported_protocols: []
     }
 
     encoded = encode!(info)
@@ -53,6 +57,8 @@ defmodule Grizzly.ZWave.QRCodeTest do
 
     assert encoded ==
              "9001346230075152535455414243444531323334352122232425001016387007680220655210100000017002880642002122232425414243444511121314153132333435"
+
+    assert {:ok, ^info} = QRCode.decode(encoded)
   end
 
   test "S2-only qr code" do
@@ -67,11 +73,13 @@ defmodule Grizzly.ZWave.QRCodeTest do
       manufacturer_id: 0xFFF0,
       product_type: 0x64,
       product_id: 3,
-      application_version: 0x0242
+      application_version: {2, 66}
     }
 
     assert encode!(info) ==
              "900032782003515253545541424344453132333435212223242500100435301537022065520001000000300578"
+
+    assert {:ok, ^info} = QRCode.decode(encode!(info))
   end
 
   defp zwave_decimalize(input) do

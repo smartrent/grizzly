@@ -6,6 +6,7 @@ defmodule Grizzly.ZWave.QRCode do
   """
 
   alias Grizzly.ZWave
+  alias Grizzly.ZWave.{DSK, Security}
   alias Grizzly.ZWave.SmartStart.MetaExtension.UUID16
 
   @typedoc "QR Code version (S2-only or Smart Start-enabled)"
@@ -24,8 +25,9 @@ defmodule Grizzly.ZWave.QRCode do
           manufacturer_id: 0..65535,
           product_type: 0..65535,
           product_id: 0..65535,
-          application_version: 0..65535,
-          uuid16: nil | UUID16.t()
+          application_version: {byte(), byte()} | nil,
+          uuid16: nil | UUID16.t(),
+          supported_protocols: any()
         }
 
   defstruct version: :smart_start,
@@ -36,10 +38,151 @@ defmodule Grizzly.ZWave.QRCode do
             manufacturer_id: 0,
             product_type: 0,
             product_id: 0,
-            application_version: 0,
-            uuid16: nil
+            application_version: nil,
+            uuid16: nil,
+            supported_protocols: []
 
   @lead_in "90"
+
+  @spec decode(<<_::16, _::_*8>>) :: {:ok, t()} | {:error, :invalid_dsk}
+  def decode(@lead_in <> binary) do
+    {version, binary} = String.split_at(binary, 2)
+    {_checksum, binary} = String.split_at(binary, 5)
+    {requested_keys, binary} = String.split_at(binary, 3)
+    {dsk, binary} = String.split_at(binary, 40)
+
+    requested_keys = requested_keys |> String.to_integer() |> Security.byte_to_keys()
+
+    case DSK.parse(dsk) do
+      {:ok, dsk} ->
+        tlv = decode_tlv(binary)
+
+        app_version =
+          if is_list(tlv[:product_id]) do
+            {tlv[:product_id][:app_version], tlv[:product_id][:app_sub_version]}
+          else
+            nil
+          end
+
+        {:ok,
+         %__MODULE__{
+           version: decode_version(version),
+           requested_keys: requested_keys,
+           dsk: dsk,
+           zwave_device_type:
+             {tlv[:product_type][:generic_device_class],
+              tlv[:product_type][:specific_device_class]},
+           zwave_installer_icon: tlv[:product_type][:installer_icon],
+           manufacturer_id: tlv[:product_id][:manufacturer_id],
+           product_type: tlv[:product_id][:product_type],
+           product_id: tlv[:product_id][:product_id],
+           application_version: app_version,
+           uuid16: tlv[:uuid_16],
+           supported_protocols: tlv[:supported_protocols] || []
+         }}
+
+      {:error, _} ->
+        {:error, :invalid_dsk}
+    end
+  end
+
+  defp decode_tlv(binary, acc \\ [])
+  defp decode_tlv("", acc), do: acc
+
+  defp decode_tlv(binary, acc) do
+    {tag_critical, binary} = String.split_at(binary, 2)
+    <<tag::7, _critical::1>> = <<String.to_integer(tag_critical)::8>>
+
+    # critical = if(critical == 1, do: true, else: false)
+    {length, binary} = String.split_at(binary, 2)
+    length = String.to_integer(length)
+    {value, binary} = String.split_at(binary, length)
+
+    tag = decode_tag(tag)
+
+    decode_tlv(binary, [{tag, decode_value(tag, value)} | acc])
+  end
+
+  defp decode_tag(0x00), do: :product_type
+  defp decode_tag(0x01), do: :product_id
+  defp decode_tag(0x02), do: :max_inclusion_request_interval
+  defp decode_tag(0x03), do: :uuid_16
+  defp decode_tag(0x04), do: :supported_protocols
+  defp decode_tag(0x32), do: :name
+  defp decode_tag(0x33), do: :location
+  defp decode_tag(0x34), do: :smartstart_inclusion_setting
+  defp decode_tag(0x35), do: :advanced_joinin
+  defp decode_tag(0x36), do: :bootstrapping_mode
+  defp decode_tag(0x37), do: :network_status
+
+  defp decode_value(:product_type, value) do
+    {classes, installer_icon} = String.split_at(value, 5)
+    <<generic::8, specific::8>> = <<String.to_integer(classes)::16>>
+    installer_icon = String.to_integer(installer_icon)
+
+    {:ok, generic_device_class} = ZWave.DeviceClasses.generic_device_class_from_byte(generic)
+
+    {:ok, specific_device_class} =
+      ZWave.DeviceClasses.specific_device_class_from_byte(
+        generic_device_class,
+        specific
+      )
+
+    {:ok, installer_icon} = ZWave.IconType.to_name(installer_icon)
+
+    %{
+      generic_device_class: generic_device_class,
+      specific_device_class: specific_device_class,
+      installer_icon: installer_icon
+    }
+  end
+
+  defp decode_value(:product_id, value) do
+    [manufacturer_id, product_type, product_id, vsn] =
+      value
+      |> String.to_charlist()
+      |> Enum.chunk_every(5)
+      |> Enum.map(&String.to_integer(to_string(&1)))
+
+    <<app_version::8, app_sub_version::8>> = <<vsn::16>>
+
+    [
+      manufacturer_id: manufacturer_id,
+      product_type: product_type,
+      product_id: product_id,
+      app_version: app_version,
+      app_sub_version: app_sub_version
+    ]
+  end
+
+  defp decode_value(:uuid_16, value) do
+    <<_presentation::2-bytes, decimalized_uuid::binary>> = value
+
+    ints =
+      decimalized_uuid
+      |> String.to_charlist()
+      |> Enum.chunk_every(5)
+      |> Enum.map(&String.to_integer(to_string(&1)))
+
+    uuid_string =
+      for int <- ints, into: <<>> do
+        <<int::16>>
+      end
+
+    {:ok, uuid} = Base.encode16(uuid_string) |> UUID16.new(:hex)
+
+    uuid
+  end
+
+  defp decode_value(:supported_protocols, value) do
+    {int_val, ""} = Integer.parse(value)
+
+    <<_reserved::6, zwave_lr::1, zwave::1, _rest::binary>> = <<int_val>>
+    protocols = if(zwave_lr == 1, do: [:zwave_lr], else: [])
+    if(zwave == 1, do: [:zwave | protocols], else: protocols)
+  end
+
+  defp decode_value(_, value), do: value
 
   @doc """
   Encode device information into Z-Wave QR Code format
@@ -71,6 +214,9 @@ defmodule Grizzly.ZWave.QRCode do
 
   defp encode_version(:s2), do: "00"
   defp encode_version(:smart_start), do: "01"
+
+  defp decode_version("00"), do: :s2
+  defp decode_version("01"), do: :smart_start
 
   defp encode_requested_keys(requested_keys) do
     ZWave.Security.keys_to_byte(requested_keys)
@@ -108,13 +254,27 @@ defmodule Grizzly.ZWave.QRCode do
   defp encode_icon_type(type), do: int_to_string(type, 5)
 
   defp encode_qr_product_id(info) do
+    app_version =
+      cond do
+        is_tuple(info.application_version) && tuple_size(info.application_version) == 2 ->
+          {app_version, app_sub_version} = info.application_version
+          <<vsn::16>> = <<app_version, app_sub_version>>
+          int_to_string(vsn, 5)
+
+        is_integer(info.application_version) ->
+          int_to_string(info.application_version, 5)
+
+        true ->
+          int_to_string(0, 5)
+      end
+
     # QR Product ID = TLV type 02, length 20
     [
       "0220",
       int_to_string(info.manufacturer_id, 5),
       int_to_string(info.product_type, 5),
       int_to_string(info.product_id, 5),
-      int_to_string(info.application_version, 5)
+      app_version
     ]
   end
 
