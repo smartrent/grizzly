@@ -5,7 +5,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   use Supervisor
 
   alias Grizzly.{Indicator, Options}
-  alias Grizzly.ZIPGateway.Config
+  alias Grizzly.ZIPGateway.{Config, LogMonitor}
   require Logger
 
   @zgw_eeprom_to_sqlite "/usr/bin/zgw_eeprom_to_sqlite"
@@ -58,12 +58,17 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     ]
 
     [
+      LogMonitor,
       {BEAMNotify, beam_notify_options},
       {MuonTrap.Daemon,
        [
          options.zipgateway_binary,
          ["-c", options.zipgateway_config_path, "-s", options.serial_port],
-         [cd: priv, log_output: :debug]
+         [
+           cd: priv,
+           log_output: :debug,
+           log_transform: &zipgateway_log_transform/1
+         ]
        ]}
     ]
   end
@@ -143,5 +148,15 @@ defmodule Grizzly.ZIPGateway.Supervisor do
       {:ok, _stat} ->
         :ok
     end
+  end
+
+  @spec zipgateway_log_transform(binary()) :: binary()
+  defp zipgateway_log_transform(message) do
+    case GenServer.whereis(Grizzly.ZIPGateway.LogMonitor) do
+      nil -> :ok
+      pid -> send(pid, {:message, message})
+    end
+
+    message
   end
 end
