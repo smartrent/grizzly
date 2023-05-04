@@ -253,9 +253,9 @@ defmodule Grizzly.ZWave.DeviceClasses do
         Try to make a basic device class from a byte
         """
         @spec basic_device_class_from_byte(byte()) ::
-                {:ok, basic_device_class()} | {:error, :unsupported_device_class}
+                {:ok, basic_device_class()} | {:ok, :unknown}
         unquote(basic_device_class_from_byte)
-        def basic_device_class_from_byte(_byte), do: {:error, :unsupported_device_class}
+        def basic_device_class_from_byte(_byte), do: {:ok, :unknown}
 
         @doc """
         Make a byte from a device class
@@ -267,9 +267,9 @@ defmodule Grizzly.ZWave.DeviceClasses do
         Try to get the generic device class for the byte
         """
         @spec generic_device_class_from_byte(byte()) ::
-                {:ok, generic_device_class()} | {:error, :unsupported_device_class}
+                {:ok, generic_device_class()} | {:ok, :unknown}
         unquote(generic_device_class_from_byte)
-        def generic_device_class_from_byte(_byte), do: {:error, :unsupported_device_class}
+        def generic_device_class_from_byte(_byte), do: {:ok, :unknown}
 
         @doc """
         Turn the generic device class into a byte
@@ -281,9 +281,9 @@ defmodule Grizzly.ZWave.DeviceClasses do
         Try to get the specific device class from the byte given the generic device class
         """
         @spec specific_device_class_from_byte(generic_device_class(), byte()) ::
-                {:ok, specific_device_class()} | {:error, :unsupported_device_class}
+                {:ok, specific_device_class()} | {:ok, :unknown}
         unquote(specific_device_class_from_byte)
-        def specific_device_class_from_byte(_, _byte), do: {:error, :unsupported_device_class}
+        def specific_device_class_from_byte(_, _byte), do: {:ok, :unknown}
 
         @doc """
         Make the specific device class into a byte

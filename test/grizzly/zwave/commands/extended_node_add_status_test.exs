@@ -33,10 +33,10 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatusTest do
         status: :done,
         node_id: 0x012C,
         command_classes: expected_command_classes,
-        basic_device_class: 1,
-        generic_device_class: 2,
+        basic_device_class: :controller,
+        generic_device_class: :static_controller,
         listening?: false,
-        specific_device_class: 3,
+        specific_device_class: :static_installer_tool,
         kex_fail_type: :none,
         keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
       ]
