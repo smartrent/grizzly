@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.5.1] - 2023-05-01
+
+### Fixed
+
+- Device classes in Node Add Status are now decoded like in Node Info Cached Get ([#759](https://github.com/smartrent/grizzly/759))
+
 ## [v6.5.0] - 2023-05-01
 
 ### Added
@@ -2193,6 +2199,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.5.1]: https://github.com/smartrent/grizzly/compare/v6.5.0..v6.5.1
 [v6.5.0]: https://github.com/smartrent/grizzly/compare/v6.4.0..v6.5.0
 [v6.4.0]: https://github.com/smartrent/grizzly/compare/v6.3.0..v6.4.0
 [v6.3.0]: https://github.com/smartrent/grizzly/compare/v6.2.0..v6.3.0
