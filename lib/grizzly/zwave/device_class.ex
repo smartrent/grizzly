@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.DeviceClass do
   @spec thermostat_hvac() :: t()
   def thermostat_hvac() do
     %{
-      basic_device_class: :routing_end_node,
+      basic_device_class: :routing_slave,
       generic_device_class: :thermostat,
       specific_device_class: :thermostat_general_v2,
       command_classes: %{
@@ -89,7 +89,7 @@ defmodule Grizzly.ZWave.DeviceClass do
       manufacturer_id: 0x0000,
       product_id: 0x0000,
       product_type_id: 0x0000,
-      library_type: :routing_end_node
+      library_type: :routing_slave
     }
   end
 
@@ -99,7 +99,7 @@ defmodule Grizzly.ZWave.DeviceClass do
   @spec multilevel_sensor() :: t()
   def multilevel_sensor() do
     %{
-      basic_device_class: :routing_end_node,
+      basic_device_class: :routing_slave,
       generic_device_class: :sensor_multilevel,
       specific_device_class: :routing_sensor_multilevel,
       command_classes: %{
@@ -121,7 +121,7 @@ defmodule Grizzly.ZWave.DeviceClass do
       manufacturer_id: 0x0000,
       product_id: 0x0000,
       product_type_id: 0x0000,
-      library_type: :routing_end_node
+      library_type: :routing_slave
     }
   end
 end
