@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, DeviceClasses}
+  alias Grizzly.ZWave.{Command, DeviceClasses}
   alias Grizzly.ZWave.CommandClasses.MultiChannel
 
   @type end_point :: MultiChannel.end_point()
@@ -62,31 +62,29 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
   end
 
   @impl true
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
         <<reports_to_follow, generic_device_class_byte, specific_device_class_byte,
           end_points_binary::binary>>
       ) do
     end_points = decode_end_points(end_points_binary)
 
-    with {:ok, generic_device_class} <-
-           MultiChannel.decode_generic_device_class(generic_device_class_byte),
-         {:ok, specific_device_class} <-
-           MultiChannel.decode_specific_device_class(
-             generic_device_class,
-             specific_device_class_byte
-           ) do
-      {:ok,
-       [
-         reports_to_follow: reports_to_follow,
-         generic_device_class: generic_device_class,
-         specific_device_class: specific_device_class,
-         end_points: end_points
-       ]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
-    end
+    {:ok, generic_device_class} =
+      DeviceClasses.generic_device_class_from_byte(generic_device_class_byte)
+
+    {:ok, specific_device_class} =
+      DeviceClasses.specific_device_class_from_byte(
+        generic_device_class,
+        specific_device_class_byte
+      )
+
+    {:ok,
+     [
+       reports_to_follow: reports_to_follow,
+       generic_device_class: generic_device_class,
+       specific_device_class: specific_device_class,
+       end_points: end_points
+     ]}
   end
 
   defp encode_end_points(end_points) do

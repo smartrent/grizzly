@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError, DeviceClasses}
+  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses}
   alias Grizzly.ZWave.CommandClasses.MultiChannel
 
   @type param ::
@@ -64,7 +64,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
   end
 
   @impl true
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
         <<dynamic_bit::size(1), end_point::size(7), generic_device_class_byte,
           specific_device_class_byte, command_classes_binary::binary>>
@@ -72,25 +72,23 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
     command_classes = decode_command_classes(command_classes_binary)
     dynamic? = decode_dynamic?(dynamic_bit)
 
-    with {:ok, generic_device_class} <-
-           MultiChannel.decode_generic_device_class(generic_device_class_byte),
-         {:ok, specific_device_class} <-
-           MultiChannel.decode_specific_device_class(
-             generic_device_class,
-             specific_device_class_byte
-           ) do
-      {:ok,
-       [
-         end_point: end_point,
-         dynamic?: dynamic?,
-         generic_device_class: generic_device_class,
-         specific_device_class: specific_device_class,
-         command_classes: command_classes
-       ]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
-    end
+    {:ok, generic_device_class} =
+      DeviceClasses.generic_device_class_from_byte(generic_device_class_byte)
+
+    {:ok, specific_device_class} =
+      DeviceClasses.specific_device_class_from_byte(
+        generic_device_class,
+        specific_device_class_byte
+      )
+
+    {:ok,
+     [
+       end_point: end_point,
+       dynamic?: dynamic?,
+       generic_device_class: generic_device_class,
+       specific_device_class: specific_device_class,
+       command_classes: command_classes
+     ]}
   end
 
   defp encode_dynamic?(false), do: 0x00

@@ -47,10 +47,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
 
       assert NetworkManagementInclusion.parse_node_info(node_info_bin) == %{
                command_classes: expected_command_classes,
-               basic_device_class: 1,
-               generic_device_class: 2,
+               basic_device_class: :controller,
+               generic_device_class: :static_controller,
                listening?: false,
-               specific_device_class: 3
+               specific_device_class: :static_installer_tool
              }
     end
 
@@ -68,10 +68,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
 
       assert NetworkManagementInclusion.parse_node_info(node_info_bin) == %{
                command_classes: expected_command_classes,
-               basic_device_class: 1,
-               generic_device_class: 2,
+               basic_device_class: :controller,
+               generic_device_class: :static_controller,
                listening?: false,
-               specific_device_class: 3,
+               specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
                keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
              }
@@ -91,10 +91,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
 
       assert NetworkManagementInclusion.parse_node_info(node_info_bin) == %{
                command_classes: expected_command_classes,
-               basic_device_class: 1,
-               generic_device_class: 2,
+               basic_device_class: :controller,
+               generic_device_class: :static_controller,
                listening?: false,
-               specific_device_class: 3,
+               specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
                keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
              }
@@ -117,10 +117,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
 
       assert NetworkManagementInclusion.parse_node_info(node_info_bin) == %{
                command_classes: expected_command_classes,
-               basic_device_class: 1,
-               generic_device_class: 2,
+               basic_device_class: :controller,
+               generic_device_class: :static_controller,
                listening?: false,
-               specific_device_class: 3,
+               specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
                keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
                input_dsk: expected_dsk

@@ -8,7 +8,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.{CommandClasses, DecodeError, DSK, Security}
+  alias Grizzly.ZWave.{CommandClasses, DecodeError, DeviceClasses, DSK, Security}
 
   @typedoc """
   The status of the inclusion process
@@ -89,9 +89,9 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           required(:node_id) => Grizzly.ZWave.node_id(),
           required(:status) => node_add_status(),
           required(:listening?) => boolean(),
-          required(:basic_device_class) => byte(),
-          required(:generic_device_class) => byte(),
-          required(:specific_device_class) => byte(),
+          required(:basic_device_class) => DeviceClasses.basic_device_class(),
+          required(:generic_device_class) => DeviceClasses.generic_device_class(),
+          required(:specific_device_class) => DeviceClasses.specific_device_class(),
           required(:command_classes) => [tagged_command_classes()],
           optional(:keys_granted) => [Security.key()],
           optional(:kex_fail_type) => Security.key_exchange_fail_type(),
@@ -113,9 +113,9 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   """
   @type extended_node_info_report() :: %{
           required(:listening?) => boolean(),
-          required(:basic_device_class) => byte(),
-          required(:generic_device_class) => byte(),
-          required(:specific_device_class) => byte(),
+          required(:basic_device_class) => DeviceClasses.basic_device_class(),
+          required(:generic_device_class) => DeviceClasses.generic_device_class(),
+          required(:specific_device_class) => DeviceClasses.specific_device_class(),
           required(:command_classes) => [tagged_command_classes()],
           required(:keys_granted) => [Security.key()],
           required(:kex_fail_type) => Security.key_exchange_fail_type()
@@ -130,7 +130,17 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           generic_device_class, specific_device_class, more_info::binary>>
       ) do
     # TODO: decode the command classes correctly (currently assuming no extended command classes)
-    # TODO: decode the device classes correctly
+
+    {:ok, basic_device_class} = DeviceClasses.basic_device_class_from_byte(basic_device_class)
+
+    {:ok, generic_device_class} =
+      DeviceClasses.generic_device_class_from_byte(generic_device_class)
+
+    {:ok, specific_device_class} =
+      DeviceClasses.specific_device_class_from_byte(
+        generic_device_class,
+        specific_device_class
+      )
 
     # node info length includes: node_info_length, listening?, opt_func, and 3 devices classes
     # to get the length of command classes we have to subject 6 bytes.
