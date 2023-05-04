@@ -361,7 +361,7 @@ iex> Grizzly.send_command(node_id, :firmware_md_get)
      impl: Grizzly.ZWave.Commands.VersionReport,
      name: :version_report,
      params: [
-       library_type: :enhanced_slave,
+       library_type: :enhanced_end_node,
        protocol_version: "4.24",
        firmware_version: "1.78",
        hardware_version: 255,
