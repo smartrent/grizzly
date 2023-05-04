@@ -218,8 +218,10 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     binary_packet <> <<header_extensions_size>> <> header_extensions_bin
   end
 
-  defp maybe_add_command(binary_packet, nil), do: binary_packet
-  defp maybe_add_command(binary_packet, command), do: binary_packet <> Command.to_binary(command)
+  @spec maybe_add_command(binary(), Command.t() | binary() | nil) :: binary()
+  defp maybe_add_command(zip_packet, nil), do: zip_packet
+  defp maybe_add_command(zip_packet, command) when is_binary(command), do: zip_packet <> command
+  defp maybe_add_command(zip_packet, command), do: zip_packet <> Command.to_binary(command)
 
   defp meta_from_byte(byte) do
     <<header?::size(1), cmd?::size(1), more_info?::size(1), secure?::size(1), _::size(4)>> =

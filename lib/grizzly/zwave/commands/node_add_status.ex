@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, DSK, Security}
+  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses, DSK, Security}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
 
   @type tagged_command_classes() ::
@@ -72,7 +72,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       basic_device_class = Command.param!(command, :basic_device_class)
       generic_device_class = Command.param!(command, :generic_device_class)
       specific_device_class = Command.param!(command, :specific_device_class)
-      command_classes = Command.param!(command, :command_classes)
+      command_classes = Command.param(command, :command_classes, [])
 
       # We add 6 to the length of the command classes to account for the 3 device
       # classes 2 Z-Wave protocol bytes and the node info length byte.
@@ -83,9 +83,10 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       # TODO: fix opt func bit (after the listening bit)
       binary =
         <<seq_number, NMI.node_add_status_to_byte(status), 0x00, node_id, node_info_length,
-          encode_listening_bit(listening?)::size(1), 0x00::size(7), 0x00, basic_device_class,
-          generic_device_class,
-          specific_device_class>> <>
+          encode_listening_bit(listening?)::size(1), 0x00::size(7), 0x00,
+          DeviceClasses.basic_device_class_to_byte(basic_device_class),
+          DeviceClasses.generic_device_class_to_byte(generic_device_class),
+          DeviceClasses.specific_device_class_to_byte(generic_device_class, specific_device_class)>> <>
           CommandClasses.command_class_list_to_binary(command_classes)
 
       maybe_add_version_2_fields(command, binary)
