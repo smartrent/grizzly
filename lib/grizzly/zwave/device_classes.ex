@@ -9,8 +9,8 @@ defmodule Grizzly.ZWave.DeviceClasses do
     @basic_mappings [
       {0x01, :controller},
       {0x02, :static_controller},
-      {0x03, :end_node},
-      {0x04, :routing_end_node}
+      {0x03, :slave},
+      {0x04, :routing_slave}
     ]
 
     @generic_mappings [
@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.DeviceClasses do
       {0x07, :sensor_notification},
       {0x08, :thermostat},
       {0x09, :window_covering},
-      {0x0F, :repeater_end_node},
+      {0x0F, :repeater_slave},
       {0x10, :switch_binary},
       {0x11, :switch_multilevel},
       {0x12, :switch_remote},
@@ -109,10 +109,10 @@ defmodule Grizzly.ZWave.DeviceClasses do
       {:switch_multilevel, 0x06, :class_b_motor_control},
       {:switch_multilevel, 0x07, :class_c_motor_control},
       {:switch_multilevel, 0x08, :fan_switch},
-      # repeater end_node
-      {:repeater_end_node, 0x00, :not_used},
-      {:repeater_end_node, 0x01, :repeater_end_node},
-      {:repeater_end_node, 0x02, :virtual_node},
+      # repeater slave
+      {:repeater_slave, 0x00, :not_used},
+      {:repeater_slave, 0x01, :repeater_slave},
+      {:repeater_slave, 0x02, :virtual_node},
       # switch remote (0x13)
       {:switch_remote, 0x00, :not_used},
       {:switch_remote, 0x01, :switch_remote_binary},

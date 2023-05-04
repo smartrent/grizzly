@@ -24,10 +24,10 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   @type library_type ::
           :static_controller
           | :controller
-          | :enhanced_end_node
-          | :end_node
+          | :enhanced_slave
+          | :slave
           | :installer
-          | :routing_end_node
+          | :routing_slave
           | :bridge_controller
           | :device_under_test
           | :av_remote
@@ -162,10 +162,10 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
   defp decode_library_type(0x01), do: {:ok, :static_controller}
   defp decode_library_type(0x02), do: {:ok, :controller}
-  defp decode_library_type(0x03), do: {:ok, :enhanced_end_node}
-  defp decode_library_type(0x04), do: {:ok, :end_node}
+  defp decode_library_type(0x03), do: {:ok, :enhanced_slave}
+  defp decode_library_type(0x04), do: {:ok, :slave}
   defp decode_library_type(0x05), do: {:ok, :installer}
-  defp decode_library_type(0x06), do: {:ok, :routing_end_node}
+  defp decode_library_type(0x06), do: {:ok, :routing_slave}
   defp decode_library_type(0x07), do: {:ok, :bridge_controller}
   defp decode_library_type(0x08), do: {:ok, :device_under_test}
   defp decode_library_type(0x0A), do: {:ok, :av_remote}
@@ -182,10 +182,10 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
   defp encode_library_type(:static_controller), do: 0x01
   defp encode_library_type(:controller), do: 0x02
-  defp encode_library_type(:enhanced_end_node), do: 0x03
-  defp encode_library_type(:end_node), do: 0x04
+  defp encode_library_type(:enhanced_slave), do: 0x03
+  defp encode_library_type(:slave), do: 0x04
   defp encode_library_type(:installer), do: 0x05
-  defp encode_library_type(:routing_end_node), do: 0x06
+  defp encode_library_type(:routing_slave), do: 0x06
   defp encode_library_type(:bridge_controller), do: 0x07
   defp encode_library_type(:device_under_test), do: 0x08
   defp encode_library_type(:av_remote), do: 0x0A
