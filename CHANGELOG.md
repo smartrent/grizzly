@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.6.0] - 2023-05-05
+
+### Changed / Fixed
+
+- **Commands are no longer retried by default** ([#761](https://github.com/smartrent/grizzly/761))
+- Node Add Status always includes the `:command_classes` param even when empty ([#760](https://github.com/smartrent/grizzly/760))
+
 ## [v6.5.1] - 2023-05-01
 
 ### Fixed
@@ -2199,6 +2206,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.6.0]: https://github.com/smartrent/grizzly/compare/v6.5.1..v6.6.0
 [v6.5.1]: https://github.com/smartrent/grizzly/compare/v6.5.0..v6.5.1
 [v6.5.0]: https://github.com/smartrent/grizzly/compare/v6.4.0..v6.5.0
 [v6.4.0]: https://github.com/smartrent/grizzly/compare/v6.3.0..v6.4.0
