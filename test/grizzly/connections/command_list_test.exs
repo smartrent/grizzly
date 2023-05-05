@@ -65,7 +65,7 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, zwave_command} = SwitchBinaryGet.new()
 
     {:ok, runner, _ref, command_list} =
-      CommandList.create(CommandList.empty(), zwave_command, 1, self())
+      CommandList.create(CommandList.empty(), zwave_command, 1, self(), retries: 2)
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 

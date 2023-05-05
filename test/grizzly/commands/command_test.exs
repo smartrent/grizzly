@@ -26,7 +26,7 @@ defmodule Grizzly.Commands.CommandTest do
       handler_state: nil,
       source: zwave_command,
       owner: self(),
-      retries: 2,
+      retries: 0,
       seq_number: grizzly_command.seq_number,
       ref: grizzly_command.ref,
       node_id: 1,
@@ -105,9 +105,9 @@ defmodule Grizzly.Commands.CommandTest do
              Command.handle_zip_command(grizzly_command, ack_response)
   end
 
-  test "handles Z/IP Packet for nack response with retires" do
+  test "handles Z/IP Packet for nack response with retries" do
     {:ok, zwave_command} = SwitchBinaryGet.new()
-    grizzly_command = Command.from_zwave_command(zwave_command, 1, self())
+    grizzly_command = Command.from_zwave_command(zwave_command, 1, self(), retries: 2)
 
     nack_response = ZIPPacket.make_nack_response(grizzly_command.seq_number)
 
@@ -117,7 +117,7 @@ defmodule Grizzly.Commands.CommandTest do
              Command.handle_zip_command(grizzly_command, nack_response)
   end
 
-  test "handles Z/IP Packet for nack response with no retires" do
+  test "handles Z/IP Packet for nack response with no retries" do
     {:ok, zwave_command} = SwitchBinaryGet.new()
     grizzly_command = Command.from_zwave_command(zwave_command, 1, self(), retries: 0)
 
