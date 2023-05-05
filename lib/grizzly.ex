@@ -290,15 +290,19 @@ defmodule Grizzly do
   end
 
   @doc """
-  Subscribe to a command event from a Z-Wave device
+  Subscribe to a command event from a Z-Wave device.
   """
   @spec subscribe_command(command()) :: :ok
-  def subscribe_command(command_name) do
-    Messages.subscribe(command_name)
-  end
+  defdelegate subscribe_command(command_name), to: Messages, as: :subscribe
 
   @doc """
-  Subscribe to many events from a Z-Wave device
+  Unsubscribe from an event.
+  """
+  @spec unsubscribe_command(command()) :: :ok
+  defdelegate unsubscribe_command(command_name), to: Messages, as: :unsubscribe
+
+  @doc """
+  Subscribe to many events from a Z-Wave device.
   """
   @spec subscribe_commands([command()]) :: :ok
   def subscribe_commands(command_names) do
@@ -306,12 +310,28 @@ defmodule Grizzly do
   end
 
   @doc """
-  Unsubscribe to an event
+  Subscribe to all events from a particular Z-Wave device.
+
+  NOTE: Subscribers using both `subscribe_node` and `subscribe_command` **will**
+  receive duplicate messages.
   """
-  @spec unsubscribe_command(command()) :: :ok
-  def unsubscribe_command(command_name) do
-    Messages.unsubscribe(command_name)
+  defdelegate subscribe_node(node_id), to: Messages
+
+  @doc """
+  Subscribe to all events from a group of Z-Wave devices.
+
+  NOTE: Subscribers using both `subscribe_node` and `subscribe_command` **will**
+  receive duplicate messages.
+  """
+  @spec subscribe_nodes([node_id() | VirtualDevices.id()]) :: :ok
+  def subscribe_nodes(node_ids) do
+    Enum.each(node_ids, &subscribe_node/1)
   end
+
+  @doc """
+  Delete a subscription created with `subscribe_node/1`.
+  """
+  defdelegate unsubscribe_node(node_id), to: Messages
 
   @doc """
   List the support commands

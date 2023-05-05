@@ -33,6 +33,17 @@ defmodule Grizzly.UnsolicitedServer.Messages do
     Registry.unregister(@registry, command_name)
   end
 
+  @spec subscribe_node(Grizzly.node_id() | VirtualDevices.id()) :: :ok
+  def subscribe_node(node_id) do
+    _ = Registry.register(@registry, node_id, [])
+    :ok
+  end
+
+  @spec unsubscribe_node(Grizzly.node_id() | VirtualDevices.id()) :: :ok
+  def unsubscribe_node(node_id) do
+    Registry.unregister(@registry, node_id)
+  end
+
   @spec broadcast(:inet.ip_address() | VirtualDevices.id(), Command.t()) :: :ok
   def broadcast({:virtual, _id} = id, command) do
     do_broadcast(id, command)
@@ -61,6 +72,11 @@ defmodule Grizzly.UnsolicitedServer.Messages do
     report = Report.new(:complete, :unsolicited, node_id, command: command)
 
     Registry.dispatch(@registry, command.name, fn listeners ->
+      for {pid, _} <- listeners,
+          do: send(pid, {:grizzly, :report, report})
+    end)
+
+    Registry.dispatch(@registry, node_id, fn listeners ->
       for {pid, _} <- listeners,
           do: send(pid, {:grizzly, :report, report})
     end)
