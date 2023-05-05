@@ -37,7 +37,7 @@ defmodule Grizzly.Commands.Command do
           | {:transmission_stats, boolean()}
 
   defstruct owner: nil,
-            retries: 2,
+            retries: 0,
             source: nil,
             handler_state: nil,
             handler: nil,
@@ -53,7 +53,7 @@ defmodule Grizzly.Commands.Command do
 
   @spec from_zwave_command(ZWaveCommand.t(), ZWave.node_id(), pid(), [opt()]) :: t()
   def from_zwave_command(zwave_command, node_id, owner, opts \\ []) do
-    retries = Keyword.get(opts, :retries, 2)
+    retries = Keyword.get(opts, :retries, 0)
     command_ref = Keyword.get(opts, :reference, make_ref())
     timeout_ref = Keyword.get(opts, :timeout_ref)
     with_transmission_stats = Keyword.get(opts, :transmission_stats, false)
