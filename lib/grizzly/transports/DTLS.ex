@@ -5,7 +5,7 @@ defmodule Grizzly.Transports.DTLS do
 
   @behaviour Grizzly.Transport
 
-  alias Grizzly.{Trace, Transport, ZWave}
+  alias Grizzly.{Trace, Transport, TransportError, ZWave}
   alias Grizzly.Transport.Response
 
   @grizzly_ip :inet.ntoa({0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02})
@@ -107,6 +107,17 @@ defmodule Grizzly.Transports.DTLS do
       error ->
         error
     end
+  end
+
+  def parse_response({:ssl_error, _, {:tls_alert, {:unexpected_message, message}}}, _opts) do
+    message =
+      if is_binary(message) && String.printable?(message) do
+        message
+      else
+        inspect(message, limit: 500)
+      end
+
+    raise TransportError, "TLS Alert (unexpected_message): #{message}"
   end
 
   def parse_response({:ssl_closed, _}, _opts) do
