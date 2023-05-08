@@ -33,13 +33,13 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   def handle_continue(:accept, listening_transport) do
     with {:ok, accept_transport} <- Transport.accept(listening_transport),
          {:ok, _sock} <- Transport.handshake(accept_transport) do
-      # Start a new listen socket to replace this one as this one is now not
-      # open for more traffic now
+      # Start a new listen socket to replace this one as this one is now bound
+      # to a single node in the Z-Wave PAN.
       {:ok, _} = SocketSupervisor.start_socket(listening_transport)
     else
       other ->
         Logger.warn(
-          "grizzly: Failed to start socket. Got this on SSL handshake: #{inspect(other)}"
+          "[Grizzly] UnsolicitedServer socket accept/handshake failed: #{inspect(other)}"
         )
     end
 
@@ -47,8 +47,10 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   end
 
   @impl GenServer
-  def handle_info({:ssl_closed, _} = message, transport) do
-    Logger.error("[CLOSED]: #{inspect(message)}")
+  def handle_info({:ssl_closed, {:sslsocket, sslsocket}}, transport) do
+    ip = client_ip(sslsocket)
+
+    Logger.debug("[Grizzly] UnsolicitedServer socket closed by client #{ip}")
     {:stop, :normal, transport}
   end
 
@@ -151,6 +153,16 @@ defmodule Grizzly.UnsolicitedServer.Socket do
       true
     else
       false
+    end
+  end
+
+  defp client_ip(sslsocket) do
+    with {:ok, {ip, _port}} <- :ssl.peername(sslsocket),
+         ip_str when is_list(ip_str) <- :inet.ntoa(ip) do
+      to_string(ip_str)
+    else
+      _ ->
+        "unknown"
     end
   end
 end
