@@ -47,9 +47,8 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   end
 
   @impl GenServer
-  def handle_info({:ssl_closed, {:sslsocket, sslsocket}}, transport) do
+  def handle_info({:ssl_closed, sslsocket}, transport) do
     ip = client_ip(sslsocket)
-
     Logger.debug("[Grizzly] UnsolicitedServer socket closed by client #{ip}")
     {:stop, :normal, transport}
   end
