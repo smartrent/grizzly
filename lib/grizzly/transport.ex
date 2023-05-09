@@ -3,6 +3,8 @@ defmodule Grizzly.Transport do
   Behaviour and functions for communicating to `zipgateway`
   """
 
+  @default_connect_timeout 10_000
+
   defmodule Response do
     @moduledoc """
     The response from parse response
@@ -50,7 +52,7 @@ defmodule Grizzly.Transport do
   @enforce_keys [:impl]
   defstruct assigns: %{}, impl: nil
 
-  @callback open(keyword()) :: {:ok, t()} | {:error, :timeout}
+  @callback open(keyword(), connect_timeout :: pos_integer()) :: {:ok, t()} | {:error, :timeout}
 
   @callback listen(t()) :: {:ok, t(), [listen_option()]} | {:error, any()}
 
@@ -128,9 +130,16 @@ defmodule Grizzly.Transport do
   @doc """
   Open the transport
   """
-  @spec open(module(), args()) :: {:ok, t()} | {:error, :timeout}
-  def open(transport_module, args) do
-    transport_module.open(args)
+  @spec open(module(), args(), connect_timeout :: pos_integer()) ::
+          {:ok, t()} | {:error, :timeout}
+  def open(transport_module, args, connect_timeout \\ @default_connect_timeout)
+
+  def open(transport_module, args, nil) do
+    open(transport_module, args, @default_connect_timeout)
+  end
+
+  def open(transport_module, args, connect_timeout) do
+    transport_module.open(args, connect_timeout)
   end
 
   @doc """

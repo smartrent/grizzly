@@ -75,7 +75,7 @@ defmodule Grizzly.Connections.AsyncConnection do
       port: grizzly_options.zipgateway_port
     ]
 
-    case Transport.open(transport_impl, transport_opts) do
+    case Transport.open(transport_impl, transport_opts, Keyword.get(opts, :connect_timeout)) do
       {:ok, transport} ->
         {:ok,
          %State{

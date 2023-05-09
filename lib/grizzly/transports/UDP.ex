@@ -8,7 +8,7 @@ defmodule Grizzly.Transports.UDP do
   alias Grizzly.Transport.Response
 
   @impl Grizzly.Transport
-  def open(args) do
+  def open(args, _connect_timeout) do
     priv = Enum.into(args, %{})
 
     case :gen_udp.open(4000, [:binary, {:active, true}, :inet6]) do

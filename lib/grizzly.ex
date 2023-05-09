@@ -121,6 +121,8 @@ defmodule Grizzly do
 
   @type node_id() :: non_neg_integer()
 
+  @type any_node() :: :gateway | Grizzly.Node.id() | VirtualDevices.id()
+
   @typedoc """
   A custom handler for the command.
 
@@ -150,6 +152,7 @@ defmodule Grizzly do
           | {:transmission_stats, boolean()}
           | {:supervision?, boolean()}
           | {:status_updates?, boolean()}
+          | {:connect_timeout, pos_integer()}
 
   @type command :: atom()
 
@@ -161,7 +164,7 @@ defmodule Grizzly do
   @doc """
   Check to if the device id is a virtual device or a regular Z-Wave devices
   """
-  @spec virtual_device?(:gateway | ZWave.node_id() | VirtualDevices.id()) :: boolean()
+  @spec virtual_device?(any_node()) :: boolean()
   def virtual_device?(device_id) do
     is_virtual_device(device_id)
   end
@@ -179,12 +182,7 @@ defmodule Grizzly do
   **NOTE:** The `:handler` and `:supervision?` options are not compatible. If
   `:supervision?` is true, any custom handler will be ignored.
   """
-  @spec send_command(
-          ZWave.node_id() | :gateway | VirtualDevices.id(),
-          command(),
-          args :: list(),
-          [command_opt()]
-        ) ::
+  @spec send_command(any_node(), command(), args :: list(), [command_opt()]) ::
           send_command_response()
   def send_command(node_id, command_name, args \\ [], opts \\ [])
 
@@ -220,11 +218,12 @@ defmodule Grizzly do
     # will not establish a new connection
     including? = Inclusions.inclusion_running?()
     updating_firmware? = FirmwareUpdates.firmware_update_running?()
+    {connect_opts, opts} = Keyword.split(opts, [:connect_timeout])
 
     with false <- including? or updating_firmware?,
          {command_module, default_opts} <- Table.lookup(command_name),
          {:ok, command} <- command_module.new(args),
-         {:ok, _} <- Connection.open(node_id) do
+         {:ok, _} <- Connection.open(node_id, connect_opts) do
       Connection.send_command(node_id, command, Keyword.merge(default_opts, opts))
     else
       true ->
@@ -338,7 +337,7 @@ defmodule Grizzly do
   Sends a no-op command to the given node to check its reachability. Transmission
   stats are enabled by default.
   """
-  @spec ping(ZWave.node_id(), [command_opt()]) :: send_command_response()
+  @spec ping(any_node(), [command_opt()]) :: send_command_response()
   def ping(node_id, opts \\ []) do
     opts = Keyword.put_new(opts, :transmission_stats, true)
     send_command(node_id, :no_operation, [], opts)

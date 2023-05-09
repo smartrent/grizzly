@@ -35,7 +35,7 @@ defmodule Grizzly.Connections.BinaryConnection do
   def start_link(grizzly_options, node_id, opts) do
     owner = Keyword.fetch!(opts, :owner)
     name = Connections.make_name({:binary, node_id, owner})
-    GenServer.start_link(__MODULE__, [grizzly_options, node_id, owner], name: name)
+    GenServer.start_link(__MODULE__, [grizzly_options, node_id, opts], name: name)
   end
 
   @doc """
@@ -48,7 +48,8 @@ defmodule Grizzly.Connections.BinaryConnection do
   end
 
   @impl GenServer
-  def init([grizzly_options, node_id, owner]) do
+  def init([grizzly_options, node_id, opts]) do
+    owner = Keyword.fetch!(opts, :owner)
     host = ZIPGateway.host_for_node(node_id, grizzly_options)
     transport_impl = grizzly_options.transport
 
@@ -57,7 +58,7 @@ defmodule Grizzly.Connections.BinaryConnection do
       port: grizzly_options.zipgateway_port
     ]
 
-    case Transport.open(transport_impl, transport_opts) do
+    case Transport.open(transport_impl, transport_opts, Keyword.get(opts, :connect_timeout)) do
       {:ok, transport} ->
         {:ok,
          %State{

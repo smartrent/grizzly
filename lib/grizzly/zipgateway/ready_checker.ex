@@ -22,7 +22,7 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   @impl GenServer
   def handle_continue(:try_connect, state) do
-    case Connection.open(:gateway) do
+    case Connection.open(:gateway, connect_timeout: 500) do
       {:ok, _} ->
         state.reporter.ready()
 
