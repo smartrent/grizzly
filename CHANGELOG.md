@@ -4,18 +4,30 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.6.1] - 2023-05-12
+
+### Added
+
+- Opt-in IEx autocompletion for `Grizzly.send_command` ([#763](https://github.com/smartrent/grizzly/pull/763))
+
+### Fixed
+
+- Ignore unexpected trailing bytes in ConfigurationReport ([#764](https://github.com/smartrent/grizzly/pull/764))
+- Reduce log level for closed connections in UnsolicitedServer ([#765](https://github.com/smartrent/grizzly/pull/765))
+- Better logging for DTLS unexpected error messages ([#767](https://github.com/smartrent/grizzly/pull/767))
+
 ## [v6.6.0] - 2023-05-05
 
 ### Changed / Fixed
 
-- **Commands are no longer retried by default** ([#761](https://github.com/smartrent/grizzly/761))
-- Node Add Status always includes the `:command_classes` param even when empty ([#760](https://github.com/smartrent/grizzly/760))
+- **Commands are no longer retried by default** ([#761](https://github.com/smartrent/grizzly/pull/761))
+- Node Add Status always includes the `:command_classes` param even when empty ([#760](https://github.com/smartrent/grizzly/pull/760))
 
 ## [v6.5.1] - 2023-05-01
 
 ### Fixed
 
-- Device classes in Node Add Status are now decoded like in Node Info Cached Get ([#759](https://github.com/smartrent/grizzly/759))
+- Device classes in Node Add Status are now decoded like in Node Info Cached Get ([#759](https://github.com/smartrent/grizzly/pull/759))
 
 ## [v6.5.0] - 2023-05-01
 
@@ -2206,6 +2218,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.6.1]: https://github.com/smartrent/grizzly/compare/v6.6.0..v6.6.1
 [v6.6.0]: https://github.com/smartrent/grizzly/compare/v6.5.1..v6.6.0
 [v6.5.1]: https://github.com/smartrent/grizzly/compare/v6.5.0..v6.5.1
 [v6.5.0]: https://github.com/smartrent/grizzly/compare/v6.4.0..v6.5.0
