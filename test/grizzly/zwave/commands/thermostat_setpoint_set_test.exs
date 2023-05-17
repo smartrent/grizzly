@@ -16,6 +16,14 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSetTest do
       <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x02::size(3), 0x02, 0xF3>>
 
     assert expected_binary == ThermostatSetpointSet.encode_params(command)
+
+    params = [type: :heating, scale: :f, value: -2.5]
+    {:ok, command} = ThermostatSetpointSet.new(params)
+
+    expected_binary =
+      <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x01::size(3), 0xE7>>
+
+    assert expected_binary == ThermostatSetpointSet.encode_params(command)
   end
 
   test "decodes params correctly" do
@@ -26,5 +34,40 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSetTest do
     assert Keyword.get(params, :type) == :heating
     assert Keyword.get(params, :scale) == :f
     assert Keyword.get(params, :value) == 75.5
+
+    binary_params =
+      <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x01::size(3), 0xE7>>
+
+    {:ok, params} = ThermostatSetpointSet.decode_params(binary_params)
+    assert Keyword.get(params, :type) == :heating
+    assert Keyword.get(params, :scale) == :f
+    assert Keyword.get(params, :value) == -2.5
+  end
+
+  test "calculates number of bits needed correctly" do
+    assert 8 == ThermostatSetpointSet.__bits_needed__(127)
+    assert 9 == ThermostatSetpointSet.__bits_needed__(128)
+    assert 8 == ThermostatSetpointSet.__bits_needed__(-128)
+    assert 9 == ThermostatSetpointSet.__bits_needed__(-129)
+
+    assert 16 == ThermostatSetpointSet.__bits_needed__(32767)
+    assert 17 == ThermostatSetpointSet.__bits_needed__(32768)
+    assert 16 == ThermostatSetpointSet.__bits_needed__(-32768)
+    assert 17 == ThermostatSetpointSet.__bits_needed__(-32769)
+  end
+
+  test "calculates number of bytes needed correctly" do
+    assert 1 == ThermostatSetpointSet.__bytes_needed__(0)
+    assert 1 == ThermostatSetpointSet.__bytes_needed__(1)
+    assert 1 == ThermostatSetpointSet.__bytes_needed__(-1)
+    assert 1 == ThermostatSetpointSet.__bytes_needed__(127)
+    assert 2 == ThermostatSetpointSet.__bytes_needed__(128)
+    assert 1 == ThermostatSetpointSet.__bytes_needed__(-128)
+    assert 2 == ThermostatSetpointSet.__bytes_needed__(-129)
+
+    assert 2 == ThermostatSetpointSet.__bytes_needed__(32767)
+    assert 3 == ThermostatSetpointSet.__bytes_needed__(32768)
+    assert 2 == ThermostatSetpointSet.__bytes_needed__(-32768)
+    assert 3 == ThermostatSetpointSet.__bytes_needed__(-32769)
   end
 end
