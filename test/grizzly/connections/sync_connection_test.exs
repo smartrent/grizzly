@@ -16,7 +16,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   end
 
   test "reports timeout" do
-    assert {:error, :timeout} == SyncConnection.start_link(Utils.default_options(), 600)
+    assert {:error, :timeout} == Connection.open(600)
   end
 
   test "handles nack responses" do
