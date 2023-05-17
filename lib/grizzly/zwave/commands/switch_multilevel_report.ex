@@ -86,7 +86,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   # no spec
-  def decode_params(<<value_byte, target_value_byte, duration::binary>>) do
+  def decode_params(<<_value_byte, _target_value_byte, duration::binary>>) do
     Logger.warning(
       "[Grizzly] Unexpected trailing bytes in SwitchMultilevelReport: #{inspect(duration)}"
     )
