@@ -1,6 +1,6 @@
 defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
   use ExUnit.Case, async: true
-
+  import ExUnit.CaptureLog
   alias Grizzly.ZWave.Commands.SwitchMultilevelReport
 
   test "creates the command and validates params" do
@@ -33,6 +33,30 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
     {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
     assert Keyword.get(params, :value) == 0x32
     assert Keyword.get(params, :duration) == 0x0A
+  end
+
+  test "decodes v4 params correctly" do
+    binary_params = <<0x32, 0x63, 0x0A>>
+    {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
+    assert Keyword.get(params, :value) == 50
+    assert Keyword.get(params, :target_value) == 99
+    assert Keyword.get(params, :duration) == 10
+  end
+
+  test "error on more than 3 bytes" do
+    {result, log} =
+      with_log(fn ->
+        SwitchMultilevelReport.decode_params(<<0x32, 0x63, 0x0, 0x87>>)
+      end)
+
+    assert {:error,
+            %Grizzly.ZWave.DecodeError{
+              value: <<0, 135>>,
+              param: :duration,
+              command: :switch_multilevel_report
+            }} = result
+
+    assert log =~ "Unexpected trailing bytes in SwitchMultilevelReport: <<0, 135>>"
   end
 
   test "decodes Leviton DZ1KD-1BZ dimmer" do

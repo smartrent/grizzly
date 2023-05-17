@@ -9,7 +9,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   """
 
   @behaviour Grizzly.ZWave.Command
-
+  require Logger
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
 
@@ -83,6 +83,15 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
       {:error, %DecodeError{}} = error ->
         error
     end
+  end
+
+  # no spec
+  def decode_params(<<value_byte, target_value_byte, duration::binary>>) do
+    Logger.warning(
+      "[Grizzly] Unexpected trailing bytes in SwitchMultilevelReport: #{inspect(duration)}"
+    )
+
+    {:error, %DecodeError{value: duration, param: :duration, command: :switch_multilevel_report}}
   end
 
   defp value_from_byte(0x00), do: {:ok, :off}
