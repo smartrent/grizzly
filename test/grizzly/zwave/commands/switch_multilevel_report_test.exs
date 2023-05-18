@@ -43,20 +43,15 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
     assert Keyword.get(params, :duration) == 10
   end
 
-  test "error on more than 3 bytes" do
+  test "ignores bytes trailing bytes" do
     {result, log} =
       with_log(fn ->
         SwitchMultilevelReport.decode_params(<<0x32, 0x63, 0x0, 0x87>>)
       end)
 
-    assert {:error,
-            %Grizzly.ZWave.DecodeError{
-              value: <<0, 135>>,
-              param: :duration,
-              command: :switch_multilevel_report
-            }} = result
+    assert {:ok, [value: 50, target_value: 99, duration: 0]} = result
 
-    assert log =~ "Unexpected trailing bytes in SwitchMultilevelReport: <<0, 135>>"
+    assert log =~ "Unexpected trailing bytes in SwitchMultilevelReport: <<135>>"
   end
 
   test "decodes Leviton DZ1KD-1BZ dimmer" do
