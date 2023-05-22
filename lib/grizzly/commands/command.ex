@@ -373,15 +373,13 @@ defmodule Grizzly.Commands.Command do
   end
 
   defp calculate_rssi_values(stats) do
-    average =
+    min_rssi =
       Keyword.get(stats, :rssi_hops, [])
-      |> Enum.reject(fn rssi ->
-        rssi in [:not_available, :max_power_saturated, :below_sensitivity]
-      end)
-      |> calculate_average_dbm()
+      |> Enum.filter(&is_number/1)
+      |> Enum.min(fn -> :not_available end)
 
-    Keyword.put(stats, :rssi_dbm, average)
-    |> Keyword.put(:rssi_4bars, calculate_bars(average))
+    Keyword.put(stats, :rssi_dbm, min_rssi)
+    |> Keyword.put(:rssi_4bars, calculate_bars(min_rssi))
   end
 
   # These values were determined based on -78dBm being the lowest RSSI considered
@@ -400,14 +398,12 @@ defmodule Grizzly.Commands.Command do
   #     cat("2 bars >=", bars_to_rssi(2), "dBm\n")
   #     cat("3 bars >=", bars_to_rssi(3), "dBm\n")
   #     cat("4 bars >=", bars_to_rssi(4), "dBm\n")
+  defp calculate_bars(:not_available), do: :not_available
   defp calculate_bars(rssi) when rssi >= -78, do: 4
   defp calculate_bars(rssi) when rssi >= -84, do: 3
   defp calculate_bars(rssi) when rssi >= -90, do: 2
   defp calculate_bars(rssi) when rssi >= -97, do: 1
   defp calculate_bars(_rssi), do: 0
-
-  defp calculate_average_dbm(numbers) when numbers == [], do: -125
-  defp calculate_average_dbm(numbers), do: round(Enum.sum(numbers) / length(numbers))
 
   defp get_stats_from_zip_packet(zip_packet) do
     case ZIPPacket.extension(zip_packet, :installation_and_maintenance_report) do
