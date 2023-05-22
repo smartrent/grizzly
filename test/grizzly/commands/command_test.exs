@@ -160,7 +160,7 @@ defmodule Grizzly.Commands.CommandTest do
     {report, _command} = Command.handle_zip_command(grizzly_command, ack_response)
     transmission_stats = report.transmission_stats
 
-    assert Keyword.get(transmission_stats, :rssi_dbm) == -50
+    assert Keyword.get(transmission_stats, :rssi_dbm) == -60
     assert Keyword.get(transmission_stats, :rssi_4bars) == 4
     assert Keyword.get(transmission_stats, :last_working_route) == [1001, 1002, 1003, 1004]
     assert Keyword.get(transmission_stats, :transmission_speed) == {9999, :kbit}
