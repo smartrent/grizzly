@@ -70,11 +70,11 @@ defmodule Grizzly.FirmwareUpdates do
       FirmwareUpdateRunner.start_firmware_update(runner, firmware_image_path)
     else
       {:error, :image_not_found} ->
-        Logger.warn("[Grizzly] Firmware image file not found")
+        Logger.warning("[Grizzly] Firmware image file not found")
         {:error, :image_not_found}
 
       other ->
-        Logger.warn("[Grizzly] Failed to start firmware update: #{inspect(other)}")
+        Logger.warning("[Grizzly] Failed to start firmware update: #{inspect(other)}")
         {:error, :busy}
     end
   end

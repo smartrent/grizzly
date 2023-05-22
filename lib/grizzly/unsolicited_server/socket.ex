@@ -38,7 +38,7 @@ defmodule Grizzly.UnsolicitedServer.Socket do
       {:ok, _} = SocketSupervisor.start_socket(listening_transport)
     else
       other ->
-        Logger.warn(
+        Logger.warning(
           "[Grizzly] UnsolicitedServer socket accept/handshake failed: #{inspect(other)}"
         )
     end

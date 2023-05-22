@@ -94,7 +94,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
         firmware_activated(firmware_update)
 
       other ->
-        Logger.warn("[Grizzly] Not handling FW update command named #{inspect(other)}")
+        Logger.warning("[Grizzly] Not handling FW update command named #{inspect(other)}")
         firmware_update
     end
   end

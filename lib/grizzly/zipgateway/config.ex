@@ -148,7 +148,7 @@ defmodule Grizzly.ZIPGateway.Config do
           :ok
 
         {:error, reason} ->
-          Logger.warn("Failed to write provision list file: #{inspect(reason)}")
+          Logger.warning("Failed to write provision list file: #{inspect(reason)}")
           :ok
       end
     end

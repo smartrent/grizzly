@@ -65,11 +65,11 @@ defmodule Grizzly.Inclusions do
           Logger.info("Node added with id: " <> node_id)
 
         :failed ->
-          Logger.warn("Adding node failed :(")
+          Logger.warning("Adding node failed :(")
 
         :security_failed ->
           node_id = Command.param!(report.command, :node_id)
-          Logger.warn("Node added with id: " <> node_id <> "but the security failed")
+          Logger.warning("Node added with id: " <> node_id <> "but the security failed")
       end
 
       {:noreply, state}

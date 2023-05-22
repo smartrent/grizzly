@@ -77,7 +77,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
     byte_list = :erlang.binary_to_list(encoded_commands_list) |> Enum.take(length)
 
     if Enum.count(byte_list) != length do
-      Logger.warn("[Grizzly] Invalid length #{length} for list of commands")
+      Logger.warning("[Grizzly] Invalid length #{length} for list of commands")
 
       {:error,
        %DecodeError{
@@ -113,7 +113,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
 
   defp specified_command([cc_byte1, cc_byte2, c_byte]) when cc_byte1 in [0xF1..0xFF] do
     _ =
-      Logger.warn(
+      Logger.warning(
         "[Grizzly] Ignoring command #{c_byte} from extended command class #{cc_byte1}, #{cc_byte2}"
       )
 
@@ -123,7 +123,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   defp specified_command([cc_byte, c_byte]) do
     case Decoder.command_module(cc_byte, c_byte) do
       {:error, :unsupported_command} ->
-        Logger.warn("[Grizzly] Unmapped class #{c_byte} of command class #{cc_byte}")
+        Logger.warning("[Grizzly] Unmapped class #{c_byte} of command class #{cc_byte}")
         :unknown
 
       {:ok, command_module} ->
