@@ -154,7 +154,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
     case report do
       %Report{status: :complete, type: :command, command: nil} ->
-        Logger.warn(
+        Logger.warning(
           "[Grizzly] FW update report of type :command has no command: #{inspect(report)}. Ignoring it."
         )
 

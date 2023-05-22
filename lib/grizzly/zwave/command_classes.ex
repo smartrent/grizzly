@@ -165,7 +165,7 @@ defmodule Grizzly.ZWave.CommandClasses do
         unquote(from_byte)
 
         def from_byte(byte) do
-          Logger.warn("[Grizzly] Unsupported command class from byte #{byte}")
+          Logger.warning("[Grizzly] Unsupported command class from byte #{byte}")
           {:error, :unsupported_command_class}
         end
 

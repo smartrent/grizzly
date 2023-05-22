@@ -964,7 +964,7 @@ defmodule Grizzly.ZWave.Notifications do
       {:ok, user_code_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
-        Logger.warn("[Grizzly] Failed to decode UserCodeReport from #{inspect(params_binary)}")
+        Logger.warning("[Grizzly] Failed to decode UserCodeReport from #{inspect(params_binary)}")
         decode_error
     end
   end
@@ -979,7 +979,7 @@ defmodule Grizzly.ZWave.Notifications do
       {:ok, node_location_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
-        Logger.warn(
+        Logger.warning(
           "[Grizzly] Failed to decode NodeLocationReport from #{inspect(params_binary)}"
         )
 
@@ -993,7 +993,7 @@ defmodule Grizzly.ZWave.Notifications do
         {:ok, [state: event]}
 
       {:error, :invalid_event_byte} ->
-        Logger.warn(
+        Logger.warning(
           "[Grizzly] Failed to decode state variable from home_security state_idle event"
         )
 
@@ -1010,7 +1010,7 @@ defmodule Grizzly.ZWave.Notifications do
       {:ok, node_location_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
-        Logger.warn(
+        Logger.warning(
           "[Grizzly] Failed to decode NodeLocationReport from #{inspect(params_binary)}"
         )
 
@@ -1023,7 +1023,7 @@ defmodule Grizzly.ZWave.Notifications do
       {:ok, node_location_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
-        Logger.warn(
+        Logger.warning(
           "[Grizzly] Failed to decode NodeLocationReport from #{inspect(params_binary)}"
         )
 

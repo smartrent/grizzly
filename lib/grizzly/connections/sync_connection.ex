@@ -141,7 +141,7 @@ defmodule Grizzly.Connections.SyncConnection do
 
       {:error, error} ->
         error_message = Exception.message(error)
-        Logger.warn("[Grizzly] #{inspect(error_message)}")
+        Logger.warning("[Grizzly] #{inspect(error_message)}")
         {:noreply, state}
     end
   end
