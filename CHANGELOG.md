@@ -4,6 +4,23 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.7.0] - 2023-06-02
+
+### Added
+
+- Subscribe to all commands from a given node
+
+### Fixed
+
+- Replace `Logger.warn` with `Logger.warning`
+- Ignore trailing bytes in `MultilevelSwitchReport`
+- Transmission stats use minimum of `rssi_hops` for `rssi_dbm` instead of average
+- Use signed values for Thermostat Setpoint Set (fixes an error when the value is negative)
+
+### Misc
+
+- Drop support for OTP 24
+
 ## [v6.6.1] - 2023-05-12
 
 ### Added
@@ -2218,6 +2235,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.7.0]: https://github.com/smartrent/grizzly/compare/v6.6.1..v6.7.0
 [v6.6.1]: https://github.com/smartrent/grizzly/compare/v6.6.0..v6.6.1
 [v6.6.0]: https://github.com/smartrent/grizzly/compare/v6.5.1..v6.6.0
 [v6.5.1]: https://github.com/smartrent/grizzly/compare/v6.5.0..v6.5.1
