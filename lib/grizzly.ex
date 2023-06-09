@@ -134,7 +134,7 @@ defmodule Grizzly do
   Options for `Grizzly.send_command/4`.
 
   * `:timeout` - Time (in milliseconds) to wait for an ACK or report before timing out.
-    Maximum 140 seconds. Default `5_000`.
+    Maximum 140 seconds. Default `15_000`.
   * `:retries` - Number of retries in case the node responds with a NACK. Default `0`.
   * `:handler` - A custom response handler (see `Grizzly.CommandHandler`).
   * `:transmission_stats` - If true, transmission stats will be included with the
