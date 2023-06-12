@@ -21,6 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   @behaviour Grizzly.ZWave.Command
 
   import Bitwise
+  import Grizzly.ZWave.Utils
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
@@ -131,8 +132,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
 
   def encode_listening?(true), do: 0x80
   def encode_listening?(false), do: 0x00
-
-  def bit_to_bool(bit), do: bit == 1
 
   def encode_optional_functionality_byte([]), do: 0x00
   def encode_optional_functionality_byte(_), do: 0x80

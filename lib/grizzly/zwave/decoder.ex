@@ -387,7 +387,15 @@ defmodule Grizzly.ZWave.Decoder do
       # Scene actuator configuration
       {0x2C, 0x01, Commands.SceneActuatorConfSet},
       {0x2C, 0x02, Commands.SceneActuatorConfGet},
-      {0x2C, 0x03, Commands.SceneActuatorConfReport}
+      {0x2C, 0x03, Commands.SceneActuatorConfReport},
+
+      # Mailbox
+      {0x69, 0x01, Commands.MailboxConfigurationGet},
+      {0x69, 0x02, Commands.MailboxConfigurationSet},
+      {0x69, 0x03, Commands.MailboxConfigurationReport},
+      {0x69, 0x04, Commands.MailboxQueue},
+      {0x69, 0x05, Commands.MailboxWakeUpNotification},
+      {0x69, 0x06, Commands.MailboxNodeFailing}
     ]
 
     defmacro __before_compile__(_) do
