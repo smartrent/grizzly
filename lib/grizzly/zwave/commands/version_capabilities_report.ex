@@ -12,6 +12,7 @@ defmodule Grizzly.ZWave.Commands.VersionCapabilitiesReport do
   @type param ::
           {:zwave_software, boolean()} | {:command_class, boolean()} | {:version, boolean()}
 
+  import Grizzly.ZWave.Utils
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Version
 
@@ -42,10 +43,4 @@ defmodule Grizzly.ZWave.Commands.VersionCapabilitiesReport do
     {:ok,
      [zwave_software: bit_to_bool(zws), command_class: bit_to_bool(cc), version: bit_to_bool(v)]}
   end
-
-  defp bool_to_bit(true), do: 1
-  defp bool_to_bit(false), do: 0
-
-  defp bit_to_bool(1), do: true
-  defp bit_to_bool(0), do: false
 end

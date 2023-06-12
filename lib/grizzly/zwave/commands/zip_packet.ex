@@ -6,6 +6,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   @behaviour Grizzly.ZWave.Command
 
   import Bitwise
+  import Grizzly.ZWave.Utils
   alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, Decoder}
   alias Grizzly.ZWave.CommandClasses.ZIP
@@ -202,9 +203,6 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
       zwave_command -> zwave_command.name
     end
   end
-
-  defp bit_to_bool(1), do: true
-  defp bit_to_bool(0), do: false
 
   # only add header extensions bytes when there are some
   defp maybe_add_header_extensions(binary_packet, []), do: binary_packet

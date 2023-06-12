@@ -13,6 +13,8 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
 
   @behaviour Grizzly.ZWave.Command
 
+  import Grizzly.ZWave.Utils
+
   alias Grizzly.ZWave
   alias Grizzly.ZWave.{Command, DSK}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
@@ -65,12 +67,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
        input_dsk: DSK.new(input_dsk)
      ]}
   end
-
-  defp bool_to_bit(true), do: 1
-  defp bool_to_bit(false), do: 0
-
-  defp bit_to_bool(1), do: true
-  defp bit_to_bool(0), do: false
 
   defp dsk_to_binary(nil, dsk_len) when dsk_len == 0 do
     <<>>

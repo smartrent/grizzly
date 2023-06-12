@@ -466,7 +466,18 @@ defmodule Grizzly.Commands.Table do
       {:window_covering_start_level_change,
        {Commands.WindowCoveringStartLevelChange, handler: AckResponse}},
       {:window_covering_stop_level_change,
-       {Commands.WindowCoveringStopLevelChange, handler: AckResponse}}
+       {Commands.WindowCoveringStopLevelChange, handler: AckResponse}},
+
+      # Mailbox
+      {:mailbox_configuration_get,
+       {Commands.MailboxConfigurationGet,
+        handler: {WaitReport, complete_report: :mailbox_configuration_report}}},
+      {:mailbox_configuration_set, {Commands.MailboxConfigurationSet, handler: AckResponse}},
+      {:mailbox_configuration_report,
+       {Commands.MailboxConfigurationReport, handler: AckResponse}},
+      # Mailbox Queue will sometimes require the `WaitReport` handler (such as with
+      # the pop operation). It is up to the caller to use the correct handler.
+      {:mailbox_queue, {Commands.MailboxQueue, handler: AckResponse}}
     ]
 
     defmacro __before_compile__(_) do
