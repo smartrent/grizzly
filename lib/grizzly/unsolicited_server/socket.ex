@@ -60,15 +60,17 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   def handle_info(response, transport) do
     {:ok, transport_response} = Transport.parse_response(transport, response)
 
-    case ResponseHandler.handle_response(transport_response) do
-      [] ->
-        :ok
-
-      actions ->
-        Enum.each(actions, &run_response_action(transport_response, &1))
-    end
+    actions = [:ack | ResponseHandler.handle_response(transport_response)]
+    Enum.each(actions, &run_response_action(transport_response, &1))
 
     {:noreply, transport}
+  end
+
+  defp run_response_action(response, :ack) do
+    %Transport.Response{ip_address: ip_address, command: zippacket} = response
+    node_id = ZIPGateway.node_id_from_ip(ip_address)
+
+    _ = send_ack_response(node_id, zippacket)
   end
 
   defp run_response_action(response, {:send, command}) do
@@ -77,8 +79,6 @@ defmodule Grizzly.UnsolicitedServer.Socket do
     # is correct when sending the response back to the Z-Wave PAN.
     header_extensions = Command.param!(zippacket, :header_extensions)
     node_id = ZIPGateway.node_id_from_ip(ip_address)
-
-    _ = send_ack_response(node_id, zippacket)
 
     {:ok, zip_packet} =
       ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc(),
