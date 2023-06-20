@@ -19,9 +19,9 @@ install_system_deps: &install_system_deps
       apk add build-base
 
 jobs:
-  build_elixir_1_14_otp_26:
+  build_elixir_1_15_otp_26:
     docker:
-      - image: hexpm/elixir:1.14.4-erlang-26.0-alpine-3.18.0
+      - image: hexpm/elixir:1.15.0-erlang-26.0.1-alpine-3.18.2
     <<: *defaults
     steps:
       - checkout
@@ -76,6 +76,6 @@ workflows:
   version: 2
   build_test:
     jobs:
-      - build_elixir_1_14_otp_26
+      - build_elixir_1_15_otp_26
       - build_elixir_1_14_otp_25
       - build_elixir_1_13_otp_25

@@ -34,10 +34,10 @@ defmodule Grizzly.Autocomplete do
 
     case expansions do
       [] ->
-        {:no, '', []}
+        {:no, ~c"", []}
 
       [^command_prefix] ->
-        {:no, '', []}
+        {:no, ~c"", []}
 
       [unique] ->
         completion = unique |> String.to_charlist() |> Enum.drop(prefix_len)
@@ -71,7 +71,7 @@ defmodule Grizzly.Autocomplete do
   def remsh(node) do
     fn e ->
       case :rpc.call(node, Grizzly.Autocomplete, :expand, [e]) do
-        {:badrpc, _} -> {:no, '', []}
+        {:badrpc, _} -> {:no, ~c"", []}
         r -> r
       end
     end

@@ -217,7 +217,7 @@ defmodule Grizzly.Transports.DTLS do
       {:versions, [:"dtlsv1.2", :dtlsv1]},
       {:protocol, :dtls},
       {:ciphers, [{:psk, :aes_128_cbc, :sha}]},
-      {:psk_identity, 'Client_identity'},
+      {:psk_identity, ~c"Client_identity"},
       {:user_lookup_fun,
        {&user_lookup/3,
         <<0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
