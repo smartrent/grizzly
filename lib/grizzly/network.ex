@@ -244,7 +244,7 @@ defmodule Grizzly.Network do
   """
   @spec node_neighbor_update_request(Grizzly.node_id(), [Grizzly.command_opt()]) ::
           Grizzly.send_command_response()
-  def node_neighbor_update_request(node_id, opts) do
+  def node_neighbor_update_request(node_id, opts \\ []) do
     Grizzly.send_command(
       :gateway,
       :node_neighbor_update_request,
@@ -254,7 +254,8 @@ defmodule Grizzly.Network do
   end
 
   @doc """
-  Request a network update (network healing)
+  Request a network update from another controller. This is a no-op if this is
+  the network's primary controller.
 
   ### Options
 
