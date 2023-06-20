@@ -4,6 +4,18 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.7.1] - 2023-06-20
+
+### Added
+
+- Added `Grizzly.Network.get_lifeline_association/1` convenience function ([#781](https://github.com/smartrent/grizzly/pull/781))
+
+### Fixed
+
+- Increased default command timeout to 15 seconds ([#776](https://github.com/smartrent/grizzly/pull/776))
+- Unsolicited server ACKs all messages ([#778](https://github.com/smartrent/grizzly/pull/778))
+- Made `opts` arg optional in `Grizzly.Network.node_neighbor_update_request/2` ([#780](https://github.com/smartrent/grizzly/pull/780))
+
 ## [v6.7.0] - 2023-06-02
 
 ### Added
@@ -2235,6 +2247,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.7.1]: https://github.com/smartrent/grizzly/compare/v6.7.0..v6.7.1
 [v6.7.0]: https://github.com/smartrent/grizzly/compare/v6.6.1..v6.7.0
 [v6.6.1]: https://github.com/smartrent/grizzly/compare/v6.6.0..v6.6.1
 [v6.6.0]: https://github.com/smartrent/grizzly/compare/v6.5.1..v6.6.0
