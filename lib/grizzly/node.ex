@@ -118,6 +118,15 @@ defmodule Grizzly.Node do
   end
 
   @doc """
+  Get the lifeline association group for a node.
+  """
+  @spec get_lifeline_association(ZWave.node_id() | VirtualDevices.id()) ::
+          Grizzly.send_command_response()
+  def get_lifeline_association(node_id) do
+    Grizzly.send_command(node_id, :association_get, grouping_identifier: 0x01)
+  end
+
+  @doc """
   Gets a node's statistics from Z/IP Gateway.
   """
   @spec get_statistics(ZWave.node_id() | VirtualDevices.id()) ::
