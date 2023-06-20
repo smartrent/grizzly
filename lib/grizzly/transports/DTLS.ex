@@ -214,7 +214,7 @@ defmodule Grizzly.Transports.DTLS do
       {:ssl_imp, :new},
       {:active, true},
       {:verify, :verify_none},
-      {:versions, [:dtlsv1]},
+      {:versions, [:"dtlsv1.2", :dtlsv1]},
       {:protocol, :dtls},
       {:ciphers, [{:psk, :aes_128_cbc, :sha}]},
       {:psk_identity, 'Client_identity'},
