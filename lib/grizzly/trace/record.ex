@@ -43,12 +43,22 @@ defmodule Grizzly.Trace.Record do
   @doc """
   Turn a record into the string format
   """
-  @spec to_string(t()) :: String.t()
-  def to_string(record) do
+  @spec to_string(t(), Trace.format()) :: String.t()
+  def to_string(record, format \\ :text)
+
+  def to_string(record, :text) do
     %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
     {:ok, zip_packet} = ZWave.from_binary(binary)
 
     "#{Time.to_string(ts)} #{src_dest_to_string(src)} #{src_dest_to_string(dest)} #{command_info_str(zip_packet, binary)}"
+  end
+
+  def to_string(record, :raw) do
+    %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
+
+    time = ts |> Time.truncate(:millisecond) |> Time.to_string()
+
+    "#{time} #{src_dest_to_string(src)} -> #{src_dest_to_string(dest)}: #{inspect(binary, limit: 500)}"
   end
 
   defp src_dest_to_string(nil) do
@@ -89,6 +99,8 @@ defmodule Grizzly.Trace.Record do
     err ->
       Logger.error("""
       [Grizzly.Trace] Expected an encapsulated command, but no command param was found.
+
+      Binary: #{inspect(binary, limit: 500)}
 
       This is probably a bug -- please report it along with the stack trace and, if
       possible, the corresponding line in the trace file.

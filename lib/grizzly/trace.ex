@@ -20,7 +20,7 @@ defmodule Grizzly.Trace do
 
   use GenServer
 
-  alias Grizzly.Trace.{Record, RecordQueue}
+  alias Grizzly.Trace.Record
 
   @type src() :: String.t()
   @type dest() :: String.t()
@@ -29,41 +29,67 @@ defmodule Grizzly.Trace do
 
   @type format() :: :text | :term
 
+  @default_size 300
+  @default_format :text
+
   @doc """
   Start the trace server
   """
   @spec start_link(keyword()) :: GenServer.on_start()
-  def start_link(args) do
+  def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @doc """
-  Serializes a list of trace records into a binary. The format can be one of:
+  Serialize a list of trace records into a binary. The format can be one of:
 
   * `:text` - Each record is on a new line and is
     formatted as `timestamp source destination sequence_number command_name
-    command_parameters`. This is the default format.
+    command_binary`. This is the default format.
+
+  * `:raw` - Each record is on a new line and is formatted as
+    `timestamp source -> destination: binary`.
 
   * `:term` - The trace is serialized as a list of `Record.t()` structs in
     Erlang external term format. This is useful if you want to load the trace
     on another machine.
   """
   @spec format([Record.t()], format()) :: binary()
-  def format(records, format \\ :text)
-  def format(records, :text), do: records_to_contents(records)
+  def format(records, format \\ @default_format)
+
+  def format(records, fmt) when fmt in [:text, :raw],
+    do: Enum.map_join(records, "\n", &Record.to_string(&1, fmt))
+
   def format(records, :term), do: :erlang.term_to_binary(records)
 
   @doc """
-  Dump the trace records into a file. See `format/2` for the available formats.
+  Dump trace records into a file. See `format/2` for the available formats.
   """
   @spec dump(binary(), format()) :: :ok | {:error, atom()}
-  def dump(file, format \\ :text) do
+  def dump(file, format \\ @default_format) do
     file_contents = format(list(), format)
     File.write(file, file_contents)
   end
 
   @doc """
-  Log the trace information
+  Write trace records to standard out. See `format/2` for the available formats.
+  """
+  @spec print(list(Record.t()), format()) :: :ok
+  def print(records, :term), do: print(records, @default_format)
+
+  def print(records, fmt) do
+    IO.puts(format(records, fmt))
+  end
+
+  @spec print(list(Record.t()) | format()) :: :ok
+  def print(records) when is_list(records), do: print(records, @default_format)
+  def print(fmt) when is_atom(fmt), do: print(list(), fmt)
+
+  @spec print() :: :ok
+  def print(), do: print(list(), @default_format)
+
+  @doc """
+  Add a record to the trace buffer.
   """
   @spec log(binary(), [log_opt()]) :: :ok
   def log(binary, opts \\ []) do
@@ -71,7 +97,7 @@ defmodule Grizzly.Trace do
   end
 
   @doc """
-  Force clear the records from the trace
+  Reset the trace buffer.
   """
   @spec clear() :: :ok
   def clear() do
@@ -79,37 +105,50 @@ defmodule Grizzly.Trace do
   end
 
   @doc """
-  List all the records currently being traced
+  List all records in the trace buffer.
   """
   @spec list() :: [Record.t()]
   def list() do
     GenServer.call(__MODULE__, :list)
   end
 
+  @doc """
+  Change the max size of the trace buffer from the default of #{@default_size}.
+  """
+  @spec resize(pos_integer()) :: :ok
+  def resize(size) do
+    GenServer.call(__MODULE__, {:resize, size})
+  end
+
   @impl GenServer
   def init(_args) do
-    {:ok, RecordQueue.new()}
+    {:ok, CircularBuffer.new(@default_size)}
   end
 
   @impl GenServer
   def handle_cast({:log, binary, opts}, records) do
     record = Record.new(binary, opts)
 
-    {:noreply, RecordQueue.add_record(records, record)}
+    {:noreply, CircularBuffer.insert(records, record)}
   end
 
   @impl GenServer
-  def handle_call(:clear, _from, _records) do
-    {:reply, :ok, RecordQueue.new()}
+  def handle_call(:clear, _from, %CircularBuffer{max_size: size} = _records) do
+    {:reply, :ok, CircularBuffer.new(size)}
   end
 
   def handle_call(:list, _from, records) do
-    {:reply, RecordQueue.to_list(records), records}
+    {:reply, CircularBuffer.to_list(records), records}
   end
 
-  defp records_to_contents(records) do
-    Enum.reduce(records, "", fn record, str ->
-      str <> Record.to_string(record) <> "\n"
-    end)
+  def handle_call({:resize, size}, _from, records) do
+    new_records =
+      records
+      |> CircularBuffer.to_list()
+      |> Enum.reduce(CircularBuffer.new(size), fn record, buffer ->
+        CircularBuffer.insert(buffer, record)
+      end)
+
+    {:reply, :ok, new_records}
   end
 end
