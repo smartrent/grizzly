@@ -53,7 +53,7 @@ defmodule Grizzly.Test do
   @tag :integration
   test "send a command to a device that is sleeping" do
     {:ok, %Report{queued_delay: 2, queued: true} = report} =
-      Grizzly.send_command(102, :battery_get)
+      Grizzly.send_command(102, :battery_get, [], timeout: 1000)
 
     assert is_reference(report.command_ref)
   end
@@ -232,5 +232,165 @@ defmodule Grizzly.Test do
              report.command.params
 
     refute_receive _
+  end
+
+  describe "nack+waiting" do
+    @tag :integration
+    test "async nack_response when expected delay > timeout" do
+      {:ok, %Report{command_ref: command_ref} = report} =
+        Grizzly.send_command(800, :switch_binary_set, [target_value: :on], timeout: 1000)
+
+      assert report.type == :queued_delay
+      assert report.status == :inflight
+      assert report.queued
+      assert report.queued_delay == 3
+
+      assert_receive {:grizzly, :report,
+                      %Report{type: :nack_response, queued: true, command_ref: ^command_ref}},
+                     3000
+    end
+
+    @tag :integration
+    test "async ack when expected delay > timeout" do
+      {:ok, %Report{command_ref: command_ref} = report} =
+        Grizzly.send_command(801, :switch_binary_set, [target_value: :on], timeout: 1000)
+
+      assert report.type == :queued_delay
+      assert report.status == :inflight
+      assert report.queued
+      assert report.queued_delay == 3
+
+      assert_receive {:grizzly, :report,
+                      %Report{
+                        type: :ack_response,
+                        queued: true,
+                        command_ref: ^command_ref,
+                        command: nil
+                      }},
+                     2500
+    end
+
+    @tag :integration
+    test "async report when expected delay > timeout" do
+      {:ok, %Report{command_ref: command_ref} = report} =
+        Grizzly.send_command(801, :switch_binary_get, [], timeout: 1000)
+
+      assert report.type == :queued_delay
+      assert report.status == :inflight
+      assert report.queued
+      assert report.queued_delay == 3
+
+      assert_receive {:grizzly, :report,
+                      %Report{
+                        type: :command,
+                        queued: true,
+                        command_ref: ^command_ref,
+                        command: %Command{name: :switch_binary_report}
+                      }},
+                     2500
+    end
+
+    @tag :integration
+    test "sync nack_response when expected delay < timeout and response arrives in time" do
+      assert {:error, :nack_response} =
+               Grizzly.send_command(800, :switch_binary_set, [target_value: :on], timeout: 5000)
+    end
+
+    @tag :integration
+    test "sync ack when expected delay < timeout and response arrives in time" do
+      {:ok, report} =
+        Grizzly.send_command(801, :switch_binary_set, [target_value: :on], timeout: 5000)
+
+      assert report.type == :ack_response
+      assert report.queued == false
+      assert report.command == nil
+    end
+
+    @tag :integration
+    test "sync report when expected delay < timeout and response arrives in time" do
+      start = System.monotonic_time(:millisecond)
+      {:ok, report} = Grizzly.send_command(801, :switch_binary_get, [], timeout: 5000)
+      duration = System.monotonic_time(:millisecond) - start
+
+      assert duration >= 1500
+
+      assert report.type == :command
+      assert report.queued == false
+      assert report.command.name == :switch_binary_report
+    end
+
+    @tag :integration
+    test "async timeout when expected delay < timeout and response arrives too late" do
+      {:ok, report} = Grizzly.send_command(802, :switch_binary_get, [], timeout: 1000)
+
+      assert report.type == :queued_delay
+      assert report.status == :inflight
+      assert report.queued
+      assert report.queued_delay == 1
+
+      command_ref = report.command_ref
+
+      assert_receive {:grizzly, :report,
+                      %Report{
+                        type: :timeout,
+                        queued: true,
+                        command_ref: ^command_ref
+                      }},
+                     2000
+    end
+
+    # actual timeout, async case
+    @tag :integration
+    test "async timeout when expected delay < timeout but we never get a response" do
+      {:ok, report} = Grizzly.send_command(803, :switch_binary_get, [], timeout: 500)
+
+      assert report.type == :queued_delay
+      assert report.status == :inflight
+      assert report.queued
+
+      command_ref = report.command_ref
+      assert_receive {:grizzly, :report, %Report{type: :timeout, command_ref: ^command_ref}}, 2000
+    end
+
+    # actual timeout, sync case
+    @tag :integration
+    test "sync timeout when expected delay < timeout but we never get a response" do
+      {:ok, report} = Grizzly.send_command(803, :switch_binary_get, [], timeout: 10000)
+
+      assert report.type == :timeout
+      assert report.status == :complete
+      refute report.queued
+    end
+
+    @tag :integration
+    test "additional nack_waiting frames extend the deadline and prevent timeouts" do
+      start = System.monotonic_time(:millisecond)
+
+      {:ok, report} =
+        Grizzly.send_command(804, :switch_binary_set, [target_value: :on], timeout: 500)
+
+      assert report.type == :queued_delay
+      assert report.status == :inflight
+      assert report.queued
+
+      command_ref = report.command_ref
+
+      # we only assert_receive two nack+waiting responses. the first one was what caused
+      # Grizzly.send_command to return the queued_delay report. the second two will extend
+      # the timer.
+      assert_receive {:grizzly, :report, %Report{type: :queued_ping, command_ref: ^command_ref}},
+                     1000
+
+      assert_receive {:grizzly, :report, %Report{type: :queued_ping, command_ref: ^command_ref}},
+                     1000
+
+      assert_receive {:grizzly, :report, %Report{type: :ack_response, command_ref: ^command_ref}},
+                     1000
+
+      duration = System.monotonic_time(:millisecond) - start
+      # node 804 sends 3 nack+waiting responses 750ms apart, so we should have spent at least
+      # 2250ms waiting before getting the ack response
+      assert duration >= 2250
+    end
   end
 end

@@ -63,7 +63,7 @@ defmodule Grizzly.Commands.CommandRunner do
   def handle_call({:handle_zip_command, zip_packet}, _from, command) do
     case Command.handle_zip_command(command, zip_packet) do
       {%Report{status: :inflight} = report, new_command} ->
-        new_command = update_timeout(new_command, report.queued_delay)
+        new_command = update_timeout(new_command, report.queued_delay * 1000)
         {:reply, report, new_command}
 
       {%Report{status: :complete} = report, new_command} ->
@@ -93,13 +93,37 @@ defmodule Grizzly.Commands.CommandRunner do
 
   @impl true
   def handle_info(:timeout, command) do
-    send(command.owner, {:grizzly, :command_timeout, self(), command})
-    {:stop, :normal, command}
+    now = System.monotonic_time()
+
+    if command.status == :nack_waiting && now < command.nack_waiting_deadline do
+      # if we're in the nack_waiting state and we haven't passed the deadline,
+      # we'll defer the command to the queue and set the timer to expire at the
+      # nack_waiting_deadline
+
+      diff_ms =
+        System.convert_time_unit(command.nack_waiting_deadline - now, :native, :millisecond)
+
+      report =
+        Report.new(:inflight, :queued_delay, command.node_id,
+          command_ref: command.ref,
+          queued_delay: ceil(diff_ms / 1000),
+          queued: true
+        )
+
+      command = %{command | status: :queued}
+      command = update_timeout(command, diff_ms)
+      send(command.owner, {:grizzly, :command_deferred, self(), command, report})
+      {:noreply, command}
+    else
+      # we actually timed out.
+      send(command.owner, {:grizzly, :command_timeout, self(), command})
+      {:stop, :normal, command}
+    end
   end
 
-  defp update_timeout(command, time_in_seconds) do
+  defp update_timeout(command, duration_ms) do
     _ = Process.cancel_timer(command.timeout_ref)
-    new_timeout_ref = start_timeout_counter(time_in_seconds * 1000 + 500)
+    new_timeout_ref = start_timeout_counter(duration_ms + 500)
     %Command{command | timeout_ref: new_timeout_ref}
   end
 

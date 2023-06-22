@@ -56,6 +56,11 @@ defmodule GrizzlyTest.Server do
           102 ->
             send_nack_waiting(state.socket, return_port, zip_packet)
 
+            spawn(fn ->
+              Process.sleep(2000)
+              maybe_send_a_report(state.socket, return_port, zip_packet)
+            end)
+
           # Node 201 is for testing starting a firmware update and uploading an image
           201 ->
             send_ack_response(state.socket, return_port, zip_packet)
@@ -122,6 +127,56 @@ defmodule GrizzlyTest.Server do
 
             {:ok, out_packet} = build_supervision_report(zip_packet, :success)
             send_packet(state.socket, return_port, out_packet)
+
+          # node 800 sends a nack+waiting response with a delay of 3 seconds, then sends
+          # a nack response 2 seconds later
+          800 ->
+            send_nack_waiting(state.socket, return_port, zip_packet, delay: 3000)
+
+            spawn(fn ->
+              Process.sleep(2000)
+              send_nack_response(state.socket, return_port, zip_packet)
+              maybe_send_a_report(state.socket, return_port, zip_packet)
+            end)
+
+          # node 801 sends a nack+waiting response with a delay of 3 seconds, then sends
+          # an ack 2 seconds later
+          801 ->
+            send_nack_waiting(state.socket, return_port, zip_packet, delay: 3000)
+
+            spawn(fn ->
+              Process.sleep(2000)
+              send_ack_response(state.socket, return_port, zip_packet)
+              maybe_send_a_report(state.socket, return_port, zip_packet)
+            end)
+
+          # node 802 sends a nack+waiting response with a delay of 1 second, then sends
+          # a nack 2 seconds later
+          802 ->
+            send_nack_waiting(state.socket, return_port, zip_packet, delay: 1000)
+
+            spawn(fn ->
+              Process.sleep(2000)
+              send_nack_response(state.socket, return_port, zip_packet)
+            end)
+
+          # node 803 sends a nack+waiting response with a delay of 2 seconds, but never
+          # sends a response
+          803 ->
+            send_nack_waiting(state.socket, return_port, zip_packet, delay: 1000)
+
+          804 ->
+            # node 804 sends 3 nack+waiting responses 750ms apart with a delay of 1 second
+            # each, then sends an ack 750ms after the last nack+waiting
+            spawn(fn ->
+              send_nack_waiting(state.socket, return_port, zip_packet, delay: 1000)
+              Process.sleep(750)
+              send_nack_waiting(state.socket, return_port, zip_packet, delay: 1000)
+              Process.sleep(750)
+              send_nack_waiting(state.socket, return_port, zip_packet, delay: 1000)
+              Process.sleep(750)
+              send_ack_response(state.socket, return_port, zip_packet)
+            end)
 
           _rest ->
             send_ack_response(state.socket, return_port, zip_packet)
@@ -193,16 +248,13 @@ defmodule GrizzlyTest.Server do
     :ok
   end
 
-  defp send_nack_waiting(socket, port, incoming_zip_packet) do
+  defp send_nack_waiting(socket, port, incoming_zip_packet, opts \\ []) do
+    delay_ms = Keyword.get(opts, :delay, 2000)
+
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
-    out_packet = ZIPPacket.make_nack_waiting_response(seq_number, 2)
+    out_packet = ZIPPacket.make_nack_waiting_response(seq_number, ceil(delay_ms / 1000))
 
     _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
-
-    spawn(fn ->
-      Process.sleep(2_000)
-      maybe_send_a_report(socket, port, incoming_zip_packet)
-    end)
 
     :ok
   end

@@ -108,6 +108,21 @@ defmodule Grizzly.Connections.SyncConnection do
     {:noreply, %State{state | keep_alive: new_keep_alive}}
   end
 
+  # handle when a command in nack+waiting is deferred to the queue
+  def handle_info(
+        {:grizzly, :command_deferred, command_runner_pid, grizzly_command, report},
+        state
+      ) do
+    if grizzly_command.source.name == :keep_alive do
+      {:noreply, state}
+    else
+      waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
+      GenServer.reply(waiter, {:ok, report})
+
+      {:noreply, state}
+    end
+  end
+
   # handle when there is a timeout and command runner stops
   def handle_info(
         {:grizzly, :command_timeout, command_runner_pid, grizzly_command},
@@ -151,7 +166,8 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   defp handle_commands(zip_packet, state) do
-    Logger.debug("Recv Z/IP Packet: #{inspect(zip_packet)}")
+    seq_number = Command.param!(zip_packet, :seq_number)
+    Logger.debug("[Grizzly] Recv Z/IP Packet (seq #{seq_number}): #{inspect(zip_packet)}")
 
     case Command.param!(zip_packet, :flag) do
       :ack_request ->

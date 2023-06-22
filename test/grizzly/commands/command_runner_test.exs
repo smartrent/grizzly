@@ -96,7 +96,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
   test "handles a queued command" do
     {:ok, command} = SwitchBinaryGet.new()
-    {:ok, runner} = CommandRunner.start_link(command, 1)
+    {:ok, runner} = CommandRunner.start_link(command, 1, timeout: 1000)
     command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
@@ -113,7 +113,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
   test "handles queued complete command" do
     {:ok, command} = SwitchBinarySet.new(target_value: :off)
-    {:ok, runner} = CommandRunner.start_link(command, 1)
+    {:ok, runner} = CommandRunner.start_link(command, 1, timeout: 1000)
     command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
@@ -140,7 +140,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
   @tag :integration
   test "handles queued complete command with long timeout" do
     {:ok, command} = SwitchBinarySet.new(target_value: :off)
-    {:ok, runner} = CommandRunner.start_link(command, 1)
+    {:ok, runner} = CommandRunner.start_link(command, 1, timeout: 5000)
     command_ref = CommandRunner.reference(runner)
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 10)

@@ -154,6 +154,7 @@ defmodule Grizzly.Report do
 
   @type type() ::
           :ack_response
+          | :nack_response
           | :command
           | :queued_ping
           | :unsolicited

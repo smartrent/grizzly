@@ -11,7 +11,7 @@ defmodule Grizzly.Commands.Command do
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands.{SupervisionGet, ZIPPacket}
 
-  @type status :: :inflight | :queued | :complete
+  @type status :: :inflight | :nack_waiting | :queued | :complete
 
   @type t :: %__MODULE__{
           owner: pid(),
@@ -27,7 +27,8 @@ defmodule Grizzly.Commands.Command do
           transmission_stats: keyword(),
           node_id: ZWave.node_id(),
           supervision?: boolean(),
-          session_id: non_neg_integer() | nil
+          session_id: non_neg_integer() | nil,
+          nack_waiting_deadline: non_neg_integer() | nil
         }
 
   @type opt ::
@@ -49,7 +50,8 @@ defmodule Grizzly.Commands.Command do
             transmission_stats: [],
             node_id: nil,
             supervision?: false,
-            session_id: nil
+            session_id: nil,
+            nack_waiting_deadline: nil
 
   @spec from_zwave_command(ZWaveCommand.t(), ZWave.node_id(), pid(), [opt()]) :: t()
   def from_zwave_command(zwave_command, node_id, owner, opts \\ []) do
@@ -179,8 +181,18 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp handle_nack_response(%__MODULE__{retries: 0} = command),
-    do: {:error, :nack_response, command}
+  defp handle_nack_response(%__MODULE__{retries: 0} = command) do
+    case command.status do
+      :queued ->
+        {Report.new(:complete, :nack_response, command.node_id,
+           command_ref: command.ref,
+           queued: true
+         ), %__MODULE__{command | status: :complete}}
+
+      _ ->
+        {:error, :nack_response, command}
+    end
+  end
 
   defp handle_nack_response(%__MODULE__{retries: n} = command),
     do: {:retry, %__MODULE__{command | retries: n - 1}}
@@ -191,7 +203,7 @@ defmodule Grizzly.Commands.Command do
     if command.seq_number == seq_number do
       # SDS13784 Network specification states that a default of 90 seconds
       # should be used if no expected delay is provided.
-      make_queued_response(command, zip_packet)
+      maybe_make_queued_response(command, zip_packet)
     else
       {:continue, command}
     end
@@ -258,13 +270,55 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp make_queued_response(command, zip_packet) do
-    case ZIPPacket.extension(zip_packet, :expected_delay, 90) do
-      delay when delay > 1 ->
-        make_queued_or_queued_ping_response(command, delay)
+  defp maybe_make_queued_response(command, zip_packet) do
+    # CC:0023.02.02.11.019: If a message has been delayed for more than 60 seconds, an
+    # intermediate receiver, such as a Z/IP Gateway, MUST transmit a new "NAck+Waiting"
+    # indication every 60 seconds to let the sending node know that it is still operational.
 
-      _other ->
-        {:continue, command}
+    # CC:0023.02.02.13.003: A sending node waiting for more than 90 seconds after receiving
+    # a "NAck+Waiting" indication MAY conclude that the Z-Wave Command is lost and retransmit
+    # a new Z/IP Packet.
+
+    # Ideally, we would use the expected delay to set a new timeout for the command. However,
+    # Z/IP Gateway isn't always accurate in reporting the expected delay. This is mostly the
+    # case when something (e.g. a busy network, a node responding slowly) is causing Z/IP
+    # Gateway to queue commands that it would normally send immediately. In these cases, the
+    # expected delay is often reported as 1 second, but Z/IP Gateway doesn't send any follow
+    # up until it either receives an ACK/NACK response or sends another NAck+Waiting after
+    # 60 seconds (at least, I presume it will do the latter -- I haven't been able to verify).
+
+    # The upshot of this is that we can't rely on the expected delay to set a new timeout.
+    # Instead, we'll act as though the expected delay is always at least 90 seconds.
+
+    expected_delay = max(ZIPPacket.extension(zip_packet, :expected_delay) || 90, 90)
+    expected_delay_ms = expected_delay * 1000
+
+    timeout_ref = command.timeout_ref
+    timeout_ms_remaining = is_reference(timeout_ref) && Process.read_timer(timeout_ref)
+
+    seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
+
+    # TODO: maybe we should always wait until the timeout expires. there are cases
+    # where the expected delay is 90 seconds, but we actually get a response in 5-6 seconds
+
+    # If the waiting out the expected delay would put us past the command timeout,
+    # we'll queue the command and return a queued_delay response.
+    if timeout_ms_remaining && timeout_ms_remaining > expected_delay_ms do
+      Logger.debug(
+        "[Grizzly] NACK+Waiting, node #{command.node_id}, seq #{seq_number}, adjusted delay #{expected_delay}s, #{timeout_ms_remaining}ms until timeout: keep blocking"
+      )
+
+      deadline =
+        System.monotonic_time() +
+          System.convert_time_unit(expected_delay_ms, :millisecond, :native)
+
+      {:continue, %__MODULE__{command | status: :nack_waiting, nack_waiting_deadline: deadline}}
+    else
+      Logger.debug(
+        "[Grizzly] NACK+Waiting, node #{command.node_id}, seq #{seq_number}, adjusted delay #{expected_delay}s, #{timeout_ms_remaining}ms until timeout: send queued_delay/queued_ping"
+      )
+
+      make_queued_or_queued_ping_response(command, expected_delay)
     end
   end
 
@@ -291,7 +345,7 @@ defmodule Grizzly.Commands.Command do
 
   defp build_complete_reply(command, response) do
     case command.status do
-      :inflight ->
+      status when status in [:inflight, :nack_waiting] ->
         {build_report(command, response), %__MODULE__{command | status: :complete}}
 
       :queued ->
