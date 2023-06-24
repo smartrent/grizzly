@@ -7,6 +7,7 @@ defmodule Grizzly.Trace.Record do
 
   alias Grizzly.{Trace, ZWave}
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   @type t() :: %__MODULE__{
           timestamp: Time.t(),
@@ -76,6 +77,12 @@ defmodule Grizzly.Trace.Record do
     flag = Command.param!(zip_packet, :flag)
 
     cond do
+      flag == :nack_waiting ->
+        expected_delay = ZIPPacket.extension(zip_packet, :expected_delay, nil)
+
+        command_info_empty_response(seq_number, flag) <>
+          " expected_delay=#{inspect(expected_delay)}"
+
       flag in [:ack_response, :nack_response, :nack_waiting] ->
         command_info_empty_response(seq_number, flag)
 

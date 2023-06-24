@@ -22,6 +22,8 @@ defmodule Grizzly.Trace do
 
   alias Grizzly.Trace.Record
 
+  @type trace_opt :: {:name, atom()} | {:size, pos_integer()} | {:record_keepalives, boolean()}
+
   @type src() :: String.t()
   @type dest() :: String.t()
 
@@ -35,9 +37,10 @@ defmodule Grizzly.Trace do
   @doc """
   Start the trace server
   """
-  @spec start_link(keyword()) :: GenServer.on_start()
-  def start_link(args \\ []) do
-    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+  @spec start_link([trace_opt()]) :: GenServer.on_start()
+  def start_link(opts \\ []) do
+    {name, opts} = Keyword.pop(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, opts, name: name)
   end
 
   @doc """
@@ -91,64 +94,86 @@ defmodule Grizzly.Trace do
   @doc """
   Add a record to the trace buffer.
   """
-  @spec log(binary(), [log_opt()]) :: :ok
-  def log(binary, opts \\ []) do
-    GenServer.cast(__MODULE__, {:log, binary, opts})
+  @spec log(GenServer.name(), binary(), [log_opt()]) :: :ok
+  def log(name, binary, opts) do
+    GenServer.cast(name, {:log, binary, opts})
   end
+
+  @doc "See `log/3`"
+  @spec log(binary(), [log_opt()]) :: :ok
+  def log(binary, opts \\ []) when is_binary(binary), do: log(__MODULE__, binary, opts)
 
   @doc """
   Reset the trace buffer.
   """
-  @spec clear() :: :ok
-  def clear() do
-    GenServer.call(__MODULE__, :clear)
+  @spec clear(GenServer.name()) :: :ok
+  def clear(name \\ __MODULE__) do
+    GenServer.call(name, :clear)
   end
 
   @doc """
   List all records in the trace buffer.
   """
-  @spec list() :: [Record.t()]
-  def list() do
-    GenServer.call(__MODULE__, :list)
+  @spec list(GenServer.name()) :: [Record.t()]
+  def list(name \\ __MODULE__) do
+    GenServer.call(name, :list)
   end
 
   @doc """
   Change the max size of the trace buffer from the default of #{@default_size}.
   """
-  @spec resize(pos_integer()) :: :ok
-  def resize(size) do
-    GenServer.call(__MODULE__, {:resize, size})
+  @spec resize(GenServer.name(), pos_integer()) :: :ok
+  def resize(name \\ __MODULE__, size) do
+    GenServer.call(name, {:resize, size})
+  end
+
+  @doc """
+  Enable or disable logging of keepalive frames.
+  """
+  @spec record_keepalives(GenServer.name(), boolean()) :: :ok
+  def record_keepalives(name \\ __MODULE__, enabled? \\ true) do
+    GenServer.call(name, {:record_keepalives, enabled?})
   end
 
   @impl GenServer
-  def init(_args) do
-    {:ok, CircularBuffer.new(@default_size)}
+  def init(opts) do
+    size = Keyword.get(opts, :size, @default_size)
+    record_keepalives = Keyword.get(opts, :record_keepalives, true)
+    {:ok, %{buffer: CircularBuffer.new(size), record_keepalives: record_keepalives}}
   end
 
   @impl GenServer
-  def handle_cast({:log, binary, opts}, records) do
+  def handle_cast({:log, <<0x23, 0x03, _ack_flag>>, _opts}, %{record_keepalives: false} = state) do
+    {:noreply, state}
+  end
+
+  def handle_cast({:log, binary, opts}, state) do
     record = Record.new(binary, opts)
 
-    {:noreply, CircularBuffer.insert(records, record)}
+    {:noreply, %{state | buffer: CircularBuffer.insert(state.buffer, record)}}
   end
 
   @impl GenServer
-  def handle_call(:clear, _from, %CircularBuffer{max_size: size} = _records) do
-    {:reply, :ok, CircularBuffer.new(size)}
+  def handle_call(:clear, _from, %{buffer: %CircularBuffer{max_size: size}} = state) do
+    {:reply, :ok, %{state | buffer: CircularBuffer.new(size)}}
   end
 
-  def handle_call(:list, _from, records) do
-    {:reply, CircularBuffer.to_list(records), records}
+  def handle_call(:list, _from, %{buffer: buffer} = state) do
+    {:reply, CircularBuffer.to_list(buffer), state}
   end
 
-  def handle_call({:resize, size}, _from, records) do
-    new_records =
-      records
+  def handle_call({:record_keepalives, enabled?}, _from, state) do
+    {:reply, :ok, %{state | record_keepalives: enabled?}}
+  end
+
+  def handle_call({:resize, size}, _from, %{buffer: buffer} = state) do
+    new_buffer =
+      buffer
       |> CircularBuffer.to_list()
       |> Enum.reduce(CircularBuffer.new(size), fn record, buffer ->
         CircularBuffer.insert(buffer, record)
       end)
 
-    {:reply, :ok, new_records}
+    {:reply, :ok, %{state | buffer: new_buffer}}
   end
 end
