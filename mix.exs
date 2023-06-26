@@ -72,6 +72,7 @@ defmodule Grizzly.MixProject do
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
       groups_for_modules: [
         Core: [
+          Grizzly.Autocomplete,
           Grizzly.Supervisor,
           Grizzly,
           Grizzly.FirmwareUpdates,
@@ -79,6 +80,7 @@ defmodule Grizzly.MixProject do
           Grizzly.Indicator,
           Grizzly.Network,
           Grizzly.Node,
+          Grizzly.Options,
           Grizzly.Trace,
           Grizzly.Trace.Record,
           Grizzly.StatusReporter,
@@ -117,6 +119,7 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.Notifications,
           Grizzly.ZWave.QRCode,
           Grizzly.ZWave.Security,
+          Grizzly.ZWave.Utils,
           ~r/^Grizzly\.ZWave\.SmartStart/,
           Grizzly.Inclusions.ZWaveAdapter
         ],

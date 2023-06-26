@@ -5,7 +5,7 @@ defmodule Grizzly.ZWave.Commands.MailboxConfigurationSet do
 
   Params:
 
-  * `mode` - The mailbox mode to set. See `Grizzly.ZWave.CommandClasses.Mailbox.mode/0`
+  * `mode` - The mailbox mode to set. See `t:Grizzly.ZWave.CommandClasses.Mailbox.mode/0`
   * `destination_ipv6_address` - The IPv6 address of the destination mailbox service.
   * `destination_port` - The port number of the destination mailbox service.
   """

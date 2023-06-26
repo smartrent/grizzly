@@ -5,8 +5,8 @@ defmodule Grizzly.ZWave.Commands.MailboxConfigurationReport do
 
   Params:
 
-  * `mode` - The current mailbox mode. See `Grizzly.ZWave.CommandClasses.Mailbox.mode/0`.
-  * `supported_modes` - The mailbox modes supported by the device. See `Grizzly.ZWave.CommandClasses.Mailbox.supported_mode/0`.
+  * `mode` - The current mailbox mode. See `t:Grizzly.ZWave.CommandClasses.Mailbox.mode/0`.
+  * `supported_modes` - The mailbox modes supported by the device. See `t:Grizzly.ZWave.CommandClasses.Mailbox.supported_mode/0`.
   * `capacity` - The maximum number of messages that can be stored in the mailbox. A value of 0xFFFF means unlimited.
   * `destination_ipv6_address` - The IPv6 address of the destination mailbox service.
   * `destination_port` - The port number of the destination mailbox service.

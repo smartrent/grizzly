@@ -1,5 +1,7 @@
 defmodule Grizzly.ZIPGateway.Config do
-  @moduledoc false
+  @moduledoc """
+  Builds valid `zipgateway.cfg` based on Grizzly options.
+  """
 
   # This module is for making the `zipgateway.cfg` file
 

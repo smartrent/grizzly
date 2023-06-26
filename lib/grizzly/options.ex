@@ -1,5 +1,7 @@
 defmodule Grizzly.Options do
-  @moduledoc false
+  @moduledoc """
+  Grizzly config options.
+  """
 
   alias Grizzly.Supervisor
   alias Grizzly.ZIPGateway.Config
