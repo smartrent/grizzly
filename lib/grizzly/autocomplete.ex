@@ -4,18 +4,36 @@ defmodule Grizzly.Autocomplete do
 
   This module augments the IEx autocompletion logic to complete Grizzly
   command names inside of `Grizzly.send_command/4` calls.
+
+  Call `Grizzly.Autocomplete.set_expand_fun()` (or put it in your `.iex.exs`) to
+  enable this feature.
   """
+
+  require Logger
 
   def expand(expr) do
     str = Enum.reverse(expr) |> to_string()
 
-    case Regex.named_captures(~r/Grizzly.send_command\(\d+,\s+:(?<command>[a-z_]+)?$/, str) do
-      %{"command" => command_prefix} ->
-        expand_command(command_prefix)
-
+    with {:unquoted_atom, partial_command_name} <- Code.Fragment.cursor_context(str),
+         {:ok, ast} = Code.Fragment.container_cursor_to_quoted(str),
+         true <- in_send_command_call?(ast) do
+      partial_command_name
+      |> to_string()
+      |> expand_command()
+    else
       _ ->
         IEx.Autocomplete.expand(expr)
     end
+  rescue
+    err ->
+      Logger.error("""
+      Error during autocomplete expansion: #{inspect(err)}
+
+      Ejecting `Grizzly.Autocomplete` and restoring default IEx autocomplete.
+      """)
+
+      gl = Process.group_leader()
+      _ = :io.setopts(gl, expand_fun: &IEx.Autocomplete.expand/1)
   end
 
   defp expand_command(command_prefix) do
@@ -61,6 +79,20 @@ defmodule Grizzly.Autocomplete do
 
   defp common_prefix(_, _, acc) do
     Enum.reverse(acc)
+  end
+
+  defp in_send_command_call?(ast) do
+    {_, yes?} =
+      Macro.postwalk(ast, false, fn
+        {{:., _, [{:__aliases__, _, [:Grizzly]}, :send_command]}, _, [_, {:__cursor__, _, _}]},
+        acc ->
+          {ast, acc || true}
+
+        ast, acc ->
+          {ast, acc || false}
+      end)
+
+    yes?
   end
 
   # The following are adapted from IEx.Autocomplete
