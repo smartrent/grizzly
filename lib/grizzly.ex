@@ -393,6 +393,10 @@ defmodule Grizzly do
   @spec restart_zipgateway :: :ok
   defdelegate restart_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
 
+  @doc "Stops the Z/IP Gateway process if it is running."
+  @spec stop_zipgateway :: :ok
+  defdelegate stop_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+
   @doc "Get the current inclusion status."
   @spec inclusion_status() :: Inclusions.status()
   defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get

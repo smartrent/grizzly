@@ -20,6 +20,13 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     :ok
   end
 
+  @doc "Stops the Z/IP Gateway process if it is running."
+  @spec stop_zipgateway() :: :ok
+  def stop_zipgateway() do
+    _ = Supervisor.terminate_child(__MODULE__, MuonTrap.Daemon)
+    :ok
+  end
+
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do
     Supervisor.start_link(__MODULE__, options, name: __MODULE__)
