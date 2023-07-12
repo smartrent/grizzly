@@ -10,7 +10,7 @@ defmodule GrizzlyTest.Transport.UDP do
   @test_port 5_000
 
   @impl Grizzly.Transport
-  def open(args) do
+  def open(args, _connect_timeout) do
     case Keyword.get(args, :ip_address) do
       {0, 0, 0, 600} ->
         {:error, :timeout}

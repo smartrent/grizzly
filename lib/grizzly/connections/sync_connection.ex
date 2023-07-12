@@ -57,7 +57,7 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @impl GenServer
-  def init([grizzly_options, node_id_or_gateway, _opts]) do
+  def init([grizzly_options, node_id_or_gateway, opts]) do
     host = ZIPGateway.host_for_node(node_id_or_gateway, grizzly_options)
     transport_impl = grizzly_options.transport
 
@@ -66,7 +66,7 @@ defmodule Grizzly.Connections.SyncConnection do
       port: grizzly_options.zipgateway_port
     ]
 
-    case Transport.open(transport_impl, transport_opts) do
+    case Transport.open(transport_impl, transport_opts, Keyword.get(opts, :connect_timeout)) do
       {:ok, transport} ->
         {:ok,
          %State{

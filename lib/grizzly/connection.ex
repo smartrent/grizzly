@@ -8,7 +8,8 @@ defmodule Grizzly.Connection do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
-  @type opt() :: {:mode, :sync | :async | :binary} | {:owner, pid()}
+  @type opt() ::
+          {:mode, :sync | :async | :binary} | {:owner, pid()} | {:connect_timeout, pos_integer()}
 
   @doc """
   Open a connection to a node or the Z/IP Gateway

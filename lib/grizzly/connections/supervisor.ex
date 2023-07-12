@@ -16,18 +16,19 @@ defmodule Grizzly.Connections.Supervisor do
   @spec start_connection(ZWave.node_id() | :gateway, [Connection.opt()]) ::
           {:ok, pid()} | {:error, :timeout}
   def start_connection(node_id, opts \\ []) do
+    # put the calling process as the owner if since the supervisor
+    # will be owner when calling from beyond this point.
+    opts = Keyword.put_new(opts, :owner, self())
+
     case Keyword.get(opts, :mode, :sync) do
       :async ->
-        # put the calling process as the owner if sine the supervisor
-        # will be owner when calling form here.
-        opts = Keyword.put_new(opts, :owner, self())
         do_start_connection(AsyncConnection, node_id, opts)
 
       :sync ->
-        do_start_connection(SyncConnection, node_id)
+        do_start_connection(SyncConnection, node_id, opts)
 
       :binary ->
-        do_start_connection(BinaryConnection, node_id, owner: self())
+        do_start_connection(BinaryConnection, node_id, opts)
     end
   end
 
@@ -48,10 +49,10 @@ defmodule Grizzly.Connections.Supervisor do
     DynamicSupervisor.init(strategy: :one_for_one, extra_arguments: [grizzly_options])
   end
 
-  defp do_start_connection(connection_module, node_id, command_opts \\ []) do
+  defp do_start_connection(connection_module, node_id, connection_opts) do
     case DynamicSupervisor.start_child(
            __MODULE__,
-           connection_module.child_spec(node_id, command_opts)
+           connection_module.child_spec(node_id, connection_opts)
          ) do
       {:ok, _} = ok -> ok
       {:error, {:already_started, pid}} -> {:ok, pid}

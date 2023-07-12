@@ -12,12 +12,12 @@ defmodule Grizzly.Transports.DTLS do
   @grizzly_port 41230
 
   @impl Grizzly.Transport
-  def open(args) do
+  def open(args, connect_timeout) do
     ip_address = Keyword.fetch!(args, :ip_address)
     port = Keyword.fetch!(args, :port)
     ifaddr = {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}
 
-    case :ssl.connect(ip_address, port, dtls_opts(ifaddr), 10_000) do
+    case :ssl.connect(ip_address, port, dtls_opts(ifaddr), connect_timeout) do
       {:ok, socket} ->
         {:ok, Transport.new(__MODULE__, %{socket: socket, port: port, ip_address: ip_address})}
 

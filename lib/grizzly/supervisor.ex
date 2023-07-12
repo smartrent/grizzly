@@ -143,6 +143,10 @@ defmodule Grizzly.Supervisor do
     `Grizzly.Status.Reporter.Console` by default.
   - `:inclusion_adapter` - the network adapter for including and excluding
     devices
+  - `:wait_for_zipgateway` - If set to `true`, `Grizzly.Supervisor`'s init will
+    wait for Z/IP Gateway to be ready before it returns. This is useful if you
+    want to prevent the rest of your supervision tree from starting until Grizzly
+    is ready for use. Defaults to `false`.
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -177,6 +181,7 @@ defmodule Grizzly.Supervisor do
           | {:zwave_firmware, [firmware_info()]}
           | {:zw_programmer_path, Path.t()}
           | {:inclusion_adapter, module()}
+          | {:wait_for_zipgateway, boolean()}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -239,6 +244,15 @@ defmodule Grizzly.Supervisor do
       {ReadyChecker, [status_reporter: options.status_reporter]}
     ]
     |> maybe_run_zipgateway_supervisor(options)
+    |> maybe_wait_for_zipgateway(options)
+  end
+
+  defp maybe_wait_for_zipgateway(children, options) do
+    if options.wait_for_zipgateway do
+      children ++ [Grizzly.ZIPGateway.Waiter]
+    else
+      children
+    end
   end
 
   defp maybe_run_zipgateway_supervisor(children, options) do
