@@ -5,10 +5,12 @@ defmodule Grizzly.Connection do
 
   alias Grizzly.Connections.Supervisor
   alias Grizzly.Connections.{AsyncConnection, BinaryConnection, SyncConnection}
+  alias Grizzly.Report
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
-  @type opt() :: {:mode, :sync | :async | :binary} | {:owner, pid()}
+  @type mode() :: :sync | :async | :binary
+  @type opt() :: {:mode, mode()} | {:owner, pid()}
 
   @doc """
   Open a connection to a node or the Z/IP Gateway
@@ -39,19 +41,24 @@ defmodule Grizzly.Connection do
   end
 
   @doc """
-  Send a `Grizzly.ZWave.Command` to a Z-Wave device
+  Send a `Grizzly.ZWave.Command` to a Z-Wave device.
   """
   @spec send_command(ZWave.node_id(), Command.t(), [Grizzly.command_opt()]) ::
           Grizzly.send_command_response()
   def send_command(node_id, command, opts \\ []) do
-    Logger.debug("Sending Cmd: #{inspect(command)}")
+    # TODO: the `:type` is deprecated and will be removed in Grizzly 7.0
+    mode = Keyword.get(opts, :mode, Keyword.get(opts, :type, :sync))
+    Logger.debug("Sending Cmd (#{inspect(mode)}): #{inspect(command)}")
 
-    case Keyword.get(opts, :type, :sync) do
+    case mode do
       :sync ->
         SyncConnection.send_command(node_id, command, opts)
 
       :async ->
-        AsyncConnection.send_command(node_id, command, opts)
+        # `AsyncConnection.send_command` always returns {:ok, ref}. We'll translate this
+        # to a `Grizzly.Report` for consistency with `SyncConnection`'s behavior.
+        {:ok, ref} = AsyncConnection.send_command(node_id, command, opts)
+        {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
     end
   end
 

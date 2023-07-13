@@ -142,6 +142,9 @@ defmodule Grizzly do
   * `:supervision?` - Whether to use Supervision CC encapsulation. Default `false`.
   * `:status_updates?` - If true, the calling process will receive messages when
     a supervision status update is received from the destination node. Default `false`.
+  * `:mode` - The connection mode to use when sending the command. Defaults to `:sync`.
+    Using `:async` will result in the returned `Grizzly.Report` always having a type of
+    `:queued_delay`.
   """
   @type command_opt() ::
           {:timeout, non_neg_integer()}
@@ -150,6 +153,7 @@ defmodule Grizzly do
           | {:transmission_stats, boolean()}
           | {:supervision?, boolean()}
           | {:status_updates?, boolean()}
+          | {:mode, Connection.mode()}
 
   @type command :: atom()
 
@@ -221,10 +225,12 @@ defmodule Grizzly do
     including? = Inclusions.inclusion_running?()
     updating_firmware? = FirmwareUpdates.firmware_update_running?()
 
+    open_opts = Keyword.take(opts, [:mode])
+
     with false <- including? or updating_firmware?,
          {command_module, default_opts} <- Table.lookup(command_name),
          {:ok, command} <- command_module.new(args),
-         {:ok, _} <- Connection.open(node_id) do
+         {:ok, _} <- Connection.open(node_id, open_opts) do
       Connection.send_command(node_id, command, Keyword.merge(default_opts, opts))
     else
       true ->
