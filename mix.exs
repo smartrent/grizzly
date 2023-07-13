@@ -44,11 +44,18 @@ defmodule Grizzly.MixProject do
   end
 
   defp dialyzer() do
+    ci_opts =
+      if System.get_env("CI") do
+        [plt_core_path: "_build/plts", plt_local_path: "_build/plts"]
+      else
+        []
+      end
+
     [
       flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return],
       plt_add_apps: [:eex, :mix, :ex_unit, :iex],
       ignore_warnings: "dialyzer_ignore_warnings.exs"
-    ]
+    ] ++ ci_opts
   end
 
   defp description do

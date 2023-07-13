@@ -1,9 +1,15 @@
-version: 2
+version: 2.1
 
 defaults: &defaults
   working_directory: ~/repo
   environment:
     LC_ALL: C.UTF-8
+    MIX_ENV: test
+  parameters:
+    image-tag:
+      description: "Docker image tag"
+      type: string
+      default: "1.15.0-erlang-26.0.1-alpine-3.18.2"
 
 install_hex_rebar: &install_hex_rebar
   run:
@@ -18,64 +24,109 @@ install_system_deps: &install_system_deps
     command: |
       apk add build-base
 
+commands:
+  restore_tagged_cache:
+    parameters:
+      prefix:
+        description: "Cache key prefix"
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - << parameters.prefix >>-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - << parameters.prefix >>-{{ .Branch }}-
+            - << parameters.prefix >>-
+
 jobs:
-  build_elixir_1_15_otp_26:
-    docker:
-      - image: hexpm/elixir:1.15.0-erlang-26.0.1-alpine-3.18.2
+  build:
     <<: *defaults
+    docker:
+      - image: hexpm/elixir:<< parameters.image-tag >>
     steps:
       - checkout
       - <<: *install_hex_rebar
       - <<: *install_system_deps
-      - restore_cache:
-          keys:
-            - v1-mix-cache-{{ checksum "mix.lock" }}
-            - v1-mix-cache-
-      - run: mix deps.get
-      - run: mix compile --warnings-as-errors
-      - run: mix format --check-formatted
-      - run: mix test --include inclusion --include integration --include firmware_update
-      - store_test_results:
-          path: test-junit-report.xml
-      - run: mix deps.unlock --check-unused
-      - run: mix docs
-      - run: mix hex.build
-      - run: MIX_ENV=test mix credo -a
-      - run: mix dialyzer
+      - restore_tagged_cache:
+          prefix: v2-mix-cache-<< parameters.image-tag >>
+      - run: mix do deps.get, compile --warnings-as-errors
       - save_cache:
-          key: v1-mix-cache-{{ checksum "mix.lock" }}
+          key: v2-mix-cache-<< parameters.image-tag >>-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build
             - deps
 
-  build_elixir_1_14_otp_25:
-    docker:
-      - image: hexpm/elixir:1.14.3-erlang-25.2.3-alpine-3.18.0
+  lint:
     <<: *defaults
+    docker:
+      - image: hexpm/elixir:<< parameters.image-tag >>
     steps:
       - checkout
       - <<: *install_hex_rebar
       - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix compile
-      - run: mix test
+      - restore_tagged_cache:
+          prefix: v2-mix-cache-<< parameters.image-tag >>
+      - run: mix deps.unlock --check-unused
+      - run: mix format --check-formatted
+      - run: mix credo -a
+      - run: mix hex.build
 
-  build_elixir_1_13_otp_25:
-    docker:
-      - image: hexpm/elixir:1.13.4-erlang-25.3.2-alpine-3.18.0
+  dialyzer:
     <<: *defaults
+    docker:
+      - image: hexpm/elixir:<< parameters.image-tag >>
     steps:
       - checkout
       - <<: *install_hex_rebar
       - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix compile
-      - run: mix test
+      - restore_tagged_cache:
+          prefix: v2-mix-cache-<< parameters.image-tag >>
+      - restore_tagged_cache:
+          prefix: v2-dialyzer-cache-<< parameters.image-tag >>
+      - run: mix dialyzer
+      - save_cache:
+          paths:
+            - _build/plts
+          key: v2-dialyzer-cache-<< parameters.image-tag >>-{{ .Branch }}-{{ checksum "mix.lock" }}
+
+  test:
+    <<: *defaults
+    parallelism: 4
+    docker:
+      - image: hexpm/elixir:<< parameters.image-tag >>
+    steps:
+      - checkout
+      - <<: *install_hex_rebar
+      - <<: *install_system_deps
+      - restore_tagged_cache:
+          prefix: v2-mix-cache-<< parameters.image-tag >>
+      - run: MIX_TEST_PARTITION="$((${CIRCLE_NODE_INDEX}+1))" mix test --include inclusion --include integration --include firmware_update --partitions $CIRCLE_NODE_TOTAL
+      - store_test_results:
+          path: test-junit-report.xml
 
 workflows:
-  version: 2
   build_test:
     jobs:
-      - build_elixir_1_15_otp_26
-      - build_elixir_1_14_otp_25
-      - build_elixir_1_13_otp_25
+      - build:
+          matrix:
+            parameters:
+              image-tag:
+                - 1.15.0-erlang-26.0.1-alpine-3.18.2
+                - 1.14.3-erlang-25.2.3-alpine-3.18.0
+                - 1.13.4-erlang-25.3.2-alpine-3.18.0
+      - lint:
+          image-tag: 1.15.0-erlang-26.0.1-alpine-3.18.2
+          requires:
+            - build
+      - dialyzer:
+          image-tag: 1.15.0-erlang-26.0.1-alpine-3.18.2
+          requires:
+            - build
+      - test:
+          requires:
+            - build
+          matrix:
+            parameters:
+              image-tag:
+                - 1.15.0-erlang-26.0.1-alpine-3.18.2
+                - 1.14.3-erlang-25.2.3-alpine-3.18.0
+                - 1.13.4-erlang-25.3.2-alpine-3.18.0
