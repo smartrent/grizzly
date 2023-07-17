@@ -49,9 +49,16 @@ defmodule Grizzly.Trace.Record do
 
   def to_string(record, :text) do
     %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
-    {:ok, zip_packet} = ZWave.from_binary(binary)
 
-    "#{Time.to_string(ts)} #{src_dest_to_string(src)} #{src_dest_to_string(dest)} #{command_info_str(zip_packet, binary)}"
+    prefix = "#{Time.to_string(ts)} #{src_dest_to_string(src)} #{src_dest_to_string(dest)}"
+
+    case ZWave.from_binary(binary) do
+      {:ok, zip_packet} ->
+        "#{prefix} #{command_info_str(zip_packet, binary)}"
+
+      {:error, _} ->
+        "#{prefix} #{inspect(binary, limit: 500)}"
+    end
   end
 
   def to_string(record, :raw) do
@@ -100,8 +107,9 @@ defmodule Grizzly.Trace.Record do
 
   defp command_info_with_encapsulated_command(seq_number, zip_packet, binary) do
     command = Command.param!(zip_packet, :command)
+    command_binary = ZIPPacket.unwrap(binary)
 
-    "#{seq_number_to_str(seq_number)} #{command.name} #{inspect(Command.encode_params(command))}"
+    "#{seq_number_to_str(seq_number)} #{command.name} #{inspect(command_binary, limit: 500)}"
   rescue
     err ->
       Logger.error("""
@@ -122,7 +130,7 @@ defmodule Grizzly.Trace.Record do
           _ -> "UNKNOWN COMMAND"
         end
 
-      "#{seq_number_to_str(seq_number)} ENCODING ERROR #{command_name} #{inspect(binary)}"
+      "#{seq_number_to_str(seq_number)} ENCODING ERROR #{command_name} #{inspect(binary, limit: 500)}"
   end
 
   defp seq_number_to_str(seq_number) do

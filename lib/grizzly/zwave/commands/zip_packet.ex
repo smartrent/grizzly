@@ -97,6 +97,32 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
      ]}
   end
 
+  @doc """
+  Removes the Z/IP Packet encapsulation from a command and returns the original command
+  as a binary.
+  """
+  @spec unwrap(binary()) :: binary()
+  def unwrap(
+        <<0x23, 0x02, _flag_byte, meta_byte, _seq_number, _source, _dest,
+          extensions_and_command::binary>>
+      ) do
+    meta = meta_from_byte(meta_byte)
+
+    case meta do
+      %{cmd: false} ->
+        <<>>
+
+      %{header: false} ->
+        extensions_and_command
+
+      %{header: true} ->
+        <<header_extension_length, _extensions::binary-size(header_extension_length - 1),
+          command_binary::binary>> = extensions_and_command
+
+        command_binary
+    end
+  end
+
   @spec flag_to_byte(flag() | nil) :: byte()
   def flag_to_byte(nil), do: 0x00
   def flag_to_byte(:ack_request), do: 0x80

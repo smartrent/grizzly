@@ -12,23 +12,26 @@ defmodule Grizzly.Trace.RecordTest do
     record = Record.new(binary, src: "192.168.0.1", dest: "192.168.0.2")
 
     expected_string =
-      "#{Time.to_string(record.timestamp)} #{record.src} #{record.dest} 1   switch_binary_set <<255>>"
+      "#{Time.to_string(record.timestamp)} #{record.src} #{record.dest} 1   switch_binary_set <<37, 1, 255>>"
 
     assert expected_string == Record.to_string(record)
   end
 
   test "decodes NodeAddDSKReport for S2 unauthenticated device without crashing" do
+    zip_packet_binary = <<35, 2, 0, 208, 42, 0, 0, 5, 132, 2, 4, 0>>
+
+    command_binary =
+      <<52, 19, 123, 0, 110, 113, 215, 70, 212, 90, 35, 31, 65, 21, 237, 23, 121, 95, 97, 122>>
+
     trace = %Grizzly.Trace.Record{
       src: "[fd00:bbbb::1]:41230",
       dest: "[fd00:aaaa::2]:41230",
-      binary:
-        <<35, 2, 0, 208, 42, 0, 0, 5, 132, 2, 4, 0, 52, 19, 123, 0, 110, 113, 215, 70, 212, 90,
-          35, 31, 65, 21, 237, 23, 121, 95, 97, 122>>,
+      binary: zip_packet_binary <> command_binary,
       timestamp: ~T[21:11:41.766545]
     }
 
     expected_string =
-      "21:11:41.766545 [fd00:bbbb::1]:41230 [fd00:aaaa::2]:41230 42  node_add_dsk_report <<123, 0, 110, 113, 215, 70, 212, 90, 35, 31, 65, 21, 237, 23, 121, 95, 97, 122>>"
+      "21:11:41.766545 [fd00:bbbb::1]:41230 [fd00:aaaa::2]:41230 42  node_add_dsk_report #{inspect(command_binary)}"
 
     assert expected_string == Record.to_string(trace)
   end
