@@ -1,6 +1,13 @@
 defmodule Grizzly.ZWave.CommandClasses do
   require Logger
 
+  @type command_class_list :: [
+          non_secure_supported: list(atom()),
+          non_secure_controlled: list(atom()),
+          secure_supported: list(atom()),
+          secure_controlled: list(atom())
+        ]
+
   defmodule Generate do
     @moduledoc false
 
@@ -39,7 +46,10 @@ defmodule Grizzly.ZWave.CommandClasses do
         unquote(from_byte)
 
         def from_byte(byte) do
-          Logger.warning("[Grizzly] Unsupported command class from byte #{byte}")
+          Logger.warning(
+            "[Grizzly] Unsupported command class from byte #{inspect(byte, base: :hex)}"
+          )
+
           {:error, :unsupported_command_class}
         end
 
@@ -60,7 +70,7 @@ defmodule Grizzly.ZWave.CommandClasses do
 
   TODO: add more details
   """
-  @spec command_class_list_to_binary([command_class()]) :: binary()
+  @spec command_class_list_to_binary([command_class_list()]) :: binary()
   def command_class_list_to_binary(command_class_list) do
     non_secure_supported = Keyword.get(command_class_list, :non_secure_supported, [])
     non_secure_controlled = Keyword.get(command_class_list, :non_secure_controlled, [])
@@ -87,7 +97,7 @@ defmodule Grizzly.ZWave.CommandClasses do
   @doc """
   Turn the binary representation that is outlined in the Network-Protocol specs
   """
-  @spec command_class_list_from_binary(binary()) :: [command_class()]
+  @spec command_class_list_from_binary(binary()) :: [command_class_list()]
   def command_class_list_from_binary(binary) do
     binary_list = :erlang.binary_to_list(binary)
 
@@ -116,10 +126,15 @@ defmodule Grizzly.ZWave.CommandClasses do
 
           command_class_byte, {security, command_classes}
           when command_class_byte not in [0xF1, 0xEF, 0x00] ->
-            # Right now lets fail super hard so we can add support for
-            # new command classes quickly
-            {:ok, command_class} = from_byte(command_class_byte)
-            {security, Keyword.update(command_classes, security, [], &(&1 ++ [command_class]))}
+            case from_byte(command_class_byte) do
+              {:ok, command_class} ->
+                {security,
+                 Keyword.update(command_classes, security, [], &(&1 ++ [command_class]))}
+
+              {:error, :unsupported_command_class} ->
+                # Skip unsupported command classes
+                {security, command_classes}
+            end
         end
       )
 
