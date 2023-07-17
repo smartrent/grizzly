@@ -274,7 +274,7 @@ defmodule Grizzly.ZWave.Decoder do
 
       # Wake Up
       {0x84, 0x04, Commands.WakeUpIntervalSet},
-      {0x84, 0x05, Commands.WakeUpIntervalSet},
+      {0x84, 0x05, Commands.WakeUpIntervalGet},
       {0x84, 0x06, Commands.WakeUpIntervalReport},
       {0x84, 0x07, Commands.WakeUpNotification},
       {0x84, 0x08, Commands.WakeUpNoMoreInformation},
