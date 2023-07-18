@@ -43,7 +43,7 @@ defmodule Grizzly.Supervisor do
 
   require Logger
 
-  alias Grizzly.{Options, ZwaveFirmware}
+  alias Grizzly.{Options, Trace, ZwaveFirmware}
   alias Grizzly.ZIPGateway.ReadyChecker
   alias Grizzly.ZwaveFirmware
 
@@ -177,6 +177,7 @@ defmodule Grizzly.Supervisor do
           | {:zwave_firmware, [firmware_info()]}
           | {:zw_programmer_path, Path.t()}
           | {:inclusion_adapter, module()}
+          | {:trace_options, [Trace.trace_opt()]}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -213,7 +214,7 @@ defmodule Grizzly.Supervisor do
       # 0 and 0xFF (255)
       {Grizzly.SeqNumber, Enum.random(0..255)},
       Grizzly.SessionId,
-      Grizzly.Trace,
+      {Grizzly.Trace, options.trace_options},
       {Registry, [keys: :duplicate, name: Grizzly.Events.Registry]},
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
       {Grizzly.Associations, options},
