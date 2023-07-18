@@ -4,6 +4,24 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.0] - 2023-07-18
+
+### Added
+
+- Add telemetry ([#751](https://github.com/smartrent/grizzly/pull/751))
+- Implement Mailbox Command Class ([#777](https://github.com/smartrent/grizzly/pull/777))
+- Allow DTLSv1.2 for Z/IP Gateway connections ([#782](https://github.com/smartrent/grizzly/pull/782))
+- Add `:raw` trace format ([#784](https://github.com/smartrent/grizzly/pull/784))
+- Add option to ignore keepalive frames in traces ([#785](https://github.com/smartrent/grizzly/pull/785))
+- Use Z-Wave XML to generate command class mappings ([#793](https://github.com/smartrent/grizzly/pull/793))
+- Add `:mode` option to `Grizzly.send_command/4` ([#795](https://github.com/smartrent/grizzly/pull/795))
+
+### Fixed
+
+- Use correct command module for Wake Up Interval Set in `Grizzly.ZWave.Decoder` ([#798](https://github.com/smartrent/grizzly/pull/798))
+- Skip unsupported values when parsing command class lists ([#799](https://github.com/smartrent/grizzly/pull/799))
+- Trace `:text` format prints command binary (without Z/IP Packet header) exactly as received ([#800](https://github.com/smartrent/grizzly/pull/800))
+
 ## [v6.7.1] - 2023-06-20
 
 ### Added
@@ -442,7 +460,6 @@ This change was made to better aline with the Z-Wave specification.
 
 - When a lock does not encode an `UserCodeReport` as an event parameter (@jfcloutier)
 - When an unknown user code is encoded as a empty string (@jfcloutier)
-
 
 ## [v2.0.0] - 2022-03-21
 
@@ -1994,7 +2011,7 @@ turning the device on. Devices that support SmartStart will have a device
 specific key (DSK) that you can provide to the controller prior to turning on
 the device.
 
-```
+```elixir
 iex> Grizzly.send_command(Grizzly.Controller, Grizzly.CommandClass.NodeProvisioning.Set, dsk: dsk)
 :ok
 ```
@@ -2247,6 +2264,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.8.0]: https://github.com/smartrent/grizzly/compare/v6.7.1..v6.8.0
 [v6.7.1]: https://github.com/smartrent/grizzly/compare/v6.7.0..v6.7.1
 [v6.7.0]: https://github.com/smartrent/grizzly/compare/v6.6.1..v6.7.0
 [v6.6.1]: https://github.com/smartrent/grizzly/compare/v6.6.0..v6.6.1
@@ -2304,7 +2322,6 @@ Same change found in `Grizzly.Node.get_command_class_version`
 [v0.18.2]: https://github.com/smartrent/grizzly/compare/v0.18.1...v0.18.2
 [v0.18.1]: https://github.com/smartrent/grizzly/compare/v0.18.0...v0.18.1
 [v0.18.0]: https://github.com/smartrent/grizzly/compare/v0.17.8...v0.18.0
-[v0.17.8]: https://github.com/smartrent/grizzly/compare/v0.17.7...v0.17.8
 [v0.17.7]: https://github.com/smartrent/grizzly/compare/v0.17.6...v0.17.7
 [v0.17.6]: https://github.com/smartrent/grizzly/compare/v0.17.5...v0.17.6
 [v0.17.5]: https://github.com/smartrent/grizzly/compare/v0.17.4...v0.17.5
