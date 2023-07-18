@@ -112,7 +112,6 @@ workflows:
               image-tag:
                 - 1.15.0-erlang-26.0.1-alpine-3.18.2
                 - 1.14.3-erlang-25.2.3-alpine-3.18.0
-                - 1.13.4-erlang-25.3.2-alpine-3.18.0
       - lint:
           image-tag: 1.15.0-erlang-26.0.1-alpine-3.18.2
           requires:
@@ -129,4 +128,3 @@ workflows:
               image-tag:
                 - 1.15.0-erlang-26.0.1-alpine-3.18.2
                 - 1.14.3-erlang-25.2.3-alpine-3.18.0
-                - 1.13.4-erlang-25.3.2-alpine-3.18.0
