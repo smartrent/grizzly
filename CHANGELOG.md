@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.1] - 2023-07-19
+
+### Changed
+
+- Pass trace options through from `Grizzly.Supervisor` ([#803](https://github.com/smartrent/grizzly/pull/803))
+- Made network management command arguments more consistent ([#804](https://github.com/smartrent/grizzly/pull/804))
+
 ## [v6.8.0] - 2023-07-18
 
 ### Added
@@ -2264,6 +2271,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.8.1]: https://github.com/smartrent/grizzly/compare/v6.8.0..v6.8.1
 [v6.8.0]: https://github.com/smartrent/grizzly/compare/v6.7.1..v6.8.0
 [v6.7.1]: https://github.com/smartrent/grizzly/compare/v6.7.0..v6.7.1
 [v6.7.0]: https://github.com/smartrent/grizzly/compare/v6.6.1..v6.7.0
