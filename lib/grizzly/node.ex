@@ -33,26 +33,25 @@ defmodule Grizzly.Node do
 
   def get_info({:virtual, _} = node_id, opts) do
     seq_number = opts[:seq_number] || SeqNumber.get_and_inc()
+    send_command_opts = Keyword.drop(opts, [:seq_number])
 
     params = [
       seq_number: seq_number,
       node_id: node_id
     ]
 
-    Grizzly.send_command(node_id, :node_info_cached_get, params)
+    Grizzly.send_command(node_id, :node_info_cached_get, params, send_command_opts)
   end
 
-  def get_info(node_id, info_opt) do
-    seq_number = SeqNumber.get_and_inc()
-    max_age = info_get_max_age(info_opt)
+  def get_info(node_id, opts) do
+    {info_opts, send_command_opts} = Keyword.split(opts, [:seq_number, :max_age, :force_update])
+    seq_number = info_opts[:seq_number] || SeqNumber.get_and_inc()
+    max_age = info_get_max_age(info_opts)
 
-    # we set the timeout to default to 10 seconds because Z-Wave will have to
+    # we set the timeout to default to 30 seconds because Z-Wave will have to
     # do the node interrogation flow again. In cases where using the cache is
     # ok, the response is immediate.
-    send_command_opts =
-      info_opt
-      |> Keyword.take([:timeout])
-      |> Keyword.put_new(:timeout, 10_000)
+    send_command_opts = Keyword.put_new(send_command_opts, :timeout, 30_000)
 
     params = [
       seq_number: seq_number,
@@ -64,13 +63,13 @@ defmodule Grizzly.Node do
   end
 
   defp info_get_max_age(info_opt) do
-    if info_opt[:force_update] do
-      :force_update
-    else
+    cond do
+      info_opt[:force_update] -> :force_update
+      info_opt[:max_age] -> info_opt[:max_age]
       # if the caller does not want to force a cache update this default
       # allowing records up to 32 minutes old. This is calculated at the Z-Wave
       # level as 2^5.
-      5
+      true -> 5
     end
   end
 

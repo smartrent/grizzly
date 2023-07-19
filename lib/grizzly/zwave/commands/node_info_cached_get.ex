@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
   will be 2 ^ number minutes. So if you pass the number `4` the receiving
   Z-Wave device will consider that 16 minutes.
 
-  Two other options are `:infinite` and `:force_update`. Where `:infinite`
+  Two other options are `:infinity` and `:force_update`. Where `:infinity`
   means that the cache will not be freshed regardless of how old the data is
   and where `:force_update` means that no matter the age of the cached node
   data the cache will attempt to be updated.
@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  @type max_age() :: 1..14 | :infinite | :force_update
+  @type max_age() :: 1..14 | :infinity | :force_update
 
   @type param() ::
           {:seq_number, Grizzly.seq_number()}
@@ -100,12 +100,12 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
   @spec encode_max_age(max_age()) :: 0..15
   def encode_max_age(n) when n > 0 and n < 15, do: n
-  def encode_max_age(:infinite), do: 15
+  def encode_max_age(:infinity), do: 15
   def encode_max_age(:force_update), do: 0
 
   @spec decode_max_age(byte()) :: {:ok, max_age()} | {:error, DecodeError.t()}
   def decode_max_age(0), do: {:ok, :force_update}
-  def decode_max_age(15), do: {:ok, :infinite}
+  def decode_max_age(15), do: {:ok, :infinity}
   def decode_max_age(n) when n > 0 and n < 15, do: {:ok, n}
 
   def decode_max_age(n),
