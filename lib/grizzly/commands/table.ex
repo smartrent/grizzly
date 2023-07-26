@@ -491,7 +491,24 @@ defmodule Grizzly.Commands.Table do
        {Commands.MailboxConfigurationReport, handler: AckResponse}},
       # Mailbox Queue will sometimes require the `WaitReport` handler (such as with
       # the pop operation). It is up to the caller to use the correct handler.
-      {:mailbox_queue, {Commands.MailboxQueue, handler: AckResponse}}
+      {:mailbox_queue, {Commands.MailboxQueue, handler: AckResponse}},
+
+      # Sound Switch
+      {:sound_switch_tones_number_get,
+       {Commands.SoundSwitchTonesNumberGet,
+        handler: {WaitReport, complete_report: :sound_switch_tones_number_report}}},
+      {:sound_switch_tone_info_get,
+       {Commands.SoundSwitchToneInfoGet,
+        handler: {WaitReport, complete_report: :sound_switch_tone_info_report}}},
+      {:sound_switch_configuration_set,
+       {Commands.SoundSwitchConfigurationSet, handler: AckResponse}},
+      {:sound_switch_configuration_get,
+       {Commands.SoundSwitchConfigurationGet,
+        handler: {WaitReport, complete_report: :sound_switch_configuration_report}}},
+      {:sound_switch_tone_play_set, {Commands.SoundSwitchTonePlaySet, handler: AckResponse}},
+      {:sound_switch_tone_play_get,
+       {Commands.SoundSwitchTonePlayGet,
+        handler: {WaitReport, complete_report: :sound_switch_tone_play_report}}}
     ]
 
     defmacro __before_compile__(_) do

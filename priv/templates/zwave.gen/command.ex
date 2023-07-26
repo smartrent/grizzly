@@ -2,9 +2,9 @@ defmodule <%= inspect command_module %> do
   @moduledoc """
   What does this command do??
 
-  Params:
+  ## Params
   <%= for p <- params do %>
-    * `<%= inspect p %>` - explain what `<%= inspect p %>` param is for
+  * `<%= inspect p %>` - explain what `<%= inspect p %>` param is for
   <% end %>
   """
 
@@ -13,7 +13,7 @@ defmodule <%= inspect command_module %> do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias <%= inspect command_class_module %>
 
-  @type param :: # give me some type specs for your params
+  @type param :: <%= Enum.map_join(params, " | ", &("{#{inspect &1}, any()}")) %>
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
