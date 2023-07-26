@@ -352,6 +352,18 @@ defmodule Grizzly.ZWave.Decoder do
       {0x78, 0x05, Commands.NodeProvisioningGet},
       {0x78, 0x06, Commands.NodeProvisioningReport},
 
+      # Sound Switch
+      {0x79, 0x01, Commands.SoundSwitchTonesNumberGet},
+      {0x79, 0x02, Commands.SoundSwitchTonesNumberReport},
+      {0x79, 0x03, Commands.SoundSwitchToneInfoGet},
+      {0x79, 0x04, Commands.SoundSwitchToneInfoReport},
+      {0x79, 0x05, Commands.SoundSwitchConfigurationSet},
+      {0x79, 0x06, Commands.SoundSwitchConfigurationGet},
+      {0x79, 0x07, Commands.SoundSwitchConfigurationReport},
+      {0x79, 0x08, Commands.SoundSwitchTonePlaySet},
+      {0x79, 0x09, Commands.SoundSwitchTonePlayGet},
+      {0x79, 0x0A, Commands.SoundSwitchTonePlayReport},
+
       # Node naming and location
       {0x77, 0x01, Commands.NodeNameSet},
       {0x77, 0x02, Commands.NodeNameGet},
