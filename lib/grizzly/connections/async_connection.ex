@@ -213,15 +213,13 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   defp do_timeout_reply(waiter, grizzly_command) do
     if grizzly_command.status == :queued do
-      {pid, _tag} = waiter
-
       report =
         Report.new(:complete, :timeout, grizzly_command.node_id,
           command_ref: grizzly_command.ref,
           queued: true
         )
 
-      send(pid, {:grizzly, :report, report})
+      send(waiter, {:grizzly, :report, report})
     else
       report =
         Report.new(:complete, :timeout, grizzly_command.node_id, command_ref: grizzly_command.ref)
