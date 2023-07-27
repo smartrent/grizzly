@@ -1,5 +1,3 @@
-![Grizzly Logo](./assets/grizzly_main-md.png)
-
 [![CircleCI](https://circleci.com/gh/smartrent/grizzly.svg?style=svg)](https://circleci.com/gh/smartrent/grizzly)
 [![Hex.pm](https://img.shields.io/hexpm/v/grizzly?style=flat-square)](https://hex.pm/packages/grizzly)
 
@@ -172,9 +170,72 @@ flush
 To know what reports a device sends please see the device's user manual as these
 events will be outlined by the manufacture in the manual.
 
-### Compile and Configure zipgateway
+## Supported Command Classes
 
-## Quick and Fast running locally
+| Command Class                   | Version | Notes                              |
+|---------------------------------|--------:|------------------------------------|
+| Alarm (Notification)            |       8 |                                    |
+| Anti-theft                      |       3 |                                    |
+| Anti-theft Unlock               |       1 |                                    |
+| Application Status              |       1 |                                    |
+| Association                     |       3 |                                    |
+| Association Group Info          |       3 |                                    |
+| Barrier Operator                |       1 |                                    |
+| Basic                           |       2 |                                    |
+| Battery                         |       3 |                                    |
+| Binary Sensor                   |      2* | Partial support, obsoleted by spec |
+| Binary Switch                   |       2 |                                    |
+| Central Scene                   |       3 |                                    |
+| Clock                           |       1 |                                    |
+| Configuration                   |       4 |                                    |
+| CRC-16 Encapsulation            |       1 |                                    |
+| Device Reset Locally            |       1 |                                    |
+| Door Lock                       |       4 |                                    |
+| Firmware Update MD              |       7 |                                    |
+| Hail                            |       1 |                                    |
+| Indicator                       |       4 |                                    |
+| Mailbox                         |       2 |                                    |
+| Manufacturer-specific           |       2 |                                    |
+| Meter                           |       1 |                                    |
+| Multi-channel                   |       4 |                                    |
+| Multi-channel association       |       4 |                                    |
+| Multi-command                   |       1 |                                    |
+| Multilevel Sensor               |     11* | Partial support                    |
+| Multilevel Switch               |       4 |                                    |
+| NM Basic Node                   |       2 |                                    |
+| NM Inclusion                    |       4 |                                    |
+| NM Installation and Maintenance |       4 |                                    |
+| NM Proxy                        |      3* | Partial support for v4             |
+| No Operation                    |       1 |                                    |
+| Node Naming and Location        |       1 |                                    |
+| Node Provisioning               |       1 |                                    |
+| Powerlevel                      |       1 |                                    |
+| Scene Activation                |       1 |                                    |
+| Scene Actuator Configuration    |       1 |                                    |
+| Schedule Entry Lock             |       3 |                                    |
+| Security                        |      1* | Partial support                    |
+| Security 2                      |      1* | Partial support                    |
+| Sound Switch                    |       2 |                                    |
+| Supervision                     |       2 |                                    |
+| Thermostat Fan Mode             |       1 |                                    |
+| Thermostat Fan State            |       2 |                                    |
+| Thermostat Mode                 |       2 |                                    |
+| Thermostat Operating State      |       1 |                                    |
+| Thermostat Setback              |       1 |                                    |
+| Thermostat Setpoint             |      3* | Partial support                    |
+| Time Parameters                 |       1 |                                    |
+| Time                            |       2 |                                    |
+| User Code                       |       2 |                                    |
+| Version                         |       3 |                                    |
+| Wake Up                         |       3 |                                    |
+| Window Covering                 |       1 |                                    |
+| Z/IP Gateway                    |      1* | Partial support                    |
+| Z/IP                            |       5 |                                    |
+| Z-Wave Plus Info                |       2 |                                    |
+
+## Get Started
+
+### Quick and Fast running locally
 
 If you want to run Grizzly locally for development and/or learning before going
 through the challenge of compiling and running in Nerves we recommend the
@@ -182,7 +243,7 @@ through the challenge of compiling and running in Nerves we recommend the
 provides a docker container and CLI for compiling and running different
 versions of `zipgateway`.
 
-## Nerves Devices (WIP)
+### Nerves Devices (WIP)
 
 First download the [Z/IP GW
 SDK](https://www.silabs.com/products/development-tools/software/z-wave/controller-sdk/z-ip-gateway-sdk)
@@ -196,7 +257,7 @@ source code can be found in the `Source` directory.
 This can be tricky and the instructions are a work in progress, so for now
 please contact us if you any troubles.
 
-#### Connecting zipgateway to Grizzly
+### Connecting zipgateway to Grizzly
 
 `zipgateway` runs as a separate server, accessed over a DTLS (UDP over SSL)
 connection. Grizzly will automatically start this server. It assumes the
@@ -265,7 +326,7 @@ and you will need to pass in the location to your configuration like so:
 
 `zipgateway -c /path/to/zipgateway.cfg`
 
-### Virtual devices
+## Virtual devices
 
 Grizzly provides a way to work with virtual devices. These devices should work
 as their hardware counterparts, however, the state of these devices are held in
