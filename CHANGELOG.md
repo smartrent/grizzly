@@ -4,6 +4,18 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.2] - 2023-07-31
+
+### Added
+
+- Implement Sound Switch CC v1-2 ([#806](https://github.com/smartrent/grizzly/pull/806))
+- Implement all commands from User Code CC v2 ([#697](https://github.com/smartrent/grizzly/pull/697))
+
+### Fixed 
+
+- Fix async command timeout handling ([#808](https://github.com/smartrent/grizzly/pull/808))
+- Fix decoding of meter type in Meter Reports ([#807](https://github.com/smartrent/grizzly/pull/807))
+
 ## [v6.8.1] - 2023-07-19
 
 ### Changed
@@ -2271,6 +2283,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.8.2]: https://github.com/smartrent/grizzly/compare/v6.8.0..v6.8.2
 [v6.8.1]: https://github.com/smartrent/grizzly/compare/v6.8.0..v6.8.1
 [v6.8.0]: https://github.com/smartrent/grizzly/compare/v6.7.1..v6.8.0
 [v6.7.1]: https://github.com/smartrent/grizzly/compare/v6.7.0..v6.7.1
