@@ -102,13 +102,26 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :node_neighbor_update_status}}},
       {:node_information_send, {Commands.NodeInformationSend, handler: AckResponse}},
 
-      # Security
-      # security_commands_supported_get should technically use AggregateReport, but it would
+      # S0
+      # s0_commands_supported_get should technically use AggregateReport, but it would
       # require changes to AggregateReport. Few devices support so many CCs that they
       # don't all fit into one frame.
-      {:security_commands_supported_get,
-       {Commands.SecurityCommandsSupportedGet,
-        handler: {WaitReport, complete_report: :security_commands_supported_report}}},
+      {:s0_nonce_get,
+       {Commands.S0NonceGet, handler: {WaitReport, complete_report: :s0_nonce_report}}},
+      {:s0_network_key_set,
+       {Commands.S0NetworkKeySet, handler: {WaitReport, complete_report: :s0_network_key_verify}}},
+      {:s0_security_scheme_get,
+       {Commands.S0SecuritySchemeGet,
+        handler: {WaitReport, complete_report: :s0_security_scheme_report}}},
+      {:s0_security_scheme_inherit,
+       {Commands.S0SecuritySchemeInherit,
+        handler: {WaitReport, complete_report: :s0_security_scheme_report}}},
+      {:s0_commands_supported_get,
+       {Commands.S0CommandsSupportedGet,
+        handler: {WaitReport, complete_report: :s0_commands_supported_report}}},
+      {:s0_message_encapsulation, {Commands.S0MessageEncapsulation, handler: AckResponse}},
+
+      # S2
       {:security_2_commands_supported_get,
        {Commands.Security2CommandsSupportedGet,
         handler: {WaitReport, complete_report: :security_2_commands_supported_report}}},

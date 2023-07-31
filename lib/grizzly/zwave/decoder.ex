@@ -195,9 +195,19 @@ defmodule Grizzly.ZWave.Decoder do
       {0x67, 0x09, Commands.S2ResynchronizationEvent},
       {0x67, 0x0E, Commands.ZWaveLongRangeChannelReport},
 
-      # Security, Security2
-      {0x98, 0x02, Commands.SecurityCommandsSupportedGet},
-      {0x98, 0x03, Commands.SecurityCommandsSupportedReport},
+      # Security
+      {0x98, 0x02, Commands.S0CommandsSupportedGet},
+      {0x98, 0x03, Commands.S0CommandsSupportedReport},
+      {0x98, 0x04, Commands.S0SecuritySchemeGet},
+      {0x98, 0x05, Commands.S0SecuritySchemeReport},
+      {0x98, 0x06, Commands.S0SecurityNetworkKeySet},
+      {0x98, 0x07, Commands.S0SecurityNetworkKeyVerify},
+      {0x98, 0x08, Commands.S0SecuritySchemeInherit},
+      {0x98, 0x40, Commands.S0NonceGet},
+      {0x98, 0x80, Commands.S0NonceReport},
+      {0x98, 0x81, Commands.S0MessageEncapsulation},
+
+      # Security2
       {0x9F, 0x0D, Commands.Security2CommandsSupportedGet},
       {0x9F, 0x0E, Commands.Security2CommandsSupportedReport},
 
