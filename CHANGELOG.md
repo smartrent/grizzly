@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.3] - 2023-08-01
+
+### Fixed 
+
+- Fix ``:ack_request` in response to AsyncConnection command ([#810](https://github.com/smartrent/grizzly/pull/810))
+
 ## [v6.8.2] - 2023-07-31
 
 ### Added
@@ -2283,6 +2289,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.8.3]: https://github.com/smartrent/grizzly/compare/v6.8.0..v6.8.3
 [v6.8.2]: https://github.com/smartrent/grizzly/compare/v6.8.0..v6.8.2
 [v6.8.1]: https://github.com/smartrent/grizzly/compare/v6.8.0..v6.8.1
 [v6.8.0]: https://github.com/smartrent/grizzly/compare/v6.7.1..v6.8.0
