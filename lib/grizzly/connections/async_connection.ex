@@ -170,6 +170,49 @@ defmodule Grizzly.Connections.AsyncConnection do
   end
 
   defp handle_commands(zip_packet, state) do
+    case Command.param!(zip_packet, :flag) do
+      :ack_request ->
+        handle_ack_request(zip_packet, state)
+
+      _ ->
+        do_handle_commands(zip_packet, state)
+    end
+  end
+
+  defp handle_ack_request(zip_packet, state) do
+    %State{transport: transport} = state
+    header_extensions = Command.param!(zip_packet, :header_extensions)
+    seq_number = Command.param!(zip_packet, :seq_number)
+    secure = Command.param!(zip_packet, :secure)
+    command = Command.param!(zip_packet, :command)
+
+    more_info =
+      if command && command.name == :supervision_get do
+        true
+      else
+        false
+      end
+
+    {:ok, ack_response} =
+      ZIPPacket.new(
+        secure: secure,
+        header_extensions: header_extensions,
+        seq_number: seq_number,
+        more_info: more_info,
+        flag: :ack_response
+      )
+
+    binary = ZWave.to_binary(ack_response)
+    Transport.send(transport, binary)
+
+    if command != nil do
+      do_handle_commands(zip_packet, state)
+    else
+      state
+    end
+  end
+
+  defp do_handle_commands(zip_packet, state) do
     updated_state =
       case CommandList.response_for_zip_packet(state.commands, zip_packet) do
         {:retry, command_runner, new_command_list} ->

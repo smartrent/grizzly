@@ -23,7 +23,9 @@ defmodule Grizzly.CommandHandlers.WaitReport do
   @spec handle_command(Command.t(), state()) ::
           {:continue, state} | {:complete, Command.t()}
   def handle_command(command, state) do
-    if state.complete_report == :any or command.name == state.complete_report do
+    expected? = not is_nil(command) and command.name == state.complete_report
+
+    if state.complete_report == :any or expected? do
       {:complete, command}
     else
       {:continue, state}
