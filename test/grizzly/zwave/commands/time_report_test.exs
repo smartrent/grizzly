@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.TimeReportTest do
     params = [rtc_failure?: false, hour: 12, minute: 10, second: 5]
     {:ok, command} = TimeReport.new(params)
     expected_binary = <<0x00::size(1), 0x00::size(2), 0x0C::size(5), 0x0A, 0x05>>
-    assert expected_binary = TimeReport.encode_params(command)
+    assert expected_binary == TimeReport.encode_params(command)
   end
 
   test "decodes params correctly" do
