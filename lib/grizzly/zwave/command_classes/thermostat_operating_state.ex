@@ -33,6 +33,11 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatOperatingState do
   def encode_state(:pending_heat), do: 0x04
   def encode_state(:pending_cool), do: 0x05
   def encode_state(:vent_economizer), do: 0x06
+  def encode_state(:aux_heating), do: 0x07
+  def encode_state(:heating_stage_2), do: 0x08
+  def encode_state(:cooling_stage_2), do: 0x09
+  def encode_state(:aux_heat_stage_2), do: 0x0A
+  def encode_state(:aux_heat_stage_3), do: 0x0B
 
   @spec decode_state(byte) :: {:ok, state} | {:error, DecodeError.t()}
   def decode_state(0x00), do: {:ok, :idle}
@@ -42,6 +47,11 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatOperatingState do
   def decode_state(0x04), do: {:ok, :pending_heat}
   def decode_state(0x05), do: {:ok, :pending_cool}
   def decode_state(0x06), do: {:ok, :vent_economizer}
+  def decode_state(0x07), do: {:ok, :aux_heating}
+  def decode_state(0x08), do: {:ok, :heating_stage_2}
+  def decode_state(0x09), do: {:ok, :cooling_stage_2}
+  def decode_state(0x0A), do: {:ok, :aux_heat_stage_2}
+  def decode_state(0x0B), do: {:ok, :aux_heat_stage_3}
 
   def decode_state(byte),
     do: {:error, %DecodeError{value: byte, param: :state, command: :thermostat_operating_state}}
