@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReportTest do
       ]
 
       {:ok, command} = MultiChannelAssociationReport.new(params)
-      expected_binary = <<0x02, 0x04, 0x05, 0x06>>
+      expected_binary = <<0x02, 0x0A, 0x00, 0x04, 0x05, 0x06>>
       assert expected_binary == MultiChannelAssociationReport.encode_params(command)
     end
 
