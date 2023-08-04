@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReport do
     node_endpoints = Command.param!(command, :node_endpoints)
 
     if Enum.empty?(node_endpoints) do
-      <<Command.param!(command, :grouping_identifier)>> <> nodes_bin
+      <<grouping_identifier, max_nodes_supported, reports_to_follow>> <> nodes_bin
     else
       encoded_node_endpoints = MultiChannelAssociation.encode_node_endpoints(node_endpoints)
 

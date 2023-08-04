@@ -204,14 +204,18 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
           MultiChannelAssociationReport.new(
             grouping_identifier: 1,
             max_nodes_supported: 1,
-            nodes: []
+            nodes: [],
+            reports_to_follow: 0,
+            node_endpoints: []
           )
 
         association ->
           MultiChannelAssociationReport.new(
             grouping_identifier: association.grouping_id,
             max_nodes_supported: 1,
-            nodes: association.node_ids
+            nodes: association.node_ids,
+            reports_to_follow: 0,
+            node_endpoints: []
           )
       end
 
