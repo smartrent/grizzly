@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
   alias Grizzly.ZWave.CommandClasses.SensorMultilevel
 
   # See Grizzly.ZWave.CommandClasses.SensorMultilevel for the full list of sensor type values
@@ -42,9 +42,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
     sensor_type_byte = SensorMultilevel.encode_sensor_type(Command.param!(command, :sensor_type))
     scale = Command.param!(command, :scale)
     value = Command.param!(command, :value)
-    precision = precision(value)
-    int_value = round(value * :math.pow(10, precision))
-    byte_size = ceil(:math.log2(int_value) / 8)
+    {int_value, precision, byte_size} = Encoding.encode_zwave_float(value)
 
     <<sensor_type_byte, precision::size(3), scale::size(2), byte_size::size(3),
       int_value::size(byte_size)-unit(8)>>
@@ -57,18 +55,11 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
           int_value::size(size)-unit(8)>>
       ) do
     with {:ok, sensor_type} <- SensorMultilevel.decode_sensor_type(sensor_type_byte) do
-      value = int_value / :math.pow(10, precision)
+      value = Encoding.decode_zwave_float(int_value, precision)
       {:ok, [sensor_type: sensor_type, scale: scale, value: value]}
     else
       {:error, %DecodeError{}} = error ->
         error
-    end
-  end
-
-  defp precision(value) when is_number(value) do
-    case String.split("#{value}", ".") do
-      [_] -> 0
-      [_, dec] -> String.length(dec)
     end
   end
 end

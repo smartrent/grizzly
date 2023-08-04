@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
   @impl Command
@@ -37,11 +37,9 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   def encode_params(command) do
     type = Command.param!(command, :type)
     scale_byte = Command.param!(command, :scale) |> ThermostatSetpoint.encode_scale()
-    value = encode_value(command, type)
+    value = get_value(command, type)
 
-    precision = precision(value)
-    int_value = round(value * :math.pow(10, precision))
-    byte_size = encode_size(type, int_value)
+    {int_value, precision, byte_size} = Encoding.encode_zwave_float(value)
 
     <<0x00::size(4), ThermostatSetpoint.encode_type(type)::size(4), precision::size(3),
       scale_byte::size(2), byte_size::size(3), int_value::size(byte_size)-unit(8)>>
@@ -51,11 +49,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   #
   #  "If this field [type] is set to 0x00 (N/A), it is RECOMMENDED to set the
   #   Size field to 1 and the Value field to 0."
-  defp encode_value(_command, :na), do: 0
-  defp encode_value(command, _other), do: Command.param!(command, :value)
-
-  defp encode_size(:na, _value), do: 1
-  defp encode_size(_type, value), do: ceil(:math.log2(value) / 8)
+  defp get_value(_command, :na), do: 0
+  defp get_value(command, _other), do: Command.param!(command, :value)
 
   @impl Command
   def decode_params(
@@ -66,18 +61,11 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
 
     case ThermostatSetpoint.decode_scale(scale_byte) do
       {:ok, scale} ->
-        value = int_value / :math.pow(10, precision)
+        value = Encoding.decode_zwave_float(int_value, precision)
         {:ok, [type: type, scale: scale, value: value]}
 
       {:error, %DecodeError{}} = error ->
         error
-    end
-  end
-
-  defp precision(value) when is_number(value) do
-    case String.split("#{value}", ".") do
-      [_] -> 0
-      [_, dec] -> String.length(dec)
     end
   end
 end

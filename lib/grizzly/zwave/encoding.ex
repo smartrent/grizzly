@@ -157,4 +157,114 @@ defmodule Grizzly.ZWave.Encoding do
     addr_list = for <<hextet::16 <- binary>>, into: [], do: hextet
     List.to_tuple(addr_list)
   end
+
+  @doc """
+  Converts a float into a tuple containing an integer representation of the float,
+  the factor of 10 by which the integer must be divided to get the original float,
+  and the number of bytes needed to represent the value as a signed integer.
+
+  ## Examples
+
+      iex> encode_zwave_float(0)
+      {0, 0, 1}
+      iex> encode_zwave_float(-1.5)
+      {-15, 1, 1}
+      iex> encode_zwave_float(-1.50)
+      {-15, 1, 1}
+      iex> encode_zwave_float(128)
+      {128, 0, 2}
+      iex> encode_zwave_float(127.5)
+      {1275, 1, 2}
+      iex> encode_zwave_float(-75.25)
+      {-7525, 2, 2}
+      iex> encode_zwave_float(-752.55)
+      {-75255, 2, 3}
+      iex> encode_zwave_float(-75.255)
+      {-75255, 3, 3}
+  """
+  @spec encode_zwave_float(value :: number()) ::
+          {int_value :: integer(), precision :: non_neg_integer(), size :: integer()}
+  def encode_zwave_float(value) do
+    # Convert the value to an integer by multiplying it by 10 ^ precision and
+    # rounding the result to the nearest integer. If the value is already an
+    # integer, leave it as-is.
+    precision = __float_precision__(value)
+
+    int_value =
+      case value do
+        v when is_integer(v) -> v
+        v -> round(v * :math.pow(10, precision))
+      end
+
+    # Determine the number of bytes needed to represent the integer value.
+    size = __float_bytes_needed__(int_value)
+
+    {int_value, precision, size}
+  end
+
+  @doc """
+  Converts an integer value and non-zero precision into a float by dividing the
+  integer by `10 ^ precision`. If the given precision is zero, the integer is
+  returned as-is.
+
+  ## Examples
+
+      iex> decode_zwave_float(0, 0)
+      0
+      iex> decode_zwave_float(0, 2)
+      0.0
+      iex> decode_zwave_float(1234, 2)
+      12.34
+      iex> decode_zwave_float(1234, 1)
+      123.4
+      iex> decode_zwave_float(1234, 0)
+      1234
+      iex> decode_zwave_float(-1234, 2)
+      -12.34
+  """
+  @spec decode_zwave_float(integer(), non_neg_integer()) :: number()
+  def decode_zwave_float(int_value, 0), do: int_value
+
+  def decode_zwave_float(int_value, precision) do
+    int_value / :math.pow(10, precision)
+  end
+
+  @doc false
+  @spec __float_precision__(number()) :: non_neg_integer()
+  def __float_precision__(v) when is_integer(v), do: 0
+
+  # We only get 3 bits to represent the precision, so the maximum possible value
+  # is 7. The quick and dirty way to determine the precision of an arbitrary
+  # float is to convert it to a string and count the number of digits after the
+  # decimal point.
+  def __float_precision__(v) when is_float(v) do
+    case String.split("#{v}", ".") do
+      [_] -> 0
+      [_, dec] -> String.length(dec)
+    end
+  end
+
+  @doc false
+  def __float_bits_needed__(0), do: 1
+
+  def __float_bits_needed__(int_value) do
+    # This is essentially the same as rounding int_value up to the next power of
+    # 2 and then taking the log2. We add 1 to the result to account for the sign
+    # bit.
+    bits = ceil(:math.log2(abs(int_value))) + 1
+
+    <<msb::1, _rest::size(bits - 1)>> = <<int_value::signed-size(bits)>>
+
+    if msb == 1 && int_value > 0 do
+      bits + 1
+    else
+      bits
+    end
+  end
+
+  @doc false
+  def __float_bytes_needed__(int_value) do
+    bits = __float_bits_needed__(int_value)
+    ceil(bits / 8)
+  end
 end

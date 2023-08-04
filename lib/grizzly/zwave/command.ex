@@ -97,6 +97,11 @@ defmodule Grizzly.ZWave.Command do
     end
   end
 
+  @spec has_param?(t(), atom()) :: boolean()
+  def has_param?(command, param) do
+    Keyword.has_key?(command.params, param)
+  end
+
   @doc """
   Just like `param/3` but will raise if the the param is not in the param list
   """
