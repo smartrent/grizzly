@@ -4,9 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.4] - 2023-08-07
+
+### Fixed
+
+- Fix response handler for Multi Channel Association Get ([#813](https://github.com/smartrent/grizzly/pull/813))
+- Add missing state values to Thermostat Operating State ([#814](https://github.com/smartrent/grizzly/pull/814))
+- Fix encoding/decoding for Meter Report v2-5 ([#815](https://github.com/smartrent/grizzly/pull/815))
+
 ## [v6.8.3] - 2023-08-01
 
-### Fixed 
+### Fixed
 
 - Fix ``:ack_request` in response to AsyncConnection command ([#810](https://github.com/smartrent/grizzly/pull/810))
 
@@ -17,7 +25,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Implement Sound Switch CC v1-2 ([#806](https://github.com/smartrent/grizzly/pull/806))
 - Implement all commands from User Code CC v2 ([#697](https://github.com/smartrent/grizzly/pull/697))
 
-### Fixed 
+### Fixed
 
 - Fix async command timeout handling ([#808](https://github.com/smartrent/grizzly/pull/808))
 - Fix decoding of meter type in Meter Reports ([#807](https://github.com/smartrent/grizzly/pull/807))
