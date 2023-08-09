@@ -195,7 +195,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x67, 0x09, Commands.S2ResynchronizationEvent},
       {0x67, 0x0E, Commands.ZWaveLongRangeChannelReport},
 
-      # Security
+      # S0
       {0x98, 0x02, Commands.S0CommandsSupportedGet},
       {0x98, 0x03, Commands.S0CommandsSupportedReport},
       {0x98, 0x04, Commands.S0SecuritySchemeGet},
@@ -207,9 +207,21 @@ defmodule Grizzly.ZWave.Decoder do
       {0x98, 0x80, Commands.S0NonceReport},
       {0x98, 0x81, Commands.S0MessageEncapsulation},
 
-      # Security2
-      {0x9F, 0x0D, Commands.Security2CommandsSupportedGet},
-      {0x9F, 0x0E, Commands.Security2CommandsSupportedReport},
+      # S2
+      {0x9F, 0x01, Commands.S2NonceGet},
+      {0x9F, 0x02, Commands.S2NonceReport},
+      {0x9F, 0x03, Commands.S2MessageEncapsulation},
+      {0x9F, 0x04, Commands.S2KexGet},
+      {0x9F, 0x05, Commands.S2KexReport},
+      {0x9F, 0x06, Commands.S2KexSet},
+      {0x9F, 0x07, Commands.S2KexFail},
+      {0x9F, 0x08, Commands.S2PublicKeyReport},
+      {0x9F, 0x09, Commands.S2NetworkKeyGet},
+      {0x9F, 0x0A, Commands.S2NetworkKeyReport},
+      {0x9F, 0x0B, Commands.S2NetworkKeyVerify},
+      {0x9F, 0x0C, Commands.S2TransferEnd},
+      {0x9F, 0x0D, Commands.S2CommandsSupportedGet},
+      {0x9F, 0x0E, Commands.S2CommandsSupportedReport},
 
       # Window Covering
       {0x6A, 0x01, Commands.WindowCoveringSupportedGet},

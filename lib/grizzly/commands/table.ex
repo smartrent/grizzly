@@ -122,9 +122,30 @@ defmodule Grizzly.Commands.Table do
       {:s0_message_encapsulation, {Commands.S0MessageEncapsulation, handler: AckResponse}},
 
       # S2
-      {:security_2_commands_supported_get,
-       {Commands.Security2CommandsSupportedGet,
-        handler: {WaitReport, complete_report: :security_2_commands_supported_report}}},
+      {:s2_kex_get,
+       {Commands.S2KexGet,
+        handler: {WaitReport, complete_report: :s2_kex_report, supports_supervision?: false}}},
+      {:s2_kex_set,
+       {Commands.S2KexSet,
+        handler: {WaitReport, complete_report: :s2_kex_report, supports_supervision?: false}}},
+      {:s2_kex_fail, {Commands.S2KexFail, handler: {AckResponse, supports_supervision?: false}}},
+      {:s2_kex_report,
+       {Commands.S2KexReport, handler: {AckResponse, supports_supervision?: false}}},
+      {:s2_public_key_report,
+       {Commands.S2PublicKeyReport, handler: {AckResponse, supports_supervision?: false}}},
+      {:s2_network_key_get,
+       {Commands.S2NetworkKeyGet,
+        handler:
+          {WaitReport, complete_report: :s2_network_key_report, supports_supervision?: false}}},
+      {:s2_network_key_report,
+       {Commands.S2NetworkKeyReport, handler: {AckResponse, supports_supervision?: false}}},
+      {:s2_network_key_verify,
+       {Commands.S2NetworkKeyVerify, handler: {AckResponse, supports_supervision?: false}}},
+      {:s2_transfer_end,
+       {Commands.S2TransferEnd, handler: {AckResponse, supports_supervision?: false}}},
+      {:s2_commands_supported_get,
+       {Commands.S2CommandsSupportedGet,
+        handler: {WaitReport, complete_report: :s2_commands_supported_report}}},
 
       # DSKs
       {:node_add_keys_set,
