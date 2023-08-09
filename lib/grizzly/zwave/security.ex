@@ -4,7 +4,8 @@ defmodule Grizzly.ZWave.Security do
   """
   import Bitwise
 
-  @type key :: :s2_unauthenticated | :s2_authenticated | :s2_access_control | :s0
+  @type s2_key :: :s2_unauthenticated | :s2_authenticated | :s2_access_control
+  @type key :: s2_key() | :s0
 
   @type key_byte :: 0x01 | 0x02 | 0x04 | 0x80
 
@@ -50,7 +51,7 @@ defmodule Grizzly.ZWave.Security do
 
   @spec keys_to_byte([key]) :: byte
   def keys_to_byte(keys) do
-    Enum.reduce(keys, 0, fn key, byte -> byte ||| key_byte(key) end)
+    Enum.reduce(keys, 0, fn key, byte -> byte ||| key_to_byte(key) end)
   end
 
   @doc """
@@ -94,11 +95,20 @@ defmodule Grizzly.ZWave.Security do
   so this function does not support encoding to that
   key.
   """
-  @spec key_byte(key) :: key_byte()
-  def key_byte(:s0), do: 0x80
-  def key_byte(:s2_access_control), do: 0x04
-  def key_byte(:s2_authenticated), do: 0x02
-  def key_byte(:s2_unauthenticated), do: 0x01
+  @spec key_to_byte(key()) :: key_byte()
+  def key_to_byte(:s0), do: 0x80
+  def key_to_byte(:s2_access_control), do: 0x04
+  def key_to_byte(:s2_authenticated), do: 0x02
+  def key_to_byte(:s2_unauthenticated), do: 0x01
+
+  @doc """
+  Get the key represented by the given byte.
+  """
+  @spec key_from_byte(key_byte()) :: key()
+  def key_from_byte(0x80), do: :s0
+  def key_from_byte(0x04), do: :s2_access_control
+  def key_from_byte(0x02), do: :s2_authenticated
+  def key_from_byte(0x01), do: :s2_unauthenticated
 
   @doc """
   Gets the highest security level key from a key list

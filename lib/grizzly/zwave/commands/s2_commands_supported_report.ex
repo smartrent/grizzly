@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.Security2CommandsSupportedReport do
+defmodule Grizzly.ZWave.Commands.S2CommandsSupportedReport do
   @moduledoc """
   Lists commands supported by a node when using S2.
   """
@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.Security2CommandsSupportedReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :security_2_commands_supported_report,
+      name: :s2_commands_supported_report,
       command_byte: 0x0E,
       command_class: Security2,
       params: put_defaults(params),
