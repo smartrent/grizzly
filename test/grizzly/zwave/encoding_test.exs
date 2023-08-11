@@ -26,8 +26,19 @@ defmodule Grizzly.ZWave.EncodingTest do
     assert 2 == Encoding.__float_bytes_needed__(-129)
 
     assert 2 == Encoding.__float_bytes_needed__(32767)
-    assert 3 == Encoding.__float_bytes_needed__(32768)
+    assert 4 == Encoding.__float_bytes_needed__(32768)
     assert 2 == Encoding.__float_bytes_needed__(-32768)
-    assert 3 == Encoding.__float_bytes_needed__(-32769)
+    assert 4 == Encoding.__float_bytes_needed__(-32769)
+  end
+
+  test "__float_precision__/1" do
+    assert 0 == Encoding.__float_precision__(0)
+    assert 2 == Encoding.__float_precision__(1.27)
+    assert 3 == Encoding.__float_precision__(1.273)
+    assert 7 == Encoding.__float_precision__(1.27341234124)
+
+    assert_raise ArgumentError, fn ->
+      Encoding.__float_precision__(4_235_573_285.134538135132)
+    end
   end
 end
