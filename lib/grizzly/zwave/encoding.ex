@@ -178,13 +178,24 @@ defmodule Grizzly.ZWave.Encoding do
       iex> encode_zwave_float(-75.25)
       {-7525, 2, 2}
       iex> encode_zwave_float(-752.55)
-      {-75255, 2, 3}
+      {-75255, 2, 4}
       iex> encode_zwave_float(-75.255)
-      {-75255, 3, 3}
+      {-75255, 3, 4}
   """
   @spec encode_zwave_float(value :: number()) ::
           {int_value :: integer(), precision :: non_neg_integer(), size :: integer()}
   def encode_zwave_float(value) do
+    # Before we start, we need to make sure the integer part of the value will
+    # fit in 32 bits. As long as that's true, we can safely convert any value
+    # into a Z-Wave float by decreasing the precision until we get a value that
+    # we can encode, even if that means dropping the fractional part entirely.
+    integer_part = round(value)
+    <<test::signed-32>> = <<integer_part::signed-32>>
+
+    if test != integer_part do
+      raise ArgumentError, "Value #{value} would overflow 32 bits"
+    end
+
     # Convert the value to an integer by multiplying it by 10 ^ precision and
     # rounding the result to the nearest integer. If the value is already an
     # integer, leave it as-is.
@@ -230,17 +241,38 @@ defmodule Grizzly.ZWave.Encoding do
   end
 
   @doc false
-  @spec __float_precision__(number()) :: non_neg_integer()
-  def __float_precision__(v) when is_integer(v), do: 0
-
   # We only get 3 bits to represent the precision, so the maximum possible value
   # is 7. The quick and dirty way to determine the precision of an arbitrary
   # float is to convert it to a string and count the number of digits after the
   # decimal point.
-  def __float_precision__(v) when is_float(v) do
-    case String.split("#{v}", ".") do
-      [_] -> 0
-      [_, dec] -> String.length(dec)
+  @spec __float_precision__(number()) :: non_neg_integer()
+  def __float_precision__(v, max_precision \\ 7)
+
+  def __float_precision__(v, _) when is_integer(v), do: 0
+
+  def __float_precision__(v, max_precision) when is_float(v) do
+    rounded = Float.round(v, max_precision)
+
+    calculated_precision =
+      case String.split("#{rounded}", ".") do
+        [_] ->
+          0
+
+        [_, dec] ->
+          String.replace_trailing(dec, "0", "") |> String.length()
+      end
+
+    # Test the integer value to see if it overflows 32 bits (if so, we need to
+    # reduce the precision).
+    candidate = round(v * :math.pow(10, calculated_precision))
+
+    <<test::signed-32>> = <<candidate::signed-32>>
+
+    cond do
+      test == candidate -> calculated_precision
+      # We should have already checked for overflow, so we _should_ never hit this branch
+      max_precision == 0 -> raise ArgumentError, "Value #{v} would overflow 32 bits"
+      true -> __float_precision__(v, max_precision - 1)
     end
   end
 
@@ -265,6 +297,13 @@ defmodule Grizzly.ZWave.Encoding do
   @doc false
   def __float_bytes_needed__(int_value) do
     bits = __float_bits_needed__(int_value)
-    ceil(bits / 8)
+    bytes_needed = ceil(bits / 8)
+
+    # Even if we only need 3 bytes, we have to use 4.
+    cond do
+      bytes_needed == 3 -> 4
+      bytes_needed > 4 -> raise ArgumentError, "Value #{int_value} would overflow 32 bits"
+      true -> bytes_needed
+    end
   end
 end
