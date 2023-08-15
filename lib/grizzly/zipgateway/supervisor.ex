@@ -77,6 +77,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
          options.zipgateway_binary,
          ["-c", options.zipgateway_config_path, "-s", options.serial_port],
          [
+           name: Grizzly.ZIPGateway.Daemon,
            cd: priv,
            log_output: :debug,
            log_transform: &zipgateway_log_transform/1,
