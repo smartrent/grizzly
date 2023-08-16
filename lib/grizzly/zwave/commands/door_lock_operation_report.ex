@@ -144,9 +144,9 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     latch_position = latch_position_from_byte(door_condition_byte)
     bolt_position = bolt_position_from_byte(door_condition_byte)
     door_state = door_state_from_byte(door_condition_byte)
+    mode = DoorLock.mode_from_byte(mode_byte)
 
-    with {:ok, mode} <- DoorLock.mode_from_byte(mode_byte),
-         {:ok, timeout_minutes} <- timeout_minutes_from_byte(timeout_minutes),
+    with {:ok, timeout_minutes} <- timeout_minutes_from_byte(timeout_minutes),
          {:ok, timeout_seconds} <- timeout_seconds_from_byte(timeout_seconds) do
       {:ok,
        [
@@ -180,11 +180,11 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     latch_position = latch_position_from_byte(door_condition_byte)
     bolt_position = bolt_position_from_byte(door_condition_byte)
     door_state = door_state_from_byte(door_condition_byte)
+    mode = DoorLock.mode_from_byte(mode_byte)
+    target_mode = DoorLock.mode_from_byte(target_mode_byte)
 
-    with {:ok, mode} <- DoorLock.mode_from_byte(mode_byte),
-         {:ok, timeout_minutes} <- timeout_minutes_from_byte(timeout_minutes),
+    with {:ok, timeout_minutes} <- timeout_minutes_from_byte(timeout_minutes),
          {:ok, timeout_seconds} <- timeout_seconds_from_byte(timeout_seconds),
-         {:ok, target_mode} <- DoorLock.mode_from_byte(target_mode_byte),
          {:ok, duration} <- duration_from_byte(duration_byte) do
       {:ok,
        [

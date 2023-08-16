@@ -85,7 +85,7 @@ defmodule Grizzly.Test do
 
     assert String.contains?(
              log,
-             "unexpected value 0xAA for param :mode when decoding binary for :door_lock_operation_report"
+             "Unexpected value for door lock mode: 170"
            )
   end
 

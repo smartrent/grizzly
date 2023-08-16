@@ -112,27 +112,22 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
           block_to_block_supported_bit::size(1)>>
       ) do
     supported_operations = operations_from_bitmask(supported_operations_bitmask)
+    supported_modes = door_lock_modes_from_binary(supported_door_lock_modes_binary)
 
-    with {:ok, modes} <- door_lock_modes_from_binary(supported_door_lock_modes_binary) do
-      {:ok,
-       [
-         supported_operations: supported_operations,
-         supported_door_lock_modes: modes,
-         configurable_outside_handles:
-           DoorLock.door_handles_from_bitmask(configurable_outside_handles_bitmask),
-         configurable_inside_handles:
-           DoorLock.door_handles_from_bitmask(configurable_inside_handles_bitmask),
-         supported_door_components:
-           door_components_from_bitmask(supported_door_components_bitmask),
-         auto_relock_supported?: auto_relock_supported_bit == 1,
-         hold_and_release_supported?: hold_and_release_supported_bit == 1,
-         block_to_block_supported?: block_to_block_supported_bit == 1,
-         twist_assist_supported?: twist_assist_supported_bit == 1
-       ]}
-    else
-      {:error, %DecodeError{} = decode_error} ->
-        {:error, %DecodeError{decode_error | command: :door_lock_capabilities_report}}
-    end
+    {:ok,
+     [
+       supported_operations: supported_operations,
+       supported_door_lock_modes: supported_modes,
+       configurable_outside_handles:
+         DoorLock.door_handles_from_bitmask(configurable_outside_handles_bitmask),
+       configurable_inside_handles:
+         DoorLock.door_handles_from_bitmask(configurable_inside_handles_bitmask),
+       supported_door_components: door_components_from_bitmask(supported_door_components_bitmask),
+       auto_relock_supported?: auto_relock_supported_bit == 1,
+       hold_and_release_supported?: hold_and_release_supported_bit == 1,
+       block_to_block_supported?: block_to_block_supported_bit == 1,
+       twist_assist_supported?: twist_assist_supported_bit == 1
+     ]}
   end
 
   defp operations_to_binary(operations) do
@@ -170,12 +165,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
 
   defp door_lock_modes_from_binary(binary) do
     mode_bytes = :erlang.binary_to_list(binary)
-
-    Enum.reduce_while(mode_bytes, {:ok, []}, fn byte, {:ok, acc} ->
-      case DoorLock.mode_from_byte(byte) do
-        {:ok, mode} -> {:cont, {:ok, [mode | acc]}}
-        {:error, %DecodeError{}} = error -> {:halt, error}
-      end
-    end)
+    Enum.map(mode_bytes, &DoorLock.mode_from_byte/1)
   end
 end

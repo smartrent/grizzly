@@ -247,9 +247,10 @@ defmodule GrizzlyTest.Server do
 
   defp send_command_not_to_spec(socket, port, _zip_packet) do
     # Door lock report with invalid mode (0xAA)
-    command = <<98, 3, 0xAA, 0, 0, 0, 0>>
+    {:ok, command} =
+      ZIPPacket.with_zwave_command(<<98, 3, 0xAA, 0, 0, 0, 0>>, SeqNumber.get_and_inc())
 
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, command)
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(command))
     :ok
   end
 
