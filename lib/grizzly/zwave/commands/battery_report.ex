@@ -100,7 +100,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
   def decode_params(
         <<level_byte, charging_status_byte::size(2), rechargeable_byte::size(1),
           backup_byte::size(1), overheating_byte::size(1), low_fluid_byte::size(1),
-          replace_recharge_byte::size(2), 0x00::size(6), low_temperature_byte::size(1),
+          replace_recharge_byte::size(2), _reserved::size(6), low_temperature_byte::size(1),
           disconnected_byte::size(1)>>
       ) do
     with {:ok, level} <- level_from_byte(level_byte),
@@ -163,10 +163,11 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
   defp charging_status_from_byte(byte),
     do: {:error, %DecodeError{value: byte, param: :chargin_status, command: :battery_report}}
 
-  defp replace_recharge_from_byte(0x00), do: {:ok, :unknown}
-  defp replace_recharge_from_byte(0x01), do: {:ok, :soon}
+  # If bit 1 is set, bit 0 is _supposed_ to be set as well, but we'll allow either.
+  # This function doesn't have an error fallback because Dialyzer knows that it can only be 0..3
+  # since it's derived from a 2-bit value.
   defp replace_recharge_from_byte(0x03), do: {:ok, :now}
-
-  defp replace_recharge_from_byte(byte),
-    do: {:error, %DecodeError{value: byte, param: :replace_recharge, command: :battery_report}}
+  defp replace_recharge_from_byte(0x02), do: {:ok, :now}
+  defp replace_recharge_from_byte(0x01), do: {:ok, :soon}
+  defp replace_recharge_from_byte(0x00), do: {:ok, :unknown}
 end
