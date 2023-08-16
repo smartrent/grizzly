@@ -23,6 +23,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   @behaviour Grizzly.ZWave.Command
 
+  require Logger
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.DoorLock
 
@@ -167,8 +168,13 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   # Version 4
   def decode_params(
         <<mode_byte, outside_handles_int::size(4), inside_handles_int::size(4),
-          door_condition_byte, timeout_minutes, timeout_seconds, target_mode_byte, duration_byte>>
+          door_condition_byte, timeout_minutes, timeout_seconds, target_mode_byte, duration_byte,
+          invalid_extra::binary>> = binary
       ) do
+    if byte_size(invalid_extra) != 0 do
+      Logger.warning("[Grizzly] Extra bytes in Door Lock Operation Report #{inspect(binary)}")
+    end
+
     outside_handles = door_handles_modes_from_byte(outside_handles_int)
     inside_handles = door_handles_modes_from_byte(inside_handles_int)
     latch_position = latch_position_from_byte(door_condition_byte)
