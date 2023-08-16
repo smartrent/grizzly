@@ -10,6 +10,8 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
 
   alias Grizzly.ZWave.DecodeError
 
+  require Logger
+
   @type mode ::
           :unsecured
           | :unsecured_with_timeout
@@ -41,19 +43,21 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
   # version >= 4
   def mode_to_byte(:unknown), do: 0xFE
 
-  @spec mode_from_byte(byte()) :: {:ok, mode()} | {:error, DecodeError.t()}
-  def mode_from_byte(0x00), do: {:ok, :unsecured}
-  def mode_from_byte(0x01), do: {:ok, :unsecured_with_timeout}
-  def mode_from_byte(0x10), do: {:ok, :unsecured_inside_door_handles}
-  def mode_from_byte(0x11), do: {:ok, :unsecured_inside_door_handles_with_timeout}
-  def mode_from_byte(0x20), do: {:ok, :unsecured_outside_door_handles}
-  def mode_from_byte(0x21), do: {:ok, :unsecured_outside_door_handles_with_timeout}
-  def mode_from_byte(0xFF), do: {:ok, :secured}
+  @spec mode_from_byte(byte()) :: mode()
+  def mode_from_byte(0x00), do: :unsecured
+  def mode_from_byte(0x01), do: :unsecured_with_timeout
+  def mode_from_byte(0x10), do: :unsecured_inside_door_handles
+  def mode_from_byte(0x11), do: :unsecured_inside_door_handles_with_timeout
+  def mode_from_byte(0x20), do: :unsecured_outside_door_handles
+  def mode_from_byte(0x21), do: :unsecured_outside_door_handles_with_timeout
+  def mode_from_byte(0xFF), do: :secured
   # version >= 4
-  def mode_from_byte(0xFE), do: {:ok, :unknown}
+  def mode_from_byte(0xFE), do: :unknown
 
-  def mode_from_byte(byte),
-    do: {:error, %DecodeError{value: byte, param: :mode}}
+  def mode_from_byte(byte) do
+    Logger.warning("Unexpected value for door lock mode: #{byte}")
+    :unknown
+  end
 
   def operation_type_to_byte(:constant_operation), do: 0x01
   def operation_type_to_byte(:timed_operation), do: 0x02

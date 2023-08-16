@@ -212,7 +212,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   @doc """
   Make a Z/IP Packet Command that encapsulates another Z-Wave command
   """
-  @spec with_zwave_command(Command.t(), ZWave.seq_number(), [param()]) :: {:ok, Command.t()}
+  @spec with_zwave_command(Command.t() | binary(), ZWave.seq_number(), [param()]) ::
+          {:ok, Command.t()}
   def with_zwave_command(zwave_command, seq_number, params \\ []) do
     params =
       [flag: :ack_request]

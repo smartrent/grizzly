@@ -38,12 +38,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSet do
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<mode_byte>>) do
-    case DoorLock.mode_from_byte(mode_byte) do
-      {:ok, mode} ->
-        {:ok, [mode: mode]}
-
-      {:error, %DecodeError{} = decode_error} ->
-        {:error, %DecodeError{decode_error | command: :door_lock_operation_set}}
-    end
+    {:ok, [mode: DoorLock.mode_from_byte(mode_byte)]}
   end
 end
