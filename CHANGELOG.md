@@ -4,6 +4,16 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.5] - 2023-08-21
+
+### Fixed
+
+- Value in Multilevel Sensor Reports should be interpreted as signed ([#817](https://github.com/smartrent/grizzly/pull/817))
+- Cap Z-Wave float precision at 7 ([#818](https://github.com/smartrent/grizzly/pull/818))
+- Ignore reserved field values when parsing Battery Reports ([#820](https://github.com/smartrent/grizzly/pull/820))
+- Ignore trailing bytes in Door Lock Operation Report ([#821](https://github.com/smartrent/grizzly/pull/821))
+- Ignore illegal values for door lock mode ([#822](https://github.com/smartrent/grizzly/pull/822))
+
 ## [v6.8.4] - 2023-08-07
 
 ### Fixed
@@ -2297,6 +2307,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.8.5]: https://github.com/smartrent/grizzly/compare/v6.8.4..v6.8.5
 [v6.8.4]: https://github.com/smartrent/grizzly/compare/v6.8.3..v6.8.4
 [v6.8.3]: https://github.com/smartrent/grizzly/compare/v6.8.2..v6.8.3
 [v6.8.2]: https://github.com/smartrent/grizzly/compare/v6.8.1..v6.8.2
