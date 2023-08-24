@@ -162,9 +162,9 @@ defmodule Grizzly.ZWave.Decoder do
       {0x63, 0x0B, Commands.ExtendedUserCodeSet},
       {0x63, 0x0C, Commands.ExtendedUserCodeGet},
       {0x63, 0x0D, Commands.ExtendedUserCodeReport},
-      {0x63, 0x0E, Commands.MasterCodeSet},
-      {0x63, 0x0F, Commands.MasterCodeGet},
-      {0x63, 0x10, Commands.MasterCodeReport},
+      {0x63, 0x0E, Commands.AdminCodeSet},
+      {0x63, 0x0F, Commands.AdminCodeGet},
+      {0x63, 0x10, Commands.AdminCodeReport},
       {0x63, 0x11, Commands.UserCodeChecksumGet},
       {0x63, 0x12, Commands.UserCodeChecksumReport},
 

@@ -236,9 +236,9 @@ defmodule Grizzly.Commands.Table do
       {:user_code_keypad_mode_get,
        {Commands.UserCodeKeypadModeGet,
         handler: {WaitReport, complete_report: :user_code_keypad_mode_report}}},
-      {:master_code_set, {Commands.MasterCodeSet, handler: AckResponse}},
-      {:master_code_get,
-       {Commands.MasterCodeGet, handler: {WaitReport, complete_report: :master_code_report}}},
+      {:admin_code_set, {Commands.AdminCodeSet, handler: AckResponse}},
+      {:admin_code_get,
+       {Commands.AdminCodeGet, handler: {WaitReport, complete_report: :admin_code_report}}},
 
       # Meter
       {:meter_get, {Commands.MeterGet, handler: {WaitReport, complete_report: :meter_report}}},
