@@ -1,10 +1,10 @@
-defmodule Grizzly.ZWave.Commands.MasterCodeSet do
+defmodule Grizzly.ZWave.Commands.AdminCodeReport do
   @moduledoc """
-  MasterCodeSet sets the master code
+  AdminCodeReport reports the admin code
 
   Params:
 
-    * `:code` - a 4 - 10 master code pin in string format (required)
+    * `:code` - a 4 - 10 admin code pin in string format (required)
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -18,8 +18,8 @@ defmodule Grizzly.ZWave.Commands.MasterCodeSet do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :master_code_set,
-      command_byte: 0x0E,
+      name: :admin_code_report,
+      command_byte: 0x10,
       command_class: UserCode,
       params: params,
       impl: __MODULE__

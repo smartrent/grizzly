@@ -1,6 +1,6 @@
-defmodule Grizzly.ZWave.Commands.MasterCodeGet do
+defmodule Grizzly.ZWave.Commands.AdminCodeGet do
   @moduledoc """
-  MasterCodeGet gets the master code
+  AdminCodeGet gets a lock's admin code.
 
   Params:
 
@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.MasterCodeGet do
   @spec new(keyword()) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :master_code_get,
+      name: :admin_code_get,
       command_byte: 0x0F,
       command_class: UserCode,
       params: params,
