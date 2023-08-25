@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.6] - 2023-08-25
+
+### Fixed
+
+- Z/IP Gateway ready checker waits for initial node list report ([#824](https://github.com/smartrent/grizzly/pull/824))
+- Rename Master Code commands to Admin Code ([#825](https://github.com/smartrent/grizzly/pull/825))
+
 ## [v6.8.5] - 2023-08-21
 
 ### Fixed
@@ -2307,6 +2314,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v6.8.6]: https://github.com/smartrent/grizzly/compare/v6.8.5..v6.8.6
 [v6.8.5]: https://github.com/smartrent/grizzly/compare/v6.8.4..v6.8.5
 [v6.8.4]: https://github.com/smartrent/grizzly/compare/v6.8.3..v6.8.4
 [v6.8.3]: https://github.com/smartrent/grizzly/compare/v6.8.2..v6.8.3
