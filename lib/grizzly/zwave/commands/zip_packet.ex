@@ -155,7 +155,17 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
 
   @spec ack_response?(Command.t()) :: boolean()
   def ack_response?(command) do
-    Command.param!(command, :flag) == :ack_response
+    Command.param(command, :flag, nil) == :ack_response
+  end
+
+  @spec nack_response?(Command.t()) :: boolean()
+  def nack_response?(command) do
+    Command.param(command, :flag, nil) == :nack_response
+  end
+
+  @spec nack_waiting?(Command.t()) :: boolean()
+  def nack_waiting?(command) do
+    Command.param(command, :flag, nil) == :nack_waiting
   end
 
   @spec make_ack_response(ZWave.seq_number(), keyword()) :: Command.t()
