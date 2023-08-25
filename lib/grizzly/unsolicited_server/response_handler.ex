@@ -19,7 +19,9 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     AssociationSpecificGroupReport,
     MultiChannelAssociationGroupingsReport,
     MultiChannelAssociationReport,
-    SupervisionReport
+    SupervisionReport,
+    ZIPKeepAlive,
+    ZIPPacket
   }
 
   @type opt() :: {:association_server, GenServer.name()}
@@ -32,15 +34,63 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   and send any other commands back over the Z-Wave PAN if needed
   """
   @spec handle_response(Transport.Response.t(), [opt()]) :: [action()] | {:error, reason :: any()}
-  def handle_response(response, opts \\ []) do
-    internal_command = Command.param!(response.command, :command)
+  def handle_response(%{command: command}, opts \\ []) do
+    cond do
+      command.name == :keep_alive ->
+        handle_keep_alive(command)
 
-    case handle_command(internal_command, opts) do
-      {:error, _any} = error ->
-        error
+      # Everything else should be Z/IP encapsulated
+      command.name != :zip_packet ->
+        Logger.warning(
+          "[Grizzly] Unsolicited server expected a Z/IP Packet, got: #{inspect(command)}"
+        )
 
-      actions when is_list(actions) ->
-        actions
+        []
+
+      # Nothing to do for ACK responses
+      ZIPPacket.ack_response?(command) ->
+        []
+
+      # Warn about nack responses
+      ZIPPacket.nack_response?(command) ->
+        Logger.warning(
+          "[Grizzly] Unsolicited server received a nack response: #{inspect(command)}"
+        )
+
+        []
+
+      # There's not much we can do about the nack+waiting condition when replying
+      # from the unsolicited server.
+      ZIPPacket.nack_waiting?(command) ->
+        []
+
+      # Pretty much anything else should be a Z/IP Packet carrying a command.
+      true ->
+        with internal_cmd when not is_nil(internal_cmd) <- Command.param!(command, :command),
+             actions when is_list(actions) <- handle_command(internal_cmd, opts) do
+          actions
+        else
+          {:error, _any} = error ->
+            error
+
+          nil ->
+            Logger.warning(
+              "[Grizzly] Unsolicited server received an unexpectedly empty Z/IP Packet: #{inspect(command)}"
+            )
+
+            []
+        end
+    end
+  end
+
+  defp handle_keep_alive(cmd) do
+    case Command.param!(cmd, :ack_flag) do
+      :ack_request ->
+        {:ok, ack_response} = ZIPKeepAlive.new(ack_flag: :ack_response)
+        [{:send_raw, ack_response}]
+
+      _ ->
+        []
     end
   end
 

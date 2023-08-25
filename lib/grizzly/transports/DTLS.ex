@@ -184,7 +184,7 @@ defmodule Grizzly.Transports.DTLS do
 
     case :ssl.transport_accept(socket) do
       {:ok, socket} ->
-        {:ok, Transport.assigns(transport, :accept_socket, socket)}
+        {:ok, Transport.assigns(transport, :socket, socket)}
 
       error ->
         error
@@ -193,11 +193,11 @@ defmodule Grizzly.Transports.DTLS do
 
   @impl Grizzly.Transport
   def handshake(transport) do
-    accept_socket = Transport.assign(transport, :accept_socket)
+    socket = Transport.assign(transport, :socket)
 
-    case :ssl.handshake(accept_socket) do
-      {:ok, _handshake_socket} ->
-        {:ok, transport}
+    case :ssl.handshake(socket) do
+      {:ok, socket} ->
+        {:ok, Transport.assigns(transport, :socket, socket)}
 
       error ->
         error
