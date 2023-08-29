@@ -27,10 +27,10 @@ defmodule Grizzly.StatusReporter do
   After this callback is called the implementor can assume the it is safe to
   access the Z-Wave network through Grizzly.
   """
-  @callback ready() :: :ok
+  @callback ready() :: any()
 
   @doc """
   This callback is executed during a firmware update of the Z-Wave module
   """
-  @callback zwave_firmware_update_status(zwave_firmware_status()) :: :ok
+  @callback zwave_firmware_update_status(zwave_firmware_status()) :: any()
 end

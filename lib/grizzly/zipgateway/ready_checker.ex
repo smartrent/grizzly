@@ -86,16 +86,19 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
   end
 
   defp ready(state) do
-    cond do
-      is_function(state.reporter, 0) ->
-        state.reporter.()
+    _ =
+      Task.Supervisor.start_child(Grizzly.TaskSupervisor, fn ->
+        cond do
+          is_function(state.reporter, 0) ->
+            state.reporter.()
 
-      function_exported?(state.reporter, :ready, 0) ->
-        state.reporter.ready()
+          function_exported?(state.reporter, :ready, 0) ->
+            state.reporter.ready()
 
-      true ->
-        :ok
-    end
+          true ->
+            :ok
+        end
+      end)
 
     %{state | ready?: true}
   end
