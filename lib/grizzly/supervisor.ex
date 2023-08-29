@@ -209,6 +209,7 @@ defmodule Grizzly.Supervisor do
 
   defp children(options) do
     [
+      {Task.Supervisor, name: Grizzly.TaskSupervisor},
       # According to Z-Wave specification we need to have a global
       # sequence number counter that starts at a random number between
       # 0 and 0xFF (255)

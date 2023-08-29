@@ -142,7 +142,12 @@ defmodule Grizzly.ZwaveFirmware do
   end
 
   defp report(options, status) do
-    # Report the firmware update status
-    options.status_reporter.zwave_firmware_update_status(status)
+    _ =
+      Task.Supervisor.start_child(Grizzly.TaskSupervisor, fn ->
+        # Report the firmware update status
+        options.status_reporter.zwave_firmware_update_status(status)
+      end)
+
+    :ok
   end
 end
