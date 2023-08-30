@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.7] - 2023-08-30
+
+### Fixed
+
+- Reply to unsolicited commands on the same DTLS connection ([#827](https://github.com/smartrent/grizzly/pull/827))
+- Execute external callbacks in `Task`s ([#830](https://github.com/smartrent/grizzly/pull/830))
+
 ## [v6.8.6] - 2023-08-25
 
 ### Fixed
