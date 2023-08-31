@@ -50,10 +50,10 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, runner, ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, 1, self())
 
-    queued_response = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
+    queued_response = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 30)
 
     report =
-      Report.new(:inflight, :queued_delay, 1, command_ref: ref, queued: true, queued_delay: 3)
+      Report.new(:inflight, :queued_delay, 1, command_ref: ref, queued: true, queued_delay: 30)
 
     assert {self(), {report, command_list}} ==
              CommandList.response_for_zip_packet(command_list, queued_response)

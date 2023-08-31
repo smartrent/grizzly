@@ -127,6 +127,23 @@ defmodule Grizzly.Connections.AsyncConnection do
     {:noreply, %State{state | keep_alive: new_keep_alive}}
   end
 
+  # handle when a command in nack+waiting is deferred to the queue. this probably
+  # won't happen for async connections since they're only used for inclusion/exclusion,
+  # but just in case.
+  def handle_info(
+        {:grizzly, :command_deferred, command_runner_pid, grizzly_command, report},
+        state
+      ) do
+    if grizzly_command.source.name == :keep_alive do
+      {:noreply, state}
+    else
+      waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
+      GenServer.reply(waiter, {:ok, report})
+
+      {:noreply, state}
+    end
+  end
+
   # handle when there is a timeout and command runner stops
   def handle_info(
         {:grizzly, :command_timeout, command_runner_pid, grizzly_command},

@@ -4,7 +4,6 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   alias Grizzly.{Connection, Report}
   alias Grizzly.Connections.SyncConnection
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias GrizzlyTest.Utils
 
   setup do
     # establish the connections for the tests
@@ -33,7 +32,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     # 102 will always respond with nack waiting with 2 seconds
     assert {:ok,
             %Report{status: :inflight, type: :queued_delay, queued_delay: 2, queued: true} =
-              report} = SyncConnection.send_command(102, command)
+              report} = SyncConnection.send_command(102, command, timeout: 1000)
 
     ref = report.command_ref
 
