@@ -59,6 +59,9 @@ defmodule Grizzly.Network do
       {:ok, %Report{type: :timeout}} ->
         {:error, :timeout}
 
+      {:error, :timeout} ->
+        {:error, :timeout}
+
       {:error, :nack_response} = error ->
         error
     end
