@@ -141,7 +141,7 @@ defmodule Grizzly.Report do
     - `:queued` - this flag marks if the command was ever queued before
       completing
     - `:acknowledged` - whether the destination node acknowledged the command.
-      Only valid when the status is `:complete. For commands using the `AckResponse`
+      Only valid when the status is `:complete`. For commands using the `AckResponse`
       command handler, this field will be true if `type` is `:ack_response` and false
       if `type` is `:nack_response`. For other command handlers, it will be true
       if the original command was acknowledged by the destination node (i.e. we
