@@ -27,7 +27,8 @@ defmodule Grizzly.Commands.Command do
           transmission_stats: keyword(),
           node_id: ZWave.node_id(),
           supervision?: boolean(),
-          session_id: non_neg_integer() | nil
+          session_id: non_neg_integer() | nil,
+          acknowledged: boolean()
         }
 
   @type opt ::
@@ -49,7 +50,8 @@ defmodule Grizzly.Commands.Command do
             transmission_stats: [],
             node_id: nil,
             supervision?: false,
-            session_id: nil
+            session_id: nil,
+            acknowledged: false
 
   @spec from_zwave_command(ZWaveCommand.t(), ZWave.node_id(), pid(), [opt()]) :: t()
   def from_zwave_command(zwave_command, node_id, owner, opts \\ []) do
@@ -143,7 +145,7 @@ defmodule Grizzly.Commands.Command do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
     if command.seq_number == seq_number do
-      do_handle_ack_response(command, zip_packet)
+      do_handle_ack_response(%__MODULE__{command | acknowledged: true}, zip_packet)
     else
       {:continue, command}
     end
@@ -299,12 +301,14 @@ defmodule Grizzly.Commands.Command do
           :ok ->
             {Report.new(:complete, :ack_response, command.node_id,
                command_ref: command.ref,
+               acknowledged: true,
                queued: true
              ), %__MODULE__{command | status: :complete}}
 
           %ZWaveCommand{} ->
             {Report.new(:complete, :command, command.node_id,
                command_ref: command.ref,
+               acknowledged: command.acknowledged,
                command: response,
                queued: true
              ), %__MODULE__{command | status: :complete}}
