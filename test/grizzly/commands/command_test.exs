@@ -52,7 +52,7 @@ defmodule Grizzly.Commands.CommandTest do
 
     report = Report.new(:complete, :ack_response, 1, command_ref: grizzly_command.ref)
 
-    assert {report, %Command{grizzly_command | status: :complete}} ==
+    assert {report, %Command{grizzly_command | status: :complete, acknowledged: true}} ==
              Command.handle_zip_command(grizzly_command, ack_response)
   end
 
@@ -99,9 +99,13 @@ defmodule Grizzly.Commands.CommandTest do
     ack_response = ZIPPacket.make_ack_response(grizzly_command.seq_number)
 
     report =
-      Report.new(:complete, :ack_response, 1, command_ref: grizzly_command.ref, queued: true)
+      Report.new(:complete, :ack_response, 1,
+        command_ref: grizzly_command.ref,
+        queued: true,
+        acknowledged: true
+      )
 
-    assert {report, %Command{grizzly_command | status: :complete}} ==
+    assert {report, %Command{grizzly_command | status: :complete, acknowledged: true}} ==
              Command.handle_zip_command(grizzly_command, ack_response)
   end
 

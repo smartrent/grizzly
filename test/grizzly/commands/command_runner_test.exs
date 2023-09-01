@@ -130,7 +130,8 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     report =
       Report.new(:complete, :ack_response, 1,
         queued: true,
-        command_ref: command_ref
+        command_ref: command_ref,
+        acknowledged: true
       )
 
     assert report ==
@@ -156,7 +157,11 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
-    assert Report.new(:complete, :ack_response, 1, command_ref: command_ref, queued: true) ==
+    assert Report.new(:complete, :ack_response, 1,
+             command_ref: command_ref,
+             queued: true,
+             acknowledged: true
+           ) ==
              CommandRunner.handle_zip_command(runner, ack_response)
   end
 

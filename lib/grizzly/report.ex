@@ -140,10 +140,22 @@ defmodule Grizzly.Report do
     - `:node_id` - the node the report is responding from
     - `:queued` - this flag marks if the command was ever queued before
       completing
+    - `:acknowledged` - whether the destination node acknowledged the command.
+      Only valid when the status is `:complete`. For commands using the `AckResponse`
+      command handler, this field will be true if `type` is `:ack_response` and false
+      if `type` is `:nack_response`. For other command handlers, it will be true
+      if the original command was acknowledged by the destination node (i.e. we
+      received an ACK Response from Z/IP Gateway). This is useful for differentiating
+      report timeouts where the destination received the command but didn't send
+      a report (e.g. it doesn't support the command or command version, it considered
+      some or all of the payload invalid, etc.) from other causes. Other types of
+      timeouts typically mean the timeout was too short and Grizzly had to return
+      before Z/IP Gateway could send a response
   """
   @type t() :: %__MODULE__{
           status: status(),
           type: type(),
+          acknowledged: boolean(),
           command: Command.t() | nil,
           transmission_stats: [transmission_stat()],
           queued_delay: non_neg_integer(),
@@ -169,6 +181,7 @@ defmodule Grizzly.Report do
           | {:command, Command.t()}
           | {:command_ref, reference()}
           | {:queued, boolean()}
+          | {:acknowledged, boolean()}
 
   @typedoc """
   The RSSI value between each device that command had to route through to get
@@ -219,7 +232,8 @@ defmodule Grizzly.Report do
             command_ref: nil,
             node_id: nil,
             type: nil,
-            queued: false
+            queued: false,
+            acknowledged: false
 
   @doc """
   Make a new `Grizzly.Report`
@@ -234,7 +248,8 @@ defmodule Grizzly.Report do
       transmission_stats: Keyword.get(opts, :transmission_stats, []),
       queued_delay: Keyword.get(opts, :queued_delay, 0),
       command: Keyword.get(opts, :command),
-      queued: Keyword.get(opts, :queued, false)
+      queued: Keyword.get(opts, :queued, false),
+      acknowledged: Keyword.get(opts, :acknowledged, false)
     }
   end
 end

@@ -235,13 +235,17 @@ defmodule Grizzly.Connections.SyncConnection do
       report =
         Report.new(:complete, :timeout, grizzly_command.node_id,
           command_ref: grizzly_command.ref,
+          acknowledged: grizzly_command.acknowledged,
           queued: true
         )
 
       send(pid, {:grizzly, :report, report})
     else
       report =
-        Report.new(:complete, :timeout, grizzly_command.node_id, command_ref: grizzly_command.ref)
+        Report.new(:complete, :timeout, grizzly_command.node_id,
+          command_ref: grizzly_command.ref,
+          acknowledged: grizzly_command.acknowledged
+        )
 
       GenServer.reply(waiter, {:ok, report})
     end
