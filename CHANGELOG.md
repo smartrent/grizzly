@@ -4,6 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.8.8] - 2023-09-01
+
+### Fixed
+
+- Reports indicate command acknowledgement ([#836](https://github.com/smartrent/grizzly/pull/836))
+- Handle `{:error, :timeout}` when getting all node ids ([#835](https://github.com/smartrent/grizzly/pull/835))
+
+### Misc
+
+- Remove dead code from `Grizzly.UnsolicitedServer` ([#832](https://github.com/smartrent/grizzly/pull/832))
+
 ## [v6.8.7] - 2023-08-30
 
 ### Fixed
