@@ -40,7 +40,9 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     controller_id = opts[:controller_id] || 1
     timeout = opts[:timeout] || @inclusion_timeout
 
-    with {:ok, command} <- NodeAdd.new(seq_number: seq_number),
+    params = opts |> Keyword.take([:mode, :tx_opt]) |> Keyword.put(:seq_number, seq_number)
+
+    with {:ok, command} <- NodeAdd.new(params),
          {:ok, command_ref} <-
            AsyncConnection.send_command(controller_id, command, timeout: timeout) do
       {:ok, %{state | command_ref: command_ref}}
@@ -85,12 +87,14 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     seq_number = SeqNumber.get_and_inc()
     timeout = opts[:timeout] || @inclusion_timeout
 
-    {:ok, command} =
-      LearnModeSet.new(
-        seq_number: seq_number,
-        mode: :direct_range_only,
-        return_interview_status: :off
-      )
+    params =
+      opts
+      |> Keyword.take([:mode, :return_interview_status])
+      |> Keyword.put(:seq_number, seq_number)
+      |> Keyword.put_new(:mode, :direct_range_only)
+      |> Keyword.put_new(:return_interview_status, :off)
+
+    {:ok, command} = LearnModeSet.new(params)
 
     {:ok, command_ref} = AsyncConnection.send_command(1, command, timeout: timeout)
 
