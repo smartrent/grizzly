@@ -43,9 +43,8 @@ defmodule Grizzly.Supervisor do
 
   require Logger
 
-  alias Grizzly.{Options, Trace, ZwaveFirmware}
+  alias Grizzly.{Options, Trace, ZWaveFirmware}
   alias Grizzly.ZIPGateway.ReadyChecker
-  alias Grizzly.ZwaveFirmware
 
   @typedoc """
   The RF region code you want the Z-Wave controller to operate at.
@@ -74,12 +73,6 @@ defmodule Grizzly.Supervisor do
           | :us_lr
           | :jp
           | :kr
-
-  @typedoc """
-  Manifest item for hub Z-Wave firmware updates. Each item identifies a target a chip type, the path
-  of the firmware image file, and the firmware version upgrade.
-  """
-  @type firmware_info() :: %{chip_type: non_neg_integer(), path: String.t(), version: String.t()}
 
   @typedoc """
   Arguments for running `Grizzly.Supervisor`
@@ -132,12 +125,9 @@ defmodule Grizzly.Supervisor do
   - `:power_level` - A tuple where the first item is the normal TX power level
     and the second item is the measured 0dBm power configuration. See Silabs
     INS14664 (MaxPowerCalc) spreadsheet to figure out the power numbers.
-  - `:update_zwave_firmware` - If set to `true`, Grizzly will attempt to update
-    the firmware on the Z-Wave module when it starts
-  - `:zwave_firmware` - If `:update_zwave_firmware` is `true`, then this is a list
-    of firmware files for expected Z-Wave module types.
-  - `:zw_programmer_path` - If `:update_zwave_firmware` is `true`, then this is
-    the path to the `zw_programmer` application.
+  - `:zwave_firmware` - See `t:Grizzly.Options.zwave_firmware_options/0`
+  - `:zw_programmer_path` - Path to `zw_programmer` binary. Defaults to
+    `/usr/bin/zw_programmer`.
   - `:status_reporter` - a module that implements the `Grizzly.StatusReporter`
     behaviour. In no reporter is provided this will use
     `Grizzly.Status.Reporter.Console` by default.
@@ -173,8 +163,7 @@ defmodule Grizzly.Supervisor do
           | {:rf_region, rf_region()}
           | {:power_level, {tx_power(), measured_power()}}
           | {:status_reporter, module()}
-          | {:update_zwave_firmware, boolean()}
-          | {:zwave_firmware, [firmware_info()]}
+          | {:zwave_firmware, Options.zwave_firmware_options()}
           | {:zw_programmer_path, Path.t()}
           | {:inclusion_adapter, module()}
           | {:trace_options, [Trace.trace_opt()]}
@@ -202,13 +191,17 @@ defmodule Grizzly.Supervisor do
   @impl Supervisor
   def init(init_args) do
     options = Options.new(init_args)
-    ZwaveFirmware.maybe_run_zwave_firmware_update(options)
+    ZWaveFirmware.maybe_run_zwave_firmware_update(options)
 
     Supervisor.init(children(options), strategy: :one_for_one)
   end
 
   defp children(options) do
     [
+      %{
+        id: Grizzly.Options.Agent,
+        start: {Agent, :start_link, [fn -> options end, [name: Grizzly.Options.Agent]]}
+      },
       {Task.Supervisor, name: Grizzly.TaskSupervisor},
       # According to Z-Wave specification we need to have a global
       # sequence number counter that starts at a random number between

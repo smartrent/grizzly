@@ -24,7 +24,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor do
   Get the controller firmware upgrade info.
   Note: The FirmwareUpdateRunnerSupervisor runs the only process that has this information once the hub is fully started.
   """
-  @spec controller_firmware_upgrade_info :: [Grizzly.ZwaveFirmware.firmware_info()]
+  @spec controller_firmware_upgrade_info :: [Grizzly.Options.zwave_firmware_options()]
   def controller_firmware_upgrade_info() do
     state = :sys.get_state(__MODULE__)
     Map.get(state.args, :zwave_firmware, [])

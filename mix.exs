@@ -35,6 +35,7 @@ defmodule Grizzly.MixProject do
       {:cerlc, "~> 0.2.0"},
       {:circular_buffer, "~> 0.4"},
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
+      {:mimic, "~> 1.7", only: :test},
       {:muontrap, "~> 1.0 or ~> 0.4"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
@@ -131,7 +132,9 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.QRCode,
           Grizzly.ZWave.Security,
           ~r/^Grizzly\.ZWave\.SmartStart/,
-          Grizzly.Inclusions.ZWaveAdapter
+          Grizzly.Inclusions.ZWaveAdapter,
+          Grizzly.ZWaveFirmware,
+          Grizzly.ZWaveFirmware.UpgradeSpec
         ],
         Transports: [
           Grizzly.Transport,

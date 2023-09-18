@@ -281,23 +281,7 @@ handle those for you in a reliable way. However, there are few exposed
 configuration options to allow some customization around device specific
 information, logging, and network interface set up.
 
-Supported configuration fields are:
-
-- `:tun_script` - a path to the `.tun` script (default priv dir of Grizzly)
-- `:manufacturer_id`: Id to set in the version report (default `0`)
-- `:hardware_version` - Hardware version to set in the version report (default `1`)
-- `:product_id` - Id to set in the version report (default `1`)
-- `:product_type` - Id to set in the version report (default `1`)
-- `:serial_log` - Log file for serial communication. Used for debugging. If this
-  option is not set the no logging is done (default none)
-- `:update_zwave_firmware` - If set to `true`, Grizzly will attempt to update
-  the firmware on the Z-Wave module when it starts
-- `:zwave_firmware` - If `:update_zwave_firmware` is `true`, then this is a list
-  of firmware files for expected Z-Wave module types.
-- `:zw_programmer_path` - If `:update_zwave_firmware` is `true`, then this is
-  the path to the `zw_programmer` application.
-- `:status_reporter` - Specify an implementation of the `Grizzly.StatusReporter`
-  to receive status updates
+Supported configuration fields are documented in `t:Grizzly.Supervisor.arg/0`.
 
 For the most part if you are using Grizzly to run zipgateway the defaults should
 just work.
