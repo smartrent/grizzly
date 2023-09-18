@@ -1,17 +1,9 @@
-defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
+defmodule Grizzly.ZWave.Commands.PriorityRouteSet do
   @moduledoc """
-  This command is used to advertise the current network route in use for an actual destination NodeID.
+  This command is used to set the network route to use when sending commands to
+  the specified NodeID. This route will override the normal routing table.
 
-  Params:
-
-    * `:node_id` - the NodeID destination for which the current network route is requested (required)
-
-    * `:type` - the route type (required)
-
-    * `:repeaters` - node ids of repeaters for the route (required)
-
-    * `:speed` - speeds used for the route (required)
-
+  The use of this command is NOT RECOMMENDED.
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -20,17 +12,16 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance, as: NMIM
 
   @type param ::
-          {:node_id, byte}
-          | {:type, NMIM.route_type()}
-          | {:repeaters, [byte]}
+          {:node_id, byte()}
+          | {:repeaters, [byte()]}
           | {:speed, NMIM.speed()}
 
   @impl true
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :priority_route_report,
-      command_byte: 0x03,
+      name: :priority_route_set,
+      command_byte: 0x01,
       command_class: NMIM,
       params: params,
       impl: __MODULE__
@@ -39,26 +30,23 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
-    type_byte = Command.param!(command, :type) |> NMIM.route_type_to_byte()
     repeater_bytes = Command.param!(command, :repeaters) |> NMIM.repeaters_to_bytes()
     speed_byte = Command.param!(command, :speed) |> NMIM.speed_to_byte()
 
-    <<node_id, type_byte>> <> repeater_bytes <> <<speed_byte>>
+    <<node_id, repeater_bytes::binary, speed_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<node_id, type_byte, repeater_bytes::binary-size(4), speed_byte>>) do
-    with {:ok, type} <- NMIM.route_type_from_byte(type_byte),
-         {:ok, speed} <- NMIM.speed_from_byte(speed_byte) do
+  def decode_params(<<node_id, repeater_bytes::binary-size(4), speed_byte>>) do
+    with {:ok, speed} <- NMIM.speed_from_byte(speed_byte) do
       {:ok,
        [
          node_id: node_id,
-         type: type,
          speed: speed,
          repeaters: NMIM.repeaters_from_bytes(repeater_bytes)
        ]}

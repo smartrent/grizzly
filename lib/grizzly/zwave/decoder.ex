@@ -179,6 +179,7 @@ defmodule Grizzly.ZWave.Decoder do
       {0x66, 0x08, Commands.BarrierOperatorSignalReport},
 
       # Network management installation maintenance
+      {0x67, 0x01, Commands.PriorityRouteSet},
       {0x67, 0x02, Commands.PriorityRouteGet},
       {0x67, 0x03, Commands.PriorityRouteReport},
       {0x67, 0x04, Commands.StatisticsGet},
