@@ -58,15 +58,34 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  @spec speeds_to_byte(speeds()) :: byte()
-  def speeds_to_byte(speeds) do
+  @spec speed_to_byte(speed()) :: byte()
+  def speed_to_byte(speed) do
+    case speed do
+      :"9.6kbit/s" -> 0x01
+      :"40kbit/s" -> 0x02
+      :"100kbit/s" -> 0x03
+    end
+  end
+
+  @spec speed_from_byte(byte()) :: {:ok, speed()} | {:error, DecodeError.t()}
+  def speed_from_byte(byte) do
+    case byte do
+      0x01 -> {:ok, :"9.6kbit/s"}
+      0x02 -> {:ok, :"40kbit/s"}
+      0x03 -> {:ok, :"100kbit/s"}
+      byte -> {:error, %DecodeError{param: :speed, value: byte}}
+    end
+  end
+
+  @spec neighbor_speeds_to_byte(speeds()) :: byte()
+  def neighbor_speeds_to_byte(speeds) do
     byte = if :"9.6kbit/s" in speeds, do: 0x01, else: 0x00
     byte = if :"40kbit/s" in speeds, do: byte ||| 0x02, else: byte
     if :"100kbit/s" in speeds, do: byte ||| 0x04, else: byte
   end
 
-  @spec speeds_from_byte(byte) :: {:ok, speeds}
-  def speeds_from_byte(byte) do
+  @spec neighbor_speeds_from_byte(byte) :: {:ok, speeds}
+  def neighbor_speeds_from_byte(byte) do
     case byte do
       0x01 -> {:ok, [:"9.6kbit/s"]}
       0x02 -> {:ok, [:"40kbit/s"]}
@@ -217,7 +236,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   defp neighbor_to_binary(neighbor) do
     node_id = Keyword.get(neighbor, :node_id)
     repeater_bit = if Keyword.get(neighbor, :repeater?), do: 0x01, else: 0x00
-    speeds_bits = Keyword.get(neighbor, :speed) |> speeds_to_byte()
+    speeds_bits = Keyword.get(neighbor, :speed) |> neighbor_speeds_to_byte()
     <<node_id, repeater_bit::size(1), 0x00::size(2), speeds_bits::size(5)>>
   end
 
@@ -227,7 +246,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
          <<node_id, repeater_bit::size(1), _reserved::size(2), speeds_bits::size(5),
            rest::binary>>
        ) do
-    with {:ok, speeds} <- speeds_from_byte(speeds_bits),
+    with {:ok, speeds} <- neighbor_speeds_from_byte(speeds_bits),
          {:ok, other_neighbors} <- neighbors_from_binary(rest) do
       neighbor = [node_id: node_id, repeater?: repeater_bit == 1, speed: speeds]
       {:ok, [neighbor | other_neighbors]}

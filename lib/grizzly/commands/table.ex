@@ -412,6 +412,7 @@ defmodule Grizzly.Commands.Table do
       {:clock_set, {Commands.ClockSet, handler: AckResponse}},
 
       # Network Management Installation Maintenance
+      {:priority_route_set, {Commands.PriorityRouteSet, handler: AckResponse}},
       {:priority_route_get,
        {Commands.PriorityRouteGet, handler: {WaitReport, complete_report: :priority_route_report}}},
       {:statistics_get,
