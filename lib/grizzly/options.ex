@@ -3,10 +3,28 @@ defmodule Grizzly.Options do
   Grizzly config options.
   """
 
-  alias Grizzly.{Supervisor, Trace}
+  alias Grizzly.{Supervisor, Trace, ZWaveFirmware}
   alias Grizzly.ZIPGateway.Config
 
   require Logger
+
+  @typedoc """
+  Options for configuring Z-Wave module firmware upgrades.
+
+  * `enabled` - whether or not to enable firmware upgrades
+  * `specs` - a list of firmware upgrade specifications. If multiple specs match,
+    the first will be applied. See `Grizzly.ZWaveFirmware.UpgradeSpec`.
+  * `chip_series` - the Z-Wave module chip type. See `t:Grizzly.ZWaveFirmware.chip_series/0`.
+  * `module_reset_fun` - a function that performs a hard rest of the Z-Wave module.
+    Used to detect whether the module is stuck at the bootloader due to a previous
+    failed upgrade. See `t:Grizzly.ZWaveFirmware.module_reset_fun/0`.
+  """
+  @type zwave_firmware_options :: %{
+          enabled: boolean(),
+          specs: [ZWaveFirmware.UpgradeSpec.t()],
+          chip_series: ZWaveFirmware.chip_series(),
+          module_reset_fun: ZWaveFirmware.module_reset_fun()
+        }
 
   @typedoc """
   See Grizzly.Supervisor
@@ -36,8 +54,7 @@ defmodule Grizzly.Options do
           rf_region: Supervisor.rf_region() | nil,
           power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
           status_reporter: module(),
-          update_zwave_firmware: boolean(),
-          zwave_firmware: [Supervisor.firmware_info()],
+          zwave_firmware: zwave_firmware_options(),
           zw_programmer_path: Path.t(),
           inclusion_adapter: module(),
           extra_config: String.t() | nil,
@@ -68,8 +85,11 @@ defmodule Grizzly.Options do
             rf_region: nil,
             power_level: nil,
             status_reporter: Grizzly.StatusReporter.Console,
-            update_zwave_firmware: false,
-            zwave_firmware: [],
+            zwave_firmware: %{
+              enabled: false,
+              zw_programmer_path: "/usr/bin/zw_programmer",
+              specs: []
+            },
             zw_programmer_path: "/usr/bin/zw_programmer",
             inclusion_adapter: Grizzly.Inclusions.ZWaveAdapter,
             extra_config: nil,

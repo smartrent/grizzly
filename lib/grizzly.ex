@@ -438,6 +438,18 @@ defmodule Grizzly do
     end
   end
 
+  @doc """
+  Return the options `Grizzly.Supervisor` was started with. Returns nil if supervisor
+  is not started.
+  """
+  @spec options() :: Grizzly.Options.t() | nil
+  def options() do
+    Agent.get(Grizzly.Options.Agent, &Function.identity/1)
+  catch
+    :exit, {:noproc, _} ->
+      nil
+  end
+
   defp maybe_log_warning(command_name) do
     deprecated_list = [
       :switch_binary_get,
