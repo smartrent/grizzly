@@ -9,7 +9,7 @@ defaults: &defaults
     image-tag:
       description: "Docker image tag"
       type: string
-      default: "1.15.0-erlang-26.0.1-alpine-3.18.2"
+      default: "1.15.6-erlang-26.1-alpine-3.18.2"
 
 install_hex_rebar: &install_hex_rebar
   run:
@@ -110,14 +110,14 @@ workflows:
           matrix:
             parameters:
               image-tag:
-                - 1.15.0-erlang-26.0.1-alpine-3.18.2
+                - 1.15.6-erlang-26.1-alpine-3.18.2
                 - 1.14.3-erlang-25.2.3-alpine-3.18.0
       - lint:
-          image-tag: 1.15.0-erlang-26.0.1-alpine-3.18.2
+          image-tag: 1.15.6-erlang-26.1-alpine-3.18.2
           requires:
             - build
       - dialyzer:
-          image-tag: 1.15.0-erlang-26.0.1-alpine-3.18.2
+          image-tag: 1.15.6-erlang-26.1-alpine-3.18.2
           requires:
             - build
       - test:
@@ -126,5 +126,5 @@ workflows:
           matrix:
             parameters:
               image-tag:
-                - 1.15.0-erlang-26.0.1-alpine-3.18.2
+                - 1.15.6-erlang-26.1-alpine-3.18.2
                 - 1.14.3-erlang-25.2.3-alpine-3.18.0
