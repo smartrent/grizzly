@@ -4,6 +4,18 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.0.0] - 2023-09-25
+
+### Added
+
+- `Grizzly.Inclusions` passes command params through to NodeAdd and SetLearnMode ([#838](https://github.com/smartrent/grizzly/pull/838))
+- Implement Priority Route Set command ([#839](https://github.com/smartrent/grizzly/pull/839))
+
+### Changed
+
+- Fix parsing of speed parameter in Priority Route Report ([#839](https://github.com/smartrent/grizzly/pull/839))
+- **BREAKING**: Z-Wave module firmware upgrade rewrite ([#840](https://github.com/smartrent/grizzly/pull/840))
+
 ## [v6.8.8] - 2023-09-01
 
 ### Fixed
@@ -2332,6 +2344,9 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.0.0]: https://github.com/smartrent/grizzly/compare/v6.8.8..v7.0.0
+[v6.8.8]: https://github.com/smartrent/grizzly/compare/v6.8.7..v6.8.8
+[v6.8.7]: https://github.com/smartrent/grizzly/compare/v6.8.6..v6.8.7
 [v6.8.6]: https://github.com/smartrent/grizzly/compare/v6.8.5..v6.8.6
 [v6.8.5]: https://github.com/smartrent/grizzly/compare/v6.8.4..v6.8.5
 [v6.8.4]: https://github.com/smartrent/grizzly/compare/v6.8.3..v6.8.4
