@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.0.1] - 2023-09-26
+
+### Fixed
+
+- Allow speed to be 0 (unknown/not set) in Priority Route Report ([#842](https://github.com/smartrent/grizzly/pull/842))
+- Ignore installation and maintenance report header extension in outgoing Z/IP Packets ([#843](https://github.com/smartrent/grizzly/pull/843))
+
 ## [v7.0.0] - 2023-09-25
 
 ### Added
