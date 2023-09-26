@@ -45,6 +45,10 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
 
       :install_and_maintenance_get, bin ->
         bin <> <<0x02, 0x00>>
+
+      # We don't ever need to send this to Z/IP Gateway even if it's specified
+      {:install_and_maintenance_report, _}, bin ->
+        bin
     end)
   end
 
