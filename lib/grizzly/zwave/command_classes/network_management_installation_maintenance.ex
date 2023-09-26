@@ -70,6 +70,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   @spec speed_from_byte(byte()) :: {:ok, speed()} | {:error, DecodeError.t()}
   def speed_from_byte(byte) do
     case byte do
+      0x00 -> {:ok, :unknown}
       0x01 -> {:ok, :"9.6kbit/s"}
       0x02 -> {:ok, :"40kbit/s"}
       0x03 -> {:ok, :"100kbit/s"}
