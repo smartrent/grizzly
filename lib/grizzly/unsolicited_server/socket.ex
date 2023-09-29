@@ -59,12 +59,16 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   end
 
   def handle_info(response, transport) do
-    {:ok, transport_response} = Transport.parse_response(transport, response)
+    case Transport.parse_response(transport, response) do
+      {:ok, :connection_closed} ->
+        {:stop, :normal, transport}
 
-    actions = [:ack | ResponseHandler.handle_response(transport_response)]
-    Enum.each(actions, &run_response_action(transport_response, &1, transport))
+      {:ok, transport_response} ->
+        actions = [:ack | ResponseHandler.handle_response(transport_response)]
+        Enum.each(actions, &run_response_action(transport_response, &1, transport))
 
-    {:noreply, transport}
+        {:noreply, transport}
+    end
   end
 
   defp run_response_action(response, :ack, transport) do
