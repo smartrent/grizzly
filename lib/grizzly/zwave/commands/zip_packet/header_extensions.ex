@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
     end)
   end
 
-  defp parse_extension(<<0x01, 0x03, seconds::integer-size(3)-unit(8), rest::binary>>) do
+  defp parse_extension(<<0x01, 0x03, seconds::3-unit(8), rest::binary>>) do
     {{:expected_delay, seconds}, rest}
   end
 

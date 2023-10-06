@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
     {{:route_changed, parse_route_change_value(route_changed)}, rest}
   end
 
-  def ime_from_binary(<<0x01, 0x02, transmission_time::integer-size(2)-unit(8), rest::binary>>) do
+  def ime_from_binary(<<0x01, 0x02, transmission_time::2-unit(8), rest::binary>>) do
     {{:transmission_time, transmission_time}, rest}
   end
 

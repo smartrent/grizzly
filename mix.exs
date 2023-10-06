@@ -39,6 +39,7 @@ defmodule Grizzly.MixProject do
       {:muontrap, "~> 1.0 or ~> 0.4"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
       {:sweet_xml, "~> 0.7", only: [:dev, :test]},
       {:junit_formatter, "~> 3.3", only: :test},
       {:beam_notify, "~> 1.0 or ~> 0.2.0"},

@@ -112,7 +112,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   def rssi_to_byte(:rssi_not_available), do: 0x7F
 
   def rssi_to_byte(rssi) do
-    <<byte::8>> = <<rssi::signed-size(8)>>
+    <<byte::8>> = <<rssi::signed>>
     byte
   end
 
@@ -130,7 +130,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   def rssi_from_byte(0x7F), do: :rssi_not_available
 
   def rssi_from_byte(byte) do
-    <<rssi::signed-size(8)>> = <<byte::8>>
+    <<rssi::signed>> = <<byte::8>>
     rssi
   end
 
@@ -161,10 +161,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
           <<0x03, 0x01, byte>>
 
         {:sum_of_transmission_times, sum} ->
-          <<0x04, 0x04, sum::integer-unsigned-unit(8)-size(4)>>
+          <<0x04, 0x04, sum::4-unit(8)>>
 
         {:sum_of_transmission_times_squared, sum} ->
-          <<0x05, 0x04, sum::integer-unsigned-unit(8)-size(4)>>
+          <<0x05, 0x04, sum::4-unit(8)>>
       end
     end
   end
@@ -212,7 +212,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  def statistics_from_binary(<<0x04, 0x04, sum::integer-unsigned-unit(8)-size(4), rest::binary>>) do
+  def statistics_from_binary(<<0x04, 0x04, sum::4-unit(8), rest::binary>>) do
     with {:ok, other_statistics} <- statistics_from_binary(rest) do
       {:ok, [sum_of_transmission_times: sum] ++ other_statistics}
     else
@@ -221,7 +221,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  def statistics_from_binary(<<0x05, 0x04, sum::integer-unsigned-unit(8)-size(4), rest::binary>>) do
+  def statistics_from_binary(<<0x05, 0x04, sum::4-unit(8), rest::binary>>) do
     with {:ok, other_statistics} <- statistics_from_binary(rest) do
       {:ok, [sum_of_transmission_times_squared: sum] ++ other_statistics}
     else

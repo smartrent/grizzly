@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReport do
   @impl true
   def decode_params(
         <<seq_number, _::size(3), dsk_byte_size::size(5),
-          dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
+          dsk_binary::binary-size(dsk_byte_size)-unit(8), meta_extensions_binary::binary>>
       ) do
     dsk = NodeProvisioning.optional_binary_to_dsk(dsk_binary)
     meta_extensions = MetaExtension.parse(meta_extensions_binary)

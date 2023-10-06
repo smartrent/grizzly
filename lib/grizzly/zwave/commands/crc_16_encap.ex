@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
     encoded_params = command.impl.encode_params(command)
     command_binary = <<command_class_byte, command_byte>> <> encoded_params
     checksum = CRC.crc16_aug_ccitt(command_binary)
-    command_binary <> <<checksum::size(2)-integer-unsigned-unit(8)>>
+    command_binary <> <<checksum::2-unit(8)>>
   end
 
   @impl true
@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
     case :erlang.binary_to_list(data_and_checksum) |> Enum.reverse() do
       [checksum_2, checksum_1 | reversed_param_bytes] ->
         checksum_binary = <<checksum_1, checksum_2>>
-        <<checksum::size(2)-integer-unsigned-unit(8)>> = checksum_binary
+        <<checksum::2-unit(8)>> = checksum_binary
         encoded_params = :erlang.list_to_binary(Enum.reverse(reversed_param_bytes))
         {:ok, encoded_params, checksum}
 

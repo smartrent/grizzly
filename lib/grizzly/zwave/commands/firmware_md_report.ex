@@ -48,11 +48,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   @impl true
   # version 1
-  def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8)>>
-      ) do
+  def decode_params(<<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8)>>) do
     {:ok,
      [
        manufacturer_id: manufacturer_id,
@@ -63,11 +59,9 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   # version 3
   def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          firmware_target_ids::size(firmware_targets)-binary-unit(16)>>
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
+          firmware_upgradable, firmware_targets, max_fragment_size::2-unit(8),
+          firmware_target_ids::binary-size(firmware_targets)-unit(16)>>
       ) do
     other_firmware_ids = for <<id::16 <- firmware_target_ids>>, do: id
 
@@ -84,11 +78,9 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   # version 5
   def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          firmware_target_ids::size(firmware_targets)-binary-unit(16), hardware_version>>
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
+          firmware_upgradable, firmware_targets, max_fragment_size::2-unit(8),
+          firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version>>
       ) do
     other_firmware_ids = for <<id::16 <- firmware_target_ids>>, do: id
 
@@ -106,11 +98,9 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   # versions 6-7
   def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          firmware_target_ids::size(firmware_targets)-binary-unit(16), hardware_version,
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
+          firmware_upgradable, firmware_targets, max_fragment_size::2-unit(8),
+          firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version,
           _reserved::size(6), activation::size(1), cc::size(1), _rest::binary>>
       ) do
     other_firmware_ids = for <<id::16 <- firmware_target_ids>>, do: id
@@ -153,11 +143,9 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         activation_supported = if activation_supported?, do: 0x01, else: 0x00
         cc = if active_during_transfer?, do: 0x01, else: 0x00
 
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          firmware_target_ids::size(firmware_targets)-binary-unit(16), hardware_version,
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
+          firmware_upgradable, firmware_targets, max_fragment_size::2-unit(8),
+          firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version,
           0x00::size(6), activation_supported::size(1), cc::size(1)>>
 
       # v5
@@ -174,11 +162,9 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         firmware_target_ids = for id <- other_firmware_ids, do: <<id::16>>, into: <<>>
         firmware_upgradable = if firmware_upgradable?, do: 0xFF, else: 0x00
 
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          firmware_target_ids::size(firmware_targets)-binary-unit(16), hardware_version>>
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
+          firmware_upgradable, firmware_targets, max_fragment_size::2-unit(8),
+          firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version>>
 
       # v3
       %{
@@ -193,11 +179,9 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         firmware_target_ids = for id <- other_firmware_ids, do: <<id::16>>, into: <<>>
         firmware_upgradable = if firmware_upgradable?, do: 0xFF, else: 0x00
 
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_upgradable, firmware_targets,
-          max_fragment_size::size(2)-integer-unsigned-unit(8),
-          firmware_target_ids::size(firmware_targets)-binary-unit(16)>>
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
+          firmware_upgradable, firmware_targets, max_fragment_size::2-unit(8),
+          firmware_target_ids::binary-size(firmware_targets)-unit(16)>>
 
       # v1
       %{
@@ -205,9 +189,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         firmware_id: firmware_id,
         checksum: checksum
       } ->
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8)>>
+        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8)>>
     end
   end
 end

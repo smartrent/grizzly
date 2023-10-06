@@ -77,7 +77,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   def decode_params(
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version, hardware_version, firmware_targets,
-          other_firmware_version_data::size(firmware_targets)-binary-unit(16)>>
+          other_firmware_version_data::binary-size(firmware_targets)-unit(16)>>
       ) do
     with {:ok, library_type} <- decode_library_type(library_type) do
       other_firmware_versions = for <<v::8, s::8 <- other_firmware_version_data>>, do: "#{v}.#{s}"
@@ -100,7 +100,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   def decode_params(
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version, hardware_version, firmware_targets,
-          other_firmware_version_data::size(2)-binary-unit(16)>>
+          other_firmware_version_data::binary-size(2)-unit(16)>>
       )
       when firmware_targets <= 1 do
     with {:ok, library_type} <- decode_library_type(library_type) do

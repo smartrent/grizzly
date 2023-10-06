@@ -53,13 +53,11 @@ defmodule Grizzly.ZWave.Commands.TimeParametersReport do
     hour_utc = Command.param!(command, :hour_utc)
     minute_utc = Command.param!(command, :minute_utc)
     second_utc = Command.param!(command, :second_utc)
-    <<year::size(16)-integer-unsigned, month, day, hour_utc, minute_utc, second_utc>>
+    <<year::16, month, day, hour_utc, minute_utc, second_utc>>
   end
 
   @impl true
-  def decode_params(
-        <<year::size(16)-integer-unsigned, month, day, hour_utc, minute_utc, second_utc>>
-      ) do
+  def decode_params(<<year::16, month, day, hour_utc, minute_utc, second_utc>>) do
     {:ok,
      [
        year: year,

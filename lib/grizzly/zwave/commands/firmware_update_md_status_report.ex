@@ -46,11 +46,11 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport do
   def encode_params(command) do
     status_byte = Command.param!(command, :status) |> encode_status()
     wait_time = Command.param!(command, :wait_time)
-    <<status_byte, wait_time::size(2)-unit(8)-integer-unsigned>>
+    <<status_byte, wait_time::2-unit(8)>>
   end
 
   @impl true
-  def decode_params(<<status_byte, wait_time::size(2)-unit(8)-integer-unsigned>>) do
+  def decode_params(<<status_byte, wait_time::2-unit(8)>>) do
     with {:ok, status} <- decode_status(status_byte) do
       {:ok, [status: status, wait_time: wait_time]}
     else

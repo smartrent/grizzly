@@ -55,7 +55,7 @@ defmodule Grizzly.ZWave.Commands.MailboxConfigurationReport do
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
-        <<_reserved::3, supported_modes::2, mode::3, capacity::16, address::binary-16, port::16>>
+        <<_reserved::3, supported_modes::2, mode::3, capacity::16, address::16-bytes, port::16>>
       ) do
     {:ok,
      [
