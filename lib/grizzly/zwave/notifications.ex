@@ -987,14 +987,14 @@ defmodule Grizzly.ZWave.Notifications do
     end
   end
 
-  def decode_event_params(:home_security, :state_idle, <<byte::8>>) do
-    case event_from_byte(:home_security, byte) do
+  def decode_event_params(notification_type, :state_idle, <<byte::8>>) do
+    case event_from_byte(notification_type, byte) do
       {:ok, event} ->
         {:ok, [state: event]}
 
       {:error, :invalid_event_byte} ->
         Logger.warning(
-          "[Grizzly] Failed to decode state variable from home_security state_idle event"
+          "[Grizzly] Failed to decode state variable from #{inspect(notification_type)} state_idle event"
         )
 
         {:ok, []}
