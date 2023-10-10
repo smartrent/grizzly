@@ -37,8 +37,10 @@ defmodule Grizzly.ZWave.Decoder do
       {0x26, 0x05, Commands.SwitchMultiLevelStopLevelChange},
 
       # Sensor binary
+      {0x30, 0x01, Commands.SensorBinarySupportedSensorGet},
       {0x30, 0x02, Commands.SensorBinaryGet},
       {0x30, 0x03, Commands.SensorBinaryReport},
+      {0x30, 0x04, Commands.SensorBinarySupportedSensorReport},
 
       # Network Management Inclusion (0x34)
       {0x34, 0x01, Commands.NodeAdd},
