@@ -7,7 +7,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   use Supervisor
 
   alias Grizzly.{Indicator, Options}
-  alias Grizzly.ZIPGateway.{Config, LogMonitor}
+  alias Grizzly.ZIPGateway.{Config, ExitMonitor, LogMonitor}
   require Logger
 
   @zgw_eeprom_to_sqlite "/usr/bin/zgw_eeprom_to_sqlite"
@@ -18,15 +18,15 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   """
   @spec restart_zipgateway() :: :ok
   def restart_zipgateway() do
-    _ = Supervisor.terminate_child(__MODULE__, MuonTrap.Daemon)
-    {:ok, _} = Supervisor.restart_child(__MODULE__, MuonTrap.Daemon)
+    _ = Supervisor.terminate_child(__MODULE__, Grizzly.ZIPGateway.ProcessSupervisor)
+    {:ok, _} = Supervisor.restart_child(__MODULE__, Grizzly.ZIPGateway.ProcessSupervisor)
     :ok
   end
 
   @doc "Stops the Z/IP Gateway process if it is running."
   @spec stop_zipgateway() :: :ok
   def stop_zipgateway() do
-    _ = Supervisor.terminate_child(__MODULE__, MuonTrap.Daemon)
+    _ = Supervisor.terminate_child(__MODULE__, Grizzly.ZIPGateway.ProcessSupervisor)
     :ok
   end
 
@@ -61,8 +61,6 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
     _ = System.cmd("modprobe", ["tun"])
 
-    priv = Application.app_dir(:grizzly, "priv")
-
     beam_notify_options = [
       name: "grizzly indicator",
       path: "/tmp/grizzly_beam_notify_socket",
@@ -72,6 +70,18 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     [
       LogMonitor,
       {BEAMNotify, beam_notify_options},
+      zipgateway_process_supervisor_spec(options)
+    ]
+  end
+
+  # Run MuonTrap.Daemon and ZIPGateway.ExitMonitor under a supervisor using the
+  # `:rest_for_one` strategy. This isolates the Z/IP Gateway process from exits
+  # in LogMonitor or BEAMNotify while allowing ExitMonitor to do cleanup when
+  # Z/IP Gateway exits (chiefly, this means closing all DTLS connections).
+  defp zipgateway_process_supervisor_spec(options) do
+    priv = Application.app_dir(:grizzly, "priv")
+
+    children = [
       {MuonTrap.Daemon,
        [
          options.zipgateway_binary,
@@ -83,8 +93,17 @@ defmodule Grizzly.ZIPGateway.Supervisor do
            log_transform: &zipgateway_log_transform/1,
            exit_status_to_reason: &zipgateway_exit_status/1
          ]
-       ]}
+       ]},
+      ExitMonitor
     ]
+
+    %{
+      id: Grizzly.ZIPGateway.ProcessSupervisor,
+      type: :supervisor,
+      start:
+        {Supervisor, :start_link,
+         [children, [name: Grizzly.ZIPGateway.ProcessSupervisor, strategy: :rest_for_one]]}
+    }
   end
 
   defp try_migrate_eeprom_to_sql(%{eeprom_file: eeprom_file, database_file: database_file}) do
