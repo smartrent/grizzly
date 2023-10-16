@@ -300,6 +300,9 @@ defmodule Grizzly.Commands.Table do
       # Sensor binary
       {:sensor_binary_get,
        {Commands.SensorBinaryGet, handler: {WaitReport, complete_report: :sensor_binary_report}}},
+      {:sensor_binary_supported_sensor_get,
+       {Commands.SensorBinarySupportedSensorGet,
+        handler: {WaitReport, complete_report: :sensor_binary_supported_sensor_report}}},
 
       # Multi Channel
       {:multi_channel_endpoint_get,

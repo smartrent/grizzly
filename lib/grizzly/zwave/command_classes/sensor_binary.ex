@@ -4,7 +4,9 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
+  import Grizzly.ZWave.Encoding
 
   @type sensor_type() ::
           :general_purpose
@@ -65,4 +67,43 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
 
   def decode_type(byte),
     do: {:error, %DecodeError{value: byte, param: :sensor_type, command: :sensor_binary}}
+
+  @doc """
+  Decode a list of sensor types from a bitmap.
+
+  ## Examples
+
+      iex> decode_sensor_types(<<0x40, 0x00>>)
+      {:ok, sensor_types: [:water]}
+  """
+  @spec decode_sensor_types(binary) :: {:ok, [sensor_types: [atom]]} | {:error, DecodeError.t()}
+  def decode_sensor_types(binary) do
+    sensor_types =
+      decode_indexed_bitmask(binary, fn value ->
+        case decode_type(value) do
+          {:ok, type} -> type
+          {:error, _error} -> nil
+        end
+      end)
+      |> Enum.filter(&elem(&1, 1))
+      |> Enum.map(&elem(&1, 0))
+
+    {:ok, [sensor_types: sensor_types]}
+  end
+
+  @doc """
+  Encode a list of sensor types as a bitmap.
+
+  ## Examples
+
+      iex> encode_sensor_types([:water])
+      <<0x40, 0x00>>
+  """
+  @spec encode_sensor_types([atom]) :: binary
+  def encode_sensor_types(sensor_types) do
+    sensor_types
+    |> Enum.map(&{&1, true})
+    |> encode_indexed_bitmask(&encode_type/1, trim_empty_bytes: false)
+    |> String.pad_trailing(2, <<0>>)
+  end
 end
