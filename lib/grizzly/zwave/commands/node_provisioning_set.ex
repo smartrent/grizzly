@@ -52,9 +52,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+  # TODO: same problem with no function call
   def decode_params(
         <<seq_number, _::size(3), dsk_byte_size::size(5),
-          dsk_binary::size(dsk_byte_size)-unit(8)-binary, meta_extensions_binary::binary>>
+          dsk_binary::binary-size(dsk_byte_size)-unit(8), meta_extensions_binary::binary>>
       ) do
     with {:ok, dsk_string} <- DSK.binary_to_string(dsk_binary),
          meta_extensions <- MetaExtension.parse(meta_extensions_binary) do

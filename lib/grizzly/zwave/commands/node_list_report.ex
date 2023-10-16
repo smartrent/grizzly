@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
 
   def encode_node_ids(node_ids) do
     mask_bit = node_id_mask(node_ids)
-    <<mask_bit::little-integer-size(29)-unit(8)>>
+    <<mask_bit::little-29-unit(8)>>
   end
 
   def encode_status(:latest), do: 0x00

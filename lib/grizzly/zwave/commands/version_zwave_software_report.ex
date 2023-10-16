@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.VersionZWaveSoftwareReport do
   defp encode_version(version) do
     case Version.parse(version) do
       {:ok, %Version{major: major, minor: minor, patch: patch}} ->
-        <<major::integer-size(8), minor::integer-size(8), patch::integer-size(8)>>
+        <<major::8, minor::8, patch::8>>
 
       :error ->
         <<0, 0, 0>>
@@ -77,7 +77,7 @@ defmodule Grizzly.ZWave.Commands.VersionZWaveSoftwareReport do
   end
 
   defp encode_version(version, build_number) do
-    encode_version(version) <> <<build_number::integer-size(16)>>
+    encode_version(version) <> <<build_number::16>>
   end
 
   defp decode_version(<<major::8, minor::8, patch::8>>), do: "#{major}.#{minor}.#{patch}"

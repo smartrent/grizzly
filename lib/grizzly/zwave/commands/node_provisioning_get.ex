@@ -47,9 +47,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
   end
 
   @impl true
+  # TODO: circle back to this
   def decode_params(
         <<seq_number, _::size(3), dsk_byte_size::size(5),
-          dsk_binary::size(dsk_byte_size)-unit(8)-binary>>
+          dsk_binary::binary-size(dsk_byte_size)-unit(8)>>
       ) do
     dsk = DSK.new(dsk_binary)
 

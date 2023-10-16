@@ -43,11 +43,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
 
   @impl true
   # version 1
-  def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8)>>
-      ) do
+  def decode_params(<<manufacturer_id::16, firmware_id::16, checksum::16>>) do
     {:ok,
      [
        manufacturer_id: manufacturer_id,
@@ -58,10 +54,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
 
   # version 3
   def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          fragment_size::size(2)-integer-unsigned-unit(8)>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16>>
       ) do
     {:ok,
      [
@@ -75,10 +68,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
 
   # version 4
   def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          fragment_size::size(2)-integer-unsigned-unit(8), _::size(7), activation::size(1)>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
+          _::size(7), activation::size(1)>>
       ) do
     {:ok,
      [
@@ -93,11 +84,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
 
   # version 5,6,7
   def decode_params(
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          fragment_size::size(2)-integer-unsigned-unit(8), _::size(7), activation::size(1),
-          hardware_version>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
+          _::size(7), activation::size(1), hardware_version>>
       ) do
     {:ok,
      [
@@ -129,11 +117,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
       } ->
         activation = if activation_may_be_delayed?, do: 0x01, else: 0x00
 
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          fragment_size::size(2)-integer-unsigned-unit(8), 0x00::size(7), activation::size(1),
-          hardware_version>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
+          0x00::size(7), activation::size(1), hardware_version>>
 
       # v4
       %{
@@ -146,10 +131,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
       } ->
         activation = if activation_may_be_delayed?, do: 0x01, else: 0x00
 
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          fragment_size::size(2)-integer-unsigned-unit(8), 0x00::size(7), activation::size(1)>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
+          0x00::size(7), activation::size(1)>>
 
       # v3
       %{
@@ -159,10 +142,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         firmware_target: firmware_target,
         fragment_size: fragment_size
       } ->
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8), firmware_target,
-          fragment_size::size(2)-integer-unsigned-unit(8)>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16>>
 
       # v1
       %{
@@ -170,9 +150,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         firmware_id: firmware_id,
         checksum: checksum
       } ->
-        <<manufacturer_id::size(2)-integer-unsigned-unit(8),
-          firmware_id::size(2)-integer-unsigned-unit(8),
-          checksum::size(2)-integer-unsigned-unit(8)>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16>>
     end
   end
 end

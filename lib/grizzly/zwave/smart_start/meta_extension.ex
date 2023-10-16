@@ -333,7 +333,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@location_information::size(7), 0::size(1), len, location::size(len)-unit(8)-binary,
+         <<@location_information::size(7), 0::size(1), len, location::binary-size(len)-unit(8),
            rest::binary>>,
          extensions
        ) do
@@ -355,7 +355,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@name_information::size(7), 0::size(1), len, name::size(len)-unit(8)-binary,
+         <<@name_information::size(7), 0::size(1), len, name::binary-size(len)-unit(8),
            rest::binary>>,
          extensions
        ) do
@@ -436,7 +436,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@uuid16::size(7), 0::size(1), len, values::size(len)-unit(8)-binary, rest::binary>>,
+         <<@uuid16::size(7), 0::size(1), len, values::binary-size(len)-unit(8), rest::binary>>,
          extensions
        ) do
     {:ok, uuid} = UUID16.parse(<<@uuid16::size(7), 0::size(1), len, values::binary>>)
@@ -446,7 +446,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     do_parse(rest, [ext | extensions])
   end
 
-  defp do_parse(<<type, len, values::size(len)-unit(8)-binary, rest::binary>>, extensions) do
+  defp do_parse(<<type, len, values::binary-size(len)-unit(8), rest::binary>>, extensions) do
     ext = {:unknown, <<type, len, values::binary>>}
 
     do_parse(rest, [ext | extensions])

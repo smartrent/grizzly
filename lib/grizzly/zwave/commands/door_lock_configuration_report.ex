@@ -83,8 +83,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReport do
       twist_assist_bit = if Command.param!(command, :twist_assist?), do: 0x01, else: 0x00
 
       common_binary <>
-        <<auto_relock_time::integer-unsigned-size(16),
-          hold_and_release_time::integer-unsigned-size(16), 0x00::size(6),
+        <<auto_relock_time::16, hold_and_release_time::16, 0x00::size(6),
           block_to_block_bit::size(1), twist_assist_bit::size(1)>>
     end
   end
@@ -122,8 +121,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReport do
   def decode_params(
         <<operation_type_byte, manual_outside_door_handles_bitmask::size(4),
           manual_inside_door_handles_bitmask::size(4), lock_timeout_mins, lock_timeout_secs,
-          auto_relock_time::integer-unsigned-size(16),
-          hold_and_release_time::integer-unsigned-size(16), _reserved::size(6),
+          auto_relock_time::16, hold_and_release_time::16, _reserved::size(6),
           block_to_block_bit::size(1), twist_assist_bit::size(1)>>
       ) do
     with {:ok, operation_type} <- DoorLock.operation_type_from_byte(operation_type_byte) do

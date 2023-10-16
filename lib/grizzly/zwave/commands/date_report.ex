@@ -38,11 +38,11 @@ defmodule Grizzly.ZWave.Commands.DateReport do
     year = Command.param!(command, :year)
     month = Command.param!(command, :month)
     day = Command.param!(command, :day)
-    <<year::size(16)-integer-unsigned, month, day>>
+    <<year::16, month, day>>
   end
 
   @impl true
-  def decode_params(<<year::size(16)-integer-unsigned, month, day>>) do
+  def decode_params(<<year::16, month, day>>) do
     {:ok, [year: year, month: month, day: day]}
   end
 end

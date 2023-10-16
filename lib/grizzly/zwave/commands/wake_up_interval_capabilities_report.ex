@@ -49,18 +49,18 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
     if on_demand == nil do
       # v2
       <<
-        minimum_seconds::size(3)-unit(8),
-        maximum_seconds::size(3)-unit(8),
-        default_seconds::size(3)-unit(8),
-        step_seconds::size(3)-unit(8)
+        minimum_seconds::24,
+        maximum_seconds::24,
+        default_seconds::24,
+        step_seconds::24
       >>
     else
       # v3
       <<
-        minimum_seconds::size(3)-unit(8),
-        maximum_seconds::size(3)-unit(8),
-        default_seconds::size(3)-unit(8),
-        step_seconds::size(3)-unit(8),
+        minimum_seconds::24,
+        maximum_seconds::24,
+        default_seconds::24,
+        step_seconds::24,
         0x00::size(7),
         encode_on_demand(on_demand)::size(1)
       >>
@@ -70,10 +70,10 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
   @impl true
   # v2
   def decode_params(<<
-        minimum_seconds::size(3)-unit(8),
-        maximum_seconds::size(3)-unit(8),
-        default_seconds::size(3)-unit(8),
-        step_seconds::size(3)-unit(8)
+        minimum_seconds::24,
+        maximum_seconds::24,
+        default_seconds::24,
+        step_seconds::24
       >>) do
     {:ok,
      [
@@ -86,9 +86,8 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
 
   # v3
   def decode_params(
-        <<minimum_seconds::size(3)-unit(8), maximum_seconds::size(3)-unit(8),
-          default_seconds::size(3)-unit(8), step_seconds::size(3)-unit(8), 0x00::size(7),
-          on_demand_byte::size(1)>>
+        <<minimum_seconds::24, maximum_seconds::24, default_seconds::24, step_seconds::24,
+          0x00::size(7), on_demand_byte::size(1)>>
       ) do
     {:ok,
      [

@@ -52,16 +52,15 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReport do
     installer_icon_type = Command.param!(command, :installer_icon_type)
     user_icon_type = Command.param!(command, :user_icon_type)
 
-    <<zwaveplus_version, role_type_byte, node_type_byte,
-      installer_icon_type::size(16)-integer-unsigned, user_icon_type::size(16)-integer-unsigned>>
+    <<zwaveplus_version, role_type_byte, node_type_byte, installer_icon_type::16,
+      user_icon_type::16>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<zwaveplus_version, role_type_byte, node_type_byte,
-          installer_icon_type::size(16)-integer-unsigned,
-          user_icon_type::size(16)-integer-unsigned>>
+        <<zwaveplus_version, role_type_byte, node_type_byte, installer_icon_type::16,
+          user_icon_type::16>>
       ) do
     with {:ok, role_type} <- ZwaveplusInfo.role_type_from_byte(role_type_byte),
          {:ok, node_type} <- ZwaveplusInfo.node_type_from_byte(node_type_byte) do

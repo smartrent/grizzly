@@ -178,14 +178,15 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
 
     case format do
       :signed_integer ->
-        <<min_value::integer-signed-unit(8)-size(size),
-          max_value::integer-signed-unit(8)-size(size),
-          default_value::integer-signed-unit(8)-size(size)>>
+        <<
+          min_value::signed-size(size)-unit(8),
+          max_value::signed-size(size)-unit(8),
+          default_value::signed
+        >>
 
       _other ->
-        <<min_value::integer-unsigned-unit(8)-size(size),
-          max_value::integer-unsigned-unit(8)-size(size),
-          default_value::integer-unsigned-unit(8)-size(size)>>
+        <<min_value::integer-size(size)-unit(8), max_value::integer-size(size)-unit(8),
+          default_value::integer-size(size)-unit(8)>>
     end
   end
 
@@ -210,11 +211,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
   defp value_spec(size, format, value_bin) do
     case format do
       :signed_integer ->
-        <<value::integer-signed-unit(8)-size(size)>> = value_bin
+        <<value::signed-size(size)-unit(8)>> = value_bin
         value
 
       _other ->
-        <<value::integer-unsigned-unit(8)-size(size)>> = value_bin
+        <<value::integer-size(size)-unit(8)>> = value_bin
         value
     end
   end
