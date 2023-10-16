@@ -11,6 +11,6 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.ExpectedDelay do
 
   @spec to_binary(Grizzly.ZWave.Command.delay_seconds()) :: binary()
   def to_binary(expected_delay) do
-    <<0x01, 0x03, expected_delay::3-unit(8)>>
+    <<0x01, 0x03, expected_delay::24>>
   end
 end

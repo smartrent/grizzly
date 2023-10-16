@@ -37,11 +37,11 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalSet do
   def encode_params(command) do
     seconds = Command.param!(command, :seconds)
     node_id = Command.param!(command, :node_id)
-    <<seconds::3-unit(8), node_id>>
+    <<seconds::24, node_id>>
   end
 
   @impl true
-  def decode_params(<<seconds::3-unit(8), node_id>>) do
+  def decode_params(<<seconds::24, node_id>>) do
     {:ok, [seconds: seconds, node_id: node_id]}
   end
 end

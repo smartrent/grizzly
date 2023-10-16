@@ -161,10 +161,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
           <<0x03, 0x01, byte>>
 
         {:sum_of_transmission_times, sum} ->
-          <<0x04, 0x04, sum::4-unit(8)>>
+          <<0x04, 0x04, sum::32>>
 
         {:sum_of_transmission_times_squared, sum} ->
-          <<0x05, 0x04, sum::4-unit(8)>>
+          <<0x05, 0x04, sum::32>>
       end
     end
   end
@@ -212,7 +212,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  def statistics_from_binary(<<0x04, 0x04, sum::4-unit(8), rest::binary>>) do
+  def statistics_from_binary(<<0x04, 0x04, sum::32, rest::binary>>) do
     with {:ok, other_statistics} <- statistics_from_binary(rest) do
       {:ok, [sum_of_transmission_times: sum] ++ other_statistics}
     else
@@ -221,7 +221,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  def statistics_from_binary(<<0x05, 0x04, sum::4-unit(8), rest::binary>>) do
+  def statistics_from_binary(<<0x05, 0x04, sum::32, rest::binary>>) do
     with {:ok, other_statistics} <- statistics_from_binary(rest) do
       {:ok, [sum_of_transmission_times_squared: sum] ++ other_statistics}
     else

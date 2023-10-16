@@ -52,19 +52,17 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSet do
     hardware_version = Command.param(command, :hardware_version)
 
     if hardware_version == nil do
-      <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8), firmware_target>>
+      <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target>>
     else
       # version 5
-      <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8), firmware_target,
-        hardware_version>>
+      <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, hardware_version>>
     end
   end
 
   @impl true
   # version 5
   def decode_params(
-        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
-          firmware_target, hardware_version>>
+        <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, hardware_version>>
       ) do
     {:ok,
      [
@@ -76,10 +74,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSet do
      ]}
   end
 
-  def decode_params(
-        <<manufacturer_id::2-unit(8), firmware_id::2-unit(8), checksum::2-unit(8),
-          firmware_target>>
-      ) do
+  def decode_params(<<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target>>) do
     {:ok,
      [
        manufacturer_id: manufacturer_id,
