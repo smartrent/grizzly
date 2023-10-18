@@ -4,6 +4,22 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.0.2] - 2023-10-17
+
+### Added
+
+- Implement Sensor Binary Supported Sensor Get/Report ([#848](https://github.com/smartrent/grizzly/pull/848))
+- Decode state_idle event params for all notification types ([#849](https://github.com/smartrent/grizzly/pull/849))
+
+### Fixed
+
+- Suppress DTLS errors for "TLS Alert: unexpected message" ([#845](https://github.com/smartrent/grizzly/pull/845))
+- Close all DTLS connections on Z/IP Gateway exit ([#850](https://github.com/smartrent/grizzly/pull/850))
+
+### Misc
+
+- Add `credo_binary_patterns` and adjust patterns to pass ([#847](https://github.com/smartrent/grizzly/pull/847))
+
 ## [v7.0.1] - 2023-09-26
 
 ### Fixed
