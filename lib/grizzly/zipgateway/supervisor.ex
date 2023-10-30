@@ -102,7 +102,15 @@ defmodule Grizzly.ZIPGateway.Supervisor do
       type: :supervisor,
       start:
         {Supervisor, :start_link,
-         [children, [name: Grizzly.ZIPGateway.ProcessSupervisor, strategy: :rest_for_one]]}
+         [
+           children,
+           [
+             name: Grizzly.ZIPGateway.ProcessSupervisor,
+             strategy: :rest_for_one,
+             max_restarts: 1,
+             max_seconds: 1
+           ]
+         ]}
     }
   end
 
