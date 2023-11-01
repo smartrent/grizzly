@@ -30,7 +30,7 @@ defmodule Grizzly.VersionReports do
   end
 
   def version_report_for(:association_group_info = name) do
-    VersionCommandClassReport.new(command_class: name, version: 1)
+    VersionCommandClassReport.new(command_class: name, version: 3)
   end
 
   def version_report_for(:device_reset_locally = name) do
