@@ -133,7 +133,7 @@ defmodule Grizzly.Test do
 
     test "multi command" do
       {:ok, report} =
-        Grizzly.send_command(:gateway, :version_command_class_get, command_class: :multi_command)
+        Grizzly.send_command(:gateway, :version_command_class_get, command_class: :multi_cmd)
 
       assert Command.param!(report.command, :version) == 1
     end
