@@ -103,7 +103,7 @@ defmodule Grizzly.Test do
           command_class: :association_group_info
         )
 
-      assert Command.param!(report.command, :version) == 1
+      assert Command.param!(report.command, :version) == 3
     end
 
     test "device reset locally" do
