@@ -14,7 +14,7 @@ defmodule Grizzly.VersionReports do
     :association_group_info,
     :device_reset_locally,
     :multi_channel_association,
-    :multi_command,
+    :multi_cmd,
     :supervision
   ]
 
@@ -45,7 +45,7 @@ defmodule Grizzly.VersionReports do
     VersionCommandClassReport.new(command_class: name, version: 1)
   end
 
-  def version_report_for(:multi_command = name) do
+  def version_report_for(:multi_cmd = name) do
     VersionCommandClassReport.new(command_class: name, version: 1)
   end
 
