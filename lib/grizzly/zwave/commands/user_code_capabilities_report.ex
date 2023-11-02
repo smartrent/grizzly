@@ -59,15 +59,17 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
 
     supported_user_id_statuses =
       Command.param(command, :supported_user_id_statuses, [])
-      |> encode_indexed_bitmask(&UserCode.user_id_status_to_byte/1)
+      |> Enum.map(&UserCode.user_id_status_to_byte/1)
+      |> encode_bitmask()
 
     supported_keypad_modes =
       Command.param(command, :supported_keypad_modes, [])
-      |> encode_indexed_bitmask(&UserCode.keypad_mode_to_byte/1)
+      |> Enum.map(&UserCode.keypad_mode_to_byte/1)
+      |> encode_bitmask()
 
     supported_keypad_keys =
       Command.param(command, :supported_keypad_keys, [])
-      |> supported_keypad_keys_charlist_to_bitmask()
+      |> encode_bitmask()
 
     <<mc::1, mcd::1, 0::1, byte_size(supported_user_id_statuses)::5>> <>
       supported_user_id_statuses <>
@@ -89,13 +91,15 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
       ) do
     user_id_statuses =
       supported_user_id_statuses
-      |> decode_indexed_bitmask(&UserCode.user_id_status_from_byte/1)
-      |> Keyword.drop([:unknown])
+      |> decode_bitmask()
+      |> Enum.map(&UserCode.user_id_status_from_byte/1)
+      |> Enum.reject(&(&1 == :unknown))
 
     keypad_modes =
       supported_keypad_modes
-      |> decode_indexed_bitmask(&UserCode.keypad_mode_from_byte/1)
-      |> Keyword.drop([:unknown])
+      |> decode_bitmask()
+      |> Enum.map(&UserCode.keypad_mode_from_byte/1)
+      |> Enum.reject(&(&1 == :unknown))
 
     {:ok,
      [
@@ -106,19 +110,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
        multi_user_code_set_supported?: mucs_support == 1,
        supported_user_id_statuses: user_id_statuses,
        supported_keypad_modes: keypad_modes,
-       supported_keypad_keys:
-         supported_keypad_keys_bitmask_to_charlist(supported_keypad_keys_bitmask)
+       supported_keypad_keys: decode_bitmask(supported_keypad_keys_bitmask)
      ]}
-  end
-
-  defp supported_keypad_keys_bitmask_to_charlist(bitmask) do
-    keys = decode_indexed_bitmask(bitmask)
-    keys = for {key, enabled?} <- keys, enabled? == true, into: [], do: key
-    to_charlist(keys)
-  end
-
-  defp supported_keypad_keys_charlist_to_bitmask(keys) do
-    keys = for key <- keys, into: [], do: {key, true}
-    encode_indexed_bitmask(keys)
   end
 end

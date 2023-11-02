@@ -5,70 +5,45 @@ defmodule Grizzly.ZWave.Encoding do
 
   import Bitwise
 
-  @type bit :: 0 | 1
-
-  @type bitmask_index_to_value_fun(v) :: (index :: non_neg_integer() -> v | nil)
-  @type bitmask_index_to_value_fun() :: bitmask_index_to_value_fun(term())
-
-  @type bitmask_value_to_index_fun(v) :: (v -> non_neg_integer())
-  @type bitmask_value_to_index_fun() :: bitmask_value_to_index_fun(term())
+  @type encode_bitmask_opts :: [min_bytes: non_neg_integer()]
 
   @doc """
-  Encodes an indexed bitmask.
+  Encodes a list of bit indexes into a bitmask.
 
   ### Examples
 
-      iex> encode_indexed_bitmask([])
+      iex> encode_bitmask([])
       <<>>
 
-      iex> encode_indexed_bitmask(
-      ...>   [{0, true}, {4, true}, {5, true}, {6, false}, {7, true}, {8, true}]
-      ...> )
-      <<0b10110001::8, 0b00000001::8>>
+      iex> encode_bitmask([0, 4, 5, 7, 8, 35])
+      <<0b10110001, 0b00000001, 0, 0, 0b00001000>>
 
-      iex> encode_indexed_bitmask(
-      ...>   [{0, true}, {4, true}, {5, true}, {6, false}, {7, true}, {8, true}, {31, true}]
-      ...> )
+      iex> encode_bitmask([31, 8, 5, 0, 4, 7])
       <<0b10110001, 0b00000001, 0b00000000, 0b10000000>>
+
+      iex> encode_bitmask([0, 4, 5, 7], min_bytes: 3)
+      <<0b10110001, 0, 0>>
   """
-  @spec encode_indexed_bitmask([{value_type, boolean()}], bitmask_value_to_index_fun(value_type)) ::
+  @spec encode_bitmask([non_neg_integer()], encode_bitmask_opts()) ::
           binary()
-        when value_type: var
-  def encode_indexed_bitmask(values, index_fun \\ &Function.identity/1, opts \\ [])
+  def encode_bitmask(values, opts \\ [])
 
-  def encode_indexed_bitmask([], _, _), do: <<>>
+  def encode_bitmask([], _), do: <<>>
 
-  def encode_indexed_bitmask(values, index_fun, opts) do
-    trim_empty_bytes? = Keyword.get(opts, :trim_empty_bytes?, true)
-    values = Enum.map(values, fn {index, enabled?} -> {index_fun.(index), enabled?} end)
-
-    values =
-      if trim_empty_bytes? do
-        Enum.filter(values, &elem(&1, 1))
-      else
-        values
-      end
-
-    max_index = Enum.max(values, fn {a, _}, {b, _} -> a >= b end) |> elem(0)
-    num_bytes = ceil((max_index + 1) / 8)
+  def encode_bitmask(values, opts) do
+    min_bytes = Keyword.get(opts, :min_bytes, 0)
+    required_bytes = ceil((Enum.max(values) + 1) / 8)
+    num_bytes = max(min_bytes, required_bytes)
 
     bitmasks = for _ <- 1..num_bytes, into: [], do: 0
 
-    for byte_index <- 0..(num_bytes - 1), bit_index <- 0..7, reduce: bitmasks do
+    for byte_index <- 0..(num_bytes - 1),
+        bit_index <- 0..7,
+        index = byte_index * 8 + bit_index,
+        Enum.member?(values, index),
+        reduce: bitmasks do
       acc ->
-        index = byte_index * 8 + bit_index
-
-        enabled? =
-          Enum.find_value(values, false, fn
-            {^index, v} -> v
-            _ -> nil
-          end)
-
-        if enabled? do
-          List.replace_at(acc, byte_index, bor(Enum.at(acc, byte_index, 0), bsl(1, bit_index)))
-        else
-          acc
-        end
+        List.replace_at(acc, byte_index, bor(Enum.at(acc, byte_index, 0), bsl(1, bit_index)))
     end
     |> :binary.list_to_bin()
   end
@@ -78,30 +53,22 @@ defmodule Grizzly.ZWave.Encoding do
 
   ### Examples
 
-      iex> decode_indexed_bitmask(<<>>)
+      iex> decode_bitmask(<<>>)
       []
 
-      iex> decode_indexed_bitmask(<<0b10110001::8>>)
-      [{0, true}, {1, false}, {2, false}, {3, false}, {4, true}, {5, true}, {6, false}, {7, true}]
-  """
-  @spec decode_indexed_bitmask(binary(), bitmask_index_to_value_fun(value_type)) :: [
-          {value_type, boolean()}
-        ]
-        when value_type: var
-  def decode_indexed_bitmask(bitmask, value_fun \\ &Function.identity/1) do
-    for {byte, byte_index} <- Enum.with_index(:binary.bin_to_list(bitmask)),
-        bit_index <- 0..7,
-        reduce: [] do
-      acc ->
-        index = byte_index * 8 + bit_index
-        enabled? = band(byte, bsl(1, bit_index)) != 0
+      iex> decode_bitmask(<<0b10110001, 0, 0>>)
+      [0, 4, 5, 7]
 
-        case value_fun.(index) do
-          nil -> acc
-          value -> [{value, enabled?} | acc]
-        end
-    end
-    |> Enum.sort()
+      iex> decode_bitmask(<<0b10110001, 0b00000001, 0, 0, 0b00001000>>)
+      [0, 4, 5, 7, 8, 35]
+  """
+  @spec decode_bitmask(binary()) :: [non_neg_integer()]
+  def decode_bitmask(bitmask) do
+    for {byte, byte_index} <- bitmask |> :erlang.binary_to_list() |> Enum.with_index(),
+        bit_index <- 0..7,
+        index = byte_index * 8 + bit_index,
+        band(byte, bsl(1, bit_index)) != 0,
+        do: index
   end
 
   @doc """
