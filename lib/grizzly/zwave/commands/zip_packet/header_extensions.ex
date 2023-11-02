@@ -12,12 +12,14 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
     InstallationAndMaintenanceReport
   }
 
+  require Logger
+
   @type encapsulation_format_info :: :crc16 | EncapsulationFormatInfo.security()
 
   @type extension ::
           {:expected_delay, Command.delay_seconds()}
-          | {:install_and_maintenance_report, list()}
-          | :install_and_maintenance_get
+          | {:installation_and_maintenance_report, list()}
+          | :installation_and_maintenance_get
           | {:encapsulation_format_info, [encapsulation_format_info()]}
           | :multicast_addressing
 
@@ -43,11 +45,18 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
       :multicast_addressing, bin ->
         bin <> <<0x05, 0x00>>
 
-      :install_and_maintenance_get, bin ->
+      :installation_and_maintenance_get, bin ->
         bin <> <<0x02, 0x00>>
 
       # We don't ever need to send this to Z/IP Gateway even if it's specified
-      {:install_and_maintenance_report, _}, bin ->
+      {:installation_and_maintenance_report, _}, bin ->
+        bin
+
+      extension, bin ->
+        Logger.warning(
+          "[Grizzly] Encoding not supported for Z/IP Packet header extension: #{inspect(extension)}"
+        )
+
         bin
     end)
   end
