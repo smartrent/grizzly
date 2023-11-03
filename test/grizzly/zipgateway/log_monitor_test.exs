@@ -4,7 +4,16 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
   alias Grizzly.ZIPGateway.LogMonitor
 
   setup %{test: test} do
-    pid = start_supervised!({LogMonitor, name: test})
+    test_pid = self()
+
+    pid =
+      start_supervised!(
+        {LogMonitor,
+         [
+           name: test,
+           status_reporter: fn status -> send(test_pid, status) end
+         ]}
+      )
 
     %{monitor_pid: pid}
   end
@@ -85,5 +94,35 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
 
     assert "A0F71EE40E5DEB55E34C71ECEBB73168" =
              Keyword.get(network_keys, :s2_access_control_long_range)
+  end
+
+  describe "serial api status reporting" do
+    test "reports ok on successful init", %{monitor_pid: pid} do
+      send(pid, {:message, "Serial Process init"})
+      assert :initializing == LogMonitor.serial_api_status(pid)
+
+      send(pid, {:message, "Bridge init done"})
+      assert :ok == LogMonitor.serial_api_status(pid)
+    end
+
+    test "reports unresponsive after 5 retransmissions", %{monitor_pid: pid} do
+      send(pid, {:message, "Serial Process init"})
+      assert :initializing == LogMonitor.serial_api_status(pid)
+      assert_received :initializing
+
+      send(pid, {:message, "Bridge init done"})
+      assert :ok == LogMonitor.serial_api_status(pid)
+      assert_received :ok
+
+      send(pid, {:message, " SerialAPI: Retransmission 0 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 1 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 2 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
+      assert :ok == LogMonitor.serial_api_status(pid)
+
+      send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
+      assert :unresponsive == LogMonitor.serial_api_status(pid)
+      assert_received :unresponsive
+    end
   end
 end

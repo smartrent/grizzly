@@ -68,7 +68,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     ]
 
     [
-      LogMonitor,
+      {LogMonitor, [status_reporter: options.status_reporter]},
       {BEAMNotify, beam_notify_options},
       zipgateway_process_supervisor_spec(options)
     ]

@@ -16,4 +16,15 @@ defmodule Grizzly.StatusReporter.Console do
   def zwave_firmware_update_status(status) do
     Logger.info("[Grizzly] Z-Wave module firmware update status: #{inspect(status)}")
   end
+
+  @impl Grizzly.StatusReporter
+  def serial_api_status(status) do
+    level =
+      case status do
+        :unresponsive -> :error
+        _ -> :info
+      end
+
+    Logger.log(level, "[Grizzly] Z-Wave Serial API status: #{inspect(status)}")
+  end
 end
