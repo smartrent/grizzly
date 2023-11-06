@@ -4,6 +4,15 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.0.3] - 2023-11-06
+
+### Fixed
+
+- Correct CC name from multi_command to multi_cmd ([#858](https://github.com/smartrent/grizzly/pull/858))
+- Grizzly supports v3 of Association Group Info CC ([#859](https://github.com/smartrent/grizzly/pull/859))
+- Fix incorrect installation and maintenance header extension name ([#860](https://github.com/smartrent/grizzly/pull/860))
+- Catch exits when closing all connections ([#862](https://github.com/smartrent/grizzly/pull/862))
+
 ## [v7.0.2] - 2023-10-17
 
 ### Added
@@ -2367,6 +2376,9 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.0.3]: https://github.com/smartrent/grizzly/compare/v7.0.2..v7.0.3
+[v7.0.2]: https://github.com/smartrent/grizzly/compare/v7.0.1..v7.0.2
+[v7.0.1]: https://github.com/smartrent/grizzly/compare/v7.0.0..v7.0.1
 [v7.0.0]: https://github.com/smartrent/grizzly/compare/v6.8.8..v7.0.0
 [v6.8.8]: https://github.com/smartrent/grizzly/compare/v6.8.7..v6.8.8
 [v6.8.7]: https://github.com/smartrent/grizzly/compare/v6.8.6..v6.8.7
