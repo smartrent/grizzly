@@ -4,6 +4,7 @@ defmodule Grizzly.StatusReporter do
   runtime
   """
 
+  alias Grizzly.ZIPGateway.LogMonitor
   alias Grizzly.ZWaveFirmware
 
   @doc """
@@ -19,4 +20,12 @@ defmodule Grizzly.StatusReporter do
   This callback is executed during a firmware update of the Z-Wave module
   """
   @callback zwave_firmware_update_status(ZWaveFirmware.update_status()) :: any()
+
+  @doc """
+  Called when the Serial API status changes. Only applicable if Grizzly is managing
+  the Z/IP Gateway process.
+  """
+  @callback serial_api_status(LogMonitor.serial_api_status()) :: any()
+
+  @optional_callbacks [serial_api_status: 1]
 end
