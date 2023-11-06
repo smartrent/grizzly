@@ -6,6 +6,10 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [v7.0.3] - 2023-11-06
 
+### Added
+
+- Report Serial API status ([#861](https://github.com/smartrent/grizzly/pull/861))
+
 ### Fixed
 
 - Correct CC name from multi_command to multi_cmd ([#858](https://github.com/smartrent/grizzly/pull/858))
