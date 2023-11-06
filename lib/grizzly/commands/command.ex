@@ -324,7 +324,7 @@ defmodule Grizzly.Commands.Command do
 
   defp maybe_add_installation_and_maintenance_get(opts, grizzly_command) do
     if grizzly_command.with_transmission_stats do
-      Keyword.put(opts, :header_extensions, [:install_and_maintenance_get])
+      Keyword.put(opts, :header_extensions, [:installation_and_maintenance_get])
     else
       opts
     end
