@@ -36,11 +36,17 @@ defmodule Grizzly.Connections.Supervisor do
   """
   @spec close_all_connections() :: :ok
   def close_all_connections() do
-    connections_pids = DynamicSupervisor.which_children(__MODULE__)
+    if GenServer.whereis(__MODULE__) != nil do
+      connections_pids = DynamicSupervisor.which_children(__MODULE__)
 
-    Enum.each(connections_pids, fn {_, connection_pid, _, _} ->
-      :ok = Connection.close(connection_pid)
-    end)
+      Enum.each(connections_pids, fn {_, connection_pid, _, _} ->
+        :ok = Connection.close(connection_pid)
+      end)
+    end
+
+    :ok
+  catch
+    {:exit, {:noproc, _}} -> :ok
   end
 
   @impl DynamicSupervisor
