@@ -1,6 +1,8 @@
 defmodule Grizzly.ZWave.Decoder do
   @moduledoc false
 
+  alias Grizzly.ZWave.{Command, DecodeError}
+
   defmodule Generate do
     @moduledoc false
     alias Grizzly.ZWave.{Command, Commands, DecodeError, ZWaveError}
@@ -429,9 +431,9 @@ defmodule Grizzly.ZWave.Decoder do
         for {command_class_byte, command_byte, command_module} <- @mappings do
           quote do
             def from_binary(
-                  <<unquote(command_class_byte), unquote(command_byte), params::binary>>
+                  <<unquote(command_class_byte), unquote(command_byte), params::binary>> = orig
                 ),
-                do: decode(unquote(command_module), params)
+                do: decode(unquote(command_module), params, orig)
           end
         end
 
@@ -448,29 +450,35 @@ defmodule Grizzly.ZWave.Decoder do
         unquote(from_binary)
 
         # No Operation (0x00) - There is no command byte or args for this command, only the command class byte
-        def from_binary(<<0x00>>), do: decode(Commands.NoOperation, [])
+        def from_binary(<<0x00>>), do: decode(Commands.NoOperation, <<>>, <<0x00>>)
 
         def from_binary(other), do: {:error, %ZWaveError{binary: other}}
 
         @spec command_module(byte, byte) :: {:ok, module} | {:error, :unsupported_command}
         unquote(command_module)
         def command_module(_cc_byte, _c_byte), do: {:error, :unsupported_command}
-
-        defp decode(command_impl, params) do
-          case command_impl.decode_params(params) do
-            {:ok, decoded_params} ->
-              command_impl.new(decoded_params)
-
-            {:error, %DecodeError{}} = error ->
-              error
-
-            %DecodeError{} = error ->
-              {:error, error}
-          end
-        end
       end
     end
   end
 
   @before_compile Generate
+
+  @spec decode(command_impl :: module(), params :: binary(), original :: binary()) ::
+          {:ok, Command.t()} | {:error, DecodeError.t()}
+  def decode(command_impl, params, original_binary) do
+    unless Keyword.has_key?(Logger.metadata(), :zwave_command) do
+      Logger.metadata(zwave_command: inspect(original_binary, base: :hex, limit: 100))
+    end
+
+    case command_impl.decode_params(params) do
+      {:ok, decoded_params} ->
+        command_impl.new(decoded_params)
+
+      {:error, %DecodeError{}} = error ->
+        error
+
+      %DecodeError{} = error ->
+        {:error, error}
+    end
+  end
 end
