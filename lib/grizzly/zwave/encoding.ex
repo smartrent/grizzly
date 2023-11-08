@@ -126,6 +126,21 @@ defmodule Grizzly.ZWave.Encoding do
   end
 
   @doc """
+  Converts a float into a binary representation of a Z-Wave float according to
+  the typical format.
+
+  * precision (3 bits)
+  * scale (2 bits)
+  * size (3 bits)
+  * value (n bytes, where n = size)
+  """
+  @spec zwave_float_to_binary(number(), byte()) :: binary()
+  def zwave_float_to_binary(value, scale) do
+    {int_value, precision, bytes} = encode_zwave_float(value)
+    <<precision::3, scale::2, bytes::3, int_value::signed-size(bytes * 8)>>
+  end
+
+  @doc """
   Converts a float into a tuple containing an integer representation of the float,
   the factor of 10 by which the integer must be divided to get the original float,
   and the number of bytes needed to represent the value as a signed integer.

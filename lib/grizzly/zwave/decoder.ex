@@ -422,7 +422,18 @@ defmodule Grizzly.ZWave.Decoder do
       {0x69, 0x03, Commands.MailboxConfigurationReport},
       {0x69, 0x04, Commands.MailboxQueue},
       {0x69, 0x05, Commands.MailboxWakeUpNotification},
-      {0x69, 0x06, Commands.MailboxNodeFailing}
+      {0x69, 0x06, Commands.MailboxNodeFailing},
+
+      # Humidity Control Setpoint
+      {0x64, 0x01, Commands.HumidityControlSetpointSet},
+      {0x64, 0x02, Commands.HumidityControlSetpointGet},
+      {0x64, 0x03, Commands.HumidityControlSetpointReport},
+      {0x64, 0x04, Commands.HumidityControlSetpointSupportedGet},
+      {0x64, 0x05, Commands.HumidityControlSetpointSupportedReport},
+      {0x64, 0x06, Commands.HumidityControlSetpointScaleSupportedGet},
+      {0x64, 0x07, Commands.HumidityControlSetpointScaleSupportedReport},
+      {0x64, 0x08, Commands.HumidityControlSetpointCapabilitiesGet},
+      {0x64, 0x09, Commands.HumidityControlSetpointCapabilitiesReport}
     ]
 
     defmacro __before_compile__(_) do
