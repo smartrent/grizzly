@@ -11,6 +11,8 @@ defmodule Grizzly.ZWave do
 
   @spec from_binary(binary()) :: {:ok, Command.t()} | {:error, DecodeError.t()}
   def from_binary(binary) do
+    Logger.metadata(zwave_command: inspect(binary, base: :hex, limit: 100))
+
     Decoder.from_binary(binary)
   end
 
