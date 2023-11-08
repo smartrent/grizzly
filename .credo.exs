@@ -28,7 +28,8 @@
         ### Below are checks we will want to enable at later date ###
         {Credo.Check.Refactor.WithClauses, false},
         {Credo.Check.Refactor.CyclomaticComplexity, false},
-        {Credo.Check.Readability.WithSingleClause, false}
+        {Credo.Check.Readability.WithSingleClause, false},
+        {Credo.Check.Warning.MissedMetadataKeyInLoggerConfig, false}
       ]
     }
   ]
