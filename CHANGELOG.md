@@ -4,6 +4,10 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.0.4] - 2023-11-08
+
+- Record original command binary in Logger metadata ([#864](https://github.com/smartrent/grizzly/pull/864))
+
 ## [v7.0.3] - 2023-11-06
 
 ### Added
@@ -2380,6 +2384,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.0.4]: https://github.com/smartrent/grizzly/compare/v7.0.3..v7.0.4
 [v7.0.3]: https://github.com/smartrent/grizzly/compare/v7.0.2..v7.0.3
 [v7.0.2]: https://github.com/smartrent/grizzly/compare/v7.0.1..v7.0.2
 [v7.0.1]: https://github.com/smartrent/grizzly/compare/v7.0.0..v7.0.1
