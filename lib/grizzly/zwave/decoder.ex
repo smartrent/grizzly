@@ -435,6 +435,13 @@ defmodule Grizzly.ZWave.Decoder do
       {0x64, 0x08, Commands.HumidityControlSetpointCapabilitiesGet},
       {0x64, 0x09, Commands.HumidityControlSetpointCapabilitiesReport},
 
+      # Humidity Control Mode
+      {0x6D, 0x01, Commands.HumidityControlModeSet},
+      {0x6D, 0x02, Commands.HumidityControlModeGet},
+      {0x6D, 0x03, Commands.HumidityControlModeReport},
+      {0x6D, 0x04, Commands.HumidityControlModeSupportedGet},
+      {0x6D, 0x05, Commands.HumidityControlModeSupportedReport},
+
       # Humidity Control Operating State
       {0x6E, 0x01, Commands.HumidityControlOperatingStateGet},
       {0x6E, 0x02, Commands.HumidityControlOperatingStateReport}

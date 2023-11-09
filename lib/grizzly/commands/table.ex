@@ -530,6 +530,15 @@ defmodule Grizzly.Commands.Table do
        {Commands.HumidityControlSetpointCapabilitiesGet,
         handler: {WaitReport, complete_report: :humidity_control_setpoint_capabilities_report}}},
 
+      # Humidity Control Mode
+      {:humidity_control_mode_set, {Commands.HumidityControlModeSet, handler: AckResponse}},
+      {:humidity_control_mode_get,
+       {Commands.HumidityControlModeGet,
+        handler: {WaitReport, complete_report: :humidity_control_mode_report}}},
+      {:humidity_control_mode_supported_get,
+       {Commands.HumidityControlModeSupportedGet,
+        handler: {WaitReport, complete_report: :humidity_control_mode_supported_report}}},
+
       # Humidity Control Operating State
       {:humidity_control_operating_state_get,
        {Commands.HumidityControlOperatingStateGet,

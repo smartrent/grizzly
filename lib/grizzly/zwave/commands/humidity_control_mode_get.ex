@@ -1,20 +1,20 @@
-defmodule Grizzly.ZWave.Commands.HumidityControlOperatingStateGet do
+defmodule Grizzly.ZWave.Commands.HumidityControlModeGet do
   @moduledoc """
-  HumidityControlOperatingStateGet
+  HumidityControlModeGet
   """
 
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.HumidityControlOperatingState
+  alias Grizzly.ZWave.CommandClasses.HumidityControlMode
 
   @impl Grizzly.ZWave.Command
   @spec new(keyword()) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :humidity_control_operating_state_get,
-      command_byte: 0x01,
-      command_class: HumidityControlOperatingState,
+      name: :humidity_control_mode_get,
+      command_byte: 0x02,
+      command_class: HumidityControlMode,
       params: params,
       impl: __MODULE__
     }
