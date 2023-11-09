@@ -35,13 +35,15 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReport do
   def encode_params(command) do
     modes = Command.param!(command, :modes)
 
-    encode_indexed_bitmask(modes, &ThermostatMode.encode_mode/1)
+    modes
+    |> Enum.map(&ThermostatMode.encode_mode/1)
+    |> encode_bitmask()
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(binary) do
-    modes = decode_indexed_bitmask(binary, &decode_mode/1)
+    modes = binary |> decode_bitmask() |> Enum.map(&decode_mode/1)
     {:ok, [modes: modes]}
   end
 

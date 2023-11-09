@@ -10,8 +10,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  import Bitwise
-
+  import Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
@@ -36,55 +35,48 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
   def encode_params(command) do
     setpoint_types = Command.param!(command, :setpoint_types)
 
-    bit_masks =
-      for byte_index <- 1..2 do
-        for bit_index <- 7..0, into: <<>> do
-          setpoint_type = bitmask_field_to_setpoint_type(byte_index, bit_index)
-
-          if Keyword.get(setpoint_types, setpoint_type) == true,
-            do: <<1::size(1)>>,
-            else: <<0::size(1)>>
-        end
-      end
-
-    for bit_mask <- bit_masks, into: <<>>, do: bit_mask
+    setpoint_types
+    |> Enum.map(&setpoint_type_to_bitmask_index/1)
+    |> encode_bitmask(min_bytes: 2)
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<first_bitmask::size(8)>>),
-    do: decode_params(<<first_bitmask, 0x0::size(8)>>)
+  def decode_params(<<first_bitmask>>),
+    do: decode_params(<<first_bitmask, 0x0>>)
 
-  def decode_params(bitmasks) do
-    bitmasks_as_indexed_list =
-      :erlang.binary_to_list(bitmasks) |> Enum.take(2) |> Enum.with_index(1)
-
+  def decode_params(binary) do
     setpoint_types =
-      Enum.flat_map(bitmasks_as_indexed_list, fn {bitmask_byte, byte_index} ->
-        for bit_index <- 0..7, into: [] do
-          {bitmask_field_to_setpoint_type(byte_index, bit_index),
-           (bitmask_byte &&& 1 <<< bit_index) !== 0}
-        end
-      end)
-      |> Keyword.drop([nil])
+      binary
+      |> decode_bitmask()
+      |> Enum.map(&bitmask_index_to_setpoint_type/1)
+      |> Enum.reject(&is_nil/1)
 
     {:ok, [setpoint_types: setpoint_types]}
   end
 
-  @spec bitmask_field_to_setpoint_type(pos_integer(), 0..7) ::
-          ThermostatSetpoint.type() | :reserved | nil
-  defp bitmask_field_to_setpoint_type(byte_index, bit_index)
+  def setpoint_type_to_bitmask_index(:heating), do: 1
+  def setpoint_type_to_bitmask_index(:cooling), do: 2
+  def setpoint_type_to_bitmask_index(:furnace), do: 3
+  def setpoint_type_to_bitmask_index(:dry_air), do: 4
+  def setpoint_type_to_bitmask_index(:moist_air), do: 5
+  def setpoint_type_to_bitmask_index(:auto_changeover), do: 6
+  def setpoint_type_to_bitmask_index(:energy_save_heating), do: 7
+  def setpoint_type_to_bitmask_index(:energy_save_cooling), do: 8
+  def setpoint_type_to_bitmask_index(:away_heating), do: 9
+  def setpoint_type_to_bitmask_index(:away_cooling), do: 10
+  def setpoint_type_to_bitmask_index(:full_power), do: 11
 
-  defp bitmask_field_to_setpoint_type(1, 1), do: :heating
-  defp bitmask_field_to_setpoint_type(1, 2), do: :cooling
-  defp bitmask_field_to_setpoint_type(1, 3), do: :furnace
-  defp bitmask_field_to_setpoint_type(1, 4), do: :dry_air
-  defp bitmask_field_to_setpoint_type(1, 5), do: :moist_air
-  defp bitmask_field_to_setpoint_type(1, 6), do: :auto_changeover
-  defp bitmask_field_to_setpoint_type(1, 7), do: :energy_save_heating
-  defp bitmask_field_to_setpoint_type(2, 0), do: :energy_save_cooling
-  defp bitmask_field_to_setpoint_type(2, 1), do: :away_heating
-  defp bitmask_field_to_setpoint_type(2, 2), do: :away_cooling
-  defp bitmask_field_to_setpoint_type(2, 3), do: :full_power
-  defp bitmask_field_to_setpoint_type(_, _), do: nil
+  def bitmask_index_to_setpoint_type(1), do: :heating
+  def bitmask_index_to_setpoint_type(2), do: :cooling
+  def bitmask_index_to_setpoint_type(3), do: :furnace
+  def bitmask_index_to_setpoint_type(4), do: :dry_air
+  def bitmask_index_to_setpoint_type(5), do: :moist_air
+  def bitmask_index_to_setpoint_type(6), do: :auto_changeover
+  def bitmask_index_to_setpoint_type(7), do: :energy_save_heating
+  def bitmask_index_to_setpoint_type(8), do: :energy_save_cooling
+  def bitmask_index_to_setpoint_type(9), do: :away_heating
+  def bitmask_index_to_setpoint_type(10), do: :away_cooling
+  def bitmask_index_to_setpoint_type(11), do: :full_power
+  def bitmask_index_to_setpoint_type(_), do: nil
 end

@@ -14,16 +14,8 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
       user_code_checksum_supported?: true,
       multi_user_code_report_supported?: false,
       multi_user_code_set_supported?: false,
-      supported_user_id_statuses: [
-        available: true,
-        occupied: true
-      ],
-      supported_keypad_modes: [
-        lockout: false,
-        normal: true,
-        privacy: true,
-        vacation: false
-      ],
+      supported_user_id_statuses: [:available, :occupied],
+      supported_keypad_modes: [:normal, :privacy],
       supported_keypad_keys: ~c"()*+,-./014567"
     ]
 
@@ -53,18 +45,18 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
     refute params[:multi_user_code_report_supported?]
     refute params[:multi_user_code_set_supported?]
 
-    refute params[:supported_user_id_statuses][:available]
-    refute params[:supported_user_id_statuses][:disabled]
-    assert params[:supported_user_id_statuses][:messaging]
-    assert params[:supported_user_id_statuses][:occupied]
-    assert params[:supported_user_id_statuses][:passage]
-    refute Keyword.has_key?(params[:supported_user_id_statuses], :unknown)
+    refute :available in params[:supported_user_id_statuses]
+    refute :disabled in params[:supported_user_id_statuses]
+    assert :messaging in params[:supported_user_id_statuses]
+    assert :occupied in params[:supported_user_id_statuses]
+    assert :passage in params[:supported_user_id_statuses]
+    refute :unknown in params[:supported_user_id_statuses]
 
-    assert params[:supported_keypad_modes][:normal]
-    refute params[:supported_keypad_modes][:vacation]
-    assert params[:supported_keypad_modes][:privacy]
-    refute params[:supported_keypad_modes][:lockout]
-    refute Keyword.has_key?(params[:supported_keypad_modes], :unknown)
+    assert :normal in params[:supported_keypad_modes]
+    refute :vacation in params[:supported_keypad_modes]
+    assert :privacy in params[:supported_keypad_modes]
+    refute :lockout in params[:supported_keypad_modes]
+    refute :unknown in params[:supported_keypad_modes]
 
     assert params[:supported_keypad_keys] == ~c"()*+,-./014567"
   end
@@ -81,16 +73,16 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
     refute params[:multi_user_code_report_supported?]
     refute params[:multi_user_code_set_supported?]
 
-    assert params[:supported_user_id_statuses][:available]
-    assert params[:supported_user_id_statuses][:disabled]
-    assert params[:supported_user_id_statuses][:messaging]
-    assert params[:supported_user_id_statuses][:occupied]
-    refute params[:supported_user_id_statuses][:passage]
+    assert :available in params[:supported_user_id_statuses]
+    assert :disabled in params[:supported_user_id_statuses]
+    assert :messaging in params[:supported_user_id_statuses]
+    assert :occupied in params[:supported_user_id_statuses]
+    refute :passage in params[:supported_user_id_statuses]
 
-    assert params[:supported_keypad_modes][:normal]
-    assert params[:supported_keypad_modes][:vacation]
-    assert params[:supported_keypad_modes][:privacy]
-    refute params[:supported_keypad_modes][:lockout]
+    assert :normal in params[:supported_keypad_modes]
+    assert :vacation in params[:supported_keypad_modes]
+    assert :privacy in params[:supported_keypad_modes]
+    refute :lockout in params[:supported_keypad_modes]
 
     assert params[:supported_keypad_keys] == ~c"0123456789"
   end

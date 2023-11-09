@@ -79,14 +79,15 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   @spec decode_sensor_types(binary) :: {:ok, [sensor_types: [atom]]} | {:error, DecodeError.t()}
   def decode_sensor_types(binary) do
     sensor_types =
-      decode_indexed_bitmask(binary, fn value ->
+      binary
+      |> decode_bitmask()
+      |> Enum.map(fn value ->
         case decode_type(value) do
           {:ok, type} -> type
           {:error, _error} -> nil
         end
       end)
-      |> Enum.filter(&elem(&1, 1))
-      |> Enum.map(&elem(&1, 0))
+      |> Enum.reject(&is_nil/1)
 
     {:ok, [sensor_types: sensor_types]}
   end
@@ -102,8 +103,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   @spec encode_sensor_types([atom]) :: binary
   def encode_sensor_types(sensor_types) do
     sensor_types
-    |> Enum.map(&{&1, true})
-    |> encode_indexed_bitmask(&encode_type/1, trim_empty_bytes: false)
-    |> String.pad_trailing(2, <<0>>)
+    |> Enum.map(&encode_type/1)
+    |> encode_bitmask(min_bytes: 2)
   end
 end
