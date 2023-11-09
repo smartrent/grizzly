@@ -528,7 +528,12 @@ defmodule Grizzly.Commands.Table do
         handler: {WaitReport, complete_report: :humidity_control_setpoint_scale_supported_report}}},
       {:humidity_control_setpoint_capabilities_get,
        {Commands.HumidityControlSetpointCapabilitiesGet,
-        handler: {WaitReport, complete_report: :humidity_control_setpoint_capabilities_report}}}
+        handler: {WaitReport, complete_report: :humidity_control_setpoint_capabilities_report}}},
+
+      # Humidity Control Operating State
+      {:humidity_control_operating_state_get,
+       {Commands.HumidityControlOperatingStateGet,
+        handler: {WaitReport, complete_report: :humidity_control_operating_state_report}}}
     ]
 
     defmacro __before_compile__(_) do

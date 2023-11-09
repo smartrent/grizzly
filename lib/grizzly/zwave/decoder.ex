@@ -433,7 +433,11 @@ defmodule Grizzly.ZWave.Decoder do
       {0x64, 0x06, Commands.HumidityControlSetpointScaleSupportedGet},
       {0x64, 0x07, Commands.HumidityControlSetpointScaleSupportedReport},
       {0x64, 0x08, Commands.HumidityControlSetpointCapabilitiesGet},
-      {0x64, 0x09, Commands.HumidityControlSetpointCapabilitiesReport}
+      {0x64, 0x09, Commands.HumidityControlSetpointCapabilitiesReport},
+
+      # Humidity Control Operating State
+      {0x6E, 0x01, Commands.HumidityControlOperatingStateGet},
+      {0x6E, 0x02, Commands.HumidityControlOperatingStateReport}
     ]
 
     defmacro __before_compile__(_) do
