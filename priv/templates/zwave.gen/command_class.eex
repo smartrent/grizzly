@@ -1,15 +1,13 @@
 defmodule <%= inspect command_class_module %> do
   @moduledoc """
-  <%= inspect command_class %> Command Class
-
-  What type of commands does this command class support?
+  <%= command_class %>
   """
 
   @behaviour Grizzly.ZWave.CommandClass
 
   @impl Grizzly.ZWave.CommandClass
-  def byte(), do: # add byte here
-
+  def byte(), do: <%= command_class_id %>
+  <%!-- --%>
   @impl Grizzly.ZWave.CommandClass
   def name(), do: <%= inspect command_class_name %>
 end
