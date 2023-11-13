@@ -11,8 +11,8 @@ defmodule Grizzly.ZWave.Commands.UserCodeSetTest do
 
   describe "encodes params correctly" do
     test "setting user code available" do
-      {:ok, command} = UserCodeSet.new(user_id: 9, user_id_status: :available, user_code: "0000")
-      expected_binary = <<0x63, 0x01, 0x09, 0x00, 0x30, 0x30, 0x30, 0x30>>
+      {:ok, command} = UserCodeSet.new(user_id: 9, user_id_status: :available, user_code: "1234")
+      expected_binary = <<0x63, 0x01, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00>>
 
       assert expected_binary == ZWave.to_binary(command)
     end
