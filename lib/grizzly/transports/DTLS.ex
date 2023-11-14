@@ -199,6 +199,12 @@ defmodule Grizzly.Transports.DTLS do
     end
   end
 
+  @impl Grizzly.Transport
+  def peername(transport) do
+    socket = Transport.assign(transport, :socket)
+    :ssl.peername(socket)
+  end
+
   @doc false
   def user_lookup(:psk, _username, userstate) do
     {:ok, userstate}

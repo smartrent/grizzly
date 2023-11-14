@@ -3,6 +3,8 @@ defmodule Grizzly.Transport do
   Behaviour and functions for communicating to `zipgateway`
   """
 
+  alias Grizzly.ZIPGateway
+
   defmodule Response do
     @moduledoc """
     The response from parse response
@@ -59,6 +61,8 @@ defmodule Grizzly.Transport do
   @callback handshake(t()) :: {:ok, t()} | {:error, any()}
 
   @callback send(t(), binary(), keyword()) :: :ok
+
+  @callback peername(t()) :: {:ok, {:inet.ip_address(), :inet.port_number()}} | {:error, any()}
 
   @callback parse_response(any(), [parse_opt()]) ::
               {:ok, Response.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
@@ -141,6 +145,20 @@ defmodule Grizzly.Transport do
     %__MODULE__{impl: transport_impl} = transport
 
     transport_impl.send(transport, binary, opts)
+  end
+
+  @spec peername(t()) :: {:ok, {:inet.ip_address(), :inet.port_number()}} | {:error, any()}
+  def peername(transport) do
+    %__MODULE__{impl: transport_impl} = transport
+    transport_impl.peername(transport)
+  end
+
+  @spec node_id(t()) :: {:ok, Grizzly.node_id()} | {:error, any()}
+  def node_id(transport) do
+    case peername(transport) do
+      {:ok, {ip, _}} -> {:ok, ZIPGateway.node_id_from_ip(ip)}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """

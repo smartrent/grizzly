@@ -53,12 +53,19 @@ defmodule Grizzly.Transports.UDP do
     |> :gen_udp.send(host, port, binary)
   end
 
+  @impl Grizzly.Transport
   def send(transport, binary, opts) do
     {ip_address, port} = Keyword.fetch!(opts, :to)
 
     transport
     |> Transport.assign(:socket)
     |> :gen_udp.send(ip_address, port, binary)
+  end
+
+  @impl Grizzly.Transport
+  def peername(transport) do
+    socket = Transport.assign(transport, :socket)
+    :inet.peername(socket)
   end
 
   @impl Grizzly.Transport

@@ -40,6 +40,12 @@ defmodule GrizzlyTest.Transport.UDP do
   end
 
   @impl Grizzly.Transport
+  def peername(transport) do
+    socket = Transport.assign(transport, :socket)
+    :inet.peername(socket)
+  end
+
+  @impl Grizzly.Transport
   def parse_response({:udp, _, ip, _, binary}, opts) do
     if Keyword.get(opts, :raw, false) do
       {:ok, binary}
