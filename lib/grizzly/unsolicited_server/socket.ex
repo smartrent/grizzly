@@ -33,6 +33,9 @@ defmodule Grizzly.UnsolicitedServer.Socket do
   def handle_continue(:accept, listening_transport) do
     with {:ok, accept_transport} <- Transport.accept(listening_transport),
          {:ok, transport} <- Transport.handshake(accept_transport) do
+      {:ok, node_id} = Transport.node_id(transport)
+      Logger.metadata(node_id: node_id)
+
       # Start a new listen socket to replace this one as this one is now bound
       # to a single node in the Z-Wave PAN.
       {:ok, _} = SocketSupervisor.start_socket(listening_transport)
