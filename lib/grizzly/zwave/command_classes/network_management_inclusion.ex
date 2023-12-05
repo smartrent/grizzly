@@ -159,8 +159,17 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
        do: node_info |> Map.put(:command_classes, [])
 
   defp parse_additional_node_info(node_info, additional_info, command_class_length) do
-    <<command_classes_bin::binary-size(command_class_length), more_info::binary>> =
-      additional_info
+    {command_classes_bin, more_info} =
+      case additional_info do
+        <<command_classes_bin::binary-size(command_class_length), more_info::binary>> ->
+          {command_classes_bin, more_info}
+
+        # This case is to handle a Z/IP Gateway bug where the node_info_length field is
+        # off by one. This appears to happen when S2 bootstrapping fails for a node being
+        # included via SmartStart, but there may be other cases as well.
+        <<command_classes_bin::binary-size(command_class_length - 1)>> ->
+          {command_classes_bin, <<>>}
+      end
 
     command_classes = CommandClasses.command_class_list_from_binary(command_classes_bin)
 

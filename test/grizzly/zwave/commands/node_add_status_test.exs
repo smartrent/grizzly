@@ -103,5 +103,55 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         assert params[param_name] == value
       end
     end
+
+    test "z/ip gateway off-by-one workaround" do
+      report =
+        <<0x25, 0x7, 0x0, 0x7, 0x1A, 0x53, 0x9C, 0x4, 0x7, 0x1, 0x5E, 0x98, 0x9F, 0x6C, 0x55,
+          0x86, 0x73, 0x85, 0x8E, 0x59, 0x72, 0x5A, 0x87, 0x80, 0x84, 0x71, 0x30, 0x31, 0x70>>
+
+      expected_command_classes = [
+        non_secure_supported: [
+          :zwaveplus_info,
+          :security,
+          :security_2,
+          :supervision,
+          :transport_service,
+          :version,
+          :powerlevel,
+          :association,
+          :multi_channel_association,
+          :association_group_info,
+          :manufacturer_specific,
+          :device_reset_locally,
+          :indicator,
+          :battery,
+          :wake_up,
+          :alarm,
+          :sensor_binary,
+          :sensor_multilevel,
+          :configuration
+        ],
+        non_secure_controlled: [],
+        secure_supported: [],
+        secure_controlled: []
+      ]
+
+      expected_params = [
+        status: :failed,
+        node_id: 7,
+        seq_number: 37,
+        listening?: false,
+        basic_device_class: :routing_slave,
+        generic_device_class: :sensor_notification,
+        specific_device_class: :notification_sensor,
+        command_classes: expected_command_classes
+      ]
+
+      {:ok, params} = NodeAddStatus.decode_params(report)
+
+      for {param_name, value} <- expected_params do
+        assert params[param_name] == value
+      end
+    end
   end
 end
