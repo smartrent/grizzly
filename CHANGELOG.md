@@ -4,7 +4,22 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.1.0] - 2023-12-05
+
+### Added
+
+- Implement Humidity Control CCs ([#867](https://github.com/smartrent/grizzly/pull/867))
+- UnsolicitedServer includes node id in Logger metadata ([#869](https://github.com/smartrent/grizzly/pull/869))
+
+### Fixed
+
+- Simplify bitmask encoding and decoding ([#866](https://github.com/smartrent/grizzly/pull/866))
+- Fix User Code Set when User ID Status is 0x00 ([#868](https://github.com/smartrent/grizzly/pull/868))
+Fix Node Add Status parsing when length is off by one ([#871](https://github.com/smartrent/grizzly/pull/871))
+
 ## [v7.0.4] - 2023-11-08
+
+### Added
 
 - Record original command binary in Logger metadata ([#864](https://github.com/smartrent/grizzly/pull/864))
 
@@ -2384,6 +2399,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.1.0]: https://github.com/smartrent/grizzly/compare/v7.0.4..v7.1.0
 [v7.0.4]: https://github.com/smartrent/grizzly/compare/v7.0.3..v7.0.4
 [v7.0.3]: https://github.com/smartrent/grizzly/compare/v7.0.2..v7.0.3
 [v7.0.2]: https://github.com/smartrent/grizzly/compare/v7.0.1..v7.0.2
