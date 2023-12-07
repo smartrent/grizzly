@@ -87,7 +87,7 @@ defmodule Grizzly do
   """
   @type send_command_response() ::
           {:ok, Report.t()}
-          | {:error, :including | :updating_firmware | :nack_response | :queue_full | any()}
+          | {:error, :including | :updating_firmware | :nack_response | :queue_full | :timeout}
 
   @type seq_number() :: non_neg_integer()
 
