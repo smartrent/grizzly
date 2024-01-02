@@ -5,9 +5,8 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
 
   use GenServer
 
+  alias Grizzly.ZIPGateway.SAPIMonitor
   require Logger
-
-  @type serial_api_status :: :ok | :initializing | :unknown | :unresponsive
 
   @type network_key_type ::
           :s0
@@ -16,15 +15,6 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
           | :s2_access_control
           | :s2_authenticated_long_range
           | :s2_access_control_long_range
-
-  @doc """
-  Returns the estimated status of the Z-Wave module based on Z/IP Gateway's
-  log output.
-  """
-  @spec serial_api_status(GenServer.name()) :: serial_api_status()
-  def serial_api_status(name \\ __MODULE__) do
-    GenServer.call(name, :serial_api_status)
-  end
 
   @doc """
   Returns the network home id as extracted from the Z/IP Gateway logs.
@@ -75,27 +65,20 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
     name = Keyword.get(opts, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, opts, name: name)
+    GenServer.start_link(__MODULE__, [], name: name)
   end
 
   @impl GenServer
-  def init(opts) do
+  def init(_opts) do
     {:ok,
      %{
        home_id: nil,
        network_keys: [],
-       next_key_type: nil,
-       sapi_retransmissions: 0,
-       sapi_status: :unknown,
-       status_reporter: opts[:status_reporter]
+       next_key_type: nil
      }}
   end
 
   @impl GenServer
-  def handle_call(:serial_api_status, _from, %{sapi_status: sapi_status} = state) do
-    {:reply, sapi_status, state}
-  end
-
   def handle_call(:home_id, _from, %{home_id: home_id} = state) do
     {:reply, home_id, state}
   end
@@ -181,52 +164,16 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
     {:noreply, %{state | home_id: home_id}}
   end
 
-  def handle_info({:message, "Serial Process init" <> _}, state) do
-    {:noreply, set_sapi_status(state, :initializing)}
-  end
-
   def handle_info({:message, "Bridge init done" <> _}, state) do
-    {:noreply, set_sapi_status(state, :ok)}
+    _ = SAPIMonitor.reset()
+    {:noreply, state}
   end
 
   def handle_info({:message, message}, state) do
-    cond do
-      not String.contains?(message, " SerialAPI: Retransmission") ->
-        {:noreply, state}
-
-      state.sapi_retransmissions + 1 > 4 ->
-        {:noreply, set_sapi_status(state, :unresponsive)}
-
-      true ->
-        {:noreply, %{state | sapi_retransmissions: state.sapi_retransmissions + 1}}
-    end
-  end
-
-  defp set_sapi_status(state, new_status) when new_status in [:ok, :initializing] do
-    maybe_notify_status_reporter(state, new_status)
-    %{state | sapi_status: new_status, sapi_retransmissions: 0}
-  end
-
-  defp set_sapi_status(state, new_status) do
-    maybe_notify_status_reporter(state, new_status)
-    %{state | sapi_status: new_status}
-  end
-
-  defp maybe_notify_status_reporter(%{sapi_status: status}, status), do: :ok
-
-  defp maybe_notify_status_reporter(state, new_status) do
-    cond do
-      is_function(state.status_reporter, 1) ->
-        state.status_reporter.(new_status)
-
-      is_atom(state.status_reporter) and
-          function_exported?(state.status_reporter, :serial_api_status, 1) ->
-        state.status_reporter.serial_api_status(new_status)
-
-      true ->
-        :ok
+    if String.contains?(message, " SerialAPI: Retransmission") do
+      SAPIMonitor.retransmission()
     end
 
-    :ok
+    {:noreply, state}
   end
 end

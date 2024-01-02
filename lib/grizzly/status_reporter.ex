@@ -4,8 +4,9 @@ defmodule Grizzly.StatusReporter do
   runtime
   """
 
-  alias Grizzly.ZIPGateway.LogMonitor
   alias Grizzly.ZWaveFirmware
+
+  @type serial_api_status :: :ok | :unresponsive
 
   @doc """
   This callback is called when Grizzly starts up zipgateway and able to
@@ -25,7 +26,7 @@ defmodule Grizzly.StatusReporter do
   Called when the Serial API status changes. Only applicable if Grizzly is managing
   the Z/IP Gateway process.
   """
-  @callback serial_api_status(LogMonitor.serial_api_status()) :: any()
+  @callback serial_api_status(serial_api_status()) :: any()
 
   @optional_callbacks [serial_api_status: 1]
 end

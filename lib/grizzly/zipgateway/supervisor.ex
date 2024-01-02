@@ -7,7 +7,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   use Supervisor
 
   alias Grizzly.{Indicator, Options}
-  alias Grizzly.ZIPGateway.{Config, ExitMonitor, LogMonitor}
+  alias Grizzly.ZIPGateway.{Config, ExitMonitor, LogMonitor, SAPIMonitor}
   require Logger
 
   @zgw_eeprom_to_sqlite "/usr/bin/zgw_eeprom_to_sqlite"
@@ -68,7 +68,8 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     ]
 
     [
-      {LogMonitor, [status_reporter: options.status_reporter]},
+      {SAPIMonitor, [status_reporter: options.status_reporter]},
+      LogMonitor,
       {BEAMNotify, beam_notify_options},
       zipgateway_process_supervisor_spec(options)
     ]

@@ -1,19 +1,15 @@
 defmodule Grizzly.ZIPGateway.LogMonitorTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZIPGateway.LogMonitor
+  alias Grizzly.ZIPGateway.{LogMonitor, SAPIMonitor}
 
   setup %{test: test} do
     test_pid = self()
 
-    pid =
-      start_supervised!(
-        {LogMonitor,
-         [
-           name: test,
-           status_reporter: fn status -> send(test_pid, status) end
-         ]}
-      )
+    status_reporter = fn status -> send(test_pid, status) end
+
+    start_supervised!({SAPIMonitor, status_reporter: status_reporter})
+    pid = start_supervised!({LogMonitor, [name: test, status_reporter: status_reporter]})
 
     %{monitor_pid: pid}
   end
@@ -97,32 +93,16 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
   end
 
   describe "serial api status reporting" do
-    test "reports ok on successful init", %{monitor_pid: pid} do
-      send(pid, {:message, "Serial Process init"})
-      assert :initializing == LogMonitor.serial_api_status(pid)
-
-      send(pid, {:message, "Bridge init done"})
-      assert :ok == LogMonitor.serial_api_status(pid)
-    end
-
     test "reports unresponsive after 5 retransmissions", %{monitor_pid: pid} do
-      send(pid, {:message, "Serial Process init"})
-      assert :initializing == LogMonitor.serial_api_status(pid)
-      assert_received :initializing
-
-      send(pid, {:message, "Bridge init done"})
-      assert :ok == LogMonitor.serial_api_status(pid)
-      assert_received :ok
+      assert_receive :ok
 
       send(pid, {:message, " SerialAPI: Retransmission 0 of 0x07"})
       send(pid, {:message, " SerialAPI: Retransmission 1 of 0x07"})
       send(pid, {:message, " SerialAPI: Retransmission 2 of 0x07"})
       send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
-      assert :ok == LogMonitor.serial_api_status(pid)
-
       send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
-      assert :unresponsive == LogMonitor.serial_api_status(pid)
-      assert_received :unresponsive
+
+      assert_receive :unresponsive
     end
   end
 end
