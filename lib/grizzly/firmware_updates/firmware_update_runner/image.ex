@@ -51,8 +51,15 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image do
     Enum.count(fragments)
   end
 
-  defp break_into_fragments(path, fragment_size) do
-    File.stream!(path, [], fragment_size)
-    |> Enum.into([])
+  if Version.match?(System.version(), ">= 1.16.0") do
+    defp break_into_fragments(path, fragment_size) do
+      File.stream!(path, fragment_size, [])
+      |> Enum.into([])
+    end
+  else
+    defp break_into_fragments(path, fragment_size) do
+      File.stream!(path, [], fragment_size)
+      |> Enum.into([])
+    end
   end
 end
