@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.1.2] - 2024-01-08
+
+### Fixed
+
+- Support Elixir 1.16 ([#881](https://github.com/smartrent/grizzly/pull/881))
+
 ## [v7.1.1] - 2024-01-03
 
 ### Fixed
@@ -2406,6 +2412,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.1.2]: https://github.com/smartrent/grizzly/compare/v7.1.1..v7.1.2
 [v7.1.1]: https://github.com/smartrent/grizzly/compare/v7.1.0..v7.1.1
 [v7.1.0]: https://github.com/smartrent/grizzly/compare/v7.0.4..v7.1.0
 [v7.0.4]: https://github.com/smartrent/grizzly/compare/v7.0.3..v7.0.4
