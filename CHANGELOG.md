@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.1.3] - 2024-01-09
+
+### Fixed
+
+- Fix more false positives in SAPI status reporting ([#884](https://github.com/smartrent/grizzly/pull/884))
+
 ## [v7.1.2] - 2024-01-08
 
 ### Fixed
@@ -2412,6 +2418,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.1.3]: https://github.com/smartrent/grizzly/compare/v7.1.2..v7.1.3
 [v7.1.2]: https://github.com/smartrent/grizzly/compare/v7.1.1..v7.1.2
 [v7.1.1]: https://github.com/smartrent/grizzly/compare/v7.1.0..v7.1.1
 [v7.1.0]: https://github.com/smartrent/grizzly/compare/v7.0.4..v7.1.0
