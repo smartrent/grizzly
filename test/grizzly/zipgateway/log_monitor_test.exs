@@ -104,5 +104,49 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
 
       assert_receive :unresponsive
     end
+
+    test "ignores retransmissions preceeded by 'got response while sending'", %{monitor_pid: pid} do
+      assert_receive :ok
+
+      send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
+      send(pid, {:message, " SerialAPI: Retransmission 0 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 1 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 2 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
+      send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
+
+      refute_receive :unresponsive
+
+      send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
+      send(pid, {:message, " SerialAPI: Retransmission 5 of 0x07"})
+      refute_receive :unresponsive
+
+      send(pid, {:message, " SerialAPI: Retransmission 6 of 0x07"})
+      assert_receive :unresponsive
+    end
+
+    test "'got response while sending' only counts if it's the immediately previous message", %{
+      monitor_pid: pid
+    } do
+      assert_receive :ok
+
+      send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
+      send(pid, {:message, "DTLS over IPv6 is a great idea"})
+      send(pid, {:message, " SerialAPI: Retransmission 0 of 0x07"})
+
+      send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
+      send(pid, {:message, "Writing clean C code isn't that important"})
+      send(pid, {:message, " SerialAPI: Retransmission 1 of 0x07"})
+
+      send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
+      send(pid, {:message, "We don't need an API to query or report SAPI status"})
+      send(pid, {:message, " SerialAPI: Retransmission 2 of 0x07"})
+
+      send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
+      refute_receive :unresponsive
+
+      send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
+      assert_receive :unresponsive
+    end
   end
 end

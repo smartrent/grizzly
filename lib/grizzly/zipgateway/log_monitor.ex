@@ -74,7 +74,8 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
      %{
        home_id: nil,
        network_keys: [],
-       next_key_type: nil
+       next_key_type: nil,
+       got_response_frame_while_sending: false
      }}
   end
 
@@ -88,22 +89,34 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   end
 
   @impl GenServer
+  def handle_continue({:message, message}, state) do
+    if String.contains?(message, "SerialAPI: Got RESPONSE frame while sending") do
+      {:noreply, %{state | got_response_frame_while_sending: true}}
+    else
+      {:noreply, %{state | got_response_frame_while_sending: false}}
+    end
+  end
+
+  @impl GenServer
   # We have the next key type in state, so extract the network key and save it
   def handle_info({:message, network_key}, %{next_key_type: key_type} = state)
       when not is_nil(key_type) do
     network_key = network_key |> String.trim() |> String.upcase()
 
-    if Regex.match?(~r/^[0-9A-F]{32}$/, network_key) do
-      Logger.debug("[Grizzly] Extracted network key type=#{key_type} key=#{network_key}")
-      updated_network_keys = Keyword.put(state.network_keys, key_type, network_key)
-      {:noreply, %{state | network_keys: updated_network_keys, next_key_type: nil}}
-    else
-      Logger.error(
-        "[Grizzly] #{inspect(key_type)} network key appears to be invalid: #{network_key}"
-      )
+    new_state =
+      if Regex.match?(~r/^[0-9A-F]{32}$/, network_key) do
+        Logger.debug("[Grizzly] Extracted network key type=#{key_type} key=#{network_key}")
+        updated_network_keys = Keyword.put(state.network_keys, key_type, network_key)
+        %{state | network_keys: updated_network_keys, next_key_type: nil}
+      else
+        Logger.error(
+          "[Grizzly] #{inspect(key_type)} network key appears to be invalid: #{network_key}"
+        )
 
-      {:noreply, state}
-    end
+        state
+      end
+
+    {:noreply, new_state, {:continue, {:message, network_key}}}
   end
 
   # The actual network key is printed on the next line, so save where we're at in state
@@ -142,7 +155,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
           nil
       end
 
-    {:noreply, %{state | next_key_type: next_key_type}}
+    {:noreply, %{state | next_key_type: next_key_type}, {:continue, {:message, message}}}
   end
 
   # Extract the Home ID from the ZIP_Router_Reset message
@@ -161,19 +174,25 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
           nil
       end
 
-    {:noreply, %{state | home_id: home_id}}
+    {:noreply, %{state | home_id: home_id}, {:continue, {:message, message}}}
   end
 
-  def handle_info({:message, "Bridge init done" <> _}, state) do
+  def handle_info({:message, "Bridge init done" <> _ = message}, state) do
     _ = SAPIMonitor.reset()
-    {:noreply, state}
+    {:noreply, state, {:continue, {:message, message}}}
   end
 
-  def handle_info({:message, message}, state) do
+  # Only count "SerialAPI: Retransmission" if the immediately preceeding message was
+  # not "SerialAPI: Got RESPONSE frame while sending"
+  def handle_info({:message, message}, %{got_response_frame_while_sending: false} = state) do
     if String.contains?(message, " SerialAPI: Retransmission") do
       SAPIMonitor.retransmission()
     end
 
-    {:noreply, state}
+    {:noreply, state, {:continue, {:message, message}}}
+  end
+
+  def handle_info({:message, message}, state) do
+    {:noreply, state, {:continue, {:message, message}}}
   end
 end
