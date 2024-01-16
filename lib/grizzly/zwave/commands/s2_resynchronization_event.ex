@@ -21,7 +21,6 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
 
     * `:node_id` - which node this message pertains to
     * `:reason` - 0 = SOS_EVENT_REASON_UNANSWERED in zipgateway
-
   """
 
   @behaviour Grizzly.ZWave.Command
@@ -46,7 +45,8 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
     reason = Command.param!(command, :reason)
-    <<node_id, reason>>
+
+    NodeId.encode_extended(node_id, delimiter: <<reason>>)
   end
 
   @impl Command
