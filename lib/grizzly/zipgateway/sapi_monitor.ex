@@ -3,6 +3,7 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
 
   use GenServer
 
+  alias Grizzly.Alarms.SerialAPIUnresponsive
   alias Grizzly.StatusReporter
 
   @type option ::
@@ -99,11 +100,15 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
     state = %{state | retransmissions: drop_old(state.retransmissions, state.period)}
 
     if length(state.retransmissions) >= state.threshold do
+      SerialAPIUnresponsive.raise_alarm()
+
       state
       |> set_status(:unresponsive)
       |> clear_timer()
       |> schedule_check()
     else
+      SerialAPIUnresponsive.clear_alarm()
+
       set_status(state, :ok)
     end
   end

@@ -1,6 +1,8 @@
 defmodule Grizzly.ZIPGateway.ReadyChecker do
   @moduledoc false
 
+  alias Grizzly.Alarms.NotReadyAlarm
+
   @ready_timeout :timer.seconds(60)
 
   # Waits for Z/IP Gateway to signal its readiness by waiting for a node list
@@ -30,6 +32,8 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   @impl GenServer
   def init(args) do
+    NotReadyAlarm.raise_alarm()
+
     Grizzly.subscribe_command(:node_list_report)
 
     state = %{
@@ -99,6 +103,8 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
             :ok
         end
       end)
+
+    NotReadyAlarm.clear_alarm()
 
     %{state | ready?: true}
   end
