@@ -200,6 +200,16 @@ defmodule Grizzly.ZIPGateway.Supervisor do
       %{exit_status: status}
     )
 
+    grizzly_opts = Grizzly.options()
+    reset_zwave_module(grizzly_opts)
+
     :error_exit_status
+  end
+
+  @spec reset_zwave_module(Options.t()) :: :ok
+  defp reset_zwave_module(%Options{zwave_firmware: opts}) do
+    if is_function(opts[:module_reset_fun], 0), do: opts.module_reset_fun.()
+
+    :ok
   end
 end
