@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.1.4] - 2024-01-26
+
+### Added
+
+- Hard reset Z-Wave module on Z/IP Gateway exit ([#888](https://github.com/smartrent/grizzly/pull/888))
+
 ## [v7.1.3] - 2024-01-09
 
 ### Fixed
@@ -2418,6 +2424,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.1.4]: https://github.com/smartrent/grizzly/compare/v7.1.3..v7.1.4
 [v7.1.3]: https://github.com/smartrent/grizzly/compare/v7.1.2..v7.1.3
 [v7.1.2]: https://github.com/smartrent/grizzly/compare/v7.1.1..v7.1.2
 [v7.1.1]: https://github.com/smartrent/grizzly/compare/v7.1.0..v7.1.1
