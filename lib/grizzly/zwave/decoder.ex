@@ -305,6 +305,9 @@ defmodule Grizzly.ZWave.Decoder do
       # Meter
       {0x32, 0x01, Commands.MeterGet},
       {0x32, 0x02, Commands.MeterReport},
+      {0x32, 0x03, Commands.MeterSupportedGet},
+      {0x32, 0x04, Commands.MeterSupportedReport},
+      {0x32, 0x05, Commands.MeterReset},
 
       # Thermostat mode
       {0x40, 0x01, Commands.ThermostatModeSet},
