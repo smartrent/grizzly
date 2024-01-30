@@ -183,7 +183,7 @@ defmodule Grizzly.Network do
     extensions = [
       bootstrapping_mode: :long_range,
       smart_start_inclusion_setting: :pending,
-      advanced_joining: [:s2_unauthenticated, :s2_authenticated]
+      advanced_joining: [:s2_access_control, :s2_authenticated]
     ]
 
     set_node_provisioning(dsk, extensions, opts)
