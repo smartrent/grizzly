@@ -242,6 +242,10 @@ defmodule Grizzly.Commands.Table do
 
       # Meter
       {:meter_get, {Commands.MeterGet, handler: {WaitReport, complete_report: :meter_report}}},
+      {:meter_supported_get,
+       {Commands.MeterSupportedGet,
+        handler: {WaitReport, complete_report: :meter_supported_report}}},
+      {:meter_reset, {Commands.MeterReset, handler: AckResponse}},
 
       # Thermostat mode
       {:thermostat_mode_set, {Commands.ThermostatModeSet, handler: AckResponse}},
