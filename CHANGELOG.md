@@ -4,6 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.2.0] - 2024-01-30
+
+### Added
+
+- Implement missing Meter CC commands ([#890](https://github.com/smartrent/grizzly/pull/890))
+- Use correct security classes for LR in advanced joining option ([#892](https://github.com/smartrent/grizzly/pull/892))
+
+### Fixed
+
+- Fix incorrect match clause in catch ([#893](https://github.com/smartrent/grizzly/pull/893))
+
 ## [v7.1.4] - 2024-01-26
 
 ### Added
@@ -2424,6 +2435,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.2.0]: https://github.com/smartrent/grizzly/compare/v7.1.4..v7.2.0
 [v7.1.4]: https://github.com/smartrent/grizzly/compare/v7.1.3..v7.1.4
 [v7.1.3]: https://github.com/smartrent/grizzly/compare/v7.1.2..v7.1.3
 [v7.1.2]: https://github.com/smartrent/grizzly/compare/v7.1.1..v7.1.2
