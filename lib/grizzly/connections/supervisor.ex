@@ -46,7 +46,7 @@ defmodule Grizzly.Connections.Supervisor do
 
     :ok
   catch
-    {:exit, {:noproc, _}} -> :ok
+    :exit, {:noproc, _} -> :ok
   end
 
   @impl DynamicSupervisor
