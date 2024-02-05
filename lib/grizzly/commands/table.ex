@@ -214,6 +214,9 @@ defmodule Grizzly.Commands.Table do
       {:sensor_multilevel_supported_sensor_get,
        {Commands.SensorMultilevelSupportedSensorGet,
         handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}}},
+      {:sensor_multilevel_supported_scale_get,
+       {Commands.SensorMultilevelSupportedScaleGet,
+        handler: {WaitReport, complete_report: :sensor_multilevel_supported_scale_report}}},
 
       # User code
       {:user_code_set, {Commands.UserCodeSet, handler: AckResponse}},
