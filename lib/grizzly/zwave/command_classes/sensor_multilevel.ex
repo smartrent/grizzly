@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
   @sensor_types [
     # byte 1
     [
-      :air_temperature,
+      :temperature,
       :general_purpose,
       :luminance,
       :power,

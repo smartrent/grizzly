@@ -5,14 +5,14 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
 
   test "creates the command and validates params" do
     params = [
-      sensor_types: [:air_temperature, :luminance, :seismic_magnitude, :water_temperature]
+      sensor_types: [:temperature, :luminance, :seismic_magnitude, :water_temperature]
     ]
 
     {:ok, _command} = SensorMultilevelSupportedSensorReport.new(params)
   end
 
   test "encodes params correctly" do
-    params = [sensor_types: [:air_temperature, :humidity, :seismic_magnitude, :water_temperature]]
+    params = [sensor_types: [:temperature, :humidity, :seismic_magnitude, :water_temperature]]
     {:ok, command} = SensorMultilevelSupportedSensorReport.new(params)
     expected_binary = <<17, 0, 64, 2>>
     assert expected_binary == SensorMultilevelSupportedSensorReport.encode_params(command)
@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
 
     assert Enum.sort(sensor_types) ==
              Enum.sort([
-               :air_temperature,
+               :temperature,
                :humidity,
                :seismic_magnitude,
                :water_temperature
