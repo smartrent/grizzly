@@ -55,7 +55,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   @impl Command
   def decode_params(
         <<_::size(4), type_byte::size(4), precision::size(3), scale_byte::size(2),
-          byte_size::size(3), int_value::size(byte_size)-unit(8)>>
+          byte_size::size(3), int_value::size(byte_size)-unit(8), _::binary>>
+        # trailing binary to capture extra 0 sent by the Aidoo
       ) do
     type = ThermostatSetpoint.decode_type(type_byte)
 
