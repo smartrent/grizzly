@@ -11,7 +11,12 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEventTest do
   test "encodes params correctly" do
     params = [node_id: 5, reason: 0]
     {:ok, command} = S2ResynchronizationEvent.new(params)
-    expected_binary = <<5, 0>>
+    expected_binary = <<5, 0, 0, 5>>
+    assert expected_binary == S2ResynchronizationEvent.encode_params(command)
+
+    params = [node_id: 0x100, reason: 0]
+    {:ok, command} = S2ResynchronizationEvent.new(params)
+    expected_binary = <<0xFF, 0x00, 0x01, 0x00>>
     assert expected_binary == S2ResynchronizationEvent.encode_params(command)
   end
 
