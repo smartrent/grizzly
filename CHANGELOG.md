@@ -4,6 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.3.0] - 2024-02-07
+
+### Added
+
+- Add missing commands to SensorMultilevel CC ([#895](https://github.com/smartrent/grizzly/pull/895))
+- Ignore extra trailing bytes when decoding ThermostatSetpointReport ([#896](https://github.com/smartrent/grizzly/pull/896))
+
+### Fixed
+
+- Encode extended node id correctly in `S2ResynchronizationEvent` ([#887](https://github.com/smartrent/grizzly/pull/887))
+
 ## [v7.2.0] - 2024-01-30
 
 ### Added
@@ -2435,6 +2446,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.3.0]: https://github.com/smartrent/grizzly/compare/v7.2.0..v7.3.0
 [v7.2.0]: https://github.com/smartrent/grizzly/compare/v7.1.4..v7.2.0
 [v7.1.4]: https://github.com/smartrent/grizzly/compare/v7.1.3..v7.1.4
 [v7.1.3]: https://github.com/smartrent/grizzly/compare/v7.1.2..v7.1.3
