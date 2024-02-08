@@ -276,6 +276,9 @@ defmodule Grizzly.Commands.Table do
       {:thermostat_fan_mode_get,
        {Commands.ThermostatFanModeGet,
         handler: {WaitReport, complete_report: :thermostat_fan_mode_report}}},
+      {:thermostat_fan_mode_supported_get,
+       {Commands.ThermostatFanModeSupportedGet,
+        handler: {WaitReport, complete_report: :thermostat_fan_mode_supported_report}}},
 
       # Thermostat fan state
       {:thermostat_fan_state_get,
