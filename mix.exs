@@ -1,7 +1,7 @@
 defmodule Grizzly.MixProject do
   use Mix.Project
 
-  @version "7.3.0"
+  @version "7.4.0"
 
   def project do
     [
