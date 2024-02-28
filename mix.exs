@@ -11,7 +11,6 @@ defmodule Grizzly.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases(),
       dialyzer: dialyzer(),
       description: description(),
       package: package(),
@@ -153,12 +152,6 @@ defmodule Grizzly.MixProject do
         Grizzly.ZWave.CommandClasses,
         Grizzly.ZWave.Commands
       ]
-    ]
-  end
-
-  defp aliases() do
-    [
-      test: ["test --exclude integration --exclude inclusion --exclude firmware_update"]
     ]
   end
 end

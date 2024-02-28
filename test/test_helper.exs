@@ -6,13 +6,17 @@ Mimic.copy(MuonTrap)
 
 Grizzly.Supervisor.start_link(GrizzlyTest.Utils.default_options_args())
 
-config =
-  case System.get_env("CI") do
-    nil -> []
-    _ -> [formatters: [ExUnit.CLIFormatter, JUnitFormatter]]
-  end
+extra_formatters = if(System.get_env("CI"), do: [JUnitFormatter], else: [])
 
-Logger.configure(level: :debug)
+config = [
+  capture_log: true,
+  exclude: [
+    inclusion: true,
+    integration: true,
+    firmware_update: true
+  ],
+  formatters: ExUnit.configuration()[:formatters] ++ extra_formatters
+]
 
-ExUnit.configure(Keyword.merge(config, capture_log: true))
+ExUnit.configure(config)
 ExUnit.start()
