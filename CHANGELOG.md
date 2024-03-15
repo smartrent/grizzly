@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.4.1] - 2024-03-15
+
+### Fixed
+
+- Handle commands timing out or being queued during firmware updates ([#908](https://github.com/smartrent/grizzly/pull/908))
+
 ## [v7.4.0] - 2024-02-08
 
 ### Added
@@ -2453,6 +2459,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v7.4.1]: https://github.com/smartrent/grizzly/compare/v7.4.0..v7.4.1
 [v7.4.0]: https://github.com/smartrent/grizzly/compare/v7.3.0..v7.4.0
 [v7.3.0]: https://github.com/smartrent/grizzly/compare/v7.2.0..v7.3.0
 [v7.2.0]: https://github.com/smartrent/grizzly/compare/v7.1.4..v7.2.0
