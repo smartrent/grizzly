@@ -121,6 +121,26 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       :ack_response ->
         {:noreply, firmware_update}
 
+      :timeout ->
+        Logger.info(
+          "[Grizzly] Updating firmware of device #{firmware_update.device_id} failed: timed out: timeout."
+        )
+
+        respond_to_handler(
+          format_handler_spec(firmware_update.handler),
+          {:error, :timeout}
+        )
+
+        {:stop, :normal, firmware_update}
+
+      type when type in [:queued_delay, :queued_ping] ->
+        respond_to_handler(
+          format_handler_spec(firmware_update.handler),
+          {:ok, :queued}
+        )
+
+        {:noreply, firmware_update}
+
       :command ->
         handle_report(report, firmware_update)
     end

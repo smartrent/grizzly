@@ -85,6 +85,17 @@ defmodule Grizzly.FirmwareUpdates do
     child_count.active == 1
   end
 
+  @doc """
+  Stop the current firmware update runner, if any.
+  """
+  @spec stop_firmware_update() :: :ok
+  def stop_firmware_update() do
+    case DynamicSupervisor.which_children(FirmwareUpdateRunnerSupervisor) do
+      [{_, pid, _, _} | _] when is_pid(pid) -> GenServer.stop(pid, :normal)
+      _other -> :ok
+    end
+  end
+
   @spec firmware_image_fragment_count :: {:ok, non_neg_integer} | {:error, :not_updating}
   def firmware_image_fragment_count() do
     if firmware_update_running?() do
