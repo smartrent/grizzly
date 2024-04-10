@@ -45,7 +45,11 @@ defmodule Grizzly.Commands.CommandRunner do
     GenServer.call(runner, :reference)
   end
 
-  def stop(runner), do: GenServer.stop(runner, :normal)
+  def stop(runner) do
+    GenServer.stop(runner, :normal)
+  catch
+    :exit, {:noproc, _} -> :ok
+  end
 
   @impl true
   def init([command, node_id, opts]) do
