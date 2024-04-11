@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.4.2] - 2024-03-15
+
+### Fixed
+
+- Stopping an already-stopped CommandRunner no longer raises ([#912](https://github.com/smartrent/grizzly/pull/912))
+- Allow any value when decoding battery level ([#913](https://github.com/smartrent/grizzly/pull/913))
+
 ## [v7.4.1] - 2024-03-15
 
 ### Fixed
