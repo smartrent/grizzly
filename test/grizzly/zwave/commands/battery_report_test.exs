@@ -59,9 +59,26 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
   end
 
   test "decodes v1 params correctly" do
-    binary_params = <<0x20>>
-    {:ok, params} = BatteryReport.decode_params(binary_params)
+    {:ok, params} = BatteryReport.decode_params(<<0x20>>)
     assert Keyword.get(params, :level) == 0x20
+
+    {:ok, params} = BatteryReport.decode_params(<<0xFF>>)
+    assert Keyword.get(params, :level) == 0
+
+    {:ok, params} = BatteryReport.decode_params(<<0>>)
+    assert Keyword.get(params, :level) == 0
+
+    {:ok, params} = BatteryReport.decode_params(<<1>>)
+    assert Keyword.get(params, :level) == 1
+
+    {:ok, params} = BatteryReport.decode_params(<<100>>)
+    assert Keyword.get(params, :level) == 100
+
+    {:ok, params} = BatteryReport.decode_params(<<101>>)
+    assert Keyword.get(params, :level) == 100
+
+    {:ok, params} = BatteryReport.decode_params(<<254>>)
+    assert Keyword.get(params, :level) == 100
   end
 
   test "decodes v2 params correctly" do
