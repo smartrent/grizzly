@@ -48,6 +48,10 @@ defmodule Grizzly.Commands.Table do
        {Commands.ConfigurationNameGet,
         handler:
           {AggregateReport, complete_report: :configuration_name_report, aggregate_param: :name}}},
+      {:configuration_info_get,
+       {Commands.ConfigurationInfoGet,
+        handler:
+          {AggregateReport, complete_report: :configuration_info_report, aggregate_param: :info}}},
 
       # Manufacturer specific
       {:manufacturer_specific_get,

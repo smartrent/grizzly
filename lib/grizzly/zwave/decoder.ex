@@ -245,6 +245,8 @@ defmodule Grizzly.ZWave.Decoder do
       {0x70, 0x09, Commands.ConfigurationBulkReport},
       {0x70, 0x0A, Commands.ConfigurationNameGet},
       {0x70, 0x0B, Commands.ConfigurationNameReport},
+      {0x70, 0x0C, Commands.ConfigurationInfoGet},
+      {0x70, 0x0D, Commands.ConfigurationInfoReport},
       {0x70, 0x0E, Commands.ConfigurationPropertiesGet},
       {0x70, 0x0F, Commands.ConfigurationPropertiesReport},
 
