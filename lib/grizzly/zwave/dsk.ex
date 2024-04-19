@@ -222,8 +222,8 @@ defmodule Grizzly.ZWave.DSK do
     @moduledoc false
 
     @spec inspect(DSK.t(), Inspect.Opts.t()) :: Inspect.Algebra.t()
-    def inspect(v, _opts) do
-      concat(["#DSK<#{to_string(v)}>"])
+    def inspect(v, opts) do
+      concat(["#DSK<", color(string(to_string(v)), :string, opts), ">"])
     end
   end
 end
