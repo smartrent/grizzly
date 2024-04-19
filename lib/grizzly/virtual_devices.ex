@@ -45,22 +45,40 @@ defmodule Grizzly.VirtualDevices do
 
   If the device takes any options you can pass a tuple of `{device, opts}`.
   """
-  @spec add_device(Device.t(), [add_opt()]) :: id()
-  def add_device(device_impl, opts \\ []) do
+  @spec add_device(id(), Device.t(), [add_opt()]) ::
+          {:ok, id()} | {:error, {:already_registered, VirtualDevicesRegistry.device_entry()}}
+  def add_device(device_id, device_impl, opts \\ []) do
     device_opts = Keyword.drop(opts, [:inclusion_handler])
-    device_entry = register(device_impl, device_opts)
 
-    if handler = opts[:inclusion_handler] || VirtualDevicesRegistry.get_handler() do
-      Reports.send_node_add_status(device_entry, handler)
+    case register(device_id, device_impl, device_opts) do
+      {:ok, device_entry} ->
+        if handler = opts[:inclusion_handler] || VirtualDevicesRegistry.get_handler() do
+          Reports.send_node_add_status(device_entry, handler)
+        end
+
+        {:ok, device_entry.id}
+
+      {:error, {:already_registered, entry}} ->
+        {:error, {:already_registered, entry}}
     end
-
-    device_entry.id
   end
 
-  defp register(device_impl, device_opts) do
+  @doc """
+  Same as `add_device/3` but raises an ArgumentError if a device with the requested
+  id is already registered.
+  """
+  @spec add_device!(id(), Device.t(), [add_opt()]) :: id()
+  def add_device!(device_id, device_impl, opts \\ []) do
+    case add_device(device_id, device_impl, opts) do
+      {:ok, device_id} -> device_id
+      {:error, {:already_registered, _entry}} -> raise ArgumentError, "Device already registered"
+    end
+  end
+
+  defp register(device_id, device_impl, device_opts) do
     device_class = device_impl.device_spec(device_opts)
 
-    VirtualDevicesRegistry.register(device_impl, device_class, device_opts)
+    VirtualDevicesRegistry.register(device_id, device_impl, device_class, device_opts)
   end
 
   @doc """

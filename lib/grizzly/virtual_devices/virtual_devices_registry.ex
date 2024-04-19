@@ -32,23 +32,23 @@ defmodule Grizzly.VirtualDevicesRegistry do
   @doc """
   Register the virtual device
   """
-  @spec register(Device.t(), DeviceClass.t(), [Device.device_opt()]) :: device_entry()
-  def register(device_impl, device_class, device_opts) do
-    id = {:virtual, Registry.count(__MODULE__) + 1}
-
+  @spec register(VirtualDevices.id(), Device.t(), DeviceClass.t(), [Device.device_opt()]) ::
+          {:ok, device_entry()} | {:error, {:already_registered, device_entry()}}
+  def register({:virtual, id} = device_id, device_impl, device_class, device_opts)
+      when is_integer(id) and id > 0 do
     entry = %{
       device_impl: device_impl,
       device_class: device_class,
-      id: id,
+      id: device_id,
       device_opts: device_opts
     }
 
-    case Registry.register(__MODULE__, id, entry) do
+    case Registry.register(__MODULE__, device_id, entry) do
       {:ok, pid} ->
-        Map.put(entry, :pid, pid)
+        {:ok, Map.put(entry, :pid, pid)}
 
-      {:error, {:already_registered, pid}} ->
-        Map.put(entry, :pid, pid)
+      {:error, {:already_registered, _pid}} ->
+        {:error, {:already_registered, get(device_id)}}
     end
   end
 
@@ -69,8 +69,8 @@ defmodule Grizzly.VirtualDevicesRegistry do
       [] ->
         nil
 
-      [{_pid, entry}] ->
-        entry
+      [{pid, entry}] ->
+        Map.put(entry, :pid, pid)
     end
   end
 

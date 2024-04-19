@@ -9,7 +9,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
     {:ok, pid} = start_supervised({Thermostat, []})
 
     device_id =
-      Grizzly.VirtualDevices.add_device(
+      Grizzly.VirtualDevices.add_device!(
+        generate_id(),
         Thermostat,
         module: Thermostat,
         server: pid
@@ -28,7 +29,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
     {:ok, pid} = start_supervised({Thermostat, []})
 
     device_id =
-      Grizzly.VirtualDevices.add_device(
+      Grizzly.VirtualDevices.add_device!(
+        generate_id(),
         Thermostat,
         module: Thermostat,
         server: pid
@@ -51,7 +53,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
     {:ok, pid} = start_supervised({Thermostat, []})
 
     device_id =
-      Grizzly.VirtualDevices.add_device(
+      Grizzly.VirtualDevices.add_device!(
+        generate_id(),
         Thermostat,
         module: Thermostat,
         server: pid
@@ -76,7 +79,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
       {:ok, pid} = start_supervised({Thermostat, []})
 
       device_id =
-        Grizzly.VirtualDevices.add_device(
+        Grizzly.VirtualDevices.add_device!(
+          generate_id(),
           Thermostat,
           module: Thermostat,
           server: pid
@@ -98,7 +102,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
       {:ok, pid} = start_supervised({Thermostat, []})
 
       device_id =
-        Grizzly.VirtualDevices.add_device(
+        Grizzly.VirtualDevices.add_device!(
+          generate_id(),
           Thermostat,
           module: Thermostat,
           server: pid
@@ -120,7 +125,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
       {:ok, pid} = start_supervised({Thermostat, []})
 
       device_id =
-        Grizzly.VirtualDevices.add_device(
+        Grizzly.VirtualDevices.add_device!(
+          generate_id(),
           Thermostat,
           module: Thermostat,
           server: pid
@@ -148,7 +154,8 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
       {:ok, pid} = start_supervised({Thermostat, []})
 
       device_id =
-        Grizzly.VirtualDevices.add_device(
+        Grizzly.VirtualDevices.add_device!(
+          generate_id(),
           Thermostat,
           module: Thermostat,
           server: pid

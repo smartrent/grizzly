@@ -28,7 +28,7 @@ defmodule Grizzly.VirtualDeviceTest do
   test "Adding devices to the network and getting them back" do
     device_ids =
       Enum.map(1..5, fn _ ->
-        VirtualDevices.add_device(Thermostat)
+        VirtualDevices.add_device!(generate_id(), Thermostat)
       end)
 
     expected_devices = VirtualDevices.list_nodes()
@@ -39,7 +39,11 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   test "Add and remove device ensure status reports are sent to configured handler" do
-    log = capture_log(fn -> VirtualDevices.add_device(Thermostat) end)
+    log =
+      capture_log(fn ->
+        VirtualDevices.add_device!(generate_id(), Thermostat)
+      end)
+
     device_id = parse_node_id_from_log(log)
 
     assert {:virtual, _id} = device_id
@@ -53,7 +57,9 @@ defmodule Grizzly.VirtualDeviceTest do
 
   test "Add and device with ensure status reports are sent with function inclusion handler" do
     device_id =
-      VirtualDevices.add_device(Thermostat, inclusion_handler: {Handler, [test: &add_test/1]})
+      VirtualDevices.add_device!(generate_id(), Thermostat,
+        inclusion_handler: {Handler, [test: &add_test/1]}
+      )
 
     :ok =
       VirtualDevices.remove_device(device_id,
@@ -109,7 +115,8 @@ defmodule Grizzly.VirtualDeviceTest do
     {:ok, pid} = start_supervised({TemperatureSensor, report_interval: 1_000, force_report: true})
 
     device_id =
-      Grizzly.VirtualDevices.add_device(
+      Grizzly.VirtualDevices.add_device!(
+        generate_id(),
         Thermostat,
         module: Thermostat,
         server: pid
