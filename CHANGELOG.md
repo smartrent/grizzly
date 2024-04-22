@@ -4,7 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v7.4.2] - 2024-03-15
+## [v8.0.0] - 2024-04-22
+
+### Breaking Changes
+
+- Virtual devices now have their IDs assigned statically at registration ([#917](https://github.com/smartrent/grizzly/pull/917))
+
+### Added
+
+- Colorize DSKs when inspecting ([#916](https://github.com/smartrent/grizzly/pull/916))
+
+## [v7.4.2] - 2024-04-11
 
 ### Fixed
 
@@ -2466,6 +2476,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.0.0]: https://github.com/smartrent/grizzly/compare/v7.4.2..v8.0.0
+[v7.4.2]: https://github.com/smartrent/grizzly/compare/v7.4.1..v7.4.2
 [v7.4.1]: https://github.com/smartrent/grizzly/compare/v7.4.0..v7.4.1
 [v7.4.0]: https://github.com/smartrent/grizzly/compare/v7.3.0..v7.4.0
 [v7.3.0]: https://github.com/smartrent/grizzly/compare/v7.2.0..v7.3.0
