@@ -9,8 +9,16 @@ defmodule Grizzly.VirtualDeviceCase do
 
   alias Grizzly.VirtualDevices
 
+  def generate_id() do
+    {:virtual, System.unique_integer([:positive])}
+  end
+
   def with_virtual_device(virtual_device_impl, test) do
-    virtual_device_id = VirtualDevices.add_device(virtual_device_impl)
+    virtual_device_id =
+      VirtualDevices.add_device!(
+        generate_id(),
+        virtual_device_impl
+      )
 
     test.(virtual_device_id)
 
@@ -18,7 +26,11 @@ defmodule Grizzly.VirtualDeviceCase do
   end
 
   def with_virtual_devices(virtual_device_impls, test) when is_list(virtual_device_impls) do
-    virtual_device_ids = Enum.map(virtual_device_impls, &VirtualDevices.add_device/1)
+    virtual_device_ids =
+      Enum.map(
+        virtual_device_impls,
+        &VirtualDevices.add_device!(generate_id(), &1)
+      )
 
     test.(virtual_device_ids)
 
