@@ -165,6 +165,9 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
+  # This is to support a lock that erroneously omits the timeout_seconds field.
+  def decode_params(bin) when byte_size(bin) == 4, do: decode_params(<<bin::binary, 0>>)
+
   # Version 4
   def decode_params(
         <<mode_byte, outside_handles_int::size(4), inside_handles_int::size(4),
