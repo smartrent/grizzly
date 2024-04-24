@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.0.1] - 2024-04-24
+
+### Fixed
+
+- Allow 4 byte input for Door Lock Operation Report ([#919](https://github.com/smartrent/grizzly/pull/919))
+
 ## [v8.0.0] - 2024-04-22
 
 ### Breaking Changes
@@ -2476,6 +2482,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.0.1]: https://github.com/smartrent/grizzly/compare/v8.0.0..v8.0.1
 [v8.0.0]: https://github.com/smartrent/grizzly/compare/v7.4.2..v8.0.0
 [v7.4.2]: https://github.com/smartrent/grizzly/compare/v7.4.1..v7.4.2
 [v7.4.1]: https://github.com/smartrent/grizzly/compare/v7.4.0..v7.4.1
