@@ -111,7 +111,7 @@ workflows:
             parameters:
               image-tag:
                 - 1.16.0-erlang-26.2.1-alpine-3.18.4
-                - 1.15.6-erlang-26.1.1-alpine-3.18.6
+                - 1.15.7-erlang-26.1.2-alpine-3.18.6
                 - 1.14.3-erlang-25.2.3-alpine-3.18.0
       - lint:
           image-tag: 1.16.0-erlang-26.2.1-alpine-3.18.4
@@ -128,5 +128,5 @@ workflows:
             parameters:
               image-tag:
                 - 1.16.0-erlang-26.2.1-alpine-3.18.4
-                - 1.15.6-erlang-26.1.1-alpine-3.18.6
+                - 1.15.7-erlang-26.1.2-alpine-3.18.6
                 - 1.14.3-erlang-25.2.3-alpine-3.18.0
