@@ -4,6 +4,11 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.4.3] - 2024-04-26
+
+- Allow 4 byte input for Door Lock Operation Report ([#919](https://github.com/smartrent/grizzly/pull/919))
+- Colorize DSKs when inspecting ([#916](https://github.com/smartrent/grizzly/pull/916))
+
 ## [v7.4.2] - 2024-03-15
 
 ### Fixed
