@@ -65,6 +65,12 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   def update_command_ref(firmware_update, new_command_ref),
     do: %__MODULE__{firmware_update | current_command_ref: new_command_ref}
 
+  @spec in_progress?(t()) :: boolean()
+  def in_progress?(firmware_update),
+    do:
+      firmware_update.state not in [:failed, :complete] and
+        (firmware_update.fragments_wanted > 0 or firmware_update.fragment_index > 1)
+
   @doc """
   Handle incoming command from the Z-Wave network
 
