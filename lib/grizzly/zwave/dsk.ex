@@ -59,6 +59,17 @@ defmodule Grizzly.ZWave.DSK do
     do_parse(dsk_string, <<>>)
   end
 
+  @doc """
+  Same as `parse/1` but raises an ArgumentError if the DSK is invalid.
+  """
+  @spec parse!(dsk_string()) :: t() | no_return()
+  def parse!(dsk_string) do
+    case parse(dsk_string) do
+      {:ok, dsk} -> dsk
+      {:error, :invalid_dsk} -> raise ArgumentError, "Invalid DSK"
+    end
+  end
+
   defp do_parse(<<>>, parts) when parts != <<>> and byte_size(parts) <= 16 do
     {:ok, new(parts)}
   end
