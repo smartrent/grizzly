@@ -27,6 +27,7 @@ defmodule Grizzly.Commands.Command do
           transmission_stats: keyword(),
           node_id: ZWave.node_id(),
           supervision?: boolean(),
+          more_info?: boolean(),
           session_id: non_neg_integer() | nil,
           acknowledged: boolean()
         }
@@ -50,6 +51,7 @@ defmodule Grizzly.Commands.Command do
             transmission_stats: [],
             node_id: nil,
             supervision?: false,
+            more_info?: false,
             session_id: nil,
             acknowledged: false
 
@@ -59,6 +61,7 @@ defmodule Grizzly.Commands.Command do
     command_ref = Keyword.get(opts, :reference, make_ref())
     timeout_ref = Keyword.get(opts, :timeout_ref)
     with_transmission_stats = Keyword.get(opts, :transmission_stats, false)
+    more_info = Keyword.get(opts, :more_info, false)
 
     {zwave_command, handler, handler_init_args, supervision?, session_id} =
       if use_supervision?(zwave_command, opts) do
@@ -94,7 +97,8 @@ defmodule Grizzly.Commands.Command do
       with_transmission_stats: with_transmission_stats,
       node_id: node_id,
       supervision?: supervision?,
-      session_id: session_id
+      session_id: session_id,
+      more_info?: more_info
     }
   end
 
@@ -319,12 +323,21 @@ defmodule Grizzly.Commands.Command do
   defp make_zip_packet_command_opts(grizzly_command) do
     Keyword.new()
     |> maybe_add_installation_and_maintenance_get(grizzly_command)
+    |> maybe_add_more_info_flag(grizzly_command)
     |> add_seq_number(grizzly_command)
   end
 
   defp maybe_add_installation_and_maintenance_get(opts, grizzly_command) do
     if grizzly_command.with_transmission_stats do
       Keyword.put(opts, :header_extensions, [:installation_and_maintenance_get])
+    else
+      opts
+    end
+  end
+
+  defp maybe_add_more_info_flag(opts, grizzly_command) do
+    if grizzly_command.more_info? do
+      Keyword.put(opts, :more_info, true)
     else
       opts
     end

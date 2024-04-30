@@ -52,7 +52,7 @@ defmodule Grizzly.FirmwareUpdates do
           | {:hardware_version, byte}
           | {:handler, pid() | module() | {module, keyword()}}
           | {:firmware_target, byte}
-          | {:fragment_size, non_neg_integer}
+          | {:max_fragment_size, non_neg_integer}
           | {:activation_may_be_delayed?, boolean}
 
   @type image_path :: String.t()
@@ -79,11 +79,12 @@ defmodule Grizzly.FirmwareUpdates do
     end
   end
 
+  @doc """
+  A firmware update is in progress when a `FirmwareUpdateRunner` process is running
+  and has received at least one request for one or more image fragments.
+  """
   @spec firmware_update_running?() :: boolean()
-  def firmware_update_running?() do
-    child_count = DynamicSupervisor.count_children(FirmwareUpdateRunnerSupervisor)
-    child_count.active == 1
-  end
+  defdelegate firmware_update_running?(), to: FirmwareUpdateRunner, as: :in_progress?
 
   @doc """
   Stop the current firmware update runner, if any.

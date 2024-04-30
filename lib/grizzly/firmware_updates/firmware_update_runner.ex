@@ -19,6 +19,17 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
   @default_fragment_size 1024
 
+  @doc """
+  A firmware update is in progress when a `FirmwareUpdateRunner` process is running
+  and has received at least one request for one or more image fragments.
+  """
+  @spec in_progress?() :: boolean()
+  def in_progress?() do
+    GenServer.call(__MODULE__, :in_progress?)
+  catch
+    :exit, {:noproc, _} -> false
+  end
+
   def child_spec(opts) do
     # Don't restart the firmware update if there is a failure
     %{
@@ -100,7 +111,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       |> FirmwareUpdate.next_command(:updating)
 
     {:ok, command_ref} =
-      AsyncConnection.send_command(firmware_update.device_id, command, timeout: 120_000)
+      AsyncConnection.send_command(firmware_update.device_id, command,
+        timeout: 120_000,
+        more_info: true
+      )
 
     {:reply, :ok, FirmwareUpdate.update_command_ref(new_firmware_update, command_ref)}
   end
@@ -112,6 +126,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       ) do
     count = Image.fragment_count(image)
     {:reply, count, firmware_update}
+  end
+
+  def handle_call(:in_progress?, _from, state) do
+    {:reply, FirmwareUpdate.in_progress?(state), state}
   end
 
   @impl true
@@ -212,7 +230,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :timer.sleep(delay_msecs)
 
     {:ok, command_ref} =
-      AsyncConnection.send_command(new_firmware_update.device_id, command, timeout: 120_000)
+      AsyncConnection.send_command(new_firmware_update.device_id, command,
+        timeout: 120_000,
+        more_info: true
+      )
 
     Logger.debug("[Grizzly] Sent FW update continuation #{inspect(command)}")
 
