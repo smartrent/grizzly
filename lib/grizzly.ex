@@ -85,9 +85,10 @@ defmodule Grizzly do
   However, it will only queue a limited number of commands. A `:queue_full` response
   is returned in this situation.
   """
-  @type send_command_response() ::
-          {:ok, Report.t()}
-          | {:error, :including | :updating_firmware | :nack_response | :queue_full | :timeout}
+  @type send_command_response() :: {:ok, Report.t()} | {:error, send_command_error()}
+
+  @type send_command_error() ::
+          :including | :updating_firmware | :nack_response | :queue_full | :timeout
 
   @type seq_number() :: non_neg_integer()
 
@@ -212,34 +213,29 @@ defmodule Grizzly do
   end
 
   def send_command(node_id, command_name, args, opts) do
-    :ok = maybe_log_warning(command_name)
-
-    send_command_no_warn(node_id, command_name, args, opts)
-  end
-
-  # This is only to be used by Grizzly as it migrates into the higher
-  # level helper modules, for example Grizzly.SwitchBinary.
-  @doc false
-  def send_command_no_warn(node_id, command_name, args, opts) do
     # always open a connection. If the connection is already opened this
     # will not establish a new connection
-    including? = Inclusions.inclusion_running?()
-    updating_firmware? = FirmwareUpdates.firmware_update_running?()
 
     open_opts = Keyword.take(opts, [:mode])
 
-    with false <- including? or updating_firmware?,
+    with :ok <- can_send_command?(),
          {command_module, default_opts} <- Table.lookup(command_name),
          {:ok, command} <- command_module.new(args),
          {:ok, _} <- Connection.open(node_id, open_opts) do
       Connection.send_command(node_id, command, Keyword.merge(default_opts, opts))
-    else
-      true ->
-        reason = if including?, do: :including, else: :updating_firmware
-        {:error, reason}
+    end
+  end
 
-      {:error, _} = error ->
-        error
+  @doc false
+  @spec send_async_command_via(GenServer.name(), ZWave.node_id(), command(), list(), [
+          command_opt()
+        ]) ::
+          send_command_response()
+  def send_async_command_via(conn, node_id, command_name, args \\ [], opts \\ []) do
+    with :ok <- can_send_command?(),
+         {command_module, default_opts} <- Table.lookup(command_name),
+         {:ok, command} <- command_module.new(args) do
+      Connection.send_async_command_via(conn, node_id, command, Keyword.merge(default_opts, opts))
     end
   end
 
@@ -271,19 +267,9 @@ defmodule Grizzly do
   """
   @spec send_binary(ZWave.node_id(), binary()) :: :ok | {:error, :including | :firmware_updating}
   def send_binary(node_id, binary) do
-    including? = Inclusions.inclusion_running?()
-    updating_firmware? = FirmwareUpdates.firmware_update_running?()
-
-    case {including?, updating_firmware?} do
-      {true, _} ->
-        {:error, :including}
-
-      {_, true} ->
-        {:error, :firmware_updating}
-
-      _can_send ->
-        {:ok, _} = Connection.open(node_id, mode: :binary)
-        Connection.send_binary(node_id, binary)
+    with :ok <- can_send_command?() do
+      {:ok, _} = Connection.open(node_id, mode: :binary)
+      Connection.send_binary(node_id, binary)
     end
   end
 
@@ -450,25 +436,15 @@ defmodule Grizzly do
       nil
   end
 
-  defp maybe_log_warning(command_name) do
-    deprecated_list = [
-      :switch_binary_get,
-      :switch_binary_set
-    ]
+  @spec can_send_command?() :: :ok | {:error, :including | :firmware_updating}
+  defp can_send_command?() do
+    including? = Inclusions.inclusion_running?()
+    updating_firmware? = FirmwareUpdates.firmware_update_running?()
 
-    if command_name in deprecated_list do
-      new_module = get_new_module(command_name)
-
-      Logger.debug("""
-      Calling Grizzly.send_command/4 for command #{inspect(command_name)} is deprecated.
-
-      Please upgrade to using #{inspect(new_module)} to send this command.
-      """)
+    case {including?, updating_firmware?} do
+      {true, _} -> {:error, :including}
+      {_, true} -> {:error, :firmware_updating}
+      _ -> :ok
     end
-
-    :ok
   end
-
-  defp get_new_module(:switch_binary_get), do: Grizzly.SwitchBinary
-  defp get_new_module(:switch_binary_set), do: Grizzly.SwitchBinary
 end

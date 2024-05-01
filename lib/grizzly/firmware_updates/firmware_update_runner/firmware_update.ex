@@ -22,6 +22,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
 
   @type t :: %__MODULE__{
           handler: pid() | module() | {module(), keyword},
+          conn: pid(),
           image: Image.t() | nil,
           manufacturer_id: non_neg_integer,
           firmware_id: non_neg_integer,
@@ -39,6 +40,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
         }
 
   defstruct handler: nil,
+            conn: nil,
             # Ref to the currently executing command - so it can be stopped if needed
             current_command_ref: nil,
             device_id: 1,
