@@ -10,7 +10,7 @@ defmodule Grizzly.Connection do
   alias Grizzly.ZWave.Command
 
   @type mode() :: :sync | :async | :binary
-  @type opt() :: {:mode, mode()} | {:owner, pid()}
+  @type opt() :: {:mode, mode()} | {:owner, pid()} | {:unnamed, boolean()}
 
   @doc """
   Open a connection to a node or the Z/IP Gateway
@@ -43,11 +43,10 @@ defmodule Grizzly.Connection do
   @doc """
   Send a `Grizzly.ZWave.Command` to a Z-Wave device.
   """
-  @spec send_command(ZWave.node_id(), Command.t(), [Grizzly.command_opt()]) ::
+  @spec send_command(GenServer.name() | ZWave.node_id(), Command.t(), [Grizzly.command_opt()]) ::
           Grizzly.send_command_response()
   def send_command(node_id, command, opts \\ []) do
-    # TODO: the `:type` is deprecated and will be removed in Grizzly 7.0
-    mode = Keyword.get(opts, :mode, Keyword.get(opts, :type, :sync))
+    mode = Keyword.get(opts, :mode, :sync)
     Logger.debug("Sending Cmd (#{inspect(mode)}): #{inspect(command)}")
 
     case mode do
@@ -60,6 +59,19 @@ defmodule Grizzly.Connection do
         {:ok, ref} = AsyncConnection.send_command(node_id, command, opts)
         {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
     end
+  end
+
+  @doc """
+  Send a `Grizzly.ZWave.Command` to a Z-Wave device using a specific async connection.
+  """
+  @spec send_async_command_via(GenServer.name(), ZWave.node_id(), Command.t(), [
+          Grizzly.command_opt()
+        ]) ::
+          Grizzly.send_command_response()
+  def send_async_command_via(connection, node_id, command, opts) do
+    Logger.debug("Sending Cmd (async via): #{inspect(command)}")
+    {:ok, ref} = AsyncConnection.send_command(connection, command, opts)
+    {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
   end
 
   def send_binary(node_id, binary, opts \\ []) do

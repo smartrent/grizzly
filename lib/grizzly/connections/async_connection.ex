@@ -17,6 +17,8 @@ defmodule Grizzly.Connections.AsyncConnection do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 
+  import Grizzly.NodeId, only: [is_zwave_node_id: 1]
+
   require Logger
 
   defmodule State do
@@ -25,6 +27,7 @@ defmodule Grizzly.Connections.AsyncConnection do
               socket: nil,
               commands: CommandList.empty(),
               owner: nil,
+              monitor_ref: nil,
               keep_alive: nil,
               node_id: nil
   end
@@ -35,16 +38,30 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   @spec start_link(Options.t(), ZWave.node_id(), [Connection.opt()]) :: GenServer.on_start()
   def start_link(grizzly_options, node_id, opts \\ []) do
-    name = Connections.make_name({:async, node_id})
     opts = Keyword.put_new(opts, :owner, self())
+    unnamed = Keyword.get(opts, :unnamed, false)
 
-    GenServer.start_link(__MODULE__, [grizzly_options, node_id, opts], name: name)
+    start_opts =
+      if unnamed do
+        []
+      else
+        [name: Connections.make_name({:async, node_id})]
+      end
+
+    GenServer.start_link(__MODULE__, [grizzly_options, node_id, opts], start_opts)
   end
 
-  @spec send_command(Grizzly.node_id(), Command.t(), keyword()) :: {:ok, reference()}
-  def send_command(node_id, command, opts \\ []) do
+  @spec send_command(GenServer.name() | Grizzly.node_id(), Command.t(), keyword()) ::
+          {:ok, reference()}
+  def send_command(node_id_or_conn, command, opts \\ [])
+
+  def send_command(node_id, command, opts) when is_zwave_node_id(node_id) do
     name = Connections.make_name({:async, node_id})
-    GenServer.call(name, {:send_command, command, opts}, 140_000)
+    send_command(name, command, opts)
+  end
+
+  def send_command(connection, command, opts) do
+    GenServer.call(connection, {:send_command, command, opts}, 140_000)
   end
 
   @spec stop_command(Grizzly.node_id(), reference()) :: :ok
@@ -63,10 +80,13 @@ defmodule Grizzly.Connections.AsyncConnection do
     # TODO close socket
     name = Connections.make_name({:async, node_id})
     GenServer.stop(name, :normal)
+  catch
+    :exit, {:noproc, _} -> :ok
   end
 
   @impl GenServer
   def init([grizzly_options, node_id, opts]) do
+    owner = Keyword.fetch!(opts, :owner)
     host = ZIPGateway.host_for_node(node_id, grizzly_options)
     transport_impl = grizzly_options.transport
 
@@ -75,13 +95,16 @@ defmodule Grizzly.Connections.AsyncConnection do
       port: grizzly_options.zipgateway_port
     ]
 
+    ref = Process.monitor(owner)
+
     case Transport.open(transport_impl, transport_opts) do
       {:ok, transport} ->
         {:ok,
          %State{
            transport: transport,
            keep_alive: KeepAlive.init(node_id, 25_000),
-           owner: Keyword.fetch!(opts, :owner),
+           owner: owner,
+           monitor_ref: ref,
            node_id: node_id
          }}
 
@@ -144,6 +167,11 @@ defmodule Grizzly.Connections.AsyncConnection do
          | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
        }}
     end
+  end
+
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{monitor_ref: ref} = state) do
+    # Connection's owner died, which means it's time to shut down
+    {:stop, :normal, state}
   end
 
   def handle_info(data, state) do

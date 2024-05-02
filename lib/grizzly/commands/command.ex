@@ -306,7 +306,8 @@ defmodule Grizzly.Commands.Command do
             {Report.new(:complete, :ack_response, command.node_id,
                command_ref: command.ref,
                acknowledged: true,
-               queued: true
+               queued: true,
+               transmission_stats: command.transmission_stats
              ), %__MODULE__{command | status: :complete}}
 
           %ZWaveCommand{} ->
@@ -314,7 +315,8 @@ defmodule Grizzly.Commands.Command do
                command_ref: command.ref,
                acknowledged: command.acknowledged,
                command: response,
-               queued: true
+               queued: true,
+               transmission_stats: command.transmission_stats
              ), %__MODULE__{command | status: :complete}}
         end
     end

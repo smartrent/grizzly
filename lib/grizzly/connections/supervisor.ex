@@ -14,12 +14,10 @@ defmodule Grizzly.Connections.Supervisor do
   Start a connection to a Z-Wave Node or the Z/IP Gateway
   """
   @spec start_connection(ZWave.node_id() | :gateway, [Connection.opt()]) ::
-          {:ok, pid()} | {:error, :timeout}
+          DynamicSupervisor.on_start_child()
   def start_connection(node_id, opts \\ []) do
     case Keyword.get(opts, :mode, :sync) do
       :async ->
-        # put the calling process as the owner if sine the supervisor
-        # will be owner when calling form here.
         opts = Keyword.put_new(opts, :owner, self())
         do_start_connection(AsyncConnection, node_id, opts)
 
@@ -60,6 +58,7 @@ defmodule Grizzly.Connections.Supervisor do
            connection_module.child_spec(node_id, command_opts)
          ) do
       {:ok, _} = ok -> ok
+      {:ok, pid, _} -> {:ok, pid}
       {:error, {:already_started, pid}} -> {:ok, pid}
       {:error, _reason} = other_error -> other_error
     end

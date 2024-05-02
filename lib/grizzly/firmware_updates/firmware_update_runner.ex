@@ -72,11 +72,15 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     max_fragment_size = Keyword.fetch!(opts, :max_fragment_size)
     activation_may_be_delayed? = Keyword.fetch!(opts, :activation_may_be_delayed?)
 
-    # {:ok, _} = AsyncConnection.start_link(Keyword.fetch!(opts, :device_id))
-    {:ok, _} = Connection.open(Keyword.fetch!(opts, :device_id), mode: :async)
+    {:ok, conn} = Connection.open(device_id, mode: :async, unnamed: true)
+
+    # if the connection dies, we won't be able to continue the firmware upgrade
+    # if we die, we don't need the connection anymore
+    Process.link(conn)
 
     {:ok,
      %FirmwareUpdate{
+       conn: conn,
        handler: handler,
        device_id: device_id,
        manufacturer_id: manufacturer_id,
@@ -111,7 +115,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       |> FirmwareUpdate.next_command(:updating)
 
     {:ok, command_ref} =
-      AsyncConnection.send_command(firmware_update.device_id, command,
+      AsyncConnection.send_command(firmware_update.conn, command,
         timeout: 120_000,
         more_info: true
       )
@@ -230,7 +234,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :timer.sleep(delay_msecs)
 
     {:ok, command_ref} =
-      AsyncConnection.send_command(new_firmware_update.device_id, command,
+      AsyncConnection.send_command(new_firmware_update.conn, command,
         timeout: 120_000,
         more_info: true
       )
