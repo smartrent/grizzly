@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.Basic
 
-  @type value :: :on | :off | :unknown
+  @type value :: :on | :off | :unknown | byte()
   @type duration :: non_neg_integer | :unknown
   @type param :: {:value, value()} | {:target_value, value()} | {:duration, duration()}
 
@@ -76,6 +76,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   defp encode_value(:on), do: 0xFF
   defp encode_value(:off), do: 0x00
   defp encode_value(:unknown), do: 0xFE
+  defp encode_value(value) when is_integer(value), do: value
 
   defp encode_duration(secs) when is_integer(secs) and secs in 0..127, do: secs
 
