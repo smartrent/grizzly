@@ -4,6 +4,15 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.1.0] - 2024-05-02
+
+### Added
+
+- Improve firmware updates for wakeup devices ([#922](https://github.com/smartrent/grizzly/pull/922))
+- Implement Included NIF Report command ([#923](https://github.com/smartrent/grizzly/pull/923))
+- Allow creation of unnamed `AsyncConnection`s ([#924](https://github.com/smartrent/grizzly/pull/924))
+- Fix typo in definition of  `Grizzly.send_command_error` ([#925](https://github.com/smartrent/grizzly/pull/925))
+
 ## [v8.0.1] - 2024-04-24
 
 ### Fixed
@@ -2482,6 +2491,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.1.0]: https://github.com/smartrent/grizzly/compare/v8.0.1..v8.1.0
 [v8.0.1]: https://github.com/smartrent/grizzly/compare/v8.0.0..v8.0.1
 [v8.0.0]: https://github.com/smartrent/grizzly/compare/v7.4.2..v8.0.0
 [v7.4.2]: https://github.com/smartrent/grizzly/compare/v7.4.1..v7.4.2
