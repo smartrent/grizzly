@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.SecurityCommandsSupportedGet do
+defmodule Grizzly.ZWave.Commands.S0CommandsSupportedGet do
   @moduledoc """
   Query the commands supported by a node when using S2.
   """
@@ -6,15 +6,15 @@ defmodule Grizzly.ZWave.Commands.SecurityCommandsSupportedGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security
+  alias Grizzly.ZWave.CommandClasses.S0
 
   @impl Grizzly.ZWave.Command
   @spec new([]) :: {:ok, Command.t()}
   def new(params \\ []) do
     command = %Command{
-      name: :security_commands_supported_get,
+      name: :s0_commands_supported_get,
       command_byte: 0x02,
-      command_class: Security,
+      command_class: S0,
       params: params,
       impl: __MODULE__
     }

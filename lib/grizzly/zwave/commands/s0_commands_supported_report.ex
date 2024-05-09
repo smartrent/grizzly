@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.SecurityCommandsSupportedReport do
+defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
   @moduledoc """
   Lists commands supported by a node when using S0.
   """
@@ -6,7 +6,7 @@ defmodule Grizzly.ZWave.Commands.SecurityCommandsSupportedReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, CommandClasses, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.Security
+  alias Grizzly.ZWave.CommandClasses.S0
 
   @type param ::
           {:supported | :controlled, [CommandClasses.command_class()]}
@@ -16,9 +16,9 @@ defmodule Grizzly.ZWave.Commands.SecurityCommandsSupportedReport do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
-      name: :security_commands_supported_report,
+      name: :s0_commands_supported_report,
       command_byte: 0x03,
-      command_class: Security,
+      command_class: S0,
       params: put_defaults(params),
       impl: __MODULE__
     }
