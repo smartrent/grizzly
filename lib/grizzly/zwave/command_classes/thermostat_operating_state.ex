@@ -18,6 +18,11 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatOperatingState do
           | :pending_heat
           | :pending_cool
           | :vent_economizer
+          | :aux_heating
+          | :heating_stage_2
+          | :cooling_stage_2
+          | :aux_heat_stage_2
+          | :aux_heat_stage_3
 
   @impl true
   def byte(), do: 0x42
