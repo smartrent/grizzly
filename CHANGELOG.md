@@ -4,6 +4,16 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.2.2] - 2024-06-05
+
+### Added
+
+- Elixir 1.17 compatibility ([#935](https://github.com/smartrent/grizzly/pull/935))
+
+### Fixed
+
+- Remove leading space from test in Z/IP Gateway log monitor ([#936](https://github.com/smartrent/grizzly/pull/936))
+
 ## [v8.2.1] - 2024-06-03
 
 ### Fixed
@@ -2504,6 +2514,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.2.2]: https://github.com/smartrent/grizzly/compare/v8.2.1..v8.2.2
 [v8.2.1]: https://github.com/smartrent/grizzly/compare/v8.2.0..v8.2.1
 [v8.2.0]: https://github.com/smartrent/grizzly/compare/v8.1.0..v8.2.0
 [v8.1.0]: https://github.com/smartrent/grizzly/compare/v8.0.1..v8.1.0
