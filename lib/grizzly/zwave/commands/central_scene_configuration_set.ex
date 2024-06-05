@@ -14,6 +14,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationSet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.CentralScene
+  import Grizzly.ZWave.Encoding
 
   @type param :: {:slow_refresh, boolean}
 
@@ -33,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationSet do
 
   @impl true
   def encode_params(command) do
-    slow_refresh_bit = Command.param!(command, :slow_refresh) |> CentralScene.boolean_to_bit()
+    slow_refresh_bit = Command.param!(command, :slow_refresh) |> bool_to_bit()
     <<slow_refresh_bit::size(1), 0x00::size(7)>>
   end
 

@@ -29,10 +29,4 @@ defmodule Grizzly.ZWave.CommandClasses.Configuration do
   def format_from_byte(byte), do: {:error, %DecodeError{param: :format, value: byte}}
 
   def validate_size(size) when size in [0, 1, 2, 4], do: size
-
-  def boolean_to_bit(false), do: 0
-  def boolean_to_bit(true), do: 1
-
-  def boolean_from_bit(0), do: false
-  def boolean_from_bit(1), do: true
 end

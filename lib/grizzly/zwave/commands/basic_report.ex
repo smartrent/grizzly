@@ -15,6 +15,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.Basic
+  import Grizzly.ZWave.Encoding
 
   @type value :: :on | :off | :unknown | byte()
   @type duration :: non_neg_integer | :unknown
@@ -64,9 +65,8 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   # v2
   def decode_params(<<value_byte, target_value_byte, duration_byte>>) do
     with {:ok, value} <- value_from_byte(value_byte, :value),
-         {:ok, target_value} <- value_from_byte(target_value_byte, :target_value),
-         {:ok, duration} <- duration_from_byte(duration_byte) do
-      {:ok, [value: value, target_value: target_value, duration: duration]}
+         {:ok, target_value} <- value_from_byte(target_value_byte, :target_value) do
+      {:ok, [value: value, target_value: target_value, duration: decode_duration(duration_byte)]}
     else
       {:error, %DecodeError{}} = error ->
         error
@@ -78,14 +78,6 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   defp encode_value(:unknown), do: 0xFE
   defp encode_value(value) when is_integer(value), do: value
 
-  defp encode_duration(secs) when is_integer(secs) and secs in 0..127, do: secs
-
-  defp encode_duration(secs) when is_integer(secs) and secs in 128..(126 * 60),
-    do: 0x80 + div(secs, 60)
-
-  defp encode_duration(:unknown), do: 0xFE
-  defp encode_duration(_), do: 0xFE
-
   defp value_from_byte(0x00, _param), do: {:ok, :off}
   defp value_from_byte(0xFF, _param), do: {:ok, :on}
   defp value_from_byte(0xFE, _param), do: {:ok, :unknown}
@@ -93,15 +85,4 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
 
   defp value_from_byte(byte, param),
     do: {:error, %DecodeError{value: byte, param: param, command: :basic_report}}
-
-  defp duration_from_byte(duration_byte) when duration_byte in 0x00..0x7F,
-    do: {:ok, duration_byte}
-
-  defp duration_from_byte(duration_byte) when duration_byte in 0x80..0xFD,
-    do: {:ok, (duration_byte - 0x80 + 1) * 60}
-
-  defp duration_from_byte(0xFE), do: {:ok, :unknown}
-
-  defp duration_from_byte(byte),
-    do: {:error, %DecodeError{value: byte, param: :duration, command: :basic_report}}
 end

@@ -38,6 +38,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.Configuration
+  import Grizzly.ZWave.Encoding
 
   @type param ::
           {:param_number, non_neg_integer()}
@@ -75,10 +76,10 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
     format_byte = Configuration.format_to_byte(format)
     size = Command.param!(command, :size) |> Configuration.validate_size()
 
-    read_only_bit = Command.param(command, :read_only, false) |> Configuration.boolean_to_bit()
+    read_only_bit = Command.param(command, :read_only, false) |> bool_to_bit()
 
     altering_capabilities_bit =
-      Command.param(command, :altering_capabilities, false) |> Configuration.boolean_to_bit()
+      Command.param(command, :altering_capabilities, false) |> bool_to_bit()
 
     <<param_number::size(16), altering_capabilities_bit::size(1), read_only_bit::size(1),
       format_byte::size(3),
@@ -109,10 +110,10 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
           {:ok,
            [
              param_number: param_number,
-             read_only: Configuration.boolean_from_bit(read_only_bit),
-             advanced: Configuration.boolean_from_bit(advanced_bit),
-             no_bulk_support: Configuration.boolean_from_bit(no_bulk_support_bit),
-             altering_capabilities: Configuration.boolean_from_bit(altering_capabilities_bit),
+             read_only: bit_to_bool(read_only_bit),
+             advanced: bit_to_bool(advanced_bit),
+             no_bulk_support: bit_to_bool(no_bulk_support_bit),
+             altering_capabilities: bit_to_bool(altering_capabilities_bit),
              format: format,
              size: 0,
              next_param_number: next_param_number
@@ -153,10 +154,10 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
           {:ok,
            [
              param_number: param_number,
-             read_only: Configuration.boolean_from_bit(read_only_bit),
-             advanced: Configuration.boolean_from_bit(advanced_bit),
-             no_bulk_support: Configuration.boolean_from_bit(no_bulk_support_bit),
-             altering_capabilities: Configuration.boolean_from_bit(altering_capabilities_bit),
+             read_only: bit_to_bool(read_only_bit),
+             advanced: bit_to_bool(advanced_bit),
+             no_bulk_support: bit_to_bool(no_bulk_support_bit),
+             altering_capabilities: bit_to_bool(altering_capabilities_bit),
              format: format,
              size: size,
              next_param_number: next_param_number
@@ -199,9 +200,9 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
 
     if v4? do
       no_bulk_support_bit =
-        Command.param!(command, :no_bulk_support) |> Configuration.boolean_to_bit()
+        Command.param!(command, :no_bulk_support) |> bool_to_bit()
 
-      advanced_bit = Command.param!(command, :advanced) |> Configuration.boolean_to_bit()
+      advanced_bit = Command.param!(command, :advanced) |> bool_to_bit()
       <<0x00::size(6), no_bulk_support_bit::size(1), advanced_bit::size(1)>>
     else
       <<>>

@@ -64,7 +64,4 @@ defmodule Grizzly.ZWave.CommandClasses.CentralScene do
   def key_attribute_from_byte(byte) do
     key_attribute_from_bit_index(1, byte)
   end
-
-  def boolean_to_bit(false), do: 0
-  def boolean_to_bit(true), do: 1
 end

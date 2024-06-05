@@ -26,6 +26,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   require Logger
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.DoorLock
+  import Grizzly.ZWave.Encoding
 
   @typedoc """
   These modes tell if the handle can open the door locally or not.
@@ -126,7 +127,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
       # version 4
       duration = Command.param!(command, :duration)
       target_mode_byte = DoorLock.mode_to_byte(target_mode)
-      duration_byte = duration_to_byte(duration)
+      duration_byte = decode_duration(duration)
 
       <<DoorLock.mode_to_byte(mode), handles_byte, door_condition_byte, timeout_minutes_byte,
         timeout_seconds_byte, target_mode_byte, duration_byte>>
@@ -258,10 +259,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   defp timeout_minutes_to_byte(m) when m >= 0 and m <= 0xFC, do: m
   defp timeout_minutes_to_byte(:undefined), do: 0xFE
-
-  defp duration_to_byte(secs) when secs in 0..127, do: secs
-  defp duration_to_byte(secs) when secs in 128..(126 * 60), do: round(secs / 60) + 0x7F
-  defp duration_to_byte(:unknown), do: 0xFE
 
   @spec door_handles_modes_from_byte(byte()) :: %{(1..4) => :enabled | :disabled}
   defp door_handles_modes_from_byte(byte) do
