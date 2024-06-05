@@ -7,6 +7,30 @@ defmodule Grizzly.ZWave.Encoding do
 
   @type encode_bitmask_opts :: [min_bytes: non_neg_integer()]
 
+  @max_duration 126 * 60
+
+  @doc """
+  Encodes a duration in seconds into a duration byte.
+
+  Durations of 0..127 seconds are encoded with 1-second resolution. Durations of
+  128..7560 seconds are encoded with 1-minute resolution. Larger durations are
+  not supported and will be encoded as unknown (0xFE).
+  """
+  @spec encode_duration(non_neg_integer() | :unknown) :: byte()
+  def encode_duration(secs) when secs in 0..127, do: secs
+  def encode_duration(secs) when secs in 128..@max_duration, do: round(secs / 60) + 0x7F
+  def encode_duration(:unknown), do: 0xFE
+  def encode_duration(_), do: 0xFE
+
+  @doc """
+  Decodes a duration as encoded by `encode_duration/1`. Returns `:unknown` if
+  the value is outside the range 0x00..0xFD.
+  """
+  @spec decode_duration(byte()) :: :unknown | non_neg_integer()
+  def decode_duration(byte) when byte in 0x00..0x7F, do: byte
+  def decode_duration(byte) when byte in 0x80..0xFD, do: (byte - 0x7F) * 60
+  def decode_duration(_), do: :unknown
+
   @doc """
   Encodes a list of bit indexes into a bitmask.
 

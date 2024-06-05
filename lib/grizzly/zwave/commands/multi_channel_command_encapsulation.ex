@@ -112,7 +112,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   defp encode_destination_end_point(destination_end_point, true)
        when destination_end_point in 1..7 do
     <<byte>> =
-      for i <- 7..1, into: <<0x01::size(1)>> do
+      for i <- 7..1//-1, into: <<0x01::size(1)>> do
         if destination_end_point == i, do: <<0x01::size(1)>>, else: <<0x00::size(1)>>
       end
 

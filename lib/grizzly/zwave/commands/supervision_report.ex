@@ -15,6 +15,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.Supervision
+  import Grizzly.ZWave.Encoding
 
   @type more_status_updates() :: :last_report | :more_reports
   @type status() :: :no_support | :working | :fail | :success
@@ -57,14 +58,13 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
           duration_byte>>
       ) do
     with {:ok, more_status_updates} <- decode_more_status_updates(more_status_updates_byte),
-         {:ok, status} <- decode_status(status_byte),
-         {:ok, duration} <- decode_duration(duration_byte) do
+         {:ok, status} <- decode_status(status_byte) do
       {:ok,
        [
          more_status_updates: more_status_updates,
          session_id: session_id,
          status: status,
-         duration: duration
+         duration: decode_duration(duration_byte)
        ]}
     else
       {:error, %DecodeError{} = error} ->
@@ -90,15 +90,4 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
   defp encode_status(:working), do: 0x01
   defp encode_status(:fail), do: 0x02
   defp encode_status(:success), do: 0xFF
-
-  defp encode_duration(secs) when secs in 0..127, do: secs
-  defp encode_duration(secs) when secs in 128..(126 * 60), do: round(secs / 60) + 0x7F
-  defp encode_duration(:unknown), do: 0xFE
-
-  defp decode_duration(byte) when byte in 0x00..0x7F, do: {:ok, byte}
-  defp decode_duration(byte) when byte in 0x80..0xFD, do: {:ok, (byte - 0x7F) * 60}
-  defp decode_duration(0xFE), do: :unknown
-
-  defp decode_duration(byte),
-    do: {:error, %DecodeError{value: byte, param: :duration, command: :supervision_report}}
 end

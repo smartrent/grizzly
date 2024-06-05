@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.CommandClasses.ScheduleEntryLock do
       for week_day <- active_days, do: Enum.find_index(@weekdays, fn day -> day == week_day end)
 
     <<bitmask::size(7)>> =
-      for day_index <- 6..0, into: <<>> do
+      for day_index <- 6..0//-1, into: <<>> do
         if day_index in active_day_indices, do: <<0x01::1>>, else: <<0x00::1>>
       end
 

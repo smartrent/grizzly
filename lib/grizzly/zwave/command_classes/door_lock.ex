@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
 
   def door_handles_to_bitmask(handles) do
     <<bitmask::size(4)>> =
-      for handle <- 4..1, into: <<>> do
+      for handle <- 4..1//-1, into: <<>> do
         if handle in handles, do: <<0x01::1>>, else: <<0x00::1>>
       end
 

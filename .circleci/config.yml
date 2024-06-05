@@ -110,6 +110,7 @@ workflows:
           matrix:
             parameters:
               image-tag:
+                - 1.17.0-rc.1-erlang-27.0-alpine-3.19.1
                 - 1.16.2-erlang-26.2.4-alpine-3.19.1
                 - 1.15.7-erlang-26.2.4-alpine-3.19.1
                 - 1.14.5-erlang-25.3.2.11-alpine-3.19.1
@@ -127,6 +128,7 @@ workflows:
           matrix:
             parameters:
               image-tag:
+                - 1.17.0-rc.1-erlang-27.0-alpine-3.19.1
                 - 1.16.2-erlang-26.2.4-alpine-3.19.1
                 - 1.15.7-erlang-26.2.4-alpine-3.19.1
                 - 1.14.5-erlang-25.3.2.11-alpine-3.19.1

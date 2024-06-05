@@ -34,6 +34,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
 
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.CentralScene
+  import Grizzly.ZWave.Encoding
 
   # give me some type specs for your params
   @type param ::
@@ -61,10 +62,10 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
   def encode_params(command) do
     supported_scenes = Command.param!(command, :supported_scenes)
     identical? = Command.param!(command, :identical)
-    identical_bit = identical? |> CentralScene.boolean_to_bit()
+    identical_bit = identical? |> bool_to_bit()
 
     slow_refresh_support_bit =
-      Command.param!(command, :slow_refresh_support) |> CentralScene.boolean_to_bit()
+      Command.param!(command, :slow_refresh_support) |> bool_to_bit()
 
     bit_mask_bytes = Command.param!(command, :bit_mask_bytes)
 
@@ -132,7 +133,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
     # [<<128>>, <<>>, <<>>]
     bit_masks =
       for per_byte_bit_indices <- byte_bit_indices do
-        for bit_index <- 7..0, into: <<>> do
+        for bit_index <- 7..0//-1, into: <<>> do
           if bit_index in per_byte_bit_indices, do: <<1::size(1)>>, else: <<0::size(1)>>
         end
       end
