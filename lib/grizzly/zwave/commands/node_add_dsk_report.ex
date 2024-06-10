@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, _::size(4), input_dsk_length::size(4), dsk_bin::binary>>) do
+  def decode_params(<<seq_number, _::4, input_dsk_length::4, dsk_bin::binary>>) do
     {:ok, [seq_number: seq_number, input_dsk_length: input_dsk_length, dsk: DSK.new(dsk_bin)]}
   end
 

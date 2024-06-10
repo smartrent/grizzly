@@ -38,13 +38,11 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReport do
     members = Command.param!(command, :members)
     encoded_members = encode_members(members)
     count = byte_size(encoded_members)
-    <<0x00::size(1), aggregated_end_point::size(7), count>> <> encoded_members
+    <<0x00::1, aggregated_end_point::7, count>> <> encoded_members
   end
 
   @impl true
-  def decode_params(
-        <<0x00::size(1), aggregated_end_point::size(7), count, bitmasks::binary-size(count)>>
-      ) do
+  def decode_params(<<0x00::1, aggregated_end_point::7, count, bitmasks::binary-size(count)>>) do
     members = decode_members(bitmasks)
     {:ok, [aggregated_end_point: aggregated_end_point, members: members]}
   end
@@ -56,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReport do
       start = i * 8 + 1
 
       for j <- (start + 7)..start, into: <<>> do
-        if j in members, do: <<0x01::size(1)>>, else: <<0x00::size(1)>>
+        if j in members, do: <<0x01::1>>, else: <<0x00::1>>
       end
     end
   end

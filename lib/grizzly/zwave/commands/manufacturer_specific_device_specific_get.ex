@@ -31,11 +31,11 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificGet do
   @impl true
   def encode_params(command) do
     device_id_type_byte = encode_device_id_type(Command.param!(command, :device_id_type))
-    <<0x00::size(5), device_id_type_byte::size(3)>>
+    <<0x00::5, device_id_type_byte::3>>
   end
 
   @impl true
-  def decode_params(<<0x00::size(5), device_id_type_byte::size(3)>>) do
+  def decode_params(<<0x00::5, device_id_type_byte::3>>) do
     case device_id_type_from_byte(device_id_type_byte) do
       {:ok, device_id_type} ->
         {:ok, [device_id_type: device_id_type]}

@@ -35,16 +35,16 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReportTest do
     {:ok, command} = DoorLockCapabilitiesReport.new(params)
 
     expected_params_binary =
-      <<0x00::size(3), 0x01::size(5), 0x06, 0x02, 0x00, 0xFF, 0x03::size(4), 0x0C::size(4), 0x06,
-        0x00::size(4), 0x01::size(1), 0x01::size(1), 0x00::size(1), 0x00::size(1)>>
+      <<0x00::3, 0x01::5, 0x06, 0x02, 0x00, 0xFF, 0x03::4, 0x0C::4, 0x06, 0x00::4, 0x01::1,
+        0x01::1, 0x00::1, 0x00::1>>
 
     assert expected_params_binary == DoorLockCapabilitiesReport.encode_params(command)
   end
 
   test "decodes params correctly" do
     params_binary =
-      <<0x00::size(3), 0x01::size(5), 0x06, 0x02, 0x00, 0xFF, 0x03::size(4), 0x0C::size(4), 0x06,
-        0x00::size(4), 0x01::size(1), 0x01::size(1), 0x00::size(1), 0x00::size(1)>>
+      <<0x00::3, 0x01::5, 0x06, 0x02, 0x00, 0xFF, 0x03::4, 0x0C::4, 0x06, 0x00::4, 0x01::1,
+        0x01::1, 0x00::1, 0x00::1>>
 
     {:ok, params} = DoorLockCapabilitiesReport.decode_params(params_binary)
     assert Keyword.get(params, :supported_operations) == [:constant_operation, :timed_operation]

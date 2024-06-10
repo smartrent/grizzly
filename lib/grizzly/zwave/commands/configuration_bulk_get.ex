@@ -35,11 +35,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkGet do
   def encode_params(command) do
     number_of_parameters = Command.param!(command, :number_of_parameters)
     offset = Command.param!(command, :offset)
-    <<offset::size(16), number_of_parameters>>
+    <<offset::16, number_of_parameters>>
   end
 
   @impl true
-  def decode_params(<<offset::size(16), number_of_parameters>>) do
+  def decode_params(<<offset::16, number_of_parameters>>) do
     {:ok, [number_of_parameters: number_of_parameters, offset: offset]}
   end
 end

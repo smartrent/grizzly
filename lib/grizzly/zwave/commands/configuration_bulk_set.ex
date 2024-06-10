@@ -57,14 +57,13 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSet do
     count = Enum.count(values)
     values_bin = for value <- values, into: <<>>, do: <<value::signed-integer-size(size)-unit(8)>>
 
-    <<offset::size(16), count, default_bit::size(1), handshake_bit::size(1), 0x00::size(3),
-      size::size(3)>> <> values_bin
+    <<offset::16, count, default_bit::1, handshake_bit::1, 0x00::3, size::3>> <> values_bin
   end
 
   @impl true
   def decode_params(
-        <<offset::size(16), _count, default_bit::size(1), handshake_bit::size(1),
-          _reserved::size(3), size::size(3), values_bin::binary>>
+        <<offset::16, _count, default_bit::1, handshake_bit::1, _reserved::3, size::3,
+          values_bin::binary>>
       ) do
     values = for <<value::signed-integer-size(size)-unit(8) <- values_bin>>, do: value
 

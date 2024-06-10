@@ -32,11 +32,11 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationReport do
   @impl true
   def encode_params(command) do
     slow_refresh_bit = Command.param!(command, :slow_refresh) |> bool_to_bit()
-    <<slow_refresh_bit::size(1), 0x00::size(7)>>
+    <<slow_refresh_bit::1, 0x00::7>>
   end
 
   @impl true
-  def decode_params(<<slow_refresh_bit::size(1), _reserved::size(7)>>) do
+  def decode_params(<<slow_refresh_bit::1, _reserved::7>>) do
     {:ok, [slow_refresh: slow_refresh_bit == 1]}
   end
 end

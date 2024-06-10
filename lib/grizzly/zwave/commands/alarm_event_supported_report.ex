@@ -35,13 +35,12 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReport do
     events = Command.param!(command, :events)
     bitmasks = Notifications.encode_type_events(type, events)
     type_byte = Notifications.type_to_byte(type)
-    <<type_byte, 0x00::size(3), byte_size(bitmasks)::size(5)>> <> bitmasks
+    <<type_byte, 0x00::3, byte_size(bitmasks)::size(5)>> <> bitmasks
   end
 
   @impl true
   def decode_params(
-        <<type_byte, 0x00::size(3), number_of_masks::size(5),
-          bitmasks::binary-size(number_of_masks)>>
+        <<type_byte, 0x00::3, number_of_masks::5, bitmasks::binary-size(number_of_masks)>>
       ) do
     with {:ok, type} <- Notifications.type_from_byte(type_byte),
          {:ok, events} <- Notifications.decode_type_events(type, bitmasks) do

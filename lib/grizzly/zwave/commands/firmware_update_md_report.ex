@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDReport do
     last_byte = encode_last(Command.param!(command, :last?))
     report_number = Command.param!(command, :report_number)
     data = Command.param!(command, :data)
-    binary_params = <<last_byte::size(1), report_number::15, data::binary>>
+    binary_params = <<last_byte::1, report_number::15, data::binary>>
     checksum = Command.param(command, :checksum)
 
     if checksum == nil do
@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDReport do
   end
 
   @impl true
-  def decode_params(<<last_byte::size(1), report_number::15, data::binary>>) do
+  def decode_params(<<last_byte::1, report_number::15, data::binary>>) do
     # The last 2 bytes of data MAY be a checksum
     {:ok, last?} = decode_last(last_byte)
     {:ok, [last?: last?, report_number: report_number, data: data]}

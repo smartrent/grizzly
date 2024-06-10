@@ -110,7 +110,7 @@ defmodule Grizzly.ZWave.NodeIdList do
     for byte_index <- 0..(number_bytes - 1), into: <<>> do
       for bit_index <- 8..1//-1, into: <<>> do
         node_id = byte_index * 8 + bit_index + offset
-        if node_id_map[node_id], do: <<1::size(1)>>, else: <<0::size(1)>>
+        if node_id_map[node_id], do: <<1::1>>, else: <<0::1>>
       end
     end
   end

@@ -35,11 +35,11 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanModeReport do
   @impl true
   def encode_params(command) do
     mode_byte = Command.param!(command, :mode) |> ThermostatFanMode.encode_mode()
-    <<0x00::size(4), mode_byte::size(4)>>
+    <<0x00::4, mode_byte::4>>
   end
 
   @impl true
-  def decode_params(<<_::size(4), mode_byte::size(4)>>) do
+  def decode_params(<<_::4, mode_byte::4>>) do
     with {:ok, mode} <- ThermostatFanMode.decode_mode(mode_byte) do
       {:ok, [mode: mode]}
     else

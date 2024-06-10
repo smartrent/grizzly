@@ -11,12 +11,12 @@ defmodule Grizzly.ZWave.Commands.ClockReportTest do
   test "encodes params correctly" do
     params = [weekday: :monday, hour: 12, minute: 30]
     {:ok, command} = ClockReport.new(params)
-    expected_binary = <<0x01::size(3), 12::size(5), 30>>
+    expected_binary = <<0x01::3, 12::5, 30>>
     assert expected_binary == ClockReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    binary_params = <<0x01::size(3), 12::size(5), 30>>
+    binary_params = <<0x01::3, 12::5, 30>>
     {:ok, params} = ClockReport.decode_params(binary_params)
 
     assert Keyword.get(params, :weekday) == :monday

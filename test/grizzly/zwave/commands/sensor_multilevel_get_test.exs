@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGetTest do
   test "encodes v5 params correctly" do
     params = [sensor_type: :temperature, scale: 2]
     {:ok, command} = SensorMultilevelGet.new(params)
-    expected_binary = <<0x01, 0x00::size(3), 0x02::size(2), 0x00::size(3)>>
+    expected_binary = <<0x01, 0x00::3, 0x02::2, 0x00::3>>
     assert expected_binary == SensorMultilevelGet.encode_params(command)
   end
 
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGetTest do
   end
 
   test "decodes v5 params correctly" do
-    binary_params = <<0x01, 0x00::size(3), 0x02::size(2), 0x00::size(3)>>
+    binary_params = <<0x01, 0x00::3, 0x02::2, 0x00::3>>
     {:ok, params} = SensorMultilevelGet.decode_params(binary_params)
     assert Keyword.get(params, :sensor_type) == :temperature
     assert Keyword.get(params, :scale) == 2

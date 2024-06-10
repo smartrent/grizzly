@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
 
       {:ok, command} = DoorLockConfigurationReport.new(params)
       expected_params_binary = DoorLockConfigurationReport.encode_params(command)
-      assert <<0x01, 0x03::size(4), 0x0C::size(4), 0x01, 0x05>> == expected_params_binary
+      assert <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05>> == expected_params_binary
     end
 
     test "v4" do
@@ -60,15 +60,15 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
       {:ok, command} = DoorLockConfigurationReport.new(params)
       expected_params_binary = DoorLockConfigurationReport.encode_params(command)
 
-      assert <<0x01, 0x03::size(4), 0x0C::size(4), 0x01, 0x05, 125::integer-unsigned-size(16),
-               30::integer-unsigned-size(16), 0x00::size(6), 0x01::size(1),
-               0x00::size(1)>> == expected_params_binary
+      assert <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05, 125::integer-unsigned-size(16),
+               30::integer-unsigned-size(16), 0x00::6, 0x01::1,
+               0x00::1>> == expected_params_binary
     end
   end
 
   describe "decodes params correctly" do
     test "v1-3" do
-      params_binary = <<0x01, 0x03::size(4), 0x0C::size(4), 0x01, 0x05>>
+      params_binary = <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05>>
       {:ok, params} = DoorLockConfigurationReport.decode_params(params_binary)
       assert Keyword.get(params, :operation_type) == :constant_operation
       assert Enum.sort(Keyword.get(params, :manual_outside_door_handles)) == [1, 2]
@@ -78,8 +78,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
 
     test "v4" do
       params_binary =
-        <<0x01, 0x03::size(4), 0x0C::size(4), 0x01, 0x05, 125::integer-unsigned-size(16),
-          30::integer-unsigned-size(16), 0x00::size(6), 0x01::size(1), 0x00::size(1)>>
+        <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05, 125::integer-unsigned-size(16),
+          30::integer-unsigned-size(16), 0x00::6, 0x01::1, 0x00::1>>
 
       {:ok, params} = DoorLockConfigurationReport.decode_params(params_binary)
       assert Keyword.get(params, :operation_type) == :constant_operation

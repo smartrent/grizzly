@@ -39,14 +39,12 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReport do
           do: WindowCovering.encode_parameter_name(parameter_name)
 
     parameter_masks_binary = parameter_ids_to_bitmasks(parameter_ids)
-    <<0x00::size(4), byte_size(parameter_masks_binary)::size(4)>> <> parameter_masks_binary
+    <<0x00::4, byte_size(parameter_masks_binary)::size(4)>> <> parameter_masks_binary
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(
-        <<_reserved::size(4), number_of_parameter_masks::size(4), parameter_masks::binary>>
-      ) do
+  def decode_params(<<_reserved::4, number_of_parameter_masks::4, parameter_masks::binary>>) do
     case bitmasks_to_parameter_names(parameter_masks, number_of_parameter_masks) do
       {:ok, parameter_names} ->
         {:ok, [parameter_names: parameter_names]}
@@ -65,17 +63,17 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReport do
     bitmasks =
       for(id <- 1..Enum.max(parameter_ids), do: if(id in parameter_ids, do: 1, else: 0))
       |> Enum.chunk_every(8, 8, [0, 0, 0, 0, 0, 0, 0, 0])
-      |> Enum.map(&for bit <- &1, into: <<>>, do: <<bit::size(1)>>)
+      |> Enum.map(&for bit <- &1, into: <<>>, do: <<bit::1>>)
 
     for bitmask <- bitmasks, into: <<>>, do: bitmask
   end
 
   defp bitmasks_to_parameter_names(binary, number_of_parameter_masks) do
-    parameter_masks = for <<mask::size(8) <- binary>>, do: <<mask::size(8)>>
+    parameter_masks = for <<mask::8 <- binary>>, do: <<mask::8>>
 
     bits =
       parameter_masks
-      |> Enum.map(&for <<bit::size(1) <- &1>>, into: [], do: bit)
+      |> Enum.map(&for <<bit::1 <- &1>>, into: [], do: bit)
       |> List.flatten()
 
     if Enum.count(bits) == number_of_parameter_masks * 8 do

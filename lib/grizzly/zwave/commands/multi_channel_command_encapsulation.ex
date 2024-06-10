@@ -63,11 +63,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
 
     if encapsulated_command_byte == nil do
       # The no_operation command has no command byte
-      <<0x00::size(1), source_end_point::size(7), destination_end_point_byte,
-        encoded_command_class>>
+      <<0x00::1, source_end_point::7, destination_end_point_byte, encoded_command_class>>
     else
-      <<0x00::size(1), source_end_point::size(7), destination_end_point_byte,
-        encoded_command_class, encapsulated_command_byte>>
+      <<0x00::1, source_end_point::7, destination_end_point_byte, encoded_command_class,
+        encapsulated_command_byte>>
     end <>
       encapsulated_parameters
   end
@@ -75,9 +74,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<0x00::size(1), source_end_point::size(7), bit_address::size(1),
-          encoded_destination_end_point::size(7), command_class_byte, command_byte,
-          parameters_binary::binary>>
+        <<0x00::1, source_end_point::7, bit_address::1, encoded_destination_end_point::7,
+          command_class_byte, command_byte, parameters_binary::binary>>
       ) do
     {:ok, command_class} = CommandClasses.from_byte(command_class_byte)
     bit_address? = bit_address == 1
@@ -112,8 +110,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   defp encode_destination_end_point(destination_end_point, true)
        when destination_end_point in 1..7 do
     <<byte>> =
-      for i <- 7..1//-1, into: <<0x01::size(1)>> do
-        if destination_end_point == i, do: <<0x01::size(1)>>, else: <<0x00::size(1)>>
+      for i <- 7..1//-1, into: <<0x01::1>> do
+        if destination_end_point == i, do: <<0x01::1>>, else: <<0x00::1>>
       end
 
     byte

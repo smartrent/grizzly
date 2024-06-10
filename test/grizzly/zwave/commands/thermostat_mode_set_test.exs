@@ -11,12 +11,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSetTest do
   test "encodes params correctly" do
     params = [mode: :heat]
     {:ok, command} = ThermostatModeSet.new(params)
-    expected_binary = <<0x00::size(3), 0x01::size(5)>>
+    expected_binary = <<0x00::3, 0x01::5>>
     assert expected_binary == ThermostatModeSet.encode_params(command)
   end
 
   test "decodes params correctly" do
-    binary_params = <<0x00::size(3), 0x02::size(5)>>
+    binary_params = <<0x00::3, 0x02::5>>
     {:ok, params} = ThermostatModeSet.decode_params(binary_params)
     assert Keyword.get(params, :mode) == :cool
   end

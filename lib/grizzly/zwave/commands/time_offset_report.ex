@@ -78,16 +78,16 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetReport do
     day_end_dst = Command.param!(command, :day_end_dst)
     hour_end_dst = Command.param!(command, :hour_end_dst)
 
-    <<Time.encode_sign(sign_tzo)::size(1), hour_tzo::size(7), minute_tzo,
-      Time.encode_sign(sign_offset_dst)::size(1), minute_offset_dst::size(7), month_start_dst,
+    <<Time.encode_sign(sign_tzo)::size(1), hour_tzo::7, minute_tzo,
+      Time.encode_sign(sign_offset_dst)::size(1), minute_offset_dst::7, month_start_dst,
       day_start_dst, hour_start_dst, month_end_dst, day_end_dst, hour_end_dst>>
   end
 
   @impl true
   def decode_params(
-        <<sign_tzo_bit::size(1), hour_tzo::size(7), minute_tzo, sign_offset_dst_bit::size(1),
-          minute_offset_dst::size(7), month_start_dst, day_start_dst, hour_start_dst,
-          month_end_dst, day_end_dst, hour_end_dst>>
+        <<sign_tzo_bit::1, hour_tzo::7, minute_tzo, sign_offset_dst_bit::1, minute_offset_dst::7,
+          month_start_dst, day_start_dst, hour_start_dst, month_end_dst, day_end_dst,
+          hour_end_dst>>
       ) do
     {:ok,
      [

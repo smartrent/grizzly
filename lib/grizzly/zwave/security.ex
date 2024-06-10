@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Security do
 
   @spec byte_to_keys(byte) :: [key]
   def byte_to_keys(granted_keys_byte) do
-    <<s0::size(1), _::size(4), ac::size(1), auth::size(1), unauth::size(1)>> =
+    <<s0::1, _::4, ac::1, auth::1, unauth::1>> =
       <<granted_keys_byte>>
 
     keys = [s0: s0, ac: ac, auth: auth, unauth: unauth]

@@ -34,8 +34,8 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
 
   @impl true
   def decode_params(
-        <<0x00::size(5), device_id_type_byte::size(3), device_id_data_format::size(3),
-          device_id_data_length::size(5), device_id_integer::size(device_id_data_length)-unit(8)>>
+        <<0x00::5, device_id_type_byte::3, device_id_data_format::3, device_id_data_length::5,
+          device_id_integer::size(device_id_data_length)-unit(8)>>
       ) do
     with {:ok, device_id_type} <- device_id_type_from_byte(device_id_type_byte),
          {:ok, device_id} <- device_id_from(device_id_data_format, device_id_integer) do
@@ -53,8 +53,8 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
     {device_id_data_format, device_id_data_length, device_id_bytes} = encode_device_id(device_id)
     device_id_type_byte = encode_device_id_type(device_id_type)
 
-    <<0x00::size(5), device_id_type_byte::size(3), device_id_data_format::size(3),
-      device_id_data_length::size(5), device_id_bytes::binary>>
+    <<0x00::5, device_id_type_byte::3, device_id_data_format::3, device_id_data_length::5,
+      device_id_bytes::binary>>
   end
 
   defp device_id_type_from_byte(0x00), do: {:ok, :oem_factory_default_device_id_type}

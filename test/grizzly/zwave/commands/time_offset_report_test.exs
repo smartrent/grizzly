@@ -39,14 +39,14 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetReportTest do
     {:ok, command} = TimeOffsetReport.new(params)
 
     expected_binary =
-      <<0x01::size(1), 4::size(7), 0, 0x00::size(1), 60::size(7), 3, 23, 2, 10, 22, 2>>
+      <<0x01::1, 4::7, 0, 0x00::1, 60::7, 3, 23, 2, 10, 22, 2>>
 
     assert expected_binary == TimeOffsetReport.encode_params(command)
   end
 
   test "decodes params correctly" do
     params_binary =
-      <<0x01::size(1), 4::size(7), 0, 0x00::size(1), 60::size(7), 3, 23, 2, 10, 22, 2>>
+      <<0x01::1, 4::7, 0, 0x00::1, 60::7, 3, 23, 2, 10, 22, 2>>
 
     {:ok, params} = TimeOffsetReport.decode_params(params_binary)
     assert Keyword.get(params, :sign_tzo) == :minus

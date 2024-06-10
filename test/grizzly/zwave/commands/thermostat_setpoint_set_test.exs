@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSetTest do
     {:ok, command} = ThermostatSetpointSet.new(params)
 
     expected_binary =
-      <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x02::size(3), 0x02, 0xF3>>
+      <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0x02, 0xF3>>
 
     assert expected_binary == ThermostatSetpointSet.encode_params(command)
 
@@ -21,14 +21,14 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSetTest do
     {:ok, command} = ThermostatSetpointSet.new(params)
 
     expected_binary =
-      <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x01::size(3), 0xE7>>
+      <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x01::3, 0xE7>>
 
     assert expected_binary == ThermostatSetpointSet.encode_params(command)
   end
 
   test "decodes params correctly" do
     binary_params =
-      <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x02::size(3), 0x02, 0xF3>>
+      <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0x02, 0xF3>>
 
     {:ok, params} = ThermostatSetpointSet.decode_params(binary_params)
     assert Keyword.get(params, :type) == :heating
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSetTest do
     assert Keyword.get(params, :value) == 75.5
 
     binary_params =
-      <<0x00::size(4), 0x01::size(4), 0x01::size(3), 0x01::size(2), 0x01::size(3), 0xE7>>
+      <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x01::3, 0xE7>>
 
     {:ok, params} = ThermostatSetpointSet.decode_params(binary_params)
     assert Keyword.get(params, :type) == :heating

@@ -93,15 +93,15 @@ defmodule Grizzly.ZWave.CommandClasses.Security2 do
     ccm_key = aes_cmac_calculate(network_key, t0)
 
     # pstring first half
-    t1 = <<ccm_key::binary-size(16), constant_nk::binary-size(15), 2::size(8)>>
+    t1 = <<ccm_key::binary-size(16), constant_nk::binary-size(15), 2::8>>
     pstring1 = aes_cmac_calculate(network_key, t1)
 
     # pstring second half
-    t2 = <<pstring1::binary-size(16), constant_nk::binary-size(15), 3::size(8)>>
+    t2 = <<pstring1::binary-size(16), constant_nk::binary-size(15), 3::8>>
     pstring2 = aes_cmac_calculate(network_key, t2)
 
     # MPAN key
-    t3 = <<pstring2::binary-size(16), constant_nk::binary-size(15), 4::size(8)>>
+    t3 = <<pstring2::binary-size(16), constant_nk::binary-size(15), 4::8>>
     mpan_key = aes_cmac_calculate(network_key, t3)
 
     {ccm_key, pstring1 <> pstring2, mpan_key}

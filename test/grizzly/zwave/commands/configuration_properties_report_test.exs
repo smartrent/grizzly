@@ -63,7 +63,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
       {:ok, command} = ConfigurationPropertiesReport.new(params)
 
       expected_params_binary =
-        <<0x02::size(16), 0x00::size(2), 0x01::size(3), 0x00::size(3), 0x03::size(16)>>
+        <<0x02::16, 0x00::2, 0x01::3, 0x00::3, 0x03::16>>
 
       assert expected_params_binary == ConfigurationPropertiesReport.encode_params(command)
     end
@@ -82,8 +82,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
       {:ok, command} = ConfigurationPropertiesReport.new(params)
 
       expected_params_binary =
-        <<0x02::size(16), 0x00::size(2), 0x00::size(3), 0x01::size(3), 0xF6, 0x0A, 0x01,
-          0x03::size(16)>>
+        <<0x02::16, 0x00::2, 0x00::3, 0x01::3, 0xF6, 0x0A, 0x01, 0x03::16>>
 
       assert expected_params_binary == ConfigurationPropertiesReport.encode_params(command)
     end
@@ -103,8 +102,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
       {:ok, command} = ConfigurationPropertiesReport.new(params)
 
       expected_params_binary =
-        <<0x02::size(16), 0x01::size(1), 0x00::size(1), 0x01::size(3), 0x00::size(3),
-          0x03::size(16), 0x00::size(6), 0x00::size(1), 0x01::size(1)>>
+        <<0x02::16, 0x01::1, 0x00::1, 0x01::3, 0x00::3, 0x03::16, 0x00::6, 0x00::1, 0x01::1>>
 
       assert expected_params_binary == ConfigurationPropertiesReport.encode_params(command)
     end
@@ -127,8 +125,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
       {:ok, command} = ConfigurationPropertiesReport.new(params)
 
       expected_params_binary =
-        <<0x02::size(16), 0x01::size(1), 0x00::size(1), 0x01::size(3), 0x01::size(3), 0x00, 0x0A,
-          0x01, 0x03::size(16), 0x00::size(6), 0x00::size(1), 0x01::size(1)>>
+        <<0x02::16, 0x01::1, 0x00::1, 0x01::3, 0x01::3, 0x00, 0x0A, 0x01, 0x03::16, 0x00::6,
+          0x00::1, 0x01::1>>
 
       assert expected_params_binary == ConfigurationPropertiesReport.encode_params(command)
     end
@@ -137,7 +135,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
   describe "decodes params correctly" do
     test "v1, size 0" do
       params_binary =
-        <<0x02::size(16), 0x00::size(2), 0x01::size(3), 0x00::size(3), 0x03::size(16)>>
+        <<0x02::16, 0x00::2, 0x01::3, 0x00::3, 0x03::16>>
 
       {:ok, params} = ConfigurationPropertiesReport.decode_params(params_binary)
 
@@ -149,8 +147,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
 
     test "v1, size > 0" do
       params_binary =
-        <<0x02::size(16), 0x00::size(2), 0x00::size(3), 0x01::size(3), 0xF6, 0x0A, 0x01,
-          0x03::size(16)>>
+        <<0x02::16, 0x00::2, 0x00::3, 0x01::3, 0xF6, 0x0A, 0x01, 0x03::16>>
 
       {:ok, params} = ConfigurationPropertiesReport.decode_params(params_binary)
       assert Keyword.get(params, :param_number) == 2
@@ -164,8 +161,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
 
     test "v4, size 0" do
       params_binary =
-        <<0x02::size(16), 0x01::size(1), 0x00::size(1), 0x01::size(3), 0x00::size(3),
-          0x03::size(16), 0x00::size(6), 0x00::size(1), 0x01::size(1)>>
+        <<0x02::16, 0x01::1, 0x00::1, 0x01::3, 0x00::3, 0x03::16, 0x00::6, 0x00::1, 0x01::1>>
 
       {:ok, params} = ConfigurationPropertiesReport.decode_params(params_binary)
       assert Keyword.get(params, :param_number) == 2
@@ -180,8 +176,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
 
     test "v4, size > 0" do
       params_binary =
-        <<0x02::size(16), 0x01::size(1), 0x00::size(1), 0x01::size(3), 0x01::size(3), 0x00, 0x0A,
-          0x01, 0x03::size(16), 0x00::size(6), 0x00::size(1), 0x01::size(1)>>
+        <<0x02::16, 0x01::1, 0x00::1, 0x01::3, 0x01::3, 0x00, 0x0A, 0x01, 0x03::16, 0x00::6,
+          0x00::1, 0x01::1>>
 
       {:ok, params} = ConfigurationPropertiesReport.decode_params(params_binary)
       assert Keyword.get(params, :param_number) == 2

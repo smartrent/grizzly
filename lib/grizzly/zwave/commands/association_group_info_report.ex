@@ -53,14 +53,11 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
         <<group_id, 0x00>> <> encode_profile(Atom.to_string(profile)) <> <<0x00, 0x00, 0x00>>
       end
 
-    <<list_mode::size(1), dynamic_bit::size(1), group_count::size(6)>> <> encoded_groups_info
+    <<list_mode::1, dynamic_bit::1, group_count::6>> <> encoded_groups_info
   end
 
   @impl Command
-  def decode_params(
-        <<list_mode::size(1), dynamic_bit::size(1), group_count::size(6),
-          encoded_groups_info::binary>>
-      ) do
+  def decode_params(<<list_mode::1, dynamic_bit::1, group_count::6, encoded_groups_info::binary>>) do
     dynamic? = dynamic_bit == 0x01
     list_mode? = list_mode == 0x01
 
@@ -88,14 +85,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
             binary = :erlang.list_to_binary(chunk)
 
             case binary do
-              <<
-                group_id,
-                0x00,
-                profile_msb,
-                profile_lsb,
-                _reserved,
-                _event_code::size(16)
-              >> ->
+              <<group_id, 0x00, profile_msb, profile_lsb, _reserved, _event_code::16>> ->
                 profile = decode_profile(profile_msb, profile_lsb)
                 {:cont, [[group_id: group_id, profile: profile] | acc]}
 

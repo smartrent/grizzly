@@ -259,8 +259,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   defp maybe_add_command(zip_packet, command), do: zip_packet <> Command.to_binary(command)
 
   defp meta_from_byte(byte) do
-    <<header?::size(1), cmd?::size(1), more_info?::size(1), secure?::size(1), _::size(4)>> =
-      <<byte>>
+    <<header?::1, cmd?::1, more_info?::1, secure?::1, _::4>> = <<byte>>
 
     %{
       header: bit_to_bool(header?),
@@ -310,14 +309,14 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   defp flag_from_byte(flag_byte) do
     case <<flag_byte>> do
       <<0x00>> -> nil
-      <<1::size(1), _::size(1), 1::size(1), _::size(5)>> -> :invalid
-      <<_::size(1), 1::size(1), 1::size(1), _::size(5)>> -> :invalid
-      <<1::size(1), _::size(7)>> -> :ack_request
-      <<_::size(1), 1::size(1), _::size(6)>> -> :ack_response
-      <<_::size(2), 1::size(1), 1::size(1), _::size(4)>> -> :nack_waiting
-      <<_::size(2), 1::size(1), _::size(1), 1::size(1), _::size(3)>> -> :nack_queue_full
-      <<_::size(2), 1::size(1), _::size(2), 1::size(1), _::size(2)>> -> :nack_option_error
-      <<_::size(2), 1::size(1), _::size(5)>> -> :nack_response
+      <<1::1, _::1, 1::1, _::5>> -> :invalid
+      <<_::1, 1::1, 1::1, _::5>> -> :invalid
+      <<1::1, _::7>> -> :ack_request
+      <<_::1, 1::1, _::6>> -> :ack_response
+      <<_::2, 1::1, 1::1, _::4>> -> :nack_waiting
+      <<_::2, 1::1, _::1, 1::1, _::3>> -> :nack_queue_full
+      <<_::2, 1::1, _::2, 1::1, _::2>> -> :nack_option_error
+      <<_::2, 1::1, _::5>> -> :nack_response
     end
   end
 

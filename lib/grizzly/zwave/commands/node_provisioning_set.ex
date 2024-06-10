@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
     dsk = Command.param!(command, :dsk)
     dsk_byte_size = byte_size(dsk.raw)
 
-    <<seq_number, 0x00::size(3), dsk_byte_size::size(5)>> <>
+    <<seq_number, 0x00::3, dsk_byte_size::5>> <>
       dsk.raw <> NodeProvisioning.encode_meta_extensions(meta_extensions)
   end
 
@@ -54,8 +54,8 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   # TODO: same problem with no function call
   def decode_params(
-        <<seq_number, _::size(3), dsk_byte_size::size(5),
-          dsk_binary::binary-size(dsk_byte_size)-unit(8), meta_extensions_binary::binary>>
+        <<seq_number, _::3, dsk_byte_size::5, dsk_binary::binary-size(dsk_byte_size)-unit(8),
+          meta_extensions_binary::binary>>
       ) do
     with {:ok, dsk_string} <- DSK.binary_to_string(dsk_binary),
          meta_extensions <- MetaExtension.parse(meta_extensions_binary) do

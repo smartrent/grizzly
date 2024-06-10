@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.MeterReportTest do
   test "encodes v1 params correctly" do
     params = [meter_type: :electric, scale: :kwh, value: 1.25]
     {:ok, command} = MeterReport.new(params)
-    expected_binary = <<0x01, 0x02::size(3), 0x00::size(2), 0x01::size(3), 0x7D>>
+    expected_binary = <<0x01, 0x02::3, 0x00::2, 0x01::3, 0x7D>>
     assert expected_binary == MeterReport.encode_params(command)
   end
 
@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.MeterReportTest do
 
   test "decodes params correctly" do
     # v1
-    binary_params = <<0x01, 0x02::size(3), 0x00::size(2), 0x01::size(3), 0x7D>>
+    binary_params = <<0x01, 0x02::3, 0x00::2, 0x01::3, 0x7D>>
     {:ok, params} = MeterReport.decode_params(binary_params)
     assert Keyword.get(params, :meter_type) == :electric
     assert Keyword.get(params, :scale) == :kwh

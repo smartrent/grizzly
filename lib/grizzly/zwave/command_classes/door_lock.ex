@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
     do: {:error, %DecodeError{param: :operation_type, value: byte}}
 
   def door_handles_to_bitmask(handles) do
-    <<bitmask::size(4)>> =
+    <<bitmask::4>> =
       for handle <- 4..1//-1, into: <<>> do
         if handle in handles, do: <<0x01::1>>, else: <<0x00::1>>
       end
@@ -78,7 +78,7 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
   end
 
   def door_handles_from_bitmask(byte) do
-    bitmask = <<byte::size(4)>>
+    bitmask = <<byte::4>>
 
     for(<<x::1 <- bitmask>>, do: x)
     |> Enum.reverse()

@@ -41,14 +41,14 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
 
     {int_value, precision, byte_size} = Encoding.encode_zwave_float(value)
 
-    <<0x00::size(4), type_byte::size(4), precision::size(3), scale_byte::size(2),
-      byte_size::size(3), int_value::signed-size(byte_size)-unit(8)>>
+    <<0x00::4, type_byte::4, precision::3, scale_byte::2, byte_size::3,
+      int_value::signed-size(byte_size)-unit(8)>>
   end
 
   @impl Command
   def decode_params(
-        <<_::size(4), type_byte::size(4), precision::size(3), scale_byte::size(2),
-          byte_size::size(3), int_value::signed-size(byte_size)-unit(8)>>
+        <<_::4, type_byte::4, precision::3, scale_byte::2, byte_size::3,
+          int_value::signed-size(byte_size)-unit(8)>>
       ) do
     type = ThermostatSetpoint.decode_type(type_byte)
 

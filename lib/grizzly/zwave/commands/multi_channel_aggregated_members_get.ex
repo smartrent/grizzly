@@ -32,11 +32,11 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersGet do
   @impl true
   def encode_params(command) do
     aggregated_end_point = Command.param!(command, :aggregated_end_point)
-    <<0x00::size(1), aggregated_end_point::size(7)>>
+    <<0x00::1, aggregated_end_point::7>>
   end
 
   @impl true
-  def decode_params(<<0x00::size(1), aggregated_end_point::size(7)>>) do
+  def decode_params(<<0x00::1, aggregated_end_point::7>>) do
     {:ok, [aggregated_end_point: aggregated_end_point]}
   end
 end

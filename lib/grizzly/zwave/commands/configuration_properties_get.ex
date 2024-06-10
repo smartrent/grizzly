@@ -31,11 +31,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesGet do
   @impl true
   def encode_params(command) do
     param_number = Command.param!(command, :param_number)
-    <<param_number::size(16)>>
+    <<param_number::16>>
   end
 
   @impl true
-  def decode_params(<<param_number::size(16)>>) do
+  def decode_params(<<param_number::16>>) do
     {:ok, [param_number: param_number]}
   end
 end

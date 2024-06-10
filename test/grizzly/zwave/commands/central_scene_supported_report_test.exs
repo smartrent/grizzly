@@ -43,8 +43,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       {:ok, command} = CentralSceneSupportedReport.new(params)
 
       expected_params_binary =
-        <<0x02, 0x01::size(1), 0x00::size(4), 0x01::size(2), 0x00::size(1), 0b00001111,
-          0b00000001>>
+        <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x00::1, 0b00001111, 0b00000001>>
 
       assert expected_params_binary == CentralSceneSupportedReport.encode_params(command)
     end
@@ -68,7 +67,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       {:ok, command} = CentralSceneSupportedReport.new(params)
 
       expected_params_binary =
-        <<0x02, 0x01::size(1), 0x00::size(4), 0x01::size(2), 0x01::size(1), 0b00001111>>
+        <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x01::1, 0b00001111>>
 
       assert expected_params_binary == CentralSceneSupportedReport.encode_params(command)
     end
@@ -77,8 +76,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
   describe "decodes params correctly" do
     test "not identical" do
       params_binary =
-        <<0x02, 0x01::size(1), 0x00::size(4), 0x01::size(2), 0x00::size(1), 0b00001111,
-          0b00000001>>
+        <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x00::1, 0b00001111, 0b00000001>>
 
       {:ok, params} = CentralSceneSupportedReport.decode_params(params_binary)
       assert Keyword.get(params, :supported_scenes) == 2
@@ -100,7 +98,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
 
     test "identical" do
       params_binary =
-        <<0x02, 0x01::size(1), 0x00::size(4), 0x01::size(2), 0x01::size(1), 0b00000001>>
+        <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x01::1, 0b00000001>>
 
       {:ok, params} = CentralSceneSupportedReport.decode_params(params_binary)
       assert Keyword.get(params, :supported_scenes) == 2

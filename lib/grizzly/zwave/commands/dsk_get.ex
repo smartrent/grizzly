@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<seq_number, _::size(7), add_mode_bit::size(1)>>) do
+  def decode_params(<<seq_number, _::7, add_mode_bit::1>>) do
     {:ok,
      [
        seq_number: seq_number,

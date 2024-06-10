@@ -44,8 +44,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemoveTest do
       {:ok, command} = MultiChannelAssociationRemove.new(params)
 
       expected_binary =
-        <<0x02, 0x04, 0x05, 0x06, 0x00, 0x07, 0x00::size(1), 0x02::size(7), 0x08, 0x01::size(1),
-          0x03::size(7)>>
+        <<0x02, 0x04, 0x05, 0x06, 0x00, 0x07, 0x00::1, 0x02::7, 0x08, 0x01::1, 0x03::7>>
 
       assert expected_binary == MultiChannelAssociationRemove.encode_params(command)
     end
@@ -62,8 +61,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemoveTest do
 
     test "with node endpoint" do
       binary_params =
-        <<0x02, 0x04, 0x05, 0x06, 0x00, 0x07, 0x00::size(1), 0x02::size(7), 0x08, 0x01::size(1),
-          0x03::size(7)>>
+        <<0x02, 0x04, 0x05, 0x06, 0x00, 0x07, 0x00::1, 0x02::7, 0x08, 0x01::1, 0x03::7>>
 
       {:ok, params} = MultiChannelAssociationRemove.decode_params(binary_params)
       assert Keyword.get(params, :grouping_identifier) == 2

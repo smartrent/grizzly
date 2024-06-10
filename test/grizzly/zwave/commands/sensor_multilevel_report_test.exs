@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReportTest do
   test "encodes params correctly" do
     params = [sensor_type: :temperature, scale: 2, value: 75.5]
     {:ok, command} = SensorMultilevelReport.new(params)
-    expected_binary = <<0x01, 0x01::size(3), 0x02::size(2), 0x02::size(3), 0x02, 0xF3>>
+    expected_binary = <<0x01, 0x01::3, 0x02::2, 0x02::3, 0x02, 0xF3>>
     assert expected_binary == SensorMultilevelReport.encode_params(command)
 
     params = [sensor_type: :temperature, scale: 2, value: 75.500000001]
@@ -53,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReportTest do
   end
 
   test "decodes params correctly" do
-    binary_params = <<0x01, 0x01::size(3), 0x02::size(2), 0x02::size(3), 0x02, 0xF3>>
+    binary_params = <<0x01, 0x01::3, 0x02::2, 0x02::3, 0x02, 0xF3>>
     {:ok, params} = SensorMultilevelReport.decode_params(binary_params)
     assert Keyword.get(params, :sensor_type) == :temperature
     assert Keyword.get(params, :scale) == 2

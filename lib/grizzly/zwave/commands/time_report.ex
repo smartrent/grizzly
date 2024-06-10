@@ -41,11 +41,11 @@ defmodule Grizzly.ZWave.Commands.TimeReport do
     minute = Command.param!(command, :minute)
     second = Command.param!(command, :second)
     rtc_failure_bit = if rtc_failure?, do: 1, else: 0
-    <<rtc_failure_bit::size(1), 0x00::size(2), hour::size(5), minute, second>>
+    <<rtc_failure_bit::1, 0x00::2, hour::5, minute, second>>
   end
 
   @impl true
-  def decode_params(<<rtc_failure_bit::size(1), 0x00::size(2), hour::size(5), minute, second>>) do
+  def decode_params(<<rtc_failure_bit::1, 0x00::2, hour::5, minute, second>>) do
     rtc_failure? = rtc_failure_bit == 1
     {:ok, [rtc_failure?: rtc_failure?, hour: hour, minute: minute, second: second]}
   end

@@ -55,16 +55,16 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
     locking_entity_id = Command.param(command, :locking_entity_id)
 
     if locking_entity_id == nil do
-      <<state_bit::size(1), byte_size(magic_code)::size(7)>> <>
+      <<state_bit::1, byte_size(magic_code)::size(7)>> <>
         magic_code <>
-        <<manufacturer_id::size(16), byte_size(antitheft_hint)>> <>
+        <<manufacturer_id::16, byte_size(antitheft_hint)>> <>
         antitheft_hint
     else
-      <<state_bit::size(1), byte_size(magic_code)::size(7)>> <>
+      <<state_bit::1, byte_size(magic_code)::size(7)>> <>
         magic_code <>
-        <<manufacturer_id::size(16), byte_size(antitheft_hint)>> <>
+        <<manufacturer_id::16, byte_size(antitheft_hint)>> <>
         antitheft_hint <>
-        <<locking_entity_id::size(16)>>
+        <<locking_entity_id::16>>
     end
   end
 
@@ -72,10 +72,9 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   # v3
   def decode_params(
-        <<state_bit::size(1), magic_code_length::size(7),
-          magic_code::binary-size(magic_code_length), manufacturer_id::size(16),
-          antitheft_hint_length, antitheft_hint::binary-size(antitheft_hint_length),
-          locking_entity_id::size(16)>>
+        <<state_bit::1, magic_code_length::7, magic_code::binary-size(magic_code_length),
+          manufacturer_id::16, antitheft_hint_length,
+          antitheft_hint::binary-size(antitheft_hint_length), locking_entity_id::16>>
       ) do
     state = Antitheft.state_from_bit(state_bit)
 
@@ -91,9 +90,9 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
 
   # v2
   def decode_params(
-        <<state_bit::size(1), magic_code_length::size(7),
-          magic_code::binary-size(magic_code_length), manufacturer_id::size(16),
-          antitheft_hint_length, antitheft_hint::binary-size(antitheft_hint_length)>>
+        <<state_bit::1, magic_code_length::7, magic_code::binary-size(magic_code_length),
+          manufacturer_id::16, antitheft_hint_length,
+          antitheft_hint::binary-size(antitheft_hint_length)>>
       ) do
     state = Antitheft.state_from_bit(state_bit)
 

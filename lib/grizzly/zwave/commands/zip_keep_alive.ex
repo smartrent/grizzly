@@ -38,8 +38,8 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
   end
 
   @impl true
-  def decode_params(<<1::size(1), _::size(7)>>), do: {:ok, [ack_flag: :ack_request]}
-  def decode_params(<<0::size(1), 1::size(1), _::size(6)>>), do: {:ok, [ack_flag: :ack_response]}
+  def decode_params(<<1::1, _::7>>), do: {:ok, [ack_flag: :ack_request]}
+  def decode_params(<<0::1, 1::1, _::6>>), do: {:ok, [ack_flag: :ack_response]}
 
   def decode_params(<<ack_flag>>),
     do: {:error, %DecodeError{value: ack_flag, param: :ack_flag, command: :keep_alive}}

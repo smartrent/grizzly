@@ -31,11 +31,11 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityGet do
   @impl true
   def encode_params(command) do
     end_point = Command.param!(command, :end_point)
-    <<0x00::size(1), end_point::size(7)>>
+    <<0x00::1, end_point::7>>
   end
 
   @impl true
-  def decode_params(<<0x00::size(1), end_point::size(7)>>) do
+  def decode_params(<<0x00::1, end_point::7>>) do
     {:ok, [end_point: end_point]}
   end
 end

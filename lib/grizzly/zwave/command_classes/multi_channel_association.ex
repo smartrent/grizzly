@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.CommandClasses.MultiChannelAssociation do
       node_id = Keyword.fetch!(node_endpoint, :node)
       bit_address = Keyword.fetch!(node_endpoint, :bit_address)
       endpoint = Keyword.fetch!(node_endpoint, :endpoint)
-      <<node_id, bit_address::size(1), endpoint::size(7)>>
+      <<node_id, bit_address::1, endpoint::7>>
     end
   end
 
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.CommandClasses.MultiChannelAssociation do
 
       node_endpoints =
         for [node_id, endpoint_byte] <- Enum.chunk_every(node_endpoint_bytes, 2) do
-          <<bit_address::size(1), endpoint::size(7)>> = <<endpoint_byte>>
+          <<bit_address::1, endpoint::7>> = <<endpoint_byte>>
           [node: node_id, bit_address: bit_address, endpoint: endpoint]
         end
 

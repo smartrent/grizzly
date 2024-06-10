@@ -39,12 +39,12 @@ defmodule Grizzly.ZWave.Commands.ConfigurationNameReport do
     param_number = Command.param!(command, :param_number)
     name = Command.param!(command, :name)
     reports_to_follow = Command.param(command, :reports_to_follow, 0)
-    <<param_number::size(16), reports_to_follow, name::binary>>
+    <<param_number::16, reports_to_follow, name::binary>>
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<param_number::size(16), reports_to_follow, name::binary>>) do
+  def decode_params(<<param_number::16, reports_to_follow, name::binary>>) do
     {:ok, [param_number: param_number, reports_to_follow: reports_to_follow, name: name]}
   end
 end

@@ -40,13 +40,12 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStarted do
     dsk = Command.param!(command, :dsk)
     dsk_byte_size = byte_size(dsk.raw)
 
-    <<seq_number, 0x00::size(3), dsk_byte_size::size(5)>> <> dsk.raw
+    <<seq_number, 0x00::3, dsk_byte_size::5>> <> dsk.raw
   end
 
   @impl true
   def decode_params(
-        <<seq_number, _::size(3), dsk_byte_size::size(5),
-          dsk_binary::binary-size(dsk_byte_size)-unit(8)>>
+        <<seq_number, _::3, dsk_byte_size::5, dsk_binary::binary-size(dsk_byte_size)-unit(8)>>
       ) do
     {:ok,
      [

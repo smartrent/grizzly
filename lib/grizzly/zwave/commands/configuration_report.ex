@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationReport do
 
   @impl true
   def decode_params(
-        <<param_number, _::size(5), size::size(3), value_int::signed-integer-size(size)-unit(8),
+        <<param_number, _::5, size::3, value_int::signed-integer-size(size)-unit(8),
           rest::binary>>
       ) do
     if byte_size(rest) > 0 do

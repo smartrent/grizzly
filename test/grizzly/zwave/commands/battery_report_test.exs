@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     {:ok, command} = BatteryReport.new(params)
 
     expected_binary =
-      <<0x20, 0x01::size(2), 0x01::size(1), 0x00::size(1), 0x00::size(1), 0x00::size(1),
-        0x01::size(2), 0x00::size(7), 0x00::size(1)>>
+      <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::7, 0x00::1>>
 
     assert expected_binary == BatteryReport.encode_params(command)
   end
@@ -52,8 +51,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     {:ok, command} = BatteryReport.new(params)
 
     expected_binary =
-      <<0x20, 0x01::size(2), 0x01::size(1), 0x00::size(1), 0x00::size(1), 0x00::size(1),
-        0x01::size(2), 0x00::size(6), 0x00::size(1), 0x00::size(1)>>
+      <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::6, 0x00::1, 0x00::1>>
 
     assert expected_binary == BatteryReport.encode_params(command)
   end
@@ -83,8 +81,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
 
   test "decodes v2 params correctly" do
     binary_params =
-      <<0x20, 0x01::size(2), 0x01::size(1), 0x00::size(1), 0x00::size(1), 0x00::size(1),
-        0x01::size(2), 0x00::size(7), 0x00::size(1)>>
+      <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::7, 0x00::1>>
 
     {:ok, params} = BatteryReport.decode_params(binary_params)
     assert Keyword.get(params, :charging_status) == :charging
@@ -98,8 +95,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
 
   test "decodes v3 params correctly" do
     binary_params =
-      <<0x20, 0x01::size(2), 0x01::size(1), 0x00::size(1), 0x00::size(1), 0x00::size(1),
-        0x01::size(2), 0x00::size(6), 0x00::size(1), 0x00::size(1)>>
+      <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::6, 0x00::1, 0x00::1>>
 
     {:ok, params} = BatteryReport.decode_params(binary_params)
     assert Keyword.get(params, :charging_status) == :charging
