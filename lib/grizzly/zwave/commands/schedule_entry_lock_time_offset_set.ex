@@ -54,14 +54,12 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet do
     sign_bit_tzo = sign_to_bit(sign_tzo)
     sign_bit_dst = sign_to_bit(sign_offset_dst)
 
-    <<sign_bit_tzo::size(1), hour_tzo::size(7), minute_tzo, sign_bit_dst::size(1),
-      minute_offset_dst::size(7)>>
+    <<sign_bit_tzo::1, hour_tzo::7, minute_tzo, sign_bit_dst::1, minute_offset_dst::7>>
   end
 
   @impl true
   def decode_params(
-        <<sign_bit_tzo::size(1), hour_tzo::size(7), minute_tzo, sign_bit_dst::size(1),
-          minute_offset_dst::size(7)>>
+        <<sign_bit_tzo::1, hour_tzo::7, minute_tzo, sign_bit_dst::1, minute_offset_dst::7>>
       ) do
     {:ok,
      [

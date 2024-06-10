@@ -238,14 +238,13 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     node_id = Keyword.get(neighbor, :node_id)
     repeater_bit = if Keyword.get(neighbor, :repeater?), do: 0x01, else: 0x00
     speeds_bits = Keyword.get(neighbor, :speed) |> neighbor_speeds_to_byte()
-    <<node_id, repeater_bit::size(1), 0x00::size(2), speeds_bits::size(5)>>
+    <<node_id, repeater_bit::1, 0x00::2, speeds_bits::5>>
   end
 
   defp neighbors_from_binary(<<>>), do: {:ok, []}
 
   defp neighbors_from_binary(
-         <<node_id, repeater_bit::size(1), _reserved::size(2), speeds_bits::size(5),
-           rest::binary>>
+         <<node_id, repeater_bit::1, _reserved::2, speeds_bits::5, rest::binary>>
        ) do
     with {:ok, speeds} <- neighbor_speeds_from_byte(speeds_bits),
          {:ok, other_neighbors} <- neighbors_from_binary(rest) do

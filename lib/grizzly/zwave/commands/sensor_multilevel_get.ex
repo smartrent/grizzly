@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
       sensor_type ->
         scale = Command.param!(command, :scale)
         sensor_type_byte = SensorMultilevel.encode_sensor_type(sensor_type)
-        <<sensor_type_byte, 0x00::size(3), scale::size(2), 0x00::size(3)>>
+        <<sensor_type_byte, 0x00::3, scale::2, 0x00::3>>
     end
   end
 
@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
   end
 
   # v5
-  def decode_params(<<sensor_type_byte, _::size(3), scale::size(2), _::size(3)>>) do
+  def decode_params(<<sensor_type_byte, _::3, scale::2, _::3>>) do
     with {:ok, sensor_type} <- SensorMultilevel.decode_sensor_type(sensor_type_byte) do
       {:ok, [sensor_type: sensor_type, scale: scale]}
     else

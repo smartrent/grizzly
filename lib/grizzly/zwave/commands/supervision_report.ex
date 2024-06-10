@@ -48,14 +48,12 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
     duration_byte = Command.param!(command, :duration) |> encode_duration()
     session_id = Command.param!(command, :session_id)
 
-    <<more_status_updates_bit::size(1), 0x00::size(1), session_id::size(6), status_byte,
-      duration_byte>>
+    <<more_status_updates_bit::1, 0x00::1, session_id::6, status_byte, duration_byte>>
   end
 
   @impl true
   def decode_params(
-        <<more_status_updates_byte::size(1), _::size(1), session_id::size(6), status_byte,
-          duration_byte>>
+        <<more_status_updates_byte::1, _::1, session_id::6, status_byte, duration_byte>>
       ) do
     with {:ok, more_status_updates} <- decode_more_status_updates(more_status_updates_byte),
          {:ok, status} <- decode_status(status_byte) do

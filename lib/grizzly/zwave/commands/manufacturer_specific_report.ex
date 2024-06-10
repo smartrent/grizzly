@@ -41,14 +41,12 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
     product_type_id = Command.param!(command, :product_type_id)
     product = Command.param!(command, :product_id)
 
-    <<manufacturer_id::size(16), product_type_id::size(16), product::size(16)>>
+    <<manufacturer_id::16, product_type_id::16, product::16>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(
-        <<manufacturer_id::size(16), product_type_id::size(16), product_id::size(16)>>
-      ) do
+  def decode_params(<<manufacturer_id::16, product_type_id::16, product_id::16>>) do
     {:ok,
      [manufacturer_id: manufacturer_id, product_type_id: product_type_id, product_id: product_id]}
   end

@@ -40,11 +40,11 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoGet do
     refresh_cache? = Command.param!(command, :refresh_cache)
     refresh_cache_bit = if refresh_cache?, do: 0x01, else: 0x00
     group_id = Command.param(command, :group_id, 0)
-    <<refresh_cache_bit::size(1), all_bit::size(1), 0x00::size(6), group_id>>
+    <<refresh_cache_bit::1, all_bit::1, 0x00::6, group_id>>
   end
 
   @impl true
-  def decode_params(<<refresh_cache_bit::size(1), all_bit::size(1), 0x00::size(6), group_id>>) do
+  def decode_params(<<refresh_cache_bit::1, all_bit::1, 0x00::6, group_id>>) do
     {:ok, [refresh_cache: refresh_cache_bit == 0x01, all: all_bit == 0x01, group_id: group_id]}
   end
 end

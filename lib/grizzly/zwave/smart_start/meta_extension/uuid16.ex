@@ -77,14 +77,14 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
   this will return `{:error, :invalid_format}`
   """
   @spec parse(binary) :: {:ok, t()} | {:error, any()}
-  def parse(<<0x03::size(7), 0::size(1), 0x11, presentation_format, uuid::binary>>) do
+  def parse(<<0x03::7, 0::1, 0x11, presentation_format, uuid::binary>>) do
     with {:ok, uuid_string} <- uuid_from_binary(presentation_format, uuid),
          {:ok, format} <- format_from_byte(presentation_format) do
       new(uuid_string, format)
     end
   end
 
-  def parse(<<0x03::size(7), 0x01::size(1), _rest::binary>>) do
+  def parse(<<0x03::7, 0x01::1, _rest::binary>>) do
     {:error, :critical_bit_set}
   end
 

@@ -118,7 +118,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     timeout_minutes_byte = timeout_minutes_to_byte(timeout_minutes)
     timeout_seconds_byte = timeout_seconds_to_byte(timeout_seconds)
 
-    <<handles_byte>> = <<outside_handles_byte::size(4), inside_handles_byte::size(4)>>
+    <<handles_byte>> = <<outside_handles_byte::4, inside_handles_byte::4>>
 
     if target_mode == nil do
       <<DoorLock.mode_to_byte(mode), handles_byte, door_condition_byte, timeout_minutes_byte,
@@ -137,8 +137,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<mode_byte, outside_handles_int::size(4), inside_handles_int::size(4),
-          door_condition_byte, timeout_minutes, timeout_seconds>>
+        <<mode_byte, outside_handles_int::4, inside_handles_int::4, door_condition_byte,
+          timeout_minutes, timeout_seconds>>
       ) do
     outside_handles = door_handles_modes_from_byte(outside_handles_int)
     inside_handles = door_handles_modes_from_byte(inside_handles_int)
@@ -171,8 +171,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   # Version 4
   def decode_params(
-        <<mode_byte, outside_handles_int::size(4), inside_handles_int::size(4),
-          door_condition_byte, timeout_minutes, timeout_seconds, target_mode_byte, duration_byte,
+        <<mode_byte, outside_handles_int::4, inside_handles_int::4, door_condition_byte,
+          timeout_minutes, timeout_seconds, target_mode_byte, duration_byte,
           invalid_extra::binary>> = binary
       ) do
     if byte_size(invalid_extra) != 0 do
@@ -213,8 +213,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     handle_4_bit = door_handle_value_to_bit(Map.get(handles_mode, 4, :disabled))
 
     <<byte>> =
-      <<0::size(4), handle_4_bit::size(1), handle_3_bit::size(1), handle_2_bit::size(1),
-        handle_1_bit::size(1)>>
+      <<0::4, handle_4_bit::1, handle_3_bit::1, handle_2_bit::1, handle_1_bit::1>>
 
     byte
   end
@@ -224,7 +223,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     bolt_bit = bolt_bit_from_position(bolt_position)
     door_bit = door_bit_from_state(door_state)
 
-    <<byte>> = <<0::size(5), latch_bit::size(1), bolt_bit::size(1), door_bit::size(1)>>
+    <<byte>> = <<0::5, latch_bit::1, bolt_bit::1, door_bit::1>>
 
     byte
   end
@@ -262,7 +261,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   @spec door_handles_modes_from_byte(byte()) :: %{(1..4) => :enabled | :disabled}
   defp door_handles_modes_from_byte(byte) do
-    <<_::size(4), handle_4::size(1), handle_3::size(1), handle_2::size(1), handle_1::size(1)>> =
+    <<_::4, handle_4::1, handle_3::1, handle_2::1, handle_1::1>> =
       <<byte>>
 
     %{
@@ -282,7 +281,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   @spec latch_position_from_byte(byte()) :: latch_position()
   defp latch_position_from_byte(byte) do
-    <<_::size(5), latch_bit::size(1), _::size(2)>> = <<byte>>
+    <<_::5, latch_bit::1, _::2>> = <<byte>>
 
     if latch_bit == 1 do
       :closed
@@ -293,7 +292,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   @spec bolt_position_from_byte(byte()) :: bolt_position()
   defp bolt_position_from_byte(byte) do
-    <<_::size(5), _::size(1), bolt_bit::size(1), _::size(1)>> = <<byte>>
+    <<_::5, _::1, bolt_bit::1, _::1>> = <<byte>>
 
     if bolt_bit == 1 do
       :unlocked
@@ -304,7 +303,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   @spec door_state_from_byte(byte()) :: door_state()
   defp door_state_from_byte(byte) do
-    <<_::size(5), _::size(2), door_state_bit::size(1)>> = <<byte>>
+    <<_::5, _::2, door_state_bit::1>> = <<byte>>
 
     if door_state_bit == 1 do
       :closed

@@ -101,7 +101,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_upgradable,
           firmware_targets, max_fragment_size::16,
           firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version,
-          _reserved::size(6), activation::size(1), cc::size(1), _rest::binary>>
+          _reserved::6, activation::1, cc::1, _rest::binary>>
       ) do
     other_firmware_ids = for <<id::16 <- firmware_target_ids>>, do: id
 
@@ -145,8 +145,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_upgradable,
           firmware_targets, max_fragment_size::16,
-          firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version,
-          0x00::size(6), activation_supported::size(1), cc::size(1)>>
+          firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version, 0x00::6,
+          activation_supported::1, cc::1>>
 
       # v5
       %{

@@ -41,8 +41,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
 
     {int_value, precision, byte_size} = Encoding.encode_zwave_float(value)
 
-    <<0x00::size(4), ThermostatSetpoint.encode_type(type)::size(4), precision::size(3),
-      scale_byte::size(2), byte_size::size(3), int_value::size(byte_size)-unit(8)>>
+    <<0x00::4, ThermostatSetpoint.encode_type(type)::size(4), precision::3, scale_byte::2,
+      byte_size::3, int_value::size(byte_size)-unit(8)>>
   end
 
   # The spec says when encoding `:na` type to force the size to 1 and the value to 0
@@ -54,8 +54,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
 
   @impl Command
   def decode_params(
-        <<_::size(4), type_byte::size(4), precision::size(3), scale_byte::size(2),
-          byte_size::size(3), int_value::size(byte_size)-unit(8), _::binary>>
+        <<_::4, type_byte::4, precision::3, scale_byte::2, byte_size::3,
+          int_value::size(byte_size)-unit(8), _::binary>>
         # trailing binary to capture extra 0 sent by the Aidoo
       ) do
     type = ThermostatSetpoint.decode_type(type_byte)

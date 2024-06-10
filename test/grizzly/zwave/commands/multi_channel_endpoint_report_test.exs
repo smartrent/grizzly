@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReportTest do
     {:ok, command} = MultiChannelEndpointReport.new(params)
 
     expected_binary =
-      <<0x00::size(1), 0x01::size(1), 0x00::size(6), 0x00::size(1), 0x03::size(7)>>
+      <<0x00::1, 0x01::1, 0x00::6, 0x00::1, 0x03::7>>
 
     assert expected_binary == MultiChannelEndpointReport.encode_params(command)
   end
@@ -28,14 +28,13 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReportTest do
     {:ok, command} = MultiChannelEndpointReport.new(params)
 
     expected_binary =
-      <<0x00::size(1), 0x01::size(1), 0x00::size(6), 0x00::size(1), 0x03::size(7), 0x00::size(1),
-        0x02::size(7)>>
+      <<0x00::1, 0x01::1, 0x00::6, 0x00::1, 0x03::7, 0x00::1, 0x02::7>>
 
     assert expected_binary == MultiChannelEndpointReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    binary_params = <<0x00::size(1), 0x01::size(1), 0x00::size(6), 0x00::size(1), 0x03::size(7)>>
+    binary_params = <<0x00::1, 0x01::1, 0x00::6, 0x00::1, 0x03::7>>
     {:ok, params} = MultiChannelEndpointReport.decode_params(binary_params)
     assert Keyword.get(params, :dynamic) == false
     assert Keyword.get(params, :identical) == true
@@ -45,8 +44,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReportTest do
 
   test "decodes params correctly - v4" do
     binary_params =
-      <<0x00::size(1), 0x01::size(1), 0x00::size(6), 0x00::size(1), 0x03::size(7), 0x00::size(1),
-        0x02::size(7)>>
+      <<0x00::1, 0x01::1, 0x00::6, 0x00::1, 0x03::7, 0x00::1, 0x02::7>>
 
     {:ok, params} = MultiChannelEndpointReport.decode_params(binary_params)
     assert Keyword.get(params, :dynamic) == false

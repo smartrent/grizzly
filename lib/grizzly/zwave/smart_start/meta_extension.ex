@@ -257,9 +257,9 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     [
       set_circuital_bit(@product_id, 0),
       0x08,
-      <<manu_id::size(16)>>,
-      <<prod_id::size(16)>>,
-      <<prod_type::size(16)>>,
+      <<manu_id::16>>,
+      <<prod_id::16>>,
+      <<prod_type::16>>,
       version.major,
       version.minor
     ]
@@ -276,7 +276,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
 
     {:ok, icon_integer} = IconType.to_value(icon_name)
 
-    [set_circuital_bit(@product_type, 0), 0x04, gen_byte, spec_byte, <<icon_integer::size(16)>>]
+    [set_circuital_bit(@product_type, 0), 0x04, gen_byte, spec_byte, <<icon_integer::16>>]
   end
 
   defp encode_extension({:smart_start_inclusion_setting, setting}) do
@@ -310,14 +310,14 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     Enum.reverse(extensions)
   end
 
-  defp do_parse(<<@advanced_joining::size(7), 1::size(1), 0x01, keys, rest::binary>>, extensions) do
+  defp do_parse(<<@advanced_joining::7, 1::1, 0x01, keys, rest::binary>>, extensions) do
     ext = {:advanced_joining, unmask_keys(keys)}
 
     do_parse(rest, [ext | extensions])
   end
 
   defp do_parse(
-         <<@bootstrapping_mode::size(7), 1::size(1), 0x01, mode, rest::binary>>,
+         <<@bootstrapping_mode::7, 1::1, 0x01, mode, rest::binary>>,
          extensions
        ) do
     mode =
@@ -333,7 +333,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@location_information::size(7), 0::size(1), len, location::binary-size(len)-unit(8),
+         <<@location_information::7, 0::1, len, location::binary-size(len)-unit(8),
            rest::binary>>,
          extensions
        ) do
@@ -343,7 +343,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@max_inclusion_request_interval::size(7), 0::size(1), 0x01, interval, rest::binary>>,
+         <<@max_inclusion_request_interval::7, 0::1, 0x01, interval, rest::binary>>,
          extensions
        ) do
     steps = interval - 5
@@ -355,8 +355,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@name_information::size(7), 0::size(1), len, name::binary-size(len)-unit(8),
-           rest::binary>>,
+         <<@name_information::7, 0::1, len, name::binary-size(len)-unit(8), rest::binary>>,
          extensions
        ) do
     name =
@@ -371,8 +370,8 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
 
   # When Long Range is enabled
   defp do_parse(
-         <<@network_status::size(7), 0::size(1), 0x04, node_id, status_byte,
-           _long_range_node_id::size(16), rest::binary>>,
+         <<@network_status::7, 0::1, 0x04, node_id, status_byte, _long_range_node_id::16,
+           rest::binary>>,
          extensions
        ) do
     status = decode_status(status_byte)
@@ -384,7 +383,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
 
   # When Long Range is NOT enabled
   defp do_parse(
-         <<@network_status::size(7), 0::size(1), 0x02, node_id, status_byte, rest::binary>>,
+         <<@network_status::7, 0::1, 0x02, node_id, status_byte, rest::binary>>,
          extensions
        ) do
     status = decode_status(status_byte)
@@ -395,8 +394,8 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@product_id::size(7), 0::size(1), 0x08, manu_id::size(16), prod_id::size(16),
-           prod_type::size(16), version_major, version_minor, rest::binary>>,
+         <<@product_id::7, 0::1, 0x08, manu_id::16, prod_id::16, prod_type::16, version_major,
+           version_minor, rest::binary>>,
          extensions
        ) do
     ext = {:product_id, {manu_id, prod_id, prod_type, "#{version_major}.#{version_minor}"}}
@@ -405,8 +404,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@product_type::size(7), 0::size(1), 0x04, gen_class, spec_class, icon::size(16),
-           rest::binary>>,
+         <<@product_type::7, 0::1, 0x04, gen_class, spec_class, icon::16, rest::binary>>,
          extensions
        ) do
     {:ok, icon} = IconType.to_name(icon)
@@ -420,7 +418,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@smart_start_inclusion_setting::size(7), 1::size(1), 0x01, setting, rest::binary>>,
+         <<@smart_start_inclusion_setting::7, 1::1, 0x01, setting, rest::binary>>,
          extensions
        ) do
     setting =
@@ -436,10 +434,10 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp do_parse(
-         <<@uuid16::size(7), 0::size(1), len, values::binary-size(len)-unit(8), rest::binary>>,
+         <<@uuid16::7, 0::1, len, values::binary-size(len)-unit(8), rest::binary>>,
          extensions
        ) do
-    {:ok, uuid} = UUID16.parse(<<@uuid16::size(7), 0::size(1), len, values::binary>>)
+    {:ok, uuid} = UUID16.parse(<<@uuid16::7, 0::1, len, values::binary>>)
 
     ext = {:uuid16, uuid}
 
@@ -462,14 +460,14 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
     end)
   end
 
-  defp byte_has_key?(<<_::size(7), 1::size(1)>>, :s2_unauthenticated), do: true
-  defp byte_has_key?(<<_::size(6), 1::size(1), _::size(1)>>, :s2_authenticated), do: true
-  defp byte_has_key?(<<_::size(5), 1::size(1), _::size(2)>>, :s2_access_control), do: true
-  defp byte_has_key?(<<_::size(1), 1::size(1), _::size(6)>>, :s0), do: true
+  defp byte_has_key?(<<_::7, 1::1>>, :s2_unauthenticated), do: true
+  defp byte_has_key?(<<_::6, 1::1, _::1>>, :s2_authenticated), do: true
+  defp byte_has_key?(<<_::5, 1::1, _::2>>, :s2_access_control), do: true
+  defp byte_has_key?(<<_::1, 1::1, _::6>>, :s0), do: true
   defp byte_has_key?(_byte, _key), do: false
 
   defp set_circuital_bit(byte, cbit) do
-    <<byte::size(7), cbit::size(1)>>
+    <<byte::7, cbit::1>>
   end
 
   defp decode_status(status_byte) do

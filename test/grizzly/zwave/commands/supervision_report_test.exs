@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionReportTest do
   end
 
   test "decodes params correctly" do
-    binary_params = <<0x01::size(1), 0x00::size(1), 0x01::size(6), 0x01, 0x0A>>
+    binary_params = <<0x01::1, 0x00::1, 0x01::6, 0x01, 0x0A>>
 
     {:ok, params} = SupervisionReport.decode_params(binary_params)
     assert Keyword.get(params, :more_status_updates) == :more_reports

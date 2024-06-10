@@ -76,16 +76,15 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
     supported_key_attributes_binary =
       supported_key_attributes_to_binary(bit_mask_bytes, supported_key_attributes)
 
-    <<supported_scenes, slow_refresh_support_bit::size(1), 0x00::size(4), bit_mask_bytes::size(2),
-      identical_bit::size(1)>> <> supported_key_attributes_binary
+    <<supported_scenes, slow_refresh_support_bit::1, 0x00::4, bit_mask_bytes::2,
+      identical_bit::1>> <> supported_key_attributes_binary
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<supported_scenes, slow_refresh_support_bit::size(1), 0x00::size(4),
-          bit_mask_bytes::size(2), identical_bit::size(1),
-          supported_key_attributes_binary::binary>>
+        <<supported_scenes, slow_refresh_support_bit::1, 0x00::4, bit_mask_bytes::2,
+          identical_bit::1, supported_key_attributes_binary::binary>>
       ) do
     identical? = identical_bit == 1
 
@@ -134,7 +133,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
     bit_masks =
       for per_byte_bit_indices <- byte_bit_indices do
         for bit_index <- 7..0//-1, into: <<>> do
-          if bit_index in per_byte_bit_indices, do: <<1::size(1)>>, else: <<0::size(1)>>
+          if bit_index in per_byte_bit_indices, do: <<1::1>>, else: <<0::1>>
         end
       end
 
@@ -197,7 +196,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
   defp bit_masks_from_binary(supported_key_attributes_binary) do
     for byte <- :erlang.binary_to_list(supported_key_attributes_binary) do
       indexed_bit_list =
-        for(<<(bit::size(1) <- <<byte>>)>>, do: bit) |> Enum.reverse() |> Enum.with_index()
+        for(<<(bit::1 <- <<byte>>)>>, do: bit) |> Enum.reverse() |> Enum.with_index()
 
       Enum.reduce(
         indexed_bit_list,

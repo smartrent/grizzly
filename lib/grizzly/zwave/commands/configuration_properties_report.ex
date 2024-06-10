@@ -81,18 +81,16 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
     altering_capabilities_bit =
       Command.param(command, :altering_capabilities, false) |> bool_to_bit()
 
-    <<param_number::size(16), altering_capabilities_bit::size(1), read_only_bit::size(1),
-      format_byte::size(3),
-      size::size(3)>> <>
+    <<param_number::16, altering_capabilities_bit::1, read_only_bit::1, format_byte::3, size::3>> <>
       maybe_value_specs(command, format, size) <>
-      <<next_param_number::size(16)>> <> maybe_v4_end_byte(command)
+      <<next_param_number::16>> <> maybe_v4_end_byte(command)
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<param_number::size(16), altering_capabilities_bit::size(1), read_only_bit::size(1),
-          format_byte::size(3), 0x00::size(3), next_param_number::size(16), maybe_more::binary>>
+        <<param_number::16, altering_capabilities_bit::1, read_only_bit::1, format_byte::3,
+          0x00::3, next_param_number::16, maybe_more::binary>>
       ) do
     with {:ok, format} <- Configuration.format_from_byte(format_byte) do
       case maybe_more do
@@ -106,7 +104,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
              next_param_number: next_param_number
            ]}
 
-        <<_reserved::size(6), no_bulk_support_bit::size(1), advanced_bit::size(1)>> ->
+        <<_reserved::6, no_bulk_support_bit::1, advanced_bit::1>> ->
           {:ok,
            [
              param_number: param_number,
@@ -126,10 +124,9 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
   end
 
   def decode_params(
-        <<param_number::size(16), altering_capabilities_bit::size(1), read_only_bit::size(1),
-          format_byte::size(3), size::size(3), min_value_bin::binary-size(size),
-          max_value_bin::binary-size(size), default_value_bin::binary-size(size),
-          next_param_number::size(16), maybe_more::binary>>
+        <<param_number::16, altering_capabilities_bit::1, read_only_bit::1, format_byte::3,
+          size::3, min_value_bin::binary-size(size), max_value_bin::binary-size(size),
+          default_value_bin::binary-size(size), next_param_number::16, maybe_more::binary>>
       ) do
     with {:ok, format} <- Configuration.format_from_byte(format_byte) do
       value_specs = [
@@ -150,7 +147,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
            ]
            |> Keyword.merge(value_specs)}
 
-        <<_reserved::size(6), no_bulk_support_bit::size(1), advanced_bit::size(1)>> ->
+        <<_reserved::6, no_bulk_support_bit::1, advanced_bit::1>> ->
           {:ok,
            [
              param_number: param_number,
@@ -203,7 +200,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
         Command.param!(command, :no_bulk_support) |> bool_to_bit()
 
       advanced_bit = Command.param!(command, :advanced) |> bool_to_bit()
-      <<0x00::size(6), no_bulk_support_bit::size(1), advanced_bit::size(1)>>
+      <<0x00::6, no_bulk_support_bit::1, advanced_bit::1>>
     else
       <<>>
     end

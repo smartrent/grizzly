@@ -33,11 +33,11 @@ defmodule Grizzly.ZWave.Commands.NodeNameSet do
     encoding = Command.param!(command, :encoding)
     name = Command.param!(command, :name)
     encoding_byte = NodeNaming.encoding_to_byte(encoding)
-    <<0x00::size(5), encoding_byte::size(3)>> <> name
+    <<0x00::5, encoding_byte::3>> <> name
   end
 
   @impl true
-  def decode_params(<<_reserved::size(5), encoding_byte::size(3), name::binary>>) do
+  def decode_params(<<_reserved::5, encoding_byte::3, name::binary>>) do
     with {:ok, encoding} <- NodeNaming.encoding_from_byte(encoding_byte) do
       {:ok, [encoding: encoding, name: name]}
     else

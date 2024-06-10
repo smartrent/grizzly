@@ -24,13 +24,13 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReportTest do
 
     expected_params_binary = <<
       # reserved
-      0x00::size(5),
+      0x00::5,
       # device id type
-      0x01::size(3),
+      0x01::3,
       # device id data format
-      0x01::size(3),
+      0x01::3,
       # device id data length
-      0x04::size(5),
+      0x04::5,
       # device id data
       0x30,
       0x31,
@@ -45,13 +45,13 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReportTest do
   test "decodes params correctly" do
     params_binary = <<
       # reserved
-      0x00::size(5),
+      0x00::5,
       # device id type
-      0x01::size(3),
+      0x01::3,
       # device id data format
-      0x01::size(3),
+      0x01::3,
       # device id data length
-      0x04::size(5),
+      0x04::5,
       # device id data
       0x30,
       0x31,

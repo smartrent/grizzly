@@ -52,15 +52,15 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
     manufacturer_id = Command.param!(command, :manufacturer_id)
     locking_entity_id = Command.param!(command, :locking_entity_id)
 
-    <<0x00::size(2), byte_size(hint)::size(4), restricted_bit::size(1), state_bit::size(1)>> <>
+    <<0x00::2, byte_size(hint)::size(4), restricted_bit::1, state_bit::1>> <>
       hint <>
-      <<manufacturer_id::size(16), locking_entity_id::size(16)>>
+      <<manufacturer_id::16, locking_entity_id::16>>
   end
 
   @impl true
   def decode_params(
-        <<_reserved::size(2), hint_length::size(4), restricted_bit::size(1), state_bit::size(1),
-          hint::binary-size(hint_length), manufacturer_id::size(16), locking_entity_id::size(16)>>
+        <<_reserved::2, hint_length::4, restricted_bit::1, state_bit::1,
+          hint::binary-size(hint_length), manufacturer_id::16, locking_entity_id::16>>
       ) do
     state = AntitheftUnlock.state_from_bit(state_bit)
     restricted? = restricted_bit == 1

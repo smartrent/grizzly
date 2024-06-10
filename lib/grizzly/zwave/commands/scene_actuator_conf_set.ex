@@ -50,13 +50,13 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfSet do
 
     override_bit = if Command.param!(command, :override) == true, do: 1, else: 0
     level_byte = Command.param!(command, :level) |> SceneActuatorConf.level_to_byte()
-    <<scene_id, dimming_duration_byte, override_bit::size(1), 0x00::size(7), level_byte>>
+    <<scene_id, dimming_duration_byte, override_bit::1, 0x00::7, level_byte>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<scene_id, dimming_duration_byte, override_bit::size(1), _reserved::size(7), level_byte>>
+        <<scene_id, dimming_duration_byte, override_bit::1, _reserved::7, level_byte>>
       ) do
     with {:ok, dimming_duration} <-
            SceneActuatorConf.dimming_duration_from_byte(dimming_duration_byte),

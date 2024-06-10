@@ -50,13 +50,13 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
 
     dsk = dsk_to_binary(input_dsk, input_dsk_length)
 
-    <<seq_number, bool_to_bit(accept)::size(1), 0::size(3), input_dsk_length::size(4)>> <> dsk
+    <<seq_number, bool_to_bit(accept)::size(1), 0::3, input_dsk_length::4>> <> dsk
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
-        <<seq_number, accept::size(1), _::size(3), input_dsk_length::size(4),
+        <<seq_number, accept::1, _::3, input_dsk_length::4,
           input_dsk::binary-size(input_dsk_length)-unit(8)>>
       ) do
     {:ok,

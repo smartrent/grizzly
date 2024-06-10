@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
       <<Command.param!(command, :supported_users)>>
     else
       # Version 2
-      <<Command.param!(command, :supported_users), extended_supported_users::size(16)>>
+      <<Command.param!(command, :supported_users), extended_supported_users::16>>
     end
   end
 
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
     {:ok, [supported_users: supported_users]}
   end
 
-  def decode_params(<<supported_users, extended_supported_users::size(16)>>) do
+  def decode_params(<<supported_users, extended_supported_users::16>>) do
     {:ok, [supported_users: supported_users, extended_supported_users: extended_supported_users]}
   end
 end

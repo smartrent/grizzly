@@ -98,9 +98,8 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
 
   @impl true
   def decode_params(
-        <<seq_number, status::size(4), age::size(4), list?::size(1), _::size(7), _, _keys,
-          basic_device_class_byte, generic_device_class_byte, specific_device_class_byte,
-          command_classes::binary>>
+        <<seq_number, status::4, age::4, list?::1, _::7, _, _keys, basic_device_class_byte,
+          generic_device_class_byte, specific_device_class_byte, command_classes::binary>>
       ) do
     {:ok, basic_device_class} =
       DeviceClasses.basic_device_class_from_byte(basic_device_class_byte)

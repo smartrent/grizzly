@@ -11,12 +11,12 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationSetTest do
   test "encodes params correctly" do
     params = [slow_refresh: true]
     {:ok, command} = CentralSceneConfigurationSet.new(params)
-    expected_params_binary = <<0x01::size(1), 0x00::size(7)>>
+    expected_params_binary = <<0x01::1, 0x00::7>>
     assert expected_params_binary == CentralSceneConfigurationSet.encode_params(command)
   end
 
   test "decodes params correctly" do
-    params_binary = <<0x01::size(1), 0x00::size(7)>>
+    params_binary = <<0x01::1, 0x00::7>>
     {:ok, params} = CentralSceneConfigurationSet.decode_params(params_binary)
     assert Keyword.get(params, :slow_refresh) == true
   end

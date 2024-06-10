@@ -47,14 +47,12 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
       Command.param(command, :return_interview_status, :off) |> encode_return_interview_status()
 
     mode_byte = Command.param!(command, :mode) |> encode_mode()
-    <<seq_number, 0x00::size(7), return_interview_status_bit::size(1), mode_byte>>
+    <<seq_number, 0x00::7, return_interview_status_bit::1, mode_byte>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(
-        <<seq_number, 0x00::size(7), return_interview_status_bit::size(1), mode_byte>>
-      ) do
+  def decode_params(<<seq_number, 0x00::7, return_interview_status_bit::1, mode_byte>>) do
     return_interview_status = decode_return_interview_status(return_interview_status_bit)
 
     with {:ok, mode} <- decode_mode(mode_byte) do

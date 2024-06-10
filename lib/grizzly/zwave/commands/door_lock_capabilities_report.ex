@@ -87,29 +87,26 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
     block_to_block_supported_bit =
       if Command.param!(command, :block_to_block_supported?), do: 1, else: 0
 
-    <<0x00::size(3), supported_bitmasks_length::size(5)>> <>
+    <<0x00::3, supported_bitmasks_length::5>> <>
       supported_operations_bitmask <>
       <<supported_modes_list_length>> <>
       supported_door_lock_modes_binary <>
-      <<configurable_outside_handles_bitmask::size(4),
-        configurable_inside_handles_bitmask::size(4)>> <>
+      <<configurable_outside_handles_bitmask::4, configurable_inside_handles_bitmask::4>> <>
       supported_door_components_bitmask <>
-      <<0x00::size(4), auto_relock_supported_bit::size(1),
-        hold_and_release_supported_bit::size(1), twist_assist_supported_bit::size(1),
-        block_to_block_supported_bit::size(1)>>
+      <<0x00::4, auto_relock_supported_bit::1, hold_and_release_supported_bit::1,
+        twist_assist_supported_bit::1, block_to_block_supported_bit::1>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         # Assuming a single supported operations bitmask
-        <<0x00::size(3), 0x01::size(5), supported_operations_bitmask, supported_modes_list_length,
+        <<0x00::3, 0x01::5, supported_operations_bitmask, supported_modes_list_length,
           supported_door_lock_modes_binary::binary-size(supported_modes_list_length),
-          configurable_outside_handles_bitmask::size(4),
-          configurable_inside_handles_bitmask::size(4), supported_door_components_bitmask,
-          0x00::size(4), auto_relock_supported_bit::size(1),
-          hold_and_release_supported_bit::size(1), twist_assist_supported_bit::size(1),
-          block_to_block_supported_bit::size(1)>>
+          configurable_outside_handles_bitmask::4, configurable_inside_handles_bitmask::4,
+          supported_door_components_bitmask, 0x00::4, auto_relock_supported_bit::1,
+          hold_and_release_supported_bit::1, twist_assist_supported_bit::1,
+          block_to_block_supported_bit::1>>
       ) do
     supported_operations = operations_from_bitmask(supported_operations_bitmask)
     supported_modes = door_lock_modes_from_binary(supported_door_lock_modes_binary)
@@ -133,11 +130,11 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
   defp operations_to_binary(operations) do
     constant_bit = if :constant_operation in operations, do: 1, else: 0
     timed_bit = if :timed_operation in operations, do: 1, else: 0
-    <<0x00::size(5), timed_bit::size(1), constant_bit::size(1), 0x00::size(1)>>
+    <<0x00::5, timed_bit::1, constant_bit::1, 0x00::1>>
   end
 
   defp operations_from_bitmask(bitmask) do
-    <<0x00::size(5), timed_bit::size(1), constant_bit::size(1), _reserved::size(1)>> = <<bitmask>>
+    <<0x00::5, timed_bit::1, constant_bit::1, _reserved::1>> = <<bitmask>>
 
     operations = []
     operations = if timed_bit == 1, do: [:timed_operation | operations], else: operations
@@ -148,11 +145,11 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
     latch_bit = if :latch in components, do: 1, else: 0
     bolt_bit = if :bolt in components, do: 1, else: 0
     door_bit = if :door in components, do: 1, else: 0
-    <<0x00::size(5), latch_bit::size(1), bolt_bit::size(1), door_bit::size(1)>>
+    <<0x00::5, latch_bit::1, bolt_bit::1, door_bit::1>>
   end
 
   defp door_components_from_bitmask(bitmask) do
-    <<0x00::size(5), latch_bit::size(1), bolt_bit::size(1), door_bit::size(1)>> = <<bitmask>>
+    <<0x00::5, latch_bit::1, bolt_bit::1, door_bit::1>> = <<bitmask>>
     components = []
     components = if latch_bit == 1, do: [:latch | components], else: components
     components = if bolt_bit == 1, do: [:bolt | components], else: components

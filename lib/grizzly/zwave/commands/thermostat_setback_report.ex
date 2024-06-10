@@ -37,12 +37,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackReport do
   def encode_params(command) do
     type_byte = Command.param!(command, :type) |> ThermostatSetback.encode_type()
     state_byte = Command.param!(command, :state) |> ThermostatSetback.encode_state()
-    <<0x00::size(6), type_byte::size(2), state_byte>>
+    <<0x00::6, type_byte::2, state_byte>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<_::size(6), type_byte::size(2), state_byte>>) do
+  def decode_params(<<_::6, type_byte::2, state_byte>>) do
     with {:ok, type} <- ThermostatSetback.decode_type(type_byte),
          {:ok, state} <- ThermostatSetback.decode_state(state_byte) do
       {:ok, [type: type, state: state]}

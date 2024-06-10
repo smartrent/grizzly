@@ -39,12 +39,12 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSet do
     parameters = Command.param!(command, :parameters)
     duration = Command.param!(command, :duration)
     parameters_binary = parameters_to_binary(parameters)
-    <<0x00::size(3), Enum.count(parameters)::size(5)>> <> parameters_binary <> <<duration>>
+    <<0x00::3, Enum.count(parameters)::size(5)>> <> parameters_binary <> <<duration>>
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<0x00::size(4), parameters_count::size(4), rest::binary>>) do
+  def decode_params(<<0x00::4, parameters_count::4, rest::binary>>) do
     parameters_size = parameters_count * 2
     <<parameters_binary::binary-size(parameters_size), duration>> = rest
 

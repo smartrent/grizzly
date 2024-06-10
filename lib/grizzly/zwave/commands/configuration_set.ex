@@ -72,11 +72,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<param_number, 1::size(1), _rest::size(7), _>>) do
+  def decode_params(<<param_number, 1::1, _rest::7, _>>) do
     {:ok, [param_number: param_number, value: :default]}
   end
 
-  def decode_params(<<param_number, _::size(5), size::size(3), value::binary>>) do
+  def decode_params(<<param_number, _::5, size::3, value::binary>>) do
     <<value_int::signed-integer-size(size)-unit(8)>> = value
     {:ok, [param_number: param_number, value: value_int, size: size]}
   end

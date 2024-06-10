@@ -45,13 +45,13 @@ defmodule Grizzly.ZWave.Commands.SupervisionGet do
     encapsulated_command = Command.param!(command, :encapsulated_command)
     encapsulated_command_length = byte_size(encapsulated_command)
 
-    <<status_updates_bit::size(1), 0x00::size(1), session_id::size(6),
-      encapsulated_command_length>> <> encapsulated_command
+    <<status_updates_bit::1, 0x00::1, session_id::6, encapsulated_command_length>> <>
+      encapsulated_command
   end
 
   @impl true
   def decode_params(
-        <<status_updates_bit::size(1), 0x00::size(1), session_id::size(6), length,
+        <<status_updates_bit::1, 0x00::1, session_id::6, length,
           encapsulated_command::binary-size(length)-unit(8)>>
       ) do
     {:ok, status_updates} = decode_status_updates(status_updates_bit)

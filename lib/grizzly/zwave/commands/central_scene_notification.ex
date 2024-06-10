@@ -53,15 +53,13 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
 
     scene_number = Command.param!(command, :scene_number)
 
-    <<seq_number, slow_refresh_bit::size(1), 0x00::size(4), key_attribute_byte::size(3),
-      scene_number>>
+    <<seq_number, slow_refresh_bit::1, 0x00::4, key_attribute_byte::3, scene_number>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<seq_number, slow_refresh_bit::size(1), 0x00::size(4), key_attribute_byte::size(3),
-          scene_number>>
+        <<seq_number, slow_refresh_bit::1, 0x00::4, key_attribute_byte::3, scene_number>>
       ) do
     {:ok,
      [

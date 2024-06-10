@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
       <<value>>
     else
       if Enum.empty?(resources) do
-        <<0x00, 0x00::size(3), 0x00::size(5)>>
+        <<0x00, 0x00::3, 0x00::5>>
       else
         resources_binary =
           for resource <- resources, into: <<>> do
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
           end
 
         count = Enum.count(resources)
-        <<0x00, 0x00::size(3), count::size(5)>> <> resources_binary
+        <<0x00, 0x00::3, count::5>> <> resources_binary
       end
     end
   end
@@ -68,7 +68,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
     {:ok, [value: value, resources: [[indicator_id: 0x00, property_id: 0x01, value: value]]]}
   end
 
-  def decode_params(<<value0, 0x00::size(3), _count::size(5), resources_binary::binary>>) do
+  def decode_params(<<value0, 0x00::3, _count::5, resources_binary::binary>>) do
     result =
       :binary.bin_to_list(resources_binary)
       |> Enum.chunk_every(3)

@@ -70,16 +70,16 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
 
       if low_temperature == nil do
         # v2
-        <<level, charging_status_byte::size(2), rechargeable_byte::size(1), backup_byte::size(1),
-          overheating_byte::size(1), low_fluid_byte::size(1), replace_recharge_byte::size(2),
-          0x00::size(7), disconnected_byte::size(1)>>
+        <<level, charging_status_byte::2, rechargeable_byte::1, backup_byte::1,
+          overheating_byte::1, low_fluid_byte::1, replace_recharge_byte::2, 0x00::7,
+          disconnected_byte::1>>
       else
         # v3
         low_temperature_byte = encode_low_temperature(low_temperature)
 
-        <<level, charging_status_byte::size(2), rechargeable_byte::size(1), backup_byte::size(1),
-          overheating_byte::size(1), low_fluid_byte::size(1), replace_recharge_byte::size(2),
-          0x00::size(6), low_temperature_byte::size(1), disconnected_byte::size(1)>>
+        <<level, charging_status_byte::2, rechargeable_byte::1, backup_byte::1,
+          overheating_byte::1, low_fluid_byte::1, replace_recharge_byte::2, 0x00::6,
+          low_temperature_byte::1, disconnected_byte::1>>
       end
     end
   end
@@ -98,10 +98,9 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
 
   # v2-3
   def decode_params(
-        <<level_byte, charging_status_byte::size(2), rechargeable_byte::size(1),
-          backup_byte::size(1), overheating_byte::size(1), low_fluid_byte::size(1),
-          replace_recharge_byte::size(2), _reserved::size(6), low_temperature_byte::size(1),
-          disconnected_byte::size(1)>>
+        <<level_byte, charging_status_byte::2, rechargeable_byte::1, backup_byte::1,
+          overheating_byte::1, low_fluid_byte::1, replace_recharge_byte::2, _reserved::6,
+          low_temperature_byte::1, disconnected_byte::1>>
       ) do
     with {:ok, level} <- level_from_byte(level_byte),
          {:ok, charging_status} <- charging_status_from_byte(charging_status_byte),

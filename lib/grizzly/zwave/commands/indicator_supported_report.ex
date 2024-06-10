@@ -49,13 +49,13 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReport do
     masks = encode_property_ids(property_ids)
     count = Enum.count(masks)
     masks_binary = for mask <- masks, into: <<>>, do: mask
-    <<indicator_id_byte, next_indicator_id_byte, 0x00::size(3), count::size(5)>> <> masks_binary
+    <<indicator_id_byte, next_indicator_id_byte, 0x00::3, count::5>> <> masks_binary
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
-        <<indicator_id_byte, next_indicator_id_byte, 0x00::size(3), _count::size(5),
+        <<indicator_id_byte, next_indicator_id_byte, 0x00::3, _count::5,
           property_id_masks::binary>>
       ) do
     with {:ok, indicator_id} <- Indicator.indicator_id_from_byte(indicator_id_byte),
@@ -84,7 +84,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReport do
 
     for chunk <- Enum.chunk_every(bits, 8, 8, [0, 0, 0, 0, 0, 0, 0]) do
       bits = Enum.reverse(chunk)
-      for bit <- bits, into: <<>>, do: <<bit::size(1)>>
+      for bit <- bits, into: <<>>, do: <<bit::1>>
     end
   end
 
@@ -104,7 +104,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReport do
 
   defp decode_mask(mask, offset) do
     indexed_bits =
-      for(<<bit::size(1) <- mask>>, do: bit) |> Enum.reverse() |> Enum.with_index(offset)
+      for(<<bit::1 <- mask>>, do: bit) |> Enum.reverse() |> Enum.with_index(offset)
 
     Enum.reduce_while(
       indexed_bits,

@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
   # version 4
   def decode_params(
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
-          _::size(7), activation::size(1)>>
+          _::7, activation::1>>
       ) do
     {:ok,
      [
@@ -85,7 +85,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
   # version 5,6,7
   def decode_params(
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
-          _::size(7), activation::size(1), hardware_version>>
+          _::7, activation::1, hardware_version>>
       ) do
     {:ok,
      [
@@ -118,7 +118,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         activation = if activation_may_be_delayed?, do: 0x01, else: 0x00
 
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
-          0x00::size(7), activation::size(1), hardware_version>>
+          0x00::7, activation::1, hardware_version>>
 
       # v4
       %{
@@ -132,7 +132,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         activation = if activation_may_be_delayed?, do: 0x01, else: 0x00
 
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
-          0x00::size(7), activation::size(1)>>
+          0x00::7, activation::1>>
 
       # v3
       %{

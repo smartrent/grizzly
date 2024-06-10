@@ -43,15 +43,12 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStartLevelChange do
 
     direction_bit = Command.param!(command, :direction) |> encode_direction()
     duration = Command.param!(command, :duration)
-    <<0x00::size(1), direction_bit::size(1), 0x00::size(6), parameter_id, duration>>
+    <<0x00::1, direction_bit::1, 0x00::6, parameter_id, duration>>
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(
-        <<_reserved::size(1), direction_bit::size(1), _also_reserved::size(6), parameter_id,
-          duration>>
-      ) do
+  def decode_params(<<_reserved::1, direction_bit::1, _also_reserved::6, parameter_id, duration>>) do
     case WindowCovering.decode_parameter_name(parameter_id) do
       {:ok, parameter_name} ->
         direction = decode_direction(direction_bit)

@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, _::size(7), add_mode_bit::size(1), dsk_binary::binary>>) do
+  def decode_params(<<seq_number, _::7, add_mode_bit::1, dsk_binary::binary>>) do
     add_mode = NetworkManagementBasicNode.add_mode_from_bit(add_mode_bit)
     {:ok, [seq_number: seq_number, add_mode: add_mode, dsk: DSK.new(dsk_binary)]}
   end

@@ -35,12 +35,12 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReportTest do
     ]
 
     {:ok, command} = AlarmEventSupportedReport.new(params)
-    expected_binary = <<0x06, 0x00::size(3), 0x02::size(5), 0b01111110, 0b00001000>>
+    expected_binary = <<0x06, 0x00::3, 0x02::5, 0b01111110, 0b00001000>>
     assert expected_binary == AlarmEventSupportedReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    binary_params = <<0x06, 0x00::size(3), 0x02::size(5), 0b01111110, 0b00001000>>
+    binary_params = <<0x06, 0x00::3, 0x02::5, 0b01111110, 0b00001000>>
     {:ok, params} = AlarmEventSupportedReport.decode_params(binary_params)
     assert :access_control == Keyword.get(params, :type)
 

@@ -88,10 +88,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
   end
 
   defp encode_end_points(end_points) do
-    for end_point <- end_points, into: <<>>, do: <<0x00::size(1), end_point::size(7)>>
+    for end_point <- end_points, into: <<>>, do: <<0x00::1, end_point::7>>
   end
 
   defp decode_end_points(binary) do
-    for <<_reserved::size(1), end_point::size(7) <- binary>>, do: end_point
+    for <<_reserved::1, end_point::7 <- binary>>, do: end_point
   end
 end

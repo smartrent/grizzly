@@ -42,12 +42,12 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
     accepted = Command.param!(command, :accept)
     granted_keys = Command.param!(command, :granted_keys)
 
-    <<seq_number, 0::size(6), encode_csa(csa)::size(1), encode_accepted(accepted)::size(1),
+    <<seq_number, 0::6, encode_csa(csa)::size(1), encode_accepted(accepted)::size(1),
       encode_granted_keys(granted_keys)>>
   end
 
   @impl true
-  def decode_params(<<seq_number, _::size(6), csa::size(1), accepted::size(1), granted_keys>>) do
+  def decode_params(<<seq_number, _::6, csa::1, accepted::1, granted_keys>>) do
     {:ok,
      [
        seq_number: seq_number,

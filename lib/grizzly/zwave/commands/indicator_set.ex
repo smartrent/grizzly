@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSet do
         end
 
       count = Enum.count(resources)
-      <<0x00, 0x00::size(3), count::size(5)>> <> resources_binary
+      <<0x00, 0x00::3, count::5>> <> resources_binary
     end
   end
 
@@ -64,7 +64,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSet do
     {:ok, [value: value]}
   end
 
-  def decode_params(<<_ignored, 0x00::size(3), _count::size(5), resources_binary::binary>>) do
+  def decode_params(<<_ignored, 0x00::3, _count::5, resources_binary::binary>>) do
     :binary.bin_to_list(resources_binary)
     |> Enum.chunk_every(3)
     |> Enum.reduce_while(

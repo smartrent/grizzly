@@ -46,12 +46,12 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeReport do
       Command.param!(command, :status_of_operation) |> Powerlevel.status_of_operation_to_byte()
 
     test_frame_count = Command.param!(command, :test_frame_count)
-    <<test_node_id, status_of_operation_byte, test_frame_count::size(16)>>
+    <<test_node_id, status_of_operation_byte, test_frame_count::16>>
   end
 
   @impl true
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<test_node_id, status_of_operation_byte, test_frame_count::size(16)>>) do
+  def decode_params(<<test_node_id, status_of_operation_byte, test_frame_count::16>>) do
     with {:ok, status_of_operation} <-
            Powerlevel.status_of_operation_from_byte(status_of_operation_byte) do
       {:ok,

@@ -41,12 +41,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
       nil ->
         <<
           # Reserved
-          0x00::size(1),
-          up_down::size(1),
+          0x00::1,
+          up_down::1,
           # A controlling device SHOULD set the Ignore Start Level bit to 1.
-          0x01::size(1),
+          0x01::1,
           # Reserved
-          0x00::size(5),
+          0x00::5,
           # Start level is ignored
           0x00
         >>
@@ -55,15 +55,15 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
       duration ->
         <<
           # Reserved
-          0x00::size(1),
-          up_down::size(1),
+          0x00::1,
+          up_down::1,
           # A controlling device SHOULD set the Ignore Start Level bit to 1.
-          0x01::size(1),
+          0x01::1,
           # Reserved
-          0x00::size(5),
+          0x00::5,
           # Start level is ignored
           0x00,
-          duration::size(8)
+          duration
         >>
     end
   end
@@ -72,12 +72,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<
         # Reserved
-        _reserved::size(1),
-        up_down_byte::size(1),
+        _reserved::1,
+        up_down_byte::1,
         # A controlling device SHOULD set the Ignore Start Level bit to 1.
-        0x01::size(1),
+        0x01::1,
         # Reserved
-        _other_reserved::size(5),
+        _other_reserved::5,
         # Start level is ignored
         _start_level
       >>) do
@@ -87,12 +87,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
   # v2
   def decode_params(<<
         # Reserved
-        _reserved::size(1),
-        up_down::size(1),
+        _reserved::1,
+        up_down::1,
         # A controlling device SHOULD set the Ignore Start Level bit to 1.
-        0x01::size(1),
+        0x01::1,
         # Reserved
-        _other_reserved::size(5),
+        _other_reserved::5,
         # Start level is ignored
         _start_level,
         duration,
