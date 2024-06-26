@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.2.3] - 2024-06-25
+
+### Changed
+
+- Use a fixed log prefix when running Z/IP Gateway ([#942](https://github.com/smartrent/grizzly/pull/942))
+
 ## [v8.2.2] - 2024-06-05
 
 ### Added
@@ -2514,6 +2520,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.2.3]: https://github.com/smartrent/grizzly/compare/v8.2.2..v8.2.3
 [v8.2.2]: https://github.com/smartrent/grizzly/compare/v8.2.1..v8.2.2
 [v8.2.1]: https://github.com/smartrent/grizzly/compare/v8.2.0..v8.2.1
 [v8.2.0]: https://github.com/smartrent/grizzly/compare/v8.1.0..v8.2.0
