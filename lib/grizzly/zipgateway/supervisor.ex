@@ -91,6 +91,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
            name: Grizzly.ZIPGateway.Daemon,
            cd: priv,
            log_output: :debug,
+           log_prefix: "zipgateway",
            log_transform: &zipgateway_log_transform/1,
            exit_status_to_reason: &zipgateway_exit_status/1
          ]
