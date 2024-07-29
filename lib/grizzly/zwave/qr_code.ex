@@ -9,6 +9,8 @@ defmodule Grizzly.ZWave.QRCode do
   alias Grizzly.ZWave.{DSK, Security}
   alias Grizzly.ZWave.SmartStart.MetaExtension.UUID16
 
+  require Logger
+
   @typedoc "QR Code version (S2-only or Smart Start-enabled)"
   @type version() :: :s2 | :smart_start
 
@@ -89,7 +91,7 @@ defmodule Grizzly.ZWave.QRCode do
   defp decode_tlv(binary, acc \\ [])
   defp decode_tlv("", acc), do: acc
 
-  defp decode_tlv(binary, acc) do
+  defp decode_tlv(binary, acc) when byte_size(binary) > 2 do
     {tag_critical, binary} = String.split_at(binary, 2)
     <<tag::7, _critical::1>> = <<String.to_integer(tag_critical)::8>>
 
@@ -102,6 +104,13 @@ defmodule Grizzly.ZWave.QRCode do
 
     decode_tlv(binary, [{tag, decode_value(tag, value)} | acc])
   end
+
+  defp decode_tlv(binary, acc) when byte_size(binary) > 0 do
+    Logger.warning("QR Code contains invalid TLV segment (too short): #{binary}")
+    acc
+  end
+
+  defp decode_tlv(<<>>, acc), do: acc
 
   defp decode_tag(0x00), do: :product_type
   defp decode_tag(0x01), do: :product_id
