@@ -119,6 +119,9 @@ defmodule Grizzly do
   * `:mode` - The connection mode to use when sending the command. Defaults to `:sync`.
     Using `:async` will result in the returned `Grizzly.Report` always having a type of
     `:queued_delay`.
+  * `:more_info` - If true, this will set the more info flag in the Z/IP Packet, which
+    will cause Z/IP Gateway to wait (at least) 3 seconds after sending the command before
+    putting the target node back to sleep. Only useful for wakeup devices. Default `false`.
   """
   @type command_opt() ::
           {:timeout, non_neg_integer()}
@@ -128,6 +131,7 @@ defmodule Grizzly do
           | {:supervision?, boolean()}
           | {:status_updates?, boolean()}
           | {:mode, Connection.mode()}
+          | {:more_info, boolean()}
 
   @type command :: atom()
 
