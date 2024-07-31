@@ -205,10 +205,6 @@ defmodule Grizzly.Connections.SyncConnection do
         {:continue, new_command_list} ->
           %State{state | commands: new_command_list}
 
-        {waiter, {:error, :nack_response, new_command_list}} ->
-          GenServer.reply(waiter, {:error, :nack_response})
-          %State{state | commands: new_command_list}
-
         {waiter, {%Report{} = report, new_command_list}} when is_pid(waiter) ->
           send(waiter, {:grizzly, :report, report})
           %State{state | commands: new_command_list}

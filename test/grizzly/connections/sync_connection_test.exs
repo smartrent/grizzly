@@ -4,7 +4,6 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   alias Grizzly.{Connection, Report}
   alias Grizzly.Connections.SyncConnection
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias GrizzlyTest.Utils
 
   setup do
     # establish the connections for the tests
@@ -23,7 +22,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, command} = SwitchBinaryGet.new()
 
     # 101 node_id will always return a nack_response
-    assert {:error, :nack_response} ==
+    assert {:ok, %Report{status: :complete, type: :nack_response, node_id: 101}} =
              SyncConnection.send_command(101, command)
   end
 

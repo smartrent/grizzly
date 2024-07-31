@@ -51,7 +51,15 @@ defmodule Grizzly.Connection do
 
     case mode do
       :sync ->
-        SyncConnection.send_command(node_id, command, opts)
+        # For sync commands, we want to return {:error, :nack_response} to preserve
+        # backwards compatibility.
+        case SyncConnection.send_command(node_id, command, opts) do
+          {:ok, %Grizzly.Report{status: :complete, type: :nack_response}} ->
+            {:error, :nack_response}
+
+          other ->
+            other
+        end
 
       :async ->
         # `AsyncConnection.send_command` always returns {:ok, ref}. We'll translate this
