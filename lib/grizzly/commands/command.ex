@@ -123,7 +123,7 @@ defmodule Grizzly.Commands.Command do
 
   @spec handle_zip_command(t(), ZWaveCommand.t()) ::
           {Report.t(), t()}
-          | {:error, :nack_response | :queue_full, t()}
+          | {:error, :queue_full, ZWaveCommand.t()}
           | {:retry, t()}
           | {:continue, t()}
   def handle_zip_command(command, zip_command) do
@@ -186,7 +186,7 @@ defmodule Grizzly.Commands.Command do
   end
 
   defp handle_nack_response(%__MODULE__{retries: 0} = command),
-    do: {:error, :nack_response, command}
+    do: make_nack_response(command)
 
   defp handle_nack_response(%__MODULE__{retries: n} = command),
     do: {:retry, %__MODULE__{command | retries: n - 1}}
@@ -293,6 +293,14 @@ defmodule Grizzly.Commands.Command do
            queued: true
          ), command}
     end
+  end
+
+  defp make_nack_response(command) do
+    {Report.new(:complete, :nack_response, command.node_id,
+       command_ref: command.ref,
+       queued: command.status == :queued,
+       transmission_stats: command.transmission_stats
+     ), %__MODULE__{command | status: :complete}}
   end
 
   defp build_complete_reply(command, response) do

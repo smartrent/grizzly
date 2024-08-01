@@ -8,6 +8,13 @@ defmodule Grizzly.Test do
   import ExUnit.CaptureLog, only: [capture_log: 2]
   import Grizzly, only: [is_virtual_device: 1]
 
+  setup do
+    # Close all connections after each test to prevent failures if multiple
+    # tests use the same node_id
+    on_exit(fn -> Grizzly.Connections.close_all() end)
+    :ok
+  end
+
   describe "SwitchBinary Commands" do
     @tag :integration
     test "SwitchBinarySet version 1" do
@@ -22,7 +29,7 @@ defmodule Grizzly.Test do
     end
 
     @tag :integration
-    test "SWitchBinaryGet" do
+    test "SwitchBinaryGet" do
       {:ok, switch_report} = SwitchBinaryReport.new(target_value: :off)
 
       assert {:ok,
@@ -34,6 +41,33 @@ defmodule Grizzly.Test do
   @tag :integration
   test "handles nack responses" do
     assert {:error, :nack_response} == Grizzly.send_command(101, :switch_binary_get)
+  end
+
+  @tag :integration
+  test "nack response to queued command (via sync connection)" do
+    test_queued_nack_response_handling(:sync)
+  end
+
+  @tag :integration
+  test "nack response to queued command (via async connection)" do
+    test_queued_nack_response_handling(:async)
+  end
+
+  defp test_queued_nack_response_handling(mode) do
+    assert {:ok,
+            %Grizzly.Report{
+              status: :inflight,
+              type: :queued_delay,
+              queued: true,
+              command_ref: ref
+            }} =
+             Grizzly.send_command(103, :switch_binary_set, [target_value: :on], mode: mode)
+
+    assert_receive {:grizzly, :report,
+                    %Grizzly.Report{status: :inflight, type: :queued_ping, command_ref: ^ref}}
+
+    assert_receive {:grizzly, :report,
+                    %Grizzly.Report{status: :complete, type: :nack_response, command_ref: ^ref}}
   end
 
   @tag :integration

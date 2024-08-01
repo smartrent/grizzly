@@ -38,8 +38,12 @@ defmodule Grizzly.Connections.CommandListTest do
 
     ack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
-    assert {self(), {:error, :nack_response, CommandList.empty()}} ==
+    pid = self()
+
+    assert {^pid, {report, %CommandList{}}} =
              CommandList.response_for_zip_packet(command_list, ack_response)
+
+    assert %Report{status: :complete, type: :nack_response, node_id: 1} = report
 
     refute Process.alive?(runner)
   end

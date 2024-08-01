@@ -54,7 +54,11 @@ defmodule GrizzlyTest.Server do
 
           # mark as sleeping node
           102 ->
-            send_nack_waiting(state.socket, return_port, zip_packet)
+            send_nack_waiting_then_report(state.socket, return_port, zip_packet)
+
+          # wakeup node that sends a nack waiting and then a nack response
+          103 ->
+            send_nack_waiting_then_nack_response(state.socket, return_port, zip_packet)
 
           # Node 201 is for testing starting a firmware update and uploading an image
           201 ->
@@ -150,6 +154,7 @@ defmodule GrizzlyTest.Server do
       {:ok, out_packet} = ZIPPacket.with_zwave_command(status_failed, seq_number, flag: nil)
 
       _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+      :ok
     end
 
     :ok
@@ -193,7 +198,7 @@ defmodule GrizzlyTest.Server do
     :ok
   end
 
-  defp send_nack_waiting(socket, port, incoming_zip_packet) do
+  defp send_nack_waiting_then_report(socket, port, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_waiting_response(seq_number, 2)
 
@@ -202,6 +207,26 @@ defmodule GrizzlyTest.Server do
     spawn(fn ->
       Process.sleep(2_000)
       maybe_send_a_report(socket, port, incoming_zip_packet)
+    end)
+
+    :ok
+  end
+
+  defp send_nack_waiting_then_nack_response(socket, port, incoming_zip_packet) do
+    seq_number = Command.param!(incoming_zip_packet, :seq_number)
+    out_packet = ZIPPacket.make_nack_waiting_response(seq_number, 3600)
+
+    send_packet(socket, port, out_packet)
+
+    spawn(fn ->
+      # send a queued_ping
+      Process.sleep(10)
+      send_packet(socket, port, out_packet)
+
+      # send a nack_response
+      Process.sleep(10)
+      out_packet = ZIPPacket.make_nack_response(seq_number)
+      send_packet(socket, port, out_packet)
     end)
 
     :ok

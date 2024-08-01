@@ -259,10 +259,6 @@ defmodule Grizzly.Connections.AsyncConnection do
 
           %State{state | commands: new_command_list}
 
-        {waiter, {:error, :nack_response, new_command_list}} ->
-          send(waiter, {:error, :nack_response})
-          %State{state | commands: new_command_list}
-
         {waiter, {%Report{} = report, new_command_list}} ->
           send(waiter, {:grizzly, :report, report})
           %State{state | commands: new_command_list}

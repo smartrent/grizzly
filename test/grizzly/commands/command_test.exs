@@ -127,8 +127,11 @@ defmodule Grizzly.Commands.CommandTest do
 
     nack_response = ZIPPacket.make_nack_response(grizzly_command.seq_number)
 
-    assert {:error, :nack_response, grizzly_command} ==
+    assert {report, grizzly_command} =
              Command.handle_zip_command(grizzly_command, nack_response)
+
+    assert %Report{status: :complete, type: :nack_response, node_id: 1} = report
+    assert grizzly_command.status == :complete
   end
 
   test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do

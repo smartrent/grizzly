@@ -71,7 +71,8 @@ defmodule Grizzly.Commands.CommandRunnerTest do
 
     nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
 
-    assert {:error, :nack_response} == CommandRunner.handle_zip_command(runner, nack_response)
+    assert %Report{status: :complete, type: :nack_response, node_id: 1} =
+             CommandRunner.handle_zip_command(runner, nack_response)
   end
 
   test "handles :nack_queue_full response" do
