@@ -47,7 +47,6 @@ defmodule Grizzly.Connections.CommandList do
           {:continue, t()}
           | {:retry, command_runner :: pid(), t()}
           | {command_waiter(), {Report.t(), t()}}
-          | {command_waiter(), {:error, :nack_response, t()}}
   def response_for_zip_packet(command_list, zip_packet) do
     case get_response_for_command(command_list, zip_packet) do
       {{:retry, command_runner}, command_list} ->
@@ -152,10 +151,6 @@ defmodule Grizzly.Connections.CommandList do
           # if the command says to continue we put it back into the command list
           :continue ->
             {:continue, [command | new_command_list]}
-
-          # if the command says it has a nack_response, we remove it from the command list
-          {:error, :nack_response} ->
-            {{:error, :nack_response, command}, new_command_list}
 
           # if the command says to retry we put it back into the command list
           :retry ->

@@ -82,7 +82,9 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     {:ok, nack_queue_full} =
       ZIPPacket.new(seq_number: CommandRunner.seq_number(runner), flag: :nack_queue_full)
 
-    assert {:error, :queue_full} == CommandRunner.handle_zip_command(runner, nack_queue_full)
+    assert %Grizzly.Report{status: :complete, type: :queue_full, queued: false} =
+             CommandRunner.handle_zip_command(runner, nack_queue_full)
+
     refute Process.alive?(runner)
   end
 
