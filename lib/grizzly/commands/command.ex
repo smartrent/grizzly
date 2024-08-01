@@ -123,7 +123,6 @@ defmodule Grizzly.Commands.Command do
 
   @spec handle_zip_command(t(), ZWaveCommand.t()) ::
           {Report.t(), t()}
-          | {:error, :queue_full, ZWaveCommand.t()}
           | {:retry, t()}
           | {:continue, t()}
   def handle_zip_command(command, zip_command) do
@@ -131,14 +130,11 @@ defmodule Grizzly.Commands.Command do
       :ack_response ->
         handle_ack_response(command, zip_command)
 
-      :nack_response ->
-        handle_nack_response(command, zip_command)
-
       :nack_waiting ->
         handle_nack_waiting(command, zip_command)
 
-      :nack_queue_full ->
-        {:error, :queue_full, zip_command}
+      flag when flag in [:nack_response, :nack_queue_full] ->
+        handle_final_nack(command, zip_command)
 
       flag when flag in [nil, :ack_request] ->
         do_handle_zip_command(command, zip_command)
@@ -175,21 +171,26 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp handle_nack_response(command, zip_packet) do
+  # Handles both nack response and nack queue full
+  defp handle_final_nack(command, zip_packet) do
+    flag = ZWaveCommand.param!(zip_packet, :flag)
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
-    if command.seq_number == seq_number do
-      handle_nack_response(command)
-    else
-      {:continue, command}
+    cond do
+      command.seq_number != seq_number ->
+        {:continue, command}
+
+      # Never retry on a nack_queue_full
+      flag == :nack_queue_full ->
+        make_queue_full_response(command)
+
+      command.retries > 0 ->
+        {:retry, %__MODULE__{command | retries: command.retries - 1}}
+
+      true ->
+        make_nack_response(command)
     end
   end
-
-  defp handle_nack_response(%__MODULE__{retries: 0} = command),
-    do: make_nack_response(command)
-
-  defp handle_nack_response(%__MODULE__{retries: n} = command),
-    do: {:retry, %__MODULE__{command | retries: n - 1}}
 
   defp handle_nack_waiting(command, zip_packet) do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
@@ -297,6 +298,14 @@ defmodule Grizzly.Commands.Command do
 
   defp make_nack_response(command) do
     {Report.new(:complete, :nack_response, command.node_id,
+       command_ref: command.ref,
+       queued: command.status == :queued,
+       transmission_stats: command.transmission_stats
+     ), %__MODULE__{command | status: :complete}}
+  end
+
+  defp make_queue_full_response(command) do
+    {Report.new(:complete, :queue_full, command.node_id,
        command_ref: command.ref,
        queued: command.status == :queued,
        transmission_stats: command.transmission_stats
