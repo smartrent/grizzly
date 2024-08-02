@@ -169,7 +169,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   end
 
   def handle_info({:error, :nack_response}, firmware_update) do
-    Logger.info(
+    Logger.debug(
       "[Grizzly] Received :nack_response while updating firmware of device #{firmware_update.device_id}. Ignoring it."
     )
 
@@ -196,7 +196,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
     case report do
       %Report{status: :complete, type: :command, command: nil} ->
-        Logger.warning(
+        Logger.debug(
           "[Grizzly] FW update report of type :command has no command: #{inspect(report)}. Ignoring it."
         )
 
