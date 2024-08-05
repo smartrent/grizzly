@@ -164,7 +164,9 @@ defmodule Grizzly.Transports.DTLS do
     port = Transport.assign(transport, :port)
     ip_address = Transport.assign(transport, :ip_address)
 
-    case :ssl.listen(port, dtls_opts(ip_address)) do
+    # Listen sockets should start in passive mode to avoid undefined behavior.
+    # See https://www.erlang.org/doc/apps/ssl/ssl.html#handshake/3
+    case :ssl.listen(port, dtls_opts(ip_address, active: false)) do
       {:ok, listening_socket} ->
         {:ok, Transport.assigns(transport, :socket, listening_socket), strategy: :accept}
 
@@ -190,12 +192,9 @@ defmodule Grizzly.Transports.DTLS do
   def handshake(transport) do
     socket = Transport.assign(transport, :socket)
 
-    case :ssl.handshake(socket) do
-      {:ok, socket} ->
-        {:ok, Transport.assigns(transport, :socket, socket)}
-
-      error ->
-        error
+    with {:ok, socket} <- :ssl.handshake(socket),
+         :ok <- :ssl.setopts(socket, active: true) do
+      {:ok, Transport.assigns(transport, :socket, socket)}
     end
   end
 
@@ -210,10 +209,10 @@ defmodule Grizzly.Transports.DTLS do
     {:ok, userstate}
   end
 
-  defp dtls_opts(ifaddr) do
+  defp dtls_opts(ifaddr, opts \\ []) do
     [
       {:ssl_imp, :new},
-      {:active, true},
+      {:active, Keyword.get(opts, :active, true)},
       {:verify, :verify_none},
       {:versions, [:"dtlsv1.2", :dtlsv1]},
       {:protocol, :dtls},
