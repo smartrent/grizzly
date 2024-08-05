@@ -71,6 +71,20 @@ defmodule Grizzly.Test do
   end
 
   @tag :integration
+  test "nack queue full (via sync connection)" do
+    assert {:error, :queue_full} = Grizzly.send_command(104, :switch_binary_get)
+  end
+
+  @tag :integration
+  test "nack queue full (via async connection)" do
+    assert {:ok, %Grizzly.Report{queued: true, command_ref: ref}} =
+             Grizzly.send_command(104, :switch_binary_get, [], mode: :async)
+
+    assert_receive {:grizzly, :report,
+                    %Grizzly.Report{status: :complete, type: :queue_full, command_ref: ^ref}}
+  end
+
+  @tag :integration
   test "command that timeouts" do
     assert {:ok, %Report{status: :complete, type: :timeout, node_id: 100}} =
              Grizzly.send_command(100, :switch_binary_get)

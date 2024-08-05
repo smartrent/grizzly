@@ -60,6 +60,9 @@ defmodule GrizzlyTest.Server do
           103 ->
             send_nack_waiting_then_nack_response(state.socket, return_port, zip_packet)
 
+          104 ->
+            send_nack_queue_full(state.socket, return_port, zip_packet)
+
           # Node 201 is for testing starting a firmware update and uploading an image
           201 ->
             send_ack_response(state.socket, return_port, zip_packet)
@@ -192,6 +195,16 @@ defmodule GrizzlyTest.Server do
   defp send_nack_response(socket, port, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_response(seq_number)
+
+    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+
+    :ok
+  end
+
+  defp send_nack_queue_full(socket, port, incoming_zip_packet) do
+    seq_number = Command.param!(incoming_zip_packet, :seq_number)
+    out_packet = ZIPPacket.make_nack_response(seq_number)
+    out_packet = Command.put_param(out_packet, :flag, :nack_queue_full)
 
     _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
 
