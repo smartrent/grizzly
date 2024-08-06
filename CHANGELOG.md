@@ -4,6 +4,22 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.4.0] - 2024-08-05
+
+### Fixed
+
+- Ignore invalid TLV segments when parsing SmartStart codes ([#950](https://github.com/smartrent/grizzly/pull/950))
+- Add missing `:more_info` option to `t:Grizzly.command_opt/0` ([#951](https://github.com/smartrent/grizzly/pull/951))
+- Fix connection crash when receiving NACK / Queue Full ([#953](https://github.com/smartrent/grizzly/pull/953))
+- Quiet down logs when ignoring fw update reports ([#954](https://github.com/smartrent/grizzly/pull/954))
+- Remove useless more info flag from ack responses ([#955](https://github.com/smartrent/grizzly/pull/955))
+- DTLS listen sockets start in passive mode ([#956](https://github.com/smartrent/grizzly/pull/956))
+- Fix Z/IP Gateway log prefix ([#957](https://github.com/smartrent/grizzly/pull/957))
+
+### Changed
+
+- Send a Grizzly.Report for nack responses to queued commands ([#952](https://github.com/smartrent/grizzly/pull/952))
+
 ## [v8.3.0] - 2024-07-17
 
 ### Changed
