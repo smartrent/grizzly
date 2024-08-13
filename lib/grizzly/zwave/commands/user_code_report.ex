@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeReport do
      [
        user_id: user_id,
        user_id_status: UserCode.user_id_status_from_byte(user_id_status_byte),
-       user_code: user_code_binary
+       user_code: String.trim_trailing(user_code_binary, <<0>>)
      ]}
   end
 end
