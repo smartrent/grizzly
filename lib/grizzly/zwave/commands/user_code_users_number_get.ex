@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :user_code_users_number_get,
@@ -26,12 +26,12 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

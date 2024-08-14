@@ -25,10 +25,10 @@ defmodule Grizzly.ZWave.CommandClasses.Powerlevel do
 
   @type status_of_operation :: :test_failed | :test_success | :test_in_progress
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x73
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :powerlevel
 
   def power_level_to_byte(:normal_power), do: 0x00

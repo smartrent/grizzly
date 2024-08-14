@@ -24,10 +24,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatOperatingState do
           | :aux_heat_stage_2
           | :aux_heat_stage_3
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x42
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :thermostat_operating_state
 
   @spec encode_state(state) :: byte

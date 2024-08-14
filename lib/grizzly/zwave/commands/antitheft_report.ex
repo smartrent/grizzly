@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
           | {:antitheft_hint, String.t()}
           | {:locking_entity_id, non_neg_integer}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     status_byte = Command.param!(command, :status) |> Antitheft.status_to_byte()
@@ -61,7 +61,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   # v3
   def decode_params(

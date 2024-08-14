@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:kex_fail_type, Security.key_exchange_fail_type()}
           | {:input_dsk, DSK.t()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param]) :: {:ok, Command.t()}
   def new(params \\ []) do
     # TODO: validate params
@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
     status = Command.param!(command, :status)
@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
     {:ok,
      [

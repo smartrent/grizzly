@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet do
 
   @type param :: {:user_identifier, byte()} | {:enabled, boolean()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_identifier = Command.param!(command, :user_identifier)
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet do
     <<user_identifier, status>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<user_identifier, enabled>>) do
     {:ok, [user_identifier: user_identifier, enabled: byte_to_status(enabled)]}
   end

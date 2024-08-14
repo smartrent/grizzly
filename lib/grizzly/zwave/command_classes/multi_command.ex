@@ -8,9 +8,9 @@ defmodule Grizzly.ZWave.CommandClasses.MultiCommand do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x8F
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :multi_cmd
 end

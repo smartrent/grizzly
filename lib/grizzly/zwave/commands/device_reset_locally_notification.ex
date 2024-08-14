@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.DeviceResetLocallyNotification do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.DeviceResetLocally
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :device_reset_locally_notification,
@@ -25,12 +25,12 @@ defmodule Grizzly.ZWave.Commands.DeviceResetLocallyNotification do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

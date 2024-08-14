@@ -8,9 +8,9 @@ defmodule Grizzly.ZWave.CommandClasses.CRC16Encap do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x56
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :crc_16_encap
 end

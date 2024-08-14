@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.SwitchMultilevel do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x26
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :switch_multilevel
 end

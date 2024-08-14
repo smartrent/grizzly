@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.MeterGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Meter
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :meter_get,
@@ -25,12 +25,12 @@ defmodule Grizzly.ZWave.Commands.MeterGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

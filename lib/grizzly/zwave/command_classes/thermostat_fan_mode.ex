@@ -22,10 +22,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatFanMode do
 
   alias Grizzly.ZWave.DecodeError
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x44
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :thermostat_fan_mode
 
   @spec encode_mode(mode) :: byte

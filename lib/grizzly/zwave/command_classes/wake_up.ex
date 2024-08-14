@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.WakeUp do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x84
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :wake_up
 end

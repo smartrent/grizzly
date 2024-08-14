@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   alias Grizzly.ZWave.{Command, DecodeError, NodeIdList}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     # TODO: validate params
     command = %Command{
@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     node_ids = encode_node_ids(Command.param!(command, :node_ids))
@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
     <<seq_number, status, controller_id>> <> node_ids
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<seq_number, status, controller_id, node_ids::binary>>) do
     case decode_status(status) do
       {:ok, status} ->

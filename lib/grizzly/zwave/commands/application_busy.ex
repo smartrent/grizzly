@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
   # give me some type specs for your params
   @type param :: {:status, ApplicationStatus.status()} | {:wait_time, :byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     status_byte = Command.param!(command, :status) |> ApplicationStatus.status_to_byte()
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
     <<status_byte, wait_time>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<status_byte, wait_time>>) do
     with {:ok, status} <- ApplicationStatus.status_from_byte(status_byte) do

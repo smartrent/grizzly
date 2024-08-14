@@ -22,10 +22,10 @@ defmodule Grizzly.ZWave.CommandClasses.ZwaveplusInfo do
 
   @type node_type :: :zwaveplus_node | :zwaveplus_for_ip_gateway
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x5E
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :zwaveplus_info
 
   def role_type_to_byte(:central_static_controller), do: 0x00

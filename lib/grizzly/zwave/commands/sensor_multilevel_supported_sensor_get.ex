@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SensorMultilevel
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :sensor_multilevel_supported_sensor_get,
@@ -24,12 +24,12 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

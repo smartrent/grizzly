@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
           | {:disconnected, boolean}
           | {:low_temperature, boolean}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     level = encode_level(Command.param!(command, :level))
     charging_status = Command.param(command, :charging_status)
@@ -84,7 +84,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # v1
   def decode_params(<<level_byte>>) do
     case level_from_byte(level_byte) do

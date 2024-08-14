@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeSet do
           | {:power_level, Powerlevel.power_level()}
           | {:test_frame_count, non_neg_integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     test_node_id = Command.param!(command, :test_node_id)
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeSet do
     <<test_node_id, power_level_byte, test_frame_count::16>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<test_node_id, power_level_byte, test_frame_count::16>>) do
     with {:ok, power_level} <- Powerlevel.power_level_from_byte(power_level_byte) do

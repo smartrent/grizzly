@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalReport do
 
   @type param :: {:seconds, non_neg_integer} | {:node_id, byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :wake_up_interval_report,
@@ -32,14 +32,14 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seconds = Command.param!(command, :seconds)
     node_id = Command.param!(command, :node_id)
     <<seconds::24, node_id>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<seconds::24, node_id>>) do
     {:ok, [seconds: seconds, node_id: node_id]}
   end

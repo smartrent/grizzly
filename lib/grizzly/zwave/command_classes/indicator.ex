@@ -104,10 +104,10 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
           | :low_power
           | :undefined
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x87
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :indicator
 
   def indicator_id_to_byte(:undefined), do: 0x00

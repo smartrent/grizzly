@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.DoorLock
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new(keyword()) :: {:ok, Command.t()}
   def new(params \\ []) do
     command = %Command{
@@ -27,13 +27,13 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, keyword()}
   def decode_params(_binary) do
     {:ok, []}

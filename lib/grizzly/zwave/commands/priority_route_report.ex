@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
           | {:repeaters, [byte]}
           | {:speed, NMIM.speed()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
     <<node_id, type_byte>> <> repeater_bytes <> <<speed_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<node_id, type_byte, repeater_bytes::binary-size(4), speed_byte>>) do
     with {:ok, type} <- NMIM.route_type_from_byte(type_byte),

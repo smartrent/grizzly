@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.SceneActivation do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x2B
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :scene_activation
 end

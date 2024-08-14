@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
           | {:duration, :unknown | non_neg_integer()}
           | {:session_id, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     more_status_updates_bit =
       Command.param!(command, :more_status_updates) |> encode_more_status_updates()
@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
     <<more_status_updates_bit::1, 0x00::1, session_id::6, status_byte, duration_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<more_status_updates_byte::1, _::1, session_id::6, status_byte, duration_byte>>
       ) do

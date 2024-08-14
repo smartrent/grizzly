@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport do
           | :successful_restarting
   @type param :: {:status, status} | {:wait_time, non_neg_integer}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :firmware_update_md_status_report,
@@ -42,14 +42,14 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     status_byte = Command.param!(command, :status) |> encode_status()
     wait_time = Command.param!(command, :wait_time)
     <<status_byte, wait_time::16>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<status_byte, wait_time::16>>) do
     with {:ok, status} <- decode_status(status_byte) do
       {:ok, [status: status, wait_time: wait_time]}

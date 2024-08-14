@@ -1,6 +1,6 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport do
   @moduledoc """
-  This command returns week day schedule report for the requested schedule slot ID for identified user. 
+  This command returns week day schedule report for the requested schedule slot ID for identified user.
 
   Params:
 
@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport do
           | {:stop_hour, 0..23}
           | {:stop_minute, 0..59}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_identifier = Command.param!(command, :user_identifier)
@@ -63,7 +63,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport do
       stop_minute>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<user_identifier, schedule_slot_id, day_of_week, start_hour, start_minute, stop_hour,

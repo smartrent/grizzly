@@ -5,9 +5,9 @@ defmodule Grizzly.ZWave.CommandClasses.Alarm do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x71
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :alarm
 end

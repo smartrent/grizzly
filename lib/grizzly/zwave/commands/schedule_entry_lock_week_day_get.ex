@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet do
 
   @type param :: {:user_identifier, byte()} | {:schedule_slot_id, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_identifier = Command.param!(command, :user_identifier)
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet do
     <<user_identifier, schedule_slot_id>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<user_identifier, schedule_slot_id>>) do
     {:ok, [user_identifier: user_identifier, schedule_slot_id: schedule_slot_id]}

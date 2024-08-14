@@ -10,10 +10,10 @@ defmodule Grizzly.ZWave.CommandClasses.Time do
 
   @type sign :: :plus | :minus
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x8A
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :time
 
   def encode_sign(:plus), do: 0

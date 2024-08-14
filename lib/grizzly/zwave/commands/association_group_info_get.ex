@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoGet do
 
   @type param :: {:all, boolean} | {:refresh_cache, boolean} | {:group_id, byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     all? = Command.param!(command, :all)
     all_bit = if all?, do: 0x01, else: 0x00
@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoGet do
     <<refresh_cache_bit::1, all_bit::1, 0x00::6, group_id>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<refresh_cache_bit::1, all_bit::1, 0x00::6, group_id>>) do
     {:ok, [refresh_cache: refresh_cache_bit == 0x01, all: all_bit == 0x01, group_id: group_id]}
   end

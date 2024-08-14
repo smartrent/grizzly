@@ -24,6 +24,7 @@
         {Credo.Check.Design.TagTODO, false},
         {Credo.Check.Refactor.LongQuoteBlocks, []},
         {Credo.Check.Refactor.Nesting, max_nesting: 3},
+        {Credo.Check.Readability.ImplTrue, []},
 
         ### Below are checks we will want to enable at later date ###
         {Credo.Check.Refactor.WithClauses, false},

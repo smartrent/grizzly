@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   @type duration :: non_neg_integer | :unknown
   @type param :: {:value, value()} | {:target_value, value()} | {:duration, duration()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     value_byte = Command.param!(command, :value) |> encode_value()
@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # v1
   def decode_params(<<value_byte>>) do
     case value_from_byte(value_byte, :value) do

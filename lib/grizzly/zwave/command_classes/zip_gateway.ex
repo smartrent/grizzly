@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.ZIPGateway do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x5F
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :zip_gateway
 end

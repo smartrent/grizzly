@@ -86,7 +86,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
           | {:target_mode, DoorLock.mode()}
           | {:duration, :unknown | non_neg_integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -100,7 +100,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     mode = Command.param!(command, :mode)
@@ -134,7 +134,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<mode_byte, outside_handles_int::4, inside_handles_int::4, door_condition_byte,

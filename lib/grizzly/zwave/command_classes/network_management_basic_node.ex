@@ -9,10 +9,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode do
   @type add_mode :: :learn | :add
   @type network_update_request_status :: :done | :abort | :wait | :disabled | :overflow
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x4D
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :network_management_basic_node
 
   @spec add_mode_to_byte(add_mode()) :: byte()

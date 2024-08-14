@@ -5,14 +5,14 @@ defmodule Grizzly.CommandHandlers.AckResponse do
   """
   @behaviour Grizzly.CommandHandler
 
-  @impl true
+  @impl Grizzly.CommandHandler
   def init(_) do
     {:ok, nil}
   end
 
-  @impl true
+  @impl Grizzly.CommandHandler
   def handle_ack(_), do: {:complete, :ok}
 
-  @impl true
+  @impl Grizzly.CommandHandler
   def handle_command(_, state), do: {:continue, state}
 end

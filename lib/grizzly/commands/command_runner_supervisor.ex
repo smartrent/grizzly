@@ -25,7 +25,7 @@ defmodule Grizzly.Commands.CommandRunnerSupervisor do
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
-  @impl true
+  @impl DynamicSupervisor
   def init(_) do
     DynamicSupervisor.init(strategy: :one_for_one)
   end

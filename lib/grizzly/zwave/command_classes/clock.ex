@@ -12,10 +12,10 @@ defmodule Grizzly.ZWave.CommandClasses.Clock do
   @type weekday ::
           :sunday | :monday | :tuesday | :wednesday | :thursday | :friday | :saturday | :unknown
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x81
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :clock
 
   @spec encode_weekday(weekday()) :: byte

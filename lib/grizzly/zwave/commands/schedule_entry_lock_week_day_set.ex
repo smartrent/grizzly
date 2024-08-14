@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
           | {:stop_hour, 0..23}
           | {:stop_minute, 0..59}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     set_action = Command.param!(command, :set_action)
@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
       stop_hour, stop_minute>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<action_byte, user_identifier, schedule_slot_id, day_of_week, start_hour, start_minute,

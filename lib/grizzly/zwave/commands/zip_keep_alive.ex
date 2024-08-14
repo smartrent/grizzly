@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
 
   @type param :: {:ack_flag, ack_flag()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new(keyword()) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -31,13 +31,13 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(params) do
     ack_flag = Command.param!(params, :ack_flag)
     <<encode_ack_flag(ack_flag)>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<1::1, _::7>>), do: {:ok, [ack_flag: :ack_request]}
   def decode_params(<<0::1, 1::1, _::6>>), do: {:ok, [ack_flag: :ack_response]}
 

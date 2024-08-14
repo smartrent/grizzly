@@ -10,10 +10,10 @@ defmodule Grizzly.ZWave.CommandClasses.MultiChannel do
 
   @type end_point :: 1..127
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x60
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :multi_channel
 
   @spec decode_generic_device_class(byte) :: {:ok, DeviceClasses.generic_device_class()}

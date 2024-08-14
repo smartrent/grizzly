@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.BasicSet do
 
   @type param :: {:value, :on | :off}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :basic_set,
@@ -29,13 +29,13 @@ defmodule Grizzly.ZWave.Commands.BasicSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     value_byte = encode_value(Command.param!(command, :value))
     <<value_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<value_byte>>) do
     case value_from_byte(value_byte) do
       {:ok, value} ->

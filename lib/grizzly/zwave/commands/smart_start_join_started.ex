@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStarted do
           {:seq_number, Grizzly.ZWave.seq_number()}
           | {:dsk, DSK.t()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStarted do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     dsk = Command.param!(command, :dsk)
@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStarted do
     <<seq_number, 0x00::3, dsk_byte_size::5>> <> dsk.raw
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<seq_number, _::3, dsk_byte_size::5, dsk_binary::binary-size(dsk_byte_size)-unit(8)>>
       ) do

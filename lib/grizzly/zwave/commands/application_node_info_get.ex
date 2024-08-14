@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoGet do
   alias Grizzly.ZWave.{Command, DecodeError}
   alias Grizzly.ZWave.CommandClasses.ZIPGateway
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new(keyword()) :: {:ok, Command.t()}
   def new(params \\ []) do
     command = %Command{
@@ -24,13 +24,13 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
   def decode_params(_binary) do
     {:ok, []}

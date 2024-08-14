@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.AlarmSet do
 
   @type param :: {:zwave_type, Notifications.type()} | {:status, Notifications.status()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.AlarmSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     zwave_type = Command.param!(command, :zwave_type)
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.AlarmSet do
     <<zwave_type_byte, status_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<zwave_type_byte, status_byte>>) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),

@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatus do
           | {:kex_fail_type, Security.key_exchange_fail_type()}
           | {:dsk, DSK.t()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :learn_mode_set_status,
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatus do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     status_byte = Command.param!(command, :status) |> encode_status()
@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatus do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<seq_number, status_byte, 0x00, new_node_id>>) do
     with {:ok, status} <- decode_status(status_byte) do
       {:ok, [seq_number: seq_number, status: status, new_node_id: new_node_id]}

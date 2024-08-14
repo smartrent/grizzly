@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.TimeParametersSet do
           | {:minute_utc, 0..59}
           | {:second_utc, 0..59}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.TimeParametersSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     year = Command.param!(command, :year)
     month = Command.param!(command, :month)
@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.TimeParametersSet do
     <<year::16, month, day, hour_utc, minute_utc, second_utc>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<year::16, month, day, hour_utc, minute_utc, second_utc>>) do
     {:ok,
      [

@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
           | {:return_interview_status, :on | :off}
           | {:mode, mode}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :learn_mode_set,
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
 
@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
     <<seq_number, 0x00::7, return_interview_status_bit::1, mode_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, 0x00::7, return_interview_status_bit::1, mode_byte>>) do
     return_interview_status = decode_return_interview_status(return_interview_status_bit)

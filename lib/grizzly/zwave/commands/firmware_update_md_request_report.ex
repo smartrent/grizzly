@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
           | :insufficient_battery_level
   @type param :: {:status, status}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -38,13 +38,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     status_byte = Command.param!(command, :status) |> encode_status()
     <<status_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<status_byte>>) do
     with {:ok, status} <- decode_status(status_byte) do
       {:ok, [status: status]}

@@ -8,9 +8,9 @@ defmodule Grizzly.ZWave.CommandClasses.DeviceResetLocally do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x5A
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :device_reset_locally
 end

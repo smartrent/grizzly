@@ -12,10 +12,10 @@ defmodule Grizzly.ZWave.CommandClasses.SceneActuatorConf do
   @type dimming_duration :: :instantly | [seconds: 1..127] | [minutes: 1..127] | :factory_settings
   @type level :: :on | :off | 1..99
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x2C
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :scene_actuator_conf
 
   @spec dimming_duration_to_byte(dimming_duration) :: byte

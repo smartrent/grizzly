@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorGet do
 
   @type param :: {:indicator_id, Indicator.indicator_id()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     indicator_id = Command.param(command, :indicator_id)
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorGet do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<>>) do
     {:ok, []}

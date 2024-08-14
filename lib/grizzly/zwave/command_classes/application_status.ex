@@ -10,10 +10,10 @@ defmodule Grizzly.ZWave.CommandClasses.ApplicationStatus do
 
   @type status :: :try_again_later | :try_again_after_wait | :request_queued
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x22
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :application_status
 
   def status_to_byte(:try_again_later), do: 0x00

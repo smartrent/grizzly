@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
   @type param ::
           {:seq_number, ZWave.seq_number()} | {:add_mode, NetworkManagementBasicNode.add_mode()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
     <<seq_number, add_mode>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(<<seq_number, _::7, add_mode_bit::1>>) do
     {:ok,

@@ -14,10 +14,10 @@ defmodule Grizzly.ZWave.CommandClasses.MultiChannelAssociation do
 
   @type node_endpoint :: [node: ZWave.node_id(), bit_address: 0 | 1, endpoint: 1..127]
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x8E
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :multi_channel_association
 
   @spec encode_node_endpoints([node_endpoint]) :: binary

@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDGet do
 
   @type param :: {:number_of_reports, byte} | {:report_number, non_neg_integer}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :firmware_update_md_get,
@@ -31,14 +31,14 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     number_of_reports = Command.param!(command, :number_of_reports)
     report_number = Command.param!(command, :report_number)
     <<number_of_reports, 0x00::1, report_number::15>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<number_of_reports, _::1, report_number::15>>) do
     {:ok, [number_of_reports: number_of_reports, report_number: report_number]}
   end

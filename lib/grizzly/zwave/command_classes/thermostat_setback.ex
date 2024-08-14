@@ -13,10 +13,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetback do
   @type type :: :no_override | :temporary_override | :permanent_override
   @type state :: number | :frost_protection | :energy_saving
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x47
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :thermostat_setback
 
   @spec encode_type(type) :: byte

@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
 
   @type param :: {:supported_users, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     extended_supported_users = Command.param(command, :extended_supported_users)
 
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # Version 1
   def decode_params(<<supported_users>>) do
     {:ok, [supported_users: supported_users]}

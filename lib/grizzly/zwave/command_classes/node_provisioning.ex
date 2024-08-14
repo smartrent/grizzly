@@ -11,10 +11,10 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
   alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.SmartStart.MetaExtension
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x78
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :node_provisioning
 
   def encode_meta_extensions(meta_extensions),

@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.ClockReport do
 
   @type param :: {:weekday, Clock.weekday()} | {:hour, 0..23} | {:minute, 0..59}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.ClockReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     encoded_weekday = Command.param!(command, :weekday) |> Clock.encode_weekday()
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.ClockReport do
     <<encoded_weekday::3, hour::5, minute>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<encoded_weekday::3, hour::5, minute>>) do
     with {:ok, weekday} <- Clock.decode_weekday(encoded_weekday) do

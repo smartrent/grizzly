@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
           | {:specific_device_class, DeviceClasses.specific_device_class()}
           | {:command_classes, [CommandClasses.command_class()]}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     end_point = Command.param!(command, :end_point)
     dynamic_bit = encode_dynamic?(Command.param!(command, :dynamic?))
@@ -62,7 +62,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
       encode_command_classes(command_classes)
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
         <<dynamic_bit::1, end_point::7, generic_device_class_byte, specific_device_class_byte,

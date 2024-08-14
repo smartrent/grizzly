@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
   @type device_id :: String.t()
   @type param :: {:device_id_type, device_id_type} | {:device_id, device_id}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :manufacturer_specific_device_specific_report,
@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<0x00::5, device_id_type_byte::3, device_id_data_format::3, device_id_data_length::5,
           device_id_integer::size(device_id_data_length)-unit(8)>>
@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     device_id_type = Command.param!(command, :device_id_type)
     device_id = Command.param!(command, :device_id)
