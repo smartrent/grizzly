@@ -13,7 +13,6 @@ defmodule Grizzly.ZIPGateway.Config do
           ca_cert: Path.t(),
           cert: Path.t(),
           priv_key: Path.t(),
-          eeprom_file: Path.t() | nil,
           tun_script: Path.t(),
           pvs_storage_file: Path.t(),
           provisioning_config_file: Path.t(),
@@ -37,7 +36,6 @@ defmodule Grizzly.ZIPGateway.Config do
   defstruct ca_cert: "./Portal.ca_x509.pem",
             cert: "./ZIPR.x509_1024.pem",
             priv_key: "./ZIPR.key_1024.pem",
-            eeprom_file: nil,
             tun_script: "./zipgateway.tun",
             pvs_storage_file: "/root/provisioning_list_store.dat",
             provisioning_config_file: "/data/zipgateway_provisioning_list.cfg",
@@ -74,7 +72,6 @@ defmodule Grizzly.ZIPGateway.Config do
         :lan_ip,
         :pan_ip,
         :database_file,
-        :eeprom_file,
         :rf_region,
         :power_level,
         :extra_config
@@ -117,7 +114,6 @@ defmodule Grizzly.ZIPGateway.Config do
     |> maybe_put_config_item(cfg, :lan_ip, "ZipLanIp6")
     |> maybe_put_config_item(cfg, :unsolicited_destination, nil)
     |> maybe_put_config_item(cfg, :database_file, "ZipGwDatabase")
-    |> maybe_put_config_item(cfg, :eeprom_file, "Eepromfile")
     |> maybe_put_config_item(cfg, :identify_script, "ZipNodeIdentifyScript")
     |> maybe_put_config_item(cfg, :rf_region, "ZWRFRegion")
     |> maybe_put_config_item(cfg, :power_level, "")

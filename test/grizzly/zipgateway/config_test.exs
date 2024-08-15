@@ -28,30 +28,6 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     assert output == Config.to_string(cfg)
   end
 
-  test "with eeprom_file" do
-    output = """
-    ZipCaCert=./Portal.ca_x509.pem
-    ZipCert=./ZIPR.x509_1024.pem
-    ZipPrivKey=./ZIPR.key_1024.pem
-    TunScript=./zipgateway.tun
-    PVSStorageFile=/root/provisioning_list_store.dat
-    ProvisioningConfigFile=/data/zipgateway_provisioning_list.cfg
-    ZipLanGw6=::1
-    ZipPSK=123456789012345678901234567890AA
-    ExtraClasses= 133 89 90 142 108 143
-    ZipPanIp6=fd00:bbbb::1
-    ZipLanIp6=fd00:aaaa::1
-    ZipUnsolicitedDestinationIp6=fd00:aaaa::2
-    ZipUnsolicitedDestinationPort=41230
-    Eepromfile=/data/zipeeprom.dat
-    ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
-    """
-
-    cfg = Config.new(%{eeprom_file: "/data/zipeeprom.dat"})
-
-    assert output == Config.to_string(cfg)
-  end
-
   test "when options are added as string" do
     output = """
     ZipCaCert=./Portal.ca_x509.pem

@@ -115,9 +115,6 @@ defmodule Grizzly.Supervisor do
   - `:database_file` - `zipgateway` >= 7.14.2 uses an sqlite database to store
     information about the Z-Wave network. This will default to
     "/data/zipgateway.db".
-  - `:eeprom_file` - `zipgateway` < 7.14.2 uses an eeprom file to store
-    information about the Z-Wave network. This will default to
-    "/data/zipeeprom.dat".
   - `:indicator_handler` - A function to run when an `Grizzly.Indicator.event()`
     is received from `zipgateway`. The function should accept an event and
     return `:ok`.
@@ -157,7 +154,6 @@ defmodule Grizzly.Supervisor do
           | {:firmware_update_handler, Grizzly.handler()}
           | {:unsolicited_destination, {:inet.ip_address(), :inet.port_number()}}
           | {:unsolicited_data_path, Path.t()}
-          | {:eeprom_file, Path.t()}
           | {:database_file, Path.t()}
           | {:indicator_handler, (Grizzly.Indicator.event() -> :ok)}
           | {:rf_region, rf_region()}
