@@ -68,7 +68,10 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
       parse_noise_floor(remote_noise_floor)}, rest}
   end
 
-  def ime_from_binary(<<0x0B, 0x05, hop1, hop2, hop3, hop4, hop5, rest::binary>>) do
+  def ime_from_binary(
+        <<0x0B, 0x05, hop1::signed, hop2::signed, hop3::signed, hop4::signed, hop5::signed,
+          rest::binary>>
+      ) do
     {{:outgoing_rssi_hops,
       [
         parse_rssi_hop(hop1),

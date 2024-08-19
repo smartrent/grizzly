@@ -172,10 +172,17 @@ defmodule Grizzly.Commands.CommandTest do
     assert Keyword.get(transmission_stats, :last_working_route) == [1001, 1002, 1003, 1004]
     assert Keyword.get(transmission_stats, :transmission_speed) == {9999, :kbit}
     # ensure filtering of unused transmission stats
-    assert Keyword.get(transmission_stats, :local_node_tx_power) == nil
-    assert Keyword.get(transmission_stats, :remote_node_tx_power) == nil
-    assert Keyword.get(transmission_stats, :local_noise_floor) == nil
-    assert Keyword.get(transmission_stats, :remote_noise_floor) == nil
-    assert Keyword.get(transmission_stats, :outgoing_rssi_hops) == nil
+    assert Keyword.get(transmission_stats, :local_node_tx_power) == -80
+    assert Keyword.get(transmission_stats, :remote_node_tx_power) == -90
+    assert Keyword.get(transmission_stats, :local_noise_floor) == -85
+    assert Keyword.get(transmission_stats, :remote_noise_floor) == -91
+
+    assert Keyword.get(transmission_stats, :outgoing_rssi_hops) == [
+             -40,
+             -50,
+             :max_power_saturated,
+             :not_available,
+             :not_available
+           ]
   end
 end
