@@ -154,6 +154,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
     |> parse_additional_node_info(more_info, command_class_length)
   end
 
+  # node_info_length can be 1 (note that it's self-inclusive) when an inclusion error
+  # occurs as no node info is available
+  def parse_node_info(<<1>>), do: %{}
+
   defp parse_additional_node_info(node_info, additional_info, command_class_length)
        when command_class_length <= 0 or byte_size(additional_info) == 0,
        do: node_info |> Map.put(:command_classes, [])
