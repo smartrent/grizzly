@@ -143,6 +143,13 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       :ack_response ->
         {:noreply, firmware_update}
 
+      :nack_response ->
+        Logger.info(
+          "[Grizzly] Ignoring nack_response while updating firmware of device #{firmware_update.device_id}"
+        )
+
+        {:noreply, firmware_update}
+
       :timeout ->
         Logger.info(
           "[Grizzly] Updating firmware of device #{firmware_update.device_id} failed: timed out: timeout."
