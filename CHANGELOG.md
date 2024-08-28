@@ -4,6 +4,24 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.5.0] - 2024-08-05
+
+### Added
+
+* Implement Configuration Info Get/Report ([#961](https://github.com/smartrent/grizzly/pull/961))
+
+### Fixed
+
+* Ignore nack_response when updating device firmware instead of crashing ([#966](https://github.com/smartrent/grizzly/pull/966))
+* Do not strip Z-Wave LR transmission stats ([#963](https://github.com/smartrent/grizzly/pull/963))
+* Handle empty node info in (Extended) Node Add Status ([#964](https://github.com/smartrent/grizzly/pull/964))
+* Fix encoding of Node Provisioning Set command ([#962](https://github.com/smartrent/grizzly/pull/962))
+* Trim trailing null bytes from User Code Report ([#959](https://github.com/smartrent/grizzly/pull/959))
+
+### Changed
+
+* Remove support for Z/IP Gateway EEPROM migration ([#960](https://github.com/smartrent/grizzly/pull/960))
+
 ## [v8.4.0] - 2024-08-05
 
 ### Fixed
@@ -2542,6 +2560,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.5.0]: https://github.com/smartrent/grizzly/compare/v8.4.0..v8.5.0
+[v8.4.0]: https://github.com/smartrent/grizzly/compare/v8.3.0..v8.4.0
 [v8.3.0]: https://github.com/smartrent/grizzly/compare/v8.2.3..v8.3.0
 [v8.2.3]: https://github.com/smartrent/grizzly/compare/v8.2.2..v8.2.3
 [v8.2.2]: https://github.com/smartrent/grizzly/compare/v8.2.1..v8.2.2
