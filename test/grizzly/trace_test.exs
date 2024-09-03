@@ -24,18 +24,22 @@ defmodule Grizzly.TraceTest do
     Trace.log(tracer, ZWave.to_binary(zip_packet), [])
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 2)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), src: "src1", dest: "dest1")
+    Trace.log(tracer, ZWave.to_binary(zip_packet), src: :grizzly, dest: 5)
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 3)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), src: "src2", dest: "dest2")
+    Trace.log(tracer, ZWave.to_binary(zip_packet), src: 6, dest: :grizzly)
 
     list = Trace.list(tracer)
     assert length(list) == 2
 
     assert [
-             %{binary: <<_::32, 2, _::binary>>, src: "src1", dest: "dest1"},
-             %{binary: <<_::32, 3, _::binary>>, src: "src2", dest: "dest2"}
+             %{binary: <<_::32, 2, _::binary>>, src: :grizzly, dest: 5},
+             %{binary: <<_::32, 3, _::binary>>, src: 6, dest: :grizzly}
            ] = list
+
+    list = Trace.list(tracer, node_id: 5)
+    assert length(list) == 1
+    assert [%{binary: <<_::32, 2, _::binary>>, src: :grizzly, dest: 5}] = list
   end
 
   @tag size: 1

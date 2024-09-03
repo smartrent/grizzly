@@ -31,6 +31,7 @@ defmodule Grizzly.Transport do
   @type args() :: [
           ip_address: :inet.ip_address(),
           port: :inet.port_number(),
+          node_id: Grizzly.node_id(),
           transport: t()
         ]
 
@@ -155,9 +156,10 @@ defmodule Grizzly.Transport do
 
   @spec node_id(t()) :: {:ok, Grizzly.node_id()} | {:error, any()}
   def node_id(transport) do
-    case peername(transport) do
+    case assign(transport, :node_id) || peername(transport) do
       {:ok, {ip, _}} -> {:ok, ZIPGateway.node_id_from_ip(ip)}
       {:error, reason} -> {:error, reason}
+      node_id -> {:ok, node_id}
     end
   end
 

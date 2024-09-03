@@ -13,7 +13,7 @@ defmodule Grizzly.Trace.Record do
           timestamp: Time.t(),
           binary: binary(),
           src: Trace.src() | nil,
-          dest: Trace.src() | nil
+          dest: Trace.dest() | nil
         }
 
   @type opt() :: {:src, Trace.src()} | {:dest, Trace.dest()} | {:timestamp, Time.t()}
@@ -49,8 +49,9 @@ defmodule Grizzly.Trace.Record do
 
   def to_string(record, :text) do
     %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
+    ts = Time.truncate(ts, :millisecond)
 
-    prefix = "#{Time.to_string(ts)} #{src_dest_to_string(src)} #{src_dest_to_string(dest)}"
+    prefix = "#{Time.to_string(ts)} #{src_to_string(src)} -> #{dest_to_string(dest)}"
 
     case ZWave.from_binary(binary) do
       {:ok, zip_packet} ->
@@ -66,17 +67,23 @@ defmodule Grizzly.Trace.Record do
 
     time = ts |> Time.truncate(:millisecond) |> Time.to_string()
 
-    "#{time} #{src_dest_to_string(src)} -> #{src_dest_to_string(dest)}: #{inspect(binary, limit: 500)}"
+    "#{time} #{src_to_string(src)} -> #{dest_to_string(dest)}: #{inspect(binary, limit: 500)}"
   end
 
-  defp src_dest_to_string(nil) do
-    Enum.reduce(1..18, "", fn _, str -> str <> " " end)
-  end
+  defp src_to_string(:grizzly), do: src_to_string("G")
+  defp src_to_string(src), do: src |> Kernel.to_string() |> String.pad_leading(3)
 
-  defp src_dest_to_string(src_or_dest), do: src_or_dest
+  defp dest_to_string(:grizzly), do: dest_to_string("G")
+  defp dest_to_string(dest), do: dest |> Kernel.to_string() |> String.pad_trailing(3)
 
-  defp command_info_str(%Command{name: :keep_alive}, _binary) do
-    "    keep_alive"
+  defp command_info_str(%Command{name: :keep_alive} = cmd, _binary) do
+    case Command.param!(cmd, :ack_flag) do
+      :ack_request ->
+        "    keep_alive (ack req)"
+
+      _ ->
+        "    keep_alive (ack resp)"
+    end
   end
 
   defp command_info_str(zip_packet, binary) do
@@ -134,15 +141,6 @@ defmodule Grizzly.Trace.Record do
   end
 
   defp seq_number_to_str(seq_number) do
-    case seq_number do
-      seq_number when seq_number < 10 ->
-        "#{seq_number}  "
-
-      seq_number when seq_number < 100 ->
-        "#{seq_number} "
-
-      seq_number ->
-        "#{seq_number}"
-    end
+    String.pad_trailing(Kernel.to_string(seq_number), 4, " ")
   end
 end

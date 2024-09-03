@@ -63,7 +63,8 @@ defmodule Grizzly.Connections.SyncConnection do
 
     transport_opts = [
       ip_address: host,
-      port: grizzly_options.zipgateway_port
+      port: grizzly_options.zipgateway_port,
+      node_id: node_id_or_gateway
     ]
 
     case Transport.open(transport_impl, transport_opts) do

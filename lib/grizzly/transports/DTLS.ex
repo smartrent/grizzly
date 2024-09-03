@@ -9,18 +9,27 @@ defmodule Grizzly.Transports.DTLS do
   alias Grizzly.Transport.Response
   require Logger
 
-  @grizzly_ip :inet.ntoa({0xFD00, 0xAAAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02})
-  @grizzly_port 41230
-
   @impl Grizzly.Transport
   def open(args) do
     ip_address = Keyword.fetch!(args, :ip_address)
     port = Keyword.fetch!(args, :port)
     ifaddr = {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}
 
+    node_id =
+      case Keyword.fetch!(args, :node_id) do
+        :gateway -> 1
+        node_id -> node_id
+      end
+
     case :ssl.connect(ip_address, port, dtls_opts(ifaddr), 10_000) do
       {:ok, socket} ->
-        {:ok, Transport.new(__MODULE__, %{socket: socket, port: port, ip_address: ip_address})}
+        {:ok,
+         Transport.new(__MODULE__, %{
+           socket: socket,
+           port: port,
+           ip_address: ip_address,
+           node_id: node_id
+         })}
 
       {:error, _} = error ->
         error
@@ -34,9 +43,8 @@ defmodule Grizzly.Transports.DTLS do
     # `:trace` can explicitly be set to false to disable tracing on a particular
     # command
     if Keyword.get(opts, :trace, true) do
-      ip = Transport.assign(transport, :ip_address, "")
-      port = Transport.assign(transport, :port)
-      maybe_write_trace(:outgoing, ip, port, binary)
+      {:ok, node_id} = Transport.node_id(transport)
+      maybe_write_trace(:outgoing, node_id, binary)
     end
 
     :ssl.send(socket, binary)
@@ -45,12 +53,13 @@ defmodule Grizzly.Transports.DTLS do
   @impl Grizzly.Transport
   # Erlang/OTP <= 23.1.x
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, port}, _}}, :dtls_connection}, _}, bin_list},
+        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _port}, _}}, :dtls_connection}, _}, bin_list},
         opts
       ) do
     binary = :erlang.list_to_binary(bin_list)
 
-    maybe_write_trace(:incoming, ip, port, binary)
+    {:ok, node_id} = Transport.node_id(opts[:transport])
+    maybe_write_trace(:incoming, node_id, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -70,18 +79,19 @@ defmodule Grizzly.Transports.DTLS do
 
   # Erlang/OTP >= 23.2
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {{ip, port}, _}, :dtls_gen_connection}, _}, bin_list},
+        {:ssl, {:sslsocket, {:gen_udp, {{ip, _port}, _}, :dtls_gen_connection}, _}, bin_list},
         opts
       ) do
-    handle_ssl_message_with_ip(ip, port, bin_list, opts)
+    handle_ssl_message_with_ip(ip, bin_list, opts)
   end
 
   # Erlang/OTP >= 23.2
   def parse_response(
-        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, port}, _}}, :dtls_gen_connection}, _}, bin_list},
+        {:ssl, {:sslsocket, {:gen_udp, {_, {{ip, _port}, _}}, :dtls_gen_connection}, _},
+         bin_list},
         opts
       ) do
-    handle_ssl_message_with_ip(ip, port, bin_list, opts)
+    handle_ssl_message_with_ip(ip, bin_list, opts)
   end
 
   def parse_response(
@@ -91,9 +101,8 @@ defmodule Grizzly.Transports.DTLS do
     transport = Keyword.get(opts, :transport)
     binary = :erlang.list_to_binary(bin_list)
 
-    {:ok, {ip, port}} = get_sockname(transport)
-
-    maybe_write_trace(:incoming, ip, port, binary)
+    {:ok, node_id} = Transport.node_id(transport)
+    maybe_write_trace(:incoming, node_id, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -111,7 +120,6 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   def parse_response({:ssl_error, _, {:tls_alert, {:unexpected_message, _message}}}, _opts) do
-    Logger.debug("[Grizzly] Connection closed due to TLS Alert (unexpected message)")
     {:ok, :connection_closed}
   end
 
@@ -119,18 +127,11 @@ defmodule Grizzly.Transports.DTLS do
     {:ok, :connection_closed}
   end
 
-  defp get_sockname(nil) do
-    {:ok, {"unk", "unk"}}
-  end
-
-  defp get_sockname(transport) do
-    socket = Transport.assign(transport, :socket)
-    :ssl.sockname(socket)
-  end
-
-  defp handle_ssl_message_with_ip(ip, port, binary_list, opts) do
+  defp handle_ssl_message_with_ip(ip, binary_list, opts) do
+    transport = Keyword.get(opts, :transport)
     binary = :erlang.list_to_binary(binary_list)
-    maybe_write_trace(:incoming, ip, port, binary)
+    {:ok, node_id} = Transport.node_id(transport)
+    maybe_write_trace(:incoming, node_id, binary)
 
     case parse_zip_packet(binary, opts) do
       {:ok, bin} when is_binary(bin) ->
@@ -192,7 +193,7 @@ defmodule Grizzly.Transports.DTLS do
   def handshake(transport) do
     socket = Transport.assign(transport, :socket)
 
-    with {:ok, socket} <- :ssl.handshake(socket),
+    with {:ok, socket} <- :ssl.handshake(socket, 10_000),
          :ok <- :ssl.setopts(socket, active: true) do
       {:ok, Transport.assigns(transport, :socket, socket)}
     end
@@ -229,28 +230,9 @@ defmodule Grizzly.Transports.DTLS do
     ]
   end
 
-  defp maybe_write_trace(in_or_out, ip, port, binary) do
-    ip_port_str = make_ip_port_str(ip, port)
-    grizzly_ip_port_string = "[#{@grizzly_ip}]:#{@grizzly_port}"
+  defp maybe_write_trace(:incoming, node_id, binary),
+    do: Trace.log(binary, src: node_id, dest: :grizzly)
 
-    case in_or_out do
-      :incoming ->
-        Trace.log(binary, src: ip_port_str, dest: grizzly_ip_port_string)
-
-      :outgoing ->
-        Trace.log(binary, src: grizzly_ip_port_string, dest: ip_port_str)
-    end
-  end
-
-  defp make_ip_port_str("", port) do
-    ":#{port}"
-  end
-
-  defp make_ip_port_str(ip, port) when is_binary(ip) do
-    "[#{ip}]:#{port}"
-  end
-
-  defp make_ip_port_str(ip, port) do
-    "[#{:inet.ntoa(ip)}]:#{port}"
-  end
+  defp maybe_write_trace(:outgoing, node_id, binary),
+    do: Trace.log(binary, src: :grizzly, dest: node_id)
 end

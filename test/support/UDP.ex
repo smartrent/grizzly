@@ -35,7 +35,7 @@ defmodule GrizzlyTest.Transport.UDP do
   @impl Grizzly.Transport
   def send(transport, binary, _) do
     node_id = Transport.assign(transport, :node_id)
-    Grizzly.Trace.log(binary, src: "G", dest: "#{node_id}")
+    Grizzly.Trace.log(binary, src: :grizzly, dest: node_id)
 
     transport
     |> Transport.assign(:socket)
@@ -52,7 +52,7 @@ defmodule GrizzlyTest.Transport.UDP do
   def parse_response({:udp, _, ip, _port, binary}, opts) do
     transport = Keyword.fetch!(opts, :transport)
     node_id = Transport.assign(transport, :node_id)
-    Grizzly.Trace.log(binary, src: "#{node_id}", dest: "G")
+    Grizzly.Trace.log(binary, src: node_id, dest: :grizzly)
 
     if Keyword.get(opts, :raw, false) do
       {:ok, binary}

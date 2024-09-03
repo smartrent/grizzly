@@ -34,6 +34,7 @@ defmodule Grizzly.UnsolicitedServer.Socket do
     with {:ok, accept_transport} <- Transport.accept(listening_transport),
          {:ok, transport} <- Transport.handshake(accept_transport) do
       {:ok, node_id} = Transport.node_id(transport)
+      transport = Transport.assigns(transport, :node_id, node_id)
       Logger.metadata(node_id: node_id)
 
       # Start a new listen socket to replace this one as this one is now bound
