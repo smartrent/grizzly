@@ -79,4 +79,26 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport do
         {:error, %{err | command: :thermostat_setpoint_capabilities_report}}
     end
   end
+
+  # Fallback for Building36 B36-T10 / Alarm.com ADC-T2000, which sends incorrect
+  # values for precision (sends 1, should be 0) and size (sends 2, should be 1).
+  def decode_params(
+        <<_::4, type::4, 1::3, min_scale::2, 2::3, min_value, 1::3, max_scale::2, 2::3,
+          max_value>>
+      ) do
+    with {:ok, min_scale} <- decode_scale(min_scale),
+         {:ok, max_scale} <- decode_scale(max_scale) do
+      {:ok,
+       [
+         type: decode_type(type),
+         min_scale: min_scale,
+         min_value: min_value,
+         max_scale: max_scale,
+         max_value: max_value
+       ]}
+    else
+      {:error, %DecodeError{} = err} ->
+        {:error, %{err | command: :thermostat_setpoint_capabilities_report}}
+    end
+  end
 end
