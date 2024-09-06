@@ -4,7 +4,14 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v8.5.0] - 2024-08-05
+## [v8.5.1] - 2024-09-06
+
+### Added
+
+* Support malformed Thermostat Setpoint Capabilities Report from B36-T10 / ADC-T2000 ([#969](https://github.com/smartrent/grizzly/pull/969))
+* Support manufacturer-specific thermostat modes ([#970](https://github.com/smartrent/grizzly/pull/970))
+
+## [v8.5.0] - 2024-08-28
 
 ### Added
 
@@ -2560,6 +2567,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.5.1]: https://github.com/smartrent/grizzly/compare/v8.5.0..v8.5.1
 [v8.5.0]: https://github.com/smartrent/grizzly/compare/v8.4.0..v8.5.0
 [v8.4.0]: https://github.com/smartrent/grizzly/compare/v8.3.0..v8.4.0
 [v8.3.0]: https://github.com/smartrent/grizzly/compare/v8.2.3..v8.3.0
