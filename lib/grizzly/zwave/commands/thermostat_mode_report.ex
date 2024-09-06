@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatMode
 
   @type param :: {:mode, ThermostatMode.mode()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -32,20 +32,9 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeReport do
     {:ok, command}
   end
 
-  @impl true
-  def encode_params(command) do
-    mode_byte = ThermostatMode.encode_mode(Command.param!(command, :mode))
-    <<0x00::3, mode_byte::5>>
-  end
+  @impl Grizzly.ZWave.Command
+  defdelegate encode_params(command), to: Grizzly.ZWave.Commands.ThermostatModeSet
 
-  @impl true
-  # version 1
-  def decode_params(<<0x00::3, mode_byte::5, _::binary>>) do
-    with {:ok, mode} <- ThermostatMode.decode_mode(mode_byte) do
-      {:ok, [mode: mode]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
-    end
-  end
+  @impl Grizzly.ZWave.Command
+  defdelegate decode_params(binary), to: Grizzly.ZWave.Commands.ThermostatModeSet
 end

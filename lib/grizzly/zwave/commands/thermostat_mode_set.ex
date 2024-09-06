@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatMode
 
   @type param :: {:mode, ThermostatMode.mode()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -32,20 +32,35 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
-    mode_byte = ThermostatMode.encode_mode(Command.param!(command, :mode))
-    <<0x00::3, mode_byte::5>>
+    mode = Command.param!(command, :mode)
+
+    if mode == :manufacturer_specific do
+      mfr_data = Command.param!(command, :manufacturer_data)
+
+      if byte_size(mfr_data) > 7 do
+        raise ArgumentError, "ThermostatModeSet manufacturer_data must be <= 7 bytes"
+      end
+
+      mfr_data_len = byte_size(mfr_data)
+
+      <<mfr_data_len::3, ThermostatMode.encode_mode(:manufacturer_specific)::5,
+        mfr_data::binary-size(mfr_data_len)>>
+    else
+      mode_byte = ThermostatMode.encode_mode(Command.param!(command, :mode))
+      <<0x00::3, mode_byte::5>>
+    end
   end
 
-  @impl true
-  # version 1
-  def decode_params(<<0x00::3, mode_byte::5, _::binary>>) do
+  @impl Grizzly.ZWave.Command
+  def decode_params(<<mfr_data_len::3, mode_byte::5, mfr_data::binary-size(mfr_data_len)>>) do
     with {:ok, mode} <- ThermostatMode.decode_mode(mode_byte) do
-      {:ok, [mode: mode]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+      if mode == :manufacturer_specific do
+        {:ok, [mode: mode, manufacturer_data: mfr_data]}
+      else
+        {:ok, [mode: mode]}
+      end
     end
   end
 end
