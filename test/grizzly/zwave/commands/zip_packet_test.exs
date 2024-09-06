@@ -1,5 +1,5 @@
 defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command

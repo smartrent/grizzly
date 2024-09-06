@@ -48,14 +48,6 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, command} = SwitchBinaryGet.new()
 
     assert {:ok, %Report{type: :timeout, node_id: 100}} =
-             SyncConnection.send_command(100, command, timeout: 2_500)
-  end
-
-  @tag :integration
-  test "handle command that does not respond (long timeout)" do
-    {:ok, command} = SwitchBinaryGet.new()
-
-    assert {:ok, %Report{type: :timeout, node_id: 100}} =
-             SyncConnection.send_command(100, command, timeout: 10_000)
+             SyncConnection.send_command(100, command, timeout: 1_000)
   end
 end

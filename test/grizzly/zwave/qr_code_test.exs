@@ -1,5 +1,5 @@
 defmodule Grizzly.ZWave.QRCodeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.{DSK, QRCode}
   alias Grizzly.ZWave.SmartStart.MetaExtension.UUID16
