@@ -147,16 +147,16 @@ defmodule Grizzly.Commands.CommandRunnerTest do
     {:ok, runner} = CommandRunner.start_link(command, 1)
     command_ref = CommandRunner.reference(runner)
 
-    nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 10)
+    nack_waiting = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 2)
 
     assert Report.new(:inflight, :queued_delay, 1,
-             queued_delay: 10,
+             queued_delay: 2,
              queued: true,
              command_ref: command_ref
            ) ==
              CommandRunner.handle_zip_command(runner, nack_waiting)
 
-    Process.sleep(10_000)
+    Process.sleep(2_000)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 

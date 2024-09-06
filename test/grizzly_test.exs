@@ -85,9 +85,9 @@ defmodule Grizzly.Test do
   end
 
   @tag :integration
-  test "command that timeouts" do
+  test "command that times out" do
     assert {:ok, %Report{status: :complete, type: :timeout, node_id: 100}} =
-             Grizzly.send_command(100, :switch_binary_get)
+             Grizzly.send_command(100, :switch_binary_get, [], timeout: 500)
   end
 
   @tag :integration
@@ -122,7 +122,10 @@ defmodule Grizzly.Test do
 
   @tag :integration
   test "handle garbage from Z-Wave network" do
-    log = capture_log([], fn -> Grizzly.send_command(500, :door_lock_operation_get) end)
+    log =
+      capture_log([], fn ->
+        Grizzly.send_command(500, :door_lock_operation_get, [], timeout: 500)
+      end)
 
     assert String.contains?(log, "unexpected Z-Wave binary")
   end

@@ -1,32 +1,38 @@
 defmodule Grizzly.Connections.KeepAliveTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Grizzly.Connections.KeepAlive
 
-  @tag :integration
   test "receive message after" do
-    KeepAlive.init(1, 2_000)
+    KeepAlive.init(1, 100)
 
-    assert_receive :keep_alive_tick, 2_100
+    assert_receive :keep_alive_tick, 200
   end
 
-  @tag :integration
   test "resets the timer early" do
-    ka = KeepAlive.init(1, 2_000)
+    ka = KeepAlive.init(1, 500)
 
-    :timer.sleep(1_000)
+    :timer.sleep(300)
 
+    # reset the timer
     new_ka = KeepAlive.timer_restart(ka)
+    # ensure the old timer was canceled
+    assert false == Process.read_timer(ka.ref)
 
-    assert_receive :keep_alive_tick, 2_100
+    :timer.sleep(250)
+    # it's ~550ms since the original init, but because of the reset, we
+    # should not have any messages
+    refute_received :keep_alive_tick
+
+    # but we should get a message in another ~250ms
+    assert_receive :keep_alive_tick, 300
     refute new_ka.ref == ka.ref
   end
 
-  @tag :integration
   test "stops keep alive" do
-    ka = KeepAlive.init(1, 2_000) |> KeepAlive.timer_clear()
+    ka = KeepAlive.init(1, 250) |> KeepAlive.timer_clear()
 
-    refute_receive :keep_alive_tick, 2_100
+    refute_receive :keep_alive_tick, 300
     assert ka.ref == nil
   end
 end
