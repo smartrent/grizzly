@@ -136,5 +136,23 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
       assert Command.param!(command, :last?) == false
       assert new_firmware_update.state == :uploading
     end
+
+    test "dynamic transmission delays", %{firmware_update: firmware_update} do
+      update = %FirmwareUpdate{
+        firmware_update
+        | transmission_delay: 500
+      }
+
+      assert 500 == FirmwareUpdate.transmission_delay(update)
+
+      update = FirmwareUpdate.put_last_transmission_speed(firmware_update, {40, :kbit_sec})
+      assert 35 == FirmwareUpdate.transmission_delay(update)
+
+      update = FirmwareUpdate.put_last_transmission_speed(update, {100, :kbit_sec})
+      assert 10 == FirmwareUpdate.transmission_delay(update)
+
+      update = FirmwareUpdate.put_last_transmission_speed(firmware_update, {9.6, :kbit_sec})
+      assert 35 == FirmwareUpdate.transmission_delay(update)
+    end
   end
 end

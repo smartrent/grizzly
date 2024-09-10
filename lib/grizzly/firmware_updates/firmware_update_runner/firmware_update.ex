@@ -15,8 +15,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
 
   require Logger
 
-  # Assuming a 100 kbits/s transmission rate. If 40kbits, set to 35 msecs.
-  @transmission_delay 15
+  @type speed :: {float() | 40 | 100, :kbit_sec}
 
   @type state :: :started | :updating | :uploading | :complete
 
@@ -36,7 +35,12 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
           # Number of fragments still to be sent as a burst
           fragments_wanted: non_neg_integer,
           # Index of fragment to be sent next. Starts at 1.
-          fragment_index: non_neg_integer
+          fragment_index: non_neg_integer,
+          # Delay between sending fragments. When nil, the default delays allowed
+          # by the spec are used. When set, the delay is used for all fragments
+          # regardless of transmission speed.
+          transmission_delay: nil | non_neg_integer(),
+          last_transmission_speed: speed()
         }
 
   defstruct handler: nil,
@@ -54,7 +58,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
             state: :started,
             fragments_wanted: 0,
             # first frgament has index 1
-            fragment_index: 1
+            fragment_index: 1,
+            transmission_delay: nil,
+            last_transmission_speed: {40, :kbit_sec}
 
   @spec put_image(t(), FirmwareUpdates.image_path()) :: t()
   def put_image(firmware_update, image_path) do
@@ -72,6 +78,30 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     do:
       firmware_update.state not in [:failed, :complete] and
         (firmware_update.fragments_wanted > 0 or firmware_update.fragment_index > 1)
+
+  @doc """
+  Store the transmission speed of the last successful command so it can be used
+  to calculate the transmission delay.
+  """
+  @spec put_last_transmission_speed(t(), speed()) :: t()
+  def put_last_transmission_speed(firmware_update, {_, :kbit_sec} = speed),
+    do: %__MODULE__{firmware_update | last_transmission_speed: speed}
+
+  def put_last_transmission_speed(firmware_update, _), do: firmware_update
+
+  @doc """
+  Returns the delay between sending fragments. If set in the `FirmwareUpdate`,
+  that value will always be used. Otherwise, the delay is calculated based on
+  the last transmission speed: 10ms for 100kbit/s, 35ms for 40kbit/s and 9.6kbit/s.
+  """
+  @spec transmission_delay(t()) :: pos_integer()
+  def transmission_delay(%__MODULE__{transmission_delay: delay})
+      when is_integer(delay) and delay > 0,
+      do: delay
+
+  def transmission_delay(%__MODULE__{last_transmission_speed: {100, :kbit_sec}}), do: 10
+  def transmission_delay(%__MODULE__{last_transmission_speed: {40, :kbit_sec}}), do: 35
+  def transmission_delay(%__MODULE__{}), do: 35
 
   @doc """
   Handle incoming command from the Z-Wave network
@@ -138,9 +168,11 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
 
   @doc "Whether a next command needs to be followed by another to achieve a possibly new desired state"
   @spec continuation(t) :: nil | {:uploading, non_neg_integer}
-  def continuation(%__MODULE__{state: :uploading, fragments_wanted: fragments_wanted})
+  def continuation(
+        %__MODULE__{state: :uploading, fragments_wanted: fragments_wanted} = firmware_update
+      )
       when fragments_wanted > 0 do
-    {:uploading, @transmission_delay}
+    {:uploading, transmission_delay(firmware_update)}
   end
 
   def continuation(_firmware_update), do: nil

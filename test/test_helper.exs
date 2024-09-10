@@ -1,5 +1,6 @@
 {:ok, _pid} = GrizzlyTest.Server.start(5000)
 
+Mimic.copy(Grizzly.Connections.AsyncConnection)
 Mimic.copy(MockStatusReporter)
 Mimic.copy(MockZWaveResetter)
 Mimic.copy(MuonTrap)
