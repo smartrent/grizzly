@@ -1,5 +1,5 @@
 %{
-  "beam_notify": {:hex, :beam_notify, "1.1.0", "4ce38e27460a3c03b6f77c10c6f31458b035ebb1035cd52d4b3e771311837dba", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "8547a310702bfcea0e401534398617b940808ff6ad10c43dddc85c169de7b9cc"},
+  "beam_notify": {:hex, :beam_notify, "1.1.1", "da7dd04f16120bcab71f01ff81607ea38ad78af859cd87fad2012eac8feab034", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "5a09fc8449171da423f781de16b95cdec52763e60308345de6f15358c2382a42"},
   "bunt": {:hex, :bunt, "1.0.0", "081c2c665f086849e6d57900292b3a161727ab40431219529f13c4ddcf3e7a44", [:mix], [], "hexpm", "dc5f86aa08a5f6fa6b8096f0735c4e76d54ae5c9fa2c143e5a1fc7c1cd9bb6b5"},
   "cerlc": {:hex, :cerlc, "0.2.1", "cfe0880aa049ebcca079ca49578055aa48e7f2e9ed8ae08bd1f919d59015d03f", [:rebar3], [], "hexpm", "37f0d74a4277dcbaf64c7c47e9953dcc8060d26d86bb466ab2a86928e0181a7d"},
   "circular_buffer": {:hex, :circular_buffer, "0.4.1", "477f370fd8cfe1787b0a1bade6208bbd274b34f1610e41f1180ba756a7679839", [:mix], [], "hexpm", "633ef2e059dde0d7b89bbab13b1da9d04c6685e80e68fbdf41282d4fae746b72"},
