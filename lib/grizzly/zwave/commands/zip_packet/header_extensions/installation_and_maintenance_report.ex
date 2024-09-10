@@ -21,7 +21,13 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
     {{:transmission_time, transmission_time}, rest}
   end
 
-  def ime_from_binary(<<0x02, 0x05, r1, r2, r3, r4, speed, rest::binary>>) do
+  # Z/IP Gateway deviates from the spec here by sending a bitfield (which includes
+  # booleans for whether a 250ms or 1000ms beam was sent). Only the 3 least-significant
+  # bits are used for the speed value.
+  def ime_from_binary(
+        <<0x02, 0x05, r1, r2, r3, r4, _::1, _beam_1000ms::1, _beam_250ms::1, _::2, speed::3,
+          rest::binary>>
+      ) do
     {{:last_working_route, {r1, r2, r3, r4}, parse_transmission_speed(speed)}, rest}
   end
 
@@ -96,6 +102,11 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
   defp parse_transmission_speed(0x01), do: {9.6, :kbit_sec}
   defp parse_transmission_speed(0x02), do: {40, :kbit_sec}
   defp parse_transmission_speed(0x03), do: {100, :kbit_sec}
+  # 0x04 is supposed to mean 100kbit/sec via Z-Wave LR, but when the controller
+  # is configured to use Z-Wave LR, it always sends 0x04 even when using classic
+  # Z-Wave to communicate with a particular node. Because of that, there's no
+  # point in differentiating here.
+  defp parse_transmission_speed(0x04), do: {100, :kbit_sec}
   defp parse_transmission_speed(speed), do: {:unknown, speed}
 
   defp parse_rssi_hop(0x7F), do: :not_available
