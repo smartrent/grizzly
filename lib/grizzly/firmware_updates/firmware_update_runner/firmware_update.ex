@@ -92,14 +92,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   @doc """
   Returns the delay between sending fragments. If set in the `FirmwareUpdate`,
   that value will always be used. Otherwise, the delay is calculated based on
-  the last transmission speed: 10ms for 100kbit/s, 35ms for 40kbit/s and 9.6kbit/s.
+  the last transmission speed: 15ms for 100kbit/s, 35ms for 40kbit/s and 9.6kbit/s.
   """
   @spec transmission_delay(t()) :: pos_integer()
   def transmission_delay(%__MODULE__{transmission_delay: delay})
       when is_integer(delay) and delay > 0,
       do: delay
 
-  def transmission_delay(%__MODULE__{last_transmission_speed: {100, :kbit_sec}}), do: 10
+  def transmission_delay(%__MODULE__{last_transmission_speed: {100, :kbit_sec}}), do: 15
   def transmission_delay(%__MODULE__{last_transmission_speed: {40, :kbit_sec}}), do: 35
   def transmission_delay(%__MODULE__{}), do: 35
 

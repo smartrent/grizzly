@@ -149,7 +149,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
       assert 35 == FirmwareUpdate.transmission_delay(update)
 
       update = FirmwareUpdate.put_last_transmission_speed(update, {100, :kbit_sec})
-      assert 10 == FirmwareUpdate.transmission_delay(update)
+      assert 15 == FirmwareUpdate.transmission_delay(update)
 
       update = FirmwareUpdate.put_last_transmission_speed(firmware_update, {9.6, :kbit_sec})
       assert 35 == FirmwareUpdate.transmission_delay(update)
