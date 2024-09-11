@@ -143,9 +143,6 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   # Async responses to commands sent
   def handle_info({:grizzly, :report, report}, firmware_update) do
     case report.type do
-      :ack_response ->
-        {:noreply, firmware_update}
-
       :nack_response ->
         Logger.info(
           "[Grizzly] Ignoring nack_response while updating firmware of device #{firmware_update.device_id}"
@@ -173,7 +170,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
         {:noreply, firmware_update}
 
-      :command ->
+      type when type in [:command, :ack_response] ->
         handle_report(report, firmware_update)
     end
   end
@@ -209,7 +206,13 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
         _ -> firmware_update
       end
 
-    {:noreply, firmware_update}
+    if firmware_update.state != :complete do
+      maybe_desired_state_with_delay = FirmwareUpdate.continuation(firmware_update)
+      firmware_update = handle_continuation(maybe_desired_state_with_delay, firmware_update)
+      {:noreply, firmware_update}
+    else
+      {:noreply, firmware_update}
+    end
   end
 
   defp handle_report(report, firmware_update) do
@@ -264,11 +267,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
     Logger.debug("[Grizzly] Sent FW update continuation #{inspect(command)}")
 
-    continued_firmware_update =
-      FirmwareUpdate.update_command_ref(new_firmware_update, command_ref)
-
-    maybe_desired_state_with_delay = FirmwareUpdate.continuation(continued_firmware_update)
-    handle_continuation(maybe_desired_state_with_delay, continued_firmware_update)
+    FirmwareUpdate.update_command_ref(new_firmware_update, command_ref)
   end
 
   defp format_handler_spec({_handler_module, _handler_opts} = handler), do: handler
