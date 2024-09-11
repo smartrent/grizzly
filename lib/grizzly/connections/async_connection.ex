@@ -244,6 +244,10 @@ defmodule Grizzly.Connections.AsyncConnection do
     updated_state =
       case CommandList.response_for_zip_packet(state.commands, zip_packet) do
         {:retry, command_runner, new_command_list} ->
+          # TODO: this could be better, but do a little sleep between retries.
+          # This is mostly for firmware updates.
+          Process.sleep(100)
+
           :ok = do_send_command(command_runner, state)
           %State{state | commands: new_command_list}
 

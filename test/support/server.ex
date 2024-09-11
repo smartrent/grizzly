@@ -22,13 +22,21 @@ defmodule GrizzlyTest.Server do
 
   require Logger
 
+  def reset() do
+    GenServer.call(__MODULE__, :reset)
+  end
+
   def start(port) do
     GenServer.start(__MODULE__, port, name: __MODULE__)
   end
 
   def init(port) do
     {:ok, socket} = :gen_udp.open(port, [:binary, {:active, true}])
-    {:ok, %{socket: socket}}
+    {:ok, %{socket: socket, firmware_update_nack: true}}
+  end
+
+  def handle_call(:reset, _from, state) do
+    {:reply, :ok, %{state | firmware_update_nack: true}}
   end
 
   def handle_info({:udp, _port, _ip, return_port, msg}, state) when return_port > 5000 do
@@ -65,14 +73,7 @@ defmodule GrizzlyTest.Server do
 
           # Node 201 is for testing starting a firmware update and uploading an image
           201 ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            maybe_send_a_report(state.socket, return_port, zip_packet)
-            # the device asks for image fragments
-            send_firmware_update_md_get_command(state.socket, return_port,
-              number_of_reports: 1,
-              # Change this to be the last fragment
-              report_number: 1
-            )
+            handle_firmware_update_command(state, return_port, zip_packet)
 
           202 ->
             send_ack_response(state.socket, return_port, zip_packet)
@@ -135,8 +136,10 @@ defmodule GrizzlyTest.Server do
             maybe_send_a_report(state.socket, return_port, zip_packet)
         end
     end
-
-    {:noreply, state}
+    |> case do
+      %{socket: _} = state -> {:noreply, state}
+      _ -> {:noreply, state}
+    end
   end
 
   defp send_ack_response(socket, port, incoming_zip_packet) do
@@ -530,5 +533,35 @@ defmodule GrizzlyTest.Server do
 
   defp flag_for_report(_) do
     nil
+  end
+
+  defp handle_firmware_update_command(state, return_port, zip_packet) do
+    command = Command.param!(zip_packet, :command)
+
+    case command do
+      # Initate the firmware update process and request the first batch of fragments
+      %{name: :firmware_update_md_request_get} ->
+        send_ack_response(state.socket, return_port, zip_packet)
+        maybe_send_a_report(state.socket, return_port, zip_packet)
+
+        send_firmware_update_md_get_command(state.socket, return_port,
+          number_of_reports: 5,
+          # Change this to be the last fragment
+          report_number: 1
+        )
+
+        state
+
+      %{name: :firmware_update_md_report} ->
+        if Command.param!(command, :report_number) == 5 and state.firmware_update_nack do
+          send_nack_response(state.socket, return_port, zip_packet)
+          %{state | firmware_update_nack: false}
+        else
+          send_ack_response(state.socket, return_port, zip_packet)
+          state
+        end
+    end
+
+    # the device asks for image fragments
   end
 end

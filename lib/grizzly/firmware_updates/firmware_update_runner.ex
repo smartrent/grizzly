@@ -88,7 +88,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
        firmware_target: firmware_target,
        hardware_version: hardware_version,
        max_fragment_size: max_fragment_size,
-       activation_may_be_delayed?: activation_may_be_delayed?
+       activation_may_be_delayed?: activation_may_be_delayed?,
+       transmission_delay: Keyword.get(opts, :transmission_delay)
      }}
   end
 
@@ -117,7 +118,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     {:ok, command_ref} =
       AsyncConnection.send_command(firmware_update.conn, command,
         timeout: 120_000,
-        more_info: true
+        transmission_stats: true,
+        more_info: true,
+        retries: 4
       )
 
     {:reply, :ok, FirmwareUpdate.update_command_ref(new_firmware_update, command_ref)}
@@ -194,7 +197,18 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :ok
   end
 
-  defp handle_report(%Report{type: :ack_response}, firmware_update) do
+  defp handle_report(
+         %Report{type: :ack_response, transmission_stats: transmission_stats},
+         firmware_update
+       ) do
+    speed = is_list(transmission_stats) && Keyword.get(transmission_stats, :transmission_speed)
+
+    firmware_update =
+      case speed do
+        {_, _} = speed -> FirmwareUpdate.put_last_transmission_speed(firmware_update, speed)
+        _ -> firmware_update
+      end
+
     {:noreply, firmware_update}
   end
 
@@ -243,7 +257,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     {:ok, command_ref} =
       AsyncConnection.send_command(new_firmware_update.conn, command,
         timeout: 120_000,
-        more_info: true
+        transmission_stats: true,
+        more_info: true,
+        retries: 2
       )
 
     Logger.debug("[Grizzly] Sent FW update continuation #{inspect(command)}")
