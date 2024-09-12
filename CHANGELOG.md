@@ -4,6 +4,14 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.5.2] - 2024-09-11
+
+### Fixed
+
+* Fix parsing of last working route / speed in transmission stats ([#974](https://github.com/smartrent/grizzly/pull/974))
+* Use dynamic delays between image fragments during firmware updates ([#975](https://github.com/smartrent/grizzly/pull/975), [#977](https://github.com/smartrent/grizzly/pull/977))
+* Wait for previous ack before continuing firmware upload ([#978](https://github.com/smartrent/grizzly/pull/978))
+
 ## [v8.5.1] - 2024-09-06
 
 ### Added
@@ -2567,6 +2575,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.5.2]: https://github.com/smartrent/grizzly/compare/v8.5.1..v8.5.2
 [v8.5.1]: https://github.com/smartrent/grizzly/compare/v8.5.0..v8.5.1
 [v8.5.0]: https://github.com/smartrent/grizzly/compare/v8.4.0..v8.5.0
 [v8.4.0]: https://github.com/smartrent/grizzly/compare/v8.3.0..v8.4.0
