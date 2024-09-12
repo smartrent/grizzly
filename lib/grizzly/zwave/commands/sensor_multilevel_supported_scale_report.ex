@@ -5,8 +5,8 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
 
   ## Parameters
 
-  * `:sensor_type` - `list  of :temperature or :illuminance or :power or :humidity` etc. (required)
-  * `:supported_scales` - `list  of supported scales, e.g. [0, 1, 3]. (required)
+  * `:sensor_type` - the type of sensor for which the scales are supported. (required)
+  * `:supported_scales` - list of supported scales, e.g. [0, 1, 3]. (required)
   """
 
   @behaviour Grizzly.ZWave.Command

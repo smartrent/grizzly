@@ -5,16 +5,6 @@ defmodule Grizzly.VirtualDevicesRegistry do
   alias Grizzly.VirtualDevices.Device
   alias Grizzly.ZWave.DeviceClass
 
-  @typedoc """
-  """
-  @type device_entry() :: %{
-          device_impl: Device.t(),
-          device_class: DeviceClass.t(),
-          device_opts: [Device.device_opt()],
-          id: VirtualDevices.id(),
-          pid: pid()
-        }
-
   @type start_opts() :: [
           {:keys, :unique},
           {:name, module()},
@@ -33,7 +23,8 @@ defmodule Grizzly.VirtualDevicesRegistry do
   Register the virtual device
   """
   @spec register(VirtualDevices.id(), Device.t(), DeviceClass.t(), [Device.device_opt()]) ::
-          {:ok, device_entry()} | {:error, {:already_registered, device_entry()}}
+          {:ok, VirtualDevices.device_entry()}
+          | {:error, {:already_registered, VirtualDevices.device_entry()}}
   def register({:virtual, id} = device_id, device_impl, device_class, device_opts)
       when is_integer(id) and id > 0 do
     entry = %{
@@ -63,7 +54,7 @@ defmodule Grizzly.VirtualDevicesRegistry do
   @doc """
   Get a device entry by the virtual device id
   """
-  @spec get(VirtualDevices.id()) :: device_entry() | nil
+  @spec get(VirtualDevices.id()) :: VirtualDevices.device_entry() | nil
   def get(device_id) do
     case Registry.lookup(__MODULE__, device_id) do
       [] ->

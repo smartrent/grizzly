@@ -3,7 +3,7 @@ defmodule Grizzly.VirtualDevices.Reports do
 
   # Helper module for building various general reports for a virtual device
 
-  alias Grizzly.{Report, VirtualDevices, VirtualDevicesRegistry}
+  alias Grizzly.{Report, VirtualDevices}
   alias Grizzly.ZWave.{Command, DeviceClass, DSK}
 
   alias Grizzly.ZWave.Commands.{
@@ -21,7 +21,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Send the node add status message to the handler
   """
-  @spec send_node_add_status(VirtualDevicesRegistry.device_entry(), Grizzly.handler()) :: :ok
+  @spec send_node_add_status(VirtualDevices.device_entry(), Grizzly.handler()) :: :ok
   def send_node_add_status(device_entry, handler) do
     {handler, handler_opts} = ensure_handler_with_opts(handler)
 
@@ -68,7 +68,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build a node info cached report based of a node info get command
   """
-  @spec build_node_info_cache_report(VirtualDevicesRegistry.device_entry(), Command.t()) ::
+  @spec build_node_info_cache_report(VirtualDevices.device_entry(), Command.t()) ::
           Report.t()
   def build_node_info_cache_report(entry, node_info_get) do
     seq_number = Command.param!(node_info_get, :seq_number)
@@ -91,7 +91,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build manufacturer specific report for the device entry
   """
-  @spec build_manufacturer_specific_report(VirtualDevicesRegistry.device_entry()) :: Report.t()
+  @spec build_manufacturer_specific_report(VirtualDevices.device_entry()) :: Report.t()
   def build_manufacturer_specific_report(entry) do
     {:ok, manufacturer_report} =
       ManufacturerSpecificReport.new(
@@ -107,7 +107,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   Build version command class get for a command class in the entry's device
   class
   """
-  @spec build_version_command_class_get_report(VirtualDevicesRegistry.device_entry(), Command.t()) ::
+  @spec build_version_command_class_get_report(VirtualDevices.device_entry(), Command.t()) ::
           Report.t()
   def build_version_command_class_get_report(entry, version_command_class_get) do
     command_class = Command.param!(version_command_class_get, :command_class)
@@ -127,7 +127,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build the association report from the association get command
   """
-  @spec build_association_report(VirtualDevicesRegistry.device_entry()) :: Report.t()
+  @spec build_association_report(VirtualDevices.device_entry()) :: Report.t()
   def build_association_report(entry) do
     {:ok, report} =
       AssociationReport.new(
@@ -143,7 +143,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build a battery report for a battery get command
   """
-  @spec build_battery_report(VirtualDevicesRegistry.device_entry()) :: Report.t()
+  @spec build_battery_report(VirtualDevices.device_entry()) :: Report.t()
   def build_battery_report(entry) do
     {:ok, report} = BatteryReport.new(level: 100)
 
@@ -153,7 +153,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build a version report for a version get command
   """
-  @spec build_version_report(VirtualDevicesRegistry.device_entry()) :: Report.t()
+  @spec build_version_report(VirtualDevices.device_entry()) :: Report.t()
   def build_version_report(entry) do
     {:ok, report} =
       VersionReport.new(
@@ -194,7 +194,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build an ack response report
   """
-  @spec build_ack_response(VirtualDevicesRegistry.device_entry()) :: Report.t()
+  @spec build_ack_response(VirtualDevices.device_entry()) :: Report.t()
   def build_ack_response(entry) do
     Report.new(:complete, :ack_response, entry.id)
   end
@@ -202,7 +202,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @doc """
   Build a report that contains a command
   """
-  @spec build_report(VirtualDevicesRegistry.device_entry(), Command.t()) :: Report.t()
+  @spec build_report(VirtualDevices.device_entry(), Command.t()) :: Report.t()
   def build_report(entry, command) do
     Report.new(:complete, :command, entry.id, command: command)
   end
