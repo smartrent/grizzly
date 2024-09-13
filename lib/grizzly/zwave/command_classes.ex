@@ -1,5 +1,11 @@
 defmodule Grizzly.ZWave.CommandClasses do
+  @moduledoc """
+  Utilities for encoding and decoding command classes and command class lists.
+  """
+
   require Logger
+
+  import Grizzly.ZWave.GeneratedMappings, only: [command_class_mappings: 0]
 
   @type command_class_list :: [
           non_secure_supported: list(atom()),
@@ -8,61 +14,34 @@ defmodule Grizzly.ZWave.CommandClasses do
           secure_controlled: list(atom())
         ]
 
-  defmodule Generate do
-    @moduledoc false
+  mappings = command_class_mappings()
 
-    import Grizzly.ZWave.GeneratedMappings, only: [command_class_mappings: 0]
+  command_classes_union =
+    mappings
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.reverse()
+    |> Enum.reduce(&{:|, [], [&1, &2]})
 
-    defmacro __before_compile__(_) do
-      mappings = command_class_mappings()
+  @type command_class :: unquote(command_classes_union)
 
-      to_byte =
-        for {byte, command_class} <- mappings do
-          quote do
-            def to_byte(unquote(command_class)), do: unquote(byte)
-          end
-        end
-
-      from_byte =
-        for {byte, command_class} <- mappings do
-          quote do
-            def from_byte(unquote(byte)), do: {:ok, unquote(command_class)}
-          end
-        end
-
-      command_classes =
-        mappings
-        |> Enum.map(&elem(&1, 1))
-        |> Enum.reverse()
-        |> Enum.reduce(&{:|, [], [&1, &2]})
-
-      quote do
-        @type command_class :: unquote(command_classes)
-
-        @doc """
-        Try to parse the byte into a command class
-        """
-        @spec from_byte(byte()) :: {:ok, command_class()} | {:error, :unsupported_command_class}
-        unquote(from_byte)
-
-        def from_byte(byte) do
-          Logger.warning(
-            "[Grizzly] Unsupported command class from byte #{inspect(byte, base: :hex)}"
-          )
-
-          {:error, :unsupported_command_class}
-        end
-
-        @doc """
-        Get the byte representation of the command class
-        """
-        @spec to_byte(command_class()) :: byte()
-        unquote(to_byte)
-      end
-    end
+  @doc """
+  Get the byte representation of the command class
+  """
+  @spec to_byte(command_class()) :: byte()
+  for {byte, command_class} <- mappings do
+    def to_byte(unquote(command_class)), do: unquote(byte)
   end
 
-  @before_compile Generate
+  @spec from_byte(byte()) :: {:ok, command_class()} | {:error, :unsupported_command_class}
+  for {byte, command_class} <- mappings do
+    def from_byte(unquote(byte)), do: {:ok, unquote(command_class)}
+  end
+
+  def from_byte(byte) do
+    Logger.warning("[Grizzly] Unsupported command class from byte #{inspect(byte, base: :hex)}")
+
+    {:error, :unsupported_command_class}
+  end
 
   @doc """
   Turn the list of command classes into the binary representation outlined in
