@@ -9,6 +9,7 @@ defmodule Grizzly.VirtualDevices do
   alias Grizzly.VirtualDevicesRegistry
   alias Grizzly.VirtualDevices.{Device, Reports}
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.DeviceClass
 
   @typedoc """
   Options for adding a virtual devices
@@ -37,6 +38,14 @@ defmodule Grizzly.VirtualDevices do
   """
   @type id() :: {:virtual, integer()}
 
+  @type device_entry() :: %{
+          device_impl: Device.t(),
+          device_class: DeviceClass.t(),
+          device_opts: [Device.device_opt()],
+          id: id(),
+          pid: pid()
+        }
+
   @doc """
   Add a new virtual device to the virtual device network
 
@@ -46,7 +55,7 @@ defmodule Grizzly.VirtualDevices do
   If the device takes any options you can pass a tuple of `{device, opts}`.
   """
   @spec add_device(id(), Device.t(), [add_opt()]) ::
-          {:ok, id()} | {:error, {:already_registered, VirtualDevicesRegistry.device_entry()}}
+          {:ok, id()} | {:error, {:already_registered, device_entry()}}
   def add_device(device_id, device_impl, opts \\ []) do
     device_opts = Keyword.drop(opts, [:inclusion_handler])
 

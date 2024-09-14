@@ -131,7 +131,7 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.IconType,
           Grizzly.ZWave.Notifications,
           Grizzly.ZWave.QRCode,
-          Grizzly.ZWave.Security,
+          ~r/^Grizzly\.ZWave\.Security/,
           ~r/^Grizzly\.ZWave\.SmartStart/,
           Grizzly.Inclusions.ZWaveAdapter,
           Grizzly.ZWaveFirmware,
@@ -150,6 +150,7 @@ defmodule Grizzly.MixProject do
       ],
       nest_modules_by_prefix: [
         Grizzly.CommandHandlers,
+        Grizzly.VirtualDevices,
         Grizzly.ZWave.CommandClasses,
         Grizzly.ZWave.Commands
       ]

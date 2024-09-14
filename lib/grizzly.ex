@@ -103,6 +103,8 @@ defmodule Grizzly do
 
   @type handler() :: module() | handler_spec()
 
+  @type connection_mode() :: :sync | :async | :binary
+
   @typedoc """
   Options for `Grizzly.send_command/4`.
 
@@ -130,7 +132,7 @@ defmodule Grizzly do
           | {:transmission_stats, boolean()}
           | {:supervision?, boolean()}
           | {:status_updates?, boolean()}
-          | {:mode, Connection.mode()}
+          | {:mode, connection_mode()}
           | {:more_info, boolean()}
 
   @type command :: atom()

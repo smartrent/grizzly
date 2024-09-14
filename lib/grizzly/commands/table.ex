@@ -1,5 +1,8 @@
 defmodule Grizzly.Commands.Table do
-  @moduledoc false
+  @moduledoc """
+  Lookup table for sendable Z-Wave commands.
+  """
+
   alias Grizzly.CommandHandlers.AckResponse
 
   # look up support for supported command classes and their default Grizzly
