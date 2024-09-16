@@ -92,7 +92,8 @@ defmodule Grizzly.Connections.AsyncConnection do
 
     transport_opts = [
       ip_address: host,
-      port: grizzly_options.zipgateway_port
+      port: grizzly_options.zipgateway_port,
+      node_id: node_id
     ]
 
     ref = Process.monitor(owner)

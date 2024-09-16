@@ -54,7 +54,8 @@ defmodule Grizzly.Connections.BinaryConnection do
 
     transport_opts = [
       ip_address: host,
-      port: grizzly_options.zipgateway_port
+      port: grizzly_options.zipgateway_port,
+      node_id: node_id
     ]
 
     case Transport.open(transport_impl, transport_opts) do
