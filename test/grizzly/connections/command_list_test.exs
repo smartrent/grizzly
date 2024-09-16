@@ -24,7 +24,7 @@ defmodule Grizzly.Connections.CommandListTest do
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 
-    report = Report.new(:complete, :ack_response, 1, command_ref: ref)
+    report = Report.new(:complete, :ack_response, 1, command_ref: ref, acknowledged: true)
 
     assert {self(), {report, CommandList.empty()}} ==
              CommandList.response_for_zip_packet(command_list, ack_response)

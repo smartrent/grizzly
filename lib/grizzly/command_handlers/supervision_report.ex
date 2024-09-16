@@ -53,7 +53,8 @@ defmodule Grizzly.CommandHandlers.SupervisionReport do
       {:grizzly, :report,
        Report.new(:inflight, :supervision_status, state.node_id,
          command: command,
-         command_ref: state.command_ref
+         command_ref: state.command_ref,
+         acknowledged: true
        )}
     )
   end

@@ -461,7 +461,8 @@ defmodule Grizzly.Commands.Command do
       command_ref: command.ref,
       transmission_stats: command.transmission_stats,
       type: :ack_response,
-      node_id: command.node_id
+      node_id: command.node_id,
+      acknowledged: command.acknowledged
     }
   end
 
@@ -472,7 +473,8 @@ defmodule Grizzly.Commands.Command do
       transmission_stats: command.transmission_stats,
       type: :command,
       command_ref: command.ref,
-      node_id: command.node_id
+      node_id: command.node_id,
+      acknowledged: command.acknowledged
     }
   end
 end
