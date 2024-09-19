@@ -15,10 +15,10 @@ defmodule Grizzly.ZWave.CommandClasses.Antitheft do
           | :protection_enabled_locked_fully_functional
           | :protection_enabled_locked_restricted
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x5D
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :antitheft
 
   def state_to_bit(:unlocked), do: 0x00

@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
           | {:generic_device_class, DeviceClasses.generic_device_class()}
           | {:specific_device_class, DeviceClasses.specific_device_class()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param]) :: {:ok, Grizzly.ZWave.Command.t()}
   def new(params) do
     # TODO validate params
@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     status_byte = encode_status(Command.param!(command, :status))
@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
       specific_device_class_byte>> <> CommandClasses.command_class_list_to_binary(command_classes)
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<seq_number, status::4, age::4, list?::1, _::7, _, _keys, basic_device_class_byte,
           generic_device_class_byte, specific_device_class_byte, command_classes::binary>>

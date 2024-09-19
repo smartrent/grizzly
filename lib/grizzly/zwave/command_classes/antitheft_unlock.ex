@@ -9,10 +9,10 @@ defmodule Grizzly.ZWave.CommandClasses.AntitheftUnlock do
 
   @type state :: :locked | :unlocked
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x7E
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :antitheft_unlock
 
   def state_to_bit(:unlocked), do: 0x00

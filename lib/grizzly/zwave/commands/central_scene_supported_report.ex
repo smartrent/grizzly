@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
           | {:identical, boolean}
           | {:bit_mask_bytes, 1..3}
           | {:supported_key_attributes, [CentralScene.key_attributes()]}
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     supported_scenes = Command.param!(command, :supported_scenes)
@@ -80,7 +80,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
       identical_bit::1>> <> supported_key_attributes_binary
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<supported_scenes, slow_refresh_support_bit::1, 0x00::4, bit_mask_bytes::2,

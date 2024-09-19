@@ -61,7 +61,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     )
   end
 
-  @impl true
+  @impl GenServer
   def init(opts) do
     handler = Keyword.fetch!(opts, :handler)
     device_id = Keyword.fetch!(opts, :device_id)
@@ -108,7 +108,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     GenServer.call(runner, :firmware_image_fragment_count)
   end
 
-  @impl true
+  @impl GenServer
   def handle_call({:start_firmware_update, image_path}, _from, firmware_update) do
     {command, new_firmware_update} =
       firmware_update
@@ -139,7 +139,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     {:reply, FirmwareUpdate.in_progress?(state), state}
   end
 
-  @impl true
+  @impl GenServer
   # Async responses to commands sent
   def handle_info({:grizzly, :report, report}, firmware_update) do
     case report.type do
@@ -183,7 +183,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     {:noreply, firmware_update}
   end
 
-  @impl true
+  @impl GenServer
   def terminate(:normal, firmware_update) do
     :ok = AsyncConnection.stop(firmware_update.device_id)
 

@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanStateGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatFanState
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :thermostat_fan_state_get,
@@ -26,13 +26,13 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanStateGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

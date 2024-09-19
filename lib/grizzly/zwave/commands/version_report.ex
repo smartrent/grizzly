@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
           | {:hardware_version, non_neg_integer}
           | {:other_firmware_versions, [firmware_version]}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :version_report,
@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # Version 1
   def decode_params(
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
@@ -138,7 +138,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     library_type = Command.param!(command, :library_type)
     protocol_version = Command.param!(command, :protocol_version)

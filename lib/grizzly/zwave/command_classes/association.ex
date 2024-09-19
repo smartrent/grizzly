@@ -9,9 +9,9 @@ defmodule Grizzly.ZWave.CommandClasses.Association do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x85
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :association
 end

@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
           | {:values, [integer]}
           | {:reports_to_follow, non_neg_integer}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -47,7 +47,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     reports_to_follow = Command.param(command, :reports_to_follow)
@@ -65,7 +65,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
       values_bin
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<offset::16, count, reports_to_follow, default_bit::1, handshake_bit::1, _reserved::3,
           size::3, values_bin::binary>>

@@ -11,10 +11,10 @@ defmodule Grizzly.ZWave.CommandClasses.Configuration do
 
   @type format :: :signed_integer | :unsigned_integer | :enumerated | :bit_field
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x70
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :configuration
 
   def format_to_byte(:signed_integer), do: 0x00

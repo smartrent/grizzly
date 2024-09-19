@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
           | {:value, integer() | :default}
           | {:param_number, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     if Command.param!(command, :value) == :default do
@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<param_number, 1::1, _rest::7, _>>) do
     {:ok, [param_number: param_number, value: :default]}

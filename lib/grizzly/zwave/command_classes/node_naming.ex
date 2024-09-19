@@ -9,10 +9,10 @@ defmodule Grizzly.ZWave.CommandClasses.NodeNaming do
   @behaviour Grizzly.ZWave.CommandClass
   alias Grizzly.ZWave.DecodeError
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x77
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :node_naming
 
   def encoding_to_byte(:ascii), do: 0x00

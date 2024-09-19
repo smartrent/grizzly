@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
           | {:dsk, DSK.t()}
           | {:meta_extensions, [MetaExtension.extension()]}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
       dsk_binary <> NodeProvisioning.encode_meta_extensions(meta_extensions)
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<seq_number, remaining_count, _::3, dsk_byte_size::5,
           dsk_binary::binary-size(dsk_byte_size)-unit(8), meta_extensions_binary::binary>>

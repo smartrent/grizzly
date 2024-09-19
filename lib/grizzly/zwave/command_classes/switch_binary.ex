@@ -8,9 +8,9 @@ defmodule Grizzly.ZWave.CommandClasses.SwitchBinary do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x25
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :switch_binary
 end

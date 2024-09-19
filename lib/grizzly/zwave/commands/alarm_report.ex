@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
           | {:sequence_number, byte()}
           | {:event_parameters, [byte()]}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     # TODO: validate params
@@ -49,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     cond do
@@ -64,7 +64,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<type, level>>) do
     {:ok, [type: type, level: level]}

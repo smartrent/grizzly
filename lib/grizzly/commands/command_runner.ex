@@ -51,7 +51,7 @@ defmodule Grizzly.Commands.CommandRunner do
     :exit, {:noproc, _} -> :ok
   end
 
-  @impl true
+  @impl GenServer
   def init([command, node_id, opts]) do
     owner = Keyword.fetch!(opts, :owner)
     timeout = Keyword.fetch!(opts, :timeout)
@@ -61,7 +61,7 @@ defmodule Grizzly.Commands.CommandRunner do
     {:ok, Command.from_zwave_command(command, node_id, owner, opts)}
   end
 
-  @impl true
+  @impl GenServer
   def handle_call(:seq_number, _from, command), do: {:reply, command.seq_number, command}
 
   def handle_call({:handle_zip_command, zip_packet}, _from, command) do
@@ -89,7 +89,7 @@ defmodule Grizzly.Commands.CommandRunner do
     {:reply, Command.to_binary(command), command}
   end
 
-  @impl true
+  @impl GenServer
   def handle_info(:timeout, command) do
     send(command.owner, {:grizzly, :command_timeout, self(), command})
     {:stop, :normal, command}

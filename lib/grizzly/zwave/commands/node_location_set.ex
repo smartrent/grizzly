@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSet do
 
   @type param :: {:location, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :node_location_set,
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     encoding = Command.param!(command, :encoding)
     location = Command.param!(command, :location)
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSet do
     <<0x00::5, encoding_byte::3>> <> location
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<_reserved::5, encoding_byte::3, location::binary>>) do
     with {:ok, encoding} <- NodeNaming.encoding_from_byte(encoding_byte) do
       {:ok, [encoding: encoding, location: location]}

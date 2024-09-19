@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.t()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
     <<seq_number, byte_size(dsk.raw)>> <> dsk.raw
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, _, dsk_bin::binary>>) do
     {:ok, [seq_number: seq_number, dsk: DSK.new(dsk_bin)]}

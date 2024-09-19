@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
           | {:status, status}
           | {:hardware_version, byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -47,7 +47,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     manufacturer_id = Command.param!(command, :manufacturer_id)
     firmware_id = Command.param!(command, :firmware_id)
@@ -69,7 +69,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # version 5
   def decode_params(
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, status_byte,

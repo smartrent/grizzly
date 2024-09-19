@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReport do
           | {:twist_assist?, boolean}
           | {:block_to_block?, boolean}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -53,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     operation_type_byte =
@@ -88,7 +88,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   # v1-3
   def decode_params(

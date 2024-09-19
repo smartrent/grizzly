@@ -10,9 +10,9 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementProxy do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x52
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :network_management_proxy
 end

@@ -26,10 +26,10 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
 
   @type door_components :: :bolt | :latch | :door
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x62
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :door_lock
 
   @spec mode_to_byte(mode()) :: byte()

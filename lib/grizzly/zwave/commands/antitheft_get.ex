@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Antitheft
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params \\ []) do
     command = %Command{
       name: :antitheft_get,
@@ -25,12 +25,12 @@ defmodule Grizzly.ZWave.Commands.AntitheftGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteSet do
           | {:repeaters, [byte()]}
           | {:speed, NMIM.speed()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{

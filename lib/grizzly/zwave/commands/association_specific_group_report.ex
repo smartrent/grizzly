@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupReport do
 
   @type param :: {:group, byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -30,13 +30,13 @@ defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     group = Command.param!(command, :group)
     <<group>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<group>>) do
     {:ok, [group: group]}
   end

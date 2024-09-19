@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfSet do
           | {:override, boolean}
           | {:level, SceneActuatorConf.level()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     scene_id = Command.param!(command, :scene_id)
@@ -53,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfSet do
     <<scene_id, dimming_duration_byte, override_bit::1, 0x00::7, level_byte>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<scene_id, dimming_duration_byte, override_bit::1, _reserved::7, level_byte>>

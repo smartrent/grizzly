@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
 
   @type param :: {:up_down, :up | :down} | {:duration, byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     up_down = encode_up_down(Command.param!(command, :up_down))
 
@@ -68,7 +68,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<
         # Reserved

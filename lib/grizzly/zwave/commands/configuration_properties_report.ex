@@ -53,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
           | {:advanced, boolean | nil}
           | {:no_bulk_support, boolean | nil}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -67,7 +67,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     param_number = Command.param!(command, :param_number)
@@ -86,7 +86,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
       <<next_param_number::16>> <> maybe_v4_end_byte(command)
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<param_number::16, altering_capabilities_bit::1, read_only_bit::1, format_byte::3,

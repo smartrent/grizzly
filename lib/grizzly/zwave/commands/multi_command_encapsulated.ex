@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
 
   @type param :: {:commands, [Command.t()]}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :multi_command_encapsulated,
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     commands = Command.param!(command, :commands)
     count = Enum.count(commands)
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
     <<count>> <> encoded_commands
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<_number_of_commands, commands_binary::binary>>) do
     commands = decode_commands(commands_binary) |> Enum.reverse()
     {:ok, [commands: commands]}

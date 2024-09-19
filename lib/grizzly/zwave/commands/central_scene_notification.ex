@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
           | {:key_attribute, CentralScene.key_attribute()}
           | {:scene_number, non_neg_integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
     <<seq_number, slow_refresh_bit::1, 0x00::4, key_attribute_byte::3, scene_number>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<seq_number, slow_refresh_bit::1, 0x00::4, key_attribute_byte::3, scene_number>>

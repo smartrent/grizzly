@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
           | {:step_seconds, non_neg_integer}
           | {:on_demand, boolean}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :wake_up_interval_capabilities_report,
@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     minimum_seconds = Command.param!(command, :minimum_seconds)
     maximum_seconds = Command.param!(command, :maximum_seconds)
@@ -67,7 +67,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # v2
   def decode_params(<<
         minimum_seconds::24,

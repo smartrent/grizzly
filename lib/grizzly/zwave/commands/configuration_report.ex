@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationReport do
   @type param ::
           {:size, 1 | 2 | 4} | {:value, integer()} | {:param_number, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :configuration_report,
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     param_num = Command.param!(command, :param_number)
     size = Command.param!(command, :size)
@@ -49,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationReport do
     <<param_num, size, value::signed-integer-size(size)-unit(8)>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<param_number, _::5, size::3, value_int::signed-integer-size(size)-unit(8),
           rest::binary>>

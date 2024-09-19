@@ -24,10 +24,10 @@ defmodule Grizzly.ZWave.CommandClasses.UserCode do
 
   @type keypad_mode :: :normal | :vacation | :privacy | :lockout | :unknown
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x63
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :user_code
 
   @spec user_id_status_to_byte(user_id_status()) :: byte()

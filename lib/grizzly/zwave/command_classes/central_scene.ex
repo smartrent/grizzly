@@ -18,10 +18,10 @@ defmodule Grizzly.ZWave.CommandClasses.CentralScene do
           | :key_pressed_4_times
           | :key_pressed_5_times
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x5B
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :central_scene
 
   def validate_supported_key_attributes(

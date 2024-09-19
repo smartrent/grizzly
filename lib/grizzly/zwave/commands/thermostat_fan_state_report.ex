@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanStateReport do
 
   @type param :: {:state, ThermostatFanState.state()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -33,13 +33,13 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanStateReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     state_byte = ThermostatFanState.encode_state(Command.param!(command, :state))
     <<0x00::4, state_byte::4>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # version 1
   def decode_params(<<0x00::4, state_byte::4, _::binary>>) do
     with {:ok, state} <- ThermostatFanState.decode_state(state_byte) do

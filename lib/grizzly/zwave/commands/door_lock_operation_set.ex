@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSet do
 
   @type param :: {:mode, DoorLock.mode()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -28,14 +28,14 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     mode = Command.param!(command, :mode)
     <<DoorLock.mode_to_byte(mode)>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<mode_byte>>) do
     {:ok, [mode: DoorLock.mode_from_byte(mode_byte)]}

@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
           | {:activation_supported?, boolean}
           | {:active_during_transfer?, boolean}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # version 1
   def decode_params(<<manufacturer_id::16, firmware_id::16, checksum::16>>) do
     {:ok,
@@ -119,7 +119,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
      ]}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     params = command.params |> Enum.into(%{})

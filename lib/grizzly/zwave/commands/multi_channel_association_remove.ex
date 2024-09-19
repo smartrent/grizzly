@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
 
   @marker 0x00
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     grouping_identifier = Command.param!(command, :grouping_identifier)
@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary) :: {:ok, [param()]}
   def decode_params(<<grouping_identifier, rest::binary>>) do
     {node_ids, node_endpoints} = MultiChannelAssociation.decode_nodes_and_node_endpoints(rest)

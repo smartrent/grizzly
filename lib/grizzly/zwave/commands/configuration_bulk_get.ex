@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkGet do
 
   @type param :: {:number_of_parameters, non_neg_integer} | {:offset, non_neg_integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -31,14 +31,14 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     number_of_parameters = Command.param!(command, :number_of_parameters)
     offset = Command.param!(command, :offset)
     <<offset::16, number_of_parameters>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<offset::16, number_of_parameters>>) do
     {:ok, [number_of_parameters: number_of_parameters, offset: offset]}
   end

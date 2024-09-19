@@ -26,10 +26,10 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
 
   alias Grizzly.ZWave.{DecodeError, Encoding}
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x32
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :meter
 
   @doc """

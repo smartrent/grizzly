@@ -20,10 +20,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatFanState do
           | :up_down_circulation
           | :quiet_circulation
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x45
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :thermostat_fan_state
 
   @spec encode_state(state) :: byte

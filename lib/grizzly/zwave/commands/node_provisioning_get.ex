@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.t()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
     <<seq_number, 0x00::3, dsk_byte_size::5>> <> dsk.raw
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   # TODO: circle back to this
   def decode_params(
         <<seq_number, _::3, dsk_byte_size::5, dsk_binary::binary-size(dsk_byte_size)-unit(8)>>

@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
 
   @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(opts) do
     # TODO: validate opts
     command = %Command{
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     target_value_byte = encode_target_value(Command.param!(command, :target_value))
 
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
   def encode_target_value(:off), do: 0x00
   def encode_target_value(:on), do: 0xFF
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<target_value_byte>>) do
     case target_value_from_byte(target_value_byte) do
       {:ok, target_value} ->

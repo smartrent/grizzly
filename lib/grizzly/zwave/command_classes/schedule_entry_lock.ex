@@ -18,10 +18,10 @@ defmodule Grizzly.ZWave.CommandClasses.ScheduleEntryLock do
 
   @weekdays [:sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday]
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x4E
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :schedule_entry_lock
 
   def weekdays_to_bitmask(active_days) do

@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpNoMoreInformation do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.WakeUp
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :wake_up_no_more_information,
@@ -24,12 +24,12 @@ defmodule Grizzly.ZWave.Commands.WakeUpNoMoreInformation do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
 
   @type param :: {:target_value, :off | :previous | 0..99} | {:duration, 0..255}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     # TODO: validate opts
@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     target_value_byte = encode_target_value(Command.param!(command, :target_value))
 
@@ -55,7 +55,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
   def encode_target_value(target_value) when target_value < 0, do: 0
   def encode_target_value(target_value), do: target_value
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<target_value_byte>>) do
     case target_value_from_byte(target_value_byte) do
       {:ok, target_value} ->

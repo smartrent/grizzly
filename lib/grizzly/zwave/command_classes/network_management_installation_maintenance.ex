@@ -31,10 +31,10 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   alias Grizzly.ZWave.DecodeError
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x67
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :network_management_installation_maintenance
 
   @spec route_type_to_byte(route_type) :: byte

@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
 
   @type param :: {:resources, [Indicator.resource()]} | {:value, byte}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     resources = Command.param(command, :resources)
@@ -62,7 +62,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
     end
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<value>>) do
     {:ok, [value: value, resources: [[indicator_id: 0x00, property_id: 0x01, value: value]]]}

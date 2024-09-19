@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationRejectedRequest do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ApplicationStatus
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params \\ []) do
     command = %Command{
       name: :application_rejected_request,
@@ -25,13 +25,13 @@ defmodule Grizzly.ZWave.Commands.ApplicationRejectedRequest do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     # "status" must always be 0
     <<0x00>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

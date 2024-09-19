@@ -27,10 +27,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatMode do
           | :full_power
           | :manufacturer_specific
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x40
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :thermostat_mode
 
   @spec encode_mode(mode) :: byte

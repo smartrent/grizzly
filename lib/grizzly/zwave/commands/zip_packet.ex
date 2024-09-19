@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     more_info: false
   ]
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params \\ []) do
     # TODO: validate params
     command = %Command{
@@ -55,7 +55,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     zwave_command = Command.param(command, :command)
@@ -74,7 +74,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     |> maybe_add_command(zwave_command)
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
         <<flag_byte, meta_byte, seq_number, source, dest, extensions_and_command::binary>>

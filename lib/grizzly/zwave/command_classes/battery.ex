@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.Battery do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x80
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :battery
 end

@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.NoOperation do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NoOperation
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :no_operation,
@@ -23,12 +23,12 @@ defmodule Grizzly.ZWave.Commands.NoOperation do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_), do: {:ok, []}
 end

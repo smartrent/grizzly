@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGet do
 
   @type param() :: {:grouping_identifier, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -28,13 +28,13 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     <<Command.param!(command, :grouping_identifier)>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(<<grouping_identifier>>),
     do: {:ok, [grouping_identifier: grouping_identifier]}

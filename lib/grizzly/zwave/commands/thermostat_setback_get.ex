@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetback
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :thermostat_setback_get,
@@ -26,12 +26,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_binary) do
     {:ok, []}
   end

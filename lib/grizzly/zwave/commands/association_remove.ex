@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.AssociationRemove do
 
   @type param :: {:grouping_identifier, byte()} | {:nodes, [ZWave.node_id()]}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -31,14 +31,14 @@ defmodule Grizzly.ZWave.Commands.AssociationRemove do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     nodes_bin = :erlang.list_to_binary(Command.param!(command, :nodes))
     <<Command.param!(command, :grouping_identifier)>> <> nodes_bin
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary) :: {:ok, [param()]}
   def decode_params(<<grouping_identifier, nodes_bin::binary>>) do
     {:ok, [grouping_identifier: grouping_identifier, nodes: :erlang.binary_to_list(nodes_bin)]}

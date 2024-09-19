@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
 
   @type param :: {:value, 0..99 | :off | :unknown} | {:duration, non_neg_integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     value_byte = encode_value(Command.param!(command, :value))
 
@@ -47,7 +47,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   def encode_value(value) when value in 0..99, do: value
   def encode_value(:unknown), do: 0xFE
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<value_byte>>) do
     case value_from_byte(value_byte) do
       {:ok, value} ->

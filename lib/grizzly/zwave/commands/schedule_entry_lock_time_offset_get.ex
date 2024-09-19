@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :schedule_entry_lock_time_offset_get,
@@ -24,13 +24,13 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(_command) do
     <<>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, []}
   def decode_params(_binary) do
     {:ok, []}

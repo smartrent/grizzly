@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListGet do
 
   @type param() :: {:allow_cache, boolean()} | {:group_id, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     allow_cache? = Command.param!(command, :allow_cache)
     group_id = Command.param!(command, :group_id)
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListGet do
     <<allow_cache_bit::1, 0x00::7, group_id>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<allow_cache_bit::1, 0x00::7, group_id>>) do
     {:ok, [allow_cache: allow_cache_bit == 0x01, group_id: group_id]}
   end

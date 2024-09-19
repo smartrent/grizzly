@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequest do
 
   @type param :: {:seq_number, Grizzly.seq_number()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -29,14 +29,14 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequest do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     <<seq_number>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(<<seq_number>>) do
     {:ok, [seq_number: seq_number]}

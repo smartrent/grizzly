@@ -12,12 +12,12 @@ defmodule Grizzly.SeqNumber do
     GenServer.call(__MODULE__, :get_and_inc)
   end
 
-  @impl true
+  @impl GenServer
   def init(start_number) do
     {:ok, start_number}
   end
 
-  @impl true
+  @impl GenServer
   def handle_call(:get_and_inc, _from, number) do
     {:reply, number, inc(number)}
   end

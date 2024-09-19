@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReport do
 
   @type param() :: {:node_ids, [ZWave.node_id()]} | {:seq_number, ZWave.seq_number()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
       name: :failed_node_list_report,
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     node_ids = Command.param!(command, :node_ids)
@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReport do
     <<seq_number>> <> node_id_bytes
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(<<seq_number, node_id_bytes::binary>>) do
     node_ids = NodeIdList.parse(node_id_bytes)

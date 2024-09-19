@@ -34,10 +34,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
 
   alias Grizzly.ZWave.DecodeError
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x43
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :thermostat_setpoint
 
   @spec encode_type(type) :: byte

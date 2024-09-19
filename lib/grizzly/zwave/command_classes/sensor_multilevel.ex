@@ -133,10 +133,10 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
     ]
   ]
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x31
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :sensor_multilevel
 
   def encode_sensor_type(:temperature), do: 0x01

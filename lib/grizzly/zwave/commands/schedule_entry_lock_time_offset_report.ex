@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetReport do
           | {:sign_offset_tzo, :plus | :minus}
           | {:minute_offset_dst, integer()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     sign_tzo = Command.param!(command, :sign_tzo)
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetReport do
     <<sign_bit_tzo::1, hour_tzo::7, minute_tzo, sign_bit_dst::1, minute_offset_dst::7>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<sign_bit_tzo::1, hour_tzo::7, minute_tzo, sign_bit_dst::1, minute_offset_dst::7>>

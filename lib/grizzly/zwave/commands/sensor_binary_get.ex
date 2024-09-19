@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryGet do
 
   @type param :: {:sensor_type, SensorBinary.sensor_type()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -30,13 +30,13 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     sensor_type = Command.param!(command, :sensor_type)
     <<SensorBinary.encode_type(sensor_type)>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<sensor_type_byte>>) do
     with {:ok, sensor_type} <- SensorBinary.decode_type(sensor_type_byte) do
       {:ok, [sensor_type: sensor_type]}

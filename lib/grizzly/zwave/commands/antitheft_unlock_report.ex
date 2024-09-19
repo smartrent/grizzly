@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
           | {:antitheft_hint, String.t()}
           | {:locking_entity_id, non_neg_integer}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     state_bit = Command.param!(command, :state) |> AntitheftUnlock.state_to_bit()
     restricted? = Command.param!(command, :restricted)
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
       <<manufacturer_id::16, locking_entity_id::16>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(
         <<_reserved::2, hint_length::4, restricted_bit::1, state_bit::1,
           hint::binary-size(hint_length), manufacturer_id::16, locking_entity_id::16>>

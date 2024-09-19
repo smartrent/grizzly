@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.ManufacturerSpecific do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x72
 
-  @impl true
+  @impl Grizzly.ZWave.CommandClass
   def name(), do: :manufacturer_specific
 end

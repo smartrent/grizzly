@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ManufacturerSpecific
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def new(_opts \\ []) do
     command = %Command{
       name: :manufacturer_specific_get,
@@ -23,9 +23,9 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificGet do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(_), do: {:ok, []}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(_), do: <<>>
 end

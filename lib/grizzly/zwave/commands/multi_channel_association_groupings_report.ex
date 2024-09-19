@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport do
 
   @type param() :: {:supported_groupings, byte()}
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     command = %Command{
@@ -30,13 +30,13 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport do
     {:ok, command}
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     supported_groupings = Command.param!(command, :supported_groupings)
     <<supported_groupings>>
   end
 
-  @impl true
+  @impl Grizzly.ZWave.Command
   def decode_params(<<supported_groupings>>) do
     {:ok, [supported_groupings: supported_groupings]}
   end
