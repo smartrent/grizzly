@@ -28,9 +28,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
   @tag :firmware_update
   test "request that a device updates its firmware" do
     Grizzly.Trace.clear()
-    GrizzlyTest.Server.reset()
 
-    # mypid = self()
     node_id = 201
     image_path = "test/serialapi_controller_bridge_OTW_SD3503_US.gbl"
 

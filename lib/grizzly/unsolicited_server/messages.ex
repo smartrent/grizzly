@@ -3,7 +3,7 @@ defmodule Grizzly.UnsolicitedServer.Messages do
 
   require Logger
 
-  alias Grizzly.{Report, VirtualDevices, ZIPGateway}
+  alias Grizzly.{Report, VirtualDevices}
   alias Grizzly.ZWave.Command
 
   @registry __MODULE__.Registry
@@ -44,14 +44,12 @@ defmodule Grizzly.UnsolicitedServer.Messages do
     Registry.unregister(@registry, node_id)
   end
 
-  @spec broadcast(:inet.ip_address() | VirtualDevices.id(), Command.t()) :: :ok
+  @spec broadcast(pos_integer() | VirtualDevices.id(), Command.t()) :: :ok
   def broadcast({:virtual, _id} = id, command) do
     do_broadcast(id, command)
   end
 
-  def broadcast(node_ip_address, zip_packet_or_command) do
-    node_id = ZIPGateway.node_id_from_ip(node_ip_address)
-
+  def broadcast(node_id, zip_packet_or_command) do
     command =
       case zip_packet_or_command.name do
         :zip_packet ->

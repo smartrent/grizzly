@@ -44,7 +44,8 @@ defmodule Grizzly.MixProject do
       {:junit_formatter, "~> 3.3", only: :test},
       {:beam_notify, "~> 1.0 or ~> 0.2.0"},
       {:telemetry, "~> 0.4.3 or ~> 1.0"},
-      {:telemetry_registry, "~> 0.3"}
+      {:telemetry_registry, "~> 0.3"},
+      {:thousand_island, "~> 1.3"}
     ]
   end
 

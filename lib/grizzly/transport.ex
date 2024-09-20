@@ -86,8 +86,8 @@ defmodule Grizzly.Transport do
   @doc """
   Update the assigns with this field and value
   """
-  @spec assigns(t(), atom(), any()) :: t()
-  def assigns(transport, assign, assign_value) do
+  @spec put(t(), atom(), any()) :: t()
+  def put(transport, assign, assign_value) do
     new_assigns = Map.put(transport.assigns, assign, assign_value)
 
     %__MODULE__{transport | assigns: new_assigns}
@@ -96,8 +96,8 @@ defmodule Grizzly.Transport do
   @doc """
   Get the assign value for the field
   """
-  @spec assign(t(), atom(), any()) :: any()
-  def assign(transport, assign, default \\ nil),
+  @spec get(t(), atom(), any()) :: any()
+  def get(transport, assign, default \\ nil),
     do: Map.get(transport.assigns, assign, default)
 
   @doc """
@@ -156,7 +156,7 @@ defmodule Grizzly.Transport do
 
   @spec node_id(t()) :: {:ok, Grizzly.node_id()} | {:error, any()}
   def node_id(transport) do
-    case assign(transport, :node_id) || peername(transport) do
+    case get(transport, :node_id) || peername(transport) do
       {:ok, {ip, _}} -> {:ok, ZIPGateway.node_id_from_ip(ip)}
       {:error, reason} -> {:error, reason}
       node_id -> {:ok, node_id}

@@ -1,5 +1,9 @@
-defmodule GrizzlyTest.Server do
-  use GenServer
+defmodule GrizzlyTest.Server.Handler do
+  @moduledoc false
+
+  use ThousandIsland.Handler
+
+  alias ThousandIsland.Socket
 
   alias Grizzly.SeqNumber
   alias Grizzly.ZWave
@@ -22,30 +26,26 @@ defmodule GrizzlyTest.Server do
 
   require Logger
 
-  def reset() do
-    GenServer.call(__MODULE__, :reset)
+  @impl ThousandIsland.Handler
+  def handle_connection(_socket, _state) do
+    {:continue, %{node_id: nil, firmware_update_nack: true}}
   end
 
-  def start(port) do
-    GenServer.start(__MODULE__, port, name: __MODULE__)
+  @impl ThousandIsland.Handler
+  def handle_data(<<node_id::16, rest::binary>>, socket, %{node_id: nil} = state) do
+    handle_data(rest, socket, %{state | node_id: node_id})
   end
 
-  def init(port) do
-    {:ok, socket} = :gen_udp.open(port, [:binary, {:active, true}])
-    {:ok, %{socket: socket, firmware_update_nack: true}}
+  def handle_data(<<>>, _socket, state) do
+    {:continue, state}
   end
 
-  def handle_call(:reset, _from, state) do
-    {:reply, :ok, %{state | firmware_update_nack: true}}
-  end
-
-  def handle_info({:udp, _port, _ip, return_port, msg}, state) when return_port > 5000 do
-    node_id = return_port - 5000
-    {:ok, zip_packet} = ZWave.from_binary(msg)
+  def handle_data(data, socket, %{node_id: node_id} = state) do
+    {:ok, zip_packet} = ZWave.from_binary(data)
 
     cond do
       zip_packet.name == :keep_alive ->
-        handle_keep_alive(state.socket, return_port, zip_packet)
+        handle_keep_alive(socket, zip_packet)
 
       Command.param(zip_packet, :flag) == :ack_response ->
         :ok
@@ -58,28 +58,28 @@ defmodule GrizzlyTest.Server do
 
           # nack response only
           101 ->
-            send_nack_response(state.socket, return_port, zip_packet)
+            send_nack_response(socket, zip_packet)
 
           # mark as sleeping node
           102 ->
-            send_nack_waiting_then_report(state.socket, return_port, zip_packet)
+            send_nack_waiting_then_report(socket, zip_packet)
 
           # wakeup node that sends a nack waiting and then a nack response
           103 ->
-            send_nack_waiting_then_nack_response(state.socket, return_port, zip_packet)
+            send_nack_waiting_then_nack_response(socket, zip_packet)
 
           104 ->
-            send_nack_queue_full(state.socket, return_port, zip_packet)
+            send_nack_queue_full(socket, zip_packet)
 
           # Node 201 is for testing starting a firmware update and uploading an image
           201 ->
-            handle_firmware_update_command(state, return_port, zip_packet)
+            handle_firmware_update_command(socket, zip_packet, state)
 
           202 ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            maybe_send_a_report(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
+            maybe_send_a_report(socket, zip_packet)
             # the device asks for image fragments
-            send_firmware_update_md_get_command(state.socket, return_port,
+            send_firmware_update_md_get_command(socket,
               number_of_reports: 2,
               # change this to the before last fragment
               report_number: 1
@@ -88,13 +88,13 @@ defmodule GrizzlyTest.Server do
 
           # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
           301 ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            only_send_report_for_node_add_or_remove_stop(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
+            only_send_report_for_node_add_or_remove_stop(socket, zip_packet)
 
           # this controller id is for testing happy S2 inclusion
           302 ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            handle_inclusion_packet(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
+            handle_inclusion_packet(socket, zip_packet)
             :ok
 
           # this controller id is for testing sad S2 inclusion
@@ -106,12 +106,12 @@ defmodule GrizzlyTest.Server do
             :ok
 
           500 ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            send_garbage(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
+            send_garbage(socket, zip_packet)
 
           501 ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            send_command_not_to_spec(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
+            send_command_not_to_spec(socket, zip_packet)
 
           # node 600 times out in `GrizzlyTest.Transport.UDP`
           600 ->
@@ -120,46 +120,45 @@ defmodule GrizzlyTest.Server do
           # node 700 expects supervised commands and will send 2 status reports
           # before the final supervision report
           700 ->
-            send_ack_response(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
 
             {:ok, out_packet} = build_supervision_report(zip_packet, :working)
-            send_packet(state.socket, return_port, out_packet)
+            send_packet(socket, out_packet)
 
             {:ok, out_packet} = build_supervision_report(zip_packet, :working)
-            send_packet(state.socket, return_port, out_packet)
+            send_packet(socket, out_packet)
 
             {:ok, out_packet} = build_supervision_report(zip_packet, :success)
-            send_packet(state.socket, return_port, out_packet)
+            send_packet(socket, out_packet)
 
           _rest ->
-            send_ack_response(state.socket, return_port, zip_packet)
-            maybe_send_a_report(state.socket, return_port, zip_packet)
+            send_ack_response(socket, zip_packet)
+            maybe_send_a_report(socket, zip_packet)
         end
     end
     |> case do
-      %{socket: _} = state -> {:noreply, state}
-      _ -> {:noreply, state}
+      %{node_id: _} = state -> {:continue, state}
+      _ -> {:continue, state}
     end
   end
 
-  defp send_ack_response(socket, port, incoming_zip_packet) do
+  defp send_ack_response(socket, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_ack_response(seq_number)
-
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+    :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     :ok
   end
 
-  def only_send_report_for_node_add_or_remove_stop(socket, port, zip_packet) do
+  def only_send_report_for_node_add_or_remove_stop(socket, zip_packet) do
     command = Command.param!(zip_packet, :command)
 
     with {:ok, status_failed} <- get_node_add_remove_command(command, zip_packet) do
       seq_number = SeqNumber.get_and_inc()
 
       {:ok, out_packet} = ZIPPacket.with_zwave_command(status_failed, seq_number, flag: nil)
+      :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
-      _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
       :ok
     end
 
@@ -195,107 +194,105 @@ defmodule GrizzlyTest.Server do
     end
   end
 
-  defp send_nack_response(socket, port, incoming_zip_packet) do
+  defp send_nack_response(socket, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_response(seq_number)
-
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+    :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     :ok
   end
 
-  defp send_nack_queue_full(socket, port, incoming_zip_packet) do
+  defp send_nack_queue_full(socket, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_response(seq_number)
     out_packet = Command.put_param(out_packet, :flag, :nack_queue_full)
-
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+    :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     :ok
   end
 
-  defp send_nack_waiting_then_report(socket, port, incoming_zip_packet) do
+  defp send_nack_waiting_then_report(socket, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_waiting_response(seq_number, 2)
-
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+    :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     spawn(fn ->
       Process.sleep(2_000)
-      maybe_send_a_report(socket, port, incoming_zip_packet)
+      maybe_send_a_report(socket, incoming_zip_packet)
     end)
 
     :ok
   end
 
-  defp send_nack_waiting_then_nack_response(socket, port, incoming_zip_packet) do
+  defp send_nack_waiting_then_nack_response(socket, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
     out_packet = ZIPPacket.make_nack_waiting_response(seq_number, 3600)
 
-    send_packet(socket, port, out_packet)
+    send_packet(socket, out_packet)
 
     spawn(fn ->
       # send a queued_ping
       Process.sleep(10)
-      send_packet(socket, port, out_packet)
+      send_packet(socket, out_packet)
 
       # send a nack_response
       Process.sleep(10)
       out_packet = ZIPPacket.make_nack_response(seq_number)
-      send_packet(socket, port, out_packet)
+      send_packet(socket, out_packet)
     end)
 
     :ok
   end
 
-  defp handle_keep_alive(socket, port, keep_alive) do
+  defp handle_keep_alive(socket, keep_alive) do
     with :ack_request <- Command.param!(keep_alive, :ack_flag) do
       {:ok, response} = ZIPKeepAlive.new(ack_flag: :ack_response)
 
-      _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(response))
+      :ok = Socket.send(socket, ZWave.to_binary(response))
     end
 
     :ok
   end
 
-  defp maybe_send_a_report(socket, port, zip_packet) do
+  defp maybe_send_a_report(socket, zip_packet) do
     encapsulated_command = Command.param!(zip_packet, :command)
 
     cond do
       encapsulated_command && expects_a_report(encapsulated_command.name) ->
         {:ok, out_packet} = build_report(zip_packet)
 
-        send_packet(socket, port, out_packet)
+        send_packet(socket, out_packet)
 
       encapsulated_command && encapsulated_command.name == :supervision_get ->
         {:ok, out_packet} = build_supervision_report(zip_packet, :success)
-        send_packet(socket, port, out_packet)
+        send_packet(socket, out_packet)
 
       true ->
         :ok
     end
   end
 
-  defp send_packet(socket, port, out_packet) do
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+  defp send_packet(socket, out_packet) do
+    :ok = Socket.send(socket, ZWave.to_binary(out_packet))
     :ok
   end
 
-  defp send_garbage(socket, port, _zip_packet) do
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, <<0x12, 0x12>>)
+  defp send_garbage(socket, _zip_packet) do
+    :ok = Socket.send(socket, <<0x12, 0x12>>)
     :ok
   end
 
-  defp send_command_not_to_spec(socket, port, _zip_packet) do
+  defp send_command_not_to_spec(socket, _zip_packet) do
     # Door lock report with invalid mode (0xAA)
     {:ok, command} =
       ZIPPacket.with_zwave_command(<<98, 3, 0xAA, 0, 0, 0, 0>>, SeqNumber.get_and_inc())
 
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(command))
+    :ok = Socket.send(socket, ZWave.to_binary(command))
+
     :ok
   end
 
-  defp send_firmware_update_md_get_command(socket, port,
+  defp send_firmware_update_md_get_command(socket,
          number_of_reports: number_of_reports,
          report_number: report_number
        ) do
@@ -305,35 +302,34 @@ defmodule GrizzlyTest.Server do
       FirmwareUpdateMDGet.new(number_of_reports: number_of_reports, report_number: report_number)
 
     {:ok, out_packet} = ZIPPacket.with_zwave_command(command, seq_number, flag: nil)
-
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_packet))
+    :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     :ok
   end
 
-  def handle_inclusion_packet(socket, port, incoming_zip_packet) do
+  def handle_inclusion_packet(socket, incoming_zip_packet) do
     encapsulated_command = Command.param!(incoming_zip_packet, :command)
 
     _ =
       case encapsulated_command.name do
         :node_add ->
-          send_node_add_keys_report(socket, port, incoming_zip_packet)
+          send_node_add_keys_report(socket, incoming_zip_packet)
 
         :node_add_keys_set ->
-          send_add_node_dsk_report(socket, port, incoming_zip_packet)
+          send_add_node_dsk_report(socket, incoming_zip_packet)
 
         :node_add_dsk_set ->
           {:ok, command} = build_s2_node_add_status(incoming_zip_packet)
 
           {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc())
 
-          _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
+          :ok = Socket.send(socket, ZWave.to_binary(out_zip_packet))
       end
 
     :ok
   end
 
-  def send_node_add_keys_report(socket, port, incoming_zip_packet) do
+  def send_node_add_keys_report(socket, incoming_zip_packet) do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
 
     {:ok, keys_report} =
@@ -344,13 +340,12 @@ defmodule GrizzlyTest.Server do
       )
 
     {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(keys_report, SeqNumber.get_and_inc())
-
-    _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
+    :ok = Socket.send(socket, ZWave.to_binary(out_zip_packet))
 
     :ok
   end
 
-  def send_add_node_dsk_report(socket, port, incoming_zip_packet) do
+  def send_add_node_dsk_report(socket, incoming_zip_packet) do
     command = Command.param!(incoming_zip_packet, :command)
 
     case Command.param!(command, :granted_keys) do
@@ -366,8 +361,8 @@ defmodule GrizzlyTest.Server do
           )
 
         {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(dsk_report, seq_number)
+        :ok = Socket.send(socket, ZWave.to_binary(out_zip_packet))
 
-        _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
         :ok
 
       [:s2_authenticated] ->
@@ -382,8 +377,8 @@ defmodule GrizzlyTest.Server do
           )
 
         {:ok, out_zip_packet} = ZIPPacket.with_zwave_command(dsk_report, seq_number)
+        :ok = Socket.send(socket, ZWave.to_binary(out_zip_packet))
 
-        _ = :gen_udp.send(socket, {0, 0, 0, 0}, port, ZWave.to_binary(out_zip_packet))
         :ok
     end
   end
@@ -535,16 +530,16 @@ defmodule GrizzlyTest.Server do
     nil
   end
 
-  defp handle_firmware_update_command(state, return_port, zip_packet) do
+  defp handle_firmware_update_command(socket, zip_packet, state) do
     command = Command.param!(zip_packet, :command)
 
     case command do
       # Initate the firmware update process and request the first batch of fragments
       %{name: :firmware_update_md_request_get} ->
-        send_ack_response(state.socket, return_port, zip_packet)
-        maybe_send_a_report(state.socket, return_port, zip_packet)
+        send_ack_response(socket, zip_packet)
+        maybe_send_a_report(socket, zip_packet)
 
-        send_firmware_update_md_get_command(state.socket, return_port,
+        send_firmware_update_md_get_command(socket,
           number_of_reports: 5,
           # Change this to be the last fragment
           report_number: 1
@@ -554,10 +549,10 @@ defmodule GrizzlyTest.Server do
 
       %{name: :firmware_update_md_report} ->
         if Command.param!(command, :report_number) == 5 and state.firmware_update_nack do
-          send_nack_response(state.socket, return_port, zip_packet)
+          send_nack_response(socket, zip_packet)
           %{state | firmware_update_nack: false}
         else
-          send_ack_response(state.socket, return_port, zip_packet)
+          send_ack_response(socket, zip_packet)
           state
         end
     end

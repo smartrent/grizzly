@@ -6,8 +6,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   require Logger
 
-  alias Grizzly.{Transport, VersionReports}
   alias Grizzly.{Associations, ZWave}
+  alias Grizzly.VersionReports
   alias Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Commands.{
@@ -33,8 +33,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   When a transport receives a response from the Z-Wave network handle it
   and send any other commands back over the Z-Wave PAN if needed
   """
-  @spec handle_response(Transport.Response.t(), [opt()]) :: [action()] | {:error, reason :: any()}
-  def handle_response(%{command: command}, opts \\ []) do
+  @spec handle_response(Command.t(), [opt()]) :: [action()] | {:error, reason :: any()}
+  def handle_response(command, opts \\ []) do
     cond do
       command.name == :keep_alive ->
         handle_keep_alive(command)
@@ -68,7 +68,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       true ->
         with internal_cmd when not is_nil(internal_cmd) <- Command.param!(command, :command),
              actions when is_list(actions) <- handle_command(internal_cmd, opts) do
-          actions
+          [:ack | actions]
         else
           {:error, _any} = error ->
             error
@@ -103,8 +103,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         # We need to process the internal command and get the actions that need
         # to be preformed. The supervision report must come last in the chain of
         # actions. See SDS13783 section 3.7.2.2 for more information.
-        actions = handle_command(report, opts)
-        actions ++ [{:send, supervision_report}]
+        handle_command(report, opts) ++ [{:send, supervision_report}]
 
       {:error, reason} ->
         Logger.warning(
@@ -382,7 +381,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   defp handle_command(command, _opts), do: [{:notify, command}]
 
-  def make_supervision_report(%Command{name: :supervision_get} = command) do
+  defp make_supervision_report(%Command{name: :supervision_get} = command) do
     session_id = Command.param!(command, :session_id)
 
     SupervisionReport.new(
