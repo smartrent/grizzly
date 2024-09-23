@@ -37,9 +37,6 @@ defmodule Grizzly.UnsolicitedServer.Socket do
       transport = Transport.assigns(transport, :node_id, node_id)
       Logger.metadata(node_id: node_id)
 
-      # Start a new listen socket to replace this one as this one is now bound
-      # to a single node in the Z-Wave PAN.
-      {:ok, _} = SocketSupervisor.start_socket(listening_transport)
       {:noreply, transport}
     else
       other ->
@@ -49,6 +46,10 @@ defmodule Grizzly.UnsolicitedServer.Socket do
 
         {:stop, :handshake_error, listening_transport}
     end
+  after
+    # Start a new listen socket to replace this one as this one is now bound
+    # to a single node in the Z-Wave PAN.
+    {:ok, _} = SocketSupervisor.start_socket(listening_transport)
   end
 
   @impl GenServer
