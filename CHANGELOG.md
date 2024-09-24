@@ -4,6 +4,21 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.5.3] - 2024-09-23
+
+### Added
+
+* Added missing notification events ([#980](https://github.com/smartrent/grizzly/pull/980))
+
+### Fixed
+
+* Prevent depletion of UnsolicitedServer listen sockets ([#988](https://github.com/smartrent/grizzly/pull/988))
+* Fix acknowledged flag sometimes being incorrectly false ([#983](https://github.com/smartrent/grizzly/pull/983))
+
+### Changed
+
+* Traces record node ids instead of IP addresses ([#985](https://github.com/smartrent/grizzly/pull/985))
+
 ## [v8.5.2] - 2024-09-11
 
 ### Fixed
@@ -2575,6 +2590,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.5.3]: https://github.com/smartrent/grizzly/compare/v8.5.2..v8.5.3
 [v8.5.2]: https://github.com/smartrent/grizzly/compare/v8.5.1..v8.5.2
 [v8.5.1]: https://github.com/smartrent/grizzly/compare/v8.5.0..v8.5.1
 [v8.5.0]: https://github.com/smartrent/grizzly/compare/v8.4.0..v8.5.0
