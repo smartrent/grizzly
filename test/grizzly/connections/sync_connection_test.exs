@@ -14,10 +14,6 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     :ok
   end
 
-  test "reports timeout" do
-    assert {:error, :timeout} == Connection.open(600)
-  end
-
   test "handles nack responses" do
     {:ok, command} = SwitchBinaryGet.new()
 

@@ -193,6 +193,8 @@ defmodule Grizzly.Supervisor do
   end
 
   defp children(options) do
+    {ip, port} = options.unsolicited_destination
+
     [
       %{
         id: Grizzly.Options.Agent,
@@ -209,13 +211,21 @@ defmodule Grizzly.Supervisor do
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
       {Grizzly.Associations, options},
 
-      # TODO: move unsolicited server stuff to own supervisor
+      # This is a registry for subscribing to unsolicited messages. It isn't
+      # under UnsolicitedServer.Supervisor because we don't want a restart
+      # of the unsolicited server subsystem to take down subscribers.
       Grizzly.UnsolicitedServer.Messages,
-      Grizzly.UnsolicitedServer.SocketSupervisor,
-      {Grizzly.UnsolicitedServer, options},
-      ##########################
+      {ThousandIsland,
+       [
+         port: port,
+         num_acceptors: 10,
+         handler_module: Grizzly.UnsolicitedServer.ConnectionHandler,
+         transport_module: Grizzly.UnsolicitedServer.DTLSTransport,
+         transport_options: [ifaddr: ip],
+         supervisor_options: [name: Grizzly.UnsolicitedServer]
+       ]},
 
-      # Supervisor for starting connections to Z-Wave nodes
+      # Supervisors for connections to/from Z-Wave nodes
       {Grizzly.Connections.Supervisor, options},
       {Grizzly.Inclusions.Supervisor, options},
 

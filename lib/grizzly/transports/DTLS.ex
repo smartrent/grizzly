@@ -9,11 +9,12 @@ defmodule Grizzly.Transports.DTLS do
   alias Grizzly.Transport.Response
   require Logger
 
+  @handshake_timeout Application.compile_env(:grizzly, :dtls_handshake_timeout, 10_000)
+
   @impl Grizzly.Transport
-  def open(args) do
+  def open(args, ifaddr \\ {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}) do
     ip_address = Keyword.fetch!(args, :ip_address)
     port = Keyword.fetch!(args, :port)
-    ifaddr = {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}
 
     node_id =
       case Keyword.fetch!(args, :node_id) do
@@ -38,7 +39,7 @@ defmodule Grizzly.Transports.DTLS do
 
   @impl Grizzly.Transport
   def send(transport, binary, opts) do
-    socket = Transport.assign(transport, :socket)
+    socket = Transport.get(transport, :socket)
 
     # `:trace` can explicitly be set to false to disable tracing on a particular
     # command
@@ -156,20 +157,20 @@ defmodule Grizzly.Transports.DTLS do
   @impl Grizzly.Transport
   def close(transport) do
     transport
-    |> Transport.assign(:socket)
+    |> Transport.get(:socket)
     |> :ssl.close()
   end
 
   @impl Grizzly.Transport
   def listen(transport) do
-    port = Transport.assign(transport, :port)
-    ip_address = Transport.assign(transport, :ip_address)
+    port = Transport.get(transport, :port)
+    ip_address = Transport.get(transport, :ip_address)
 
     # Listen sockets should start in passive mode to avoid undefined behavior.
     # See https://www.erlang.org/doc/apps/ssl/ssl.html#handshake/3
     case :ssl.listen(port, dtls_opts(ip_address, active: false)) do
       {:ok, listening_socket} ->
-        {:ok, Transport.assigns(transport, :socket, listening_socket), strategy: :accept}
+        {:ok, Transport.put(transport, :socket, listening_socket), strategy: :accept}
 
       error ->
         error
@@ -178,11 +179,11 @@ defmodule Grizzly.Transports.DTLS do
 
   @impl Grizzly.Transport
   def accept(transport) do
-    socket = Transport.assign(transport, :socket)
+    socket = Transport.get(transport, :socket)
 
     case :ssl.transport_accept(socket) do
       {:ok, socket} ->
-        {:ok, Transport.assigns(transport, :socket, socket)}
+        {:ok, Transport.put(transport, :socket, socket)}
 
       error ->
         error
@@ -191,17 +192,17 @@ defmodule Grizzly.Transports.DTLS do
 
   @impl Grizzly.Transport
   def handshake(transport) do
-    socket = Transport.assign(transport, :socket)
+    socket = Transport.get(transport, :socket)
 
-    with {:ok, socket} <- :ssl.handshake(socket, 10_000),
+    with {:ok, socket} <- :ssl.handshake(socket, @handshake_timeout),
          :ok <- :ssl.setopts(socket, active: true) do
-      {:ok, Transport.assigns(transport, :socket, socket)}
+      {:ok, Transport.put(transport, :socket, socket)}
     end
   end
 
   @impl Grizzly.Transport
   def peername(transport) do
-    socket = Transport.assign(transport, :socket)
+    socket = Transport.get(transport, :socket)
     :ssl.peername(socket)
   end
 
@@ -211,7 +212,14 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   defp dtls_opts(ifaddr, opts \\ []) do
+    protocol =
+      case tuple_size(ifaddr) do
+        4 -> :inet
+        8 -> :inet6
+      end
+
     [
+      protocol,
       {:ssl_imp, :new},
       {:active, Keyword.get(opts, :active, true)},
       {:verify, :verify_none},
@@ -224,7 +232,6 @@ defmodule Grizzly.Transports.DTLS do
         <<0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
           0x90, 0xAA>>}},
       {:cb_info, {:gen_udp, :udp, :udp_close, :udp_error}},
-      :inet6,
       {:ifaddr, ifaddr},
       {:log_level, :error}
     ]

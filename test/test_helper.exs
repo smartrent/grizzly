@@ -1,4 +1,13 @@
-{:ok, _pid} = GrizzlyTest.Server.start(5000)
+# Start the mock Z/IP Gateway server
+{:ok, _pid} =
+  ThousandIsland.start_link(
+    handler_module: GrizzlyTest.Server.Handler,
+    handler_options: %{node_id: nil},
+    port: 5000,
+    transport_module: Grizzly.UnsolicitedServer.DTLSTransport,
+    transport_options: [ifaddr: {127, 0, 0, 1}],
+    num_acceptors: 10
+  )
 
 Mimic.copy(Grizzly.Connections.AsyncConnection)
 Mimic.copy(MockStatusReporter)

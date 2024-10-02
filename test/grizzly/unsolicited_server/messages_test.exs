@@ -11,10 +11,7 @@ defmodule Grizzly.UnsolicitedServer.MessagesTest do
     :ok = Messages.subscribe(:switch_binary_get)
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(receiving_command, 0x02)
 
-    Messages.broadcast(
-      {0, 0, 0, 2},
-      zip_packet
-    )
+    Messages.broadcast(2, zip_packet)
 
     assert_receive {:grizzly, :report, %Report{} = report}, 500
 
