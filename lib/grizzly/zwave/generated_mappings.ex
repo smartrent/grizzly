@@ -105,6 +105,7 @@ defmodule Grizzly.ZWave.GeneratedMappings do
       {128, :battery},
       {129, :clock},
       {130, :hail},
+      {131, :user_credential},
       {132, :wake_up},
       {133, :association},
       {134, :version},
@@ -142,7 +143,7 @@ defmodule Grizzly.ZWave.GeneratedMappings do
   end
 
   def basic_device_class_mappings() do
-    [{1, :controller}, {2, :static_controller}, {3, :slave}, {4, :routing_slave}]
+    [{1, :controller}, {2, :static_controller}, {3, :end_node}, {4, :routing_end_node}]
   end
 
   def generic_device_class_mappings() do
@@ -156,7 +157,7 @@ defmodule Grizzly.ZWave.GeneratedMappings do
       {7, :sensor_notification},
       {8, :thermostat},
       {9, :window_covering},
-      {15, :repeater_slave},
+      {15, :repeater_end_node},
       {16, :switch_binary},
       {17, :switch_multilevel},
       {18, :switch_remote},
@@ -215,10 +216,10 @@ defmodule Grizzly.ZWave.GeneratedMappings do
       {:network_extender, 0, :not_used},
       {:network_extender, 1, :secure_extender},
       {:non_interoperable, 0, :not_used},
-      {:repeater_slave, 0, :not_used},
-      {:repeater_slave, 1, :repeater_slave},
-      {:repeater_slave, 2, :virtual_node},
-      {:repeater_slave, 3, :ir_repeater},
+      {:repeater_end_node, 0, :not_used},
+      {:repeater_end_node, 1, :repeater_end_node},
+      {:repeater_end_node, 2, :virtual_node},
+      {:repeater_end_node, 3, :ir_repeater},
       {:security_panel, 0, :not_used},
       {:security_panel, 1, :zoned_security_panel},
       {:semi_interoperable, 0, :not_used},

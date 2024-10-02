@@ -12,6 +12,9 @@ defmodule Grizzly.ZWave.IconType do
   provided by Silicon Labs for more information.
   """
 
+  @type name :: atom()
+  @type value :: 0x0000..0xFFFF
+
   @mappings [
     {0x0000, :unassigned},
     {0x0100, :generic_central_controller},
@@ -149,7 +152,7 @@ defmodule Grizzly.ZWave.IconType do
     {0x1900, :generic_window_covering_endpoint_aware},
     {0x1A00, :generic_window_covering_position_endpoint_aware},
     {0x1B00, :generic_repeater},
-    {0x1B01, :specific_repeater_slave},
+    {0x1B01, :specific_repeater_end_node},
     {0x1B03, :specific_ir_repeater},
     {0x1C00, :generic_dimmer_wall_switch},
     {0x1C01, :specific_dimmer_wall_switch_one_button},
@@ -179,10 +182,6 @@ defmodule Grizzly.ZWave.IconType do
     {0x2202, :specific_sound_switch_chime},
     {0x2203, :specific_sound_switch_alarm_clock}
   ]
-
-  @type name :: atom()
-
-  @type value :: 0x0000..0xFFFF
 
   @doc """
   Get the icon type's name from a 16-bit integer value

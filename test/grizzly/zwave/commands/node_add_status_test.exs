@@ -141,7 +141,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         node_id: 7,
         seq_number: 37,
         listening?: false,
-        basic_device_class: :routing_slave,
+        basic_device_class: :routing_end_node,
         generic_device_class: :sensor_notification,
         specific_device_class: :notification_sensor,
         command_classes: expected_command_classes
