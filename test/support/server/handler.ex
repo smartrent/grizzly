@@ -217,7 +217,7 @@ defmodule GrizzlyTest.Server.Handler do
     :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     spawn(fn ->
-      Process.sleep(2_000)
+      Process.sleep(500)
       maybe_send_a_report(socket, incoming_zip_packet)
     end)
 

@@ -1,5 +1,5 @@
 defmodule Grizzly.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Grizzly.Report
   alias Grizzly.ZWave.Command

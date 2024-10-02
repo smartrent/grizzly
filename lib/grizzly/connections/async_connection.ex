@@ -56,7 +56,7 @@ defmodule Grizzly.Connections.AsyncConnection do
   def send_command(node_id_or_conn, command, opts \\ [])
 
   def send_command(node_id, command, opts) when is_zwave_node_id(node_id) do
-    name = Connections.make_name({:async, node_id})
+    name = make_name(node_id)
     send_command(name, command, opts)
   end
 
@@ -64,17 +64,20 @@ defmodule Grizzly.Connections.AsyncConnection do
     GenServer.call(connection, {:send_command, command, opts}, 140_000)
   end
 
-  @spec stop_command(Grizzly.node_id(), reference()) :: :ok
+  @spec stop_command(Grizzly.node_id() | pid(), reference()) :: :ok
   def stop_command(node_id, command_ref) do
-    name = Connections.make_name({:async, node_id})
+    name = make_name(node_id)
     GenServer.call(name, {:stop_command, command_ref})
   end
 
-  @spec command_alive?(Grizzly.node_id(), reference()) :: boolean()
+  @spec command_alive?(Grizzly.node_id() | pid(), reference()) :: boolean()
   def command_alive?(node_id, command_ref) do
-    name = Connections.make_name({:async, node_id})
+    name = make_name(node_id)
     GenServer.call(name, {:command_alive?, command_ref})
   end
+
+  defp make_name(pid) when is_pid(pid), do: pid
+  defp make_name(node_id), do: Connections.make_name({:async, node_id})
 
   def stop(node_id) do
     # TODO close socket
