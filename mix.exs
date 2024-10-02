@@ -58,8 +58,7 @@ defmodule Grizzly.MixProject do
 
     [
       flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return],
-      plt_add_apps: [:eex, :mix, :ex_unit, :iex],
-      ignore_warnings: "dialyzer_ignore_warnings.exs"
+      plt_add_apps: [:eex, :mix, :ex_unit, :iex]
     ] ++ ci_opts
   end
 
