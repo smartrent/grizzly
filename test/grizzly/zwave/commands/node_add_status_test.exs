@@ -58,7 +58,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         listening?: false,
         specific_device_class: :static_installer_tool,
         kex_fail_type: :none,
-        keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
+        granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
       ]
 
       {:ok, params} = NodeAddStatus.decode_params(report)
@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         listening?: false,
         specific_device_class: :static_installer_tool,
         kex_fail_type: :none,
-        keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
+        granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
         input_dsk: expected_dsk
       ]
 

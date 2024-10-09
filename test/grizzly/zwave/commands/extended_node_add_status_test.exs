@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatusTest do
         listening?: false,
         specific_device_class: :static_installer_tool,
         kex_fail_type: :none,
-        keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
+        granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
       ]
 
       {:ok, params} = ExtendedNodeAddStatus.decode_params(report)
