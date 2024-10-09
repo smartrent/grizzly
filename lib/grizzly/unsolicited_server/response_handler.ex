@@ -29,6 +29,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   @type action() ::
           {:notify, Command.t()} | {:send, Command.t()} | {:forward_to_controller, Command.t()}
 
+  defguardp is_supervision_status_action(a) when is_tuple(a) and elem(a, 0) == :supervision_status
+
   @doc """
   When a transport receives a response from the Z-Wave network handle it
   and send any other commands back over the Z-Wave PAN if needed
@@ -68,6 +70,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       true ->
         with internal_cmd when not is_nil(internal_cmd) <- Command.param!(command, :command),
              actions when is_list(actions) <- handle_command(internal_cmd, opts) do
+          actions = Enum.reject(actions, &is_supervision_status_action/1)
           [:ack | actions]
         else
           {:error, _any} = error ->
@@ -95,7 +98,6 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   end
 
   defp handle_command(%Command{name: :supervision_get} = command, opts) do
-    {:ok, supervision_report} = make_supervision_report(command)
     encapsulated_command = Command.param!(command, :encapsulated_command)
 
     case ZWave.from_binary(encapsulated_command) do
@@ -103,15 +105,28 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         # We need to process the internal command and get the actions that need
         # to be preformed. The supervision report must come last in the chain of
         # actions. See SDS13783 section 3.7.2.2 for more information.
-        handle_command(report, opts) ++ [{:send, supervision_report}]
+        actions = handle_command(report, opts)
+
+        {_, supervision_status} =
+          Enum.find(actions, {:supervision_status, :success}, &is_supervision_status_action/1)
+
+        actions = Enum.reject(actions, &is_supervision_status_action/1)
+
+        {:ok, supervision_report} = make_supervision_report(command, supervision_status)
+        actions ++ [{:send, supervision_report}]
 
       {:error, reason} ->
         Logger.warning(
           "Failed to parse: #{inspect(encapsulated_command)} notification for reason: #{inspect(reason)}"
         )
 
-        []
+        {:ok, supervision_report} = make_supervision_report(command, :no_support)
+        [{:send, supervision_report}]
     end
+  end
+
+  defp handle_command(%Command{name: :basic_set}, _opts) do
+    [{:supervision_status, :no_support}]
   end
 
   defp handle_command(%Command{name: :association_specific_group_get}, _) do
@@ -157,10 +172,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     # if the command contains something other than one we will just move along.
     if grouping_identifier == 1 do
       nodes = Command.param!(command, :nodes)
-      :ok = Associations.save(associations_server, grouping_identifier, nodes)
-    end
 
-    []
+      case Associations.save(associations_server, grouping_identifier, nodes) do
+        :ok -> [supervision_status: :success]
+        _ -> [supervision_status: :fail]
+      end
+    else
+      [supervision_status: :fail]
+    end
   end
 
   defp handle_command(%Command{name: :association_groupings_get}, _opts) do
@@ -280,10 +299,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     # if the command contains something other than one we will just move along.
     if grouping_identifier == 1 do
       nodes = Command.param!(command, :nodes)
-      :ok = Associations.save(associations_server, grouping_identifier, nodes)
-    end
 
-    []
+      case Associations.save(associations_server, grouping_identifier, nodes) do
+        :ok -> [supervision_status: :success]
+        _ -> [supervision_status: :fail]
+      end
+    else
+      [supervision_status: :fail]
+    end
   end
 
   defp handle_command(%Command{name: :multi_channel_association_remove} = command, opts) do
@@ -381,12 +404,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   defp handle_command(command, _opts), do: [{:notify, command}]
 
-  defp make_supervision_report(%Command{name: :supervision_get} = command) do
+  defp make_supervision_report(%Command{name: :supervision_get} = command, status) do
     session_id = Command.param!(command, :session_id)
 
     SupervisionReport.new(
       session_id: session_id,
-      status: :success,
+      status: status,
       more_status_updates: :last_report,
       duration: 0
     )

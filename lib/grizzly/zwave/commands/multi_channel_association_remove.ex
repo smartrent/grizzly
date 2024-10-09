@@ -64,4 +64,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
     {:ok,
      [grouping_identifier: grouping_identifier, nodes: node_ids, node_endpoints: node_endpoints]}
   end
+
+  def decode_params(<<>>) do
+    {:ok, [grouping_identifier: 0, nodes: [], node_endpoints: []]}
+  end
 end
