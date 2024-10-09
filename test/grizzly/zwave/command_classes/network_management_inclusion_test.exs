@@ -73,7 +73,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                listening?: false,
                specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
-               keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
+               granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
              }
     end
 
@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                listening?: false,
                specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
-               keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
+               granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
              }
     end
 
@@ -122,7 +122,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                listening?: false,
                specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
-               keys_granted: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
+               granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
                input_dsk: expected_dsk
              }
     end

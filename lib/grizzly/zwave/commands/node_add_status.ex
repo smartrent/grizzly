@@ -128,15 +128,15 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   def encode_listening_bit(false), do: 0x00
 
   defp maybe_add_version_2_fields(command, command_bin) do
-    case Command.param(command, :keys_granted) do
+    case Command.param(command, :granted_keys) do
       nil ->
         command_bin
 
-      keys_granted ->
+      granted_keys ->
         kex_failed_type = Command.param!(command, :kex_fail_type)
 
         command_bin <>
-          <<Security.keys_to_byte(keys_granted), Security.failed_type_to_byte(kex_failed_type)>>
+          <<Security.keys_to_byte(granted_keys), Security.failed_type_to_byte(kex_failed_type)>>
     end
   end
 

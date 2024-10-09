@@ -122,7 +122,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
   end
 
   defp add_keys_granted_and_fail_type(command) do
-    keys = Command.param!(command, :keys_granted)
+    keys = Command.param!(command, :granted_keys)
     kex_failed_type = Command.param!(command, :kex_fail_type)
 
     <<Security.keys_to_byte(keys), Security.failed_type_to_byte(kex_failed_type)>>
