@@ -78,7 +78,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   * `:generic_device_class` - the generic device class
   * `:specific_device_class` - the specific device class
   * `:command_classes` - list of command classes the new device supports
-  * `:keys_granted` - S2 keys granted by the user during the time of inclusion
+  * `:granted_keys` - S2 keys granted by the user during the time of inclusion
     version 2 and above
   * `:kex_fail_type` - the type of key exchange failure if there is one version
     2 and above
@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           required(:generic_device_class) => DeviceClasses.generic_device_class(),
           required(:specific_device_class) => DeviceClasses.specific_device_class(),
           required(:command_classes) => [tagged_command_classes()],
-          optional(:keys_granted) => [Security.key()],
+          optional(:granted_keys) => [Security.key()],
           optional(:kex_fail_type) => Security.key_exchange_fail_type(),
           optional(:input_dsk) => Security.key_exchange_fail_type()
         }
@@ -108,7 +108,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   * `:generic_device_class` - the generic device class
   * `:specific_device_class` - the specific device class
   * `:command_classes` - list of command classes the new device supports
-  * `:keys_granted` - S2 keys granted by the user during the time of inclusion
+  * `:granted_keys` - S2 keys granted by the user during the time of inclusion
   * `:kex_fail_type` - the type of key exchange failure if there is one
   """
   @type extended_node_info_report() :: %{
@@ -117,7 +117,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           required(:generic_device_class) => DeviceClasses.generic_device_class(),
           required(:specific_device_class) => DeviceClasses.specific_device_class(),
           required(:command_classes) => [tagged_command_classes()],
-          required(:keys_granted) => [Security.key()],
+          required(:granted_keys) => [Security.key()],
           required(:kex_fail_type) => Security.key_exchange_fail_type()
         }
 
@@ -184,25 +184,25 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   defp parse_optional_fields(info, <<>>), do: info
 
-  defp parse_optional_fields(info, <<keys_granted, kex_fail_type>>) do
+  defp parse_optional_fields(info, <<granted_keys, kex_fail_type>>) do
     info
-    |> put_security_info(keys_granted, kex_fail_type)
+    |> put_security_info(granted_keys, kex_fail_type)
   end
 
-  defp parse_optional_fields(info, <<keys_granted, kex_fail_type, 0x00>>) do
+  defp parse_optional_fields(info, <<granted_keys, kex_fail_type, 0x00>>) do
     info
-    |> put_security_info(keys_granted, kex_fail_type)
+    |> put_security_info(granted_keys, kex_fail_type)
   end
 
-  defp parse_optional_fields(info, <<keys_granted, kex_fail_type, 16, dsk::binary-size(16)>>) do
+  defp parse_optional_fields(info, <<granted_keys, kex_fail_type, 16, dsk::binary-size(16)>>) do
     info
-    |> put_security_info(keys_granted, kex_fail_type)
+    |> put_security_info(granted_keys, kex_fail_type)
     |> put_dsk(dsk)
   end
 
-  defp put_security_info(info, keys_granted, kex_fail_type) do
+  defp put_security_info(info, granted_keys, kex_fail_type) do
     info
-    |> Map.put(:keys_granted, Security.byte_to_keys(keys_granted))
+    |> Map.put(:granted_keys, Security.byte_to_keys(granted_keys))
     |> Map.put(:kex_fail_type, Security.failed_type_from_byte(kex_fail_type))
   end
 
