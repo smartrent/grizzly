@@ -36,6 +36,16 @@ defmodule Grizzly.ZWave.CommandClassesTest do
 
       binary = <<0x20, 0x32, 0xEF, 0xCC>>
       assert expected_command_classes == CommandClasses.command_class_list_from_binary(binary)
+
+      expected_command_classes = [
+        non_secure_supported: [:basic, :meter],
+        non_secure_controlled: [],
+        secure_supported: [],
+        secure_controlled: []
+      ]
+
+      binary = <<0x20, 0x32, 0xEF, 0xCC, 0xFA, 0x01, 0xF8, 0x90>>
+      assert expected_command_classes == CommandClasses.command_class_list_from_binary(binary)
     end
   end
 end
