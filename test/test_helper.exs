@@ -9,6 +9,7 @@
     num_acceptors: 10
   )
 
+Mimic.copy(Grizzly)
 Mimic.copy(Grizzly.Connections.AsyncConnection)
 Mimic.copy(MockStatusReporter)
 Mimic.copy(MockZWaveResetter)

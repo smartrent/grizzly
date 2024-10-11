@@ -77,6 +77,12 @@ defmodule Grizzly.Network do
     * `:node_id` - If your controller is part of another controller's network
       you might want to issue network commands to that controller. By default
       this option will chose your controller.
+    * `:notify` - Whether to notify the nodes in the lifeline association group
+      that the controller is being reset. Used primarily to disable this behavior
+      in unit tests. Default `true`.
+    * `:associations_server` - Which associations server to use for notifications
+      and to clear after a successful reset. Default is to use the default
+      associations server (named `Grizzly.Associations`).
   """
   @spec reset_controller([reset_opt() | opt()]) :: Grizzly.send_command_response()
   def reset_controller(opts \\ []) do
@@ -88,12 +94,16 @@ defmodule Grizzly.Network do
     # sending keep alive messages when we don't need to and will have
     # unnecessary connections hanging out just taking up resources.
     :ok = Connections.close_all()
+
     seq_number = SeqNumber.get_and_inc()
     node_id = node_id_from_opts(opts)
 
+    maybe_notify_reset(opts)
+
     case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 10_000) do
       {:ok, %Report{type: :command, status: :complete}} = response ->
-        maybe_notify_reset(response, opts)
+        _ = Associations.delete_all(Keyword.get(opts, :associations_server, Grizzly.Associations))
+        response
 
       other ->
         other
@@ -312,37 +322,14 @@ defmodule Grizzly.Network do
     Keyword.get(opts, :node_id, :gateway)
   end
 
-  defp maybe_notify_reset(response, opts) do
-    {:ok, %Report{command: command}} = response
-
-    case Command.param!(command, :status) do
-      :done ->
-        maybe_notify_reset(opts)
-        response
-
-      :busy ->
-        response
-    end
-  end
-
   defp maybe_notify_reset(opts) do
-    if Keyword.get(opts, :notify, true) do
-      notify_reset()
+    server = Keyword.get(opts, :associations_server, Grizzly.Associations)
+
+    with true <- Keyword.get(opts, :notify, true),
+         %Associations.Association{node_ids: nodes} <- Associations.get(server, 1) do
+      Enum.each(nodes, &Grizzly.send_command(&1, :device_reset_locally_notification))
     else
-      :ok
-    end
-  end
-
-  defp notify_reset() do
-    # get the nodes in the lifeline group
-    case Associations.get(1) do
-      nil ->
-        :ok
-
-      association ->
-        Enum.each(association.node_ids, fn node_id ->
-          Grizzly.send_command(node_id, :device_reset_locally_notification)
-        end)
+      _ -> :ok
     end
   end
 end

@@ -6,7 +6,6 @@ defmodule Grizzly.Test do
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, ZIPPacket}
 
   import ExUnit.CaptureLog, only: [capture_log: 2]
-  import Grizzly, only: [is_virtual_device: 1]
 
   setup do
     # Close all connections after each test to prevent failures if multiple
@@ -192,19 +191,14 @@ defmodule Grizzly.Test do
 
   describe "checking if a device id is a virtual devices" do
     test "when it is a virtual device" do
-      id = {:virtual, 100}
-
-      assert is_virtual_device(id)
-      assert Grizzly.virtual_device?(id)
+      assert Grizzly.virtual_device?({:virtual, 100})
     end
 
     test "when it is not a virtual device" do
-      refute is_virtual_device(100)
       refute Grizzly.virtual_device?(100)
     end
 
     test "when it is the gateway" do
-      refute is_virtual_device(:gateway)
       refute Grizzly.virtual_device?(:gateway)
     end
   end

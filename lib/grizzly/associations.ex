@@ -6,10 +6,19 @@ defmodule Grizzly.Associations do
 
   @type grouping_id() :: byte()
 
+  def child_spec(%Options{} = o), do: child_spec([o])
+
+  def child_spec(args) when is_list(args) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, args}
+    }
+  end
+
   defmodule State do
     @moduledoc false
 
-    defstruct file_path: nil
+    defstruct file_path: nil, max_per_group: 5
   end
 
   defmodule Association do
@@ -44,7 +53,7 @@ defmodule Grizzly.Associations do
   @doc """
   Save the node ids to the grouping id
   """
-  @spec save(GenServer.name(), grouping_id(), [ZWave.node_id()]) :: :ok
+  @spec save(GenServer.server(), grouping_id(), [ZWave.node_id()]) :: :ok | :error
   def save(server \\ __MODULE__, grouping_id, node_ids) do
     GenServer.call(server, {:save, grouping_id, node_ids})
   end
@@ -52,7 +61,7 @@ defmodule Grizzly.Associations do
   @doc """
   Get all the associations
   """
-  @spec get_all(GenServer.name()) :: [Association.t()]
+  @spec get_all(GenServer.server()) :: [Association.t()]
   def get_all(server \\ __MODULE__) do
     GenServer.call(server, :get_all)
   end
@@ -60,7 +69,7 @@ defmodule Grizzly.Associations do
   @doc """
   Get an association by the grouping id
   """
-  @spec get(GenServer.name(), grouping_id()) :: Association.t() | nil
+  @spec get(GenServer.server(), grouping_id()) :: Association.t() | nil
   def get(server \\ __MODULE__, grouping_id) do
     GenServer.call(server, {:get, grouping_id})
   end
@@ -68,7 +77,7 @@ defmodule Grizzly.Associations do
   @doc """
   Delete all the associations
   """
-  @spec delete_all(GenServer.name()) :: :ok
+  @spec delete_all(GenServer.server()) :: :ok
   def delete_all(server \\ __MODULE__) do
     GenServer.call(server, :delete_all)
   end
@@ -76,7 +85,7 @@ defmodule Grizzly.Associations do
   @doc """
   Delete all the nodes from the grouping
   """
-  @spec delete_all_nodes_from_grouping(GenServer.name(), grouping_id()) :: :ok
+  @spec delete_all_nodes_from_grouping(GenServer.server(), grouping_id()) :: :ok
   def delete_all_nodes_from_grouping(server \\ __MODULE__, grouping_id) do
     GenServer.call(server, {:delete_all_from_grouping, grouping_id})
   end
@@ -84,7 +93,7 @@ defmodule Grizzly.Associations do
   @doc """
   Delete the specified nodes from the association grouping
   """
-  @spec delete_nodes_from_grouping(GenServer.name(), grouping_id(), [ZWave.node_id()]) ::
+  @spec delete_nodes_from_grouping(GenServer.server(), grouping_id(), [ZWave.node_id()]) ::
           :ok | {:error, :invalid_grouping_id}
   def delete_nodes_from_grouping(server \\ __MODULE__, grouping_id, nodes) do
     GenServer.call(server, {:remove_nodes_from_grouping, grouping_id, nodes})
@@ -93,7 +102,7 @@ defmodule Grizzly.Associations do
   @doc """
   Delete the nodes from each association group
   """
-  @spec delete_nodes_from_all_groupings(GenServer.name(), [ZWave.node_id()]) :: :ok
+  @spec delete_nodes_from_all_groupings(GenServer.server(), [ZWave.node_id()]) :: :ok
   def delete_nodes_from_all_groupings(server \\ __MODULE__, nodes) do
     GenServer.call(server, {:delete_nodes_from_all_associations, nodes})
   end
@@ -103,26 +112,37 @@ defmodule Grizzly.Associations do
     :ignore
   end
 
-  def init(%Options{associations_file: file}) do
-    if File.exists?(file) do
-      {:ok, %State{file_path: file}}
-    else
-      try_create_file(file)
+  def init(%Options{associations_file: file, max_associations_per_group: max_per_group}) do
+    if not File.exists?(file) do
+      create_file!(file)
     end
+
+    {:ok, %State{file_path: file, max_per_group: max_per_group}}
   end
 
   @impl GenServer
   def handle_call({:save, grouping_id, node_ids}, _from, state) do
     %State{file_path: file_path} = state
 
-    new_associations =
-      file_path
-      |> read_all_associations()
-      |> Map.put(grouping_id, node_ids)
+    current_associations = read_all_associations(file_path)
+
+    current_node_ids = Map.get(current_associations, grouping_id, [])
+
+    new_node_ids =
+      current_node_ids
+      |> Enum.concat(node_ids)
+      |> Enum.uniq()
+      |> Enum.take(state.max_per_group)
+
+    new_associations = Map.put(current_associations, grouping_id, new_node_ids)
 
     write_associations(file_path, new_associations)
 
-    {:reply, :ok, state}
+    if length(new_node_ids) == length(Enum.uniq(current_node_ids ++ node_ids)) do
+      {:reply, :ok, state}
+    else
+      {:reply, :error, state}
+    end
   end
 
   def handle_call(:get_all, _from, state) do
@@ -212,9 +232,9 @@ defmodule Grizzly.Associations do
     {:reply, :ok, state}
   end
 
-  defp try_create_file(path) do
+  defp create_file!(path) do
     write_associations(path, %{})
-    {:ok, %State{file_path: path}}
+    :ok
   rescue
     _e ->
       raise ArgumentError, """
