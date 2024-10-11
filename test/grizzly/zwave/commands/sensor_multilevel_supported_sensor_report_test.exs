@@ -12,14 +12,25 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
   end
 
   test "encodes params correctly" do
-    params = [sensor_types: [:temperature, :humidity, :seismic_magnitude, :water_temperature]]
+    params = [
+      sensor_types: [
+        :temperature,
+        :humidity,
+        :seismic_magnitude,
+        :water_temperature,
+        :person_counter_exiting
+      ]
+    ]
+
     {:ok, command} = SensorMultilevelSupportedSensorReport.new(params)
-    expected_binary = <<17, 0, 64, 2>>
-    assert expected_binary == SensorMultilevelSupportedSensorReport.encode_params(command)
+    expected_binary = <<17, 0, 64, 2, 0, 0, 0, 0, 0, 0, 128>>
+
+    assert expected_binary ==
+             SensorMultilevelSupportedSensorReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    binary_params = <<17, 0, 64, 2>>
+    binary_params = <<17, 0, 64, 2, 0, 0, 0, 0, 0, 0, 128>>
     {:ok, params} = SensorMultilevelSupportedSensorReport.decode_params(binary_params)
 
     sensor_types = Keyword.get(params, :sensor_types)
@@ -29,7 +40,8 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
                :temperature,
                :humidity,
                :seismic_magnitude,
-               :water_temperature
+               :water_temperature,
+               :person_counter_exiting
              ])
   end
 end

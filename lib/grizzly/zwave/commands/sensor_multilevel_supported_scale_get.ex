@@ -36,11 +36,17 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleGet do
 
   @impl Grizzly.ZWave.Command
   def decode_params(<<sensor_type_byte>>) do
-    with {:ok, sensor_type} <- SensorMultilevel.decode_sensor_type(sensor_type_byte) do
-      {:ok, [sensor_type: sensor_type]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+    case SensorMultilevel.decode_sensor_type(sensor_type_byte) do
+      {:ok, sensor_type} ->
+        {:ok, [sensor_type: sensor_type]}
+
+      :error ->
+        {:error,
+         %DecodeError{
+           value: sensor_type_byte,
+           param: :sensor_type,
+           command: :sensor_multilevel_supported_scale_get
+         }}
     end
   end
 end

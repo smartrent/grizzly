@@ -56,7 +56,19 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReportTest do
     binary_params = <<0x01, 0x01::3, 0x02::2, 0x02::3, 0x02, 0xF3>>
     {:ok, params} = SensorMultilevelReport.decode_params(binary_params)
     assert Keyword.get(params, :sensor_type) == :temperature
-    assert Keyword.get(params, :scale) == 2
+    assert Keyword.get(params, :scale) == :unknown
+    assert Keyword.get(params, :value) == 75.5
+
+    binary_params = <<0x01, 0x01::3, 0x01::2, 0x02::3, 0x02, 0xF3>>
+    {:ok, params} = SensorMultilevelReport.decode_params(binary_params)
+    assert Keyword.get(params, :sensor_type) == :temperature
+    assert Keyword.get(params, :scale) == :f
+    assert Keyword.get(params, :value) == 75.5
+
+    binary_params = <<0x25, 0x01::3, 0x00::2, 0x02::3, 0x02, 0xF3>>
+    {:ok, params} = SensorMultilevelReport.decode_params(binary_params)
+    assert Keyword.get(params, :sensor_type) == :radon_concentration
+    assert Keyword.get(params, :scale) == :becquerels_per_cubic_meter
     assert Keyword.get(params, :value) == 75.5
   end
 end
