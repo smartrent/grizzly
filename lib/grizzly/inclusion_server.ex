@@ -89,6 +89,14 @@ defmodule Grizzly.InclusionServer do
     GenServer.call(__MODULE__, {:set_input_dsk, input_dsk})
   end
 
+  @doc """
+  Continues security bootstrapping for a node added by an inclusion controller.
+  """
+  @spec continue_inclusion(Command.t()) :: :ok
+  def continue_inclusion(command) do
+    GenServer.call(__MODULE__, {:continue_inclusion, command})
+  end
+
   @impl GenServer
   def init(grizzly_opts) do
     # check status and preform recovery steps if necessary
@@ -99,6 +107,7 @@ defmodule Grizzly.InclusionServer do
 
     state = %{
       adapter: adapter,
+      default_handler: grizzly_opts.inclusion_handler,
       handler: nil,
       adapter_state: adapter_state,
       dsk_requested_length: 0
@@ -248,6 +257,10 @@ defmodule Grizzly.InclusionServer do
   end
 
   def handle_call({:set_input_dsk, dsk}, _from, state) do
+    Logger.info(
+      "[Grizzly.InclusionServer] Set input DSK (#{state.dsk_requested_length}): #{inspect(dsk)}"
+    )
+
     with :waiting_dsk <- StatusServer.get(),
          {:ok, new_adapter_state} <-
            state.adapter.set_input_dsk(dsk, state.dsk_requested_length, state.adapter_state) do
@@ -258,6 +271,12 @@ defmodule Grizzly.InclusionServer do
       error ->
         {:reply, error, state}
     end
+  end
+
+  def handle_call({:continue_inclusion, %Command{} = command}, _from, state) do
+    state.adapter.connect(1)
+    {_, state} = handle_report(command, state)
+    {:reply, :ok, state}
   end
 
   def handle_call(_, _from, state) do
@@ -290,7 +309,7 @@ defmodule Grizzly.InclusionServer do
 
   def handle_report(%Command{name: :node_remove_status} = command, state) do
     report = Report.new(:complete, :command, 1, command: command)
-    send_to_handler(state.handler, report)
+    send_to_handler(state, report)
 
     state =
       state
@@ -302,7 +321,7 @@ defmodule Grizzly.InclusionServer do
 
   def handle_report(%Command{name: :node_add_status} = command, state) do
     report = Report.new(:complete, :command, 1, command: command)
-    send_to_handler(state.handler, report)
+    send_to_handler(state, report)
 
     state =
       state
@@ -314,7 +333,7 @@ defmodule Grizzly.InclusionServer do
 
   def handle_report(%Command{name: :learn_mode_set_status} = command, state) do
     report = Report.new(:complete, :command, 1, command: command)
-    send_to_handler(state.handler, report)
+    send_to_handler(state, report)
 
     state =
       state
@@ -326,7 +345,7 @@ defmodule Grizzly.InclusionServer do
 
   def handle_report(%Command{name: :node_add_keys_report} = command, state) do
     report = Report.new(:complete, :command, 1, command: command)
-    send_to_handler(state.handler, report)
+    send_to_handler(state, report)
 
     state = set_status(state, :waiting_s2_keys)
 
@@ -337,9 +356,11 @@ defmodule Grizzly.InclusionServer do
     requested_length = Command.param!(command, :input_dsk_length)
 
     report = Report.new(:complete, :command, 1, command: command)
-    send_to_handler(state.handler, report)
+    send_to_handler(state, report)
 
     state = set_status(state, :waiting_dsk)
+
+    Logger.info("[Grizzly.InclusionServer] DSK requested length: #{requested_length}")
 
     {:noreply, %{state | dsk_requested_length: requested_length}}
   end
@@ -401,25 +422,33 @@ defmodule Grizzly.InclusionServer do
     state
   end
 
-  def send_to_handler(nil, report) do
+  defp send_to_handler(state, report) do
+    do_send_to_handler(handler(state), report)
+  end
+
+  defp do_send_to_handler(nil, report) do
     Logger.debug("[Grizzly]: unhandled inclusion report: #{inspect(report)}")
 
     :ok
   end
 
-  def send_to_handler(handler, report) when is_pid(handler) do
+  defp do_send_to_handler(handler, report) when is_pid(handler) do
     send(handler, {:grizzly, :report, report})
   end
 
-  def send_to_handler({handler, handler_opts}, report) when is_atom(handler) do
+  defp do_send_to_handler({handler, handler_opts}, report) when is_atom(handler) do
     send_to_module_handler(handler, report, handler_opts)
   end
 
-  def send_to_handler(handler, report) when is_atom(handler) do
+  defp do_send_to_handler(handler, report) when is_atom(handler) do
     send_to_module_handler(handler, report, [])
   end
 
-  def send_to_module_handler(handler, report, opts) do
+  defp send_to_module_handler(handler, report, opts) do
     spawn_link(fn -> handler.handle_report(report, opts) end)
+  end
+
+  defp handler(state) do
+    state.handler || state.default_handler
   end
 end

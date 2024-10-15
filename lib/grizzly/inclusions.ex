@@ -168,7 +168,7 @@ defmodule Grizzly.Inclusions do
 
   alias Grizzly.Inclusions.StatusServer
   alias Grizzly.InclusionServer
-  alias Grizzly.ZWave.{DSK, Security}
+  alias Grizzly.ZWave.{Command, DSK, Security}
 
   @typedoc """
   Status of the inclusion server
@@ -305,5 +305,13 @@ defmodule Grizzly.Inclusions do
   @spec inclusion_running?() :: boolean()
   def inclusion_running?() do
     StatusServer.get() != :idle
+  end
+
+  @doc """
+  Continues security bootstrapping for a node added by an inclusion controller.
+  """
+  @spec continue_inclusion(Command.t()) :: :ok
+  def continue_inclusion(command) do
+    InclusionServer.continue_inclusion(command)
   end
 end
