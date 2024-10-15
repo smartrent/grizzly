@@ -41,6 +41,6 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(binary) do
-    SensorMultilevel.decode_sensor_types(binary)
+    {:ok, [sensor_types: SensorMultilevel.decode_sensor_types(binary)]}
   end
 end

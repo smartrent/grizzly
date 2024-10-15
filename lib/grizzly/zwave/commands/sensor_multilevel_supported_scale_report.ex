@@ -32,7 +32,11 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
   @impl Grizzly.ZWave.Command
   def encode_params(command) do
     sensor_type = Command.param(command, :sensor_type)
-    supported_scales = Command.param(command, :supported_scales)
+
+    supported_scales =
+      Command.param(command, :supported_scales)
+      |> Enum.map(&SensorMultilevel.encode_sensor_scale(sensor_type, &1))
+
     sensor_type_byte = SensorMultilevel.encode_sensor_type(sensor_type)
     <<scales_bitmask>> = Encoding.encode_bitmask(supported_scales)
     <<sensor_type_byte, 0x00::4, scales_bitmask::4>>
@@ -40,12 +44,22 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(<<sensor_type_byte, 0x00::4, scales_bitmask::4>>) do
-    with {:ok, sensor_type} <- SensorMultilevel.decode_sensor_type(sensor_type_byte),
-         supported_scales <- Encoding.decode_bitmask(<<scales_bitmask>>) do
-      {:ok, [sensor_type: sensor_type, supported_scales: supported_scales]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+    case SensorMultilevel.decode_sensor_type(sensor_type_byte) do
+      {:ok, sensor_type} ->
+        {:ok,
+         [
+           sensor_type: sensor_type,
+           supported_scales:
+             SensorMultilevel.decode_sensor_scales(sensor_type, <<scales_bitmask>>)
+         ]}
+
+      :error ->
+        {:error,
+         %DecodeError{
+           value: sensor_type_byte,
+           param: :sensor_type,
+           command: :sensor_multilevel_supported_scale_report
+         }}
     end
   end
 end

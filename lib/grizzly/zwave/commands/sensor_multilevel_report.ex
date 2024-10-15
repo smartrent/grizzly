@@ -39,15 +39,18 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do
-    sensor_type_byte = SensorMultilevel.encode_sensor_type(Command.param!(command, :sensor_type))
+    sensor_type = Command.param!(command, :sensor_type)
+    sensor_type_byte = SensorMultilevel.encode_sensor_type(sensor_type)
     scale = Command.param!(command, :scale)
+    scale_byte = SensorMultilevel.encode_sensor_scale(sensor_type, scale)
+
     value = Command.param!(command, :value)
     {int_value, precision, byte_size} = Encoding.encode_zwave_float(value)
 
     <<
       sensor_type_byte,
       precision::3,
-      scale::2,
+      scale_byte::2,
       byte_size::3,
       int_value::signed-size(byte_size)-unit(8)
     >>
@@ -62,12 +65,19 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
         size::3,
         int_value::signed-size(size)-unit(8)
       >>) do
-    with {:ok, sensor_type} <- SensorMultilevel.decode_sensor_type(sensor_type_byte) do
-      value = Encoding.decode_zwave_float(int_value, precision)
-      {:ok, [sensor_type: sensor_type, scale: scale, value: value]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+    case SensorMultilevel.decode_sensor_type(sensor_type_byte) do
+      {:ok, sensor_type} ->
+        value = Encoding.decode_zwave_float(int_value, precision)
+        scale = SensorMultilevel.decode_sensor_scale(sensor_type, scale)
+        {:ok, [sensor_type: sensor_type, scale: scale, value: value]}
+
+      :error ->
+        {:error,
+         %DecodeError{
+           value: sensor_type_byte,
+           param: :sensor_type,
+           command: :sensor_multilevel_report
+         }}
     end
   end
 end
