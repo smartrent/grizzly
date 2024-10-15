@@ -6,6 +6,8 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   to the Z-Wave network
   """
 
+  require Logger
+
   @behaviour Grizzly.ZWave.CommandClass
 
   alias Grizzly.ZWave.{CommandClasses, DecodeError, DeviceClasses, DSK, Security}
@@ -127,7 +129,8 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   @spec parse_node_info(binary()) :: node_info_report() | extended_node_info_report()
   def parse_node_info(
         <<node_info_length, listening?::1, _::7, _opt_func, basic_device_class,
-          generic_device_class, specific_device_class, more_info::binary>>
+          generic_device_class, specific_device_class,
+          command_classes::binary-size(node_info_length - 6), rest::binary>>
       ) do
     # TODO: decode the command classes correctly (currently assuming no extended command classes)
 
@@ -142,62 +145,48 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
         specific_device_class
       )
 
-    # node info length includes: node_info_length, listening?, opt_func, and 3 devices classes
-    # to get the length of command classes we have to subject 6 bytes.
-    command_class_length = node_info_length - 6
+    # node info length includes: node_info_length, listening?, opt_func, basic class,
+    # generic class, specific class, and the command class list. Granted keys, kex fail
+    # type, and DSK are not included.
 
-    Map.new()
-    |> Map.put(:listening?, listening? == 1)
-    |> Map.put(:basic_device_class, basic_device_class)
-    |> Map.put(:generic_device_class, generic_device_class)
-    |> Map.put(:specific_device_class, specific_device_class)
-    |> parse_additional_node_info(more_info, command_class_length)
+    %{
+      listening?: listening? == 1,
+      basic_device_class: basic_device_class,
+      generic_device_class: generic_device_class,
+      specific_device_class: specific_device_class,
+      command_classes: CommandClasses.command_class_list_from_binary(command_classes)
+    }
+    |> parse_optional_fields(rest)
   end
+
+  # This accounts for an off-by-one error observed (rarely) in node add status
+  # frames sent by Z/IP Gateway when a SmartStart node fails security bootstrapping.
+  # node_info_length is supposed to include itself, but in that case, it sometimes
+  # doesn't.
+  def parse_node_info(<<node_info_length, rest::binary-size(node_info_length - 2)>>),
+    do: parse_node_info(<<node_info_length - 1, rest::binary>>)
 
   # node_info_length can be 1 (note that it's self-inclusive) when an inclusion error
-  # occurs as no node info is available
+  # occurs and no node info is available
   def parse_node_info(<<1>>), do: %{}
-
-  defp parse_additional_node_info(node_info, additional_info, command_class_length)
-       when command_class_length <= 0 or byte_size(additional_info) == 0,
-       do: node_info |> Map.put(:command_classes, [])
-
-  defp parse_additional_node_info(node_info, additional_info, command_class_length) do
-    {command_classes_bin, more_info} =
-      case additional_info do
-        <<command_classes_bin::binary-size(command_class_length), more_info::binary>> ->
-          {command_classes_bin, more_info}
-
-        # This case is to handle a Z/IP Gateway bug where the node_info_length field is
-        # off by one. This appears to happen when S2 bootstrapping fails for a node being
-        # included via SmartStart, but there may be other cases as well.
-        <<command_classes_bin::binary-size(command_class_length - 1)>> ->
-          {command_classes_bin, <<>>}
-      end
-
-    command_classes = CommandClasses.command_class_list_from_binary(command_classes_bin)
-
-    node_info
-    |> Map.put(:command_classes, command_classes)
-    |> parse_optional_fields(more_info)
-  end
 
   defp parse_optional_fields(info, <<>>), do: info
 
-  defp parse_optional_fields(info, <<granted_keys, kex_fail_type>>) do
-    info
-    |> put_security_info(granted_keys, kex_fail_type)
-  end
+  defp parse_optional_fields(info, <<granted_keys, kex_fail_type>>),
+    do: put_security_info(info, granted_keys, kex_fail_type)
 
-  defp parse_optional_fields(info, <<granted_keys, kex_fail_type, 0x00>>) do
-    info
-    |> put_security_info(granted_keys, kex_fail_type)
-  end
+  defp parse_optional_fields(info, <<granted_keys, kex_fail_type, 0x00>>),
+    do: put_security_info(info, granted_keys, kex_fail_type)
 
-  defp parse_optional_fields(info, <<granted_keys, kex_fail_type, 16, dsk::binary-size(16)>>) do
+  defp parse_optional_fields(info, <<granted_keys, kex_fail_type, 16, dsk::binary-size(16)>>),
+    do: info |> put_security_info(granted_keys, kex_fail_type) |> put_dsk(dsk)
+
+  defp parse_optional_fields(info, extra) do
+    Logger.warning(
+      "[Grizzly] Unable to parse fields after command class list in (Ext.) Node Add Status: #{inspect(extra, base: :hex)}"
+    )
+
     info
-    |> put_security_info(granted_keys, kex_fail_type)
-    |> put_dsk(dsk)
   end
 
   defp put_security_info(info, granted_keys, kex_fail_type) do

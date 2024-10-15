@@ -154,4 +154,23 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
       end
     end
   end
+
+  test "handle whatever random weirdness z/ip gateway throws at us" do
+    binary =
+      <<0x34, 0x2, 0xA, 0x9, 0x0, 0x8, 0xC, 0xD3, 0x9C, 0x4, 0x10, 0x0, 0x5E, 0x9F, 0x98, 0x6C,
+        0x55, 0x25, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0>>
+
+    assert {:ok, command} = Grizzly.ZWave.from_binary(binary)
+    assert :node_add_status == command.name
+    assert 8 == command.params[:node_id]
+
+    assert command.params[:command_classes][:non_secure_supported] == [
+             :zwaveplus_info,
+             :security_2,
+             :security,
+             :supervision,
+             :transport_service,
+             :switch_binary
+           ]
+  end
 end
