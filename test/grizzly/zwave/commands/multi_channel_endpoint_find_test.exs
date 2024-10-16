@@ -21,6 +21,19 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
     {:ok, command} = MultiChannelEndpointFind.new(params)
     expected_binary = <<0x10, 0x04>>
     assert expected_binary == MultiChannelEndpointFind.encode_params(command)
+
+    params = [
+      generic_device_class: :all,
+      specific_device_class: :all
+    ]
+
+    {:ok, command} = MultiChannelEndpointFind.new(params)
+    expected_binary = <<0xFF, 0xFF>>
+    assert expected_binary == MultiChannelEndpointFind.encode_params(command)
+
+    {:ok, command} = MultiChannelEndpointFind.new([])
+    expected_binary = <<0xFF, 0xFF>>
+    assert expected_binary == MultiChannelEndpointFind.encode_params(command)
   end
 
   test "decodes params correctly" do
