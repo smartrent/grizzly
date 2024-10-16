@@ -129,6 +129,25 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:supervision_status, :no_support}]
   end
 
+  # When an inclusion controller adds a node, we'll receive network management
+  # commands via the unsolicited server.
+  defp handle_command(%Command{name: inclusion_cmd} = cmd, _opts)
+       when inclusion_cmd in [
+              :node_add_status,
+              :node_add_keys_report,
+              :node_add_dsk_report,
+              :extended_node_add_status
+            ] do
+    Logger.debug(
+      "[UnsolicitedServer] Received unsolicited inclusion command: #{inspect(cmd, pretty: true)}"
+    )
+
+    Grizzly.Inclusions.continue_inclusion(cmd)
+
+    # do nothing. the configured inclusion handler will take care of it.
+    []
+  end
+
   defp handle_command(%Command{name: :association_specific_group_get}, _) do
     case AssociationSpecificGroupReport.new(group: 0) do
       {:ok, command} -> [{:send, command}]

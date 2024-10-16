@@ -220,6 +220,7 @@ defmodule Grizzly.Supervisor do
          port: port,
          num_acceptors: 10,
          handler_module: Grizzly.UnsolicitedServer.ConnectionHandler,
+         handler_options: [inclusion_handler: options.inclusion_handler],
          transport_module: Grizzly.UnsolicitedServer.DTLSTransport,
          transport_options: [ifaddr: ip],
          supervisor_options: [name: Grizzly.UnsolicitedServer]
