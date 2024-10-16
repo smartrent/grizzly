@@ -112,7 +112,7 @@ defmodule Grizzly.VirtualDeviceTest do
   end
 
   test "receives notification for sensor report" do
-    {:ok, pid} = start_supervised({TemperatureSensor, report_interval: 1_000, force_report: true})
+    {:ok, pid} = start_supervised({TemperatureSensor, report_interval: 100, force_report: true})
 
     device_id =
       Grizzly.VirtualDevices.add_device!(
@@ -127,7 +127,7 @@ defmodule Grizzly.VirtualDeviceTest do
     Messages.subscribe(:sensor_multilevel_report)
     on_exit(fn -> Messages.unsubscribe(:sensor_multilevel_report) end)
 
-    assert_receive {:grizzly, :report, report}, 5_000
+    assert_receive {:grizzly, :report, report}, 500
 
     assert report.command.name == :sensor_multilevel_report
   end

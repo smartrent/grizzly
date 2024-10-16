@@ -156,7 +156,7 @@ defmodule Grizzly.Commands.CommandRunnerTest do
            ) ==
              CommandRunner.handle_zip_command(runner, nack_waiting)
 
-    Process.sleep(2_000)
+    Process.sleep(250)
 
     ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
 

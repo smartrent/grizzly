@@ -1,28 +1,32 @@
 defmodule Grizzly.Connections.AsyncConnectionTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.CommandHandlers.AckResponse
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
 
   test "can stop a running command" do
-    {:ok, _async_conn} = AsyncConnection.start_link(GrizzlyTest.Utils.default_options(), 400)
+    {:ok, conn} =
+      AsyncConnection.start_link(GrizzlyTest.Utils.default_options(), 400, unnamed: true)
+
     {:ok, command} = SwitchBinaryGet.new()
 
-    {:ok, command_ref} = AsyncConnection.send_command(400, command, handler: AckResponse)
+    {:ok, command_ref} = AsyncConnection.send_command(conn, command, handler: AckResponse)
 
-    :ok = AsyncConnection.stop_command(400, command_ref)
+    :ok = AsyncConnection.stop_command(conn, command_ref)
 
-    refute AsyncConnection.command_alive?(400, command_ref)
+    refute AsyncConnection.command_alive?(conn, command_ref)
   end
 
   @tag :integration
   test "gets a timeout for the async command" do
-    {:ok, _async_conn} = AsyncConnection.start_link(GrizzlyTest.Utils.default_options(), 400)
+    {:ok, conn} =
+      AsyncConnection.start_link(GrizzlyTest.Utils.default_options(), 400, unnamed: true)
+
     {:ok, command} = SwitchBinaryGet.new()
 
     {:ok, command_ref} =
-      AsyncConnection.send_command(400, command, timeout: 1_000, handler: AckResponse)
+      AsyncConnection.send_command(conn, command, timeout: 100, handler: AckResponse)
 
     assert_receive {:grizzly, :report, report}, 2_000
 

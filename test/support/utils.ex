@@ -28,8 +28,8 @@ defmodule GrizzlyTest.Utils do
       transport: GrizzlyTest.Transport.DTLS,
       lan_ip: {127, 0, 0, 1},
       pan_ip: {127, 0, 0, 1},
-      zipgateway_port: 5000,
-      unsolicited_destination: {{127, 0, 0, 1}, 5001},
+      zipgateway_port: :persistent_term.get(:zipgateway_port),
+      unsolicited_destination: {{127, 0, 0, 1}, 0},
       run_zipgateway: false,
       inclusion_handler: TestInclusionHandler,
       inclusion_adapter: GrizzlyTest.InclusionAdapter

@@ -99,7 +99,7 @@ jobs:
       - <<: *install_system_deps
       - restore_tagged_cache:
           prefix: v2-mix-cache-<< parameters.image-tag >>
-      - run: MIX_TEST_PARTITION="$((${CIRCLE_NODE_INDEX}+1))" mix test --include inclusion --include integration --include firmware_update --partitions $CIRCLE_NODE_TOTAL
+      - run: MIX_TEST_PARTITION="$((${CIRCLE_NODE_INDEX}+1))" mix test --partitions $CIRCLE_NODE_TOTAL
       - store_test_results:
           path: test-junit-report.xml
 

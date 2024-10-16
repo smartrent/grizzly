@@ -34,8 +34,16 @@ defmodule Grizzly.Connections.SyncConnection do
   @spec start_link(Options.t(), ZWave.node_id() | :gateway, [Grizzly.command_opt()]) ::
           GenServer.on_start()
   def start_link(grizzly_options, node_id_or_gateway, opts \\ []) do
-    name = Connections.make_name(node_id_or_gateway)
-    GenServer.start_link(__MODULE__, [grizzly_options, node_id_or_gateway, opts], name: name)
+    unnamed = Keyword.get(opts, :unnamed, false)
+
+    start_opts =
+      if unnamed do
+        []
+      else
+        [name: Connections.make_name(node_id_or_gateway)]
+      end
+
+    GenServer.start_link(__MODULE__, [grizzly_options, node_id_or_gateway, opts], start_opts)
   end
 
   @spec send_command(ZWave.node_id() | pid(), Command.t(), [send_opt()]) ::
@@ -82,9 +90,9 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @impl GenServer
-  def handle_call({:send_command, command, node_id, command_opts}, from, state) do
+  def handle_call({:send_command, command, _node_id, command_opts}, from, state) do
     {:ok, command_runner, _, new_command_list} =
-      CommandList.create(state.commands, command, node_id, from, command_opts)
+      CommandList.create(state.commands, command, state.node_id, from, command_opts)
 
     case do_send_command(command_runner, state) do
       :ok ->
