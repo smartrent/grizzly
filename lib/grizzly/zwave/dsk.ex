@@ -221,6 +221,19 @@ defmodule Grizzly.ZWave.DSK do
     }
   end
 
+  @doc """
+  Extracts the NWI Home ID (the Home ID used by a SmartStart device when it is
+  not yet included in a network) from the DSK.
+
+  The NWI Home ID is calculated by taking bytes 9-12 of the DSK. Given this value,
+  the two most significant bits are then set and the least significant bit is cleared.
+  """
+  @spec nwi_home_id(t()) :: non_neg_integer()
+  def nwi_home_id(%__MODULE__{raw: <<_::8-bytes, _::2, dsk_bits::29, _::1, _::binary>>}) do
+    <<nwi_home_id::32>> = <<1::1, 1::1, dsk_bits::29, 0::1>>
+    nwi_home_id
+  end
+
   defimpl String.Chars do
     @moduledoc false
     defdelegate to_string(v), to: Grizzly.ZWave.DSK

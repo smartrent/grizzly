@@ -94,4 +94,12 @@ defmodule Grizzly.ZWave.DSKTest do
   test "inspecting a DSK" do
     assert inspect(@dsk_struct) == "#DSK<" <> @dsk_string <> ">"
   end
+
+  test "nwi_home_id/1" do
+    dsk = DSK.parse!("65319-38004-24661-25491-29723-39413-61677-10659")
+    assert 0xF41B99F4 == DSK.nwi_home_id(dsk)
+
+    dsk = DSK.parse!("11111-48612-46962-61307-25830-37127-62771-03285")
+    assert 0xE4E69106 == DSK.nwi_home_id(dsk)
+  end
 end
