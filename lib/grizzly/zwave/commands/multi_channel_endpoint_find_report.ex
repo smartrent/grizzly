@@ -47,10 +47,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
   def encode_params(command) do
     reports_to_follow = Command.param!(command, :reports_to_follow)
     generic_device_class = Command.param!(command, :generic_device_class)
-    generic_device_class_byte = DeviceClasses.generic_device_class_to_byte(generic_device_class)
+    generic_device_class_byte = encode_generic_class(generic_device_class)
 
     specific_device_class_byte =
-      DeviceClasses.specific_device_class_to_byte(
+      encode_specific_class(
         generic_device_class,
         Command.param!(command, :specific_device_class)
       )
@@ -69,14 +69,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
       ) do
     end_points = decode_end_points(end_points_binary)
 
-    {:ok, generic_device_class} =
-      DeviceClasses.generic_device_class_from_byte(generic_device_class_byte)
+    generic_device_class = decode_generic_class(generic_device_class_byte)
 
-    {:ok, specific_device_class} =
-      DeviceClasses.specific_device_class_from_byte(
-        generic_device_class,
-        specific_device_class_byte
-      )
+    specific_device_class =
+      decode_specific_class(generic_device_class, specific_device_class_byte)
 
     {:ok,
      [
@@ -86,6 +82,20 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
        end_points: end_points
      ]}
   end
+
+  defp encode_generic_class(:all), do: 0xFF
+  defp encode_generic_class(g), do: DeviceClasses.generic_device_class_to_byte(g)
+
+  defp decode_generic_class(0xFF), do: :all
+  defp decode_generic_class(g), do: elem(DeviceClasses.generic_device_class_from_byte(g), 1)
+
+  defp encode_specific_class(_g, :all), do: 0xFF
+  defp encode_specific_class(g, s), do: DeviceClasses.specific_device_class_to_byte(g, s)
+
+  defp decode_specific_class(_g, 0xFF), do: :all
+
+  defp decode_specific_class(g, s),
+    do: elem(DeviceClasses.specific_device_class_from_byte(g, s), 1)
 
   defp encode_end_points(end_points) do
     for end_point <- end_points, into: <<>>, do: <<0x00::1, end_point::7>>
