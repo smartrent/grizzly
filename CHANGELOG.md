@@ -4,6 +4,28 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.0] - 2024-10-17
+
+### Added
+
+* Support finding all endpoints with Multi Channel Endpoint Find and Multi Channel Endpoint Find Report ([#998](https://github.com/smartrent/grizzly/pull/998), [#1000](https://github.com/smartrent/grizzly/pull/1000))
+* Add util to get NWI Home Id from DSK ([#1001](https://github.com/smartrent/grizzly/pull/1001))
+* Add missing multilevel sensor types ([#995](https://github.com/smartrent/grizzly/pull/995))
+* Update Z-Wave XML to 2024A specification ([#981](https://github.com/smartrent/grizzly/pull/981))
+
+### Fixed
+
+* Continue inclusion started by an inclusion controller ([#997](https://github.com/smartrent/grizzly/pull/997))
+* Fix another issue with Z/IP Gateway's Node Add Status formatting ([#996](https://github.com/smartrent/grizzly/pull/996))
+* Fix association management for certification ([#994](https://github.com/smartrent/grizzly/pull/994))
+* Ignore extended CCs when parsing command class lists ([#993](https://github.com/smartrent/grizzly/pull/993))
+* Change keys_granted to granted_keys for consistency ([#992](https://github.com/smartrent/grizzly/pull/992))
+
+### Changed
+
+* Use [`thousand_island`](https://github.com/mtrudel/thousand_island) to manage the unsolicited server ([#987](https://github.com/smartrent/grizzly/pull/987))
+
+
 ## [v8.5.3] - 2024-09-23
 
 ### Added
@@ -2590,6 +2612,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.6.0]: https://github.com/smartrent/grizzly/compare/v8.5.3..v8.6.0
 [v8.5.3]: https://github.com/smartrent/grizzly/compare/v8.5.2..v8.5.3
 [v8.5.2]: https://github.com/smartrent/grizzly/compare/v8.5.1..v8.5.2
 [v8.5.1]: https://github.com/smartrent/grizzly/compare/v8.5.0..v8.5.1
