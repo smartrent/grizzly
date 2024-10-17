@@ -1,18 +1,11 @@
 defmodule Grizzly.Test do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, ZIPPacket}
 
   import ExUnit.CaptureLog, only: [capture_log: 2]
-
-  setup do
-    # Close all connections after each test to prevent failures if multiple
-    # tests use the same node_id
-    on_exit(fn -> Grizzly.Connections.close_all() end)
-    :ok
-  end
 
   describe "SwitchBinary Commands" do
     @tag :integration
