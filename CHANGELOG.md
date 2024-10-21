@@ -4,6 +4,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [v8.6.1] - 2024-10-21
+
+### Changed
+
+* Use atoms for scale in Sensor Multilevel Get to align with Sensor Multilevel Report ([#1003](https://github.com/smartrent/grizzly/pull/1003))
+
 ## [v8.6.0] - 2024-10-17
 
 ### Added
@@ -2612,6 +2619,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.6.1]: https://github.com/smartrent/grizzly/compare/v8.6.0..v8.6.1
 [v8.6.0]: https://github.com/smartrent/grizzly/compare/v8.5.3..v8.6.0
 [v8.5.3]: https://github.com/smartrent/grizzly/compare/v8.5.2..v8.5.3
 [v8.5.2]: https://github.com/smartrent/grizzly/compare/v8.5.1..v8.5.2
