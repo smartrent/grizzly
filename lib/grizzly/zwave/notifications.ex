@@ -352,6 +352,14 @@ defmodule Grizzly.ZWave.Notifications do
                  end)
 
   @doc """
+  All notification types
+  """
+  @spec all_notification_types() :: [atom()]
+  def all_notification_types() do
+    @type_from_byte |> Map.values()
+  end
+
+  @doc """
   Encode a notification type.
   """
   @spec type_to_byte(type()) :: byte()
