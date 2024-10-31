@@ -136,7 +136,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
               :node_add_status,
               :node_add_keys_report,
               :node_add_dsk_report,
-              :extended_node_add_status
+              :extended_node_add_status,
+              :node_remove_status
             ] do
     Logger.debug(
       "[UnsolicitedServer] Received unsolicited inclusion command: #{inspect(cmd, pretty: true)}"
