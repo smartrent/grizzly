@@ -6,7 +6,9 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
   @behaviour Grizzly.Inclusions.NetworkAdapter
 
-  @inclusion_timeout 120_000
+  # For certification to pass, this must be at least the sum of the S2 bootstrapping
+  # timeouts TA1 (10), TA2 (10), TA3 (10), TA4 (10), TA5 (10), TAI1 (240), and TAI2 (240).
+  @inclusion_timeout :timer.seconds(530)
 
   require Logger
 
