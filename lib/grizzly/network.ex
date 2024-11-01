@@ -86,6 +86,8 @@ defmodule Grizzly.Network do
   """
   @spec reset_controller([reset_opt() | opt()]) :: Grizzly.send_command_response()
   def reset_controller(opts \\ []) do
+    maybe_notify_reset(opts)
+
     # close all the connections before resetting the controller. It's okay
     # to blindly close all connections because when we send the command to
     # the controller Grizzly will automatically reconnect to the controller
@@ -97,8 +99,6 @@ defmodule Grizzly.Network do
 
     seq_number = SeqNumber.get_and_inc()
     node_id = node_id_from_opts(opts)
-
-    maybe_notify_reset(opts)
 
     case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 10_000) do
       {:ok, %Report{type: :command, status: :complete}} = response ->
