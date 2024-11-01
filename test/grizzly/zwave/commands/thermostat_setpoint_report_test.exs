@@ -16,6 +16,14 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
       <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0x02, 0xF3>>
 
     assert expected_binary == ThermostatSetpointReport.encode_params(command)
+
+    params = [type: :heating, scale: :f, value: -75.5]
+    {:ok, command} = ThermostatSetpointReport.new(params)
+
+    expected_binary =
+      <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0xFD, 0x0D>>
+
+    assert expected_binary == ThermostatSetpointReport.encode_params(command)
   end
 
   test "decodes params correctly" do
@@ -26,6 +34,14 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
     assert Keyword.get(params, :type) == :heating
     assert Keyword.get(params, :scale) == :f
     assert Keyword.get(params, :value) == 75.5
+
+    binary_params =
+      <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0xFD, 0x0D>>
+
+    {:ok, params} = ThermostatSetpointReport.decode_params(binary_params)
+    assert Keyword.get(params, :type) == :heating
+    assert Keyword.get(params, :scale) == :f
+    assert Keyword.get(params, :value) == -75.5
   end
 
   test "decodes params correctly when there is a trailing junk byte (Aidoo Airzone)" do

@@ -53,16 +53,17 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport do
     {max_int_value, max_precision, max_byte_size} = encode_zwave_float(max_value)
 
     <<0::4, encode_type(type)::4, min_precision::3, encode_scale(min_scale)::2, min_byte_size::3,
-      min_int_value::size(min_byte_size)-unit(8), max_precision::3, encode_scale(max_scale)::2,
-      max_byte_size::3, max_int_value::size(max_byte_size)-unit(8)>>
+      min_int_value::signed-size(min_byte_size)-unit(8), max_precision::3,
+      encode_scale(max_scale)::2, max_byte_size::3,
+      max_int_value::signed-size(max_byte_size)-unit(8)>>
   end
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
         <<_::4, type::4, min_precision::3, min_scale::2, min_byte_size::3,
-          min_int_value::size(min_byte_size)-unit(8), max_precision::3, max_scale::2,
-          max_byte_size::3, max_int_value::size(max_byte_size)-unit(8)>>
+          min_int_value::signed-size(min_byte_size)-unit(8), max_precision::3, max_scale::2,
+          max_byte_size::3, max_int_value::signed-size(max_byte_size)-unit(8)>>
       ) do
     with {:ok, min_scale} <- decode_scale(min_scale),
          {:ok, max_scale} <- decode_scale(max_scale) do
