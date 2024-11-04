@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
           | :v
           | :w
 
-  @type meter_rate_type :: :export | :import | :import_export | :unspecified
+  @type meter_rate_type :: :export | :import | :import_export | :default
 
   alias Grizzly.ZWave.{DecodeError, Encoding}
 
@@ -55,6 +55,20 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
 
   def decode_meter_type(byte),
     do: {:error, %DecodeError{value: byte, param: :meter_type, command: :meter_report}}
+
+  @spec encode_meter_scale(meter_scale()) :: {0..7, 0..1}
+  def encode_meter_scale(:kwh), do: {0x00, 0x00}
+  def encode_meter_scale(:kvah), do: {0x01, 0x00}
+  def encode_meter_scale(:w), do: {0x02, 0x00}
+  def encode_meter_scale(:pulse_count), do: {0x03, 0x00}
+  def encode_meter_scale(:v), do: {0x04, 0x00}
+  def encode_meter_scale(:a), do: {0x05, 0x00}
+  def encode_meter_scale(:power_factor), do: {0x06, 0x00}
+  def encode_meter_scale(:kvar), do: {0x07, 0x00}
+  def encode_meter_scale(:kvarh), do: {0x07, 0x01}
+  def encode_meter_scale(:cubic_meters), do: {0x00, 0x00}
+  def encode_meter_scale(:cubic_feet), do: {0x01, 0x00}
+  def encode_meter_scale(:us_gallons), do: {0x02, 0x00}
 
   @spec encode_meter_scale(meter_scale(), meter_type()) :: {0..7, 0..1}
   def encode_meter_scale(:kwh, :electric), do: {0x00, 0x00}
@@ -168,7 +182,7 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
   Encode meter rate type
   """
   @spec encode_rate_type(meter_rate_type()) :: 0..3
-  def encode_rate_type(:unspecified), do: 0x00
+  def encode_rate_type(:default), do: 0x00
   def encode_rate_type(:import), do: 0x01
   def encode_rate_type(:export), do: 0x02
   def encode_rate_type(:import_export), do: 0x03
@@ -178,7 +192,7 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
   """
   @spec decode_rate_type(non_neg_integer()) ::
           {:ok, meter_rate_type()} | {:error, DecodeError.t()}
-  def decode_rate_type(0x00), do: {:ok, :unspecified}
+  def decode_rate_type(0x00), do: {:ok, :default}
   def decode_rate_type(0x01), do: {:ok, :import}
   def decode_rate_type(0x02), do: {:ok, :export}
   def decode_rate_type(0x03), do: {:ok, :import_export}
