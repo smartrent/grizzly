@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
 
   @type meter_type :: :electric | :gas | :water | :heating | :cooling
   @type meter_scale :: atom()
-  @type rate_type :: :unspecified | :import | :export
+  @type rate_type :: :default | :import | :export
   @type param ::
           {:meter_type, meter_type()}
           | {:scale, meter_scale()}
@@ -78,7 +78,7 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
     meter_type_bin = Meter.encode_meter_type(meter_type)
     {scale1, scale2} = Meter.encode_meter_scale(scale, meter_type)
 
-    rate_type = Command.param(command, :rate_type, :unspecified)
+    rate_type = Command.param(command, :rate_type, :default)
     delta_time = Command.param(command, :delta_time, 0)
     previous_value = Command.param(command, :previous_value, 0)
 
