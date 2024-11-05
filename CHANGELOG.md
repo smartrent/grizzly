@@ -4,19 +4,25 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.3] - 2024-11-05
+
+### Fixed
+
+* Inclusion Server handles Extended Node Add Status ([#1015](https://github.com/smartrent/grizzly/pull/1015))
+
 ## [v8.6.2] - 2024-11-04
 
 ### Added
 
-* Add function to get all notification types [#1005](https://github.com/smartrent/grizzly/pull/1005)
-* Forward unsolicited Node Remove Status to inclusion handler [#1007](https://github.com/smartrent/grizzly/pull/1007)
-* Implement Meter Get v2-6 [#1012](https://github.com/smartrent/grizzly/pull/1012)
+* Add function to get all notification types ([#1005](https://github.com/smartrent/grizzly/pull/1005))
+* Forward unsolicited Node Remove Status to inclusion handler ([#1007](https://github.com/smartrent/grizzly/)pull/1007)
+* Implement Meter Get v2-6 ([#1012](https://github.com/smartrent/grizzly/pull/1012))
 
 ### Fixed
 
-* Inclusion timeout must be at least as long as the S2 bootstrapping timeouts [#1008](https://github.com/smartrent/grizzly/pull/1008)
-* Send Device Reset Locally notifications before closing connections [#1009](https://github.com/smartrent/grizzly/pull/1009)
-* Thermostat Setpoint values should be signed [#1010](https://github.com/smartrent/grizzly/pull/1010)
+* Inclusion timeout must be at least as long as the S2 bootstrapping timeouts ([#1008](https://github.com/)smartrent/grizzly/pull/1008)
+* Send Device Reset Locally notifications before closing connections ([#1009](https://github.com/smartrent/)grizzly/pull/1009)
+* Thermostat Setpoint values should be signed ([#1010](https://github.com/smartrent/grizzly/pull/1010))
 
 
 ## [v8.6.1] - 2024-10-21
@@ -2633,6 +2639,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.6.3]: https://github.com/smartrent/grizzly/compare/v8.6.2..v8.6.3
 [v8.6.2]: https://github.com/smartrent/grizzly/compare/v8.6.1..v8.6.2
 [v8.6.1]: https://github.com/smartrent/grizzly/compare/v8.6.0..v8.6.1
 [v8.6.0]: https://github.com/smartrent/grizzly/compare/v8.5.3..v8.6.0
