@@ -319,7 +319,8 @@ defmodule Grizzly.InclusionServer do
     {:noreply, state}
   end
 
-  def handle_report(%Command{name: :node_add_status} = command, state) do
+  def handle_report(%Command{name: name} = command, state)
+      when name in [:node_add_status, :extended_node_add_status] do
     report = Report.new(:complete, :command, 1, command: command)
     send_to_handler(state, report)
 
