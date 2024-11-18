@@ -84,9 +84,10 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
         # Sometimes a 0 seq_number is added
         _::binary
       >>) do
-    with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
-         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
-         {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
+    zwave_type = type_from_byte(zwave_type_byte)
+    zwave_event = event_from_byte(zwave_type, zwave_event_byte)
+
+    with {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
          {:ok, event_parameters} <-
            Notifications.decode_event_params(zwave_type, zwave_event, event_params) do
       {:ok,
@@ -99,16 +100,6 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
          zwave_event: zwave_event,
          event_parameters: event_parameters
        ]}
-    else
-      {:error, :invalid_type_byte} ->
-        {:error, %DecodeError{value: zwave_type_byte, param: :zwave_type, command: :alarm_report}}
-
-      {:error, :invalid_event_byte} ->
-        {:error,
-         %DecodeError{value: zwave_event_byte, param: :zwave_event, command: :alarm_report}}
-
-      error ->
-        error
     end
   end
 
@@ -116,9 +107,10 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
         <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte, 0x01::1,
           0x00::2, params_length::5, event_params::binary-size(params_length), sequence_number>>
       ) do
-    with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
-         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
-         {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
+    zwave_type = type_from_byte(zwave_type_byte)
+    zwave_event = event_from_byte(zwave_type, zwave_event_byte)
+
+    with {:ok, zwave_status} <- Notifications.status_from_byte(status_byte),
          {:ok, event_parameters} <-
            Notifications.decode_event_params(zwave_type, zwave_event, event_params) do
       {:ok,
@@ -132,16 +124,6 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
          event_parameters: event_parameters,
          sequence_number: sequence_number
        ]}
-    else
-      {:error, :invalid_type_byte} ->
-        {:error, %DecodeError{value: zwave_type_byte, param: :zwave_type, command: :alarm_report}}
-
-      {:error, :invalid_event_byte} ->
-        {:error,
-         %DecodeError{value: zwave_event_byte, param: :zwave_event, command: :alarm_report}}
-
-      error ->
-        error
     end
   end
 
@@ -149,9 +131,10 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   def decode_params(
         <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte>>
       ) do
-    with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
-         {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte),
-         {:ok, zwave_status} <- Notifications.status_from_byte(status_byte) do
+    zwave_type = type_from_byte(zwave_type_byte)
+    zwave_event = event_from_byte(zwave_type, zwave_event_byte)
+
+    with {:ok, zwave_status} <- Notifications.status_from_byte(status_byte) do
       {:ok,
        [
          type: type,
@@ -162,16 +145,6 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
          zwave_event: zwave_event,
          event_parameters: []
        ]}
-    else
-      {:error, :invalid_type_byte} ->
-        {:error, %DecodeError{value: zwave_type_byte, param: :zwave_type, command: :alarm_report}}
-
-      {:error, :invalid_event_byte} ->
-        {:error,
-         %DecodeError{value: zwave_event_byte, param: :zwave_event, command: :alarm_report}}
-
-      error ->
-        error
     end
   end
 
@@ -234,6 +207,20 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
       Keyword.merge([zensor_net_node_id: 0, event_parameters: []], params)
     else
       params
+    end
+  end
+
+  defp type_from_byte(byte) do
+    case Notifications.type_from_byte(byte) do
+      {:ok, type} -> type
+      {:error, _} -> byte
+    end
+  end
+
+  defp event_from_byte(type, byte) do
+    case Notifications.event_from_byte(type, byte) do
+      {:ok, event} -> event
+      {:error, _} -> byte
     end
   end
 end

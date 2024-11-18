@@ -387,6 +387,7 @@ defmodule Grizzly.ZWave.Notifications do
   def type_from_byte(byte) do
     case Map.fetch(@type_from_byte, byte) do
       {:ok, type} -> {:ok, type}
+      # There is no decoding for Alarm CC V1 - the byte is the type
       :error -> {:error, :invalid_type_byte}
     end
   end
@@ -399,6 +400,7 @@ defmodule Grizzly.ZWave.Notifications do
     with v when not is_nil(v) <- get_in(@event_from_byte, [type, byte]) do
       {:ok, v}
     else
+      # Alarm reports might not provide a defined event (e.g.  event byte is 0)
       _ -> {:error, :invalid_event_byte}
     end
   end
