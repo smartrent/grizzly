@@ -114,6 +114,9 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
   @spec all_sensor_types() :: [atom()]
   def all_sensor_types(), do: Enum.map(@sensor_types, &elem(&1, 1))
 
+  @spec sensor_type_scales(atom()) :: [atom()]
+  def sensor_type_scales(sensor_type), do: Map.get(@sensor_scales_by_type, sensor_type)
+
   @spec encode_sensor_type(atom() | byte()) :: byte()
   def encode_sensor_type(sensor_type) when sensor_type in 0..255, do: sensor_type
 
