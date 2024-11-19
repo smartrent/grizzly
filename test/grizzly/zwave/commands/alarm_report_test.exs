@@ -162,6 +162,19 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
              ]
     end
 
+    test "v2 with undefined zwave_event and zwave_type" do
+      binary = <<0x10, 0x25, 0x00, 0x00, 0xB9, 0x9B, 0x04, 0x63, 0x03, 0xFB, 0x01>>
+
+      {:ok, params} = AlarmReport.decode_params(binary)
+
+      assert Keyword.fetch!(params, :type) == 0x10
+      assert Keyword.fetch!(params, :level) == 0x25
+      assert Keyword.fetch!(params, :zwave_status) == :disabled
+      assert Keyword.fetch!(params, :zensor_net_node_id) == 0x00
+      assert Keyword.fetch!(params, :zwave_type) == 0xB9
+      assert Keyword.fetch!(params, :zwave_event) == 0x9B
+    end
+
     test "v8 with sequence number" do
       binary =
         <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x01::1, 0x00::2, 0x04::5, 0x63, 0x03, 0xFB, 0x01,
