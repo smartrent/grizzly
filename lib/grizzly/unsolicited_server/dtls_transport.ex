@@ -3,10 +3,6 @@ defmodule Grizzly.UnsolicitedServer.DTLSTransport do
 
   @behaviour ThousandIsland.Transport
 
-  # Dialyzer complains about the `:ciphers` option passed to `:ssl.listen/2`
-  # even though the option works as passed (and is required).
-  @dialyzer {:no_return, listen: 2, do_listen: 3}
-
   @impl ThousandIsland.Transport
   def listen(port, opts), do: do_listen(port, opts, 3)
 
