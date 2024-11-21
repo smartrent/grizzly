@@ -65,7 +65,7 @@ defmodule Grizzly.UnsolicitedServer.DTLSTransport do
       {:verify, :verify_none},
       {:versions, [:"dtlsv1.2", :dtlsv1]},
       {:protocol, :dtls},
-      {:ciphers, [{:psk, :aes_128_cbc, :sha}]},
+      {:ciphers, [%{key_exchange: :psk, cipher: :aes_128_cbc, mac: :sha, prf: :default_prf}]},
       {:psk_identity, ~c"Client_identity"},
       {:user_lookup_fun,
        {&user_lookup/3,
