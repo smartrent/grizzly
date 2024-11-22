@@ -22,4 +22,12 @@ defmodule Grizzly.ZWave.Commands.AlarmTypeSupportedReportTest do
     assert Enum.sort([:smoke_alarm, :home_security, :siren, :gas_alarm]) ==
              Enum.sort(Keyword.get(params, :types))
   end
+
+  test "decodes params correctly with alarm v1 support" do
+    binary_params = <<0x01::3, 0x03::5, 0b10000010, 0b01000000, 0b00000100>>
+    {:ok, params} = AlarmTypeSupportedReport.decode_params(binary_params)
+
+    assert Enum.sort([:smoke_alarm, :home_security, :siren, :gas_alarm]) ==
+             Enum.sort(Keyword.get(params, :types))
+  end
 end
