@@ -39,7 +39,9 @@ defmodule Grizzly.ZWave.Commands.AlarmTypeSupportedReport do
 
   @impl Grizzly.ZWave.Command
   @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<0x00::3, number_of_masks::5, bitmasks::binary-size(number_of_masks)>>) do
+  def decode_params(
+        <<_v1_support::3, number_of_masks::5, bitmasks::binary-size(number_of_masks)>>
+      ) do
     with {:ok, types} <- decode_alarm_types(bitmasks) do
       {:ok, [types: types]}
     else
