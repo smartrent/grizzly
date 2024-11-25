@@ -4,6 +4,19 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.4] - 2024-11-25
+
+### Added
+
+* Add retry logic to unsolicited server listen call ([#1021](https://github.com/smartrent/grizzly/pull/1021))
+* Provide the possible scales for a given sensor type ([#1019](https://github.com/smartrent/grizzly/pull/1019))
+* Support alarm reports for Alarm CC v1 ([#1017](https://github.com/smartrent/grizzly/pull/1017))
+  * Unknown alarm types and events will be the raw value
+
+### Fixed
+
+* Fix the decoding of `alarm_type_supported_report` when version 1 of alarm types and events are also supported by the device ([#1024](https://github.com/smartrent/grizzly/pull/1024))
+
 ## [v8.6.3] - 2024-11-05
 
 ### Fixed
