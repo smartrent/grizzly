@@ -8,7 +8,7 @@ defmodule Grizzly.CommandHandlers.SupervisionReportTest do
     ref = make_ref()
 
     {:ok, state} =
-      Handler.init(
+      Handler.init(nil,
         session_id: 1,
         waiter: {self(), nil},
         command_ref: ref,

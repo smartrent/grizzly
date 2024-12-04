@@ -21,14 +21,15 @@ defmodule GrizzlyTest.Server.Handler do
     FirmwareUpdateMDRequestReport,
     FirmwareUpdateMDGet,
     FirmwareUpdateMDStatusReport,
-    SupervisionReport
+    SupervisionReport,
+    VersionCommandClassReport
   }
 
   require Logger
 
   @impl ThousandIsland.Handler
   def handle_connection(_socket, _state) do
-    {:continue, %{node_id: nil, firmware_update_nack: true}}
+    {:continue, %{node_id: nil, firmware_update_nack: true, commands_received: []}}
   end
 
   @impl ThousandIsland.Handler
@@ -42,6 +43,8 @@ defmodule GrizzlyTest.Server.Handler do
 
   def handle_data(data, socket, %{node_id: node_id} = state) do
     {:ok, zip_packet} = ZWave.from_binary(data)
+
+    state = %{state | commands_received: state.commands_received ++ [zip_packet]}
 
     cond do
       zip_packet.name == :keep_alive ->
@@ -85,6 +88,10 @@ defmodule GrizzlyTest.Server.Handler do
               report_number: 1
               # TODO only expect an update status report on the last fragment
             )
+
+          # 203 waits until it receives two version gets, then sends the reports out of order
+          203 ->
+            handle_version_get_command(socket, zip_packet, state)
 
           # Node 301 is a long waiting inclusion meant to exercising stopping inclusion/exclusion
           301 ->
@@ -558,5 +565,31 @@ defmodule GrizzlyTest.Server.Handler do
     end
 
     # the device asks for image fragments
+  end
+
+  defp handle_version_get_command(socket, zip_packet, state) do
+    send_ack_response(socket, zip_packet)
+
+    if length(state.commands_received) == 2 do
+      Process.sleep(100)
+
+      [first, second] = state.commands_received
+
+      cc = second |> Command.param!(:command) |> Command.param!(:command_class)
+      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: 2)
+
+      {:ok, out_packet} = ZIPPacket.with_zwave_command(reply, Grizzly.SeqNumber.get_and_inc())
+      :ok = Socket.send(socket, ZWave.to_binary(out_packet))
+
+      Process.sleep(100)
+
+      cc = first |> Command.param!(:command) |> Command.param!(:command_class)
+      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: 1)
+
+      {:ok, out_packet} = ZIPPacket.with_zwave_command(reply, Grizzly.SeqNumber.get_and_inc())
+      :ok = Socket.send(socket, ZWave.to_binary(out_packet))
+    end
+
+    state
   end
 end

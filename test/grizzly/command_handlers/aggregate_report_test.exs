@@ -7,7 +7,7 @@ defmodule Grizzly.CommandHandlers.AggregateReportTest do
 
   test "when the waiting report has no reports to follow" do
     {:ok, state} =
-      AggregateReport.init(complete_report: :association_report, aggregate_param: :nodes)
+      AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, association_report} =
       AssociationReport.new(
@@ -25,7 +25,7 @@ defmodule Grizzly.CommandHandlers.AggregateReportTest do
 
   test "when the waiting report is aggregated" do
     {:ok, state} =
-      AggregateReport.init(complete_report: :association_report, aggregate_param: :nodes)
+      AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, association_report_one} =
       AssociationReport.new(
@@ -53,7 +53,7 @@ defmodule Grizzly.CommandHandlers.AggregateReportTest do
 
   test "when the waiting report has reports to follow" do
     {:ok, state} =
-      AggregateReport.init(complete_report: :association_report, aggregate_param: :nodes)
+      AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, association_report} =
       AssociationReport.new(
@@ -71,7 +71,7 @@ defmodule Grizzly.CommandHandlers.AggregateReportTest do
 
   test "when different report is being handled than the one that is being waited on" do
     {:ok, state} =
-      AggregateReport.init(complete_report: :association_report, aggregate_param: :nodes)
+      AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, switch_binary_report} = SwitchBinaryReport.new(target_value: :on)
 

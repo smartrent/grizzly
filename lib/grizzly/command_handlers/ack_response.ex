@@ -6,7 +6,7 @@ defmodule Grizzly.CommandHandlers.AckResponse do
   @behaviour Grizzly.CommandHandler
 
   @impl Grizzly.CommandHandler
-  def init(_) do
+  def init(_, _) do
     {:ok, nil}
   end
 
