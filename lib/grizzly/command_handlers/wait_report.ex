@@ -7,28 +7,37 @@ defmodule Grizzly.CommandHandlers.WaitReport do
 
   alias Grizzly.ZWave.Command
 
-  @type state :: %{complete_report: atom()}
+  @type state :: %{complete_report: atom(), get_command: Command.t()}
 
-  @type opt :: {:complete_report, atom()}
+  @type opt :: {:complete_report, atom(), get_command: Command.t()}
 
-  @spec init([opt]) :: {:ok, state()}
-  def init(opts) do
+  @impl Grizzly.CommandHandler
+  def init(command, opts) do
     report_name = Keyword.fetch!(opts, :complete_report)
-    {:ok, %{complete_report: report_name}}
+    {:ok, %{complete_report: report_name, get_command: command}}
   end
 
-  @spec handle_ack(state()) :: {:continue, state()}
+  @impl Grizzly.CommandHandler
   def handle_ack(state), do: {:continue, state}
 
-  @spec handle_command(Command.t(), state()) ::
-          {:continue, state} | {:complete, Command.t()}
+  @impl Grizzly.CommandHandler
   def handle_command(command, state) do
-    expected? = not is_nil(command) and command.name == state.complete_report
+    expected? =
+      not is_nil(command) and command.name == state.complete_report and
+        report_matches_get?(state.get_command, command)
 
     if state.complete_report == :any or expected? do
       {:complete, command}
     else
       {:continue, state}
+    end
+  end
+
+  defp report_matches_get?(get, report) do
+    if function_exported?(get.impl, :report_matches_get?, 2) do
+      get.impl.report_matches_get?(get, report)
+    else
+      true
     end
   end
 end

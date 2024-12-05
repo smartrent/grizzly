@@ -83,7 +83,7 @@ defmodule Grizzly.Commands.Command do
         {zwave_command, handler, handler_init_args, false, nil}
       end
 
-    {:ok, handler_state} = handler.init(handler_init_args)
+    {:ok, handler_state} = handler.init(zwave_command, handler_init_args)
 
     %__MODULE__{
       handler: handler,

@@ -67,7 +67,17 @@ defmodule Grizzly.ZWave.Command do
   """
   @callback decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
 
-  @optional_callbacks encode_params: 2
+  @doc """
+  Returns true if the report is a good match for the get command. This is useful
+  for commands like Version Command Class Get, which can be sent in rapid succession
+  during a device interview, which can lead to reports getting matched back to the
+  wrong get.
+
+  This is an optional callback. If not implemented, command handlers will assume true.
+  """
+  @callback report_matches_get?(get :: t(), report :: t()) :: boolean()
+
+  @optional_callbacks encode_params: 2, report_matches_get?: 2
 
   @doc """
   Encode the `Command.t()` into it's binary representation

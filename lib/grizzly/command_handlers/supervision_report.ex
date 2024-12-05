@@ -8,7 +8,7 @@ defmodule Grizzly.CommandHandlers.SupervisionReport do
   alias Grizzly.ZWave.Command
 
   @impl Grizzly.CommandHandler
-  def init(opts) do
+  def init(_, opts) do
     state =
       opts
       |> Enum.into(%{})

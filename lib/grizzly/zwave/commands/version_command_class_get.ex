@@ -47,4 +47,9 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassGet do
          %DecodeError{value: cc_byte, param: :command_class, command: :version_command_class_get}}
     end
   end
+
+  @impl Grizzly.ZWave.Command
+  def report_matches_get?(get, report) do
+    Command.param!(get, :command_class) == Command.param!(report, :command_class)
+  end
 end

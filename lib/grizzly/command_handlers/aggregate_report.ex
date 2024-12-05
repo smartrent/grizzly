@@ -14,19 +14,18 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
 
   @type opt :: {:complete_report, atom(), aggregate_param: atom()}
 
-  @spec init([opt]) :: {:ok, state()}
-  def init(opts) do
+  @impl Grizzly.CommandHandler
+  def init(_, opts) do
     report_name = Keyword.fetch!(opts, :complete_report)
     aggregate_param = Keyword.fetch!(opts, :aggregate_param)
 
     {:ok, %{complete_report: report_name, aggregate_param: aggregate_param, aggregates: []}}
   end
 
-  @spec handle_ack(state()) :: {:continue, state()}
+  @impl Grizzly.CommandHandler
   def handle_ack(state), do: {:continue, state}
 
-  @spec handle_command(Command.t(), state()) ::
-          {:continue, state} | {:complete, Command.t()}
+  @impl Grizzly.CommandHandler
   def handle_command(command, state) do
     if command.name == state.complete_report do
       do_handle_command(command, state)
