@@ -8,6 +8,7 @@ defmodule Grizzly.ZWave do
   @type seq_number :: non_neg_integer()
 
   @type node_id :: non_neg_integer()
+  @type endpoint_id :: 0..127
 
   @spec from_binary(binary()) :: {:ok, Command.t()} | {:error, DecodeError.t()}
   def from_binary(binary) do

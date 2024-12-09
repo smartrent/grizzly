@@ -327,7 +327,15 @@ defmodule Grizzly.Network do
 
     with true <- Keyword.get(opts, :notify, true),
          %Associations.Association{node_ids: nodes} <- Associations.get(server, 1) do
-      Enum.each(nodes, &Grizzly.send_command(&1, :device_reset_locally_notification))
+      Enum.each(nodes, fn
+        {node_id, endpoint} ->
+          Grizzly.send_command(node_id, :device_reset_locally_notification, [],
+            destination: endpoint
+          )
+
+        node_id ->
+          Grizzly.send_command(node_id, :device_reset_locally_notification)
+      end)
     else
       _ -> :ok
     end
