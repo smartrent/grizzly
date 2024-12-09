@@ -134,6 +134,7 @@ defmodule Grizzly do
           | {:status_updates?, boolean()}
           | {:mode, connection_mode()}
           | {:more_info, boolean()}
+          | {:destination, ZWave.endpoint_id()}
 
   @type command :: atom()
 

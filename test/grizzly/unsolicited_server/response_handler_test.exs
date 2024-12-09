@@ -182,14 +182,20 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     end
 
     test "set", %{multi_channel_server: server} do
-      {:ok, mcas} = MultiChannelAssociationSet.new(grouping_identifier: 1, nodes: [1, 2, 3, 4])
+      {:ok, mcas} =
+        MultiChannelAssociationSet.new(
+          grouping_identifier: 1,
+          nodes: [1, 2, 3, 4],
+          node_endpoints: [%{node: 5, endpoint: 6, bit_address: 0}]
+        )
 
       assert [:ack] =
                ResponseHandler.handle_response(make_response(mcas), associations_server: server)
     end
 
     test "remove", %{multi_channel_server: server} do
-      {:ok, mcar} = MultiChannelAssociationRemove.new(grouping_identifier: 1, nodes: [])
+      {:ok, mcar} =
+        MultiChannelAssociationRemove.new(grouping_identifier: 1, nodes: [], node_endpoints: [])
 
       assert [:ack] =
                ResponseHandler.handle_response(make_response(mcar), associations_server: server)
