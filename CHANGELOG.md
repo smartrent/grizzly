@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.6] - 2024-12-13
+
+### Added
+
+* Handle incoming Multi Channel Association commands for endpoint associations ([#1029](https://github.com/smartrent/grizzly/pull/1029))
+
 ## [v8.6.5] - 2024-12-05
 
 ### Fixed
