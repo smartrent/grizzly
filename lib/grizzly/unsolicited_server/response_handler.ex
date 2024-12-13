@@ -298,12 +298,17 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
           )
 
         association ->
+          {endpoints, nodes} = Enum.split_with(association.node_ids, fn v -> is_tuple(v) end)
+
           MultiChannelAssociationReport.new(
             grouping_identifier: association.grouping_id,
             max_nodes_supported: 1,
-            nodes: association.node_ids,
+            nodes: nodes,
             reports_to_follow: 0,
-            node_endpoints: []
+            node_endpoints:
+              Enum.map(endpoints, fn {node, endpoint} ->
+                [node: node, endpoint: endpoint, bit_address: 0]
+              end)
           )
       end
 
@@ -319,8 +324,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     # if the command contains something other than one we will just move along.
     if grouping_identifier == 1 do
       nodes = Command.param!(command, :nodes)
+      node_endpoints = Command.param!(command, :node_endpoints)
 
-      case Associations.save(associations_server, grouping_identifier, nodes) do
+      node_endpoints =
+        Enum.map(node_endpoints, fn ep ->
+          {ep[:node], ep[:endpoint]}
+        end)
+
+      case Associations.save(associations_server, grouping_identifier, node_endpoints ++ nodes) do
         :ok -> [supervision_status: :success]
         _ -> [supervision_status: :fail]
       end
@@ -333,6 +344,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     associations_server = Keyword.get(opts, :associations_server, Associations)
     grouping_id = Command.param!(command, :grouping_identifier)
     nodes = Command.param!(command, :nodes)
+    node_endpoints = Command.param!(command, :node_endpoints)
+
+    node_endpoints =
+      Enum.map(node_endpoints, fn ep ->
+        {ep[:node], ep[:endpoint]}
+      end)
 
     # This case matching is based off a table from the Z-Wave specification
     # Right now we only have one association grouping, so the first and third
@@ -346,7 +363,11 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         []
 
       {1, nodes} ->
-        case Associations.delete_nodes_from_grouping(associations_server, grouping_id, nodes) do
+        case Associations.delete_nodes_from_grouping(
+               associations_server,
+               grouping_id,
+               node_endpoints ++ nodes
+             ) do
           :ok -> []
           error -> error
         end
@@ -356,7 +377,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         []
 
       {0, nodes} ->
-        :ok = Associations.delete_nodes_from_all_groupings(associations_server, nodes)
+        :ok =
+          Associations.delete_nodes_from_all_groupings(
+            associations_server,
+            node_endpoints ++ nodes
+          )
+
         []
 
       _ ->

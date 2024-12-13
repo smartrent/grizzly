@@ -33,8 +33,10 @@ defmodule Grizzly.AssociationsTest do
   end
 
   test "get all associations", %{server: server} do
-    :ok = Associations.save(server, 1, [1, 2])
-    assert [%Association{node_ids: [1, 2], grouping_id: 1}] == Associations.get_all(server)
+    :ok = Associations.save(server, 1, [1, 2, {3, 1}])
+
+    assert [%Association{node_ids: [1, 2, {3, 1}], grouping_id: 1}] ==
+             Associations.get_all(server)
   end
 
   @tag max_per_group: 2

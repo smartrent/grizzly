@@ -28,7 +28,7 @@ defmodule Grizzly.Associations do
 
     @type t() :: %__MODULE__{
             grouping_id: byte(),
-            node_ids: [ZWave.node_id()]
+            node_ids: [ZWave.node_id() | {ZWave.node_id(), ZWave.endpoint_id()}]
           }
 
     defstruct grouping_id: nil, node_ids: []
