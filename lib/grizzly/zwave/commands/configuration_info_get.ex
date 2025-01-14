@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationInfoGet do
   def new(params) do
     command = %Command{
       name: :configuration_info_get,
-      command_byte: 0x0B,
+      command_byte: 0x0C,
       command_class: Configuration,
       params: params,
       impl: __MODULE__
