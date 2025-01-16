@@ -4,6 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.7] - 2025-01-16
+
+### Added
+
+* Implement Configuration Default Reset from Config v4 ([#1040](https://github.com/smartrent/grizzly/pull/1040))
+* Elixir 1.18 compatibility ([#1041](https://github.com/smartrent/grizzly/pull/1041))
+
+### Fixed
+
+* Fix incorrect command IDs for Config Info Get/Report ([#1039](https://github.com/smartrent/grizzly/pull/1039))
+
 ## [v8.6.6] - 2024-12-13
 
 ### Added
