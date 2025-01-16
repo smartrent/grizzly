@@ -55,6 +55,7 @@ defmodule Grizzly.Commands.Table do
        {Commands.ConfigurationInfoGet,
         handler:
           {AggregateReport, complete_report: :configuration_info_report, aggregate_param: :info}}},
+      {:configuration_default_reset, {Commands.ConfigurationDefaultReset, handler: AckResponse}},
 
       # Manufacturer specific
       {:manufacturer_specific_get,
