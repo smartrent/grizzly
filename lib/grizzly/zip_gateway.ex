@@ -24,12 +24,12 @@ defmodule Grizzly.ZIPGateway do
 
   @spec unsolicited_server_ip() :: :inet.ip_address()
   def unsolicited_server_ip() do
-    case Application.get_env(:grizzly, :unsolicited_server) do
-      nil ->
-        Tuple.append(@default_lan_host_base, 0x0002)
+    default_lan_host =
+      Tuple.insert_at(@default_lan_host_base, tuple_size(@default_lan_host_base), 0x0002)
 
-      config ->
-        config.ip || Tuple.append(@default_lan_host_base, 0x0002)
+    case Application.get_env(:grizzly, :unsolicited_server) do
+      nil -> default_lan_host
+      config -> config.ip || default_lan_host
     end
   end
 

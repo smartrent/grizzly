@@ -53,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReport do
     for i <- 0..(masks_count - 1), into: <<>> do
       start = i * 8 + 1
 
-      for j <- (start + 7)..start, into: <<>> do
+      for j <- (start + 7)..start//-1, into: <<>> do
         if j in members, do: <<0x01::1>>, else: <<0x00::1>>
       end
     end
