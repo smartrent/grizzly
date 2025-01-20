@@ -4,7 +4,11 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v8.6.7] - 2025-01-16
+## [v8.6.8] - 2025-01-20
+
+No changes. Bumped due to an issue when publishing v8.6.7.
+
+## [v8.6.7] - 2025-01-16 **RETIRED**
 
 ### Added
 
@@ -2675,6 +2679,9 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.6.8]: https://github.com/smartrent/grizzly/compare/v8.6.7..v8.6.8
+[v8.6.7]: https://github.com/smartrent/grizzly/compare/v8.6.6..v8.6.7
+[v8.6.6]: https://github.com/smartrent/grizzly/compare/v8.6.5..v8.6.6
 [v8.6.5]: https://github.com/smartrent/grizzly/compare/v8.6.4..v8.6.5
 [v8.6.4]: https://github.com/smartrent/grizzly/compare/v8.6.3..v8.6.4
 [v8.6.3]: https://github.com/smartrent/grizzly/compare/v8.6.2..v8.6.3
