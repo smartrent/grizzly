@@ -86,9 +86,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
          [
            name: Grizzly.ZIPGateway.Daemon,
            cd: priv,
-           log_output: :debug,
-           log_prefix: "zipgateway: ",
-           log_transform: &zipgateway_log_transform/1,
+           logger_fun: &zipgateway_log/1,
            exit_status_to_reason: &zipgateway_exit_status/1
          ]
        ]},
@@ -150,14 +148,16 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     end
   end
 
-  @spec zipgateway_log_transform(binary()) :: binary()
-  defp zipgateway_log_transform(message) do
+  @spec zipgateway_log(binary()) :: :ok
+  defp zipgateway_log(message) do
+    Logger.debug("zipgateway: " <> message)
+
     case GenServer.whereis(Grizzly.ZIPGateway.LogMonitor) do
       nil -> :ok
       pid -> send(pid, {:message, message})
     end
 
-    message
+    :ok
   end
 
   defp zipgateway_exit_status(status) do
