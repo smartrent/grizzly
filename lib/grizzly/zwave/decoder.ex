@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Decoder do
     {0x26, 0x02} => Commands.SwitchMultilevelGet,
     {0x26, 0x03} => Commands.SwitchMultilevelReport,
     {0x26, 0x04} => Commands.SwitchMultilevelStartLevelChange,
-    {0x26, 0x05} => Commands.SwitchMultiLevelStopLevelChange,
+    {0x26, 0x05} => Commands.SwitchMultilevelStopLevelChange,
 
     # Sensor binary
     {0x30, 0x01} => Commands.SensorBinarySupportedSensorGet,
@@ -196,8 +196,8 @@ defmodule Grizzly.ZWave.Decoder do
     {0x98, 0x03} => Commands.S0CommandsSupportedReport,
     {0x98, 0x04} => Commands.S0SecuritySchemeGet,
     {0x98, 0x05} => Commands.S0SecuritySchemeReport,
-    {0x98, 0x06} => Commands.S0SecurityNetworkKeySet,
-    {0x98, 0x07} => Commands.S0SecurityNetworkKeyVerify,
+    {0x98, 0x06} => Commands.S0NetworkKeySet,
+    {0x98, 0x07} => Commands.S0NetworkKeyVerify,
     {0x98, 0x08} => Commands.S0SecuritySchemeInherit,
     {0x98, 0x40} => Commands.S0NonceGet,
     {0x98, 0x80} => Commands.S0NonceReport,
@@ -439,7 +439,7 @@ defmodule Grizzly.ZWave.Decoder do
     {0x87, 0x07} => Commands.IndicatorDescriptionReport,
 
     # Scene activation
-    {0x2B, 0x01} => Commands.SceneActovationSet,
+    {0x2B, 0x01} => Commands.SceneActivationSet,
 
     # Scene actuator configuration
     {0x2C, 0x01} => Commands.SceneActuatorConfSet,
@@ -513,4 +513,7 @@ defmodule Grizzly.ZWave.Decoder do
         {:error, error}
     end
   end
+
+  @doc false
+  def __mappings__(), do: @mappings
 end
