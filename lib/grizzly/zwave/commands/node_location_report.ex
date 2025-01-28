@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.NodeLocationReport do
   @impl Grizzly.ZWave.Command
   def new(params) do
     command = %Command{
-      name: :node_location_set,
+      name: :node_location_report,
       command_byte: 0x06,
       command_class: NodeNaming,
       params: params,
