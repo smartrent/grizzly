@@ -4,6 +4,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.9] - 2025-02-03
+
+### Added
+
+* Require MuonTrap v1.6.0 for logging improvements ([#1045](https://github.com/smartrent/grizzly/pull/1045))
+
+### Fixed
+
+* Fix module name typos in `Grizzly.ZWave.Decoder` ([#1046](https://github.com/smartrent/grizzly/pull/1046))
+* Enforce command names match module names and handler specs ([#1047](https://github.com/smartrent/grizzly/pull/1047))
+
 ## [v8.6.8] - 2025-01-20
 
 No changes. Bumped due to an issue when publishing v8.6.7.
@@ -2679,6 +2690,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.6.9]: https://github.com/smartrent/grizzly/compare/v8.6.8..v8.6.9
 [v8.6.8]: https://github.com/smartrent/grizzly/compare/v8.6.7..v8.6.8
 [v8.6.7]: https://github.com/smartrent/grizzly/compare/v8.6.6..v8.6.7
 [v8.6.6]: https://github.com/smartrent/grizzly/compare/v8.6.5..v8.6.6
