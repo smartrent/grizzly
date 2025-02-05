@@ -9,7 +9,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     * `:seq_number` - the sequence number of the inclusion command
     * `:status` - the status of the inclusion
     * `:node_id` - the new id of the new Z-Wave node
-    * `:listening?` - if the node is a listening node or not
     * `:basic_device_class` - the Z-Wave basic device class
     * `:generic_device_class` - the Z-Wave generic device class
     * `:specific_device_class` - the Z-Wave specific device class
@@ -35,7 +34,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           {:node_id, Grizzly.node_id() | Grizzly.VirtualDevices.id()}
           | {:status, NMI.node_add_status()}
           | {:seq_number, Grizzly.seq_number()}
-          | {:listening?, boolean()}
           | {:basic_device_class, byte()}
           | {:generic_device_class, byte()}
           | {:specific_device_class, byte()}
@@ -68,11 +66,11 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     if status == :failed do
       <<seq_number, NMI.node_add_status_to_byte(status), 0x00, node_id, 0x01>>
     else
-      listening? = Command.param!(command, :listening?)
+      command_classes = Command.param(command, :command_classes, [])
+      extra_ccs? = not Enum.empty?(command_classes)
       basic_device_class = Command.param!(command, :basic_device_class)
       generic_device_class = Command.param!(command, :generic_device_class)
       specific_device_class = Command.param!(command, :specific_device_class)
-      command_classes = Command.param(command, :command_classes, [])
 
       # We add 6 to the length of the command classes to account for the 3 device
       # classes 2 Z-Wave protocol bytes and the node info length byte.
@@ -80,10 +78,10 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       # See SDS13784 4.4.8.2 for more details
       node_info_length = 6 + cc_count(command_classes)
 
-      # TODO: fix opt func bit (after the listening bit)
+      # TODO: fix opt func bit (after the extra_ccs bit)
       binary =
         <<seq_number, NMI.node_add_status_to_byte(status), 0x00, node_id, node_info_length,
-          encode_listening_bit(listening?)::size(1), 0x00::7, 0x00,
+          encode_extra_ccs_bit(extra_ccs?)::size(1), 0x00::7, 0x00,
           DeviceClasses.basic_device_class_to_byte(basic_device_class),
           DeviceClasses.generic_device_class_to_byte(generic_device_class),
           DeviceClasses.specific_device_class_to_byte(generic_device_class, specific_device_class)>> <>
@@ -100,7 +98,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
        status: NMI.parse_node_add_status(status_byte),
        seq_number: seq_number,
        node_id: node_id,
-       listening?: false,
        basic_device_class: :unknown,
        generic_device_class: :unknown,
        specific_device_class: :unknown,
@@ -123,9 +120,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
     {:ok, params}
   end
 
-  @spec encode_listening_bit(boolean()) :: byte()
-  def encode_listening_bit(true), do: 0x01
-  def encode_listening_bit(false), do: 0x00
+  @spec encode_extra_ccs_bit(boolean()) :: byte()
+  def encode_extra_ccs_bit(true), do: 0x01
+  def encode_extra_ccs_bit(false), do: 0x00
 
   defp maybe_add_version_2_fields(command, command_bin) do
     case Command.param(command, :granted_keys) do
