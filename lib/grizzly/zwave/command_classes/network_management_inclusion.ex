@@ -75,7 +75,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   node information from a node add status report
 
-  * `:listening?` - is the device a listening device
   * `:basic_device_class` - the basic device class
   * `:generic_device_class` - the generic device class
   * `:specific_device_class` - the specific device class
@@ -90,7 +89,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           required(:seq_number) => byte(),
           required(:node_id) => Grizzly.ZWave.node_id(),
           required(:status) => node_add_status(),
-          required(:listening?) => boolean(),
           required(:basic_device_class) => DeviceClasses.basic_device_class(),
           required(:generic_device_class) => DeviceClasses.generic_device_class(),
           required(:specific_device_class) => DeviceClasses.specific_device_class(),
@@ -105,7 +103,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
 
   Node information from an extended node add status report
 
-  * `:listening?` - is the device a listening device
   * `:basic_device_class` - the basic device class
   * `:generic_device_class` - the generic device class
   * `:specific_device_class` - the specific device class
@@ -114,7 +111,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   * `:kex_fail_type` - the type of key exchange failure if there is one
   """
   @type extended_node_info_report() :: %{
-          required(:listening?) => boolean(),
           required(:basic_device_class) => DeviceClasses.basic_device_class(),
           required(:generic_device_class) => DeviceClasses.generic_device_class(),
           required(:specific_device_class) => DeviceClasses.specific_device_class(),
@@ -128,7 +124,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   """
   @spec parse_node_info(binary()) :: node_info_report() | extended_node_info_report()
   def parse_node_info(
-        <<node_info_length, listening?::1, _::7, _opt_func, basic_device_class,
+        <<node_info_length, _extra_ccs?::1, _::7, _opt_func, basic_device_class,
           generic_device_class, specific_device_class,
           command_classes::binary-size(node_info_length - 6), rest::binary>>
       ) do
@@ -145,12 +141,11 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
         specific_device_class
       )
 
-    # node info length includes: node_info_length, listening?, opt_func, basic class,
+    # node info length includes: node_info_length, extra_ccs?, opt_func, basic class,
     # generic class, specific class, and the command class list. Granted keys, kex fail
     # type, and DSK are not included.
 
     %{
-      listening?: listening? == 1,
       basic_device_class: basic_device_class,
       generic_device_class: generic_device_class,
       specific_device_class: specific_device_class,

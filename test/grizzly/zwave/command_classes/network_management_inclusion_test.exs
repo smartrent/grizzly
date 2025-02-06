@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
   describe "parsing node information" do
     test "version 1 - only a list of command classes" do
       node_info_bin =
-        <<0x10, 0x00, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
+        <<0x10, 0x80, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
           0x62, 0x63>>
 
       expected_command_classes = [
@@ -49,14 +49,13 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                command_classes: expected_command_classes,
                basic_device_class: :controller,
                generic_device_class: :static_controller,
-               listening?: false,
                specific_device_class: :static_installer_tool
              }
     end
 
     test "version 2 - adds S2 key values" do
       node_info_bin =
-        <<0x10, 0x00, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
+        <<0x10, 0x80, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
           0x62, 0x63, 0x07, 0x00>>
 
       expected_command_classes = [
@@ -70,7 +69,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                command_classes: expected_command_classes,
                basic_device_class: :controller,
                generic_device_class: :static_controller,
-               listening?: false,
                specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
                granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
@@ -79,7 +77,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
 
     test "version 3 - adds input DSK field - when DSK is empty" do
       node_info_bin =
-        <<0x10, 0x00, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
+        <<0x10, 0x80, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
           0x62, 0x63, 0x07, 0x00, 0x00>>
 
       expected_command_classes = [
@@ -93,7 +91,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                command_classes: expected_command_classes,
                basic_device_class: :controller,
                generic_device_class: :static_controller,
-               listening?: false,
                specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
                granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
@@ -102,7 +99,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
 
     test "version 3 - adds input DSK field - when DSK is provided" do
       node_info_bin =
-        <<0x10, 0x00, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
+        <<0x10, 0x80, 0x00, 0x01, 0x02, 0x03, 0x20, 0x32, 0xEF, 0xF1, 0x00, 0x71, 0x25, 0xEF,
           0x62, 0x63, 0x07, 0x00, 0x10, 0xC4, 0x6D, 0x49, 0x83, 0x26, 0xC4, 0x77, 0xE3, 0x3E,
           0x65, 0x83, 0xAF, 0xF, 0xA5, 0xE, 0x27>>
 
@@ -119,7 +116,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
                command_classes: expected_command_classes,
                basic_device_class: :controller,
                generic_device_class: :static_controller,
-               listening?: false,
                specific_device_class: :static_installer_tool,
                kex_fail_type: :none,
                granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
