@@ -69,6 +69,7 @@ jobs:
       - run: mix format --check-formatted
       - run: mix credo -a
       - run: mix hex.build
+      - run: MIX_ENV=docs mix docs --warnings-as-errors
 
   dialyzer:
     <<: *defaults

@@ -1,5 +1,8 @@
 defmodule Grizzly.Associations do
-  @moduledoc false
+  @moduledoc """
+  Storage for Z-Wave association groups. Supports both standard and multi channel
+  associations.
+  """
 
   use GenServer
   alias Grizzly.{Options, ZWave}
@@ -22,10 +25,21 @@ defmodule Grizzly.Associations do
   end
 
   defmodule Association do
-    @moduledoc false
+    @moduledoc """
+    A representation of a Z-Wave association group with associated nodes.
+    """
 
     alias Grizzly.ZWave
 
+    @typedoc """
+    ### Fields
+
+    * `grouping_id` - the association group id
+    * `node_ids` - a list of node in the association group. Integers represent
+      node associations, while tuples represent endpoint associations. For example,
+      `[5, {6, 0}]` represents a node association for node 5 and an endpoint
+      association for node 6 endpoint 0.
+    """
     @type t() :: %__MODULE__{
             grouping_id: byte(),
             node_ids: [ZWave.node_id() | {ZWave.node_id(), ZWave.endpoint_id()}]
