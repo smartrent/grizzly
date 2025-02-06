@@ -81,8 +81,7 @@ defmodule Grizzly.Network do
       that the controller is being reset. Used primarily to disable this behavior
       in unit tests. Default `true`.
     * `:associations_server` - Which associations server to use for notifications
-      and to clear after a successful reset. Default is to use the default
-      associations server (named `Grizzly.Associations`).
+      and to clear after a successful reset. Defaults to `Grizzly.Associations`.
   """
   @spec reset_controller([reset_opt() | opt()]) :: Grizzly.send_command_response()
   def reset_controller(opts \\ []) do

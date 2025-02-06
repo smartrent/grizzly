@@ -1,5 +1,8 @@
 defmodule Grizzly.ZWave.Notifications do
-  @moduledoc false
+  @moduledoc """
+  Encoding and decoding functions for notification events and types from the
+  Notification command class.
+  """
 
   alias Grizzly.ZWave.Commands.{NodeLocationReport, UserCodeReport}
   alias Grizzly.ZWave.CommandClasses.{NodeNaming, UserCode}
@@ -352,11 +355,18 @@ defmodule Grizzly.ZWave.Notifications do
                  end)
 
   @doc """
-  All notification types
+  Lists all notification types.
   """
   @spec all_notification_types() :: [atom()]
   def all_notification_types() do
     @type_from_byte |> Map.values()
+  end
+
+  @doc """
+  Lists all events associated with the given notification type.
+  """
+  def all_events_by_type(type) do
+    @event_from_byte |> Map.fetch!(type) |> Map.values()
   end
 
   @doc """
