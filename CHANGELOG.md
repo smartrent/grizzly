@@ -1,8 +1,14 @@
-<!-- markdownlint-disable-file MD024 -->
-
 # Changelog
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v8.7.0] - 2025-02-08
+
+### Changed
+
+* Remove the `listening?` node info property ([#1050](https://github.com/smartrent/grizzly/pull/1050))
+  * See the PR for more details, but tl;dr this flag was long ago misinterpreted and does not
+    actually indicate whether a node is listening
 
 ## [v8.6.9] - 2025-02-03
 
@@ -2687,6 +2693,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.7.0]: https://github.com/smartrent/grizzly/compare/v8.6.9..v8.7.0
 [v8.6.9]: https://github.com/smartrent/grizzly/compare/v8.6.8..v8.6.9
 [v8.6.8]: https://github.com/smartrent/grizzly/compare/v8.6.7..v8.6.8
 [v8.6.7]: https://github.com/smartrent/grizzly/compare/v8.6.6..v8.6.7
