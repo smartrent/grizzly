@@ -2,18 +2,23 @@
 
 Below are short notes about using Grizzly.
 
-1. [Starting Grizzly](#starting-grizzly)
-1. [Docker Local Development](#docker-local-development)
-1. [Add Devices](#add-devices)
-1. [Remove Devices](#remove-devices)
-1. [Factory Reset Controller](#factory-reset-controller)
-1. [Command Basics](#command-basics)
-1. [Binary Switches](#binary-switches)
-1. [Door Locks](#door-locks)
-1. [DSK](#dsk)
-1. [Indicator Light](#indicator-light)
-1. [Firmware Information](#firmware-information)
-1. [Network Update](#network-update)
+- [Grizzly Cookbook](#grizzly-cookbook)
+  - [Starting Grizzly](#starting-grizzly)
+  - [Docker Local Development](#docker-local-development)
+  - [Add Devices](#add-devices)
+    - [No Security](#no-security)
+    - [S0](#s0)
+  - [Remove Devices](#remove-devices)
+  - [Factory Reset Controller](#factory-reset-controller)
+  - [Command Basics](#command-basics)
+    - [When you get command reports back](#when-you-get-command-reports-back)
+    - [When you get ack responses back](#when-you-get-ack-responses-back)
+  - [Binary Switches](#binary-switches)
+  - [Door Locks](#door-locks)
+  - [DSK](#dsk)
+  - [Indicator Light](#indicator-light)
+  - [Firmware Information](#firmware-information)
+  - [Network Update](#network-update)
 
 ## Starting Grizzly
 
@@ -67,7 +72,7 @@ There are 3 security schemas a device can be included with:
 
 1. [No Security](#no-security)
 1. [S0](#s0)
-1. [S2]
+1. S2
 
 When adding a device you will need to put the device into inclusion mode. How to
 do this is normally found in the device's user manual. So, be sure to read that

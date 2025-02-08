@@ -1473,6 +1473,7 @@ will need to update to the use the new module names.
   `Grizzly.ZWave.Commands.VersionCommandClassReport`
 - The `:name` field for `:command_class_report` is now
   `:version_command_class_report`
+- Easier to read stack traces when some GenServers crash
 
 ### Added
 
@@ -1483,10 +1484,6 @@ will need to update to the use the new module names.
 ### Fixed
 
 - In some GenServers an exception would cascade
-
-### Changed
-
-- Easier to read stack traces when some GenServers crash
 
 ## [v0.15.11] - 2020-12-11
 
