@@ -1011,7 +1011,7 @@ Thank you to everyone who has contributed over the years!
 
 ### Fixes
 
-- No longer hard crashs on Z/IP Packets that don't follow Z-Wave spec
+- No longer hard crashes on Z/IP Packets that don't follow Z-Wave spec
 - Fix crash when zipgateway's mailbox queue is full when trying to send command
   to a sleeping device
 
@@ -2016,7 +2016,7 @@ Thank you to those who contributed to this release:
 Enhancements
 
 - Add `handle_timeout/2` to the `Grizzly.InclusionHandler` behaviour. This
-  allows for handling when an inclusion process timesout.
+  allows for handling when an inclusion process times out.
 - Add `Grizzly.Inclusions.stop/0` force stop any type of inclusion process.
 - Add `Grizzly.FirmwareUpdates` module for updating the Z-Wave firmware on
   Z-Wave hardware
@@ -2197,9 +2197,9 @@ Breaking Changes
 
 - `Grizzly.ZWave.IconTypes` removed `icon_type` from the atom values of the
   icon name.
-- `Grizzly.ZWave.DeciveTypes.icon_name()` ->
+- `Grizzly.ZWave.DeviceTypes.icon_name()` ->
   `Grizzly.ZWave.DeviceTypes.name()`
-- `Grizzly.ZWave.DeciveTypes.icon_integer()` ->
+- `Grizzly.ZWave.DeviceTypes.icon_integer()` ->
   `Grizzly.ZWave.DeviceTypes.value()`
 
 Enhancements
@@ -2511,7 +2511,7 @@ When using that function `send_command` would return
 ### v0.6.0
 
 Changed `Grizzly.CommandClass.CommandClassVersion` to `Grizzly.CommandClass.Version`
-and changed `Grizzly.ComamndClass.CommandClassVersion.Get` to
+and changed `Grizzly.CommandClass.CommandClassVersion.Get` to
 `Grizzly.CommandClass.Version.CommandClassGet` as these names reflect the Z-Wave
 specification better.
 
@@ -2555,7 +2555,7 @@ validating specs for command arguments.
   - Update all the command arg encoder/decoder to use tagged
     tuples for better handling of invalid command arguments
   - Introduces new `Grizzly.Command.Encoding` modules for helping
-    validate command arugment specifications
+    validate command argument specifications
 - Fixes
   - Crashes when providing invalid command arguments
 
