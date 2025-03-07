@@ -99,7 +99,9 @@ defmodule Grizzly.Network do
     seq_number = SeqNumber.get_and_inc()
     node_id = node_id_from_opts(opts)
 
-    case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 10_000) do
+    # Changed timeout from 10s because doing a Z-Wave reset can take a few seconds longer than 10s.
+    # 60s is more than enough time.
+    case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 60_000) do
       {:ok, %Report{type: :command, status: :complete}} = response ->
         _ = Associations.delete_all(Keyword.get(opts, :associations_server, Grizzly.Associations))
         response
