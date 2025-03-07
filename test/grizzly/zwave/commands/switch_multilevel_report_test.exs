@@ -20,6 +20,16 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
     {:ok, command} = SwitchMultilevelReport.new(params)
     expected_binary = <<0x63, 0x0A>>
     assert expected_binary == SwitchMultilevelReport.encode_params(command)
+
+    params = [value: 99, duration: :default]
+    {:ok, command} = SwitchMultilevelReport.new(params)
+    expected_binary = <<0x63, 0xFF>>
+    assert expected_binary == SwitchMultilevelReport.encode_params(command)
+
+    params = [value: 99, duration: 180]
+    {:ok, command} = SwitchMultilevelReport.new(params)
+    expected_binary = <<0x63, 0x82>>
+    assert expected_binary == SwitchMultilevelReport.encode_params(command)
   end
 
   test "decodes v1 params correctly" do
@@ -33,6 +43,16 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
     {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
     assert Keyword.get(params, :value) == 0x32
     assert Keyword.get(params, :duration) == 0x0A
+
+    binary_params = <<0x32, 0xFF>>
+    {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
+    assert Keyword.get(params, :value) == 0x32
+    assert Keyword.get(params, :duration) == :default
+
+    binary_params = <<0x32, 0x81>>
+    {:ok, params} = SwitchMultilevelReport.decode_params(binary_params)
+    assert Keyword.get(params, :value) == 0x32
+    assert Keyword.get(params, :duration) == 120
   end
 
   test "decodes v4 params correctly" do

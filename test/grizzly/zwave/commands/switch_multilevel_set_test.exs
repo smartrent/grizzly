@@ -20,6 +20,16 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSetTest do
     {:ok, command} = SwitchMultilevelSet.new(params)
     expected_binary = <<0x63, 0x0A>>
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
+
+    params = [target_value: 99, duration: :default]
+    {:ok, command} = SwitchMultilevelSet.new(params)
+    expected_binary = <<0x63, 0xFF>>
+    assert expected_binary == SwitchMultilevelSet.encode_params(command)
+
+    params = [target_value: 99, duration: 180]
+    {:ok, command} = SwitchMultilevelSet.new(params)
+    expected_binary = <<0x63, 0x82>>
+    assert expected_binary == SwitchMultilevelSet.encode_params(command)
   end
 
   test "encodes v2 params correctly - accept level 100" do
@@ -40,5 +50,15 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSetTest do
     {:ok, params} = SwitchMultilevelSet.decode_params(binary_params)
     assert Keyword.get(params, :target_value) == 0x32
     assert Keyword.get(params, :duration) == 0x0A
+
+    binary_params = <<0x32, 0xFF>>
+    {:ok, params} = SwitchMultilevelSet.decode_params(binary_params)
+    assert Keyword.get(params, :target_value) == 0x32
+    assert Keyword.get(params, :duration) == :default
+
+    binary_params = <<0x32, 0x81>>
+    {:ok, params} = SwitchMultilevelSet.decode_params(binary_params)
+    assert Keyword.get(params, :target_value) == 0x32
+    assert Keyword.get(params, :duration) == 120
   end
 end
