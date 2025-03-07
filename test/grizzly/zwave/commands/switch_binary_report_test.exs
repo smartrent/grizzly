@@ -23,6 +23,23 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReportTest do
       assert <<0x25, 0x03, 0xFE>> == ZWave.to_binary(report)
     end
 
+    test "encodes duration param correctly" do
+      params = [current_value: :on, target_value: :off, duration: 10]
+      {:ok, command} = SwitchBinaryReport.new(params)
+      expected_binary = <<0xFF, 0x00, 0x0A>>
+      assert expected_binary == SwitchBinaryReport.encode_params(command)
+
+      params = [current_value: :on, target_value: :off, duration: :default]
+      {:ok, command} = SwitchBinaryReport.new(params)
+      expected_binary = <<0xFF, 0x00, 0xFF>>
+      assert expected_binary == SwitchBinaryReport.encode_params(command)
+
+      params = [current_value: :on, target_value: :off, duration: 180]
+      {:ok, command} = SwitchBinaryReport.new(params)
+      expected_binary = <<0xFF, 0x00, 0x82>>
+      assert expected_binary == SwitchBinaryReport.encode_params(command)
+    end
+
     test "decodes correctly on" do
       binary = <<0x25, 0x03, 0xFF>>
       expected_report = SwitchBinaryReport.new(target_value: :on)

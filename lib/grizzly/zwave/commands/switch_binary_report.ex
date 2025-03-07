@@ -5,17 +5,22 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   Params:
 
     * `:target_value` - `:on`, `:off`, or `:unknown` (required)
-    * `:duration` - 0-255 (required V2)
     * `:current_value` - `:on`, `:off`, or `:unknown` (required V2)
+    * `:duration` - How long in seconds the switch should take to reach target value or the factory default (:default)
+                    Beyond 127 seconds, the duration is truncated to the minute. E.g. 179s is 2 minutes and 180s is 3 minutes
+                    (required V2)
   """
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.SwitchBinary
+  alias Grizzly.ZWave.CommandClasses.{SwitchBinary, SwitchSupport}
 
   @type value() :: :on | :off | :unknown
 
-  @type param() :: {:target_value, value()} | {:duration, byte()} | {:current_value, value()}
+  @type param() ::
+          {:target_value, value()}
+          | {:duration, SwitchSupport.duration()}
+          | {:current_value, value()}
 
   @impl Grizzly.ZWave.Command
   def new(opts) do
@@ -41,8 +46,9 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
 
       current_value ->
         duration = Command.param!(command, :duration)
+        duration_byte = SwitchSupport.duration_to_byte(duration)
         current_value_byte = encode_target_value(current_value)
-        <<current_value_byte, target_value_byte, duration>>
+        <<current_value_byte, target_value_byte, duration_byte>>
     end
   end
 
@@ -61,9 +67,11 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
     end
   end
 
-  def decode_params(<<current_value, target_value, duration>>) do
+  def decode_params(<<current_value, target_value, duration_byte>>) do
     with {:ok, target_value} <- value_from_byte(target_value),
-         {:ok, current_value} <- value_from_byte(current_value) do
+         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte),
+         {:ok, current_value} <-
+           value_from_byte(current_value) do
       {:ok,
        [
          target_value: target_value,
