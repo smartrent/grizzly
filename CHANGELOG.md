@@ -2,6 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.7.1] - 2025-03-06
+
+### Fixed
+
+* Increase timeout for `Grizzly.Network.reset_controller/1` to 60 seconds to allow enough time
+  for the Default Set command to complete ([#1058](https://github.com/smartrent/grizzly/pull/1058))
+
 ## [v8.7.0] - 2025-02-08
 
 ### Changed
@@ -2693,6 +2700,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.7.1]: https://github.com/smartrent/grizzly/compare/v8.7.0..v8.7.1
 [v8.7.0]: https://github.com/smartrent/grizzly/compare/v8.6.9..v8.7.0
 [v8.6.9]: https://github.com/smartrent/grizzly/compare/v8.6.8..v8.6.9
 [v8.6.8]: https://github.com/smartrent/grizzly/compare/v8.6.7..v8.6.8
