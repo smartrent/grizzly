@@ -4,15 +4,17 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
 
   Params:
 
-    * `:target_value` - `:on` or `:off`(required)
-    * `:duration` - 0-255 (optional v2)
+  * `:target_value` - `:on` or `:off`(required)
+  * `:duration` - How long in seconds the switch should take to reach target value or the factory default (:default)
+                  Beyond 127 seconds, the duration is truncated to the minute. E.g. 179s is 2 minutes and 180s is 3 minutes
+                  (optional V2)
   """
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.SwitchBinary
+  alias Grizzly.ZWave.CommandClasses.{SwitchBinary, SwitchSupport}
 
-  @type param :: {:target_value, non_neg_integer()} | {:duration, non_neg_integer()}
+  @type param :: {:target_value, :on | :off} | {:duration, SwitchSupport.duration()}
 
   @impl Grizzly.ZWave.Command
   def new(opts) do
@@ -36,7 +38,8 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
       nil ->
         <<target_value_byte>>
 
-      duration_byte ->
+      duration ->
+        duration_byte = SwitchSupport.duration_to_byte(duration)
         <<target_value_byte, duration_byte>>
     end
   end
@@ -55,11 +58,11 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
     end
   end
 
-  def decode_params(<<target_value_byte, duration>>) do
-    case target_value_from_byte(target_value_byte) do
-      {:ok, target_value} ->
-        {:ok, [target_value: target_value, duration: duration]}
-
+  def decode_params(<<target_value_byte, duration_byte>>) do
+    with {:ok, target_value} <- target_value_from_byte(target_value_byte),
+         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte) do
+      {:ok, [target_value: target_value, duration: duration]}
+    else
       {:error, %DecodeError{}} = error ->
         error
     end

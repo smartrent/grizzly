@@ -5,15 +5,17 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   Params:
 
     * `:value` - `:off`, 0 (off) and 99 (100% on), or `:unknown`
-    * `:duration` - How long the switch should take to reach target value, 0 -> instantly, 1..127 -> seconds, 128..253 -> minutes, 255 -> unknown (optional v2)
+    * `:duration` - How long in seconds the switch should take to reach target value or the factory default (:default)
+                    Beyond 127 seconds, the duration is truncated to the minute. E.g. 179s is 2 minutes and 180s is 3 minutes
+                    (optional v2)
   """
 
   @behaviour Grizzly.ZWave.Command
   require Logger
   alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
+  alias Grizzly.ZWave.CommandClasses.{SwitchMultilevel, SwitchSupport}
 
-  @type param :: {:value, 0..99 | :off | :unknown} | {:duration, non_neg_integer()}
+  @type param :: {:value, 0..99 | :off | :unknown} | {:duration, SwitchSupport.duration()}
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
@@ -38,7 +40,8 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
         <<value_byte>>
 
       # version 2
-      duration_byte ->
+      duration ->
+        duration_byte = SwitchSupport.duration_to_byte(duration)
         <<value_byte, duration_byte>>
     end
   end
@@ -59,18 +62,18 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   # version 2
-  def decode_params(<<value_byte, duration>>) do
-    case value_from_byte(value_byte) do
-      {:ok, value} ->
-        {:ok, [value: value, duration: duration]}
-
+  def decode_params(<<value_byte, duration_byte>>) do
+    with {:ok, value} <- value_from_byte(value_byte),
+         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte) do
+      {:ok, [value: value, duration: duration]}
+    else
       {:error, %DecodeError{}} = error ->
         error
     end
   end
 
   # version 4
-  def decode_params(<<value_byte, target_value_byte, duration, rest::binary>>) do
+  def decode_params(<<value_byte, target_value_byte, duration_byte, rest::binary>>) do
     if byte_size(rest) > 0 do
       Logger.warning(
         "[Grizzly] Unexpected trailing bytes in SwitchMultilevelReport: #{inspect(rest)}"
@@ -78,6 +81,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
     end
 
     with {:ok, value} <- value_from_byte(value_byte),
+         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte),
          {:ok, target_value} <- value_from_byte(target_value_byte) do
       {:ok,
        [
