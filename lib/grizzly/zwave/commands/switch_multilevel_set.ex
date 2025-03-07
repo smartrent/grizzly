@@ -5,20 +5,17 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
   Params:
 
     * `:target_value` - '`:off`, `:previous` or a value between 0 and 99
-    * `:duration` - How long the switch should take to reach target value,
-      * 0 -> instantly
-      * 1..127 -> seconds
-      * 128..254 -> minutes + 127
-      * 255 -> factory default (option v2)
-
+    * `:duration` - How long in seconds the switch should take to reach target value or the factory default (:default)
+                    Beyond 127 seconds, the duration is truncated to the minute. E.g. 179s is 2 minutes and 180s is 3 minutes
+                    (optional v2)
   """
 
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
+  alias Grizzly.ZWave.CommandClasses.{SwitchMultilevel, SwitchSupport}
 
-  @type param :: {:target_value, :off | :previous | 0..99} | {:duration, 0..255}
+  @type param :: {:target_value, :off | :previous | 0..99} | {:duration, SwitchSupport.duration()}
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
@@ -43,7 +40,8 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
       nil ->
         <<target_value_byte>>
 
-      duration_byte ->
+      duration ->
+        duration_byte = SwitchSupport.duration_to_byte(duration)
         <<target_value_byte, duration_byte>>
     end
   end
@@ -66,11 +64,11 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
     end
   end
 
-  def decode_params(<<target_value_byte, duration>>) do
-    case target_value_from_byte(target_value_byte) do
-      {:ok, target_value} ->
-        {:ok, [target_value: target_value, duration: duration]}
-
+  def decode_params(<<target_value_byte, duration_byte>>) do
+    with {:ok, target_value} <- target_value_from_byte(target_value_byte),
+         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte) do
+      {:ok, [target_value: target_value, duration: duration]}
+    else
       {:error, %DecodeError{}} = error ->
         error
     end
