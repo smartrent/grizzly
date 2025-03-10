@@ -2,6 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.8.0] - 2025-04-10
+
+### Changed
+
+* Use strictly seconds or :default as duration when setting a binary or multilevel switch ([#1061](https://github.com/smartrent/grizzly/pull/1061))
+  * The meaning of a duration would vary from seconds to converted minutes when exceeding 127 (128 meant one minute, 129 meant 2 minutes etc., and 255 meant manufacturer default)
+
 ## [v8.7.1] - 2025-03-06
 
 ### Fixed
@@ -2700,6 +2707,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.8.0]: https://github.com/smartrent/grizzly/compare/v8.7.1..v8.8.0
 [v8.7.1]: https://github.com/smartrent/grizzly/compare/v8.7.0..v8.7.1
 [v8.7.0]: https://github.com/smartrent/grizzly/compare/v8.6.9..v8.7.0
 [v8.6.9]: https://github.com/smartrent/grizzly/compare/v8.6.8..v8.6.9
