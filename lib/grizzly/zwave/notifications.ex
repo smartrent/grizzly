@@ -491,8 +491,14 @@ defmodule Grizzly.ZWave.Notifications do
      ]}
   end
 
+  # After a user code reset, the Kaadas KA210; Alloy deadbolt (KA210.ah-nck) emits an :access_control notification
+  # with z-wave event :new_user_code_not_added_duplicate and an econded user_code_report as event parameters
   def decode_event_params(:access_control, zwave_event, params_binary)
-      when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
+      when zwave_event in [
+             :keypad_lock_operation,
+             :keypad_unlock_operation,
+             :new_user_code_not_added_duplicate
+           ] do
     with {:ok, user_code_report} <- Decoder.from_binary(params_binary) do
       {:ok, user_code_report.params}
     else
