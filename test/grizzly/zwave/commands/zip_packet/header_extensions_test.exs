@@ -33,9 +33,9 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensionsTest do
   end
 
   test "makes the encapsulation format info into a binary" do
-    encapinfo = EncapsulationFormatInfo.new(:non_secure, true)
+    encap_info = EncapsulationFormatInfo.new(:non_secure, true)
 
-    assert <<0x84, 0x02, 0x00, 0x01>> == EncapsulationFormatInfo.to_binary(encapinfo)
+    assert <<0x84, 0x02, 0x00, 0x01>> == EncapsulationFormatInfo.to_binary(encap_info)
   end
 
   test "parse multicast addressing" do

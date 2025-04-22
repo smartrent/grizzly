@@ -296,7 +296,7 @@ defmodule Grizzly.ZWave.Notifications do
       0x06 => :replacement_required,
       0xFE => :unknown
     },
-    {0x13, :pest_contol} => %{
+    {0x13, :pest_control} => %{
       0x00 => :state_idle,
       0x01 => :trap_armed_location_provided,
       0x02 => :trap_armed,
@@ -456,7 +456,7 @@ defmodule Grizzly.ZWave.Notifications do
   def encode_event_params(:water_alarm, zwave_event, event_params_list)
       when zwave_event in [
              :water_leak_detected_location_provided,
-             :water_level_droppped_location_provided
+             :water_level_dropped_location_provided
            ] do
     {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
 
@@ -537,7 +537,7 @@ defmodule Grizzly.ZWave.Notifications do
   def decode_event_params(:water_alarm, zwave_event, params_binary)
       when zwave_event in [
              :water_leak_detected_location_provided,
-             :water_level_droppped_location_provided
+             :water_level_dropped_location_provided
            ] do
     with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
       {:ok, node_location_report.params}

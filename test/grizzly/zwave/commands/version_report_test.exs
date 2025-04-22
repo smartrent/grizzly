@@ -145,7 +145,7 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
       0x01,
       # hardware version
       0x04,
-      # number of other firmware targets is 0 wherby it should be 2
+      # number of other firmware targets is 0 whereby it should be 2
       0x00,
       # other firmware versions
       0x04,

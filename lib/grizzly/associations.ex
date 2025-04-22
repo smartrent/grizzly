@@ -165,8 +165,8 @@ defmodule Grizzly.Associations do
     associations =
       file_path
       |> read_all_associations()
-      |> Enum.reduce([], fn {groupind_id, node_ids}, assocs ->
-        assoc = %Association{grouping_id: groupind_id, node_ids: node_ids}
+      |> Enum.reduce([], fn {grouping_id, node_ids}, assocs ->
+        assoc = %Association{grouping_id: grouping_id, node_ids: node_ids}
 
         assocs ++ [assoc]
       end)

@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
     * `:manufacturer_id` - This field describes the Z-Wave Manufacturer ID of
       the company’s product that has locked the node (required)
     * `:antitheft_hint` - This field is used as a 1 to 10 byte identifier or key
-      value to help retriving the Magic Code (required)
+      value to help retrieving the Magic Code (required)
     * `:locking_entity_id` - This field specifies a unique Z-Wave Alliance
       identifier for the entity that has locked the node (required)
   """

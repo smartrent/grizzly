@@ -39,8 +39,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatI
   Make an `EncapsulationFormatInfo` into a binary
   """
   @spec to_binary(t()) :: binary()
-  def to_binary(encapformat) do
-    %__MODULE__{security_classes: security_classes, crc16: crc16?} = encapformat
+  def to_binary(encap_format) do
+    %__MODULE__{security_classes: security_classes, crc16: crc16?} = encap_format
 
     crc16_byte = if crc16?, do: 0x01, else: 0x00
 

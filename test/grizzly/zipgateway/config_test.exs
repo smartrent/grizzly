@@ -3,7 +3,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
 
   alias Grizzly.ZIPGateway.Config
 
-  def cfg_path(), do: Path.join(System.tmp_dir!(), "/zipgateay.cfg")
+  def cfg_path(), do: Path.join(System.tmp_dir!(), "/zipgateway.cfg")
 
   test "default config to string" do
     output = """

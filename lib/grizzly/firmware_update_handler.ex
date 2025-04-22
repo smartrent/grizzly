@@ -8,7 +8,7 @@ defmodule Grizzly.FirmwareUpdateHandler do
 
   The report this callback function will most want to handle is:
 
-  - `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport` It indicates whether the formware update was initiated successfully.
+  - `Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport` It indicates whether the firmware update was initiated successfully.
   - `Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport` It is sent by the target device once the firmware update completes, successfully or in failure.
 
   The callback might also want to be aware of:

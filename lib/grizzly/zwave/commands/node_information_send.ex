@@ -5,7 +5,7 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
 
   ### Params
 
-  * seq_number - the sequence number of the network managment command (required)
+  * seq_number - the sequence number of the network management command (required)
   * destination_node_id - the node that should receive the node information frame (required)
   * tx_options - the transmission options for the target node to use when sending its NIF (optional)
   """

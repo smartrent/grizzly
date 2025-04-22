@@ -7,7 +7,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
     * `:up_down` - initiating change of level :up or :down
     * `:duration` - seconds to take to go from 0 to 99, or 99 to 0 - optional v2
 
-    Note that support for secodary switch introduced in v3 is deprecated and ignored here.
+    Note that support for secondary switch introduced in v3 is deprecated and ignored here.
     A controller SHOULD ignore Start Level; it is always ignored here.
 
   """

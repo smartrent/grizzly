@@ -3,7 +3,7 @@ defmodule Grizzly.ZWave.Commands.MeterReset do
   This module implements the command METER_RESET of the METER command class.
 
   This command is used to reset all accumulated measurements stored at the receiving node to 0 (v1)
-  or possibly only a smeasurement to a given value (v6).
+  or possibly only a measurement to a given value (v6).
 
   ## Parameters
 

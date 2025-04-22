@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfGet do
 
   Params:
 
-    * `:scene_id` - a scene id, 0 for the curretly active scene, if any (required)
+    * `:scene_id` - a scene id, 0 for the currently active scene, if any (required)
 
   """
 
