@@ -127,7 +127,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
           {generic_device_class(), specific_device_class(), installer_icon_type()}
 
   @typedoc """
-  Settings for the smart start inclusion setting exentsion
+  Settings for the smart start inclusion setting extension
 
   * `:pending` - the node will be added to the network when it issues SmartStart
     inclusion requests.

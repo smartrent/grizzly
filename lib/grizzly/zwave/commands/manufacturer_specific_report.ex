@@ -7,7 +7,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
 
     * `:manufacturer_id` - unique ID for the manufacturer (required)
     * `:product_type_id` - unique ID for the product type (required)
-    * `:prodcut_id` - unique ID for the actual product (required)
+    * `:product_id` - unique ID for the actual product (required)
   """
 
   @behaviour Grizzly.ZWave.Command

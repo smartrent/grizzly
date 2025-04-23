@@ -162,7 +162,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
   defp charging_status_from_byte(0x02), do: {:ok, :maintaining}
 
   defp charging_status_from_byte(byte),
-    do: {:error, %DecodeError{value: byte, param: :chargin_status, command: :battery_report}}
+    do: {:error, %DecodeError{value: byte, param: :charging_status, command: :battery_report}}
 
   # If bit 1 is set, bit 0 is _supposed_ to be set as well, but we'll allow either.
   # This function doesn't have an error fallback because Dialyzer knows that it can only be 0..3

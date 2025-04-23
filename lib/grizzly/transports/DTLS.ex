@@ -207,8 +207,8 @@ defmodule Grizzly.Transports.DTLS do
   end
 
   @doc false
-  def user_lookup(:psk, _username, userstate) do
-    {:ok, userstate}
+  def user_lookup(:psk, _username, user_state) do
+    {:ok, user_state}
   end
 
   defp dtls_opts(ifaddr, opts \\ []) do

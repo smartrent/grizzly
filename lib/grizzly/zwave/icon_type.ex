@@ -76,7 +76,7 @@ defmodule Grizzly.ZWave.IconType do
     {0x0D07, :specific_sensor_multilevel_direction},
     {0x0D08, :specific_sensor_multilevel_atmospheric_pressure},
     {0x0D09, :specific_sensor_multilevel_barometric_pressure},
-    {0x0D0A, :specific_sensor_multilevel_solor_radiation},
+    {0x0D0A, :specific_sensor_multilevel_solar_radiation},
     {0x0D0B, :specific_sensor_multilevel_dew_point},
     {0x0D0C, :specific_sensor_multilevel_rain_rate},
     {0x0D0D, :specific_sensor_multilevel_tide_level},

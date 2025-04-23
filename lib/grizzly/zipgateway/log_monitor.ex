@@ -182,7 +182,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
     {:noreply, state, {:continue, {:message, message}}}
   end
 
-  # Only count "SerialAPI: Retransmission" if the immediately preceeding message was
+  # Only count "SerialAPI: Retransmission" if the immediately preceding message was
   # not "SerialAPI: Got RESPONSE frame while sending"
   def handle_info({:message, message}, %{got_response_frame_while_sending: false} = state) do
     if String.contains?(message, "SerialAPI: Retransmission") do

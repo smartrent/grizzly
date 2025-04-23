@@ -4,13 +4,13 @@ defmodule Grizzly.FirmwareUpdates do
 
   Required options:
 
-  * `manufacturer_id` - The unique id indentifying the manufacturer of the target device
+  * `manufacturer_id` - The unique id identifying the manufacturer of the target device
   * `firmware_id` - The id of the current firmware
 
   Other options:
 
   * `device_id` - Node id of the device to be updated. Defaults to 1 (controller)
-  * `firmware_target` - The firwmare target id. Defaults to 0 (the ZWave chip)
+  * `firmware_target` - The firmware target id. Defaults to 0 (the ZWave chip)
   * `max_fragment_size` - The maximum number of bytes that will be transmitted at a time. Defaults to 2048.
   * `hardware_version` - The current hardware version of the device to be updated. Defaults to 0.
   * `activation_may_be_delayed?` - Whether it is permitted for the device may delay the actual firmware update. Defaults to false.

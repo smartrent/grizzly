@@ -2,7 +2,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   @moduledoc false
 
   # This module holds the state of the FirmwareUpdateRunner and
-  # knows how to move the process along (which commmand follows which)
+  # knows how to move the process along (which command follows which)
 
   alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
@@ -57,7 +57,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
             activation_may_be_delayed?: false,
             state: :started,
             fragments_wanted: 0,
-            # first frgament has index 1
+            # first fragment has index 1
             fragment_index: 1,
             transmission_delay: nil,
             last_transmission_speed: {40, :kbit_sec}

@@ -41,8 +41,8 @@ defmodule Grizzly.UnsolicitedServer.DTLSTransport do
   @impl ThousandIsland.Transport
   defdelegate upgrade(socket, options), to: ThousandIsland.Transports.SSL
 
-  defp user_lookup(:psk, _username, userstate) do
-    {:ok, userstate}
+  defp user_lookup(:psk, _username, user_state) do
+    {:ok, user_state}
   end
 
   defp do_listen(port, opts, attempts) do

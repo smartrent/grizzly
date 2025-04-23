@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.SecurityTest do
     end
 
     test "Unauthenticated and authenticated" do
-      # this is 3 but want to make sure the bits are relected as they will be in real life
+      # this is 3 but want to make sure the bits are reflected as they will be in real life
       byte = 0b11
       assert [:s2_authenticated, :s2_unauthenticated] == Security.byte_to_keys(byte)
     end

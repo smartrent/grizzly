@@ -537,7 +537,7 @@ defmodule GrizzlyTest.Server.Handler do
     command = Command.param!(zip_packet, :command)
 
     case command do
-      # Initate the firmware update process and request the first batch of fragments
+      # Initiate the firmware update process and request the first batch of fragments
       %{name: :firmware_update_md_request_get} ->
         send_ack_response(socket, zip_packet)
         maybe_send_a_report(socket, zip_packet)

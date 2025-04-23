@@ -105,7 +105,7 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
       assert_receive :unresponsive
     end
 
-    test "ignores retransmissions preceeded by 'got response while sending'", %{monitor_pid: pid} do
+    test "ignores retransmissions preceded by 'got response while sending'", %{monitor_pid: pid} do
       assert_receive :ok
 
       send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})

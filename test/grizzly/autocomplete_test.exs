@@ -7,6 +7,7 @@ defmodule Grizzly.AutocompleteTest do
     input = make_input("{:ok, x} = Grizzly.send_command(1, :assoc")
     assert {:yes, expansion, completions} = Autocomplete.expand(input)
 
+    # cspell:disable-next-line
     assert expansion == ~c"iation_"
     assert ~c"association_set" in completions
     assert ~c"association_get" in completions

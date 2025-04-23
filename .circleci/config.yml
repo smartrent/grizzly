@@ -61,6 +61,12 @@ jobs:
       - image: hexpm/elixir:<< parameters.image-tag >>
     steps:
       - checkout
+      - run:
+          name: Spell check
+          command: |
+            apk add --no-cache npm
+            npm install -g cspell
+            cspell --quiet .
       - <<: *install_hex_rebar
       - <<: *install_system_deps
       - restore_tagged_cache:

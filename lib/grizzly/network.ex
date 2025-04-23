@@ -281,7 +281,7 @@ defmodule Grizzly.Network do
   end
 
   @doc """
-  Request a node to peform a neighbor update operation.
+  Request a node to perform a neighbor update operation.
   """
   @spec node_neighbor_update_request(Grizzly.node_id(), [Grizzly.command_opt()]) ::
           Grizzly.send_command_response()

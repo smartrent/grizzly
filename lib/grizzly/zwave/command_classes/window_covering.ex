@@ -2,7 +2,7 @@ defmodule Grizzly.ZWave.CommandClasses.WindowCovering do
   @moduledoc """
   Window Covering Command Class
 
-  Command class for window coverings which can be openned or closed
+  Command class for window coverings which can be opened or closed
   """
 
   alias Grizzly.ZWave.DecodeError
