@@ -2,6 +2,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.8.1] - 2025-04-28
+
+### Fixed
+
+* Add missing entry for command `:central_scene_configuration_set` to `Grizzly.Commands.Table` ([#1071](https://github.com/smartrent/grizzly/pull/1071))
+
 ## [v8.8.0] - 2025-04-10
 
 ### Changed
@@ -2707,6 +2713,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.8.1]: https://github.com/smartrent/grizzly/compare/v8.8.0..v8.8.1
 [v8.8.0]: https://github.com/smartrent/grizzly/compare/v8.7.1..v8.8.0
 [v8.7.1]: https://github.com/smartrent/grizzly/compare/v8.7.0..v8.7.1
 [v8.7.0]: https://github.com/smartrent/grizzly/compare/v8.6.9..v8.7.0
