@@ -429,6 +429,8 @@ defmodule Grizzly.Commands.Table do
     central_scene_configuration_get:
       {Commands.CentralSceneConfigurationGet,
        handler: {WaitReport, complete_report: :central_scene_configuration_report}},
+    central_scene_configuration_set:
+      {Commands.CentralSceneConfigurationSet, handler: AckResponse},
 
     # Scene actuator configuration
     scene_actuator_conf_get:
