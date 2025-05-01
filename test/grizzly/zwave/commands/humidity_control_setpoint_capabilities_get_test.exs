@@ -4,7 +4,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointCapabilitiesGetTest do
   alias Grizzly.ZWave.Commands.HumidityControlSetpointCapabilitiesGet
 
   test "encode/1 correctly encodes command" do
-    {:ok, command} = HumidityControlSetpointCapabilitiesGet.new(setpoint_type: :humidifier)
+    {:ok, command} = HumidityControlSetpointCapabilitiesGet.new(setpoint_type: :humidify)
     assert <<1>> == HumidityControlSetpointCapabilitiesGet.encode_params(command)
 
     {:ok, command} = HumidityControlSetpointCapabilitiesGet.new(setpoint_type: :auto)
@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointCapabilitiesGetTest do
   end
 
   test "decode/1 correctly decodes command" do
-    assert {:ok, [setpoint_type: :humidifier]} ==
+    assert {:ok, [setpoint_type: :humidify]} ==
              HumidityControlSetpointCapabilitiesGet.decode_params(<<1>>)
 
     assert {:ok, [setpoint_type: :auto]} ==
