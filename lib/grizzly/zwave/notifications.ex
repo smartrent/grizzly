@@ -384,6 +384,9 @@ defmodule Grizzly.ZWave.Notifications do
   Encode a notification event.
   """
   @spec event_to_byte(type(), event()) :: byte()
+  # :state_idle is always encoded as 0x00 no matter the type
+  def event_to_byte(_type, :state_idle), do: 0x00
+
   def event_to_byte(type, event) do
     with nil <- get_in(@event_to_byte, [type, event]) do
       raise KeyError, "Unknown notification event: #{inspect(type)} / #{inspect(event)}"
@@ -406,6 +409,9 @@ defmodule Grizzly.ZWave.Notifications do
   Decode a notification event.
   """
   @spec event_from_byte(type(), byte()) :: {:ok, event()} | {:error, :invalid_event_byte}
+  # Event 0x00 is always :state_idle even if the type is not known
+  def event_from_byte(_type, 0), do: {:ok, :state_idle}
+
   def event_from_byte(type, byte) do
     with v when not is_nil(v) <- get_in(@event_from_byte, [type, byte]) do
       {:ok, v}
