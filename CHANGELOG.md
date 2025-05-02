@@ -2,6 +2,16 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.9.0] - 2025-05-02
+
+### Changed
+
+* Rename humidity control setpoint types from `:humidifier` and :`dehumidifier` to `:humidify` and `:dehumidify` ([#1074](https://github.com/smartrent/grizzly/pull/1074))
+
+### Fixed
+
+* Alarm event `0x00` must always decode to `:state_idle` even when the alarm type is not known ([#1075](https://github.com/smartrent/grizzly/pull/1075))
+
 ## [v8.8.1] - 2025-04-28
 
 ### Fixed
@@ -2713,6 +2723,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.9.0]: https://github.com/smartrent/grizzly/compare/v8.8.1..v8.9.0
 [v8.8.1]: https://github.com/smartrent/grizzly/compare/v8.8.0..v8.8.1
 [v8.8.0]: https://github.com/smartrent/grizzly/compare/v8.7.1..v8.8.0
 [v8.7.1]: https://github.com/smartrent/grizzly/compare/v8.7.0..v8.7.1
