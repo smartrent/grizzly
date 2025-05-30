@@ -7,6 +7,8 @@ defmodule Grizzly.UnsolicitedServer.DTLSTransport do
   def listen(port, opts), do: do_listen(port, opts, 3)
 
   @impl ThousandIsland.Transport
+  defdelegate connection_information(socket), to: ThousandIsland.Transports.SSL
+  @impl ThousandIsland.Transport
   defdelegate accept(listener_socket), to: ThousandIsland.Transports.SSL
   @impl ThousandIsland.Transport
   defdelegate handshake(socket), to: ThousandIsland.Transports.SSL
