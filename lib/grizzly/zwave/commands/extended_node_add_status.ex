@@ -10,6 +10,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
     * `:seq_number` - the sequence number of the inclusion command
     * `:status` - the status of the inclusion
     * `:node_id` - the new id of the new Z-Wave node
+    * `:listening?` - if the node is a listening node or not
     * `:basic_device_class` - the Z-Wave basic device class
     * `:generic_device_class` - the Z-Wave generic device class
     * `:specific_device_class` - the Z-Wave specific device class
@@ -34,6 +35,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
           {:node_id, Grizzly.node_id()}
           | {:status, NetworkManagementInclusion.node_add_status()}
           | {:seq_number, Grizzly.seq_number()}
+          | {:listening?, boolean()}
           | {:basic_device_class, byte()}
           | {:generic_device_class, byte()}
           | {:specific_device_class, byte()}
@@ -66,11 +68,11 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
     if status == :failed do
       <<seq_number, status_byte, node_id::16, 0x01>>
     else
+      listening? = Command.param!(command, :listening?)
       basic_device_class = Command.param!(command, :basic_device_class)
       generic_device_class = Command.param!(command, :generic_device_class)
       specific_device_class = Command.param!(command, :specific_device_class)
       command_classes = Command.param!(command, :command_classes)
-      extra_ccs? = not Enum.empty?(command_classes)
 
       # We add 6 to the length of the command classes to account for the 3 device
       # classes 2 Z-Wave protocol bytes and the node info length byte.
@@ -78,10 +80,10 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
       # See SDS13784 4.4.8.2 for more details
       node_info_length = 6 + cc_count(command_classes)
 
-      extra_ccs_bit = if extra_ccs?, do: 1, else: 0
+      listening_bit = if listening?, do: 1, else: 0
 
-      # TODO: fix opt func bit (after the extra_ccs bit)
-      <<seq_number, status_byte, node_id::16, node_info_length, extra_ccs_bit::1, 0x00::7, 0x00,
+      # TODO: fix opt func bit (after the listening bit)
+      <<seq_number, status_byte, node_id::16, node_info_length, listening_bit::1, 0x00::7, 0x00,
         basic_device_class, generic_device_class,
         specific_device_class>> <>
         CommandClasses.command_class_list_to_binary(command_classes) <>
@@ -111,6 +113,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
        status: NetworkManagementInclusion.parse_node_add_status(status_byte),
        seq_number: seq_number,
        node_id: node_id,
+       listening?: false,
        basic_device_class: :unknown,
        generic_device_class: :unknown,
        specific_device_class: :unknown,
