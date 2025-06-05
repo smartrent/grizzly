@@ -25,6 +25,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         command_classes: expected_command_classes,
         basic_device_class: :controller,
         generic_device_class: :static_controller,
+        listening?: false,
         specific_device_class: :static_installer_tool
       ]
 
@@ -54,6 +55,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         command_classes: expected_command_classes,
         basic_device_class: :controller,
         generic_device_class: :static_controller,
+        listening?: false,
         specific_device_class: :static_installer_tool,
         kex_fail_type: :none,
         granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
@@ -88,6 +90,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         command_classes: expected_command_classes,
         basic_device_class: :controller,
         generic_device_class: :static_controller,
+        listening?: false,
         specific_device_class: :static_installer_tool,
         kex_fail_type: :none,
         granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated],
@@ -137,6 +140,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         status: :failed,
         node_id: 7,
         seq_number: 37,
+        listening?: false,
         basic_device_class: :routing_end_node,
         generic_device_class: :sensor_notification,
         specific_device_class: :notification_sensor,
