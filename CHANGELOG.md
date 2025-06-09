@@ -2,6 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.0.0] - 2025-06-09
+
+### Added
+
+* Reinstate the `listening?` node info property. It was removed in v8.7.0 because we trusted the Z-Wave documentation at "5.2.5.4.4. Node info cached report" and its definition of the `List.` bit in the report. Contrary to the doc, this bit does not indicate whether the report contains a list of command classes but rather indicates whether or not the device is mains powered and thus always listening, as determined once, at the moment of pairing. ([#1082](https://github.com/smartrent/grizzly/pull/1082))
+* Add connection_information/1 callback to unsolicited server DTLS transport ([#1081](https://github.com/smartrent/grizzly/pull/1081))
+
 ## [v8.9.0] - 2025-05-02
 
 ### Changed
@@ -2723,6 +2730,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v9.0.0]: https://github.com/smartrent/grizzly/compare/v8.9.0..v9.0.0
 [v8.9.0]: https://github.com/smartrent/grizzly/compare/v8.8.1..v8.9.0
 [v8.8.1]: https://github.com/smartrent/grizzly/compare/v8.8.0..v8.8.1
 [v8.8.0]: https://github.com/smartrent/grizzly/compare/v8.7.1..v8.8.0
