@@ -148,8 +148,6 @@ defmodule Grizzly.ZWaveFirmware do
     |> Enum.find(&UpgradeSpec.applies?(&1, current_version))
   end
 
-  @sapi_version_regex ~r/Chip type: (?<chip_type>\d+).*SDK:\s*(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/m
-
   @doc false
   @spec zwave_module_version(Options.t()) :: Version.t() | nil
   def zwave_module_version(opts) do
@@ -158,10 +156,13 @@ defmodule Grizzly.ZWaveFirmware do
     {answer, _} = zw_programmer(opts, ["-t"])
     Logger.debug("[Grizzly] Extracting current Z-Wave firmware version from #{inspect(answer)}")
 
+    sapi_version_regex =
+      ~r/Chip type: (?<chip_type>\d+).*SDK:\s*(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/m
+
     cond do
-      Regex.match?(@sapi_version_regex, answer) ->
+      Regex.match?(sapi_version_regex, answer) ->
         %{"major" => major_s, "minor" => minor_s, "patch" => patch_s} =
-          Regex.named_captures(@sapi_version_regex, answer)
+          Regex.named_captures(sapi_version_regex, answer)
 
         Logger.info("[Grizzly] Current Z-Wave firmware version: #{major_s}.#{minor_s}.#{patch_s}")
 
