@@ -22,7 +22,7 @@ defmodule Grizzly.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :crypto, :asn1, :public_key, :ssl]
+      extra_applications: [:logger, :crypto, :asn1, :public_key, :ssl, :sasl]
     ]
   end
 
