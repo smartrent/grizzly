@@ -498,7 +498,7 @@ defmodule Grizzly.ZWave.Decoder do
   @spec decode(command_impl :: module(), params :: binary(), original :: binary()) ::
           {:ok, Command.t()} | {:error, DecodeError.t()}
   def decode(command_impl, params, original_binary) do
-    unless Keyword.has_key?(Logger.metadata(), :zwave_command) do
+    if !Keyword.has_key?(Logger.metadata(), :zwave_command) do
       Logger.metadata(zwave_command: inspect(original_binary, base: :hex, limit: 100))
     end
 
