@@ -32,7 +32,7 @@ defmodule Grizzly.MixProject do
   defp deps do
     [
       {:cerlc, "~> 0.2.0"},
-      {:circular_buffer, "~> 0.4"},
+      {:circular_buffer, "~> 1.0 or ~> 0.4.2"},
       {:ctr_drbg, "~> 0.1"},
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
       {:mimic, "~> 1.7", only: [:dev, :test]},
