@@ -85,7 +85,7 @@ defmodule Grizzly.Connections.KeepAlive do
   @spec run(t(), (pid() -> :ok)) :: t()
   def run(keep_alive, runner_func) do
     :ok = runner_func.(keep_alive.command_runner)
-    %__MODULE__{keep_alive | last_send: :os.system_time(:millisecond)}
+    %__MODULE__{keep_alive | last_send: System.os_time(:millisecond)}
   end
 
   defp timer_start(keep_alive) do
