@@ -2,6 +2,16 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.11.0] - 2025-06-18
+
+### Added
+
+* Monitor background RSSI and raise an alarm when high ([#1086](https://github.com/smartrent/grizzly/pull/1086))
+
+### Fixed
+
+* Fix OTP 28 deprecations ([#1085](https://github.com/smartrent/grizzly/pull/1085))
+
 ## [v8.10.0] - 2025-06-09
 
 ### Added
@@ -2730,6 +2740,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.11.0]: https://github.com/smartrent/grizzly/compare/v8.10.0..v8.11.0
 [v8.10.0]: https://github.com/smartrent/grizzly/compare/v8.9.0..v8.10.0
 [v8.9.0]: https://github.com/smartrent/grizzly/compare/v8.8.1..v8.9.0
 [v8.8.1]: https://github.com/smartrent/grizzly/compare/v8.8.0..v8.8.1
