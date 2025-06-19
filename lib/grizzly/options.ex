@@ -58,7 +58,8 @@ defmodule Grizzly.Options do
           zw_programmer_path: Path.t(),
           inclusion_adapter: module(),
           extra_config: String.t() | nil,
-          trace_options: [Trace.trace_opt()]
+          trace_options: [Trace.trace_opt()],
+          background_rssi_monitor: [Grizzly.BackgroundRSSIMonitor.opt()]
         }
 
   defstruct run_zipgateway: true,
@@ -93,7 +94,8 @@ defmodule Grizzly.Options do
             zw_programmer_path: "/usr/bin/zw_programmer",
             inclusion_adapter: Grizzly.Inclusions.ZWaveAdapter,
             extra_config: nil,
-            trace_options: []
+            trace_options: [],
+            background_rssi_monitor: []
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do

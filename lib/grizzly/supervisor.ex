@@ -163,6 +163,7 @@ defmodule Grizzly.Supervisor do
           | {:zw_programmer_path, Path.t()}
           | {:inclusion_adapter, module()}
           | {:trace_options, [Trace.trace_opt()]}
+          | {:background_rssi_monitor, [Grizzly.BackgroundRSSIMonitor.opt()]}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -238,7 +239,8 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for virtual devices
       {Grizzly.VirtualDevicesSupervisor, options},
-      {ReadyChecker, [status_reporter: options.status_reporter]}
+      {ReadyChecker, [status_reporter: options.status_reporter]},
+      {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
     ]
     |> maybe_run_zipgateway_supervisor(options)
   end
