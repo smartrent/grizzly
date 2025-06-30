@@ -474,7 +474,33 @@ defmodule Grizzly.ZWave.Decoder do
 
     # Humidity Control Operating State
     {0x6E, 0x01} => Commands.HumidityControlOperatingStateGet,
-    {0x6E, 0x02} => Commands.HumidityControlOperatingStateReport
+    {0x6E, 0x02} => Commands.HumidityControlOperatingStateReport,
+
+    # User Credential
+    {0x83, 0x01} => Commands.UserCapabilitiesGet,
+    {0x83, 0x02} => Commands.UserCapabilitiesReport,
+    {0x83, 0x03} => Commands.CredentialCapabilitiesGet,
+    {0x83, 0x04} => Commands.CredentialCapabilitiesReport,
+    {0x83, 0x05} => Commands.UserSet,
+    {0x83, 0x06} => Commands.UserGet,
+    {0x83, 0x07} => Commands.UserReport,
+    {0x83, 0x0A} => Commands.CredentialSet,
+    {0x83, 0x0B} => Commands.CredentialGet,
+    {0x83, 0x0C} => Commands.CredentialReport,
+    {0x83, 0x0F} => Commands.CredentialLearnStart,
+    {0x83, 0x10} => Commands.CredentialLearnCancel,
+    {0x83, 0x11} => Commands.CredentialLearnStatusReport,
+    {0x83, 0x12} => Commands.UserCredentialAssociationSet,
+    {0x83, 0x13} => Commands.UserCredentialAssociationReport,
+    {0x83, 0x14} => Commands.AllUsersChecksumGet,
+    {0x83, 0x15} => Commands.AllUsersChecksumReport,
+    {0x83, 0x16} => Commands.UserChecksumGet,
+    {0x83, 0x17} => Commands.UserChecksumReport,
+    {0x83, 0x18} => Commands.CredentialChecksumGet,
+    {0x83, 0x19} => Commands.CredentialChecksumReport,
+    {0x83, 0x1A} => Commands.AdminPinCodeSet,
+    {0x83, 0x1B} => Commands.AdminPinCodeGet,
+    {0x83, 0x1C} => Commands.AdminPinCodeReport
   }
 
   @spec command_module(byte(), byte()) :: {:ok, module()} | {:error, :unsupported_command}

@@ -7,7 +7,53 @@ defmodule Grizzly.ZWave.Encoding do
 
   @type encode_bitmask_opts :: [min_bytes: non_neg_integer()]
 
+  @type string_encoding :: :ascii | :extended_ascii | :utf16
+
   @max_duration 126 * 60
+
+  @doc """
+  Encodes a UTF-8 string using the specified encoding type.
+
+  ASCII and extended ASCII encodings remove non-ASCII characters, while
+  UTF-16 encoding converts the string to a UTF-16 binary representation.
+  """
+  @spec encode_string(binary(), string_encoding()) :: binary()
+  def encode_string(str, :ascii), do: String.replace(str, ~r/[^\x00-\x7F]/, "")
+  def encode_string(str, :extended_ascii), do: String.replace(str, ~r/[^\x00-\xFF]/, "")
+  def encode_string(str, :utf16), do: convert_str(str, :utf8, :utf16)
+
+  @doc """
+  Decodes a binary string into a UTF-8 string using the specified encoding type.
+  """
+  @spec decode_string(binary(), string_encoding()) :: binary()
+  def decode_string(str, :ascii), do: String.replace(str, ~r/[^\x00-\x7F]/, "")
+  def decode_string(str, :extended_ascii), do: String.replace(str, ~r/[^\x00-\xFF]/, "")
+  def decode_string(str, :utf16), do: convert_str(str, :utf16, :utf8)
+
+  defp convert_str(str, in_enc, out_enc) when is_binary(str) do
+    case :unicode.characters_to_binary(str, in_enc, out_enc) do
+      binary when is_binary(binary) -> binary
+      _ -> str
+    end
+  end
+
+  @doc """
+  Encodes a string encoding type to a byte value.
+
+  Uses the representation defined in the Node Naming and User Credential command
+  classes.
+  """
+  @spec encode_string_encoding(string_encoding()) :: byte()
+  def encode_string_encoding(:ascii), do: 0x00
+  def encode_string_encoding(:extended_ascii), do: 0x01
+  def encode_string_encoding(:utf16), do: 0x02
+
+  @doc "Decodes a string encoding type from a byte value."
+  @spec decode_string_encoding(byte()) :: string_encoding() | :unknown
+  def decode_string_encoding(0x00), do: :ascii
+  def decode_string_encoding(0x01), do: :extended_ascii
+  def decode_string_encoding(0x02), do: :utf16
+  def decode_string_encoding(_), do: :unknown
 
   @doc """
   Encodes a duration in seconds into a duration byte.
