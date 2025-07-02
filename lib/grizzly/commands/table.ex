@@ -580,7 +580,35 @@ defmodule Grizzly.Commands.Table do
     # Humidity Control Operating State
     humidity_control_operating_state_get:
       {Commands.HumidityControlOperatingStateGet,
-       handler: {WaitReport, complete_report: :humidity_control_operating_state_report}}
+       handler: {WaitReport, complete_report: :humidity_control_operating_state_report}},
+
+    # User Credential
+    user_capabilities_get:
+      {Commands.UserCapabilitiesGet,
+       handler: {WaitReport, complete_report: :user_capabilities_report}},
+    credential_capabilities_get:
+      {Commands.CredentialCapabilitiesGet,
+       handler: {WaitReport, complete_report: :credential_capabilities_report}},
+    user_set: {Commands.UserSet, handler: AckResponse},
+    user_get: {Commands.UserGet, handler: {WaitReport, complete_report: :user_report}},
+    credential_set: {Commands.CredentialSet, handler: AckResponse},
+    credential_get:
+      {Commands.CredentialGet, handler: {WaitReport, complete_report: :credential_report}},
+    credential_learn_start: {Commands.CredentialLearnStart, handler: AckResponse},
+    credential_learn_cancel: {Commands.CredentialLearnCancel, handler: AckResponse},
+    user_credential_association_set:
+      {Commands.UserCredentialAssociationSet, handler: AckResponse},
+    all_users_checksum_get:
+      {Commands.AllUsersChecksumGet,
+       handler: {WaitReport, complete_report: :all_users_checksum_report}},
+    user_checksum_get:
+      {Commands.UserChecksumGet, handler: {WaitReport, complete_report: :user_checksum_report}},
+    credential_checksum_get:
+      {Commands.CredentialChecksumGet,
+       handler: {WaitReport, complete_report: :credential_checksum_report}},
+    admin_pin_code_set: {Commands.AdminPinCodeSet, handler: AckResponse},
+    admin_pin_code_get:
+      {Commands.AdminPinCodeGet, handler: {WaitReport, complete_report: :admin_pin_code_report}}
   }
 
   @spec lookup(Grizzly.command()) :: {module(), [Grizzly.command_opt()]}
