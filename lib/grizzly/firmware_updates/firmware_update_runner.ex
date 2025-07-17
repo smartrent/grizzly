@@ -255,7 +255,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     )
 
     {command, new_firmware_update} = FirmwareUpdate.next_command(firmware_update, desired_state)
-    :timer.sleep(delay_msecs)
+
+    if delay_msecs > 0 do
+      Process.sleep(delay_msecs)
+    end
 
     {:ok, command_ref} =
       AsyncConnection.send_command(new_firmware_update.conn, command,

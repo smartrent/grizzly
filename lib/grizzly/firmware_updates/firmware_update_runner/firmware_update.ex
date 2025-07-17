@@ -32,6 +32,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
           activation_may_be_delayed?: boolean,
           current_command_ref: reference(),
           state: state,
+          last_batch_size: non_neg_integer(),
           # Number of fragments still to be sent as a burst
           fragments_wanted: non_neg_integer,
           # Index of fragment to be sent next. Starts at 1.
@@ -56,6 +57,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
             max_fragment_size: 2048,
             activation_may_be_delayed?: false,
             state: :started,
+            last_batch_size: 0,
             fragments_wanted: 0,
             # first frgament has index 1
             fragment_index: 1,
@@ -90,11 +92,18 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   def put_last_transmission_speed(firmware_update, _), do: firmware_update
 
   @doc """
-  Returns the delay between sending fragments. If set in the `FirmwareUpdate`,
-  that value will always be used. Otherwise, the delay is calculated based on
-  the last transmission speed: 15ms for 100kbit/s, 35ms for 40kbit/s and 9.6kbit/s.
+  Returns the delay between sending fragments.
+
+  If set in the `FirmwareUpdate`, that value will always be used. Otherwise, the
+  delay is calculated based on the last transmission speed: 15ms for 100kbit/s,
+  35ms for 40kbit/s and 9.6kbit/s.
+
+  This delay is only applicable when a device requests multiple fragments at once,
+  so 0 will be returned when only one fragment is requested.
   """
-  @spec transmission_delay(t()) :: pos_integer()
+  @spec transmission_delay(t()) :: non_neg_integer()
+  def transmission_delay(%__MODULE__{last_batch_size: 1}), do: 0
+
   def transmission_delay(%__MODULE__{transmission_delay: delay})
       when is_integer(delay) and delay > 0,
       do: delay
@@ -263,6 +272,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     %__MODULE__{
       firmware_update
       | state: :uploading,
+        last_batch_size: fragments_wanted,
         fragments_wanted: fragments_wanted,
         fragment_index: fragment_index
     }
