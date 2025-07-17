@@ -58,7 +58,9 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesReport do
     admin_code_deactivation_supported? =
       Command.param!(command, :admin_code_deactivation_supported?)
 
-    credential_types = Command.param!(command, :credential_types)
+    credential_types =
+      Command.param!(command, :credential_types)
+      |> Enum.sort_by(fn {type, _} -> UserCredential.encode_credential_type(type) end)
 
     encoded_credential_types =
       for {credential_type, capabilities} <- credential_types do
