@@ -35,7 +35,7 @@ defmodule Grizzly.MixProject do
       {:circular_buffer, "~> 1.0 or ~> 0.4.2"},
       {:ctr_drbg, "~> 0.1"},
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
-      {:mimic, "~> 1.7", only: [:dev, :test]},
+      {:mimic, "~> 2.0", only: [:dev, :test]},
       {:muontrap, "~> 1.6"},
       {:ex_doc, "~> 0.21", only: :docs, runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
