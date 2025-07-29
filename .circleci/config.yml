@@ -9,7 +9,7 @@ defaults: &defaults
     image-tag:
       description: "Docker image tag"
       type: string
-      default: "1.18.1-erlang-27.0.1-alpine-3.21.2"
+      default: "1.18.4-erlang-27.3.4.2-alpine-3.22.1"
 
 install_hex_rebar: &install_hex_rebar
   run:
@@ -61,12 +61,6 @@ jobs:
       - image: hexpm/elixir:<< parameters.image-tag >>
     steps:
       - checkout
-      - run:
-          name: Spell check
-          command: |
-            apk add --no-cache npm
-            npm install -g cspell
-            cspell --quiet .
       - <<: *install_hex_rebar
       - <<: *install_system_deps
       - restore_tagged_cache:
@@ -110,14 +104,21 @@ jobs:
       - store_test_results:
           path: test-junit-report.xml
 
-  markdownlint:
+  spelling_and_markdownlint:
     working_directory: ~/repo
     environment:
       LC_ALL: C.UTF-8
     docker:
-      - image: davidanson/markdownlint-cli2:v0.17.2
+      - image: node:24-alpine
     steps:
       - checkout
+      - run:
+          name: Setup
+          command: |
+            npm i -g cspell markdownlint-cli2
+      - run:
+          name: Spell check
+          command: cspell --quiet .
       - run:
           name: Lint markdown files
           command: markdownlint-cli2
@@ -129,15 +130,15 @@ workflows:
           matrix:
             parameters:
               image-tag:
-                - 1.18.1-erlang-27.0.1-alpine-3.21.2
-                - 1.17.2-erlang-27.0.1-alpine-3.20.1
-                - 1.16.2-erlang-26.2.4-alpine-3.19.1
+                - 1.18.4-erlang-27.3.4.2-alpine-3.22.1
+                - 1.17.3-erlang-27.3.4.2-alpine-3.22.1
+                - 1.16.3-erlang-26.2.5.14-alpine-3.22.1
       - lint:
-          image-tag: 1.18.1-erlang-27.0.1-alpine-3.21.2
+          image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
           requires:
             - build
       - dialyzer:
-          image-tag: 1.18.1-erlang-27.0.1-alpine-3.21.2
+          image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
           requires:
             - build
       - test:
@@ -146,7 +147,7 @@ workflows:
           matrix:
             parameters:
               image-tag:
-                - 1.18.1-erlang-27.0.1-alpine-3.21.2
-                - 1.17.2-erlang-27.0.1-alpine-3.20.1
-                - 1.16.2-erlang-26.2.4-alpine-3.19.1
-      - markdownlint
+                - 1.18.4-erlang-27.3.4.2-alpine-3.22.1
+                - 1.17.3-erlang-27.3.4.2-alpine-3.22.1
+                - 1.16.3-erlang-26.2.5.14-alpine-3.22.1
+      - spelling_and_markdownlint
