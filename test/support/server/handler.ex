@@ -576,7 +576,8 @@ defmodule GrizzlyTest.Server.Handler do
       [first, second] = state.commands_received
 
       cc = second |> Command.param!(:command) |> Command.param!(:command_class)
-      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: 2)
+      v = if(cc == :alarm, do: 1, else: 2)
+      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: v)
 
       {:ok, out_packet} = ZIPPacket.with_zwave_command(reply, Grizzly.SeqNumber.get_and_inc())
       :ok = Socket.send(socket, ZWave.to_binary(out_packet))
@@ -584,7 +585,8 @@ defmodule GrizzlyTest.Server.Handler do
       Process.sleep(100)
 
       cc = first |> Command.param!(:command) |> Command.param!(:command_class)
-      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: 1)
+      v = if(cc == :alarm, do: 1, else: 2)
+      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: v)
 
       {:ok, out_packet} = ZIPPacket.with_zwave_command(reply, Grizzly.SeqNumber.get_and_inc())
       :ok = Socket.send(socket, ZWave.to_binary(out_packet))
