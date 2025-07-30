@@ -3,7 +3,11 @@ defmodule Grizzly.CommandHandlers.WaitReportTest do
 
   setup do
     Grizzly.Trace.clear()
-    on_exit(fn -> Grizzly.Trace.clear() end)
+
+    on_exit(fn ->
+      Grizzly.Connection.close(203)
+      Grizzly.Trace.clear()
+    end)
   end
 
   test "orders reports correctly when a get command implements report_matches_get?/2" do
@@ -26,6 +30,9 @@ defmodule Grizzly.CommandHandlers.WaitReportTest do
 
     literal_packets =
       Grizzly.Trace.list()
+      # Filter out packets that are not relevant to the test. Needed because
+      # BackgroundRSSIMonitor is running and sending RSSI Get commands to node 1.
+      |> Enum.reject(&(&1.src == 1 or &1.dest == 1))
       |> Enum.map(&binary_slice(&1.binary, 7..-1//1))
       |> Enum.reject(&(&1 == ""))
 
