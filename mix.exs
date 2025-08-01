@@ -1,7 +1,7 @@
 defmodule Grizzly.MixProject do
   use Mix.Project
 
-  @version "8.6.10"
+  @version "8.6.11"
 
   def project do
     [
@@ -22,7 +22,7 @@ defmodule Grizzly.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :crypto, :asn1, :public_key, :ssl]
+      extra_applications: [:logger, :crypto, :asn1, :public_key, :ssl, :sasl]
     ]
   end
 

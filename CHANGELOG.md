@@ -4,6 +4,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.6.11] - 2025-08-01
+
+### Fixed
+
+* Run OTW firmware upgrades in a task ([#1098](https://github.com/smartrent/grizzly/pull/1098))
+
 ## [v8.6.10] - 2025-03-06
 
 ### Fixed
@@ -2697,6 +2703,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.6.11]: https://github.com/smartrent/grizzly/compare/v8.6.10..v8.6.11
 [v8.6.10]: https://github.com/smartrent/grizzly/compare/v8.6.9..v8.6.10
 [v8.6.9]: https://github.com/smartrent/grizzly/compare/v8.6.8..v8.6.9
 [v8.6.8]: https://github.com/smartrent/grizzly/compare/v8.6.7..v8.6.8
