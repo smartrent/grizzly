@@ -82,10 +82,14 @@ defmodule Grizzly.FirmwareUpdates do
 
   @doc """
   A firmware update is in progress when a `FirmwareUpdateRunner` process is running
-  and has received at least one request for one or more image fragments.
+  and has received at least one request for one or more image fragments OR when
+  an `OTWUpdateRunner` process is running.
   """
   @spec firmware_update_running?() :: boolean()
-  defdelegate firmware_update_running?(), to: FirmwareUpdateRunner, as: :in_progress?
+  def firmware_update_running?() do
+    is_pid(Process.whereis(Grizzly.FirmwareUpdates.OTWUpdateRunner)) or
+      FirmwareUpdateRunner.in_progress?()
+  end
 
   @doc """
   Stop the current firmware update runner, if any.
