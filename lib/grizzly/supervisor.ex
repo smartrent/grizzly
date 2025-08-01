@@ -43,7 +43,7 @@ defmodule Grizzly.Supervisor do
 
   require Logger
 
-  alias Grizzly.{Options, Trace, ZWaveFirmware}
+  alias Grizzly.{Options, Trace}
   alias Grizzly.ZIPGateway.ReadyChecker
 
   @typedoc """
@@ -188,7 +188,6 @@ defmodule Grizzly.Supervisor do
   @impl Supervisor
   def init(init_args) do
     options = Options.new(init_args)
-    ZWaveFirmware.maybe_run_zwave_firmware_update(options)
 
     Supervisor.init(children(options), strategy: :one_for_one)
   end
@@ -242,6 +241,7 @@ defmodule Grizzly.Supervisor do
       {ReadyChecker, [status_reporter: options.status_reporter]},
       {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
     ]
+    |> otw_update_runner(options)
     |> maybe_run_zipgateway_supervisor(options)
   end
 
@@ -253,4 +253,9 @@ defmodule Grizzly.Supervisor do
       children
     end
   end
+
+  defp otw_update_runner(children, %Options{zwave_firmware: %{enabled: true}}),
+    do: children ++ [Grizzly.FirmwareUpdates.OTWUpdateRunner]
+
+  defp otw_update_runner(children, _options), do: children
 end

@@ -20,14 +20,6 @@ defmodule Grizzly.ZWaveFirmwareTest do
   """
 
   describe "maybe_run_zwave_firmware_update/1" do
-    test "when disabled" do
-      stub(MuonTrap)
-      stub(MockStatusReporter)
-      stub(MockZWaveResetter)
-
-      ZWaveFirmware.maybe_run_zwave_firmware_update(get_options(%{enabled: false}))
-    end
-
     test "normal operation" do
       MuonTrap
       |> expect(:cmd, fn "/usr/bin/zw_programmer", ["-s", "/dev/null", "-t"] ->

@@ -88,7 +88,10 @@ defmodule Grizzly.ZWaveFirmware do
   Update the firmware on the Z-Wave module if an update is available
   """
   @spec maybe_run_zwave_firmware_update(Grizzly.Options.t()) :: :ok
-  def maybe_run_zwave_firmware_update(%Options{zwave_firmware: %{enabled: true}} = opts) do
+  def maybe_run_zwave_firmware_update(%Options{} = opts) do
+    stop_zipgateway()
+    Process.sleep(1000)
+
     report(opts, :started)
     version = zwave_module_version(opts)
 
@@ -124,6 +127,8 @@ defmodule Grizzly.ZWaveFirmware do
 
       report(opts, {:error, error})
       :ok
+  after
+    restart_zipgateway()
   end
 
   def maybe_run_zwave_firmware_update(_), do: :ok
@@ -234,5 +239,21 @@ defmodule Grizzly.ZWaveFirmware do
     _ = Process.spawn(fn -> opts.status_reporter.zwave_firmware_update_status(status) end, [])
 
     :ok
+  end
+
+  defp stop_zipgateway() do
+    Grizzly.stop_zipgateway()
+  catch
+    :exit, {:noproc, _} ->
+      # The Z/IP Gateway supervisor isn't running.
+      :ok
+  end
+
+  defp restart_zipgateway() do
+    Grizzly.restart_zipgateway()
+  catch
+    :exit, {:noproc, _} ->
+      # The Z/IP Gateway supervisor isn't running.
+      :ok
   end
 end

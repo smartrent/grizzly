@@ -11,7 +11,8 @@ defmodule Grizzly.Options do
   @typedoc """
   Options for configuring Z-Wave module firmware upgrades.
 
-  * `enabled` - whether or not to enable firmware upgrades
+  * `enabled` - whether firmware upgrades should run automatically after Grizzly
+    starts (with a delay of 1 minute). Defaults to `false`.
   * `specs` - a list of firmware upgrade specifications. If multiple specs match,
     the first will be applied. See `Grizzly.ZWaveFirmware.UpgradeSpec`.
   * `chip_series` - the Z-Wave module chip type. See `t:Grizzly.ZWaveFirmware.chip_series/0`.
