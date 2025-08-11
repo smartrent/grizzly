@@ -2,6 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.11.3] - 2025-08-11
+
+### Fixed
+
+* Disable inter-fragment delay when only one fragment is requested ([#1092](https://github.com/smartrent/grizzly/pull/1092))
+* Improve error handling during firmware updates ([#1102](https://github.com/smartrent/grizzly/pull/1102))
+
 ## [v8.11.2] - 2025-08-01
 
 ### Fixed
@@ -2756,6 +2763,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.11.3]: https://github.com/smartrent/grizzly/compare/v8.11.2..v8.11.3
 [v8.11.2]: https://github.com/smartrent/grizzly/compare/v8.11.1..v8.11.2
 [v8.11.1]: https://github.com/smartrent/grizzly/compare/v8.11.0..v8.11.1
 [v8.11.0]: https://github.com/smartrent/grizzly/compare/v8.10.0..v8.11.0
