@@ -31,6 +31,12 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
           firmware_target: byte,
           activation_may_be_delayed?: boolean,
           current_command_ref: reference(),
+          current_command: Command.t() | nil,
+          current_command_attempts: non_neg_integer(),
+          progress_timer: reference() | nil,
+          # How long to wait with no progress before aborting
+          progress_timeout: non_neg_integer(),
+          max_fragment_retries: non_neg_integer(),
           state: state,
           last_batch_size: non_neg_integer(),
           # Number of fragments still to be sent as a burst
@@ -48,6 +54,12 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
             conn: nil,
             # Ref to the currently executing command - so it can be stopped if needed
             current_command_ref: nil,
+            current_command: nil,
+            current_command_attempts: 0,
+            last_progress: nil,
+            progress_timer: nil,
+            progress_timeout: :timer.minutes(2),
+            max_fragment_retries: 10,
             device_id: 1,
             image: nil,
             manufacturer_id: nil,
@@ -72,8 +84,17 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   @spec current_command_ref(t()) :: reference()
   def current_command_ref(firmware_update), do: firmware_update.current_command_ref
 
-  def update_command_ref(firmware_update, new_command_ref),
-    do: %__MODULE__{firmware_update | current_command_ref: new_command_ref}
+  def update_command_ref(firmware_update, new_command_ref, command),
+    do: %__MODULE__{
+      firmware_update
+      | current_command_ref: new_command_ref,
+        current_command: command,
+        current_command_attempts:
+          if(command == firmware_update.current_command,
+            do: firmware_update.current_command_attempts + 1,
+            else: 1
+          )
+    }
 
   @spec in_progress?(t()) :: boolean()
   def in_progress?(firmware_update),
@@ -242,10 +263,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
          firmware_update,
          true = _last?
        ) do
-    %__MODULE__{
-      firmware_update
-      | fragments_wanted: 0
-    }
+    %__MODULE__{firmware_update | fragments_wanted: 0}
   end
 
   defp firmware_fragment_uploaded(
@@ -330,5 +348,21 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
          image: image
        }) do
     Image.data(image, fragment_index)
+  end
+
+  def clear_progress_timer(%__MODULE__{progress_timer: progress_timer} = firmware_update) do
+    _ =
+      if is_reference(progress_timer) do
+        Process.cancel_timer(progress_timer)
+      end
+
+    %{firmware_update | progress_timer: nil}
+  end
+
+  def reset_progress_timer(%__MODULE__{} = firmware_update) do
+    firmware_update = clear_progress_timer(firmware_update)
+
+    timer_ref = Process.send_after(self(), :progress_timeout, firmware_update.progress_timeout)
+    %__MODULE__{firmware_update | progress_timer: timer_ref}
   end
 end
