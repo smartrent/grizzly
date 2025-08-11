@@ -162,6 +162,19 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
         {:noreply, firmware_update}
 
+      :timeout ->
+        # Timeouts are ignored because by the time we receive a message that a command
+        # timed out, there are two likely cases: (a) the firmware update has resumed
+        # because the target device sent us a fresh Firmware Update Metadata Get or
+        # (b) the update has stalled badly due to communication issues and is unlikely
+        # to be successful.
+        # In the first case, the firmware update has resumed, and so retransmitting the
+        # most recent command is the wrong thing to do. In the latter case, we're probably
+        # better off waiting for the device to send a Firmware Update Metadata Get (if
+        # we can receive it).
+        Logger.debug("[Grizzly] Firmware update command timed out: #{inspect(report)}")
+        {:noreply, firmware_update}
+
       type when type in [:queued_delay, :queued_ping] ->
         respond_to_handler(
           format_handler_spec(firmware_update.handler),
@@ -199,24 +212,23 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :ok
   end
 
-  defp handle_nack_response_or_timeout(%FirmwareUpdate{} = firmware_update, type) do
+  defp handle_nack_response(%FirmwareUpdate{} = firmware_update, type) do
     if firmware_update.current_command_attempts > 10 do
       Logger.error(
-        "[Grizzly] Received #{inspect(type)} while updating firmware of device #{firmware_update.device_id}, fragment #{firmware_update.fragment_index}, attempts so far: #{firmware_update.current_command_attempts}. Giving up."
+        "[Grizzly] Received nack_response while updating firmware of device #{firmware_update.device_id}, fragment #{firmware_update.fragment_index}, attempts so far: #{firmware_update.current_command_attempts}. Giving up."
       )
 
       firmware_update
     else
       Logger.warning(
-        "[Grizzly] Received #{inspect(type)} while updating firmware of device #{firmware_update.device_id}, fragment #{firmware_update.fragment_index}, attempts so far: #{firmware_update.current_command_attempts}. Retransmitting..."
+        "[Grizzly] Received nack_response while updating firmware of device #{firmware_update.device_id}, fragment #{firmware_update.fragment_index}, attempts so far: #{firmware_update.current_command_attempts}. Retransmitting..."
       )
 
       {:ok, command_ref} =
         AsyncConnection.send_command(firmware_update.conn, firmware_update.current_command,
           timeout: 120_000,
           transmission_stats: true,
-          more_info: true,
-          retries: 2
+          more_info: true
         )
 
       FirmwareUpdate.update_command_ref(
@@ -297,8 +309,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       AsyncConnection.send_command(new_firmware_update.conn, command,
         timeout: 120_000,
         transmission_stats: true,
-        more_info: true,
-        retries: 2
+        more_info: true
       )
 
     Logger.debug("[Grizzly] Sent FW update continuation #{inspect(command)}")
