@@ -58,7 +58,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       hardware_version: 0,
       firmware_target: 0,
       max_fragment_size: @default_fragment_size,
-      activation_may_be_delayed?: false
+      activation_may_be_delayed?: false,
+      max_fragment_retries: 10,
+      progress_timeout: :timer.minutes(2)
     ]
 
     GenServer.start_link(
@@ -78,7 +80,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     firmware_target = Keyword.fetch!(opts, :firmware_target)
     max_fragment_size = Keyword.fetch!(opts, :max_fragment_size)
     activation_may_be_delayed? = Keyword.fetch!(opts, :activation_may_be_delayed?)
-    progress_timeout = Keyword.get(opts, :progress_timeout, :timer.minutes(2))
+    max_fragment_retries = Keyword.fetch!(opts, :max_fragment_retries)
+    progress_timeout = Keyword.fetch!(opts, :progress_timeout)
 
     {:ok, conn} = Connection.open(device_id, mode: :async, unnamed: true)
 
@@ -98,6 +101,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
        max_fragment_size: max_fragment_size,
        activation_may_be_delayed?: activation_may_be_delayed?,
        transmission_delay: Keyword.get(opts, :transmission_delay),
+       max_fragment_retries: max_fragment_retries,
        progress_timeout: progress_timeout
      }}
   end
@@ -158,7 +162,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   def handle_info({:grizzly, :report, report}, firmware_update) do
     case report.type do
       type when type in [:nack_response, :timeout] ->
-        firmware_update = handle_nack_response_or_timeout(firmware_update, type)
+        firmware_update = handle_nack_response(firmware_update)
 
         {:noreply, firmware_update}
 
@@ -212,8 +216,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     :ok
   end
 
-  defp handle_nack_response(%FirmwareUpdate{} = firmware_update, type) do
-    if firmware_update.current_command_attempts > 10 do
+  defp handle_nack_response(%FirmwareUpdate{} = firmware_update) do
+    if firmware_update.current_command_attempts > firmware_update.max_fragment_retries do
       Logger.error(
         "[Grizzly] Received nack_response while updating firmware of device #{firmware_update.device_id}, fragment #{firmware_update.fragment_index}, attempts so far: #{firmware_update.current_command_attempts}. Giving up."
       )

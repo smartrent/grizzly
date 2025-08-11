@@ -36,6 +36,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
           progress_timer: reference() | nil,
           # How long to wait with no progress before aborting
           progress_timeout: non_neg_integer(),
+          max_fragment_retries: non_neg_integer(),
           state: state,
           last_batch_size: non_neg_integer(),
           # Number of fragments still to be sent as a burst
@@ -58,6 +59,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
             last_progress: nil,
             progress_timer: nil,
             progress_timeout: :timer.minutes(2),
+            max_fragment_retries: 10,
             device_id: 1,
             image: nil,
             manufacturer_id: nil,

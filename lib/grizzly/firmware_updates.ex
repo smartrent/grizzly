@@ -55,6 +55,8 @@ defmodule Grizzly.FirmwareUpdates do
           | {:max_fragment_size, non_neg_integer}
           | {:activation_may_be_delayed?, boolean}
           | {:transmission_delay, pos_integer()}
+          | {:progress_timeout, timeout()}
+          | {:max_fragment_retries, non_neg_integer()}
 
   @type image_path :: String.t()
 
