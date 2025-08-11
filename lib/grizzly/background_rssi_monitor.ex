@@ -114,7 +114,7 @@ defmodule Grizzly.BackgroundRSSIMonitor do
         set_or_clear_alarm(state)
         {:ok, state}
 
-      {:error, :including} ->
+      {:error, reason} when reason in [:including, :firmware_updating] ->
         {:error, state}
 
       {:error, reason} ->

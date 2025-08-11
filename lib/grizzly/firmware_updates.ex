@@ -55,6 +55,8 @@ defmodule Grizzly.FirmwareUpdates do
           | {:max_fragment_size, non_neg_integer}
           | {:activation_may_be_delayed?, boolean}
           | {:transmission_delay, pos_integer()}
+          | {:progress_timeout, timeout()}
+          | {:max_fragment_retries, non_neg_integer()}
 
   @type image_path :: String.t()
 
@@ -90,6 +92,13 @@ defmodule Grizzly.FirmwareUpdates do
     is_pid(Process.whereis(Grizzly.FirmwareUpdates.OTWUpdateRunner)) or
       FirmwareUpdateRunner.in_progress?()
   end
+
+  @doc """
+  Returns the progress of the current firmware update, if any, as a tuple containing
+  the last requested fragment index and the total number of fragments.
+  """
+  @spec progress() :: {non_neg_integer(), pos_integer()} | nil
+  defdelegate progress(), to: FirmwareUpdateRunner
 
   @doc """
   Stop the current firmware update runner, if any.
