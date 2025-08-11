@@ -92,6 +92,13 @@ defmodule Grizzly.FirmwareUpdates do
   end
 
   @doc """
+  Returns the progress of the current firmware update, if any, as a tuple containing
+  the last requested fragment index and the total number of fragments.
+  """
+  @spec progress() :: {non_neg_integer(), pos_integer()} | nil
+  defdelegate progress(), to: FirmwareUpdateRunner
+
+  @doc """
   Stop the current firmware update runner, if any.
   """
   @spec stop_firmware_update() :: :ok
