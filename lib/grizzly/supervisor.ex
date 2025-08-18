@@ -200,14 +200,15 @@ defmodule Grizzly.Supervisor do
         id: Grizzly.Options.Agent,
         start: {Agent, :start_link, [fn -> options end, [name: Grizzly.Options.Agent]]}
       },
+      Grizzly.Events,
       {Task.Supervisor, name: Grizzly.TaskSupervisor},
+      if(options.run_zipgateway, do: {Grizzly.ZIPGateway.Supervisor, options}, else: nil),
       # According to Z-Wave specification we need to have a global
       # sequence number counter that starts at a random number between
       # 0 and 0xFF (255)
       {Grizzly.SeqNumber, Enum.random(0..255)},
       Grizzly.SessionId,
       {Grizzly.Trace, options.trace_options},
-      {Registry, [keys: :duplicate, name: Grizzly.Events.Registry]},
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
       {Grizzly.Associations, options},
 
@@ -242,16 +243,7 @@ defmodule Grizzly.Supervisor do
       {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
     ]
     |> otw_update_runner(options)
-    |> maybe_run_zipgateway_supervisor(options)
-  end
-
-  defp maybe_run_zipgateway_supervisor(children, options) do
-    if options.run_zipgateway do
-      # Supervisor for the zipgateway binary
-      [{Grizzly.ZIPGateway.Supervisor, options} | children]
-    else
-      children
-    end
+    |> Enum.reject(&is_nil/1)
   end
 
   defp otw_update_runner(children, %Options{zwave_firmware: %{enabled: true}}),
