@@ -237,6 +237,7 @@ defmodule Grizzly.ZWaveFirmware do
   @spec report(Options.t(), update_status()) :: :ok
   defp report(opts, status) do
     _ = Process.spawn(fn -> opts.status_reporter.zwave_firmware_update_status(status) end, [])
+    Grizzly.Events.broadcast(:otw_firmware_update, status)
 
     :ok
   end

@@ -21,6 +21,8 @@ defmodule Grizzly.ZWaveFirmwareTest do
 
   describe "maybe_run_zwave_firmware_update/1" do
     test "normal operation" do
+      Grizzly.Events.subscribe(:otw_firmware_update)
+
       MuonTrap
       |> expect(:cmd, fn "/usr/bin/zw_programmer", ["-s", "/dev/null", "-t"] ->
         {zw_programmer_version_output("7.18.02"), 0}
@@ -44,9 +46,12 @@ defmodule Grizzly.ZWaveFirmwareTest do
 
       assert_receive :started
       assert_receive {:done, :success}
+      assert_receive {:grizzly, :otw_firmware_update, {:done, :success}}
     end
 
     test "failed update" do
+      Grizzly.Events.subscribe(:otw_firmware_update)
+
       MuonTrap
       |> expect(:cmd, fn "/usr/bin/zw_programmer", ["-s", "/dev/null", "-t"] ->
         {zw_programmer_version_output("7.18.02"), 0}
@@ -72,9 +77,12 @@ defmodule Grizzly.ZWaveFirmwareTest do
 
       assert_receive :started
       assert_receive {:error, _}
+      assert_receive {:grizzly, :otw_firmware_update, {:error, _}}
     end
 
     test "stuck at bootloader (500-series)" do
+      Grizzly.Events.subscribe(:otw_firmware_update)
+
       MuonTrap
       |> expect(:cmd, fn "/usr/bin/zw_programmer", ["-s", "/dev/null", "-t"] ->
         {@corrupt_fw_output, 0}
@@ -98,9 +106,12 @@ defmodule Grizzly.ZWaveFirmwareTest do
 
       assert_receive :started
       assert_receive {:done, :success}
+      assert_receive {:grizzly, :otw_firmware_update, {:done, :success}}
     end
 
     test "stuck at bootloader (700/800-series)" do
+      Grizzly.Events.subscribe(:otw_firmware_update)
+
       MuonTrap
       |> expect(:cmd, fn "/usr/bin/zw_programmer", ["-s", "/dev/null", "-t"] ->
         {@corrupt_fw_output, 0}
@@ -124,6 +135,7 @@ defmodule Grizzly.ZWaveFirmwareTest do
 
       assert_receive :started
       assert_receive {:done, :success}
+      assert_receive {:grizzly, :otw_firmware_update, {:done, :success}}
     end
   end
 

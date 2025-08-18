@@ -100,6 +100,8 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
         end
       end)
 
+    Grizzly.Events.broadcast(:ready, true)
+
     %{state | ready?: true}
   end
 end
