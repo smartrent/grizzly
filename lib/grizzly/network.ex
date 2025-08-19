@@ -48,7 +48,7 @@ defmodule Grizzly.Network do
   """
   @doc since: "3.0.0"
   @spec get_all_node_ids([opt()]) ::
-          {:ok, [ZWave.node_id() | VirtualDevices.id()]} | {:error, :timeout | :nack_response}
+          {:ok, [ZWave.node_id() | VirtualDevices.id()]} | {:error, Grizzly.send_command_error()}
   def get_all_node_ids(opts \\ []) do
     case get_node_ids(opts) do
       {:ok, %Report{type: :command, status: :complete, command: node_id_list}} ->
@@ -59,10 +59,7 @@ defmodule Grizzly.Network do
       {:ok, %Report{type: :timeout}} ->
         {:error, :timeout}
 
-      {:error, :timeout} ->
-        {:error, :timeout}
-
-      {:error, :nack_response} = error ->
+      error ->
         error
     end
   end
