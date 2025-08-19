@@ -62,6 +62,10 @@ defmodule Grizzly.Network do
       {:error, :timeout} ->
         {:error, :timeout}
 
+      # If firmware is currently updating, present the error as a timeout error
+      {:error, :firmware_updating} ->
+        {:error, :timeout}
+
       {:error, :nack_response} = error ->
         error
     end
