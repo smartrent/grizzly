@@ -20,6 +20,14 @@ defmodule Grizzly.InclusionServer do
   end
 
   @doc """
+  Handle the start of a SmartStart join process
+  """
+  @spec smart_start_join_started(DSK.t()) :: :ok
+  def smart_start_join_started(dsk) do
+    GenServer.call(__MODULE__, {:smart_start_join_started, dsk})
+  end
+
+  @doc """
   Set the control into inclusion state
   """
   @spec add_node([Inclusions.opt()]) :: :ok | Inclusions.status()
@@ -110,7 +118,10 @@ defmodule Grizzly.InclusionServer do
       default_handler: grizzly_opts.inclusion_handler,
       handler: nil,
       adapter_state: adapter_state,
-      dsk_requested_length: 0
+      dsk_requested_length: 0,
+      dsk: nil,
+      smartstart?: false,
+      node_add_status_cmd: nil
     }
 
     case StatusServer.get() do
@@ -172,7 +183,8 @@ defmodule Grizzly.InclusionServer do
     with :idle <- StatusServer.get(),
          {:ok, new_adapter_state} <- state.adapter.add_node(state.adapter_state, opts) do
       state =
-        state
+        %{state | smartstart?: false}
+        |> reset_new_node_info()
         |> set_status(:node_adding)
         |> put_new_handler(opts)
 
@@ -264,7 +276,16 @@ defmodule Grizzly.InclusionServer do
            state.adapter.set_input_dsk(dsk, state.dsk_requested_length, state.adapter_state) do
       state = set_status(state, :dsk_input_set)
 
-      {:reply, :ok, %{state | adapter_state: new_adapter_state}}
+      full_dsk =
+        if is_struct(state.dsk, DSK) do
+          raw =
+            binary_part(dsk.raw, 0, state.dsk_requested_length) <>
+              binary_slice(state.dsk.raw, state.dsk_requested_length..-1//1)
+
+          DSK.new(raw)
+        end
+
+      {:reply, :ok, %{state | adapter_state: new_adapter_state, dsk: full_dsk}}
     else
       error ->
         {:reply, error, state}
@@ -273,6 +294,15 @@ defmodule Grizzly.InclusionServer do
 
   def handle_call({:continue_inclusion, node_id, %Command{} = command}, _from, state) do
     {_, state} = handle_report(command, node_id, state)
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:smart_start_join_started, dsk}, _from, state) do
+    state =
+      state
+      |> reset_new_node_info()
+      |> Map.merge(%{smartstart?: true, dsk: dsk})
+
     {:reply, :ok, state}
   end
 
@@ -326,6 +356,7 @@ defmodule Grizzly.InclusionServer do
 
     state =
       state
+      |> node_add_complete(command)
       |> remove_handler()
       |> set_status(:idle)
 
@@ -355,6 +386,7 @@ defmodule Grizzly.InclusionServer do
 
   def handle_report(%Command{name: :node_add_dsk_report} = command, node_id, state) do
     requested_length = Command.param!(command, :input_dsk_length)
+    dsk = Command.param!(command, :dsk)
 
     report = Report.new(:complete, :command, node_id, command: command)
     send_to_handler(state, report)
@@ -363,7 +395,7 @@ defmodule Grizzly.InclusionServer do
 
     Logger.info("[Grizzly.InclusionServer] DSK requested length: #{requested_length}")
 
-    {:noreply, %{state | dsk_requested_length: requested_length}}
+    {:noreply, %{state | dsk_requested_length: requested_length, dsk: dsk}}
   end
 
   defp run_remove_node_stop(state) do
@@ -402,7 +434,47 @@ defmodule Grizzly.InclusionServer do
   defp set_status(state, status) do
     :ok = StatusServer.set(status)
 
-    state
+    if status == :idle do
+      reset_new_node_info(state)
+    else
+      state
+    end
+  end
+
+  defp node_add_complete(state, cmd) do
+    node_id = Command.param!(cmd, :node_id)
+    status = Command.param!(cmd, :status)
+
+    if status != :failed do
+      granted_keys = Command.param(cmd, :granted_keys, [])
+      kex_fail_type = Command.param(cmd, :kex_fail_type, nil)
+      dsk = Command.param(cmd, :input_dsk, state.dsk)
+
+      if(dsk != nil, do: Grizzly.Storage.put_node_dsk(node_id, dsk))
+
+      Grizzly.Storage.put_node_inclusion_info(node_id, %{
+        status: status,
+        granted_keys: granted_keys,
+        kex_fail_type: kex_fail_type,
+        smartstart?: state.smartstart?
+      })
+
+      listening? = Command.param!(cmd, :listening?)
+      basic_device_class = Command.param!(cmd, :basic_device_class)
+      generic_device_class = Command.param!(cmd, :generic_device_class)
+      specific_device_class = Command.param!(cmd, :specific_device_class)
+      command_classes = Command.param!(cmd, :command_classes)
+
+      Grizzly.Storage.put_node_info(node_id, %{
+        listening?: listening?,
+        basic_device_class: basic_device_class,
+        generic_device_class: generic_device_class,
+        specific_device_class: specific_device_class,
+        command_classes: command_classes
+      })
+    end
+
+    reset_new_node_info(state)
   end
 
   defp remove_handler(state) do
@@ -445,5 +517,9 @@ defmodule Grizzly.InclusionServer do
 
   defp handler(state) do
     state.handler || state.default_handler
+  end
+
+  defp reset_new_node_info(state) do
+    %{state | dsk_requested_length: 0, dsk: nil, node_add_status_cmd: nil, smartstart?: false}
   end
 end

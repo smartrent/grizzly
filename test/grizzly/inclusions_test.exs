@@ -3,6 +3,7 @@ defmodule Grizzly.InclusionsTest do
 
   alias Grizzly.{Inclusions, Report}
   alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.Commands.NodeAddStatus
   alias GrizzlyTest.Server.Handler
 
   @moduletag :inclusion
@@ -140,7 +141,7 @@ defmodule Grizzly.InclusionsTest do
     assert Inclusions.status() == :idle
   end
 
-  test "S2 inclusion" do
+  test "S2 unauthenticated" do
     :ok = Inclusions.add_node(s2: true, controller_id: 302)
 
     Process.sleep(10)
@@ -170,12 +171,121 @@ defmodule Grizzly.InclusionsTest do
     Process.sleep(10)
     assert command.name == :node_add_status
     assert Command.param!(command, :status) == :done
+
+    node_id = Command.param!(command, :node_id)
+
+    expected_dsk = DSK.parse!("50285-18819-09924-30691-15973-33711-04005-03623")
+
+    assert expected_dsk == Grizzly.Storage.get_node_dsk(node_id)
+
+    assert %{
+             status: :done,
+             granted_keys: [:s2_unauthenticated],
+             kex_fail_type: :none,
+             smartstart?: false
+           } = Grizzly.Storage.get_node_inclusion_info(node_id)
+  end
+
+  test "S2 authenticated" do
+    :ok = Inclusions.add_node(s2: true, controller_id: 302)
+
+    Process.sleep(10)
+    assert :node_adding = Inclusions.status()
+
+    assert_receive {:grizzly, :report, %Report{type: :command, command: node_add_keys_report}},
+                   1_000
+
+    assert node_add_keys_report.name == :node_add_keys_report
+    Process.sleep(10)
+    assert :waiting_s2_keys = Inclusions.status()
+
+    :ok = Inclusions.grant_keys([:s2_authenticated])
+
+    assert_receive {:grizzly, :report, %Report{type: :command, command: dsk_report}}, 1_000
+
+    assert dsk_report.name == :node_add_dsk_report
+    assert %DSK{} = Command.param!(dsk_report, :dsk)
+    Process.sleep(10)
+    assert :waiting_dsk == Inclusions.status()
+
+    {:ok, pin} = DSK.parse_pin("12345")
+    :ok = Inclusions.set_input_dsk(pin)
+
+    assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
+
+    Process.sleep(10)
+    assert command.name == :node_add_status
+    assert Command.param!(command, :status) == :done
+
+    node_id = Command.param!(command, :node_id)
+
+    expected_dsk = DSK.parse!("12345-18819-09924-30691-15973-33711-04005-03623")
+
+    assert expected_dsk == Grizzly.Storage.get_node_dsk(node_id)
+
+    assert %{
+             status: :done,
+             granted_keys: [:s2_authenticated],
+             kex_fail_type: :none,
+             smartstart?: false
+           } = Grizzly.Storage.get_node_inclusion_info(node_id)
   end
 
   test "S2 inclusions with handler" do
     :ok = Inclusions.add_node(s2: true, handler: {TestHandler, test_pid: self()})
 
     assert_receive %Grizzly.ZWave.Command{name: :node_add_status}, 1_500
+  end
+
+  test "smartstart join" do
+    dsk = DSK.parse!("29831-31413-38451-51291-12021-51481-12092-01212")
+    Grizzly.InclusionServer.smart_start_join_started(dsk)
+
+    {:ok, node_add_status} =
+      NodeAddStatus.new(
+        status: :done,
+        node_id: 101,
+        seq_number: 1,
+        listening?: true,
+        basic_device_class: :end_node,
+        generic_device_class: :door_lock,
+        specific_device_class: :secure_keypad_door_lock,
+        command_classes: [
+          non_secure_supported: [:basic, :zwaveplus_info],
+          non_secure_controlled: [],
+          secure_supported: [:alarm, :door_lock, :user_code],
+          secure_controlled: []
+        ],
+        granted_keys: [:s2_access_control],
+        kex_fail_type: :none,
+        input_dsk: dsk
+      )
+
+    Grizzly.InclusionServer.continue_inclusion(302, node_add_status)
+
+    Process.sleep(10)
+
+    assert dsk == Grizzly.Storage.get_node_dsk(101)
+
+    assert %{
+             status: :done,
+             smartstart?: true,
+             granted_keys: [:s2_access_control],
+             kex_fail_type: :none
+           } == Grizzly.Storage.get_node_inclusion_info(101)
+
+    assert %{
+             listening?: true,
+             basic_device_class: :end_node,
+             generic_device_class: :door_lock,
+             specific_device_class: :secure_keypad_door_lock,
+             command_classes: [
+               non_secure_supported: [:basic, :zwaveplus_info],
+               non_secure_controlled: [],
+               secure_supported: [:alarm, :door_lock, :user_code],
+               secure_controlled: []
+             ]
+           } == Grizzly.Storage.get_node_info(101)
   end
 
   test "crashing inclusion should return server back into idle state" do

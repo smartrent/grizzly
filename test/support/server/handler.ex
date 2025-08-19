@@ -100,6 +100,7 @@ defmodule GrizzlyTest.Server.Handler do
   @impl ThousandIsland.Handler
   def handle_data(<<node_id::16, rest::binary>>, socket, %{node_id: nil} = state) do
     _ = Registry.register(GrizzlyTest.Server.ConnectionRegistry, node_id, nil)
+
     handle_data(rest, socket, %{state | node_id: node_id})
   end
 

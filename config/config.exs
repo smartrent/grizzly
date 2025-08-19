@@ -10,4 +10,6 @@ if config_env() == :test do
   config :grizzly,
     unsolicited_server_health_check_interval: 1000,
     dtls_handshake_timeout: 100
+
+  config :grizzly, Grizzly.Storage.Populate, disabled: true
 end
