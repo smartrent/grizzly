@@ -35,8 +35,9 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   When a transport receives a response from the Z-Wave network handle it
   and send any other commands back over the Z-Wave PAN if needed
   """
-  @spec handle_response(Command.t(), [opt()]) :: [action()] | {:error, reason :: any()}
-  def handle_response(command, opts \\ []) do
+  @spec handle_response(Grizzly.node_id(), Command.t(), [opt()]) ::
+          [action()] | {:error, reason :: any()}
+  def handle_response(node_id, command, opts \\ []) do
     cond do
       command.name == :keep_alive ->
         handle_keep_alive(command)
@@ -69,7 +70,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       # Pretty much anything else should be a Z/IP Packet carrying a command.
       true ->
         with internal_cmd when not is_nil(internal_cmd) <- Command.param!(command, :command),
-             actions when is_list(actions) <- handle_command(internal_cmd, opts) do
+             actions when is_list(actions) <- handle_command(node_id, internal_cmd, opts) do
           actions = Enum.reject(actions, &is_supervision_status_action/1)
           [:ack | actions]
         else
@@ -97,7 +98,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :supervision_get} = command, opts) do
+  defp handle_command(node_id, %Command{name: :supervision_get} = command, opts) do
     encapsulated_command = Command.param!(command, :encapsulated_command)
 
     case ZWave.from_binary(encapsulated_command) do
@@ -105,7 +106,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         # We need to process the internal command and get the actions that need
         # to be preformed. The supervision report must come last in the chain of
         # actions. See SDS13783 section 3.7.2.2 for more information.
-        actions = handle_command(report, opts)
+        actions = handle_command(node_id, report, opts)
 
         {_, supervision_status} =
           Enum.find(actions, {:supervision_status, :success}, &is_supervision_status_action/1)
@@ -125,13 +126,13 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :basic_set}, _opts) do
+  defp handle_command(_node_id, %Command{name: :basic_set}, _opts) do
     [{:supervision_status, :no_support}]
   end
 
   # When an inclusion controller adds a node, we'll receive network management
   # commands via the unsolicited server.
-  defp handle_command(%Command{name: inclusion_cmd} = cmd, _opts)
+  defp handle_command(node_id, %Command{name: inclusion_cmd} = cmd, _opts)
        when inclusion_cmd in [
               :node_add_status,
               :node_add_keys_report,
@@ -143,19 +144,19 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       "[UnsolicitedServer] Received unsolicited inclusion command: #{inspect(cmd, pretty: true)}"
     )
 
-    Grizzly.Inclusions.continue_inclusion(cmd)
+    Grizzly.Inclusions.continue_inclusion(node_id, cmd)
 
     # do nothing. the configured inclusion handler will take care of it.
     []
   end
 
-  defp handle_command(%Command{name: :association_specific_group_get}, _) do
+  defp handle_command(_node_id, %Command{name: :association_specific_group_get}, _) do
     case AssociationSpecificGroupReport.new(group: 0) do
       {:ok, command} -> [{:send, command}]
     end
   end
 
-  defp handle_command(%Command{name: :association_get}, opts) do
+  defp handle_command(_node_id, %Command{name: :association_get}, opts) do
     # According the the Z-Wave specification if a get request contains an
     # unsupported grouping identifier then we should report back the grouping
     # information for group number 1. Since right now we only support that
@@ -183,7 +184,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:send, respond_with_command}]
   end
 
-  defp handle_command(%Command{name: :association_set} = command, opts) do
+  defp handle_command(_node_id, %Command{name: :association_set} = command, opts) do
     associations_server = Keyword.get(opts, :associations_server, Associations)
     grouping_identifier = Command.param!(command, :grouping_identifier)
 
@@ -202,13 +203,13 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :association_groupings_get}, _opts) do
+  defp handle_command(_node_id, %Command{name: :association_groupings_get}, _opts) do
     case AssociationGroupingsReport.new(supported_groupings: 1) do
       {:ok, command} -> [{:send, command}]
     end
   end
 
-  defp handle_command(%Command{name: :association_remove} = command, opts) do
+  defp handle_command(_node_id, %Command{name: :association_remove} = command, opts) do
     associations_server = Keyword.get(opts, :associations_server, Associations)
     grouping_id = Command.param!(command, :grouping_identifier)
     nodes = Command.param!(command, :nodes)
@@ -243,7 +244,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :association_group_name_get}, _opts) do
+  defp handle_command(_node_id, %Command{name: :association_group_name_get}, _opts) do
     # Always just return the lifeline group (group_id == 1) as of right now
     # because that is all that Grizzly supports right now.
     case AssociationGroupNameReport.new(group_id: 1, name: "Lifeline") do
@@ -251,7 +252,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :association_group_info_get} = command, _opts) do
+  defp handle_command(_node_id, %Command{name: :association_group_info_get} = command, _opts) do
     {:ok, report} =
       AssociationGroupInfoReport.new(
         dynamic: false,
@@ -262,7 +263,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:send, report}]
   end
 
-  defp handle_command(%Command{name: :association_group_command_list_get}, _opts) do
+  defp handle_command(_node_id, %Command{name: :association_group_command_list_get}, _opts) do
     {:ok, report} =
       AssociationGroupCommandListReport.new(
         group_id: 0x01,
@@ -272,13 +273,13 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:send, report}]
   end
 
-  defp handle_command(%Command{name: :multi_channel_association_groupings_get}, _opts) do
+  defp handle_command(_node_id, %Command{name: :multi_channel_association_groupings_get}, _opts) do
     {:ok, report} = MultiChannelAssociationGroupingsReport.new(supported_groupings: 1)
 
     [{:send, report}]
   end
 
-  defp handle_command(%Command{name: :multi_channel_association_get}, opts) do
+  defp handle_command(_node_id, %Command{name: :multi_channel_association_get}, opts) do
     # According the the Z-Wave specification if a get request contains an
     # unsupported grouping identifier then we should report back the grouping
     # information for group number 1. Since right now we only support that
@@ -315,7 +316,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:send, respond_with_command}]
   end
 
-  defp handle_command(%Command{name: :multi_channel_association_set} = command, opts) do
+  defp handle_command(_node_id, %Command{name: :multi_channel_association_set} = command, opts) do
     associations_server = Keyword.get(opts, :associations_server, Associations)
     grouping_identifier = Command.param!(command, :grouping_identifier)
 
@@ -340,7 +341,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :multi_channel_association_remove} = command, opts) do
+  defp handle_command(_node_id, %Command{name: :multi_channel_association_remove} = command, opts) do
     associations_server = Keyword.get(opts, :associations_server, Associations)
     grouping_id = Command.param!(command, :grouping_identifier)
     nodes = Command.param!(command, :nodes)
@@ -390,7 +391,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :multi_command_encapsulated} = command, opts) do
+  defp handle_command(node_id, %Command{name: :multi_command_encapsulated} = command, opts) do
     commands = Command.param!(command, :commands)
 
     extra_commands = [
@@ -411,7 +412,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
     Enum.reduce(commands, [], fn cmd, actions ->
       if Enum.member?(extra_commands, cmd) do
-        new_actions = handle_command(cmd, opts)
+        new_actions = handle_command(node_id, cmd, opts)
         actions ++ new_actions
       else
         if cmd.name == :alarm_report do
@@ -423,7 +424,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end)
   end
 
-  defp handle_command(%Command{name: :version_command_class_get} = command, _opts) do
+  defp handle_command(_node_id, %Command{name: :version_command_class_get} = command, _opts) do
     command_class = Command.param!(command, :command_class)
 
     case VersionReports.version_report_for(command_class) do
@@ -435,7 +436,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
-  defp handle_command(%Command{name: :s2_resynchronization_event} = command, _opts) do
+  defp handle_command(_node_id, %Command{name: :s2_resynchronization_event} = command, _opts) do
     node_id = Command.param!(command, :node_id)
     reason = Command.param!(command, :reason)
 
@@ -448,7 +449,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     [{:notify, command}]
   end
 
-  defp handle_command(command, _opts), do: [{:notify, command}]
+  defp handle_command(_node_id, command, _opts), do: [{:notify, command}]
 
   defp make_supervision_report(%Command{name: :supervision_get} = command, status) do
     session_id = Command.param!(command, :session_id)

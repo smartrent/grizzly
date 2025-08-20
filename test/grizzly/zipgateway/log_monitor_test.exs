@@ -1,5 +1,5 @@
 defmodule Grizzly.ZIPGateway.LogMonitorTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Grizzly.ZIPGateway.{LogMonitor, SAPIMonitor}
 

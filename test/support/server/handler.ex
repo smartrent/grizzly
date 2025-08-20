@@ -7,13 +7,15 @@ defmodule GrizzlyTest.Server.Handler do
 
   alias Grizzly.SeqNumber
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
 
   alias Grizzly.ZWave.Commands.{
     ZIPPacket,
     ZIPKeepAlive,
     NodeListReport,
     SwitchBinaryReport,
+    LearnModeSetStatus,
     NodeAddDSKReport,
     NodeAddStatus,
     NodeAddKeysReport,
@@ -27,13 +29,77 @@ defmodule GrizzlyTest.Server.Handler do
 
   require Logger
 
+  def send_command(node_id, %Command{} = command) do
+    case lookup_node_connection(node_id) do
+      nil -> raise "No connection for node_id #{node_id}"
+      pid -> GenServer.call(pid, {:send_command, command})
+    end
+  end
+
+  def learn_mode_success(node_id) do
+    {:ok, cmd} =
+      LearnModeSetStatus.new(
+        seq_number: 1,
+        status: :done,
+        new_node_id: 5,
+        granted_keys: [:s2_access_control, :s0],
+        kex_fail_type: :none,
+        dsk: DSK.random()
+      )
+
+    send_command(node_id, cmd)
+  end
+
+  @spec add_node_status(Grizzly.node_id(), NMI.node_add_status(), [NodeAddStatus.param()]) :: :ok
+  def add_node_status(node_id, status, params \\ []) do
+    {:ok, cmd} =
+      [
+        seq_number: 1,
+        status: status,
+        node_id: if(status == :failed, do: 0, else: 15),
+        kex_fail_type: if(status == :security_failed, do: :decrypt, else: :none),
+        dsk: if(status == :done, do: DSK.random()),
+        listening?: true,
+        basic_device_class: :end_node,
+        generic_device_class: :entry_control,
+        specific_device_class: :secure_keypad_door_lock,
+        command_classes: [
+          non_secure_supported: [:basic, :meter],
+          non_secure_controlled: [],
+          secure_supported: [:alarm, :switch_binary],
+          secure_controlled: [:door_lock, :user_code]
+        ]
+      ]
+      |> Keyword.merge(params)
+      |> NodeAddStatus.new()
+
+    send_command(node_id, cmd)
+  end
+
+  @spec remove_node_status(Grizzly.node_id(), NodeRemoveStatus.status(), keyword()) :: :ok
+  def remove_node_status(node_id, status, params \\ []) do
+    {:ok, cmd} =
+      [seq_number: 1, status: status, node_id: if(status == :done, do: 15, else: 0)]
+      |> Keyword.merge(params)
+      |> NodeRemoveStatus.new()
+
+    send_command(node_id, cmd)
+  end
+
   @impl ThousandIsland.Handler
   def handle_connection(_socket, _state) do
     {:continue, %{node_id: nil, firmware_update_nack: true, commands_received: []}}
   end
 
+  @impl GenServer
+  def handle_call({:send_command, command}, _from, {socket, state}) do
+    wrap_and_send(socket, command)
+    {:reply, :ok, {socket, state}, socket.read_timeout}
+  end
+
   @impl ThousandIsland.Handler
   def handle_data(<<node_id::16, rest::binary>>, socket, %{node_id: nil} = state) do
+    _ = Registry.register(GrizzlyTest.Server.ConnectionRegistry, node_id, nil)
     handle_data(rest, socket, %{state | node_id: node_id})
   end
 
@@ -101,12 +167,21 @@ defmodule GrizzlyTest.Server.Handler do
           # this controller id is for testing happy S2 inclusion
           302 ->
             send_ack_response(socket, zip_packet)
-            handle_inclusion_packet(socket, zip_packet)
+
+            _ =
+              :timer.apply_after(100, __MODULE__, :handle_inclusion_packet, [socket, zip_packet])
+
             :ok
 
           # this controller id is for testing sad S2 inclusion
           303 ->
             :ok
+
+          # 350-359 do learn mode on the happy path
+          id when id in 350..359 ->
+            send_ack_response(socket, zip_packet)
+            Process.sleep(100)
+            handle_learn_mode_packet(socket, zip_packet)
 
           # async ignore all
           400 ->
@@ -137,6 +212,11 @@ defmodule GrizzlyTest.Server.Handler do
 
             {:ok, out_packet} = build_supervision_report(zip_packet, :success)
             send_packet(socket, out_packet)
+
+          # anything >=2000 acks incoming commands but does nothing else. use `send_command/2`
+          # to control them.
+          id when id >= 2000 ->
+            send_ack_response(socket, zip_packet)
 
           _rest ->
             send_ack_response(socket, zip_packet)
@@ -181,10 +261,10 @@ defmodule GrizzlyTest.Server.Handler do
         node_id: 15,
         status: :failed,
         listening?: true,
-        basic_device_class: 0x10,
-        generic_device_class: 0x12,
-        specific_device_class: 0x15,
-        command_classes: [0x34]
+        basic_device_class: :end_node,
+        generic_device_class: :entry_control,
+        specific_device_class: :secure_keypad_door_lock,
+        command_classes: []
       )
     end
   end
@@ -312,6 +392,25 @@ defmodule GrizzlyTest.Server.Handler do
     :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
     :ok
+  end
+
+  def handle_learn_mode_packet(socket, incoming_zip_packet) do
+    cmd = Command.param!(incoming_zip_packet, :command)
+
+    case {cmd.name, Command.param(cmd, :mode)} do
+      {:learn_mode_set, :disable} ->
+        {:ok, learn_mode_set_status} =
+          LearnModeSetStatus.new(
+            seq_number: 1,
+            status: :failed,
+            new_node_id: 0
+          )
+
+        wrap_and_send(socket, learn_mode_set_status)
+
+      {_, _} ->
+        :ok
+    end
   end
 
   def handle_inclusion_packet(socket, incoming_zip_packet) do
@@ -455,9 +554,9 @@ defmodule GrizzlyTest.Server.Handler do
       node_id: 15,
       status: :done,
       listening?: true,
-      basic_device_class: 0x10,
-      generic_device_class: 0x12,
-      specific_device_class: 0x15,
+      basic_device_class: :end_node,
+      generic_device_class: :entry_control,
+      specific_device_class: :secure_keypad_door_lock,
       command_classes: command_classes
     )
   end
@@ -505,9 +604,9 @@ defmodule GrizzlyTest.Server.Handler do
           node_id: 15,
           status: :done,
           listening?: true,
-          basic_device_class: 0x10,
-          generic_device_class: 0x12,
-          specific_device_class: 0x15,
+          basic_device_class: :end_node,
+          generic_device_class: :entry_control,
+          specific_device_class: :secure_keypad_door_lock,
           command_classes: command_classes,
           granted_keys: [:s2_unauthenticated],
           kex_fail_type: :none
@@ -519,9 +618,9 @@ defmodule GrizzlyTest.Server.Handler do
           node_id: 15,
           status: :done,
           listening?: true,
-          basic_device_class: 0x10,
-          generic_device_class: 0x12,
-          specific_device_class: 0x15,
+          basic_device_class: :end_node,
+          generic_device_class: :entry_control,
+          specific_device_class: :secure_keypad_door_lock,
           command_classes: command_classes,
           granted_keys: [:s2_authenticated],
           kex_fail_type: :none
@@ -593,5 +692,17 @@ defmodule GrizzlyTest.Server.Handler do
     end
 
     state
+  end
+
+  defp wrap_and_send(socket, command) do
+    {:ok, zip_packet} = ZIPPacket.with_zwave_command(command, SeqNumber.get_and_inc())
+    :ok = Socket.send(socket, ZWave.to_binary(zip_packet))
+  end
+
+  defp lookup_node_connection(node_id) do
+    case Registry.lookup(GrizzlyTest.Server.ConnectionRegistry, node_id) do
+      [{pid, _}] -> pid
+      [] -> nil
+    end
   end
 end
