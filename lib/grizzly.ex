@@ -38,8 +38,8 @@ defmodule Grizzly do
   """
 
   alias Grizzly.Commands.Table
+  alias Grizzly.Events
   alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
-  alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.{ZIPGateway, ZWave}
   alias Grizzly.ZWave.Commands.RssiReport
 
@@ -92,7 +92,9 @@ defmodule Grizzly do
 
   @type seq_number() :: non_neg_integer()
 
-  @type node_id() :: non_neg_integer()
+  @type zwave_node_id() :: non_neg_integer()
+  @type virtual_node_id() :: VirtualDevices.id()
+  @type node_id() :: zwave_node_id() | virtual_node_id()
 
   @typedoc """
   A custom handler for the command.
@@ -280,49 +282,50 @@ defmodule Grizzly do
     end
   end
 
+  @spec subscribe(Events.subject() | [Events.subject()], Events.subscribe_opts()) :: :ok
+  defdelegate subscribe(subject, opts \\ []), to: Events
+
   @doc """
   Subscribe to unsolicited events for the given command.
   """
+  @deprecated "Use `subscribe/2` instead"
   @spec subscribe_command(command()) :: :ok
-  defdelegate subscribe_command(command_name), to: Messages, as: :subscribe
+  def subscribe_command(command_name, opts \\ []), do: Events.subscribe(command_name, opts)
 
   @doc """
   Unsubscribe from an unsolicited event.
   """
+  @deprecated "Use `subscribe/2` instead"
   @spec unsubscribe_command(command()) :: :ok
-  defdelegate unsubscribe_command(command_name), to: Messages, as: :unsubscribe
+  def unsubscribe_command(command_name), do: Events.unsubscribe(command_name)
 
   @doc """
   Subscribe to unsolicited events for multiple commands.
   """
+  @deprecated "Use `subscribe/2` instead"
   @spec subscribe_commands([command()]) :: :ok
-  def subscribe_commands(command_names) do
-    Enum.each(command_names, &subscribe_command/1)
-  end
+  def subscribe_commands(command_names, opts \\ []), do: Events.subscribe(command_names, opts)
 
   @doc """
   Subscribe to all events from a particular Z-Wave device.
-
-  NOTE: Subscribers using both `subscribe_node` and `subscribe_command` **will**
-  receive duplicate messages.
   """
-  defdelegate subscribe_node(node_id), to: Messages
+  @deprecated "Use `subscribe/2` instead"
+  @spec subscribe_node(node_id()) :: :ok
+  def subscribe_node(node_id, opts \\ []), do: Events.subscribe(node_id, opts)
 
   @doc """
   Subscribe to all events from a group of Z-Wave devices.
-
-  NOTE: Subscribers using both `subscribe_node` and `subscribe_command` **will**
-  receive duplicate messages.
   """
-  @spec subscribe_nodes([node_id() | VirtualDevices.id()]) :: :ok
-  def subscribe_nodes(node_ids) do
-    Enum.each(node_ids, &subscribe_node/1)
-  end
+  @deprecated "Use `subscribe/2` instead"
+  @spec subscribe_nodes([node_id()]) :: :ok
+  def subscribe_nodes(node_ids, opts \\ []), do: Events.subscribe(node_ids, opts)
 
   @doc """
   Delete a subscription created with `subscribe_node/1`.
   """
-  defdelegate unsubscribe_node(node_id), to: Messages
+  @deprecated "Use `subscribe/2` instead"
+  @spec unsubscribe_node(node_id()) :: :ok
+  def unsubscribe_node(node_id), do: Events.unsubscribe(node_id)
 
   @doc """
   List all supported Z-Wave commands.

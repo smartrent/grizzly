@@ -5,7 +5,6 @@ defmodule Grizzly.VirtualDevices do
   Virtual devices are in-memory devices that act like a Z-Wave device
   """
 
-  alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.VirtualDevicesRegistry
   alias Grizzly.VirtualDevices.{Device, Reports}
   alias Grizzly.ZWave.Command
@@ -36,7 +35,7 @@ defmodule Grizzly.VirtualDevices do
   @typedoc """
   Id for a virtual device
   """
-  @type id() :: {:virtual, integer()}
+  @type id() :: {:virtual, non_neg_integer()}
 
   @type device_entry() :: %{
           device_impl: Device.t(),
@@ -95,7 +94,9 @@ defmodule Grizzly.VirtualDevices do
   """
   @spec broadcast_command(id(), Command.t()) :: :ok
   def broadcast_command(device_id, command) do
-    Messages.broadcast(device_id, command)
+    device_id
+    |> Grizzly.Report.unsolicited(command)
+    |> Grizzly.Events.broadcast_report()
   end
 
   @doc """
@@ -191,7 +192,9 @@ defmodule Grizzly.VirtualDevices do
             {:ok, Reports.build_ack_response(entry)}
 
           {:ok, command} ->
-            {:ok, Reports.build_report(entry, command)}
+            report = Reports.build_report(entry, command)
+            Grizzly.Events.broadcast_report(report)
+            {:ok, report}
 
           {:error, :timeout} ->
             {:error, Reports.build_timeout_report(entry.id)}

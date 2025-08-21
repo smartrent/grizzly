@@ -30,7 +30,7 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   @impl GenServer
   def init(args) do
-    Grizzly.subscribe_command(:node_list_report)
+    Grizzly.subscribe(:node_list_report)
 
     state = %{
       reporter: args[:status_reporter],
@@ -100,7 +100,7 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
         end
       end)
 
-    Grizzly.Events.broadcast(:ready, true)
+    Grizzly.Events.broadcast_event(:ready, true)
 
     %{state | ready?: true}
   end

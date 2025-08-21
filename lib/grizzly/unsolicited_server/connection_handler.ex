@@ -5,7 +5,6 @@ defmodule Grizzly.UnsolicitedServer.ConnectionHandler do
 
   alias Grizzly.Report
   alias Grizzly.SeqNumber
-  alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.UnsolicitedServer.ResponseHandler
   alias Grizzly.ZIPGateway
   alias Grizzly.ZWave
@@ -88,7 +87,9 @@ defmodule Grizzly.UnsolicitedServer.ConnectionHandler do
   end
 
   defp run_response_action({:notify, command}, _socket, _zip_packet, state) do
-    :ok = Messages.broadcast(state.node_id, command)
+    state.node_id
+    |> Report.unsolicited(command)
+    |> Grizzly.Events.broadcast_report()
   end
 
   defp run_response_action({:forward_to_controller, command}, socket, _zip_packet, state) do
