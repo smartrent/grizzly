@@ -32,7 +32,7 @@ defmodule GrizzlyTest.Utils do
       unsolicited_destination: {{127, 0, 0, 1}, 0},
       run_zipgateway: false,
       inclusion_handler: TestInclusionHandler,
-      inclusion_adapter: GrizzlyTest.InclusionAdapter
+      storage_adapter: {Grizzly.Storage.PropertyTable, Grizzly.Storage}
     ]
   end
 

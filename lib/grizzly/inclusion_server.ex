@@ -92,9 +92,9 @@ defmodule Grizzly.InclusionServer do
   @doc """
   Continues security bootstrapping for a node added by an inclusion controller.
   """
-  @spec continue_inclusion(Command.t()) :: :ok
-  def continue_inclusion(command) do
-    GenServer.call(__MODULE__, {:continue_inclusion, command})
+  @spec continue_inclusion(Grizzly.node_id(), Command.t()) :: :ok
+  def continue_inclusion(node_id, command) do
+    GenServer.call(__MODULE__, {:continue_inclusion, node_id, command})
   end
 
   @impl GenServer
@@ -170,7 +170,6 @@ defmodule Grizzly.InclusionServer do
   @impl GenServer
   def handle_call({:add_node, opts}, _from, state) do
     with :idle <- StatusServer.get(),
-         :ok <- state.adapter.connect(1),
          {:ok, new_adapter_state} <- state.adapter.add_node(state.adapter_state, opts) do
       state =
         state
@@ -186,7 +185,6 @@ defmodule Grizzly.InclusionServer do
 
   def handle_call({:remove_node, opts}, _from, state) do
     with :idle <- StatusServer.get(),
-         :ok <- state.adapter.connect(1),
          {:ok, new_adapter_state} <- state.adapter.remove_node(state.adapter_state, opts) do
       state =
         state
@@ -273,9 +271,8 @@ defmodule Grizzly.InclusionServer do
     end
   end
 
-  def handle_call({:continue_inclusion, %Command{} = command}, _from, state) do
-    state.adapter.connect(1)
-    {_, state} = handle_report(command, state)
+  def handle_call({:continue_inclusion, node_id, %Command{} = command}, _from, state) do
+    {_, state} = handle_report(command, node_id, state)
     {:reply, :ok, state}
   end
 
@@ -292,8 +289,11 @@ defmodule Grizzly.InclusionServer do
     {:noreply, state}
   end
 
-  def handle_info({:grizzly, :report, %Report{type: :command, command: command}}, state) do
-    handle_report(command, state)
+  def handle_info(
+        {:grizzly, :report, %Report{type: :command, command: command, node_id: node_id}},
+        state
+      ) do
+    handle_report(command, node_id, state)
   end
 
   def handle_info({:grizzly, :report, %Report{type: :timeout, command_ref: command_ref}}, state) do
@@ -307,8 +307,8 @@ defmodule Grizzly.InclusionServer do
     {:noreply, %{new_state | adapter_state: new_adapter_state}}
   end
 
-  def handle_report(%Command{name: :node_remove_status} = command, state) do
-    report = Report.new(:complete, :command, 1, command: command)
+  def handle_report(%Command{name: :node_remove_status} = command, node_id, state) do
+    report = Report.new(:complete, :command, node_id, command: command)
     send_to_handler(state, report)
 
     state =
@@ -319,9 +319,9 @@ defmodule Grizzly.InclusionServer do
     {:noreply, state}
   end
 
-  def handle_report(%Command{name: name} = command, state)
+  def handle_report(%Command{name: name} = command, node_id, state)
       when name in [:node_add_status, :extended_node_add_status] do
-    report = Report.new(:complete, :command, 1, command: command)
+    report = Report.new(:complete, :command, node_id, command: command)
     send_to_handler(state, report)
 
     state =
@@ -332,8 +332,8 @@ defmodule Grizzly.InclusionServer do
     {:noreply, state}
   end
 
-  def handle_report(%Command{name: :learn_mode_set_status} = command, state) do
-    report = Report.new(:complete, :command, 1, command: command)
+  def handle_report(%Command{name: :learn_mode_set_status} = command, node_id, state) do
+    report = Report.new(:complete, :command, node_id, command: command)
     send_to_handler(state, report)
 
     state =
@@ -344,8 +344,8 @@ defmodule Grizzly.InclusionServer do
     {:noreply, state}
   end
 
-  def handle_report(%Command{name: :node_add_keys_report} = command, state) do
-    report = Report.new(:complete, :command, 1, command: command)
+  def handle_report(%Command{name: :node_add_keys_report} = command, node_id, state) do
+    report = Report.new(:complete, :command, node_id, command: command)
     send_to_handler(state, report)
 
     state = set_status(state, :waiting_s2_keys)
@@ -353,10 +353,10 @@ defmodule Grizzly.InclusionServer do
     {:noreply, state}
   end
 
-  def handle_report(%Command{name: :node_add_dsk_report} = command, state) do
+  def handle_report(%Command{name: :node_add_dsk_report} = command, node_id, state) do
     requested_length = Command.param!(command, :input_dsk_length)
 
-    report = Report.new(:complete, :command, 1, command: command)
+    report = Report.new(:complete, :command, node_id, command: command)
     send_to_handler(state, report)
 
     state = set_status(state, :waiting_dsk)
@@ -367,8 +367,6 @@ defmodule Grizzly.InclusionServer do
   end
 
   defp run_remove_node_stop(state) do
-    :ok = state.adapter.connect(1)
-
     case state.adapter.remove_node_stop(state.adapter_state) do
       {:ok, new_adapter_state} ->
         state = set_status(state, :node_remove_stopping)
@@ -380,8 +378,6 @@ defmodule Grizzly.InclusionServer do
   end
 
   defp run_learn_mode_stop(state) do
-    :ok = state.adapter.connect(1)
-
     case state.adapter.learn_mode_stop(state.adapter_state) do
       {:ok, new_adapter_state} ->
         state = set_status(state, :learn_mode_stopping)
@@ -393,8 +389,6 @@ defmodule Grizzly.InclusionServer do
   end
 
   defp run_add_node_stop(state) do
-    :ok = state.adapter.connect(1)
-
     case state.adapter.add_node_stop(state.adapter_state) do
       {:ok, new_adapter_state} ->
         state = set_status(state, :node_add_stopping)

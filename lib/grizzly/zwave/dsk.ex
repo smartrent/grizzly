@@ -222,6 +222,14 @@ defmodule Grizzly.ZWave.DSK do
   end
 
   @doc """
+  Generate a random DSK.
+  """
+  @spec random() :: t()
+  def random() do
+    %__MODULE__{raw: :crypto.strong_rand_bytes(16)}
+  end
+
+  @doc """
   Extracts the NWI Home ID (the Home ID used by a SmartStart device when it is
   not yet included in a network) from the DSK.
 

@@ -19,11 +19,6 @@ defmodule Grizzly.Inclusions.NetworkAdapter do
   @callback init() :: {:ok, state()}
 
   @doc """
-  Establish any a connection the including device id
-  """
-  @callback connect(Grizzly.ZWave.node_id()) :: :ok
-
-  @doc """
   Start the inclusion process
   """
   @callback add_node(state(), [Inclusions.opt()]) :: {:ok, state()}

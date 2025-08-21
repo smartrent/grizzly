@@ -34,7 +34,7 @@ defmodule Grizzly.UnsolicitedServer.ConnectionHandler do
 
     case Grizzly.ZWave.from_binary(data) do
       {:ok, zip_packet} ->
-        actions = ResponseHandler.handle_response(zip_packet)
+        actions = ResponseHandler.handle_response(node_id, zip_packet)
         Enum.each(actions, &run_response_action(&1, socket, zip_packet, state))
 
         {:continue, state}

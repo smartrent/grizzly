@@ -40,24 +40,26 @@ defmodule Grizzly.InclusionsTest do
     end
   end
 
-  @tag skip: "Flaky"
   test "remove a node" do
-    :ok = Inclusions.remove_node()
+    :ok = Inclusions.remove_node(controller_id: 2000)
 
+    Process.sleep(10)
     assert :node_removing = Inclusions.status()
 
+    GrizzlyTest.Server.Handler.remove_node_status(2000, :done)
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
     assert command.name == :node_remove_status
     assert Command.param!(command, :status) == :done
 
+    Process.sleep(10)
     assert Inclusions.status() == :idle
   end
 
-  @tag skip: "Flaky"
   test "remove a node then stop it" do
-    :ok = Inclusions.remove_node()
+    :ok = Inclusions.remove_node(controller_id: 301)
 
+    Process.sleep(10)
     assert :node_removing = Inclusions.status()
 
     :ok = Inclusions.remove_node_stop()
@@ -67,27 +69,30 @@ defmodule Grizzly.InclusionsTest do
     assert command.name == :node_remove_status
     assert Command.param!(command, :status) == :failed
 
+    Process.sleep(10)
     assert Inclusions.status() == :idle
   end
 
-  @tag skip: "Flaky"
   test "add device" do
-    :ok = Inclusions.add_node()
+    :ok = Inclusions.add_node(controller_id: 2001)
 
+    Process.sleep(10)
     assert :node_adding == Inclusions.status()
 
+    GrizzlyTest.Server.Handler.add_node_status(2001, :done)
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
     assert command.name == :node_add_status
     assert Command.param!(command, :status) == :done
 
+    Process.sleep(10)
     assert Inclusions.status() == :idle
   end
 
-  @tag skip: "Flaky"
   test "start add device process then stop it" do
-    :ok = Inclusions.add_node()
+    :ok = Inclusions.add_node(controller_id: 301)
 
+    Process.sleep(10)
     assert :node_adding = Inclusions.status()
 
     :ok = Inclusions.add_node_stop()
@@ -97,27 +102,30 @@ defmodule Grizzly.InclusionsTest do
     assert command.name == :node_add_status
     assert Command.param!(command, :status) == :failed
 
+    Process.sleep(10)
     assert Inclusions.status() == :idle
   end
 
-  @tag skip: "Flaky"
   test "start learn mode" do
-    :ok = Inclusions.learn_mode()
+    :ok = Inclusions.learn_mode(controller_id: 350)
 
+    Process.sleep(10)
     assert :learn_mode = Inclusions.status()
 
+    GrizzlyTest.Server.Handler.learn_mode_success(350)
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
     assert command.name == :learn_mode_set_status
     assert Command.param!(command, :status) == :done
 
+    Process.sleep(10)
     assert Inclusions.status() == :idle
   end
 
-  @tag skip: "Flaky"
   test "start learn mode and stop it" do
-    :ok = Inclusions.learn_mode()
+    :ok = Inclusions.learn_mode(controller_id: 351)
 
+    Process.sleep(10)
     assert :learn_mode = Inclusions.status()
 
     :ok = Inclusions.learn_mode_stop()
@@ -127,19 +135,21 @@ defmodule Grizzly.InclusionsTest do
     assert command.name == :learn_mode_set_status
     assert Command.param!(command, :status) == :failed
 
+    Process.sleep(10)
     assert Inclusions.status() == :idle
   end
 
-  @tag skip: "Flaky"
   test "S2 inclusion" do
-    :ok = Inclusions.add_node(s2: true)
+    :ok = Inclusions.add_node(s2: true, controller_id: 302)
 
+    Process.sleep(10)
     assert :node_adding = Inclusions.status()
 
     assert_receive {:grizzly, :report, %Report{type: :command, command: node_add_keys_report}},
                    1_000
 
     assert node_add_keys_report.name == :node_add_keys_report
+    Process.sleep(10)
     assert :waiting_s2_keys = Inclusions.status()
 
     :ok = Inclusions.grant_keys([:s2_unauthenticated])
@@ -148,29 +158,31 @@ defmodule Grizzly.InclusionsTest do
 
     assert dsk_report.name == :node_add_dsk_report
     assert %DSK{} = Command.param!(dsk_report, :dsk)
+    Process.sleep(10)
     assert :waiting_dsk == Inclusions.status()
 
-    :ok = Inclusions.set_input_dsk()
+    {:ok, pin} = DSK.parse_pin("12345")
+    :ok = Inclusions.set_input_dsk(pin)
 
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
+    Process.sleep(10)
     assert command.name == :node_add_status
     assert Command.param!(command, :status) == :done
   end
 
-  @tag skip: "Flaky"
   test "S2 inclusions with handler" do
     :ok = Inclusions.add_node(s2: true, handler: {TestHandler, test_pid: self()})
 
     assert_receive %Grizzly.ZWave.Command{name: :node_add_status}, 1_500
   end
 
-  @tag skip: "Flaky"
   test "crashing inclusion should return server back into idle state" do
-    :ok = Inclusions.add_node()
+    :ok = Inclusions.add_node(controller_id: 302)
 
     inclusions_pid = Process.whereis(Grizzly.InclusionServer)
 
+    Process.sleep(10)
     assert :node_adding = Inclusions.status()
 
     Process.exit(inclusions_pid, :kill)
@@ -179,12 +191,12 @@ defmodule Grizzly.InclusionsTest do
     assert :idle == Inclusions.status()
   end
 
-  @tag skip: "Flaky"
   test "crashing exclusion should return server back into idle state" do
-    :ok = Inclusions.remove_node()
+    :ok = Inclusions.remove_node(controller_id: 301)
 
     inclusions_pid = Process.whereis(Grizzly.InclusionServer)
 
+    Process.sleep(10)
     assert :node_removing = Inclusions.status()
 
     Process.exit(inclusions_pid, :kill)

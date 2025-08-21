@@ -1,4 +1,6 @@
 # Start the mock Z/IP Gateway server
+Registry.start_link(keys: :unique, name: GrizzlyTest.Server.ConnectionRegistry)
+
 {:ok, test_server} =
   ThousandIsland.start_link(
     handler_module: GrizzlyTest.Server.Handler,

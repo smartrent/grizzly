@@ -310,8 +310,8 @@ defmodule Grizzly.Inclusions do
   @doc """
   Continues security bootstrapping for a node added by an inclusion controller.
   """
-  @spec continue_inclusion(Command.t()) :: :ok
-  def continue_inclusion(command) do
-    InclusionServer.continue_inclusion(command)
+  @spec continue_inclusion(Grizzly.node_id(), Command.t()) :: :ok
+  def continue_inclusion(node_id, command) do
+    InclusionServer.continue_inclusion(node_id, command)
   end
 end
