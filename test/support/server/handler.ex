@@ -167,11 +167,7 @@ defmodule GrizzlyTest.Server.Handler do
           # this controller id is for testing happy S2 inclusion
           302 ->
             send_ack_response(socket, zip_packet)
-
-            _ =
-              :timer.apply_after(100, __MODULE__, :handle_inclusion_packet, [socket, zip_packet])
-
-            :ok
+            :timer.apply_after(100, __MODULE__, :handle_inclusion_packet, [socket, zip_packet])
 
           # this controller id is for testing sad S2 inclusion
           303 ->
@@ -180,8 +176,7 @@ defmodule GrizzlyTest.Server.Handler do
           # 350-359 do learn mode on the happy path
           id when id in 350..359 ->
             send_ack_response(socket, zip_packet)
-            Process.sleep(100)
-            handle_learn_mode_packet(socket, zip_packet)
+            :timer.apply_after(100, __MODULE__, :handle_learn_mode_packet, [socket, zip_packet])
 
           # async ignore all
           400 ->
@@ -203,7 +198,6 @@ defmodule GrizzlyTest.Server.Handler do
           # before the final supervision report
           700 ->
             send_ack_response(socket, zip_packet)
-
             {:ok, out_packet} = build_supervision_report(zip_packet, :working)
             send_packet(socket, out_packet)
 
