@@ -160,7 +160,7 @@ defmodule Grizzly.Report do
           transmission_stats: [transmission_stat()],
           queued_delay: non_neg_integer(),
           command_ref: reference() | nil,
-          node_id: ZWave.node_id() | VirtualDevices.id(),
+          node_id: Grizzly.node_id(),
           queued: boolean()
         }
 
@@ -253,5 +253,17 @@ defmodule Grizzly.Report do
       queued: Keyword.get(opts, :queued, false),
       acknowledged: Keyword.get(opts, :acknowledged, false)
     }
+  end
+
+  @doc false
+  @spec unsolicited(Grizzly.node_id(), Command.t(), [opt()]) :: t()
+  def unsolicited(node_id, %Command{} = command, opts \\ []) do
+    new(:complete, :unsolicited, node_id, Keyword.merge(opts, command: command))
+  end
+
+  @doc false
+  @spec command(Grizzly.node_id(), Command.t(), [opt()]) :: t()
+  def command(node_id, %Command{} = command, opts \\ []) do
+    new(:complete, :command, node_id, Keyword.merge(opts, command: command))
   end
 end

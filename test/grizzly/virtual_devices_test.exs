@@ -4,7 +4,6 @@ defmodule Grizzly.VirtualDeviceTest do
   import ExUnit.CaptureLog
 
   alias Grizzly.{Node, Report, VirtualDevices}
-  alias Grizzly.UnsolicitedServer.Messages
   alias Grizzly.VirtualDevices.{TemperatureSensor, Thermostat}
   alias Grizzly.ZWave.Command
 
@@ -124,8 +123,7 @@ defmodule Grizzly.VirtualDeviceTest do
 
     Thermostat.set_device_id(pid, device_id)
 
-    Messages.subscribe(:sensor_multilevel_report)
-    on_exit(fn -> Messages.unsubscribe(:sensor_multilevel_report) end)
+    Grizzly.subscribe(:sensor_multilevel_report)
 
     assert_receive {:grizzly, :report, report}, 500
 

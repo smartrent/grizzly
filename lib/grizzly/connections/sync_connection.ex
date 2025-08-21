@@ -216,10 +216,12 @@ defmodule Grizzly.Connections.SyncConnection do
 
         {waiter, {%Report{} = report, new_command_list}} when is_pid(waiter) ->
           send(waiter, {:grizzly, :report, report})
+          Grizzly.Events.broadcast_report(report)
           %State{state | commands: new_command_list}
 
         {waiter, {%Report{} = report, new_command_list}} ->
           GenServer.reply(waiter, {:ok, report})
+          Grizzly.Events.broadcast_report(report)
           %State{state | commands: new_command_list}
       end
 
