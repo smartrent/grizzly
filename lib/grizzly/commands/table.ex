@@ -77,7 +77,7 @@ defmodule Grizzly.Commands.Table do
        handler: {WaitReport, complete_report: :failed_node_replace_status}},
     node_info_cached_get:
       {Commands.NodeInfoCachedGet,
-       handler: {WaitReport, complete_report: :node_info_cache_report}},
+       handler: {WaitReport, complete_report: :node_info_cached_report}},
     node_remove:
       {Commands.NodeRemove, handler: {WaitReport, complete_report: :node_remove_status}},
     failed_node_remove:

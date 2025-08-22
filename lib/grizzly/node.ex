@@ -25,7 +25,7 @@ defmodule Grizzly.Node do
   @doc """
   Get the information for a node by its id
 
-  The response to this command is the `NodeInfoCacheReport` command
+  The response to this command is the `NodeInfoCachedReport` command
   """
   @spec get_info(ZWave.node_id() | VirtualDevices.id(), [info_opt() | opt()]) ::
           Grizzly.send_command_response()
