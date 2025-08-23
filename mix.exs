@@ -15,7 +15,7 @@ defmodule Grizzly.MixProject do
       description: description(),
       package: package(),
       docs: docs(),
-      preferred_cli_env: [docs: :docs, "hex.publish": :docs, dialyzer: :test],
+      preferred_cli_env: ["hex.publish": :docs, dialyzer: :test],
       xref: [exclude: EEx]
     ]
   end

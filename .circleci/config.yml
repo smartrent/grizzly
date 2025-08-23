@@ -47,10 +47,10 @@ jobs:
       - <<: *install_hex_rebar
       - <<: *install_system_deps
       - restore_tagged_cache:
-          prefix: v2-mix-cache-<< parameters.image-tag >>
+          prefix: v3-mix-cache-<< parameters.image-tag >>
       - run: mix do deps.get, compile --warnings-as-errors
       - save_cache:
-          key: v2-mix-cache-<< parameters.image-tag >>-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: v3-mix-cache-<< parameters.image-tag >>-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build
             - deps
@@ -64,7 +64,7 @@ jobs:
       - <<: *install_hex_rebar
       - <<: *install_system_deps
       - restore_tagged_cache:
-          prefix: v2-mix-cache-<< parameters.image-tag >>
+          prefix: v3-mix-cache-<< parameters.image-tag >>
       - run: mix deps.unlock --check-unused
       - run: mix format --check-formatted
       - run: mix credo -a
@@ -80,7 +80,7 @@ jobs:
       - <<: *install_hex_rebar
       - <<: *install_system_deps
       - restore_tagged_cache:
-          prefix: v2-mix-cache-<< parameters.image-tag >>
+          prefix: v3-mix-cache-<< parameters.image-tag >>
       - restore_tagged_cache:
           prefix: v2-dialyzer-cache-<< parameters.image-tag >>
       - run: mix dialyzer
@@ -99,7 +99,7 @@ jobs:
       - <<: *install_hex_rebar
       - <<: *install_system_deps
       - restore_tagged_cache:
-          prefix: v2-mix-cache-<< parameters.image-tag >>
+          prefix: v3-mix-cache-<< parameters.image-tag >>
       - run: MIX_TEST_PARTITION="$((${CIRCLE_NODE_INDEX}+1))" mix test --partitions $CIRCLE_NODE_TOTAL
       - store_test_results:
           path: test-junit-report.xml
