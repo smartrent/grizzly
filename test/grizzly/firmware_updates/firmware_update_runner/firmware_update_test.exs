@@ -5,11 +5,11 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
   alias Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Commands.{
-    FirmwareUpdateMDRequestReport,
-    FirmwareUpdateMDGet,
-    FirmwareUpdateMDStatusReport,
     FirmwareMDReport,
-    FirmwareUpdateActivationReport
+    FirmwareUpdateActivationReport,
+    FirmwareUpdateMDGet,
+    FirmwareUpdateMDRequestReport,
+    FirmwareUpdateMDStatusReport
   }
 
   setup do

@@ -1,8 +1,8 @@
 defmodule Grizzly.Commands.CommandTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.Report
   alias Grizzly.Commands.Command
+  alias Grizzly.Report
 
   alias Grizzly.ZWave.CommandClasses.ZIP
 

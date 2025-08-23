@@ -2,8 +2,8 @@ defmodule Grizzly.CommandHandlers.AggregateReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.CommandHandlers.AggregateReport
-  alias Grizzly.ZWave.Commands.{AssociationReport, SwitchBinaryReport}
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.{AssociationReport, SwitchBinaryReport}
 
   test "when the waiting report has no reports to follow" do
     {:ok, state} =

@@ -1,4 +1,6 @@
 defmodule Grizzly.VirtualDeviceCase do
+  @moduledoc false
+
   use ExUnit.CaseTemplate
 
   using do

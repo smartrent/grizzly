@@ -3,6 +3,7 @@ defmodule Grizzly.InclusionsTest do
 
   alias Grizzly.{Inclusions, Report}
   alias Grizzly.ZWave.{Command, DSK}
+  alias GrizzlyTest.Server.Handler
 
   @moduletag :inclusion
 
@@ -46,7 +47,7 @@ defmodule Grizzly.InclusionsTest do
     Process.sleep(10)
     assert :node_removing = Inclusions.status()
 
-    GrizzlyTest.Server.Handler.remove_node_status(2000, :done)
+    Handler.remove_node_status(2000, :done)
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
     assert command.name == :node_remove_status
@@ -79,7 +80,7 @@ defmodule Grizzly.InclusionsTest do
     Process.sleep(10)
     assert :node_adding == Inclusions.status()
 
-    GrizzlyTest.Server.Handler.add_node_status(2001, :done)
+    Handler.add_node_status(2001, :done)
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
     assert command.name == :node_add_status
@@ -112,7 +113,7 @@ defmodule Grizzly.InclusionsTest do
     Process.sleep(10)
     assert :learn_mode = Inclusions.status()
 
-    GrizzlyTest.Server.Handler.learn_mode_success(350)
+    Handler.learn_mode_success(350)
     assert_receive {:grizzly, :report, %Report{type: :command, command: command}}, 1_000
 
     assert command.name == :learn_mode_set_status

@@ -11,20 +11,20 @@ defmodule GrizzlyTest.Server.Handler do
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
 
   alias Grizzly.ZWave.Commands.{
-    ZIPPacket,
-    ZIPKeepAlive,
-    NodeListReport,
-    SwitchBinaryReport,
+    FirmwareUpdateMDGet,
+    FirmwareUpdateMDRequestReport,
+    FirmwareUpdateMDStatusReport,
     LearnModeSetStatus,
     NodeAddDSKReport,
-    NodeAddStatus,
     NodeAddKeysReport,
+    NodeAddStatus,
+    NodeListReport,
     NodeRemoveStatus,
-    FirmwareUpdateMDRequestReport,
-    FirmwareUpdateMDGet,
-    FirmwareUpdateMDStatusReport,
     SupervisionReport,
-    VersionCommandClassReport
+    SwitchBinaryReport,
+    VersionCommandClassReport,
+    ZIPKeepAlive,
+    ZIPPacket
   }
 
   require Logger
@@ -451,7 +451,7 @@ defmodule GrizzlyTest.Server.Handler do
     case Command.param!(command, :granted_keys) do
       [:s2_unauthenticated] ->
         seq_number = SeqNumber.get_and_inc()
-        {:ok, dsk} = Grizzly.ZWave.DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
+        {:ok, dsk} = DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
 
         {:ok, dsk_report} =
           NodeAddDSKReport.new(
@@ -467,7 +467,7 @@ defmodule GrizzlyTest.Server.Handler do
 
       [:s2_authenticated] ->
         seq_number = SeqNumber.get_and_inc()
-        {:ok, dsk} = Grizzly.ZWave.DSK.parse("00000-18819-09924-30691-15973-33711-04005-03623")
+        {:ok, dsk} = DSK.parse("00000-18819-09924-30691-15973-33711-04005-03623")
 
         {:ok, dsk_report} =
           NodeAddDSKReport.new(

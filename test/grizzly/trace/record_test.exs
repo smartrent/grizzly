@@ -1,9 +1,9 @@
 defmodule Grizzly.Trace.RecordTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.Trace.Record
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands.{SwitchBinarySet, ZIPPacket}
-  alias Grizzly.Trace.Record
 
   test "generate string log" do
     {:ok, encapsulated_command} = SwitchBinarySet.new(target_value: :on)

@@ -1,8 +1,8 @@
 defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGetTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet
 
   test "creates the command and validates params" do
     {:ok, command} =

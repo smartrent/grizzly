@@ -1,8 +1,8 @@
 defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport
 
   test "creates the command and validates params" do
     {:ok, command} = FirmwareUpdateMDRequestReport.new(status: :insufficient_battery_level)

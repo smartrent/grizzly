@@ -26,15 +26,12 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReportTest do
 
     {:ok, command} = ZwaveplusInfoReport.new(params)
 
-    expected_binary =
-      <<0x02, 0x00, 0x00, 0x0100::size(16)-integer-unsigned, 0x0500::size(16)-integer-unsigned>>
-
+    expected_binary = <<0x02, 0x00, 0x00, 0x0100::16, 0x0500::16>>
     assert expected_binary == ZwaveplusInfoReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    binary_params =
-      <<0x02, 0x00, 0x00, 0x0100::size(16)-integer-unsigned, 0x0500::size(16)-integer-unsigned>>
+    binary_params = <<0x02, 0x00, 0x00, 0x0100::16, 0x0500::16>>
 
     {:ok, params} = ZwaveplusInfoReport.decode_params(binary_params)
     assert Keyword.get(params, :zwaveplus_version) == 2

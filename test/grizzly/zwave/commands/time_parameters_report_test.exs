@@ -11,12 +11,12 @@ defmodule Grizzly.ZWave.Commands.TimeParametersReportTest do
   test "encodes params correctly" do
     params = [year: 2020, month: 7, day: 17, hour_utc: 14, minute_utc: 30, second_utc: 45]
     {:ok, command} = TimeParametersReport.new(params)
-    expected_binary = <<2020::size(16)-integer-unsigned, 7, 17, 14, 30, 45>>
+    expected_binary = <<2020::16, 7, 17, 14, 30, 45>>
     assert expected_binary == TimeParametersReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    params_binary = <<2020::size(16)-integer-unsigned, 7, 17, 14, 30, 45>>
+    params_binary = <<2020::16, 7, 17, 14, 30, 45>>
     {:ok, params} = TimeParametersReport.decode_params(params_binary)
     assert 2020 == Keyword.get(params, :year)
     assert 7 == Keyword.get(params, :month)

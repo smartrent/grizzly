@@ -1,8 +1,8 @@
 defmodule Grizzly.Commands.CommandRunnerTest do
   use ExUnit.Case
 
-  alias Grizzly.{SeqNumber, Report}
   alias Grizzly.Commands.CommandRunner
+  alias Grizzly.{Report, SeqNumber}
   alias Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Commands.{

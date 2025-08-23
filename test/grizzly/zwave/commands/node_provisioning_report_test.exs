@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.NodeProvisioningReport
+  alias Grizzly.ZWave.DSK
   alias GrizzlyTest.Utils
 
   test "creates the command and validates params" do
@@ -57,7 +58,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
 
     {:ok, params} = NodeProvisioningReport.decode_params(binary_params)
     assert Keyword.get(params, :seq_number) == 1
-    assert Keyword.get(params, :dsk) == Grizzly.ZWave.DSK.zeros()
+    assert Keyword.get(params, :dsk) == DSK.zeros()
     assert Keyword.get(params, :meta_extensions) == []
   end
 end
