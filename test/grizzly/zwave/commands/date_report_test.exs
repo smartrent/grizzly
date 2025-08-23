@@ -11,12 +11,12 @@ defmodule Grizzly.ZWave.Commands.DateReportTest do
   test "encodes params correctly" do
     params = [year: 2020, month: 7, day: 16]
     {:ok, command} = DateReport.new(params)
-    expected_binary = <<2020::size(16)-integer-unsigned, 7, 16>>
+    expected_binary = <<2020::16, 7, 16>>
     assert expected_binary == DateReport.encode_params(command)
   end
 
   test "decodes params correctly" do
-    params_binary = <<2020::size(16)-integer-unsigned, 7, 16>>
+    params_binary = <<2020::16, 7, 16>>
     {:ok, params} = DateReport.decode_params(params_binary)
     assert Keyword.get(params, :year) == 2020
     assert Keyword.get(params, :month) == 7

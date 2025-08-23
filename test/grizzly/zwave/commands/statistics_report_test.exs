@@ -44,8 +44,8 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
         <<0x06, 0x00::1, 0x00::2, 0x02::5>>
 
     packet_error_count = <<0x03, 0x01, 0x05>>
-    sum_of_transmission_times = <<0x04, 0x04, 12::integer-unsigned-unit(8)-size(4)>>
-    sum_of_transmission_times_squared = <<0x05, 0x04, 144::integer-unsigned-unit(8)-size(4)>>
+    sum_of_transmission_times = <<0x04, 0x04, 12::32>>
+    sum_of_transmission_times_squared = <<0x05, 0x04, 144::32>>
 
     expected_binary =
       <<0x04>> <>
@@ -67,8 +67,8 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
         <<0x05, 0x01::1, 0x00::2, 0x03::5>> <>
         <<0x06, 0x00::1, 0x00::2, 0x08::5>>
 
-    sum_of_transmission_times = <<0x04, 0x04, 12::integer-unsigned-unit(8)-size(4)>>
-    sum_of_transmission_times_squared = <<0x05, 0x04, 144::integer-unsigned-unit(8)-size(4)>>
+    sum_of_transmission_times = <<0x04, 0x04, 12::32>>
+    sum_of_transmission_times_squared = <<0x05, 0x04, 144::32>>
 
     params_binary =
       <<0x04>> <>

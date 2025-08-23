@@ -2,8 +2,8 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.VersionCommandClassReport
   alias Grizzly.ZWave.CommandClasses.Version
+  alias Grizzly.ZWave.Commands.VersionCommandClassReport
 
   test "creates the command and validates params" do
     assert {:ok,

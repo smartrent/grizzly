@@ -1,8 +1,8 @@
 defmodule Grizzly.ZWave.Commands.NodeAddDSKSetTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.Commands.NodeAddDSKSet
+  alias Grizzly.ZWave.DSK
 
   test "creates the command and validates params" do
     {:ok, dsk} = DSK.parse("46411")

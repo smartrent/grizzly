@@ -6,6 +6,7 @@ defmodule GrizzlyTest.Transport.DTLS do
   @behaviour Grizzly.Transport
 
   alias Grizzly.Transport
+  alias Grizzly.Transports.DTLS
   require Logger
 
   @handshake_timeout Application.compile_env(:grizzly, :dtls_handshake_timeout, 10_000)
@@ -14,7 +15,7 @@ defmodule GrizzlyTest.Transport.DTLS do
   def open(args) do
     args = Keyword.put(args, :ip_address, {127, 0, 0, 1})
 
-    with {:ok, transport} <- Grizzly.Transports.DTLS.open(args, {127, 0, 0, 1}),
+    with {:ok, transport} <- DTLS.open(args, {127, 0, 0, 1}),
          socket = Transport.get(transport, :socket),
          node_id = Transport.get(transport, :node_id),
          :ok <- :ssl.send(socket, <<node_id::16>>) do
@@ -24,26 +25,26 @@ defmodule GrizzlyTest.Transport.DTLS do
   end
 
   @impl Grizzly.Transport
-  defdelegate send(transport, binary, opts), to: Grizzly.Transports.DTLS
+  defdelegate send(transport, binary, opts), to: DTLS
 
   @impl Grizzly.Transport
-  defdelegate parse_response(response, opts), to: Grizzly.Transports.DTLS
+  defdelegate parse_response(response, opts), to: DTLS
 
   @impl Grizzly.Transport
-  defdelegate close(transport), to: Grizzly.Transports.DTLS
+  defdelegate close(transport), to: DTLS
 
   @impl Grizzly.Transport
   def listen(transport) do
-    with {:ok, transport, opts} <- Grizzly.Transports.DTLS.listen(transport) do
+    with {:ok, transport, opts} <- DTLS.listen(transport) do
       transport = Transport.put(transport, :type, :server)
       {:ok, transport, opts}
     end
   end
 
   @impl Grizzly.Transport
-  defdelegate accept(transport), to: Grizzly.Transports.DTLS
+  defdelegate accept(transport), to: DTLS
   @impl Grizzly.Transport
-  defdelegate peername(transport), to: Grizzly.Transports.DTLS
+  defdelegate peername(transport), to: DTLS
 
   @impl Grizzly.Transport
   def handshake(transport) do

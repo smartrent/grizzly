@@ -1,8 +1,9 @@
 defmodule Grizzly.Commands.TableTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.Commands.Table
   alias Grizzly.CommandHandlers.WaitReport
+  alias Grizzly.Commands.Table
+  alias Grizzly.ZWave.DSK
 
   # There was a good reason for this exception at one point, but I don't remember
   # what it was. :shrug:
@@ -60,7 +61,7 @@ defmodule Grizzly.Commands.TableTest do
       if Code.ensure_loaded?(mod) && function_exported?(mod, :new, 1) do
         # most command modules don't validate anything in new/1, but some do, so
         # we provide valid arguments for those here
-        {:ok, cmd} = mod.new(seq_number: 0, dsk: Grizzly.ZWave.DSK.zeros())
+        {:ok, cmd} = mod.new(seq_number: 0, dsk: DSK.zeros())
         cmd.name == command_name
       else
         false

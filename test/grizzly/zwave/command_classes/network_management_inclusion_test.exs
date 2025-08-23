@@ -1,8 +1,8 @@
 defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusionTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.DSK
 
   describe "parsing node add status" do
     test "when status is done" do

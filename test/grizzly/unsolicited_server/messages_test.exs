@@ -2,8 +2,8 @@ defmodule Grizzly.UnsolicitedServer.MessagesTest do
   use ExUnit.Case
 
   alias Grizzly.Report
-  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, ZIPPacket}
   alias Grizzly.UnsolicitedServer.Messages
+  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, ZIPPacket}
 
   test "can subscribe and receive messages" do
     {:ok, receiving_command} = SwitchBinaryGet.new()

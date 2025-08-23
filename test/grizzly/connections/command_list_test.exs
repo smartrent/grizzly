@@ -1,10 +1,10 @@
 defmodule Grizzly.Connections.CommandListTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.Report
-  alias Grizzly.Connections.CommandList
   alias Grizzly.Commands.CommandRunner
-  alias Grizzly.ZWave.Commands.{SwitchBinarySet, SwitchBinaryGet, ZIPPacket}
+  alias Grizzly.Connections.CommandList
+  alias Grizzly.Report
+  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinarySet, ZIPPacket}
 
   test "create and monitor a command runtime" do
     {:ok, zwave_command} = SwitchBinaryGet.new()

@@ -1,8 +1,8 @@
 defmodule Grizzly.Connections.AsyncConnectionTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.Connections.AsyncConnection
   alias Grizzly.CommandHandlers.AckResponse
+  alias Grizzly.Connections.AsyncConnection
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
 
   test "can stop a running command" do

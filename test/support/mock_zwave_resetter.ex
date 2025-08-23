@@ -1,3 +1,4 @@
 defmodule MockZWaveResetter do
-  def reset_zwave_module, do: :ok
+  @moduledoc false
+  def reset_zwave_module(), do: :ok
 end

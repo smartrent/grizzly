@@ -1,8 +1,8 @@
 defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport
 
   test "creates the command and validates params" do
     {:ok, report} =
