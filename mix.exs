@@ -37,7 +37,7 @@ defmodule Grizzly.MixProject do
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
       {:mimic, "~> 2.0", only: [:dev, :test]},
       {:muontrap, "~> 1.6"},
-      {:ex_doc, "~> 0.21", only: :docs, runtime: false},
+      {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
       {:sweet_xml, "~> 0.7", only: [:dev, :test]},
