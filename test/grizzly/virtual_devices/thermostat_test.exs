@@ -22,7 +22,7 @@ defmodule Grizzly.VirtualDevices.ThermostatTest do
 
     assert {:ok, %Report{type: :command, command: command}} = Node.get_info(device_id)
 
-    assert command.name == :node_info_cache_report
+    assert command.name == :node_info_cached_report
   end
 
   test "get thermostat manufacture info" do

@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
+defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
   @moduledoc """
   Report the cached node information
 
@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCacheReport do
   def new(params) do
     # TODO validate params
     command = %Command{
-      name: :node_info_cache_report,
+      name: :node_info_cached_report,
       command_byte: 0x04,
       command_class: NetworkManagementProxy,
       params: params,

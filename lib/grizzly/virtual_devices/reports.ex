@@ -12,7 +12,7 @@ defmodule Grizzly.VirtualDevices.Reports do
     ManufacturerSpecificDeviceSpecificReport,
     ManufacturerSpecificReport,
     NodeAddStatus,
-    NodeInfoCacheReport,
+    NodeInfoCachedReport,
     NodeRemoveStatus,
     VersionCommandClassReport,
     VersionReport
@@ -74,7 +74,7 @@ defmodule Grizzly.VirtualDevices.Reports do
     seq_number = Command.param!(node_info_get, :seq_number)
 
     {:ok, node_info_report} =
-      NodeInfoCacheReport.new(
+      NodeInfoCachedReport.new(
         seq_number: seq_number,
         status: :ok,
         age: 1,
