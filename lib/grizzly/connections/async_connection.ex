@@ -259,16 +259,16 @@ defmodule Grizzly.Connections.AsyncConnection do
           if !ZIPPacket.ack_response?(zip_packet) do
             # Since we are doing async communications we need to handle when the
             # connection gets an unhandled command from the Z-Wave
-            send(
-              state.owner,
-              {:grizzly, :report, to_report(zip_packet, state.node_id)}
-            )
+            report = to_report(zip_packet, state.node_id)
+            send(state.owner, {:grizzly, :report, report})
+            Grizzly.Events.broadcast_report(report)
           end
 
           %State{state | commands: new_command_list}
 
         {waiter, {%Report{} = report, new_command_list}} ->
           send(waiter, {:grizzly, :report, report})
+          Grizzly.Events.broadcast_report(report)
           %State{state | commands: new_command_list}
       end
 
