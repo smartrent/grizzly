@@ -151,7 +151,7 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
         :ok
     end
 
-    Grizzly.Events.broadcast(:serial_api_status, status)
+    Grizzly.Events.broadcast_event(:serial_api_status, status)
 
     :ok
   end

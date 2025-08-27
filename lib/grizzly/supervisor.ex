@@ -211,11 +211,6 @@ defmodule Grizzly.Supervisor do
       {Grizzly.Trace, options.trace_options},
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
       {Grizzly.Associations, options},
-
-      # This is a registry for subscribing to unsolicited messages. It isn't
-      # under UnsolicitedServer.Supervisor because we don't want a restart
-      # of the unsolicited server subsystem to take down subscribers.
-      Grizzly.UnsolicitedServer.Messages,
       {ThousandIsland,
        [
          port: port,
