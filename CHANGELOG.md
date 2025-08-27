@@ -2,6 +2,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.13.0] - 2025-08-27
+
+### Fixed
+
+* Grizzly.Network.get_all_node_ids/1 returns errors unmodified ([#1110](https://github.com/smartrent/grizzly/pull/1110))
+* Fix command name for Node Info Cached Report ([#1113](https://github.com/smartrent/grizzly/pull/1113))
+
+### Changed
+
+* Refactor subscriptions to use `Grizzly.Events` and add firehose ([#1112](https://github.com/smartrent/grizzly/pull/1112))
+
 ## [v8.12.0] - 2025-08-18
 
 ### Added
@@ -2773,6 +2784,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.13.0]: https://github.com/smartrent/grizzly/compare/v8.12.0..v8.13.0
 [v8.12.0]: https://github.com/smartrent/grizzly/compare/v8.11.3..v8.12.0
 [v8.11.3]: https://github.com/smartrent/grizzly/compare/v8.11.2..v8.11.3
 [v8.11.2]: https://github.com/smartrent/grizzly/compare/v8.11.1..v8.11.2
