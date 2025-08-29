@@ -7,7 +7,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   use Supervisor
 
   alias Grizzly.{Indicator, Options}
-  alias Grizzly.ZIPGateway.{Config, ExitMonitor, LogMonitor, SAPIMonitor}
+  alias Grizzly.ZIPGateway.{Config, DatabaseChecker, ExitMonitor, LogMonitor, SAPIMonitor}
   require Logger
 
   @doc """
@@ -64,6 +64,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
     ]
 
     [
+      DatabaseChecker,
       {SAPIMonitor, [status_reporter: options.status_reporter]},
       LogMonitor,
       {BEAMNotify, beam_notify_options},
