@@ -91,7 +91,7 @@ jobs:
 
   test:
     <<: *defaults
-    parallelism: 4
+    parallelism: 2
     docker:
       - image: hexpm/elixir:<< parameters.image-tag >>
     steps:
@@ -100,7 +100,12 @@ jobs:
       - <<: *install_system_deps
       - restore_tagged_cache:
           prefix: v3-mix-cache-<< parameters.image-tag >>
-      - run: MIX_TEST_PARTITION="$((${CIRCLE_NODE_INDEX}+1))" mix test --partitions $CIRCLE_NODE_TOTAL
+      - run:
+          name: Run tests
+          command: |
+            circleci tests glob 'test/**/*_test.exs' | \
+              circleci tests run --split-by=timings --command='xargs -n1 echo > test_file_paths.txt'
+            cat test_file_paths.txt | xargs mix test
       - store_test_results:
           path: test-junit-report.xml
 
@@ -125,6 +130,7 @@ jobs:
 
 workflows:
   build_test:
+    max_auto_reruns: 3
     jobs:
       - build:
           matrix:
