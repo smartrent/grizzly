@@ -100,6 +100,7 @@ defmodule Grizzly.Network do
     # 60s is more than enough time.
     case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 60_000) do
       {:ok, %Report{type: :command, status: :complete}} = response ->
+        Grizzly.Storage.delete_all()
         _ = Associations.delete_all(Keyword.get(opts, :associations_server, Grizzly.Associations))
         response
 

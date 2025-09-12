@@ -4,7 +4,7 @@ defmodule Grizzly.ZIPGateway.Database do
   """
 
   alias Exqlite.Sqlite3
-  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
   alias Grizzly.ZWave.DSK
 
   import Bitwise
@@ -68,6 +68,14 @@ defmodule Grizzly.ZIPGateway.Database do
           wake_up_interval: non_neg_integer() | nil
         }
 
+  @type endpoint :: %{
+          id: non_neg_integer(),
+          node_id: Grizzly.zwave_node_id(),
+          generic_device_class: DeviceClasses.generic_device_class() | nil,
+          specific_device_class: DeviceClasses.specific_device_class() | nil,
+          command_classes: CommandClasses.command_class_list()
+        }
+
   @doc """
   Opens a SQLite database and passes the connection handle to the given function,
   then closes the database on completion.
@@ -109,7 +117,7 @@ defmodule Grizzly.ZIPGateway.Database do
   @doc """
   Looks up a node by its ID and returns a map or nil if not found.
   """
-  @spec get_node(Sqlite3.db(), integer()) :: query_result(map() | nil)
+  @spec get_node(Sqlite3.db(), integer()) :: query_result(zwave_node() | nil)
   def get_node(db, node_id) do
     with {:ok, result} when not is_nil(result) <-
            select_one(db, "SELECT * FROM nodes WHERE nodeid = ?", [node_id]) do
@@ -120,10 +128,20 @@ defmodule Grizzly.ZIPGateway.Database do
   @doc """
   Returns a list of all nodes.
   """
-  @spec all_nodes(Sqlite3.db()) :: query_result([map()])
+  @spec all_nodes(Sqlite3.db()) :: query_result([zwave_node()])
   def all_nodes(db) do
     with {:ok, results} <- select_all(db, "SELECT * FROM nodes") do
       {:ok, Enum.map(results, &decode_node_record/1)}
+    end
+  end
+
+  @doc """
+  Returns a list of all endpoints.
+  """
+  @spec all_endpoints(Sqlite3.db()) :: query_result([endpoint()])
+  def all_endpoints(db) do
+    with {:ok, results} <- select_all(db, "SELECT * FROM endpoints") do
+      {:ok, Enum.map(results, &decode_endpoint_record/1)}
     end
   end
 
@@ -254,6 +272,28 @@ defmodule Grizzly.ZIPGateway.Database do
       version_capabilities: decode_version_capabilities(node["node_version_cap_and_zwave_sw"]),
       basic_device_class: elem(DeviceClasses.basic_device_class_from_byte(node["nodeType"]), 1),
       wake_up_interval: node["wakeUp_interval"]
+    }
+  end
+
+  @spec decode_endpoint_record(map()) :: endpoint()
+  defp decode_endpoint_record(endpoint) do
+    {generic_class, specific_class, command_classes} =
+      case endpoint["info"] do
+        <<generic, specific, command_classes::binary>> ->
+          {:ok, generic} = DeviceClasses.generic_device_class_from_byte(generic)
+          {:ok, specific} = DeviceClasses.specific_device_class_from_byte(generic, specific)
+          {generic, specific, CommandClasses.command_class_list_from_binary(command_classes)}
+
+        _ ->
+          {nil, nil, []}
+      end
+
+    %{
+      id: endpoint["endpointid"],
+      node_id: endpoint["nodeid"],
+      generic_device_class: generic_class,
+      specific_device_class: specific_class,
+      command_classes: command_classes
     }
   end
 

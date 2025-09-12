@@ -43,7 +43,7 @@ defmodule Grizzly.Supervisor do
 
   require Logger
 
-  alias Grizzly.{Options, Trace}
+  alias Grizzly.{Options, Storage, Trace}
   alias Grizzly.ZIPGateway.ReadyChecker
 
   @typedoc """
@@ -130,6 +130,12 @@ defmodule Grizzly.Supervisor do
     `Grizzly.Status.Reporter.Console` by default.
   - `:inclusion_adapter` - the network adapter for including and excluding
     devices
+  - `:storage_adapter` - a tuple where the first element is a module implementing
+    the `Grizzly.Storage.Adapter` behaviour and the second element is an argument
+    passed to the adapter when any of its functions are called.
+  - `:storage_options` - when using the default storage adapter (`Grizzly.Storage.PropertyTable`),
+    these options will be passed to `PropertyTable.start_link/1`. It's highly recommended
+    to enable persistence.
 
   For the most part the defaults should work out of the box. However, the
   `serial_port` argument is the most likely argument that will need to be
@@ -164,6 +170,8 @@ defmodule Grizzly.Supervisor do
           | {:inclusion_adapter, module()}
           | {:trace_options, [Trace.trace_opt()]}
           | {:background_rssi_monitor, [Grizzly.BackgroundRSSIMonitor.opt()]}
+          | {:storage_adapter, {module(), Storage.Adapter.adapter_options()}}
+          | {:storage_options, PropertyTable.options()}
 
   @typedoc """
   The power level used when transmitting frames at normal power
@@ -200,7 +208,11 @@ defmodule Grizzly.Supervisor do
         id: Grizzly.Options.Agent,
         start: {Agent, :start_link, [fn -> options end, [name: Grizzly.Options.Agent]]}
       },
+      if(options.storage_adapter == {Grizzly.Storage.PropertyTable, Grizzly.Storage},
+        do: {PropertyTable, Keyword.merge(options.storage_options, name: Grizzly.Storage)}
+      ),
       Grizzly.Events,
+      Storage.CommandWatcher,
       {Task.Supervisor, name: Grizzly.TaskSupervisor},
       if(options.run_zipgateway, do: {Grizzly.ZIPGateway.Supervisor, options}, else: nil),
       # According to Z-Wave specification we need to have a global

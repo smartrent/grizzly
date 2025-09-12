@@ -59,7 +59,11 @@ defmodule Grizzly.Node do
       max_age: max_age
     ]
 
-    Grizzly.send_command(:gateway, :node_info_cached_get, params, send_command_opts)
+    with {:ok, %Grizzly.Report{command: %Command{name: :node_info_cached_report} = cmd} = report} <-
+           Grizzly.send_command(:gateway, :node_info_cached_get, params, send_command_opts) do
+      Grizzly.Storage.put_node_info(node_id, cmd)
+      {:ok, report}
+    end
   end
 
   defp info_get_max_age(info_opt) do

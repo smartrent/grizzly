@@ -150,6 +150,10 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     []
   end
 
+  defp handle_command(_node_id, %Command{name: :smart_start_join_started} = cmd, _opts) do
+    [{:notify, cmd}]
+  end
+
   defp handle_command(_node_id, %Command{name: :association_specific_group_get}, _) do
     case AssociationSpecificGroupReport.new(group: 0) do
       {:ok, command} -> [{:send, command}]
@@ -445,6 +449,12 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
       %{},
       %{node_id: node_id, reason: reason}
     )
+
+    [{:notify, command}]
+  end
+
+  defp handle_command(node_id, %Command{name: :wake_up_notification} = command, _opts) do
+    Grizzly.Storage.put_node_last_awake(node_id, DateTime.utc_now())
 
     [{:notify, command}]
   end

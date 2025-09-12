@@ -38,6 +38,7 @@ defmodule Grizzly.MixProject do
       {:exqlite, "~> 0.33"},
       {:mimic, "~> 2.0", only: [:dev, :test]},
       {:muontrap, "~> 1.6"},
+      {:property_table, "~> 0.3"},
       {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
