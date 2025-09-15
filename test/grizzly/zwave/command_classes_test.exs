@@ -47,5 +47,39 @@ defmodule Grizzly.ZWave.CommandClassesTest do
       binary = <<0x20, 0x32, 0xEF, 0xCC, 0xFA, 0x01, 0xF8, 0x90>>
       assert expected_command_classes == CommandClasses.command_class_list_from_binary(binary)
     end
+
+    test "merging command class lists doesn't overwrite empty" do
+      list1 = [
+        non_secure_supported: [:basic, :meter],
+        non_secure_controlled: [],
+        secure_supported: [:alarm, :switch_binary],
+        secure_controlled: [:door_lock, :user_code]
+      ]
+
+      list2 = [
+        non_secure_supported: [],
+        non_secure_controlled: [],
+        secure_supported: [:alarm],
+        secure_controlled: []
+      ]
+
+      expected = [
+        non_secure_supported: [:basic, :meter],
+        non_secure_controlled: [],
+        secure_supported: [:alarm],
+        secure_controlled: [:door_lock, :user_code]
+      ]
+
+      assert expected == CommandClasses.merge(list1, list2)
+
+      expected = [
+        non_secure_supported: [:basic, :meter],
+        non_secure_controlled: [],
+        secure_supported: [:alarm, :switch_binary],
+        secure_controlled: [:door_lock, :user_code]
+      ]
+
+      assert expected == CommandClasses.merge(list2, list1)
+    end
   end
 end

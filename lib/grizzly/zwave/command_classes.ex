@@ -44,6 +44,27 @@ defmodule Grizzly.ZWave.CommandClasses do
   end
 
   @doc """
+  Merges command class lists in a way that's more resilient to some Z/IP Gateway
+  bugs. The list provided in the second argument is merged into the first.
+
+  In particular, there's a Z/IP Gateway bug where it can lose track of a node's
+  supported command classes. If this happens while the node is failing, a Node
+  Info Cached Report can come back with an empty command class list. If requesting
+  the NIF works but the controller doesn't receive an S0/S2 Commands Supported Report
+  (e.g. due to interference), the secure command class lists will be empty.
+  """
+  @spec merge(command_class_list(), command_class_list()) :: command_class_list()
+  def merge(list1, list2) do
+    Keyword.merge(list1, list2, fn _key, val1, val2 ->
+      if val2 == [] do
+        val1
+      else
+        val2
+      end
+    end)
+  end
+
+  @doc """
   Turn the list of command classes into the binary representation outlined in
   the Network-Protocol command class specification.
 
