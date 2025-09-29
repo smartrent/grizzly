@@ -394,6 +394,10 @@ defmodule Grizzly do
   @spec stop_zipgateway :: :ok
   defdelegate stop_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
 
+  @doc "Is Z/IP Gateway ready?"
+  @spec zipgateway_ready?() :: boolean()
+  defdelegate zipgateway_ready?(), to: Grizzly.ZIPGateway.ReadyChecker, as: :ready?
+
   @doc "Get the current inclusion status."
   @spec inclusion_status() :: Inclusions.status()
   defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get
