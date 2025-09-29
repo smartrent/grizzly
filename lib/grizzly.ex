@@ -398,6 +398,11 @@ defmodule Grizzly do
   @spec inclusion_status() :: Inclusions.status()
   defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get
 
+  @doc "Get the listening mode of a node"
+  @spec listening_mode(integer) ::
+          {:ok, Grizzly.ZIPGateway.Database.listening_mode()} | nil
+  defdelegate listening_mode(node_id), to: Grizzly.ZIPGateway.Database
+
   @doc """
   Returns the network's home id. Returns nil if Grizzly is started with `run_zipgateway: false`
   or if Z/IP Gateway has not yet logged the home id.

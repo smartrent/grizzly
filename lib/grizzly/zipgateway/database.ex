@@ -9,6 +9,8 @@ defmodule Grizzly.ZIPGateway.Database do
 
   import Bitwise
 
+  require Logger
+
   @type query_result(result) :: {:ok, result} | {:error, Sqlite3.reason()}
 
   @type security_flag ::
@@ -75,6 +77,8 @@ defmodule Grizzly.ZIPGateway.Database do
           specific_device_class: DeviceClasses.specific_device_class() | nil,
           command_classes: CommandClasses.command_class_list()
         }
+
+  @type listening_mode :: :always_listening | :frequently_listening | :wakeup | :unknown
 
   @doc """
   Opens a SQLite database and passes the connection handle to the given function,
@@ -249,6 +253,46 @@ defmodule Grizzly.ZIPGateway.Database do
         {:error, reason} -> {:error, reason}
       end
     end)
+  end
+
+  @doc """
+  Retrieve the listening mode of a node.
+  """
+  @spec listening_mode(integer()) :: {:ok, listening_mode()} | nil
+  def listening_mode(node_id) when is_integer(node_id) do
+    case with_database(&get_listening_mode(&1, node_id)) do
+      {:ok, listening_mode} ->
+        {:ok, listening_mode}
+
+      {:error, reason} ->
+        Logger.warning(
+          "[Grizzly] Failed to get listening mode of node #{node_id}: #{inspect(reason)}"
+        )
+
+        nil
+    end
+  end
+
+  defp get_listening_mode(db, node_id) do
+    case get_node(db, node_id) do
+      {:ok, node} when is_map(node) ->
+        mode =
+          case Keyword.get(node.mode, :mode) do
+            :always_listening -> :always_listening
+            :flirs -> :frequently_listening
+            :wakeup -> :wakeup
+            :wakeup_firmware_upgrade -> :wakeup
+            _ -> :unknown
+          end
+
+        {:ok, mode}
+
+      {:error, reason} ->
+        {:error, reason}
+
+      _ ->
+        {:error, :invalid_or_missing_mode}
+    end
   end
 
   defp rows_to_records(cols, rows), do: Enum.map(rows, &row_to_record(cols, &1))
