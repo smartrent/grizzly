@@ -2,6 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.15.0] - 2025-09-12
+
+### Added
+
+* Get the listening mode of a node from the ZIPGateway database ([#1125](https://github.com/smartrent/grizzly/pull/1125))
+* Add `Grizzly.zipgateway_ready?/0` ([#1126](https://github.com/smartrent/grizzly/pull/1126))
+
 ## [v8.14.0] - 2025-09-12
 
 ### Added
@@ -2790,6 +2797,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.15.0]: https://github.com/smartrent/grizzly/compare/v8.14.0..v8.15.0
 [v8.14.0]: https://github.com/smartrent/grizzly/compare/v8.13.0..v8.14.0
 [v8.13.0]: https://github.com/smartrent/grizzly/compare/v8.12.0..v8.13.0
 [v8.12.0]: https://github.com/smartrent/grizzly/compare/v8.11.3..v8.12.0
