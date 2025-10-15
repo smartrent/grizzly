@@ -3,8 +3,8 @@ defmodule Grizzly.Connection do
 
   require Logger
 
-  alias Grizzly.Connections.Supervisor
   alias Grizzly.Connections.{AsyncConnection, BinaryConnection, SyncConnection}
+  alias Grizzly.Connections.Supervisor
   alias Grizzly.Report
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command

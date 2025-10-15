@@ -23,9 +23,8 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
   import Bitwise
   import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses}
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
-  alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
 
   @typedoc """
   The status of the refresh of the node information cache

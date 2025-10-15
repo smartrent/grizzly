@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Encoding
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
 
   @impl Command
