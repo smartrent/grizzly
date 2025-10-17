@@ -575,6 +575,6 @@ defmodule Grizzly.ZWave.Notifications do
       "Decoding not implemented for event params #{inspect(params_binary)} for zwave_type #{inspect(zwave_type)} and zwave_event #{inspect(zwave_event)}"
     )
 
-    {:ok, []}
+    {:ok, [raw: :erlang.binary_to_list(params_binary)]}
   end
 end
