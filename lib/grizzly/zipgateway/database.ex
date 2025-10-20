@@ -3,6 +3,7 @@ defmodule Grizzly.ZIPGateway.Database do
   Functions for inspecting and debugging Z/IP Gateway's SQLite database.
   """
 
+  require Grizzly.NodeId
   alias Exqlite.Sqlite3
   alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
   alias Grizzly.ZWave.DSK
@@ -258,8 +259,8 @@ defmodule Grizzly.ZIPGateway.Database do
   @doc """
   Retrieve the listening mode of a node.
   """
-  @spec listening_mode(integer()) :: {:ok, listening_mode()} | nil
-  def listening_mode(node_id) when is_integer(node_id) do
+  @spec listening_mode(Grizzly.node_id()) :: {:ok, listening_mode()} | nil
+  def listening_mode(node_id) when Grizzly.NodeId.is_zwave_node_id(node_id) do
     case with_database(&get_listening_mode(&1, node_id)) do
       {:ok, listening_mode} ->
         {:ok, listening_mode}
@@ -272,6 +273,9 @@ defmodule Grizzly.ZIPGateway.Database do
         nil
     end
   end
+
+  def listening_mode(node_id) when Grizzly.NodeId.is_virtual_node_id(node_id),
+    do: {:ok, :always_listening}
 
   defp get_listening_mode(db, node_id) do
     case get_node(db, node_id) do
