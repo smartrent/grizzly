@@ -38,8 +38,8 @@ defmodule Grizzly do
   """
 
   alias Grizzly.Commands.Table
-  alias Grizzly.Events
   alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
+  alias Grizzly.Events
   alias Grizzly.{ZIPGateway, ZWave}
   alias Grizzly.ZWave.Commands.RssiReport
 

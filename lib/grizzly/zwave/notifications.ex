@@ -4,8 +4,8 @@ defmodule Grizzly.ZWave.Notifications do
   Notification command class.
   """
 
-  alias Grizzly.ZWave.Commands.{NodeLocationReport, UserCodeReport}
   alias Grizzly.ZWave.CommandClasses.{NodeNaming, UserCode}
+  alias Grizzly.ZWave.Commands.{NodeLocationReport, UserCodeReport}
   alias Grizzly.ZWave.{DecodeError, Decoder}
   require Logger
 
