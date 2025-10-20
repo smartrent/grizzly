@@ -109,6 +109,27 @@ jobs:
       - store_test_results:
           path: test-junit-report.xml
 
+  publish:
+    <<: *defaults
+    docker:
+      - image: hexpm/elixir:<< parameters.image-tag >>
+    steps:
+      - checkout
+      - <<: *install_hex_rebar
+      - run:
+          name: Install GitHub CLI
+          command: apk add --no-cache build-base github-cli
+      - restore_tagged_cache:
+          prefix: v3-mix-cache-<< parameters.image-tag >>
+      - run:
+          name: Create GitHub Release
+          command: |
+            awk -v ver="<< pipeline.git.tag >>" '/^#+ \[/ { if (p) { exit }; if ($2 == "["ver"]") { p=1; next} } p && NF' CHANGELOG.md > release-notes.md
+            gh release create << pipeline.git.tag >> --title << pipeline.git.tag >> -F release-notes.md
+      - run:
+          name: Publish Hex
+          command: MIX_ENV=docs HEX_API_KEY=${HEX_API_WRITE_KEY} mix hex.publish --yes
+
   spelling_and_markdownlint:
     working_directory: ~/repo
     environment:
@@ -156,4 +177,13 @@ workflows:
                 - 1.18.4-erlang-27.3.4.2-alpine-3.22.1
                 - 1.17.3-erlang-27.3.4.2-alpine-3.22.1
                 - 1.16.3-erlang-26.2.5.14-alpine-3.22.1
+      - publish:
+          context:
+            - github-token
+          filters: pipeline.git.tag starts-with "v"
+          image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
+          requires:
+            - lint
+            - dialyzer
+            - test
       - spelling_and_markdownlint
