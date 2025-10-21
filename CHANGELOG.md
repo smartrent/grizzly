@@ -2,6 +2,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.15.2] - 2025-10-20
+
+### Fixed
+
+* Fetching listening mode of a virtual device would cause a crashing error ([#1133](https://github.com/smartrent/grizzly/pull/1133))
+
 ## [v8.15.1] - 2025-10-17
 
 ### Added
@@ -2803,6 +2809,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v8.15.2]: https://github.com/smartrent/grizzly/compare/v8.15.0..v8.15.2
 [v8.15.1]: https://github.com/smartrent/grizzly/compare/v8.15.0..v8.15.1
 [v8.15.0]: https://github.com/smartrent/grizzly/compare/v8.14.0..v8.15.0
 [v8.14.0]: https://github.com/smartrent/grizzly/compare/v8.13.0..v8.14.0
