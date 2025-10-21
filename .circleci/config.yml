@@ -154,6 +154,7 @@ workflows:
     max_auto_reruns: 3
     jobs:
       - build:
+          filters: pipeline.git.tag
           matrix:
             parameters:
               image-tag:
@@ -161,14 +162,17 @@ workflows:
                 - 1.17.3-erlang-27.3.4.2-alpine-3.22.1
                 - 1.16.3-erlang-26.2.5.14-alpine-3.22.1
       - lint:
+          filters: pipeline.git.tag
           image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
           requires:
             - build
       - dialyzer:
+          filters: pipeline.git.tag
           image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
           requires:
             - build
       - test:
+          filters: pipeline.git.tag
           requires:
             - build
           matrix:
