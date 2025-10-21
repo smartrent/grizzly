@@ -19,6 +19,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
 
   @default_fragment_size 1024
 
+  # How long to wait (in milliseconds) without progressing before timing out a firmware update.
+  @default_progress_timeout :timer.minutes(2)
+
   @doc """
   A firmware update is in progress when a `FirmwareUpdateRunner` process is running
   and has received at least one request for one or more image fragments.
@@ -60,7 +63,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       max_fragment_size: @default_fragment_size,
       activation_may_be_delayed?: false,
       max_fragment_retries: 10,
-      progress_timeout: :timer.minutes(2)
+      progress_timeout: progress_timeout()
     ]
 
     GenServer.start_link(
@@ -332,5 +335,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   defp respond_to_handler({handler_module, handler_opts}, command) do
     # TODO - Consider using a handler runner genserver for calling the plugin inclusion handler
     spawn_link(fn -> handler_module.handle_command(command, handler_opts) end)
+  end
+
+  defp progress_timeout() do
+    Application.get_env(:grizzly, :firmware_update_progress_timeout, @default_progress_timeout)
   end
 end
