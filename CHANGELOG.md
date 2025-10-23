@@ -2,6 +2,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v8.15.3] - 2025-10-23
+
+### Fixed
+
+* Make firmware update progress timeout configurable ([#1137](https://github.com/smartrent/grizzly/pull/1137))
+
 ## [v8.15.2] - 2025-10-20
 
 ### Fixed
@@ -2809,7 +2815,8 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
-[v8.15.2]: https://github.com/smartrent/grizzly/compare/v8.15.0..v8.15.2
+[v8.15.3]: https://github.com/smartrent/grizzly/compare/v8.15.2..v8.15.3
+[v8.15.2]: https://github.com/smartrent/grizzly/compare/v8.15.1..v8.15.2
 [v8.15.1]: https://github.com/smartrent/grizzly/compare/v8.15.0..v8.15.1
 [v8.15.0]: https://github.com/smartrent/grizzly/compare/v8.14.0..v8.15.0
 [v8.14.0]: https://github.com/smartrent/grizzly/compare/v8.13.0..v8.14.0
