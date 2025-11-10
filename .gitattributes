@@ -1,1 +1,3 @@
 resources/*.xml text eol=lf
+test/fixtures/*.hex -diff
+test/fixtures/*.gbl -diff

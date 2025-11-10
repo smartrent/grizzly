@@ -45,7 +45,6 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
 
     # Alarmist.subscribe(Grizzly.HighBackgroundRSSIAlarm)
     allow(Grizzly, self(), pid)
-    :alarm_handler.get_alarms()
 
     expect Grizzly.background_rssi(),
       num_calls: 2,
@@ -58,10 +57,11 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
     BackgroundRSSIMonitor.__sample__(pid)
     BackgroundRSSIMonitor.__sample__(pid)
     BackgroundRSSIMonitor.__sample__(pid)
-    refute {Grizzly.HighBackgroundRSSIAlarm, []} in :alarm_handler.get_alarms()
+    refute Grizzly.HighBackgroundRSSIAlarm in Alarmist.get_alarm_ids()
 
     BackgroundRSSIMonitor.__sample__(pid)
-    assert {Grizzly.HighBackgroundRSSIAlarm, []} in :alarm_handler.get_alarms()
+    Process.sleep(20)
+    assert Grizzly.HighBackgroundRSSIAlarm in Alarmist.get_alarm_ids()
 
     {:ok, averages} = BackgroundRSSIMonitor.get_averages(pid)
 

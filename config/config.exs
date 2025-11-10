@@ -12,4 +12,8 @@ if config_env() == :test do
     dtls_handshake_timeout: 100
 
   config :grizzly, Grizzly.Storage.Populate, disabled: true
+
+  if File.exists?("config/test.local.exs") do
+    import_config "test.local.exs"
+  end
 end

@@ -26,7 +26,8 @@ extra_formatters = if(System.get_env("CI"), do: [JUnitFormatter], else: [])
 
 config = [
   capture_log: true,
-  formatters: ExUnit.configuration()[:formatters] ++ extra_formatters
+  formatters: ExUnit.configuration()[:formatters] ++ extra_formatters,
+  exclude: [hardware: true]
 ]
 
 ExUnit.configure(config)

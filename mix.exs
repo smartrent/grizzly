@@ -15,7 +15,7 @@ defmodule Grizzly.MixProject do
       description: description(),
       package: package(),
       docs: docs(),
-      preferred_cli_env: ["hex.publish": :docs, dialyzer: :test],
+      preferred_cli_env: ["hex.publish": :docs, docs: :docs, dialyzer: :test],
       xref: [exclude: EEx]
     ]
   end
@@ -31,13 +31,17 @@ defmodule Grizzly.MixProject do
 
   defp deps do
     [
-      {:cerlc, "~> 0.2.0"},
+      {:alarmist, "~> 0.4", only: [:test]},
+      {:cerlc, "~> 0.2"},
+      {:circuits_uart, "~> 1.0"},
       {:circular_buffer, "~> 1.0 or ~> 0.4.2"},
       {:ctr_drbg, "~> 0.1"},
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
+      {:exmodem, "~> 0.1"},
       {:exqlite, "~> 0.33"},
       {:mimic, "~> 2.0", only: [:dev, :test]},
       {:muontrap, "~> 1.6"},
+      {:nimble_options, "~> 1.0"},
       {:property_table, "~> 0.3"},
       {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
@@ -93,7 +97,6 @@ defmodule Grizzly.MixProject do
           Grizzly.BackgroundRSSIMonitor,
           ~r/^Grizzly\.(Commands|CommandHandlers)/,
           Grizzly.Events,
-          ~r/^Grizzly\.FirmwareUpdates/,
           Grizzly.Inclusions,
           Grizzly.Indicator,
           Grizzly.Network,
@@ -125,6 +128,9 @@ defmodule Grizzly.MixProject do
           Grizzly.ZIPGateway,
           ~r/^Grizzly\.ZIPGateway/
         ],
+        "Firmware Updates": [
+          ~r/^Grizzly\.FirmwareUpdates/
+        ],
         "Z-Wave": [
           Grizzly.ZWave,
           Grizzly.ZWave.Command,
@@ -139,9 +145,7 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.QRCode,
           ~r/^Grizzly\.ZWave\.Security/,
           ~r/^Grizzly\.ZWave\.SmartStart/,
-          Grizzly.Inclusions.ZWaveAdapter,
-          Grizzly.ZWaveFirmware,
-          Grizzly.ZWaveFirmware.UpgradeSpec
+          Grizzly.Inclusions.ZWaveAdapter
         ],
         Transports: [
           Grizzly.Transport,
@@ -159,7 +163,43 @@ defmodule Grizzly.MixProject do
         Grizzly.VirtualDevices,
         Grizzly.ZWave.CommandClasses,
         Grizzly.ZWave.Commands
-      ]
+      ],
+      before_closing_body_tag: &before_closing_body_tag/1
     ]
   end
+
+  defp before_closing_body_tag(:html) do
+    """
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
+    <script>
+      let initialized = false;
+
+      window.addEventListener("exdoc:loaded", () => {
+        if (!initialized) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: document.body.className.includes("dark") ? "dark" : "default"
+          });
+          initialized = true;
+        }
+
+        let id = 0;
+        for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
+          const preEl = codeEl.parentElement;
+          const graphDefinition = codeEl.textContent;
+          const graphEl = document.createElement("div");
+          const graphId = "mermaid-graph-" + id++;
+          mermaid.render(graphId, graphDefinition).then(({svg, bindFunctions}) => {
+            graphEl.innerHTML = svg;
+            bindFunctions?.(graphEl);
+            preEl.insertAdjacentElement("afterend", graphEl);
+            preEl.remove();
+          });
+        }
+      });
+    </script>
+    """
+  end
+
+  defp before_closing_body_tag(_), do: ""
 end

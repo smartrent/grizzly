@@ -24,5 +24,8 @@ nerves_hub-*.tar
 
 /.idea/
 
-# Igonre Elixir LS VS code directory for VS code users
+# Ignore Elixir LS VS code directory for VS code users
 .elixir_ls
+
+# Ignore local config files
+/config/test.local.exs

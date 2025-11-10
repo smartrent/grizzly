@@ -44,6 +44,7 @@ defmodule Grizzly.FirmwareUpdates do
 
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor
+  alias Grizzly.FirmwareUpdates.OTWUpdateRunner
 
   @type opt ::
           {:manufacturer_id, non_neg_integer}
@@ -89,7 +90,10 @@ defmodule Grizzly.FirmwareUpdates do
   """
   @spec firmware_update_running?() :: boolean()
   def firmware_update_running?() do
-    is_pid(Process.whereis(Grizzly.FirmwareUpdates.OTWUpdateRunner)) or
+    otw_runner_pid = Process.whereis(Grizzly.FirmwareUpdates.OTWUpdateRunner)
+
+    (is_pid(otw_runner_pid) and Process.alive?(otw_runner_pid) and
+       (otw_runner_pid != self() and OTWUpdateRunner.busy?())) or
       FirmwareUpdateRunner.in_progress?()
   end
 
