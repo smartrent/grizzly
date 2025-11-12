@@ -11,6 +11,19 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   require Logger
 
   @doc """
+  Starts the Z/IP Gateway process if it is not already running.
+  """
+  @spec start_zipgateway() :: :ok | {:error, atom()}
+  def start_zipgateway() do
+    case Supervisor.restart_child(__MODULE__, Grizzly.ZIPGateway.ProcessSupervisor) do
+      {:ok, _} -> :ok
+      {:ok, _, _} -> :ok
+      {:error, :running} -> :ok
+      {:error, _reason} = error -> error
+    end
+  end
+
+  @doc """
   Restarts the Z/IP Gateway process. An error will be raised if `Grizzly.ZIPGateway.Supervisor`
   is not running.
   """
