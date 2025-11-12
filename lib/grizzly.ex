@@ -384,6 +384,12 @@ defmodule Grizzly do
     as: :supports_supervision?
 
   @doc """
+  Starts the Z/IP Gateway process if it is not already running.
+  """
+  @spec start_zipgateway :: :ok | {:error, atom()}
+  defdelegate start_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+
+  @doc """
   Restarts the Z/IP Gateway process. An error will be raised if `Grizzly.ZIPGateway.Supervisor`
   is not running.
   """
