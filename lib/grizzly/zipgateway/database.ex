@@ -318,7 +318,7 @@ defmodule Grizzly.ZIPGateway.Database do
       probe_state: decode_probe_state(node["probe_flags"]),
       state: decode_node_state(node["state"]),
       version_capabilities: decode_version_capabilities(node["node_version_cap_and_zwave_sw"]),
-      basic_device_class: elem(DeviceClasses.basic_device_class_from_byte(node["nodeType"]), 1),
+      basic_device_class: DeviceClasses.decode_basic(node["nodeType"]),
       wake_up_interval: node["wakeUp_interval"]
     }
   end
@@ -328,8 +328,8 @@ defmodule Grizzly.ZIPGateway.Database do
     {generic_class, specific_class, command_classes} =
       case endpoint["info"] do
         <<generic, specific, command_classes::binary>> ->
-          {:ok, generic} = DeviceClasses.generic_device_class_from_byte(generic)
-          {:ok, specific} = DeviceClasses.specific_device_class_from_byte(generic, specific)
+          generic = DeviceClasses.decode_generic(generic)
+          specific = DeviceClasses.decode_specific(generic, specific)
           {generic, specific, CommandClasses.command_class_list_from_binary(command_classes)}
 
         _ ->
