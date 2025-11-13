@@ -78,7 +78,7 @@ defmodule Grizzly.ZIPGateway.Supervisor do
 
     [
       DatabaseChecker,
-      {SAPIMonitor, [status_reporter: options.status_reporter]},
+      SAPIMonitor,
       LogMonitor,
       {BEAMNotify, beam_notify_options},
       zipgateway_process_supervisor_spec(options)

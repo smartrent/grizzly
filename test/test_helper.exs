@@ -16,7 +16,6 @@ Registry.start_link(keys: :unique, name: GrizzlyTest.Server.ConnectionRegistry)
 
 Mimic.copy(Grizzly)
 Mimic.copy(Grizzly.Connections.AsyncConnection)
-Mimic.copy(MockStatusReporter)
 Mimic.copy(MockZWaveResetter)
 Mimic.copy(MuonTrap)
 
