@@ -125,9 +125,6 @@ defmodule Grizzly.Supervisor do
   - `:zwave_firmware` - See `t:Grizzly.Options.zwave_firmware_options/0`
   - `:zw_programmer_path` - Path to `zw_programmer` binary. Defaults to
     `/usr/bin/zw_programmer`.
-  - `:status_reporter` - a module that implements the `Grizzly.StatusReporter`
-    behaviour. In no reporter is provided this will use
-    `Grizzly.Status.Reporter.Console` by default.
   - `:inclusion_adapter` - the network adapter for including and excluding
     devices
   - `:storage_adapter` - a tuple where the first element is a module implementing
@@ -164,7 +161,6 @@ defmodule Grizzly.Supervisor do
           | {:indicator_handler, (Grizzly.Indicator.event() -> :ok)}
           | {:rf_region, rf_region()}
           | {:power_level, {tx_power(), measured_power()}}
-          | {:status_reporter, module()}
           | {:zwave_firmware, Options.zwave_firmware_options()}
           | {:zw_programmer_path, Path.t()}
           | {:inclusion_adapter, module()}
@@ -246,7 +242,7 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for virtual devices
       {Grizzly.VirtualDevicesSupervisor, options},
-      {ReadyChecker, [status_reporter: options.status_reporter]},
+      ReadyChecker,
       {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
     ]
     |> otw_update_runner(options)

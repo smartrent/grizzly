@@ -4,15 +4,9 @@ defmodule Grizzly.ZIPGateway.SAPIMonitorTest do
   alias Grizzly.ZIPGateway.SAPIMonitor
 
   setup %{test: test} do
-    test_pid = self()
     Grizzly.Events.subscribe(:serial_api_status)
 
-    opts = [
-      name: test,
-      status_reporter: fn status -> send(test_pid, status) end
-    ]
-
-    %{monitor_opts: opts}
+    %{monitor_opts: [name: test]}
   end
 
   test "transition into unresponsive status", %{monitor_opts: opts} do
@@ -20,7 +14,6 @@ defmodule Grizzly.ZIPGateway.SAPIMonitorTest do
       start_supervised!({SAPIMonitor, Keyword.merge(opts, period: 250, threshold: 5)})
 
     assert :ok = SAPIMonitor.status(pid)
-    assert_received :ok
     assert_receive {:grizzly, :serial_api_status, :ok}
 
     SAPIMonitor.retransmission(pid)
@@ -32,7 +25,6 @@ defmodule Grizzly.ZIPGateway.SAPIMonitorTest do
 
     SAPIMonitor.retransmission(pid)
     assert :unresponsive = SAPIMonitor.status(pid)
-    assert_received :unresponsive
     assert_receive {:grizzly, :serial_api_status, :unresponsive}
   end
 
@@ -41,7 +33,7 @@ defmodule Grizzly.ZIPGateway.SAPIMonitorTest do
       start_supervised!({SAPIMonitor, Keyword.merge(opts, period: 250, threshold: 5)})
 
     assert :ok = SAPIMonitor.status(pid)
-    assert_received :ok
+    assert_received {:grizzly, :serial_api_status, :ok}
 
     SAPIMonitor.retransmission(pid)
     SAPIMonitor.retransmission(pid)
@@ -50,11 +42,9 @@ defmodule Grizzly.ZIPGateway.SAPIMonitorTest do
     SAPIMonitor.retransmission(pid)
 
     assert :unresponsive = SAPIMonitor.status(pid)
-    assert_received :unresponsive
     assert_receive {:grizzly, :serial_api_status, :unresponsive}
 
-    assert_receive :ok, 500
+    assert_receive {:grizzly, :serial_api_status, :ok}, 500
     assert :ok = SAPIMonitor.status(pid)
-    assert_receive {:grizzly, :serial_api_status, :ok}
   end
 end

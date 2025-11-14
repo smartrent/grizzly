@@ -43,7 +43,7 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
     pid =
       start_link_supervised!({BackgroundRSSIMonitor, [name: ctx.test, sample_interval: false]})
 
-    # Alarmist.subscribe(Grizzly.HighBackgroundRSSIAlarm)
+    Alarmist.subscribe(Grizzly.HighBackgroundRSSIAlarm)
     allow(Grizzly, self(), pid)
 
     expect Grizzly.background_rssi(),
@@ -60,7 +60,7 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
     refute Grizzly.HighBackgroundRSSIAlarm in Alarmist.get_alarm_ids()
 
     BackgroundRSSIMonitor.__sample__(pid)
-    Process.sleep(20)
+    assert_receive %Alarmist.Event{id: Grizzly.HighBackgroundRSSIAlarm, state: :set}, 500
     assert Grizzly.HighBackgroundRSSIAlarm in Alarmist.get_alarm_ids()
 
     {:ok, averages} = BackgroundRSSIMonitor.get_averages(pid)

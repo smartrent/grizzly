@@ -103,8 +103,6 @@ defmodule Grizzly.MixProject do
           Grizzly.Node,
           Grizzly.Options,
           Grizzly.Report,
-          Grizzly.StatusReporter,
-          Grizzly.StatusReporter.Console,
           Grizzly.Supervisor,
           Grizzly.Trace,
           Grizzly.Trace.Record

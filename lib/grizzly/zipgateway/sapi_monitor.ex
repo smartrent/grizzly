@@ -3,12 +3,11 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
 
   use GenServer
 
-  alias Grizzly.StatusReporter
+  @type serial_api_status :: :ok | :unresponsive
 
   @type option ::
           {:period, pos_integer()}
           | {:threshold, pos_integer()}
-          | {:status_reporter, (StatusReporter.serial_api_status() -> :ok) | {module(), atom()}}
           | {:name, GenServer.name()}
 
   # There must be THRESHOLD retransmissions within the last PERIOD milliseconds for
@@ -22,7 +21,7 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
     GenServer.call(name, :retransmission)
   end
 
-  @spec status(GenServer.name()) :: StatusReporter.serial_api_status()
+  @spec status(GenServer.name()) :: serial_api_status()
   def status(name \\ __MODULE__) do
     GenServer.call(name, :status)
   end
@@ -41,11 +40,10 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
 
     period = Keyword.get(opts, :period, default_period)
     threshold = Keyword.get(opts, :threshold, default_threshold)
-    status_reporter = Keyword.get(opts, :status_reporter)
 
     GenServer.start_link(
       __MODULE__,
-      [period: period, threshold: threshold, status_reporter: status_reporter],
+      [period: period, threshold: threshold],
       name: name
     )
   end
@@ -54,18 +52,16 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
   def init(opts) do
     period = Keyword.fetch!(opts, :period)
     threshold = Keyword.fetch!(opts, :threshold)
-    status_reporter = Keyword.get(opts, :status_reporter)
 
     state = %{
       period: period,
       threshold: threshold,
-      status_reporter: status_reporter,
       retransmissions: [],
       status: :ok,
       check_timer: nil
     }
 
-    notify_status_reporter(status_reporter, :ok)
+    notify(:ok)
 
     {:ok, state}
   end
@@ -109,7 +105,7 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
   end
 
   defp set_status(state, new_status) do
-    maybe_notify_status_reporter(state, new_status)
+    maybe_notify(state, new_status)
     %{state | status: new_status}
   end
 
@@ -132,25 +128,13 @@ defmodule Grizzly.ZIPGateway.SAPIMonitor do
   end
 
   # If status has not changed, do not notify
-  defp maybe_notify_status_reporter(%{status: status}, status), do: :ok
+  defp maybe_notify(%{status: status}, status), do: :ok
 
-  defp maybe_notify_status_reporter(state, new_status) do
-    notify_status_reporter(state.status_reporter, new_status)
+  defp maybe_notify(_state, new_status) do
+    notify(new_status)
   end
 
-  defp notify_status_reporter(status_reporter, status) do
-    cond do
-      is_function(status_reporter, 1) ->
-        status_reporter.(status)
-
-      is_atom(status_reporter) and
-          function_exported?(status_reporter, :serial_api_status, 1) ->
-        status_reporter.serial_api_status(status)
-
-      true ->
-        :ok
-    end
-
+  defp notify(status) do
     Grizzly.Events.broadcast_event(:serial_api_status, status)
 
     :ok
