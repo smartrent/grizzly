@@ -60,19 +60,19 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFind do
 
   @spec encode_generic_class(atom() | 0..255) :: 0..255
   defp encode_generic_class(:all), do: 0xFF
-  defp encode_generic_class(g) when is_atom(g), do: DC.generic_device_class_to_byte(g)
+  defp encode_generic_class(g) when is_atom(g), do: DC.encode_generic(g)
   defp encode_generic_class(g) when g in 0..255, do: g
 
   @spec decode_generic_class(0..255) :: atom()
   defp decode_generic_class(0xFF), do: :all
-  defp decode_generic_class(g), do: elem(DC.generic_device_class_from_byte(g), 1)
+  defp decode_generic_class(g), do: DC.decode_generic(g)
 
   @spec encode_specific_class(atom(), atom() | 0..255) :: 0..255
   defp encode_specific_class(_g, :all), do: 0xFF
-  defp encode_specific_class(g, s) when is_atom(s), do: DC.specific_device_class_to_byte(g, s)
+  defp encode_specific_class(g, s) when is_atom(s), do: DC.encode_specific(g, s)
   defp encode_specific_class(_g, s) when s in 0..255, do: s
 
   @spec decode_specific_class(atom(), 0..255) :: atom()
   defp decode_specific_class(_g, 0xFF), do: :all
-  defp decode_specific_class(g, s), do: elem(DC.specific_device_class_from_byte(g, s), 1)
+  defp decode_specific_class(g, s), do: DC.decode_specific(g, s)
 end

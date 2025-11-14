@@ -129,10 +129,10 @@ defmodule Grizzly.ZWave.QRCode do
     <<generic::8, specific::8>> = <<String.to_integer(classes)::16>>
     installer_icon = String.to_integer(installer_icon)
 
-    {:ok, generic_device_class} = ZWave.DeviceClasses.generic_device_class_from_byte(generic)
+    generic_device_class = ZWave.DeviceClasses.decode_generic(generic)
 
-    {:ok, specific_device_class} =
-      ZWave.DeviceClasses.specific_device_class_from_byte(
+    specific_device_class =
+      ZWave.DeviceClasses.decode_specific(
         generic_device_class,
         specific
       )
@@ -245,8 +245,8 @@ defmodule Grizzly.ZWave.QRCode do
 
   defp encode_device_type({generic, specific}) do
     device_type =
-      ZWave.DeviceClasses.generic_device_class_to_byte(generic) * 256 +
-        ZWave.DeviceClasses.specific_device_class_to_byte(generic, specific)
+      ZWave.DeviceClasses.encode_generic(generic) * 256 +
+        ZWave.DeviceClasses.encode_specific(generic, specific)
 
     encode_device_type(device_type)
   end

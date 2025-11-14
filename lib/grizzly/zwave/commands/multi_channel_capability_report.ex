@@ -50,10 +50,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
     command_classes = Command.param!(command, :command_classes)
 
     generic_device_class = Command.param!(command, :generic_device_class)
-    generic_device_class_byte = DeviceClasses.generic_device_class_to_byte(generic_device_class)
+    generic_device_class_byte = DeviceClasses.encode_generic(generic_device_class)
 
     specific_device_class_byte =
-      DeviceClasses.specific_device_class_to_byte(
+      DeviceClasses.encode_specific(
         generic_device_class,
         Command.param!(command, :specific_device_class)
       )
@@ -71,11 +71,11 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
     command_classes = decode_command_classes(command_classes_binary)
     dynamic? = decode_dynamic?(dynamic_bit)
 
-    {:ok, generic_device_class} =
-      DeviceClasses.generic_device_class_from_byte(generic_device_class_byte)
+    generic_device_class =
+      DeviceClasses.decode_generic(generic_device_class_byte)
 
-    {:ok, specific_device_class} =
-      DeviceClasses.specific_device_class_from_byte(
+    specific_device_class =
+      DeviceClasses.decode_specific(
         generic_device_class,
         specific_device_class_byte
       )

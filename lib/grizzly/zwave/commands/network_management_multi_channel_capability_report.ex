@@ -82,7 +82,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
   defp encode_generic_device_class(nil), do: 0
 
   defp encode_generic_device_class(gen_dev_class),
-    do: DeviceClasses.generic_device_class_to_byte(gen_dev_class)
+    do: DeviceClasses.encode_generic(gen_dev_class)
 
   defp encode_specific_device_class(0, _command), do: 0
   defp encode_specific_device_class(nil, _command), do: 0
@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
         0
 
       spec_dev_class ->
-        DeviceClasses.specific_device_class_to_byte(gen_dev_class, spec_dev_class)
+        DeviceClasses.encode_specific(gen_dev_class, spec_dev_class)
     end
   end
 
@@ -117,11 +117,11 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
     <<_node_id, cc_len, _reserved::1, end_point::7, generic_device_class, specific_device_class,
       command_classes::binary-size(cc_len), _rest::binary>> = params
 
-    {:ok, generic_device_class} =
-      DeviceClasses.generic_device_class_from_byte(generic_device_class)
+    generic_device_class =
+      DeviceClasses.decode_generic(generic_device_class)
 
-    {:ok, specific_device_class} =
-      DeviceClasses.specific_device_class_from_byte(
+    specific_device_class =
+      DeviceClasses.decode_specific(
         generic_device_class,
         specific_device_class
       )

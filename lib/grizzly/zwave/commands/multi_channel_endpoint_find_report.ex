@@ -84,18 +84,16 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
   end
 
   defp encode_generic_class(:all), do: 0xFF
-  defp encode_generic_class(g), do: DeviceClasses.generic_device_class_to_byte(g)
+  defp encode_generic_class(g), do: DeviceClasses.encode_generic(g)
 
   defp decode_generic_class(0xFF), do: :all
-  defp decode_generic_class(g), do: elem(DeviceClasses.generic_device_class_from_byte(g), 1)
+  defp decode_generic_class(g), do: DeviceClasses.decode_generic(g)
 
   defp encode_specific_class(_g, :all), do: 0xFF
-  defp encode_specific_class(g, s), do: DeviceClasses.specific_device_class_to_byte(g, s)
+  defp encode_specific_class(g, s), do: DeviceClasses.encode_specific(g, s)
 
   defp decode_specific_class(_g, 0xFF), do: :all
-
-  defp decode_specific_class(g, s),
-    do: elem(DeviceClasses.specific_device_class_from_byte(g, s), 1)
+  defp decode_specific_class(g, s), do: DeviceClasses.decode_specific(g, s)
 
   defp encode_end_points(end_points) do
     for end_point <- end_points, into: <<>>, do: <<0x00::1, end_point::7>>

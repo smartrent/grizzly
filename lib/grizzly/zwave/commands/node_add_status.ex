@@ -84,9 +84,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       binary =
         <<seq_number, NMI.node_add_status_to_byte(status), 0x00, node_id, node_info_length,
           encode_listening_bit(listening?)::size(1), 0x00::7, 0x00,
-          DeviceClasses.basic_device_class_to_byte(basic_device_class),
-          DeviceClasses.generic_device_class_to_byte(generic_device_class),
-          DeviceClasses.specific_device_class_to_byte(generic_device_class, specific_device_class)>> <>
+          DeviceClasses.encode_basic(basic_device_class),
+          DeviceClasses.encode_generic(generic_device_class),
+          DeviceClasses.encode_specific(generic_device_class, specific_device_class)>> <>
           CommandClasses.command_class_list_to_binary(command_classes)
 
       maybe_add_version_2_fields(command, binary)
