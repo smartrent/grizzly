@@ -3,7 +3,8 @@ defmodule Grizzly.Options do
   Grizzly config options.
   """
 
-  alias Grizzly.{Supervisor, Trace, ZWaveFirmware}
+  alias Grizzly.FirmwareUpdates.OTW.UpdateSpec
+  alias Grizzly.{Supervisor, Trace}
   alias Grizzly.ZIPGateway.Config
 
   require Logger
@@ -14,17 +15,15 @@ defmodule Grizzly.Options do
   * `enabled` - whether firmware upgrades should run automatically after Grizzly
     starts (with a delay of 1 minute). Defaults to `false`.
   * `specs` - a list of firmware upgrade specifications. If multiple specs match,
-    the first will be applied. See `Grizzly.ZWaveFirmware.UpgradeSpec`.
-  * `chip_series` - the Z-Wave module chip type. See `t:Grizzly.ZWaveFirmware.chip_series/0`.
-  * `module_reset_fun` - a function that performs a hard rest of the Z-Wave module.
+    the first will be applied. See `Grizzly.FirmwareUpdates.OTW.UpdateSpec`.
+  * `module_reset_fun` - a 0-arity function that performs a hard rest of the Z-Wave module.
     Used to detect whether the module is stuck at the bootloader due to a previous
-    failed upgrade. See `t:Grizzly.ZWaveFirmware.module_reset_fun/0`.
+    failed upgrade.
   """
   @type zwave_firmware_options :: %{
           enabled: boolean(),
-          specs: [ZWaveFirmware.UpgradeSpec.t()],
-          chip_series: ZWaveFirmware.chip_series(),
-          module_reset_fun: ZWaveFirmware.module_reset_fun()
+          specs: [UpdateSpec.t()],
+          module_reset_fun: (-> :ok) | nil
         }
 
   @typedoc """

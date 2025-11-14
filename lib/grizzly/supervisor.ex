@@ -253,8 +253,15 @@ defmodule Grizzly.Supervisor do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp otw_update_runner(children, %Options{zwave_firmware: %{enabled: true}}),
-    do: children ++ [Grizzly.FirmwareUpdates.OTWUpdateRunner]
+  defp otw_update_runner(children, %Options{zwave_firmware: %{enabled: true}} = opts),
+    do:
+      children ++
+        [
+          {Grizzly.FirmwareUpdates.OTWUpdateRunner,
+           serial_port: opts.serial_port,
+           module_reset_fun: opts.zwave_firmware[:module_reset_fun],
+           update_specs: opts.zwave_firmware[:specs]}
+        ]
 
   defp otw_update_runner(children, _options), do: children
 end

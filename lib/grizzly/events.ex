@@ -10,7 +10,7 @@ defmodule Grizzly.Events do
 
   ### OTW Firmware Update
   This event is emitted when updating the firmware on the Z-Wave module. The
-  payload indicates the status. See `t:Grizzly.ZWaveFirmware.update_status/0`.
+  payload indicates the status. See `t:Grizzly.FirmwareUpdates.OTWUpdateRunner.update_status/0`.
 
   ### Serial API Status
   This event is emitted when the serial API appears to be unresponsive (or recovers

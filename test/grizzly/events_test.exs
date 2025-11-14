@@ -5,9 +5,11 @@ defmodule Grizzly.EventsTest do
   alias Grizzly.ZWave.Commands.{AlarmReport, BasicReport, WakeUpIntervalReport}
 
   test "finding subscribers that match a particular report" do
+    Supervisor.terminate_child(Grizzly.Supervisor, Grizzly.FirmwareUpdates.OTWUpdateRunner)
     Supervisor.terminate_child(Grizzly.Supervisor, Grizzly.Storage.CommandWatcher)
 
     on_exit(fn ->
+      Supervisor.restart_child(Grizzly.Supervisor, Grizzly.FirmwareUpdates.OTWUpdateRunner)
       Supervisor.restart_child(Grizzly.Supervisor, Grizzly.Storage.CommandWatcher)
     end)
 

@@ -22,7 +22,7 @@ install_system_deps: &install_system_deps
   run:
     name: Install system dependencies
     command: |
-      apk add build-base
+      apk add build-base linux-headers
 
 commands:
   restore_tagged_cache:
