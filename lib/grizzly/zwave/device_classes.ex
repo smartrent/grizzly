@@ -40,57 +40,57 @@ defmodule Grizzly.ZWave.DeviceClasses do
   @doc """
   Try to make a basic device class from a byte
   """
-  @spec basic_device_class_from_byte(byte()) :: {:ok, basic_device_class()} | {:ok, :unknown}
+  @spec decode_basic(byte()) :: basic_device_class() | :unknown
   for {byte, device_class} <- basic_mappings do
-    def basic_device_class_from_byte(unquote(byte)), do: {:ok, unquote(device_class)}
+    def decode_basic(unquote(byte)), do: unquote(device_class)
   end
 
-  def basic_device_class_from_byte(_byte), do: {:ok, :unknown}
+  def decode_basic(_byte), do: :unknown
 
   @doc """
   Make a byte from a device class
   """
-  @spec basic_device_class_to_byte(basic_device_class()) :: byte()
+  @spec encode_basic(basic_device_class()) :: byte()
   for {byte, device_class} <- basic_mappings do
-    def basic_device_class_to_byte(unquote(device_class)), do: unquote(byte)
+    def encode_basic(unquote(device_class)), do: unquote(byte)
   end
 
   @doc """
   Try to get the generic device class for the byte
   """
-  @spec generic_device_class_from_byte(byte()) :: {:ok, generic_device_class()} | {:ok, :unknown}
+  @spec decode_generic(byte()) :: generic_device_class() | :unknown
   for {byte, device_class} <- generic_mappings do
-    def generic_device_class_from_byte(unquote(byte)), do: {:ok, unquote(device_class)}
+    def decode_generic(unquote(byte)), do: unquote(device_class)
   end
 
-  def generic_device_class_from_byte(_byte), do: {:ok, :unknown}
+  def decode_generic(_byte), do: :unknown
 
   @doc """
   Turn the generic device class into a byte
   """
-  @spec generic_device_class_to_byte(generic_device_class()) :: byte()
+  @spec encode_generic(generic_device_class()) :: byte()
   for {byte, device_class} <- generic_mappings do
-    def generic_device_class_to_byte(unquote(device_class)), do: unquote(byte)
+    def encode_generic(unquote(device_class)), do: unquote(byte)
   end
 
   @doc """
   Try to get the specific device class from the byte given the generic device class
   """
-  @spec specific_device_class_from_byte(generic_device_class(), byte()) ::
-          {:ok, specific_device_class()} | {:ok, :unknown}
+  @spec decode_specific(generic_device_class(), byte()) ::
+          specific_device_class() | :unknown
   for {gen_class, byte, spec_class} <- specific_mappings do
-    def specific_device_class_from_byte(unquote(gen_class), unquote(byte)),
-      do: {:ok, unquote(spec_class)}
+    def decode_specific(unquote(gen_class), unquote(byte)),
+      do: unquote(spec_class)
   end
 
-  def specific_device_class_from_byte(_, _byte), do: {:ok, :unknown}
+  def decode_specific(_, _byte), do: :unknown
 
   @doc """
   Make the specific device class into a byte
   """
-  @spec specific_device_class_to_byte(generic_device_class(), specific_device_class()) :: byte()
+  @spec encode_specific(generic_device_class(), specific_device_class()) :: byte()
   for {gen_class, byte, spec_class} <- specific_mappings do
-    def specific_device_class_to_byte(unquote(gen_class), unquote(spec_class)),
+    def encode_specific(unquote(gen_class), unquote(spec_class)),
       do: unquote(byte)
   end
 end

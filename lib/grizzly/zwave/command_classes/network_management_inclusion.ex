@@ -134,13 +134,13 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
       ) do
     # TODO: decode the command classes correctly (currently assuming no extended command classes)
 
-    {:ok, basic_device_class} = DeviceClasses.basic_device_class_from_byte(basic_device_class)
+    basic_device_class = DeviceClasses.decode_basic(basic_device_class)
 
-    {:ok, generic_device_class} =
-      DeviceClasses.generic_device_class_from_byte(generic_device_class)
+    generic_device_class =
+      DeviceClasses.decode_generic(generic_device_class)
 
-    {:ok, specific_device_class} =
-      DeviceClasses.specific_device_class_from_byte(
+    specific_device_class =
+      DeviceClasses.decode_specific(
         generic_device_class,
         specific_device_class
       )

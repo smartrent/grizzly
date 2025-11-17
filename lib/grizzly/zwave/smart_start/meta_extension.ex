@@ -266,10 +266,10 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   end
 
   defp encode_extension({:product_type, {gen_class, spec_class, icon_name}}) do
-    gen_byte = DeviceClasses.generic_device_class_to_byte(gen_class)
+    gen_byte = DeviceClasses.encode_generic(gen_class)
 
     spec_byte =
-      DeviceClasses.specific_device_class_to_byte(
+      DeviceClasses.encode_specific(
         gen_class,
         spec_class
       )
@@ -408,9 +408,9 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
          extensions
        ) do
     {:ok, icon} = IconType.to_name(icon)
-    {:ok, gen_class} = DeviceClasses.generic_device_class_from_byte(gen_class)
+    gen_class = DeviceClasses.decode_generic(gen_class)
 
-    {:ok, spec_class} = DeviceClasses.specific_device_class_from_byte(gen_class, spec_class)
+    spec_class = DeviceClasses.decode_specific(gen_class, spec_class)
 
     ext = {:product_type, {gen_class, spec_class, icon}}
 

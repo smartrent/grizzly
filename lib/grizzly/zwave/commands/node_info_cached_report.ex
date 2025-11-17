@@ -77,12 +77,12 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
     command_classes = Command.param!(command, :command_classes)
 
     basic_device_class_byte =
-      DeviceClasses.basic_device_class_to_byte(Command.param!(command, :basic_device_class))
+      DeviceClasses.encode_basic(Command.param!(command, :basic_device_class))
 
     generic_device_class = Command.param!(command, :generic_device_class)
 
     specific_device_class_byte =
-      DeviceClasses.specific_device_class_to_byte(
+      DeviceClasses.encode_specific(
         generic_device_class,
         Command.param!(command, :specific_device_class)
       )
@@ -91,7 +91,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
 
     # the `0x00` byte is a reserved byte for Z-Wave and must be set to 0x00
     <<seq_number, status_byte ||| age, listening_byte, optional_functionality_byte, 0x00,
-      basic_device_class_byte, DeviceClasses.generic_device_class_to_byte(generic_device_class),
+      basic_device_class_byte, DeviceClasses.encode_generic(generic_device_class),
       specific_device_class_byte>> <> CommandClasses.command_class_list_to_binary(command_classes)
   end
 
@@ -100,14 +100,14 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
         <<seq_number, status::4, age::4, list?::1, _::7, _, _keys, basic_device_class_byte,
           generic_device_class_byte, specific_device_class_byte, command_classes::binary>>
       ) do
-    {:ok, basic_device_class} =
-      DeviceClasses.basic_device_class_from_byte(basic_device_class_byte)
+    basic_device_class =
+      DeviceClasses.decode_basic(basic_device_class_byte)
 
-    {:ok, generic_device_class} =
-      DeviceClasses.generic_device_class_from_byte(generic_device_class_byte)
+    generic_device_class =
+      DeviceClasses.decode_generic(generic_device_class_byte)
 
-    {:ok, specific_device_class} =
-      DeviceClasses.specific_device_class_from_byte(
+    specific_device_class =
+      DeviceClasses.decode_specific(
         generic_device_class,
         specific_device_class_byte
       )
