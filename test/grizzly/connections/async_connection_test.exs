@@ -15,7 +15,7 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
 
     :ok = AsyncConnection.stop_command(conn, command_ref)
 
-    refute AsyncConnection.command_alive?(conn, command_ref)
+    refute AsyncConnection.request_alive?(conn, command_ref)
   end
 
   @tag :integration

@@ -12,7 +12,7 @@ defmodule Grizzly.Connections.AsyncConnection do
   use GenServer
 
   alias Grizzly.{Connection, Connections, Options, Report, Transport, ZIPGateway, ZWave}
-  alias Grizzly.Connections.{CommandList, KeepAlive}
+  alias Grizzly.Connections.{KeepAlive, RequestList}
   alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
@@ -25,7 +25,7 @@ defmodule Grizzly.Connections.AsyncConnection do
     @moduledoc false
     defstruct transport: nil,
               socket: nil,
-              commands: CommandList.empty(),
+              requests: RequestList.empty(),
               owner: nil,
               monitor_ref: nil,
               keep_alive: nil,
@@ -70,10 +70,10 @@ defmodule Grizzly.Connections.AsyncConnection do
     GenServer.call(name, {:stop_command, command_ref})
   end
 
-  @spec command_alive?(Grizzly.node_id() | pid(), reference()) :: boolean()
-  def command_alive?(node_id, command_ref) do
+  @spec request_alive?(Grizzly.node_id() | pid(), reference()) :: boolean()
+  def request_alive?(node_id, command_ref) do
     name = make_name(node_id)
-    GenServer.call(name, {:command_alive?, command_ref})
+    GenServer.call(name, {:request_alive?, command_ref})
   end
 
   defp make_name(pid) when is_pid(pid), do: pid
@@ -119,27 +119,27 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   @impl GenServer
   def handle_call({:send_command, command, send_opts}, {waiter, _ref}, state) do
-    {:ok, command_runner, command_ref, new_command_list} =
-      CommandList.create(state.commands, command, state.node_id, waiter, send_opts)
+    {:ok, request_runner, command_ref, new_request_list} =
+      RequestList.create(state.requests, command, state.node_id, waiter, send_opts)
 
-    case do_send_command(command_runner, state) do
+    case do_send_command(request_runner, state) do
       :ok ->
         {:reply, {:ok, command_ref},
          %State{
            state
-           | commands: new_command_list,
+           | requests: new_request_list,
              keep_alive: KeepAlive.timer_restart(state.keep_alive)
          }}
     end
   end
 
   def handle_call({:stop_command, command_ref}, _from, state) do
-    {:ok, new_commands} = CommandList.stop_command_by_ref(state.commands, command_ref)
-    {:reply, :ok, %State{state | commands: new_commands}}
+    {:ok, new_requests} = RequestList.stop_request_by_ref(state.requests, command_ref)
+    {:reply, :ok, %State{state | requests: new_requests}}
   end
 
-  def handle_call({:command_alive?, command_ref}, _from, state) do
-    {:reply, CommandList.has_command_ref?(state.commands, command_ref), state}
+  def handle_call({:request_alive?, command_ref}, _from, state) do
+    {:reply, RequestList.has_command_ref?(state.requests, command_ref), state}
   end
 
   @impl GenServer
@@ -156,19 +156,19 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   # handle when there is a timeout and command runner stops
   def handle_info(
-        {:grizzly, :command_timeout, command_runner_pid, grizzly_command},
+        {:grizzly, :command_timeout, request_runner_pid, request},
         state
       ) do
-    if grizzly_command.source.name == :keep_alive do
+    if request.source.name == :keep_alive do
       {:noreply, state}
     else
-      waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
-      do_timeout_reply(waiter, grizzly_command)
+      waiter = RequestList.get_waiter_for_runner(state.requests, request_runner_pid)
+      do_timeout_reply(waiter, request)
 
       {:noreply,
        %State{
          state
-         | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
+         | requests: RequestList.drop_request_runner(state.requests, request_runner_pid)
        }}
     end
   end
@@ -246,16 +246,16 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   defp do_handle_commands(zip_packet, state) do
     updated_state =
-      case CommandList.response_for_zip_packet(state.commands, zip_packet) do
-        {:retry, command_runner, new_command_list} ->
+      case RequestList.response_for_zip_packet(state.requests, zip_packet) do
+        {:retry, request_runner, new_request_list} ->
           # TODO: this could be better, but do a little sleep between retries.
           # This is mostly for firmware updates.
           Process.sleep(100)
 
-          :ok = do_send_command(command_runner, state)
-          %State{state | commands: new_command_list}
+          :ok = do_send_command(request_runner, state)
+          %State{state | requests: new_request_list}
 
-        {:continue, new_command_list} ->
+        {:continue, new_request_list} ->
           if !ZIPPacket.ack_response?(zip_packet) do
             # Since we are doing async communications we need to handle when the
             # connection gets an unhandled command from the Z-Wave
@@ -264,12 +264,12 @@ defmodule Grizzly.Connections.AsyncConnection do
             Grizzly.Events.broadcast_report(report)
           end
 
-          %State{state | commands: new_command_list}
+          %State{state | requests: new_request_list}
 
-        {waiter, {%Report{} = report, new_command_list}} ->
+        {waiter, {%Report{} = report, new_request_list}} ->
           send(waiter, {:grizzly, :report, report})
           Grizzly.Events.broadcast_report(report)
-          %State{state | commands: new_command_list}
+          %State{state | requests: new_request_list}
       end
 
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
@@ -279,28 +279,28 @@ defmodule Grizzly.Connections.AsyncConnection do
     Report.new(:complete, :command, node_id, command: Command.param!(zip_packet, :command))
   end
 
-  defp do_send_command(command_runner, state) do
+  defp do_send_command(request_runner, state) do
     %State{transport: transport} = state
-    binary = RequestRunner.encode_command(command_runner)
+    binary = RequestRunner.encode_command(request_runner)
 
     Transport.send(transport, binary)
   end
 
-  defp do_timeout_reply(waiter, grizzly_command) do
-    if grizzly_command.status == :queued do
+  defp do_timeout_reply(waiter, request) do
+    if request.status == :queued do
       report =
-        Report.new(:complete, :timeout, grizzly_command.node_id,
-          command_ref: grizzly_command.ref,
-          acknowledged: grizzly_command.acknowledged,
+        Report.new(:complete, :timeout, request.node_id,
+          command_ref: request.ref,
+          acknowledged: request.acknowledged,
           queued: true
         )
 
       send(waiter, {:grizzly, :report, report})
     else
       report =
-        Report.new(:complete, :timeout, grizzly_command.node_id,
-          command_ref: grizzly_command.ref,
-          acknowledged: grizzly_command.acknowledged
+        Report.new(:complete, :timeout, request.node_id,
+          command_ref: request.ref,
+          acknowledged: request.acknowledged
         )
 
       send(waiter, {:grizzly, :report, report})
