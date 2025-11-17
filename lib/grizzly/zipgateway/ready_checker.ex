@@ -12,8 +12,6 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
 
   require Logger
 
-  @type init_arg() :: {:status_reporter, module()}
-
   @doc """
   Returns true if Z/IP Gateway has reported that it is ready.
   """
@@ -22,18 +20,17 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
     GenServer.call(server, :ready?)
   end
 
-  @spec start_link([init_arg()]) :: GenServer.on_start()
-  def start_link(args) do
-    {name, args} = Keyword.pop(args, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, args, name: name)
+  @spec start_link(keyword()) :: GenServer.on_start()
+  def start_link(opts \\ []) do
+    {name, opts} = Keyword.pop(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, opts, name: name)
   end
 
   @impl GenServer
-  def init(args) do
+  def init(_opts) do
     Grizzly.subscribe(:node_list_report)
 
     state = %{
-      reporter: args[:status_reporter],
       started_at: System.monotonic_time(),
       ready?: false
     }
@@ -86,20 +83,6 @@ defmodule Grizzly.ZIPGateway.ReadyChecker do
   end
 
   defp ready(state) do
-    _ =
-      Task.Supervisor.start_child(Grizzly.TaskSupervisor, fn ->
-        cond do
-          is_function(state.reporter, 0) ->
-            state.reporter.()
-
-          function_exported?(state.reporter, :ready, 0) ->
-            state.reporter.ready()
-
-          true ->
-            :ok
-        end
-      end)
-
     Grizzly.Events.broadcast_event(:ready, true)
 
     %{state | ready?: true}

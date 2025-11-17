@@ -53,7 +53,6 @@ defmodule Grizzly.Options do
           indicator_handler: (Grizzly.Indicator.event() -> :ok),
           rf_region: Supervisor.rf_region() | nil,
           power_level: {Supervisor.tx_power(), Supervisor.measured_power()} | nil,
-          status_reporter: module(),
           zwave_firmware: zwave_firmware_options(),
           zw_programmer_path: Path.t(),
           inclusion_adapter: module(),
@@ -87,7 +86,6 @@ defmodule Grizzly.Options do
             indicator_handler: nil,
             rf_region: nil,
             power_level: nil,
-            status_reporter: Grizzly.StatusReporter.Console,
             zwave_firmware: %{
               enabled: false,
               zw_programmer_path: "/usr/bin/zw_programmer",

@@ -4,13 +4,10 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
   alias Grizzly.ZIPGateway.{LogMonitor, SAPIMonitor}
 
   setup %{test: test} do
-    test_pid = self()
-
-    status_reporter = fn status -> send(test_pid, status) end
     Grizzly.Events.subscribe(:serial_api_status)
 
-    start_supervised!({SAPIMonitor, status_reporter: status_reporter})
-    pid = start_supervised!({LogMonitor, [name: test, status_reporter: status_reporter]})
+    start_supervised!(SAPIMonitor)
+    pid = start_supervised!({LogMonitor, [name: test]})
 
     %{monitor_pid: pid}
   end
@@ -95,7 +92,6 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
 
   describe "serial api status reporting" do
     test "reports unresponsive after 5 retransmissions", %{monitor_pid: pid} do
-      assert_receive :ok
       assert_receive {:grizzly, :serial_api_status, :ok}
 
       send(pid, {:message, " SerialAPI: Retransmission 0 of 0x07"})
@@ -104,12 +100,10 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
       send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
       send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
 
-      assert_receive :unresponsive
       assert_receive {:grizzly, :serial_api_status, :unresponsive}
     end
 
     test "ignores retransmissions preceded by 'got response while sending'", %{monitor_pid: pid} do
-      assert_receive :ok
       assert_receive {:grizzly, :serial_api_status, :ok}
 
       send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
@@ -118,24 +112,19 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
       send(pid, {:message, " SerialAPI: Retransmission 2 of 0x07"})
       send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
       send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
-
-      refute_receive :unresponsive
       refute_receive {:grizzly, :serial_api_status, _}
 
       send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
       send(pid, {:message, " SerialAPI: Retransmission 5 of 0x07"})
-      refute_receive :unresponsive
       refute_receive {:grizzly, :serial_api_status, _}
 
       send(pid, {:message, " SerialAPI: Retransmission 6 of 0x07"})
-      assert_receive :unresponsive
       assert_receive {:grizzly, :serial_api_status, :unresponsive}
     end
 
     test "'got response while sending' only counts if it's the immediately previous message", %{
       monitor_pid: pid
     } do
-      assert_receive :ok
       assert_receive {:grizzly, :serial_api_status, :ok}
 
       send(pid, {:message, " SerialAPI: Got RESPONSE frame while sending...."})
@@ -151,11 +140,9 @@ defmodule Grizzly.ZIPGateway.LogMonitorTest do
       send(pid, {:message, " SerialAPI: Retransmission 2 of 0x07"})
 
       send(pid, {:message, " SerialAPI: Retransmission 3 of 0x07"})
-      refute_receive :unresponsive
       refute_receive {:grizzly, :serial_api_status, :unresponsive}
 
       send(pid, {:message, " SerialAPI: Retransmission 4 of 0x07"})
-      assert_receive :unresponsive
       assert_receive {:grizzly, :serial_api_status, :unresponsive}
     end
   end

@@ -18,7 +18,7 @@ defmodule Grizzly.Storage.PopulateTest do
     end)
 
     start_link_supervised!({Storage.Populate, disabled: false, database: test_db})
-    Process.sleep(50)
+    Process.sleep(100)
 
     assert Storage.get(["migrated_zipgateway_db"]) == true
 
