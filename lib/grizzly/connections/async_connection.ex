@@ -11,9 +11,9 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   use GenServer
 
-  alias Grizzly.Commands.CommandRunner
   alias Grizzly.{Connection, Connections, Options, Report, Transport, ZIPGateway, ZWave}
   alias Grizzly.Connections.{CommandList, KeepAlive}
+  alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
 
@@ -281,7 +281,7 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   defp do_send_command(command_runner, state) do
     %State{transport: transport} = state
-    binary = CommandRunner.encode_command(command_runner)
+    binary = RequestRunner.encode_command(command_runner)
 
     Transport.send(transport, binary)
   end

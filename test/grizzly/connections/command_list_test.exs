@@ -1,9 +1,9 @@
 defmodule Grizzly.Connections.CommandListTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.Commands.CommandRunner
   alias Grizzly.Connections.CommandList
   alias Grizzly.Report
+  alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinarySet, ZIPPacket}
 
   test "create and monitor a command runtime" do
@@ -22,7 +22,7 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, runner, ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, 1, self())
 
-    ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
+    ack_response = ZIPPacket.make_ack_response(RequestRunner.seq_number(runner))
 
     report = Report.new(:complete, :ack_response, 1, command_ref: ref, acknowledged: true)
 
@@ -36,7 +36,7 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, runner, _ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, 1, self(), retries: 0)
 
-    ack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
+    ack_response = ZIPPacket.make_nack_response(RequestRunner.seq_number(runner))
 
     pid = self()
 
@@ -54,7 +54,7 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, runner, ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, 1, self())
 
-    queued_response = ZIPPacket.make_nack_waiting_response(CommandRunner.seq_number(runner), 3)
+    queued_response = ZIPPacket.make_nack_waiting_response(RequestRunner.seq_number(runner), 3)
 
     report =
       Report.new(:inflight, :queued_delay, 1, command_ref: ref, queued: true, queued_delay: 3)
@@ -71,7 +71,7 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, runner, _ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, 1, self(), retries: 2)
 
-    nack_response = ZIPPacket.make_nack_response(CommandRunner.seq_number(runner))
+    nack_response = ZIPPacket.make_nack_response(RequestRunner.seq_number(runner))
 
     assert {:retry, runner, command_list} ==
              CommandList.response_for_zip_packet(command_list, nack_response)
@@ -85,7 +85,7 @@ defmodule Grizzly.Connections.CommandListTest do
     {:ok, runner, _ref, command_list} =
       CommandList.create(CommandList.empty(), zwave_command, 1, self())
 
-    ack_response = ZIPPacket.make_ack_response(CommandRunner.seq_number(runner))
+    ack_response = ZIPPacket.make_ack_response(RequestRunner.seq_number(runner))
 
     assert {:continue, command_list} ==
              CommandList.response_for_zip_packet(command_list, ack_response)

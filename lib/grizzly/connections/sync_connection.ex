@@ -7,9 +7,9 @@ defmodule Grizzly.Connections.SyncConnection do
 
   require Logger
 
-  alias Grizzly.Commands.CommandRunner
   alias Grizzly.{Connections, Options, Report, Transport, ZIPGateway}
   alias Grizzly.Connections.{CommandList, KeepAlive}
+  alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
@@ -230,7 +230,7 @@ defmodule Grizzly.Connections.SyncConnection do
 
   defp do_send_command(command, state, opts \\ []) do
     %State{transport: transport} = state
-    binary = CommandRunner.encode_command(command)
+    binary = RequestRunner.encode_command(command)
 
     Transport.send(transport, binary, opts)
   end

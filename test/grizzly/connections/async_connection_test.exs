@@ -3,6 +3,7 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
 
   alias Grizzly.CommandHandlers.AckResponse
   alias Grizzly.Connections.AsyncConnection
+  alias Grizzly.Requests.Handlers.AckResponse
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
 
   test "can stop a running command" do

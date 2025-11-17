@@ -4,7 +4,7 @@ defmodule Grizzly.Connections.KeepAlive do
   # module for working with the Z/IP Keep Alive command and handling the keep
   # alive information
 
-  alias Grizzly.{Commands, ZWave}
+  alias Grizzly.{Requests, ZWave}
   alias Grizzly.ZWave.Commands.ZIPKeepAlive
 
   @type opt :: {:owner, pid()}
@@ -51,7 +51,7 @@ defmodule Grizzly.Connections.KeepAlive do
   @spec make_command(t()) :: t()
   def make_command(keep_alive) do
     {:ok, keep_alive_command} = ZIPKeepAlive.new(ack_flag: :ack_request)
-    {:ok, command_runner} = Commands.create_command(keep_alive_command, keep_alive.node_id)
+    {:ok, command_runner} = Requests.start_request_runner(keep_alive_command, keep_alive.node_id)
 
     %__MODULE__{keep_alive | command_runner: command_runner}
   end
@@ -97,7 +97,7 @@ defmodule Grizzly.Connections.KeepAlive do
   defp maybe_stop_command_runner(%__MODULE__{command_runner: nil} = ka), do: ka
 
   defp maybe_stop_command_runner(%__MODULE__{command_runner: runner} = ka) when is_pid(runner) do
-    :ok = Commands.stop(runner)
+    :ok = Requests.stop(runner)
     %__MODULE__{ka | command_runner: nil}
   end
 end

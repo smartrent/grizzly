@@ -6,8 +6,8 @@ defmodule Grizzly.Connections.CommandList do
 
   #### TODO separate out keep alive stuff ####
 
-  alias Grizzly.{Commands, Report, ZWave}
-  alias Grizzly.Commands.CommandRunner
+  alias Grizzly.{Report, Requests, ZWave}
+  alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 
   # this command is the process or GenServer waiting for a response
@@ -110,7 +110,7 @@ defmodule Grizzly.Connections.CommandList do
   def stop_command_by_ref(command_list, command_ref) do
     case find_item_for_ref(command_list, command_ref) do
       {runner, _waiter, _ref} ->
-        Commands.stop(runner)
+        Requests.stop(runner)
         {:ok, drop_command_runner(command_list, runner)}
     end
   end
@@ -147,7 +147,7 @@ defmodule Grizzly.Connections.CommandList do
         {{report, completed_command}, [command | new_command_list]}
 
       {command_runner, _command_waiter, _ref} = command, {_result, new_command_list} ->
-        case CommandRunner.handle_zip_command(command_runner, zip_packet) do
+        case RequestRunner.handle_zip_command(command_runner, zip_packet) do
           # if the command says to continue we put it back into the command list
           :continue ->
             {:continue, [command | new_command_list]}
@@ -177,7 +177,7 @@ defmodule Grizzly.Connections.CommandList do
     command_opts = Keyword.put_new(command_opts, :reference, command_ref)
     command_opts = Keyword.put_new(command_opts, :waiter, waiter)
 
-    case Commands.create_command(command, node_id, command_opts) do
+    case Requests.start_request_runner(command, node_id, command_opts) do
       {:ok, command_runner} ->
         {:ok, command_runner, command_ref,
          put_command(command_list, command_runner, waiter, command_ref)}

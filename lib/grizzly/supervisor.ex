@@ -238,7 +238,7 @@ defmodule Grizzly.Supervisor do
       {Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor, options},
 
       # Supervisor for running commands
-      Grizzly.Commands.CommandRunnerSupervisor,
+      Grizzly.Requests.RequestRunnerSupervisor,
 
       # Supervisor for virtual devices
       {Grizzly.VirtualDevicesSupervisor, options},
