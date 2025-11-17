@@ -3,7 +3,7 @@ defmodule Grizzly.ZWave.Commands do
   Lookup table for sendable Z-Wave commands.
   """
 
-  alias Grizzly.CommandHandlers.{AckResponse, AggregateReport, WaitReport}
+  alias Grizzly.Requests.Handlers.{AckResponse, AggregateReport, WaitReport}
   alias Grizzly.ZWave.Commands
 
   @table %{

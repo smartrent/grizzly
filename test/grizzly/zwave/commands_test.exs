@@ -1,7 +1,7 @@
 defmodule Grizzly.ZWave.CommandsTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandHandlers.WaitReport
+  alias Grizzly.Requests.Handlers.WaitReport
   alias Grizzly.ZWave.{Commands, DSK}
 
   @special_cases [

@@ -1,9 +1,9 @@
-defmodule Grizzly.CommandHandlers.WaitReport do
+defmodule Grizzly.Requests.Handlers.WaitReport do
   @moduledoc """
   This handle is useful for when you want to wait for a particular report from
   the Z-Wave network. Most GET commands can use this handler.
   """
-  @behaviour Grizzly.CommandHandler
+  @behaviour Grizzly.Requests.Handler
 
   alias Grizzly.ZWave.Command
 
@@ -11,16 +11,16 @@ defmodule Grizzly.CommandHandlers.WaitReport do
 
   @type opt :: {:complete_report, atom(), get_command: Command.t()}
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def init(command, opts) do
     report_name = Keyword.fetch!(opts, :complete_report)
     {:ok, %{complete_report: report_name, get_command: command}}
   end
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_ack(state), do: {:continue, state}
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_command(command, state) do
     expected? =
       not is_nil(command) and command.name == state.complete_report and

@@ -1,18 +1,18 @@
-defmodule Grizzly.CommandHandlers.AckResponse do
+defmodule Grizzly.Requests.Handlers.AckResponse do
   @moduledoc """
   This handler is useful for most set commands that only needs to be
   acknowledged
   """
-  @behaviour Grizzly.CommandHandler
+  @behaviour Grizzly.Requests.Handler
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def init(_, _) do
     {:ok, nil}
   end
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_ack(_), do: {:complete, :ok}
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_command(_, state), do: {:continue, state}
 end

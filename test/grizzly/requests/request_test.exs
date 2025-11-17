@@ -14,7 +14,7 @@ defmodule Grizzly.Requests.RequestTest do
     ZIPPacket
   }
 
-  alias Grizzly.CommandHandlers.AckResponse
+  alias Grizzly.Requests.Handlers.AckResponse
 
   test "turns a Z-Wave command into a Grizzly request" do
     {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)

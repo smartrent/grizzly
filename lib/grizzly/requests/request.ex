@@ -5,8 +5,8 @@ defmodule Grizzly.Requests.Request do
 
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
-  alias Grizzly.CommandHandlers.SupervisionReport
   alias Grizzly.{Report, SeqNumber, ZWave}
+  alias Grizzly.Requests.Handlers.SupervisionReport
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.{SupervisionGet, ZIPPacket}
