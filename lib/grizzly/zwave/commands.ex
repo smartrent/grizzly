@@ -1,4 +1,4 @@
-defmodule Grizzly.Commands.Table do
+defmodule Grizzly.ZWave.Commands do
   @moduledoc """
   Lookup table for sendable Z-Wave commands.
   """

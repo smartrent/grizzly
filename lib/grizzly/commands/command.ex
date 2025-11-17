@@ -6,9 +6,9 @@ defmodule Grizzly.Commands.Command do
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
   alias Grizzly.CommandHandlers.SupervisionReport
-  alias Grizzly.Commands.Table
   alias Grizzly.{Report, SeqNumber, ZWave}
   alias Grizzly.ZWave.Command, as: ZWaveCommand
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.{SupervisionGet, ZIPPacket}
 
   @type status :: :inflight | :queued | :complete
@@ -219,10 +219,10 @@ defmodule Grizzly.Commands.Command do
   defp get_handler_spec(zwave_command, opts) do
     case Keyword.get(opts, :handler) do
       nil ->
-        Table.handler(zwave_command.name)
+        Commands.handler(zwave_command.name)
 
       handler ->
-        Table.format_handler_spec(handler)
+        Commands.format_handler_spec(handler)
     end
   end
 
@@ -235,7 +235,7 @@ defmodule Grizzly.Commands.Command do
   defp maybe_warn_supervision(_, _), do: :ok
 
   defp use_supervision?(zwave_command, opts) do
-    opts[:supervision?] == true && Table.supports_supervision?(zwave_command.name)
+    opts[:supervision?] == true && Commands.supports_supervision?(zwave_command.name)
   end
 
   defp add_supervision_encapsulation(zwave_command, node_id, opts) do
