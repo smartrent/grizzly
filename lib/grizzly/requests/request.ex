@@ -1,14 +1,14 @@
-defmodule Grizzly.Commands.Command do
+defmodule Grizzly.Requests.Request do
   @moduledoc false
 
   require Logger
 
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
-  alias Grizzly.CommandHandlers.SupervisionReport
-  alias Grizzly.Commands.Table
   alias Grizzly.{Report, SeqNumber, ZWave}
+  alias Grizzly.Requests.Handlers.SupervisionReport
   alias Grizzly.ZWave.Command, as: ZWaveCommand
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.{SupervisionGet, ZIPPacket}
 
   @type status :: :inflight | :queued | :complete
@@ -103,8 +103,8 @@ defmodule Grizzly.Commands.Command do
   end
 
   @spec to_binary(t()) :: binary()
-  def to_binary(command) do
-    zwave_command = command.source
+  def to_binary(request) do
+    zwave_command = request.source
 
     case zwave_command.name do
       :keep_alive ->
@@ -112,10 +112,10 @@ defmodule Grizzly.Commands.Command do
           ZWaveCommand.encode_params(zwave_command)
 
       _other ->
-        opts = make_zip_packet_command_opts(command)
+        opts = make_zip_packet_command_opts(request)
 
         {:ok, zip_packet_command} =
-          ZIPPacket.with_zwave_command(zwave_command, command.seq_number, opts)
+          ZIPPacket.with_zwave_command(zwave_command, request.seq_number, opts)
 
         ZWaveCommand.to_binary(zip_packet_command)
     end
@@ -125,117 +125,117 @@ defmodule Grizzly.Commands.Command do
           {Report.t(), t()}
           | {:retry, t()}
           | {:continue, t()}
-  def handle_zip_command(command, zip_command) do
+  def handle_zip_command(request, zip_command) do
     case ZWaveCommand.param!(zip_command, :flag) do
       :ack_response ->
-        handle_ack_response(command, zip_command)
+        handle_ack_response(request, zip_command)
 
       :nack_waiting ->
-        handle_nack_waiting(command, zip_command)
+        handle_nack_waiting(request, zip_command)
 
       flag when flag in [:nack_response, :nack_queue_full] ->
-        handle_final_nack(command, zip_command)
+        handle_final_nack(request, zip_command)
 
       flag when flag in [nil, :ack_request] ->
-        do_handle_zip_command(command, zip_command)
+        do_handle_zip_command(request, zip_command)
     end
   end
 
-  defp handle_ack_response(command, zip_packet) do
+  defp handle_ack_response(request, zip_packet) do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
-    if command.seq_number == seq_number do
-      do_handle_ack_response(%__MODULE__{command | acknowledged: true}, zip_packet)
+    if request.seq_number == seq_number do
+      do_handle_ack_response(%__MODULE__{request | acknowledged: true}, zip_packet)
     else
-      {:continue, command}
+      {:continue, request}
     end
   end
 
-  defp do_handle_ack_response(command, zip_packet) do
-    transmission_stats = make_network_stats(command, zip_packet)
+  defp do_handle_ack_response(request, zip_packet) do
+    transmission_stats = make_network_stats(request, zip_packet)
 
-    case command.handler.handle_ack(command.handler_state) do
+    case request.handler.handle_ack(request.handler_state) do
       {:continue, new_handler_state} ->
         {:continue,
          %__MODULE__{
-           command
+           request
            | handler_state: new_handler_state,
              transmission_stats: transmission_stats
          }}
 
       {:complete, response} ->
         build_complete_reply(
-          %__MODULE__{command | transmission_stats: transmission_stats},
+          %__MODULE__{request | transmission_stats: transmission_stats},
           response
         )
     end
   end
 
   # Handles both nack response and nack queue full
-  defp handle_final_nack(command, zip_packet) do
+  defp handle_final_nack(request, zip_packet) do
     flag = ZWaveCommand.param!(zip_packet, :flag)
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
     cond do
-      command.seq_number != seq_number ->
-        {:continue, command}
+      request.seq_number != seq_number ->
+        {:continue, request}
 
       # Never retry on a nack_queue_full
       flag == :nack_queue_full ->
-        make_queue_full_response(command)
+        make_queue_full_response(request)
 
-      command.retries > 0 ->
-        {:retry, %__MODULE__{command | retries: command.retries - 1}}
+      request.retries > 0 ->
+        {:retry, %__MODULE__{request | retries: request.retries - 1}}
 
       true ->
-        make_nack_response(command)
+        make_nack_response(request)
     end
   end
 
-  defp handle_nack_waiting(command, zip_packet) do
+  defp handle_nack_waiting(request, zip_packet) do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
-    if command.seq_number == seq_number do
+    if request.seq_number == seq_number do
       # SDS13784 Network specification states that a default of 90 seconds
       # should be used if no expected delay is provided.
-      make_queued_response(command, zip_packet)
+      make_queued_response(request, zip_packet)
     else
-      {:continue, command}
+      {:continue, request}
     end
   end
 
-  defp do_handle_zip_command(command, zip_packet_command) do
+  defp do_handle_zip_command(request, zip_packet_command) do
     zwave_command = ZWaveCommand.param!(zip_packet_command, :command)
 
-    case command.handler.handle_command(zwave_command, command.handler_state) do
+    case request.handler.handle_command(zwave_command, request.handler_state) do
       {:continue, new_handler_state} ->
-        {:continue, %__MODULE__{command | handler_state: new_handler_state}}
+        {:continue, %__MODULE__{request | handler_state: new_handler_state}}
 
       {:complete, response} ->
-        build_complete_reply(command, response)
+        build_complete_reply(request, response)
     end
   end
 
   defp get_handler_spec(zwave_command, opts) do
     case Keyword.get(opts, :handler) do
       nil ->
-        Table.handler(zwave_command.name)
+        Commands.handler(zwave_command.name)
 
       handler ->
-        Table.format_handler_spec(handler)
+        Commands.format_handler_spec(handler)
     end
   end
 
-  defp maybe_warn_supervision(command, true) do
+  defp maybe_warn_supervision(zwave_command, true) do
     Logger.warning(
-      "[Grizzly] Supervision was requested for command #{command.name} but is not supported"
+      "[Grizzly] Supervision was requested for command #{zwave_command.name} but is not supported"
     )
   end
 
   defp maybe_warn_supervision(_, _), do: :ok
 
   defp use_supervision?(zwave_command, opts) do
-    opts[:supervision?] == true && Table.supports_supervision?(zwave_command.name)
+    opts[:supervision?] == true && Commands.supports_supervision?(zwave_command.name)
   end
 
   defp add_supervision_encapsulation(zwave_command, node_id, opts) do
@@ -265,114 +265,114 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp make_queued_response(command, zip_packet) do
+  defp make_queued_response(request, zip_packet) do
     case ZIPPacket.extension(zip_packet, :expected_delay, 90) do
       delay when delay > 1 ->
-        make_queued_or_queued_ping_response(command, delay)
+        make_queued_or_queued_ping_response(request, delay)
 
       _other ->
-        {:continue, command}
+        {:continue, request}
     end
   end
 
-  defp make_queued_or_queued_ping_response(command, delay) do
-    case command.status do
+  defp make_queued_or_queued_ping_response(request, delay) do
+    case request.status do
       :inflight ->
         queued_delay_report =
-          Report.new(:inflight, :queued_delay, command.node_id,
-            command_ref: command.ref,
+          Report.new(:inflight, :queued_delay, request.node_id,
+            command_ref: request.ref,
             queued_delay: delay,
             queued: true
           )
 
-        {queued_delay_report, %__MODULE__{command | status: :queued}}
+        {queued_delay_report, %__MODULE__{request | status: :queued}}
 
       :queued ->
-        {Report.new(:inflight, :queued_ping, command.node_id,
-           command_ref: command.ref,
+        {Report.new(:inflight, :queued_ping, request.node_id,
+           command_ref: request.ref,
            queued_delay: delay,
            queued: true
-         ), command}
+         ), request}
     end
   end
 
-  defp make_nack_response(command) do
-    {Report.new(:complete, :nack_response, command.node_id,
-       command_ref: command.ref,
-       queued: command.status == :queued,
-       transmission_stats: command.transmission_stats
-     ), %__MODULE__{command | status: :complete}}
+  defp make_nack_response(request) do
+    {Report.new(:complete, :nack_response, request.node_id,
+       command_ref: request.ref,
+       queued: request.status == :queued,
+       transmission_stats: request.transmission_stats
+     ), %__MODULE__{request | status: :complete}}
   end
 
-  defp make_queue_full_response(command) do
-    {Report.new(:complete, :queue_full, command.node_id,
-       command_ref: command.ref,
-       queued: command.status == :queued,
-       transmission_stats: command.transmission_stats
-     ), %__MODULE__{command | status: :complete}}
+  defp make_queue_full_response(request) do
+    {Report.new(:complete, :queue_full, request.node_id,
+       command_ref: request.ref,
+       queued: request.status == :queued,
+       transmission_stats: request.transmission_stats
+     ), %__MODULE__{request | status: :complete}}
   end
 
-  defp build_complete_reply(command, response) do
-    case command.status do
+  defp build_complete_reply(request, response) do
+    case request.status do
       :inflight ->
-        {build_report(command, response), %__MODULE__{command | status: :complete}}
+        {build_report(request, response), %__MODULE__{request | status: :complete}}
 
       :queued ->
         case response do
           :ok ->
-            {Report.new(:complete, :ack_response, command.node_id,
-               command_ref: command.ref,
+            {Report.new(:complete, :ack_response, request.node_id,
+               command_ref: request.ref,
                acknowledged: true,
                queued: true,
-               transmission_stats: command.transmission_stats
-             ), %__MODULE__{command | status: :complete}}
+               transmission_stats: request.transmission_stats
+             ), %__MODULE__{request | status: :complete}}
 
           %ZWaveCommand{} ->
-            {Report.new(:complete, :command, command.node_id,
-               command_ref: command.ref,
-               acknowledged: command.acknowledged,
+            {Report.new(:complete, :command, request.node_id,
+               command_ref: request.ref,
+               acknowledged: request.acknowledged,
                command: response,
                queued: true,
-               transmission_stats: command.transmission_stats
-             ), %__MODULE__{command | status: :complete}}
+               transmission_stats: request.transmission_stats
+             ), %__MODULE__{request | status: :complete}}
         end
     end
   end
 
-  defp make_zip_packet_command_opts(grizzly_command) do
+  defp make_zip_packet_command_opts(request) do
     Keyword.new()
-    |> maybe_add_installation_and_maintenance_get(grizzly_command)
-    |> maybe_add_more_info_flag(grizzly_command)
-    |> add_seq_number(grizzly_command)
+    |> maybe_add_installation_and_maintenance_get(request)
+    |> maybe_add_more_info_flag(request)
+    |> add_seq_number(request)
   end
 
-  defp maybe_add_installation_and_maintenance_get(opts, grizzly_command) do
-    if grizzly_command.with_transmission_stats do
+  defp maybe_add_installation_and_maintenance_get(opts, request) do
+    if request.with_transmission_stats do
       Keyword.put(opts, :header_extensions, [:installation_and_maintenance_get])
     else
       opts
     end
   end
 
-  defp maybe_add_more_info_flag(opts, grizzly_command) do
-    if grizzly_command.more_info? do
+  defp maybe_add_more_info_flag(opts, request) do
+    if request.more_info? do
       Keyword.put(opts, :more_info, true)
     else
       opts
     end
   end
 
-  defp add_seq_number(opts, grizzly_command) do
-    Keyword.put(opts, :seq_number, grizzly_command.seq_number)
+  defp add_seq_number(opts, request) do
+    Keyword.put(opts, :seq_number, request.seq_number)
   end
 
-  defp make_network_stats(command, zip_packet) do
+  defp make_network_stats(request, zip_packet) do
     Keyword.new()
-    |> maybe_return_network_stats(command, zip_packet)
+    |> maybe_return_network_stats(request, zip_packet)
   end
 
-  defp maybe_return_network_stats(meta, command, zip_packet) do
-    if command.with_transmission_stats do
+  defp maybe_return_network_stats(meta, request, zip_packet) do
+    if request.with_transmission_stats do
       stats = get_stats_from_zip_packet(zip_packet)
 
       Enum.reduce(stats, meta, fn
@@ -455,26 +455,26 @@ defmodule Grizzly.Commands.Command do
     end
   end
 
-  defp build_report(command, :ok) do
+  defp build_report(request, :ok) do
     %Report{
       status: :complete,
-      command_ref: command.ref,
-      transmission_stats: command.transmission_stats,
+      command_ref: request.ref,
+      transmission_stats: request.transmission_stats,
       type: :ack_response,
-      node_id: command.node_id,
-      acknowledged: command.acknowledged
+      node_id: request.node_id,
+      acknowledged: request.acknowledged
     }
   end
 
-  defp build_report(command, response) do
+  defp build_report(request, response) do
     %Report{
       status: :complete,
       command: response,
-      transmission_stats: command.transmission_stats,
+      transmission_stats: request.transmission_stats,
       type: :command,
-      command_ref: command.ref,
-      node_id: command.node_id,
-      acknowledged: command.acknowledged
+      command_ref: request.ref,
+      node_id: request.node_id,
+      acknowledged: request.acknowledged
     }
   end
 end

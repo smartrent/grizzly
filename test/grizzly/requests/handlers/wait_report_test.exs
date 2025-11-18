@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandHandlers.WaitReportTest do
+defmodule Grizzly.Requests.Handlers.WaitReportTest do
   use ExUnit.Case
 
   setup do

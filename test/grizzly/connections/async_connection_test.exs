@@ -1,8 +1,8 @@
 defmodule Grizzly.Connections.AsyncConnectionTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandHandlers.AckResponse
   alias Grizzly.Connections.AsyncConnection
+  alias Grizzly.Requests.Handlers.AckResponse
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
 
   test "can stop a running command" do
@@ -15,7 +15,7 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
 
     :ok = AsyncConnection.stop_command(conn, command_ref)
 
-    refute AsyncConnection.command_alive?(conn, command_ref)
+    refute AsyncConnection.request_alive?(conn, command_ref)
   end
 
   @tag :integration

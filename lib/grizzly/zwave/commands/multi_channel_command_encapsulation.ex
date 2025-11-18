@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.Commands.Table
-  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError, Decoder}
+  alias Grizzly.ZWave.{Command, CommandClasses, Commands, DecodeError, Decoder}
   alias Grizzly.ZWave.CommandClasses.MultiChannel
 
   @type param ::
@@ -118,7 +117,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   end
 
   defp make_command(command_name, parameters) do
-    {command_module, _} = Table.lookup(command_name)
+    {command_module, _} = Commands.lookup(command_name)
 
     {:ok, command} = command_module.new(parameters)
     command

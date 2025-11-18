@@ -1,12 +1,12 @@
-defmodule Grizzly.Commands.CommandRunner do
+defmodule Grizzly.Requests.RequestRunner do
   @moduledoc false
 
   # TODO: document ownership and timeouts
 
   use GenServer
 
-  alias Grizzly.Commands.Command
   alias Grizzly.Report
+  alias Grizzly.Requests.Request
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 
   def child_spec([_command, _node_id, _opts] = args) do
@@ -15,10 +15,10 @@ defmodule Grizzly.Commands.CommandRunner do
     %{id: __MODULE__, start: {__MODULE__, :start_link, args}, restart: :temporary}
   end
 
-  @spec start_link(Command.t(), [Grizzly.command_opt()]) :: GenServer.on_start()
-  def start_link(command, node_id, opts \\ []) do
+  @spec start_link(Request.t(), [Grizzly.command_opt()]) :: GenServer.on_start()
+  def start_link(request, node_id, opts \\ []) do
     opts = Keyword.merge([owner: self(), timeout: 15_000], opts)
-    GenServer.start_link(__MODULE__, [command, node_id, opts])
+    GenServer.start_link(__MODULE__, [request, node_id, opts])
   end
 
   @spec handle_zip_command(pid(), ZWaveCommand.t()) ::
@@ -58,47 +58,48 @@ defmodule Grizzly.Commands.CommandRunner do
     timeout_ref = start_timeout_counter(timeout)
     opts = Keyword.merge(opts, timeout_ref: timeout_ref)
 
-    {:ok, Command.from_zwave_command(command, node_id, owner, opts)}
+    {:ok, Request.from_zwave_command(command, node_id, owner, opts)}
   end
 
   @impl GenServer
-  def handle_call(:seq_number, _from, command), do: {:reply, command.seq_number, command}
+  def handle_call(:seq_number, _from, request), do: {:reply, request.seq_number, request}
 
-  def handle_call({:handle_zip_command, zip_packet}, _from, command) do
-    case Command.handle_zip_command(command, zip_packet) do
-      {%Report{status: :inflight} = report, new_command} ->
-        new_command = update_timeout(new_command, report.queued_delay)
-        {:reply, report, new_command}
+  def handle_call({:handle_zip_command, zip_packet}, _from, request) do
+    case Request.handle_zip_command(request, zip_packet) do
+      {%Report{status: :inflight} = report, new_request} ->
+        new_request = update_timeout(new_request, report.queued_delay)
+        {:reply, report, new_request}
 
-      {%Report{status: :complete} = report, new_command} ->
-        {:stop, :normal, report, new_command}
+      {%Report{status: :complete} = report, new_request} ->
+        {:stop, :normal, report, new_request}
 
-      {:continue, new_command} ->
-        {:reply, :continue, new_command}
+      {:continue, new_request} ->
+        {:reply, :continue, new_request}
 
-      {:retry, new_command} ->
-        {:reply, :retry, new_command}
+      {:retry, new_request} ->
+        {:reply, :retry, new_request}
     end
   end
 
-  def handle_call(:reference, _from, command) do
-    {:reply, command.ref, command}
+  def handle_call(:reference, _from, request) do
+    {:reply, request.ref, request}
   end
 
-  def handle_call(:encode, _from, command) do
-    {:reply, Command.to_binary(command), command}
+  def handle_call(:encode, _from, request) do
+    {:reply, Request.to_binary(request), request}
   end
 
   @impl GenServer
-  def handle_info(:timeout, command) do
-    send(command.owner, {:grizzly, :command_timeout, self(), command})
-    {:stop, :normal, command}
+  def handle_info(:timeout, request) do
+    # TODO: :command_timeout -> :request_timeout?
+    send(request.owner, {:grizzly, :command_timeout, self(), request})
+    {:stop, :normal, request}
   end
 
-  defp update_timeout(command, time_in_seconds) do
-    _ = Process.cancel_timer(command.timeout_ref)
+  defp update_timeout(request, time_in_seconds) do
+    _ = Process.cancel_timer(request.timeout_ref)
     new_timeout_ref = start_timeout_counter(time_in_seconds * 1000 + 500)
-    %Command{command | timeout_ref: new_timeout_ref}
+    %Request{request | timeout_ref: new_timeout_ref}
   end
 
   defp start_timeout_counter(timeout), do: Process.send_after(self(), :timeout, timeout)

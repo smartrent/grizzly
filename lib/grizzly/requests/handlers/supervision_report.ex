@@ -1,13 +1,13 @@
-defmodule Grizzly.CommandHandlers.SupervisionReport do
+defmodule Grizzly.Requests.Handlers.SupervisionReport do
   @moduledoc """
   This handler is used for non-get commands sent with Supervision.
   """
-  @behaviour Grizzly.CommandHandler
+  @behaviour Grizzly.Requests.Handler
 
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def init(_, opts) do
     state =
       opts
@@ -17,10 +17,10 @@ defmodule Grizzly.CommandHandlers.SupervisionReport do
     {:ok, state}
   end
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_ack(state), do: {:continue, state}
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_command(%Command{name: :supervision_report} = command, state) do
     session_id = Command.param!(command, :session_id)
     status = Command.param!(command, :status)

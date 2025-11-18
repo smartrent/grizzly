@@ -95,7 +95,6 @@ defmodule Grizzly.MixProject do
           ~r/^Grizzly\.Associations/,
           Grizzly.Autocomplete,
           Grizzly.BackgroundRSSIMonitor,
-          ~r/^Grizzly\.(Commands|CommandHandlers)/,
           Grizzly.Events,
           Grizzly.Inclusions,
           Grizzly.Indicator,
@@ -129,6 +128,12 @@ defmodule Grizzly.MixProject do
         "Firmware Updates": [
           ~r/^Grizzly\.FirmwareUpdates/
         ],
+        Requests: [
+          ~r/^Grizzly\.(Requests)/
+        ],
+        Storage: [
+          ~r/^Grizzly\.Storage/
+        ],
         "Z-Wave": [
           Grizzly.ZWave,
           Grizzly.ZWave.Command,
@@ -157,7 +162,6 @@ defmodule Grizzly.MixProject do
         ]
       ],
       nest_modules_by_prefix: [
-        Grizzly.CommandHandlers,
         Grizzly.VirtualDevices,
         Grizzly.ZWave.CommandClasses,
         Grizzly.ZWave.Commands

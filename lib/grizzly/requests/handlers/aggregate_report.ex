@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandHandlers.AggregateReport do
+defmodule Grizzly.Requests.Handlers.AggregateReport do
   @moduledoc """
   Handler for working with reports that could take many report frames to
   complete
@@ -6,7 +6,7 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
   This handler will handle aggregating the responses into one report command
   for ease of consumption by callers.
   """
-  @behaviour Grizzly.CommandHandler
+  @behaviour Grizzly.Requests.Handler
 
   alias Grizzly.ZWave.Command
 
@@ -14,7 +14,7 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
 
   @type opt :: {:complete_report, atom(), aggregate_param: atom()}
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def init(_, opts) do
     report_name = Keyword.fetch!(opts, :complete_report)
     aggregate_param = Keyword.fetch!(opts, :aggregate_param)
@@ -22,10 +22,10 @@ defmodule Grizzly.CommandHandlers.AggregateReport do
     {:ok, %{complete_report: report_name, aggregate_param: aggregate_param, aggregates: []}}
   end
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_ack(state), do: {:continue, state}
 
-  @impl Grizzly.CommandHandler
+  @impl Grizzly.Requests.Handler
   def handle_command(command, state) do
     if command.name == state.complete_report do
       do_handle_command(command, state)

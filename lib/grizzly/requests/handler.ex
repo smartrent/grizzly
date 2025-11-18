@@ -1,4 +1,4 @@
-defmodule Grizzly.CommandHandler do
+defmodule Grizzly.Requests.Handler do
   @moduledoc """
   Behaviour for how commands should handle incoming Z-Wave messages
   """

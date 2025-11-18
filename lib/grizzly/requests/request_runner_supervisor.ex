@@ -1,11 +1,11 @@
-defmodule Grizzly.Commands.CommandRunnerSupervisor do
+defmodule Grizzly.Requests.RequestRunnerSupervisor do
   @moduledoc false
 
-  # Supervisor for command runners
+  # Supervisor for request runners
 
   use DynamicSupervisor
 
-  alias Grizzly.Commands.{Command, CommandRunner}
+  alias Grizzly.Requests.{Request, RequestRunner}
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 
@@ -16,11 +16,11 @@ defmodule Grizzly.Commands.CommandRunnerSupervisor do
   @doc """
   Start a new supervised runtime for a command
   """
-  @spec start_runner(ZWaveCommand.t(), ZWave.node_id(), [Command.opt()]) ::
+  @spec start_runner(ZWaveCommand.t(), ZWave.node_id(), [Request.opt()]) ::
           DynamicSupervisor.on_start_child()
   def start_runner(command, node_id, command_opts) do
     command_opts = Keyword.merge([owner: self()], command_opts)
-    child_spec = CommandRunner.child_spec([command, node_id, command_opts])
+    child_spec = RequestRunner.child_spec([command, node_id, command_opts])
 
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end

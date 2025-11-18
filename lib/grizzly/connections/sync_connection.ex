@@ -7,9 +7,9 @@ defmodule Grizzly.Connections.SyncConnection do
 
   require Logger
 
-  alias Grizzly.Commands.CommandRunner
   alias Grizzly.{Connections, Options, Report, Transport, ZIPGateway}
-  alias Grizzly.Connections.{CommandList, KeepAlive}
+  alias Grizzly.Connections.{KeepAlive, RequestList}
+  alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
@@ -19,7 +19,7 @@ defmodule Grizzly.Connections.SyncConnection do
   defmodule State do
     @moduledoc false
     defstruct transport: nil,
-              commands: CommandList.empty(),
+              requests: RequestList.empty(),
               keep_alive: nil,
               node_id: nil
   end
@@ -91,15 +91,15 @@ defmodule Grizzly.Connections.SyncConnection do
 
   @impl GenServer
   def handle_call({:send_command, command, _node_id, command_opts}, from, state) do
-    {:ok, command_runner, _, new_command_list} =
-      CommandList.create(state.commands, command, state.node_id, from, command_opts)
+    {:ok, request_runner, _, new_request_list} =
+      RequestList.create(state.requests, command, state.node_id, from, command_opts)
 
-    case do_send_command(command_runner, state) do
+    case do_send_command(request_runner, state) do
       :ok ->
         {:noreply,
          %State{
            state
-           | commands: new_command_list,
+           | requests: new_request_list,
              keep_alive: KeepAlive.timer_restart(state.keep_alive)
          }}
     end
@@ -119,19 +119,19 @@ defmodule Grizzly.Connections.SyncConnection do
 
   # handle when there is a timeout and command runner stops
   def handle_info(
-        {:grizzly, :command_timeout, command_runner_pid, grizzly_command},
+        {:grizzly, :command_timeout, request_runner_pid, request},
         state
       ) do
-    if grizzly_command.source.name == :keep_alive do
+    if request.source.name == :keep_alive do
       {:noreply, state}
     else
-      waiter = CommandList.get_waiter_for_runner(state.commands, command_runner_pid)
-      do_timeout_reply(waiter, grizzly_command)
+      waiter = RequestList.get_waiter_for_runner(state.requests, request_runner_pid)
+      do_timeout_reply(waiter, request)
 
       {:noreply,
        %State{
          state
-         | commands: CommandList.drop_command_runner(state.commands, command_runner_pid)
+         | requests: RequestList.drop_request_runner(state.requests, request_runner_pid)
        }}
     end
   end
@@ -206,23 +206,23 @@ defmodule Grizzly.Connections.SyncConnection do
 
   defp do_handle_commands(zip_packet, state) do
     updated_state =
-      case CommandList.response_for_zip_packet(state.commands, zip_packet) do
-        {:retry, command_runner, new_command_list} ->
-          :ok = do_send_command(command_runner, state)
-          %State{state | commands: new_command_list}
+      case RequestList.response_for_zip_packet(state.requests, zip_packet) do
+        {:retry, request_runner, new_request_list} ->
+          :ok = do_send_command(request_runner, state)
+          %State{state | requests: new_request_list}
 
-        {:continue, new_command_list} ->
-          %State{state | commands: new_command_list}
+        {:continue, new_request_list} ->
+          %State{state | requests: new_request_list}
 
-        {waiter, {%Report{} = report, new_command_list}} when is_pid(waiter) ->
+        {waiter, {%Report{} = report, new_request_list}} when is_pid(waiter) ->
           send(waiter, {:grizzly, :report, report})
           Grizzly.Events.broadcast_report(report)
-          %State{state | commands: new_command_list}
+          %State{state | requests: new_request_list}
 
-        {waiter, {%Report{} = report, new_command_list}} ->
+        {waiter, {%Report{} = report, new_request_list}} ->
           GenServer.reply(waiter, {:ok, report})
           Grizzly.Events.broadcast_report(report)
-          %State{state | commands: new_command_list}
+          %State{state | requests: new_request_list}
       end
 
     %State{updated_state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
@@ -230,28 +230,28 @@ defmodule Grizzly.Connections.SyncConnection do
 
   defp do_send_command(command, state, opts \\ []) do
     %State{transport: transport} = state
-    binary = CommandRunner.encode_command(command)
+    binary = RequestRunner.encode_command(command)
 
     Transport.send(transport, binary, opts)
   end
 
-  defp do_timeout_reply(waiter, grizzly_command) do
-    if grizzly_command.status == :queued do
+  defp do_timeout_reply(waiter, request) do
+    if request.status == :queued do
       {pid, _tag} = waiter
 
       report =
-        Report.new(:complete, :timeout, grizzly_command.node_id,
-          command_ref: grizzly_command.ref,
-          acknowledged: grizzly_command.acknowledged,
+        Report.new(:complete, :timeout, request.node_id,
+          command_ref: request.ref,
+          acknowledged: request.acknowledged,
           queued: true
         )
 
       send(pid, {:grizzly, :report, report})
     else
       report =
-        Report.new(:complete, :timeout, grizzly_command.node_id,
-          command_ref: grizzly_command.ref,
-          acknowledged: grizzly_command.acknowledged
+        Report.new(:complete, :timeout, request.node_id,
+          command_ref: request.ref,
+          acknowledged: request.acknowledged
         )
 
       GenServer.reply(waiter, {:ok, report})

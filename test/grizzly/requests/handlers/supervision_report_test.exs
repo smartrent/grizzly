@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandHandlers.SupervisionReportTest do
+defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandHandlers.SupervisionReport, as: Handler
+  alias Grizzly.Requests.Handlers.SupervisionReport, as: Handler
   alias Grizzly.ZWave.Commands.SupervisionReport
 
   setup do

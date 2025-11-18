@@ -37,10 +37,10 @@ defmodule Grizzly do
   #{telemetry_docs()}
   """
 
-  alias Grizzly.Commands.Table
   alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
   alias Grizzly.Events
   alias Grizzly.{ZIPGateway, ZWave}
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.RssiReport
 
   require Logger
@@ -162,7 +162,7 @@ defmodule Grizzly do
     will be sent to the locally running Z/IP Gateway -- this is useful if this controller
     has a node id other than 1.
 
-  * `command` - The command to send. See `Grizzly.Commands.Table` for a list of available commands
+  * `command` - The command to send. See `Grizzly.ZWave.Commands` for a list of available commands
     and their associated modules.
 
   * `args` - A list of arguments to pass to the command. See the associated command module
@@ -204,7 +204,7 @@ defmodule Grizzly do
   def send_command(node_id, command_name, args \\ [], opts \\ [])
 
   def send_command(node_id, command_name, args, _opts) when is_virtual_device(node_id) do
-    with {command_module, _default_opts} <- Table.lookup(command_name),
+    with {command_module, _default_opts} <- Commands.lookup(command_name),
          {:ok, command} <- command_module.new(args) do
       VirtualDevices.send_command(node_id, command)
     end
@@ -228,7 +228,7 @@ defmodule Grizzly do
     open_opts = Keyword.take(opts, [:mode])
 
     with :ok <- can_send_command?(),
-         {command_module, default_opts} <- Table.lookup(command_name),
+         {command_module, default_opts} <- Commands.lookup(command_name),
          {:ok, command} <- command_module.new(args),
          {:ok, _} <- Connection.open(node_id, open_opts) do
       Connection.send_command(node_id, command, Keyword.merge(default_opts, opts))
@@ -242,7 +242,7 @@ defmodule Grizzly do
           send_command_response()
   def send_async_command_via(conn, node_id, command_name, args \\ [], opts \\ []) do
     with :ok <- can_send_command?(),
-         {command_module, default_opts} <- Table.lookup(command_name),
+         {command_module, default_opts} <- Commands.lookup(command_name),
          {:ok, command} <- command_module.new(args) do
       Connection.send_async_command_via(conn, node_id, command, Keyword.merge(default_opts, opts))
     end
@@ -332,7 +332,7 @@ defmodule Grizzly do
   """
   @spec list_commands() :: [atom()]
   def list_commands() do
-    Enum.map(Table.dump(), fn {command, _} -> command end)
+    Enum.map(Commands.dump(), fn {command, _} -> command end)
   end
 
   @doc """
@@ -340,7 +340,7 @@ defmodule Grizzly do
   """
   @spec commands_for_command_class(atom()) :: [atom()]
   def commands_for_command_class(command_class_name) do
-    Table.dump()
+    Commands.dump()
     |> Enum.filter(fn {_command, {command_module, _}} ->
       {:ok, command} = command_module.new([])
       command.command_class == command_class_name
@@ -380,7 +380,7 @@ defmodule Grizzly do
   """
   @spec can_supervise_command?(Grizzly.command()) :: boolean()
   defdelegate can_supervise_command?(command_name),
-    to: Grizzly.Commands.Table,
+    to: Grizzly.ZWave.Commands,
     as: :supports_supervision?
 
   @doc """

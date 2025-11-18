@@ -1,7 +1,7 @@
-defmodule Grizzly.CommandHandlers.AggregateReportTest do
+defmodule Grizzly.Requests.Handlers.AggregateReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.CommandHandlers.AggregateReport
+  alias Grizzly.Requests.Handlers.AggregateReport
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.{AssociationReport, SwitchBinaryReport}
 

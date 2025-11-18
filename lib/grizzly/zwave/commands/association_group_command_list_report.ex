@@ -11,8 +11,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.Commands.Table
-  alias Grizzly.ZWave.{Command, DecodeError, Decoder}
+  alias Grizzly.ZWave.{Command, Commands, DecodeError, Decoder}
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
 
   require Logger
@@ -67,7 +66,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   end
 
   defp make_command(command_name) do
-    {command_module, _} = Table.lookup(command_name)
+    {command_module, _} = Commands.lookup(command_name)
 
     command_module.new([])
   end

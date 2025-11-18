@@ -1,11 +1,11 @@
-defmodule Grizzly.Commands do
+defmodule Grizzly.Requests do
   @moduledoc false
 
   # module for providing away to setup and tie Z-Wave commands into the
   # Grizzly runtime for handling commands
 
-  alias Grizzly.Commands.{CommandRunner, CommandRunnerSupervisor}
   alias Grizzly.Report
+  alias Grizzly.Requests.{RequestRunner, RequestRunnerSupervisor}
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
@@ -15,10 +15,10 @@ defmodule Grizzly.Commands do
   This command process is supervised and will stop once the command has
   completed its life cycle or until the timeout has expired
   """
-  @spec create_command(Command.t(), ZWave.node_id(), keyword()) ::
+  @spec start_request_runner(Command.t(), ZWave.node_id(), keyword()) ::
           DynamicSupervisor.on_start_child()
-  def create_command(zwave_command, node_id, opts \\ []) do
-    CommandRunnerSupervisor.start_runner(zwave_command, node_id, opts)
+  def start_request_runner(zwave_command, node_id, opts \\ []) do
+    RequestRunnerSupervisor.start_runner(zwave_command, node_id, opts)
   end
 
   @doc """
@@ -30,7 +30,7 @@ defmodule Grizzly.Commands do
           | {:error, :nack_response}
           | Report.t()
   def handle_zip_packet_for_command(command, zip_packet) do
-    CommandRunner.handle_zip_command(command, zip_packet)
+    RequestRunner.handle_zip_command(command, zip_packet)
   end
 
   @doc """
@@ -38,6 +38,6 @@ defmodule Grizzly.Commands do
   """
   @spec stop(pid()) :: :ok
   def stop(runner) do
-    CommandRunner.stop(runner)
+    RequestRunner.stop(runner)
   end
 end

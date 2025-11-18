@@ -4,7 +4,7 @@ defmodule Grizzly.Connections.KeepAlive do
   # module for working with the Z/IP Keep Alive command and handling the keep
   # alive information
 
-  alias Grizzly.{Commands, ZWave}
+  alias Grizzly.{Requests, ZWave}
   alias Grizzly.ZWave.Commands.ZIPKeepAlive
 
   @type opt :: {:owner, pid()}
@@ -14,7 +14,7 @@ defmodule Grizzly.Connections.KeepAlive do
           last_send: non_neg_integer() | nil,
           interval: non_neg_integer() | nil,
           owner: pid(),
-          command_runner: pid() | nil,
+          request_runner: pid() | nil,
           node_id: ZWave.node_id()
         }
 
@@ -22,7 +22,7 @@ defmodule Grizzly.Connections.KeepAlive do
             last_send: nil,
             interval: nil,
             owner: nil,
-            command_runner: nil,
+            request_runner: nil,
             node_id: nil
 
   @doc """
@@ -51,9 +51,9 @@ defmodule Grizzly.Connections.KeepAlive do
   @spec make_command(t()) :: t()
   def make_command(keep_alive) do
     {:ok, keep_alive_command} = ZIPKeepAlive.new(ack_flag: :ack_request)
-    {:ok, command_runner} = Commands.create_command(keep_alive_command, keep_alive.node_id)
+    {:ok, request_runner} = Requests.start_request_runner(keep_alive_command, keep_alive.node_id)
 
-    %__MODULE__{keep_alive | command_runner: command_runner}
+    %__MODULE__{keep_alive | request_runner: request_runner}
   end
 
   @doc """
@@ -64,7 +64,7 @@ defmodule Grizzly.Connections.KeepAlive do
     _ = Process.cancel_timer(keep_alive.ref)
 
     %__MODULE__{keep_alive | ref: nil}
-    |> maybe_stop_command_runner()
+    |> maybe_stop_request_runner()
   end
 
   @doc """
@@ -84,7 +84,7 @@ defmodule Grizzly.Connections.KeepAlive do
   """
   @spec run(t(), (pid() -> :ok)) :: t()
   def run(keep_alive, runner_func) do
-    :ok = runner_func.(keep_alive.command_runner)
+    :ok = runner_func.(keep_alive.request_runner)
     %__MODULE__{keep_alive | last_send: System.os_time(:millisecond)}
   end
 
@@ -94,10 +94,10 @@ defmodule Grizzly.Connections.KeepAlive do
     %__MODULE__{keep_alive | ref: ref}
   end
 
-  defp maybe_stop_command_runner(%__MODULE__{command_runner: nil} = ka), do: ka
+  defp maybe_stop_request_runner(%__MODULE__{request_runner: nil} = ka), do: ka
 
-  defp maybe_stop_command_runner(%__MODULE__{command_runner: runner} = ka) when is_pid(runner) do
-    :ok = Commands.stop(runner)
-    %__MODULE__{ka | command_runner: nil}
+  defp maybe_stop_request_runner(%__MODULE__{request_runner: runner} = ka) when is_pid(runner) do
+    :ok = Requests.stop(runner)
+    %__MODULE__{ka | request_runner: nil}
   end
 end
