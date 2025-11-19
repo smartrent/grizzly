@@ -237,9 +237,6 @@ defmodule Grizzly.Transports.DTLS do
     ]
   end
 
-  defp maybe_write_trace(:incoming, node_id, binary),
-    do: Trace.log(binary, src: node_id, dest: :grizzly)
-
-  defp maybe_write_trace(:outgoing, node_id, binary),
-    do: Trace.log(binary, src: :grizzly, dest: node_id)
+  defp maybe_write_trace(:incoming, node_id, binary), do: Trace.log(node_id, :grizzly, binary)
+  defp maybe_write_trace(:outgoing, node_id, binary), do: Trace.log(:grizzly, node_id, binary)
 end

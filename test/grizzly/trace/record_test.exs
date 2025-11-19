@@ -9,7 +9,7 @@ defmodule Grizzly.Trace.RecordTest do
     {:ok, encapsulated_command} = SwitchBinarySet.new(target_value: :on)
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(encapsulated_command, 0x01)
     binary = ZWave.to_binary(zip_packet)
-    record = Record.new(binary, src: :grizzly, dest: 1)
+    record = Record.new(:grizzly, 1, binary)
 
     expected_string = "   G -> 1   1    switch_binary_set <<37, 1, 255>>"
 
