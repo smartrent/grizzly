@@ -29,7 +29,7 @@ defmodule Grizzly.UnsolicitedServer.ConnectionHandler do
 
   @impl ThousandIsland.Handler
   def handle_data(data, socket, %{node_id: node_id} = state) do
-    Grizzly.Trace.log(data, src: node_id, dest: :grizzly)
+    Grizzly.Trace.log(node_id, :grizzly, data)
 
     case Grizzly.ZWave.from_binary(data) do
       {:ok, zip_packet} ->
@@ -119,7 +119,7 @@ defmodule Grizzly.UnsolicitedServer.ConnectionHandler do
   end
 
   defp send_cmd(socket, binary, node_id) do
-    Grizzly.Trace.log(binary, src: :grizzly, dest: node_id)
+    Grizzly.Trace.log(:grizzly, node_id, binary)
     Socket.send(socket, binary)
   end
 end

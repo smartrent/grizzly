@@ -82,14 +82,10 @@ defmodule Grizzly.Trace do
   def print(), do: print([])
 
   @doc "Add a record to the trace buffer."
-  @spec log(GenServer.server(), binary(), [log_opt()]) :: :ok
-  def log(name, binary, opts) do
-    GenServer.cast(name, {:log, binary, opts})
+  @spec log(GenServer.server(), src(), dest(), binary()) :: :ok
+  def log(name \\ __MODULE__, src, dest, binary) do
+    GenServer.cast(name, {:log, src, dest, binary})
   end
-
-  @doc "See `log/3`"
-  @spec log(binary(), [log_opt()]) :: :ok
-  def log(binary, opts \\ []) when is_binary(binary), do: log(__MODULE__, binary, opts)
 
   @doc "Reset the trace buffer."
   @spec clear(GenServer.server()) :: :ok
@@ -133,41 +129,56 @@ defmodule Grizzly.Trace do
   def init(opts) do
     size = Keyword.get(opts, :size, @default_size)
     record_keepalives = Keyword.get(opts, :record_keepalives, true)
-    {:ok, %{buffer: CircularBuffer.new(size), record_keepalives: record_keepalives}}
+    {:ok, %{buffers: %{}, size: size, record_keepalives: record_keepalives}}
   end
 
   @impl GenServer
-  def handle_cast({:log, <<0x23, 0x03, _ack_flag>>, _opts}, %{record_keepalives: false} = state) do
+  def handle_cast(
+        {:log, _src, _dest, <<0x23, 0x03, _ack_flag>>},
+        %{record_keepalives: false} = state
+      ) do
     {:noreply, state}
   end
 
-  def handle_cast({:log, binary, opts}, state) do
-    record = Record.new(binary, opts)
+  def handle_cast({:log, src, dest, binary}, state) do
+    record = Record.new(src, dest, binary)
 
-    {:noreply, %{state | buffer: CircularBuffer.insert(state.buffer, record)}}
+    remote_node = Record.remote_node(record)
+
+    state =
+      update_in(state.buffers[remote_node], fn
+        nil -> state.size |> CircularBuffer.new() |> CircularBuffer.insert(record)
+        buf -> CircularBuffer.insert(buf, record)
+      end)
+
+    {:noreply, state}
   end
 
   @impl GenServer
-  def handle_call(:clear, _from, %{buffer: %CircularBuffer{max_size: size}} = state) do
-    {:reply, :ok, %{state | buffer: CircularBuffer.new(size)}}
+  def handle_call(:clear, _from, state) do
+    {:reply, :ok, %{state | buffers: %{}}}
   end
 
-  def handle_call(:list, _from, %{buffer: buffer} = state) do
-    {:reply, CircularBuffer.to_list(buffer), state}
+  def handle_call(:list, _from, state) do
+    records =
+      state.buffers
+      |> Map.values()
+      |> Enum.concat()
+
+    {:reply, Enum.sort_by(records, & &1.timestamp, {:asc, Time}), state}
   end
 
   def handle_call({:record_keepalives, enabled?}, _from, state) do
     {:reply, :ok, %{state | record_keepalives: enabled?}}
   end
 
-  def handle_call({:resize, size}, _from, %{buffer: buffer} = state) do
-    new_buffer =
-      buffer
-      |> CircularBuffer.to_list()
-      |> Enum.reduce(CircularBuffer.new(size), fn record, buffer ->
-        CircularBuffer.insert(buffer, record)
+  def handle_call({:resize, new_size}, _from, %{buffers: buffers} = state) do
+    new_buffers =
+      Map.new(buffers, fn {node_id, buffer} ->
+        resized_buffer = Enum.into(buffer, CircularBuffer.new(new_size))
+        {node_id, resized_buffer}
       end)
 
-    {:reply, :ok, %{state | buffer: new_buffer}}
+    {:reply, :ok, %{state | buffers: new_buffers, size: new_size}}
   end
 end

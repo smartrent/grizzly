@@ -21,18 +21,10 @@ defmodule Grizzly.Trace.Record do
   defstruct src: nil, dest: nil, binary: nil, timestamp: nil
 
   @doc """
-  Make a new `Grizzly.Record.t()` from a binary string
-
-  Options:
-    * `:src` - the src as a string
-    * `:dest` - the dest as a string
+  Make a new `Grizzly.Record.t()` from a binary
   """
-  @spec new(binary(), [opt()]) :: t()
-  def new(binary, opts \\ []) do
-    timestamp = Keyword.get(opts, :timestamp, Time.utc_now())
-    src = Keyword.get(opts, :src)
-    dest = Keyword.get(opts, :dest)
-
+  @spec new(Trace.src(), Trace.dest(), binary(), Time.t()) :: t()
+  def new(src, dest, binary, timestamp \\ Time.utc_now()) do
     %__MODULE__{
       src: src,
       dest: dest,
@@ -69,6 +61,12 @@ defmodule Grizzly.Trace.Record do
 
     "#{time} #{src_to_string(src)} -> #{dest_to_string(dest)}: #{inspect(binary, limit: 500)}"
   end
+
+  @doc """
+  Returns the remote node in the trace record, i.e., the node that is not :grizzly.
+  """
+  def remote_node(%__MODULE__{src: :grizzly, dest: dest}), do: dest
+  def remote_node(%__MODULE__{src: src, dest: :grizzly}), do: src
 
   defp src_to_string(:grizzly), do: src_to_string("G")
   defp src_to_string(src), do: src |> Kernel.to_string() |> String.pad_leading(3)

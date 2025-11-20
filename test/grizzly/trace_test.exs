@@ -20,26 +20,39 @@ defmodule Grizzly.TraceTest do
   test "log/3", %{tracer: tracer} do
     {:ok, cmd} = SwitchBinaryGet.new()
 
+    # The sleeps are to ensure records get different timestamps
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 1)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 5, ZWave.to_binary(zip_packet))
+    Process.sleep(10)
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 2)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), src: :grizzly, dest: 5)
+    Trace.log(tracer, 6, :grizzly, ZWave.to_binary(zip_packet))
+    Process.sleep(10)
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 3)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), src: 6, dest: :grizzly)
+    Trace.log(tracer, 5, :grizzly, ZWave.to_binary(zip_packet))
+    Process.sleep(10)
+
+    {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 4)
+    Trace.log(tracer, :grizzly, 5, ZWave.to_binary(zip_packet))
+    Process.sleep(10)
 
     list = Trace.list(tracer)
-    assert length(list) == 2
+    assert length(list) == 3
 
     assert [
-             %{binary: <<_::32, 2, _::binary>>, src: :grizzly, dest: 5},
-             %{binary: <<_::32, 3, _::binary>>, src: 6, dest: :grizzly}
+             %{binary: <<_::32, 2, _::binary>>, src: 6, dest: :grizzly},
+             %{binary: <<_::32, 3, _::binary>>, src: 5, dest: :grizzly},
+             %{binary: <<_::32, 4, _::binary>>, src: :grizzly, dest: 5}
            ] = list
 
     list = Trace.list(tracer, node_id: 5)
-    assert length(list) == 1
-    assert [%{binary: <<_::32, 2, _::binary>>, src: :grizzly, dest: 5}] = list
+    assert length(list) == 2
+
+    assert [
+             %{binary: <<_::32, 3, _::binary>>, src: 5, dest: :grizzly},
+             %{binary: <<_::32, 4, _::binary>>, src: :grizzly, dest: 5}
+           ] = list
   end
 
   @tag size: 1
@@ -47,10 +60,10 @@ defmodule Grizzly.TraceTest do
     {:ok, cmd} = SwitchBinaryGet.new()
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 1)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 4, ZWave.to_binary(zip_packet))
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 2)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 4, ZWave.to_binary(zip_packet))
 
     list = Trace.list(tracer)
     assert length(list) == 1
@@ -60,13 +73,13 @@ defmodule Grizzly.TraceTest do
     Trace.resize(tracer, 3)
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 3)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 4, ZWave.to_binary(zip_packet))
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 4)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 4, ZWave.to_binary(zip_packet))
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 5)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 4, ZWave.to_binary(zip_packet))
 
     list = Trace.list(tracer)
     assert length(list) == 3
@@ -92,10 +105,10 @@ defmodule Grizzly.TraceTest do
     {:ok, cmd} = SwitchBinaryGet.new()
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 1)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 1, ZWave.to_binary(zip_packet))
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 2)
-    Trace.log(tracer, ZWave.to_binary(zip_packet), [])
+    Trace.log(tracer, :grizzly, 2, ZWave.to_binary(zip_packet))
 
     list = Trace.list(tracer)
     assert length(list) == 2
@@ -108,10 +121,10 @@ defmodule Grizzly.TraceTest do
 
   test "records keepalives by default", %{tracer: tracer} do
     {:ok, keepalive} = ZIPKeepAlive.new(ack_flag: :ack_request)
-    Trace.log(tracer, ZWave.to_binary(keepalive), [])
+    Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     {:ok, keepalive} = ZIPKeepAlive.new(ack_flag: :ack_response)
-    Trace.log(tracer, ZWave.to_binary(keepalive), [])
+    Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     list = Trace.list(tracer)
     assert length(list) == 2
@@ -125,16 +138,16 @@ defmodule Grizzly.TraceTest do
   @tag record_keepalives: false
   test "enable/disable keepalives", %{tracer: tracer} do
     {:ok, keepalive} = ZIPKeepAlive.new(ack_flag: :ack_request)
-    Trace.log(tracer, ZWave.to_binary(keepalive), [])
+    Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     list = Trace.list(tracer)
     assert list == []
 
     Trace.record_keepalives(tracer, true)
-    Trace.log(tracer, ZWave.to_binary(keepalive), [])
+    Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     Trace.record_keepalives(tracer, false)
-    Trace.log(tracer, ZWave.to_binary(keepalive), [])
+    Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     list = Trace.list(tracer)
     assert [%{binary: <<0x23, 0x03, 0x80>>}] = list
