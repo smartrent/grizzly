@@ -186,8 +186,8 @@ defmodule Grizzly.Connections.AsyncConnection do
         Logger.debug("[Grizzly] connection to node #{inspect(node_id)} closed")
         {:stop, :normal, state}
 
-      {:ok, transport_response} ->
-        updated_state = handle_commands(transport_response.command, state)
+      {:ok, command} ->
+        updated_state = handle_commands(command, state)
         {:noreply, updated_state}
 
       {:error, error} ->
