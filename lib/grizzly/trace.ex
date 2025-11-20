@@ -161,9 +161,9 @@ defmodule Grizzly.Trace do
 
   def handle_call(:list, _from, state) do
     records =
-      for buffer <- Map.values(state.buffers),
-          record <- buffer,
-          do: record
+      state.buffers
+      |> Map.values()
+      |> Enum.concat()
 
     {:reply, Enum.sort_by(records, & &1.timestamp, {:asc, Time}), state}
   end
@@ -175,11 +175,7 @@ defmodule Grizzly.Trace do
   def handle_call({:resize, new_size}, _from, %{buffers: buffers} = state) do
     new_buffers =
       Map.new(buffers, fn {node_id, buffer} ->
-        resized_buffer =
-          Enum.reduce(buffer, CircularBuffer.new(new_size), fn record, new_buffer ->
-            CircularBuffer.insert(new_buffer, record)
-          end)
-
+        resized_buffer = Enum.into(buffer, CircularBuffer.new(new_size))
         {node_id, resized_buffer}
       end)
 
