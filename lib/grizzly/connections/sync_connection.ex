@@ -90,7 +90,7 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @impl GenServer
-  def handle_call({:send_command, command, _node_id, command_opts}, from, state) do
+  def handle_call({:send_command, command, _node_id, command_opts}, from, %State{} = state) do
     {:ok, request_runner, _, new_request_list} =
       RequestList.create(state.requests, command, state.node_id, from, command_opts)
 
@@ -106,7 +106,7 @@ defmodule Grizzly.Connections.SyncConnection do
   end
 
   @impl GenServer
-  def handle_info(:keep_alive_tick, state) do
+  def handle_info(:keep_alive_tick, %State{} = state) do
     %State{keep_alive: keep_alive} = state
 
     new_keep_alive =
@@ -120,7 +120,7 @@ defmodule Grizzly.Connections.SyncConnection do
   # handle when there is a timeout and command runner stops
   def handle_info(
         {:grizzly, :command_timeout, request_runner_pid, request},
-        state
+        %State{} = state
       ) do
     if request.source.name == :keep_alive do
       {:noreply, state}
@@ -155,7 +155,7 @@ defmodule Grizzly.Connections.SyncConnection do
     end
   end
 
-  defp handle_commands(%Command{name: :keep_alive}, state) do
+  defp handle_commands(%Command{name: :keep_alive}, %State{} = state) do
     %State{state | keep_alive: KeepAlive.timer_restart(state.keep_alive)}
   end
 
@@ -204,7 +204,7 @@ defmodule Grizzly.Connections.SyncConnection do
     end
   end
 
-  defp do_handle_commands(zip_packet, state) do
+  defp do_handle_commands(zip_packet, %State{} = state) do
     updated_state =
       case RequestList.response_for_zip_packet(state.requests, zip_packet) do
         {:retry, request_runner, new_request_list} ->

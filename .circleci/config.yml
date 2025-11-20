@@ -1,5 +1,9 @@
 version: 2.1
 
+elixir_current: &elixir_current "1.19.3-erlang-28.1.1-alpine-3.22.2"
+elixir_prev_1: &elixir_prev_1 "1.18.4-erlang-27.3.4.2-alpine-3.22.2"
+elixir_prev_2: &elixir_prev_2 "1.17.3-erlang-27.3.4.2-alpine-3.22.2"
+
 defaults: &defaults
   working_directory: ~/repo
   environment:
@@ -9,7 +13,7 @@ defaults: &defaults
     image-tag:
       description: "Docker image tag"
       type: string
-      default: "1.18.4-erlang-27.3.4.2-alpine-3.22.1"
+      default: *elixir_current
 
 install_hex_rebar: &install_hex_rebar
   run:
@@ -158,17 +162,17 @@ workflows:
           matrix:
             parameters:
               image-tag:
-                - 1.18.4-erlang-27.3.4.2-alpine-3.22.1
-                - 1.17.3-erlang-27.3.4.2-alpine-3.22.1
-                - 1.16.3-erlang-26.2.5.14-alpine-3.22.1
+                - *elixir_current
+                - *elixir_prev_1
+                - *elixir_prev_2
       - lint:
           filters: pipeline.git.tag
-          image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
+          image-tag: *elixir_current
           requires:
             - build
       - dialyzer:
           filters: pipeline.git.tag
-          image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
+          image-tag: *elixir_current
           requires:
             - build
       - test:
@@ -178,14 +182,14 @@ workflows:
           matrix:
             parameters:
               image-tag:
-                - 1.18.4-erlang-27.3.4.2-alpine-3.22.1
-                - 1.17.3-erlang-27.3.4.2-alpine-3.22.1
-                - 1.16.3-erlang-26.2.5.14-alpine-3.22.1
+                - *elixir_current
+                - *elixir_prev_1
+                - *elixir_prev_2
       - publish:
           context:
             - github-token
           filters: pipeline.git.tag starts-with "v"
-          image-tag: 1.18.4-erlang-27.3.4.2-alpine-3.22.1
+          image-tag: *elixir_current
           requires:
             - lint
             - dialyzer

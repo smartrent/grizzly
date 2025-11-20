@@ -84,8 +84,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
 
       # TODO: fix opt func bit (after the listening bit)
       <<seq_number, status_byte, node_id::16, node_info_length, listening_bit::1, 0x00::7, 0x00,
-        basic_device_class, generic_device_class,
-        specific_device_class>> <>
+        basic_device_class, generic_device_class, specific_device_class>> <>
         CommandClasses.command_class_list_to_binary(command_classes) <>
         add_keys_granted_and_fail_type(command)
     end

@@ -141,7 +141,7 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp handle_ack_response(request, zip_packet) do
+  defp handle_ack_response(%__MODULE__{} = request, zip_packet) do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
     if request.seq_number == seq_number do
@@ -151,7 +151,7 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp do_handle_ack_response(request, zip_packet) do
+  defp do_handle_ack_response(%__MODULE__{} = request, zip_packet) do
     transmission_stats = make_network_stats(request, zip_packet)
 
     case request.handler.handle_ack(request.handler_state) do
@@ -172,7 +172,7 @@ defmodule Grizzly.Requests.Request do
   end
 
   # Handles both nack response and nack queue full
-  defp handle_final_nack(request, zip_packet) do
+  defp handle_final_nack(%__MODULE__{} = request, zip_packet) do
     flag = ZWaveCommand.param!(zip_packet, :flag)
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
@@ -204,7 +204,7 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp do_handle_zip_command(request, zip_packet_command) do
+  defp do_handle_zip_command(%__MODULE__{} = request, zip_packet_command) do
     zwave_command = ZWaveCommand.param!(zip_packet_command, :command)
 
     case request.handler.handle_command(zwave_command, request.handler_state) do
@@ -275,7 +275,7 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp make_queued_or_queued_ping_response(request, delay) do
+  defp make_queued_or_queued_ping_response(%__MODULE__{} = request, delay) do
     case request.status do
       :inflight ->
         queued_delay_report =
@@ -296,7 +296,7 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp make_nack_response(request) do
+  defp make_nack_response(%__MODULE__{} = request) do
     {Report.new(:complete, :nack_response, request.node_id,
        command_ref: request.ref,
        queued: request.status == :queued,
@@ -304,7 +304,7 @@ defmodule Grizzly.Requests.Request do
      ), %__MODULE__{request | status: :complete}}
   end
 
-  defp make_queue_full_response(request) do
+  defp make_queue_full_response(%__MODULE__{} = request) do
     {Report.new(:complete, :queue_full, request.node_id,
        command_ref: request.ref,
        queued: request.status == :queued,
@@ -312,7 +312,7 @@ defmodule Grizzly.Requests.Request do
      ), %__MODULE__{request | status: :complete}}
   end
 
-  defp build_complete_reply(request, response) do
+  defp build_complete_reply(%__MODULE__{} = request, response) do
     case request.status do
       :inflight ->
         {build_report(request, response), %__MODULE__{request | status: :complete}}
@@ -455,7 +455,7 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp build_report(request, :ok) do
+  defp build_report(%__MODULE__{} = request, :ok) do
     %Report{
       status: :complete,
       command_ref: request.ref,
@@ -466,7 +466,7 @@ defmodule Grizzly.Requests.Request do
     }
   end
 
-  defp build_report(request, response) do
+  defp build_report(%__MODULE__{} = request, response) do
     %Report{
       status: :complete,
       command: response,

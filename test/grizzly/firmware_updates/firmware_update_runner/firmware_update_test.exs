@@ -41,7 +41,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
     end
 
     test "firmware update get command", context do
-      firmware_update = %FirmwareUpdate{context[:firmware_update] | state: :updating}
+      firmware_update = %{context[:firmware_update] | state: :updating}
       {:ok, command} = FirmwareUpdateMDGet.new(number_of_reports: 2, report_number: 1)
       new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
       assert new_firmware_update.state == :uploading
@@ -50,7 +50,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
     end
 
     test "firmware update md status report", context do
-      firmware_update = %FirmwareUpdate{context[:firmware_update] | state: :updating}
+      firmware_update = %{context[:firmware_update] | state: :updating}
 
       {:ok, command} =
         FirmwareUpdateMDStatusReport.new(status: :successful_restarting, wait_time: 10)
@@ -60,7 +60,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
     end
 
     test "firmware md report", context do
-      firmware_update = %FirmwareUpdate{context[:firmware_update] | state: :uploading}
+      firmware_update = %{context[:firmware_update] | state: :uploading}
 
       {:ok, command} =
         FirmwareMDReport.new(
@@ -81,7 +81,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
     end
 
     test "firmware activation report", context do
-      firmware_update = %FirmwareUpdate{context[:firmware_update] | state: :activating}
+      firmware_update = %{context[:firmware_update] | state: :activating}
 
       {:ok, command} =
         FirmwareUpdateActivationReport.new(
@@ -118,13 +118,13 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
     end
 
     test "updating state to uploading state", context do
-      context_firmware_update = %FirmwareUpdate{
+      context_firmware_update = %{
         context[:firmware_update]
         | state: :uploading,
           fragment_index: 1
       }
 
-      firmware_update = %FirmwareUpdate{
+      firmware_update = %{
         context_firmware_update
         | image: Image.fragment_image(context_firmware_update.image, 1024, 1)
       }
@@ -138,7 +138,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
     end
 
     test "dynamic transmission delays", %{firmware_update: firmware_update} do
-      update = %FirmwareUpdate{
+      update = %{
         firmware_update
         | transmission_delay: 500
       }

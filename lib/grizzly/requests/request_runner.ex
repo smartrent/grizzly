@@ -96,7 +96,7 @@ defmodule Grizzly.Requests.RequestRunner do
     {:stop, :normal, request}
   end
 
-  defp update_timeout(request, time_in_seconds) do
+  defp update_timeout(%Request{} = request, time_in_seconds) do
     _ = Process.cancel_timer(request.timeout_ref)
     new_timeout_ref = start_timeout_counter(time_in_seconds * 1000 + 500)
     %Request{request | timeout_ref: new_timeout_ref}

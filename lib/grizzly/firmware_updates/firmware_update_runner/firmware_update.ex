@@ -77,14 +77,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
             last_transmission_speed: {40, :kbit_sec}
 
   @spec put_image(t(), FirmwareUpdates.image_path()) :: t()
-  def put_image(firmware_update, image_path) do
+  def put_image(%__MODULE__{} = firmware_update, image_path) do
     %__MODULE__{firmware_update | image: Image.new(image_path)}
   end
 
   @spec current_command_ref(t()) :: reference()
   def current_command_ref(firmware_update), do: firmware_update.current_command_ref
 
-  def update_command_ref(firmware_update, new_command_ref, command),
+  def update_command_ref(%__MODULE__{} = firmware_update, new_command_ref, command),
     do: %__MODULE__{
       firmware_update
       | current_command_ref: new_command_ref,
@@ -107,10 +107,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   to calculate the transmission delay.
   """
   @spec put_last_transmission_speed(t(), speed()) :: t()
-  def put_last_transmission_speed(firmware_update, {_, :kbit_sec} = speed),
+  def put_last_transmission_speed(%__MODULE__{} = firmware_update, {_, :kbit_sec} = speed),
     do: %__MODULE__{firmware_update | last_transmission_speed: speed}
 
-  def put_last_transmission_speed(firmware_update, _), do: firmware_update
+  def put_last_transmission_speed(%__MODULE__{} = firmware_update, _), do: firmware_update
 
   @doc """
   Returns the delay between sending fragments.
@@ -237,7 +237,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
 
   # STATE TRANSITIONS for commands sent and incoming commands
 
-  defp firmware_update_requested(firmware_update, params) do
+  defp firmware_update_requested(%__MODULE__{} = firmware_update, params) do
     max_fragment_size = Keyword.fetch!(params, :fragment_size)
 
     image_with_fragments =
@@ -250,7 +250,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     %__MODULE__{firmware_update | state: :updating, image: image_with_fragments}
   end
 
-  defp update_request_responded(firmware_update, command) do
+  defp update_request_responded(%__MODULE__{} = firmware_update, command) do
     status = Command.param!(command, :status)
 
     case status do
@@ -260,7 +260,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   end
 
   defp firmware_fragment_uploaded(
-         firmware_update,
+         %__MODULE__{} = firmware_update,
          true = _last?
        ) do
     %__MODULE__{firmware_update | fragments_wanted: 0}
@@ -281,7 +281,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     }
   end
 
-  defp fragments_requested(firmware_update, command) do
+  defp fragments_requested(%__MODULE__{} = firmware_update, command) do
     # a number of fragments are requested
     fragments_wanted = Command.param!(command, :number_of_reports)
     # starting from this one (zwave is 1-based so first report number will be 1)
@@ -296,7 +296,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     }
   end
 
-  defp max_fragment_size_modified(firmware_update, command) do
+  defp max_fragment_size_modified(%__MODULE__{} = firmware_update, command) do
     max_fragment_size = Command.param!(command, :max_fragment_size)
 
     image_with_fragments =
@@ -318,7 +318,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     %__MODULE__{firmware_update | state: :complete}
   end
 
-  defp firmware_activated(firmware_update) do
+  defp firmware_activated(%__MODULE__{} = firmware_update) do
     %__MODULE__{firmware_update | state: :complete}
   end
 
