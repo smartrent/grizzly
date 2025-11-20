@@ -102,8 +102,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         )
 
       assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x01::1, 0x00::2, 0x04::5, 0x63, 0x03, 0xFB,
-               0x01,
-               0x09>> ==
+               0x01, 0x09>> ==
                AlarmReport.encode_params(command)
     end
   end

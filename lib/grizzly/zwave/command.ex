@@ -134,7 +134,7 @@ defmodule Grizzly.ZWave.Command do
   one
   """
   @spec put_param(t(), atom(), any()) :: t()
-  def put_param(command, param, new_value) do
+  def put_param(%__MODULE__{} = command, param, new_value) do
     new_params = Keyword.put(command.params, param, new_value)
     %__MODULE__{command | params: new_params}
   end

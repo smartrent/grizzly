@@ -49,7 +49,7 @@ defmodule Grizzly.Connections.KeepAlive do
   This does not send it the command
   """
   @spec make_command(t()) :: t()
-  def make_command(keep_alive) do
+  def make_command(%__MODULE__{} = keep_alive) do
     {:ok, keep_alive_command} = ZIPKeepAlive.new(ack_flag: :ack_request)
     {:ok, request_runner} = Requests.start_request_runner(keep_alive_command, keep_alive.node_id)
 
@@ -60,7 +60,7 @@ defmodule Grizzly.Connections.KeepAlive do
   Clears the process timer and stops any currently running command
   """
   @spec timer_clear(t()) :: t()
-  def timer_clear(keep_alive) do
+  def timer_clear(%__MODULE__{} = keep_alive) do
     _ = Process.cancel_timer(keep_alive.ref)
 
     %__MODULE__{keep_alive | ref: nil}
@@ -73,7 +73,7 @@ defmodule Grizzly.Connections.KeepAlive do
   This will clear the current timer, stop any running command, and start the
   timer again.
   """
-  def timer_restart(keep_alive) do
+  def timer_restart(%__MODULE__{} = keep_alive) do
     keep_alive
     |> timer_clear()
     |> timer_start()
@@ -83,12 +83,12 @@ defmodule Grizzly.Connections.KeepAlive do
   Run the keep alive command with a runner function passed in
   """
   @spec run(t(), (pid() -> :ok)) :: t()
-  def run(keep_alive, runner_func) do
+  def run(%__MODULE__{} = keep_alive, runner_func) do
     :ok = runner_func.(keep_alive.request_runner)
     %__MODULE__{keep_alive | last_send: System.os_time(:millisecond)}
   end
 
-  defp timer_start(keep_alive) do
+  defp timer_start(%__MODULE__{} = keep_alive) do
     ref = Process.send_after(keep_alive.owner, :keep_alive_tick, keep_alive.interval)
 
     %__MODULE__{keep_alive | ref: ref}

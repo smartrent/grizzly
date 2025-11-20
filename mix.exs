@@ -7,7 +7,7 @@ defmodule Grizzly.MixProject do
     [
       app: :grizzly,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -15,7 +15,9 @@ defmodule Grizzly.MixProject do
       description: description(),
       package: package(),
       docs: docs(),
-      preferred_cli_env: ["hex.publish": :docs, docs: :docs, dialyzer: :test],
+      test_coverage: [
+        ignore_modules: [~r/^GrizzlyTest/, ~r/^Mock/, ~r/^Mix/]
+      ],
       xref: [exclude: EEx]
     ]
   end
@@ -26,31 +28,37 @@ defmodule Grizzly.MixProject do
     ]
   end
 
+  def cli do
+    [
+      preferred_envs: ["hex.publish": :docs, docs: :docs, dialyzer: :test]
+    ]
+  end
+
   def elixirc_paths(:test), do: ["test/support", "lib"]
   def elixirc_paths(_), do: ["lib"]
 
   defp deps do
     [
       {:alarmist, "~> 0.4", only: [:test]},
+      {:beam_notify, "~> 1.0 or ~> 0.2.0"},
       {:cerlc, "~> 0.2"},
       {:circuits_uart, "~> 1.0"},
       {:circular_buffer, "~> 1.0 or ~> 0.4.2"},
+      {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ctr_drbg, "~> 0.1"},
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
       {:exmodem, "~> 0.1"},
       {:exqlite, "~> 0.33"},
+      {:junit_formatter, "~> 3.3", only: :test},
       {:mimic, "~> 2.0", only: [:dev, :test]},
       {:muontrap, "~> 1.6"},
       {:nimble_options, "~> 1.0"},
       {:property_table, "~> 0.3"},
-      {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
       {:sweet_xml, "~> 0.7", only: [:dev, :test]},
-      {:junit_formatter, "~> 3.3", only: :test},
-      {:beam_notify, "~> 1.0 or ~> 0.2.0"},
-      {:telemetry, "~> 0.4.3 or ~> 1.0"},
       {:telemetry_registry, "~> 0.3"},
+      {:telemetry, "~> 0.4.3 or ~> 1.0"},
       {:thousand_island, "~> 1.3"}
     ]
   end

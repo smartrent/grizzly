@@ -171,8 +171,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
     <<type, level, zensor_node_id, Notifications.status_to_byte(zwave_status),
       Notifications.type_to_byte(zwave_type),
-      Notifications.event_to_byte(zwave_type, zwave_event),
-      params_length>> <>
+      Notifications.event_to_byte(zwave_type, zwave_event), params_length>> <>
       encoded_event_params
   end
 
@@ -192,8 +191,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
     <<type, level, 0x00, Notifications.status_to_byte(zwave_status),
       Notifications.type_to_byte(zwave_type),
-      Notifications.event_to_byte(zwave_type, zwave_event), 0x01::1, 0x00::2,
-      params_length::5>> <>
+      Notifications.event_to_byte(zwave_type, zwave_event), 0x01::1, 0x00::2, params_length::5>> <>
       encoded_event_params <>
       <<sequence_number>>
   end

@@ -184,7 +184,7 @@ defmodule Grizzly.Connections.RequestList do
     end
   end
 
-  defp put_request(request_list, command_runner, waiter, reference) do
+  defp put_request(%__MODULE__{} = request_list, command_runner, waiter, reference) do
     %__MODULE__{
       request_list
       | requests: [{command_runner, waiter, reference} | request_list.requests]

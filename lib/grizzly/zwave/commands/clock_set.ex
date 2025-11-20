@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.ClockSet do
         {:error, %DecodeError{param: :hour, value: hour, command: :clock_set}}
       end
     else
-      {:error, decode_error} ->
+      {:error, %DecodeError{} = decode_error} ->
         {:error, %DecodeError{decode_error | command: :clock_set}}
     end
   end

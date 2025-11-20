@@ -70,7 +70,7 @@ defmodule Grizzly.Transport do
   Update the assigns with this field and value
   """
   @spec put(t(), atom(), any()) :: t()
-  def put(transport, assign, assign_value) do
+  def put(%__MODULE__{} = transport, assign, assign_value) do
     new_assigns = Map.put(transport.assigns, assign, assign_value)
 
     %__MODULE__{transport | assigns: new_assigns}
