@@ -39,6 +39,7 @@ defmodule Grizzly do
 
   alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
   alias Grizzly.Events
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
   alias Grizzly.{ZIPGateway, ZWave}
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.RssiReport
@@ -412,6 +413,10 @@ defmodule Grizzly do
   @spec listening_mode(integer) ::
           {:ok, Grizzly.ZIPGateway.Database.listening_mode()} | nil
   defdelegate listening_mode(node_id), to: Grizzly.ZIPGateway.Database
+
+  @doc "How long in milliseconds before a device firmware update times out because of inactivity"
+  @spec firmware_update_progress_timeout() :: non_neg_integer()
+  defdelegate firmware_update_progress_timeout(), to: FirmwareUpdateRunner, as: :progress_timeout
 
   @doc """
   Returns the network's home id. Returns nil if Grizzly is started with `run_zipgateway: false`

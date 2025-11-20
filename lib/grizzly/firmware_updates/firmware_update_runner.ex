@@ -124,6 +124,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     GenServer.call(runner, :firmware_image_fragment_count)
   end
 
+  @doc """
+  How long in milliseconds before a device firmware update times out because of inactivity.
+  """
+  @spec progress_timeout() :: non_neg_integer()
+  def progress_timeout() do
+    Application.get_env(:grizzly, :firmware_update_progress_timeout, @default_progress_timeout)
+  end
+
   @impl GenServer
   def handle_call({:start_firmware_update, image_path}, _from, firmware_update) do
     {command, new_firmware_update} =
@@ -335,9 +343,5 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   defp respond_to_handler({handler_module, handler_opts}, command) do
     # TODO - Consider using a handler runner genserver for calling the plugin inclusion handler
     spawn_link(fn -> handler_module.handle_command(command, handler_opts) end)
-  end
-
-  defp progress_timeout() do
-    Application.get_env(:grizzly, :firmware_update_progress_timeout, @default_progress_timeout)
   end
 end
