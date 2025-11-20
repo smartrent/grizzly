@@ -61,8 +61,7 @@ defmodule GrizzlyTest.Transport.DTLS do
     if Transport.get(transport, :type) == :server do
       socket = Transport.get(transport, :socket)
 
-      with {:ok, node_id} when is_list(node_id) <- :ssl.recv(socket, 2, 1000) do
-        <<node_id::16>> = :erlang.list_to_binary(node_id)
+      with {:ok, <<node_id::16>>} <- :ssl.recv(socket, 2, 1000) do
         {:ok, Transport.put(transport, :node_id, node_id)}
       end
     else

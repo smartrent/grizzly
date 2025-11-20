@@ -5,23 +5,6 @@ defmodule Grizzly.Transport do
 
   alias Grizzly.ZIPGateway
 
-  defmodule Response do
-    @moduledoc """
-    The response from parse response
-    """
-
-    alias Grizzly.ZWave.Command
-
-    @type t() :: %__MODULE__{
-            port: :inet.port_number() | nil,
-            ip_address: :inet.ip_address() | nil,
-            command: Command.t()
-          }
-
-    @enforce_keys [:command]
-    defstruct port: nil, ip_address: nil, command: nil
-  end
-
   alias Grizzly.ZWave.{Command, DecodeError}
 
   @opaque t() :: %__MODULE__{impl: module(), assigns: map()}
@@ -66,7 +49,7 @@ defmodule Grizzly.Transport do
   @callback peername(t()) :: {:ok, {:inet.ip_address(), :inet.port_number()}} | {:error, any()}
 
   @callback parse_response(any(), [parse_opt()]) ::
-              {:ok, Response.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
+              {:ok, Command.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
 
   @callback close(t()) :: :ok
 
@@ -167,7 +150,7 @@ defmodule Grizzly.Transport do
   Parse the response for the transport
   """
   @spec parse_response(t(), any()) ::
-          {:ok, Response.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
+          {:ok, Command.t() | binary() | :connection_closed} | {:error, DecodeError.t()}
   def parse_response(transport, response, opts \\ []) do
     %__MODULE__{impl: transport_impl} = transport
     opts = [transport: transport] ++ opts

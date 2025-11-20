@@ -144,8 +144,8 @@ defmodule Grizzly.Connections.SyncConnection do
         Logger.debug("[Grizzly] connection to node #{inspect(node_id)} closed")
         {:stop, :normal, state}
 
-      {:ok, transport_response} ->
-        new_state = handle_commands(transport_response.command, state)
+      {:ok, command} ->
+        new_state = handle_commands(command, state)
         {:noreply, new_state}
 
       {:error, error} ->
