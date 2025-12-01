@@ -17,8 +17,7 @@ defmodule Grizzly.MixProject do
       docs: docs(),
       test_coverage: [
         ignore_modules: [~r/^GrizzlyTest/, ~r/^Mock/, ~r/^Mix/]
-      ],
-      xref: [exclude: EEx]
+      ]
     ]
   end
 
@@ -73,7 +72,7 @@ defmodule Grizzly.MixProject do
 
     [
       flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return],
-      plt_add_apps: [:eex, :mix, :ex_unit, :iex]
+      plt_add_apps: [:mix, :ex_unit]
     ] ++ ci_opts
   end
 

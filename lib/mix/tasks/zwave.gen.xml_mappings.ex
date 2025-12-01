@@ -22,6 +22,7 @@ if Code.ensure_loaded?(SweetXml) do
 
     @skip_command_classes [:zwave_cmd_class, :zwave_long_range]
     @command_class_name_overrides %{
+      0x4D => :network_management_basic_node,
       0x4F => :zip_6lowpan,
       0x59 => :association_group_info,
       0x96 => :av_content_renderer_status
