@@ -11,10 +11,12 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.{SwitchBinary, SwitchSupport}
+  import Grizzly.ZWave.Encoding
 
-  @type param :: {:target_value, :on | :off} | {:duration, SwitchSupport.duration()}
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.CommandClasses.SwitchBinary
+
+  @type param :: {:target_value, :on | :off} | {:duration, Encoding.duration()}
 
   @impl Grizzly.ZWave.Command
   def new(opts) do
@@ -39,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
         <<target_value_byte>>
 
       duration ->
-        duration_byte = SwitchSupport.duration_to_byte(duration)
+        duration_byte = encode_duration(duration)
         <<target_value_byte, duration_byte>>
     end
   end
@@ -59,12 +61,8 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
   end
 
   def decode_params(<<target_value_byte, duration_byte>>) do
-    with {:ok, target_value} <- target_value_from_byte(target_value_byte),
-         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte) do
-      {:ok, [target_value: target_value, duration: duration]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+    with {:ok, target_value} <- target_value_from_byte(target_value_byte) do
+      {:ok, [target_value: target_value, duration: decode_duration(duration_byte)]}
     end
   end
 

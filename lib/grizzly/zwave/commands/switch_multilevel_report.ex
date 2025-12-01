@@ -11,11 +11,15 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   """
 
   @behaviour Grizzly.ZWave.Command
-  require Logger
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.{SwitchMultilevel, SwitchSupport}
 
-  @type param :: {:value, 0..99 | :off | :unknown} | {:duration, SwitchSupport.duration()}
+  import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
+
+  require Logger
+
+  @type param :: {:value, 0..99 | :off | :unknown} | {:duration, Encoding.duration()}
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
@@ -41,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
 
       # version 2
       duration ->
-        duration_byte = SwitchSupport.duration_to_byte(duration)
+        duration_byte = encode_duration(duration)
         <<value_byte, duration_byte>>
     end
   end
@@ -63,12 +67,8 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
 
   # version 2
   def decode_params(<<value_byte, duration_byte>>) do
-    with {:ok, value} <- value_from_byte(value_byte),
-         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte) do
-      {:ok, [value: value, duration: duration]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+    with {:ok, value} <- value_from_byte(value_byte) do
+      {:ok, [value: value, duration: decode_duration(duration_byte)]}
     end
   end
 
@@ -81,17 +81,13 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
     end
 
     with {:ok, value} <- value_from_byte(value_byte),
-         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte),
          {:ok, target_value} <- value_from_byte(target_value_byte) do
       {:ok,
        [
          value: value,
          target_value: target_value,
-         duration: duration
+         duration: decode_duration(duration_byte)
        ]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
     end
   end
 

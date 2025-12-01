@@ -12,14 +12,16 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.{SwitchBinary, SwitchSupport}
+  import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.CommandClasses.SwitchBinary
 
   @type value() :: :on | :off | :unknown
 
   @type param() ::
           {:target_value, value()}
-          | {:duration, SwitchSupport.duration()}
+          | {:duration, Encoding.duration()}
           | {:current_value, value()}
 
   @impl Grizzly.ZWave.Command
@@ -46,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
 
       current_value ->
         duration = Command.param!(command, :duration)
-        duration_byte = SwitchSupport.duration_to_byte(duration)
+        duration_byte = encode_duration(duration)
         current_value_byte = encode_target_value(current_value)
         <<current_value_byte, target_value_byte, duration_byte>>
     end
@@ -58,24 +60,18 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(<<target_value_byte>>) do
-    case value_from_byte(target_value_byte) do
-      {:ok, target_value} ->
-        {:ok, [target_value: target_value]}
-
-      {:error, %DecodeError{}} = error ->
-        error
+    with {:ok, target_value} <- value_from_byte(target_value_byte) do
+      {:ok, [target_value: target_value]}
     end
   end
 
   def decode_params(<<current_value, target_value, duration_byte>>) do
     with {:ok, target_value} <- value_from_byte(target_value),
-         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte),
-         {:ok, current_value} <-
-           value_from_byte(current_value) do
+         {:ok, current_value} <- value_from_byte(current_value) do
       {:ok,
        [
          target_value: target_value,
-         duration: duration,
+         duration: decode_duration(duration_byte),
          current_value: current_value
        ]}
     end
