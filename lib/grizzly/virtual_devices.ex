@@ -60,7 +60,9 @@ defmodule Grizzly.VirtualDevices do
 
     case register(device_id, device_impl, device_opts) do
       {:ok, device_entry} ->
-        if handler = opts[:inclusion_handler] || VirtualDevicesRegistry.get_handler() do
+        handler = opts[:inclusion_handler] || VirtualDevicesRegistry.get_handler()
+
+        if handler != nil do
           Reports.send_node_add_status(device_entry, handler)
         end
 
@@ -106,7 +108,9 @@ defmodule Grizzly.VirtualDevices do
   def remove_device(device_id, opts \\ []) do
     :ok = VirtualDevicesRegistry.unregister(device_id)
 
-    if handler = opts[:inclusion_handler] || VirtualDevicesRegistry.get_handler() do
+    handler = opts[:inclusion_handler] || VirtualDevicesRegistry.get_handler()
+
+    if handler != nil do
       Reports.send_node_remove_status(device_id, handler)
     end
 
