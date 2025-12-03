@@ -114,7 +114,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
 
       assert Command.param!(command, :checksum) != nil
       assert new_firmware_update.state == :updating
-      assert Enum.count(new_firmware_update.image.fragments) > 0
+      refute Enum.empty?(new_firmware_update.image.fragments)
     end
 
     test "updating state to uploading state", context do
