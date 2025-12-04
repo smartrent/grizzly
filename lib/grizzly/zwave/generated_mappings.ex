@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.GeneratedMappings do
       {74, :tariff_config},
       {75, :tariff_tbl_monitor},
       {76, :door_lock_logging},
-      {77, :network_management_basic},
+      {77, :network_management_basic_node},
       {78, :schedule_entry_lock},
       {79, :zip_6lowpan},
       {80, :basic_window_covering},
