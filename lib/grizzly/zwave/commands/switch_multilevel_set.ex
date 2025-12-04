@@ -12,10 +12,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.{SwitchMultilevel, SwitchSupport}
+  import Grizzly.ZWave.Encoding
 
-  @type param :: {:target_value, :off | :previous | 0..99} | {:duration, SwitchSupport.duration()}
+  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
+
+  @type param :: {:target_value, :off | :previous | 0..99} | {:duration, Encoding.duration()}
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}
@@ -41,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
         <<target_value_byte>>
 
       duration ->
-        duration_byte = SwitchSupport.duration_to_byte(duration)
+        duration_byte = encode_duration(duration)
         <<target_value_byte, duration_byte>>
     end
   end
@@ -55,22 +57,14 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
 
   @impl Grizzly.ZWave.Command
   def decode_params(<<target_value_byte>>) do
-    case target_value_from_byte(target_value_byte) do
-      {:ok, target_value} ->
-        {:ok, [target_value: target_value]}
-
-      {:error, %DecodeError{}} = error ->
-        error
+    with {:ok, target_value} <- target_value_from_byte(target_value_byte) do
+      {:ok, [target_value: target_value]}
     end
   end
 
   def decode_params(<<target_value_byte, duration_byte>>) do
-    with {:ok, target_value} <- target_value_from_byte(target_value_byte),
-         {:ok, duration} <- SwitchSupport.duration_from_byte(duration_byte) do
-      {:ok, [target_value: target_value, duration: duration]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
+    with {:ok, target_value} <- target_value_from_byte(target_value_byte) do
+      {:ok, [target_value: target_value, duration: decode_duration(duration_byte)]}
     end
   end
 

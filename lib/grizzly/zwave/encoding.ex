@@ -9,6 +9,17 @@ defmodule Grizzly.ZWave.Encoding do
 
   @type string_encoding :: :ascii | :extended_ascii | :utf16
 
+  @typedoc """
+  Common representation for durations used in Z-Wave command classes.
+
+  Durations of 0..127 seconds are encoded with 1-second resolution. Durations of
+  128..7560 seconds are encoded with 1-minute resolution. Larger durations are
+  not supported and will be encoded as unknown (0xFE).
+
+  See section 2.1.7.3 of the Z-Wave Specification for details.
+  """
+  @type duration :: 0..7560 | :unknown | :default
+
   @max_duration 126 * 60
 
   @doc """
@@ -59,22 +70,72 @@ defmodule Grizzly.ZWave.Encoding do
   Encodes a duration in seconds into a duration byte.
 
   Durations of 0..127 seconds are encoded with 1-second resolution. Durations of
-  128..7560 seconds are encoded with 1-minute resolution. Larger durations are
-  not supported and will be encoded as unknown (0xFE).
+  128..7560 seconds are encoded with 1-minute resolution, **rounded to the nearest
+  minute**. Larger durations are not supported and will be encoded as unknown (0xFE).
+
+  Some command classes also support a device-default duration (0xFF), which can
+  be specified using `:default`.
+
+  ## Examples
+
+      iex> encode_duration(0)
+      0x00
+      iex> encode_duration(45)
+      0x2D
+      iex> encode_duration(127)
+      0x7F
+      iex> encode_duration(128)
+      0x81
+      iex> encode_duration(180)
+      0x82
+      iex> encode_duration(200)
+      0x82
+      iex> encode_duration(7560)
+      0xFD
+      iex> encode_duration(8000)
+      0xFE
+      iex> encode_duration(:unknown)
+      0xFE
+      iex> encode_duration(:default)
+      0xFF
   """
-  @spec encode_duration(non_neg_integer() | :unknown) :: byte()
+  @spec encode_duration(duration()) :: byte()
+  def encode_duration(secs) when secs < 0, do: 0
   def encode_duration(secs) when secs in 0..127, do: secs
   def encode_duration(secs) when secs in 128..@max_duration, do: round(secs / 60) + 0x7F
   def encode_duration(:unknown), do: 0xFE
+  def encode_duration(:default), do: 0xFF
   def encode_duration(_), do: 0xFE
 
   @doc """
   Decodes a duration as encoded by `encode_duration/1`. Returns `:unknown` if
-  the value is outside the range 0x00..0xFD.
+  the value is outside the range 0x00..0xFD or `:default` for 0xFF.
+
+  ## Examples
+
+      iex> decode_duration(0x00)
+      0
+      iex> decode_duration(0x2D)
+      45
+      iex> decode_duration(0x7F)
+      127
+      iex> decode_duration(0x80)
+      60
+      iex> decode_duration(0x81)
+      120
+      iex> decode_duration(0x82)
+      180
+      iex> decode_duration(0xFD)
+      7560
+      iex> decode_duration(0xFE)
+      :unknown
+      iex> decode_duration(0xFF)
+      :default
   """
-  @spec decode_duration(byte()) :: :unknown | non_neg_integer()
+  @spec decode_duration(byte()) :: duration()
   def decode_duration(byte) when byte in 0x00..0x7F, do: byte
   def decode_duration(byte) when byte in 0x80..0xFD, do: (byte - 0x7F) * 60
+  def decode_duration(0xFF), do: :default
   def decode_duration(_), do: :unknown
 
   @doc """
