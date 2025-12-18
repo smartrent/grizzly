@@ -14,13 +14,11 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
   use GenServer
 
   alias Grizzly.VirtualDevices
-  alias Grizzly.ZWave.{Command, DeviceClass}
-
-  alias Grizzly.ZWave.Commands.{
-    BasicReport,
-    SensorMultilevelReport,
-    SensorMultilevelSupportedSensorReport
-  }
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.BasicReport
+  alias Grizzly.ZWave.Commands.SensorMultilevelReport
+  alias Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport
+  alias Grizzly.ZWave.DeviceClass
 
   @typedoc """
   Init options

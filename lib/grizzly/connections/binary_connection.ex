@@ -13,9 +13,14 @@ defmodule Grizzly.Connections.BinaryConnection do
   # another device asks us something about our device.
 
   use GenServer
-  require Logger
 
-  alias Grizzly.{Connections, Options, Transport, ZIPGateway, ZWave}
+  alias Grizzly.Connections
+  alias Grizzly.Options
+  alias Grizzly.Transport
+  alias Grizzly.ZIPGateway
+  alias Grizzly.ZWave
+
+  require Logger
 
   defmodule State do
     @moduledoc false

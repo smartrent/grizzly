@@ -3,7 +3,9 @@ defmodule Grizzly.TraceTest do
 
   alias Grizzly.Trace
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, ZIPKeepAlive, ZIPPacket}
+  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   setup %{test: test} = ctx do
     opts =

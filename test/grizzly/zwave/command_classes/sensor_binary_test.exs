@@ -1,8 +1,9 @@
 defmodule Grizzly.ZWave.CommandClasses.SensorBinaryTest do
   use ExUnit.Case, async: true
-  doctest Grizzly.ZWave.CommandClasses.SensorBinary, import: true
 
   alias Grizzly.ZWave.CommandClasses.SensorBinary
+
+  doctest Grizzly.ZWave.CommandClasses.SensorBinary, import: true
 
   describe "encode type" do
     test "when type is general purpose" do

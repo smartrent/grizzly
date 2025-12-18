@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.CommandClasses.SceneActuatorConf do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
 
   @type dimming_duration :: :instantly | [seconds: 1..127] | [minutes: 1..127] | :factory_settings

@@ -3,7 +3,8 @@ defmodule Grizzly.Trace.RecordTest do
 
   alias Grizzly.Trace.Record
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Commands.{SwitchBinarySet, ZIPPacket}
+  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "generate string log" do
     {:ok, encapsulated_command} = SwitchBinarySet.new(target_value: :on)

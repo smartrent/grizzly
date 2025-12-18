@@ -11,8 +11,10 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.Version
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:command_class, CommandClasses.command_class()} | {:version, byte()}
 

@@ -5,7 +5,8 @@ defmodule Grizzly.Requests do
   # Grizzly runtime for handling commands
 
   alias Grizzly.Report
-  alias Grizzly.Requests.{RequestRunner, RequestRunnerSupervisor}
+  alias Grizzly.Requests.RequestRunner
+  alias Grizzly.Requests.RequestRunnerSupervisor
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 

@@ -1,10 +1,10 @@
 defmodule Grizzly.AssociationsTest do
   use ExUnit.Case, async: true
-
   use Mimic.DSL
 
-  alias Grizzly.{Associations, Options}
+  alias Grizzly.Associations
   alias Grizzly.Associations.Association
+  alias Grizzly.Options
 
   @moduletag max_per_group: 5
 

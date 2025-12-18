@@ -3,9 +3,9 @@ defmodule Grizzly.ZWave.CommandClasses.HumidityControlOperatingState do
   HumidityControlOperatingState
   """
 
-  require Logger
-
   @behaviour Grizzly.ZWave.CommandClass
+
+  require Logger
 
   @type state :: :idle | :humidifying | :dehumidifying
 

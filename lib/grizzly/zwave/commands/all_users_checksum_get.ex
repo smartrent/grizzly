@@ -7,8 +7,9 @@ defmodule Grizzly.ZWave.Commands.AllUsersChecksumGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
+  alias Grizzly.ZWave.DecodeError
 
   @impl Grizzly.ZWave.Command
   @spec new(keyword()) :: {:ok, Command.t()}

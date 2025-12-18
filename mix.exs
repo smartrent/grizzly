@@ -55,6 +55,7 @@ defmodule Grizzly.MixProject do
       {:muontrap, "~> 1.6"},
       {:nimble_options, "~> 1.0"},
       {:property_table, "~> 0.3"},
+      {:quokka, "~> 2.11", only: [:dev, :test], runtime: false},
       {:sweet_xml, "~> 0.7", only: [:dev, :test]},
       {:telemetry_registry, "~> 0.3"},
       {:telemetry, "~> 0.4.3 or ~> 1.0"},

@@ -4,8 +4,12 @@ defmodule Grizzly.Storage do
   """
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses, DSK, Security}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
+  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   @typedoc """
   See `t:PropertyTable.property/0`.

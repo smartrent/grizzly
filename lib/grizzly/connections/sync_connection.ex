@@ -5,14 +5,19 @@ defmodule Grizzly.Connections.SyncConnection do
 
   use GenServer
 
-  require Logger
-
-  alias Grizzly.{Connections, Options, Report, Transport, ZIPGateway}
-  alias Grizzly.Connections.{KeepAlive, RequestList}
+  alias Grizzly.Connections
+  alias Grizzly.Connections.KeepAlive
+  alias Grizzly.Connections.RequestList
+  alias Grizzly.Options
+  alias Grizzly.Report
   alias Grizzly.Requests.RequestRunner
+  alias Grizzly.Transport
+  alias Grizzly.ZIPGateway
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
+
+  require Logger
 
   @type send_opt() :: {:timeout, non_neg_integer()} | {:retries, non_neg_integer()}
 

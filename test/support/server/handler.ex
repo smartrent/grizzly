@@ -3,29 +3,26 @@ defmodule GrizzlyTest.Server.Handler do
 
   use ThousandIsland.Handler
 
-  alias ThousandIsland.Socket
-
   alias Grizzly.SeqNumber
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
-
-  alias Grizzly.ZWave.Commands.{
-    FirmwareUpdateMDGet,
-    FirmwareUpdateMDRequestReport,
-    FirmwareUpdateMDStatusReport,
-    LearnModeSetStatus,
-    NodeAddDSKReport,
-    NodeAddKeysReport,
-    NodeAddStatus,
-    NodeListReport,
-    NodeRemoveStatus,
-    SupervisionReport,
-    SwitchBinaryReport,
-    VersionCommandClassReport,
-    ZIPKeepAlive,
-    ZIPPacket
-  }
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDGet
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport
+  alias Grizzly.ZWave.Commands.LearnModeSetStatus
+  alias Grizzly.ZWave.Commands.NodeAddDSKReport
+  alias Grizzly.ZWave.Commands.NodeAddKeysReport
+  alias Grizzly.ZWave.Commands.NodeAddStatus
+  alias Grizzly.ZWave.Commands.NodeListReport
+  alias Grizzly.ZWave.Commands.NodeRemoveStatus
+  alias Grizzly.ZWave.Commands.SupervisionReport
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands.VersionCommandClassReport
+  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave.DSK
+  alias ThousandIsland.Socket
 
   require Logger
 

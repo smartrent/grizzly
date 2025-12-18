@@ -1,7 +1,8 @@
 defmodule Grizzly.ConnectionTest do
   use ExUnit.Case
 
-  alias Grizzly.{Connection, Report}
+  alias Grizzly.Connection
+  alias Grizzly.Report
 
   test "open a connection" do
     assert {:ok, _connection} = Connection.open(1200)

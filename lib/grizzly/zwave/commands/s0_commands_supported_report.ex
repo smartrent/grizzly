@@ -5,8 +5,10 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.S0
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:supported | :controlled, [CommandClasses.command_class()]}

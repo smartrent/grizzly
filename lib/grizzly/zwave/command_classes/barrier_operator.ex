@@ -7,9 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.BarrierOperator do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.DecodeError
-
   import Bitwise
+
+  alias Grizzly.ZWave.DecodeError
 
   @type target_value :: :open | :close
   @type state :: :closed | 0x01..0x63 | :closing | :stopped | :opening | :open

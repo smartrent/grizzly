@@ -6,6 +6,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   use GenServer
 
   alias Grizzly.ZIPGateway.SAPIMonitor
+
   require Logger
 
   @type network_key_type ::

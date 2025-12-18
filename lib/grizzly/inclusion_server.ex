@@ -5,9 +5,12 @@ defmodule Grizzly.InclusionServer do
 
   use GenServer
 
-  alias Grizzly.{Inclusions, Report}
+  alias Grizzly.Inclusions
   alias Grizzly.Inclusions.StatusServer
-  alias Grizzly.ZWave.{Command, DSK, Security}
+  alias Grizzly.Report
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   require Logger
 

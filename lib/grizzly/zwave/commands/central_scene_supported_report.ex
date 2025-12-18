@@ -32,9 +32,11 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.CentralScene
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.CentralScene
+  alias Grizzly.ZWave.DecodeError
 
   # give me some type specs for your params
   @type param ::

@@ -19,8 +19,10 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
   @behaviour Grizzly.ZWave.Command
 
   import Grizzly.ZWave.Encoding
-  alias Grizzly.ZWave.{Command, DecodeError}
+
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.DecodeError
 
   @type ascii_char :: 0..127
 

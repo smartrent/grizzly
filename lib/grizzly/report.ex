@@ -117,7 +117,8 @@ defmodule Grizzly.Report do
   the example for illustration purposes
   """
 
-  alias Grizzly.{VirtualDevices, ZWave}
+  alias Grizzly.VirtualDevices
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
   @typedoc """

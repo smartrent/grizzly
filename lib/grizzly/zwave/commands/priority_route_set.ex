@@ -8,8 +8,9 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance, as: NMIM
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:node_id, byte()}

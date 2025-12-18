@@ -1,6 +1,5 @@
 defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
   use ExUnit.Case, async: false
-
   use Mimic.DSL
 
   alias Grizzly.FirmwareUpdates.OTWUpdateRunner

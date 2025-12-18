@@ -20,8 +20,11 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses, NodeId}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
+  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.NodeId
 
   @type param() ::
           {:seq_number, ZWave.seq_number()}

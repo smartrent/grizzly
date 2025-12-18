@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.PowerlevelSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Powerlevel
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:power_level, Powerlevel.power_level()} | {:timeout, non_neg_integer()}
 

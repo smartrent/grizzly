@@ -13,8 +13,10 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeGet do
   @behaviour Grizzly.ZWave.Command
 
   import Grizzly.ZWave.Encoding
-  alias Grizzly.ZWave.{Command, DecodeError}
+
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:user_id, UserCode.extended_user_id()} | {:report_more?, boolean()}
 

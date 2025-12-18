@@ -23,8 +23,9 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, NodeId}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.NodeId
 
   @type param() :: {:node_id, char()} | {:seq_number, ZWave.seq_number()}
 

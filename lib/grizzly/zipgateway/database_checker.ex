@@ -13,9 +13,9 @@ defmodule Grizzly.ZIPGateway.DatabaseChecker do
 
   use GenServer, restart: :temporary
 
-  require Logger
-
   alias Grizzly.ZIPGateway.Database, as: ZIPGatewayDb
+
+  require Logger
 
   @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(opts) do

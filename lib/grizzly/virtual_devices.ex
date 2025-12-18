@@ -5,7 +5,8 @@ defmodule Grizzly.VirtualDevices do
   Virtual devices are in-memory devices that act like a Z-Wave device
   """
 
-  alias Grizzly.VirtualDevices.{Device, Reports}
+  alias Grizzly.VirtualDevices.Device
+  alias Grizzly.VirtualDevices.Reports
   alias Grizzly.VirtualDevicesRegistry
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.DeviceClass

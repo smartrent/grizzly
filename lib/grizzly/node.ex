@@ -3,7 +3,11 @@ defmodule Grizzly.Node do
   Functions for working directly with a Z-Wave node
   """
 
-  alias Grizzly.{Report, SeqNumber, VirtualDevices, ZWave, ZWave.Command}
+  alias Grizzly.Report
+  alias Grizzly.SeqNumber
+  alias Grizzly.VirtualDevices
+  alias Grizzly.ZWave
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance, as: NMIM
 
   @type id :: non_neg_integer()

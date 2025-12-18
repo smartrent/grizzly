@@ -11,8 +11,10 @@ defmodule Grizzly.ZWave.Commands.AlarmSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, Notifications}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Alarm
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Notifications
 
   @type param :: {:zwave_type, Notifications.type()} | {:status, Notifications.status()}
 

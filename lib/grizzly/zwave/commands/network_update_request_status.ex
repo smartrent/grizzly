@@ -13,8 +13,9 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequestStatus do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:seq_number, Grizzly.seq_number()}

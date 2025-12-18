@@ -6,12 +6,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
 
   alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
-  alias Grizzly.ZWave.{Command, CRC}
-
-  alias Grizzly.ZWave.Commands.{
-    FirmwareUpdateMDReport,
-    FirmwareUpdateMDRequestGet
-  }
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDReport
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet
+  alias Grizzly.ZWave.CRC
 
   require Logger
 

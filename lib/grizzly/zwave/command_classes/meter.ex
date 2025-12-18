@@ -7,6 +7,9 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
 
   @behaviour Grizzly.ZWave.CommandClass
 
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
+
   @type meter_type :: :electric | :gas | :water | :heating | :cooling
   @type meter_scale ::
           :a
@@ -23,8 +26,6 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
           | :w
 
   @type meter_rate_type :: :export | :import | :import_export | :default
-
-  alias Grizzly.ZWave.{DecodeError, Encoding}
 
   @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x32

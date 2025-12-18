@@ -11,8 +11,9 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, NodeId}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
+  alias Grizzly.ZWave.NodeId
 
   @impl Grizzly.ZWave.Command
   def new(params \\ []) do

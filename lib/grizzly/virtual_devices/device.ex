@@ -3,7 +3,8 @@ defmodule Grizzly.VirtualDevices.Device do
   Behaviour for implementing virtual device specifics
   """
 
-  alias Grizzly.ZWave.{Command, DeviceClass}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.DeviceClass
 
   @typedoc """
   A module that implements this behaviour

@@ -23,8 +23,10 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemoveStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DecodeError, NodeId}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.NodeId
 
   @type status() :: :done | :failed_node_not_found | :failed_node_remove_fail
   @type param() :: {:node_id, char()} | {:seq_number, ZWave.seq_number()} | {:status, status}

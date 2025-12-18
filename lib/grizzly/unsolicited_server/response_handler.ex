@@ -4,25 +4,23 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   # module helper for handling various different responses from the Z-Wave PAN
   # network
 
-  require Logger
-
-  alias Grizzly.{Associations, ZWave}
+  alias Grizzly.Associations
   alias Grizzly.VersionReports
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.AssociationGroupCommandListReport
+  alias Grizzly.ZWave.Commands.AssociationGroupInfoReport
+  alias Grizzly.ZWave.Commands.AssociationGroupingsReport
+  alias Grizzly.ZWave.Commands.AssociationGroupNameReport
+  alias Grizzly.ZWave.Commands.AssociationReport
+  alias Grizzly.ZWave.Commands.AssociationSpecificGroupReport
+  alias Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport
+  alias Grizzly.ZWave.Commands.MultiChannelAssociationReport
+  alias Grizzly.ZWave.Commands.SupervisionReport
+  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
-  alias Grizzly.ZWave.Commands.{
-    AssociationGroupCommandListReport,
-    AssociationGroupInfoReport,
-    AssociationGroupingsReport,
-    AssociationGroupNameReport,
-    AssociationReport,
-    AssociationSpecificGroupReport,
-    MultiChannelAssociationGroupingsReport,
-    MultiChannelAssociationReport,
-    SupervisionReport,
-    ZIPKeepAlive,
-    ZIPPacket
-  }
+  require Logger
 
   @type opt() :: {:association_server, GenServer.name()}
 

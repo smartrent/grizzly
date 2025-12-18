@@ -8,7 +8,8 @@ defmodule Grizzly.UnsolicitedServer.ConnectionHandler do
   alias Grizzly.UnsolicitedServer.ResponseHandler
   alias Grizzly.ZIPGateway
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, Commands.ZIPPacket}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.ZIPPacket
   alias ThousandIsland.Socket
 
   require Logger

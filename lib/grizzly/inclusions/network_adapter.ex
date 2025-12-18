@@ -4,7 +4,8 @@ defmodule Grizzly.Inclusions.NetworkAdapter do
   """
 
   alias Grizzly.Inclusions
-  alias Grizzly.ZWave.{DSK, Security}
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   @typedoc """
   A module that implements the behaviour

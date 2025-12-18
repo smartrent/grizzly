@@ -12,9 +12,10 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationSet do
 
   @behaviour Grizzly.ZWave.Command
 
+  import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.CentralScene
-  import Grizzly.ZWave.Encoding
 
   @type param :: {:slow_refresh, boolean}
 

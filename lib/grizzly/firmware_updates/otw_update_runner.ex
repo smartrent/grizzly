@@ -30,10 +30,10 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
 
   @behaviour :gen_statem
 
-  require Logger
-
   alias Grizzly.FirmwareUpdates.OTW.UpdateSpec
   alias Grizzly.ZWave.Command
+
+  require Logger
 
   @in_progress_alarm Grizzly.FirmwareUpdates.OTWUpdateInProgress
   @error_alarm Grizzly.FirmwareUpdates.OTWUpdateFailedWhileInProgress

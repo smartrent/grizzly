@@ -18,9 +18,11 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.CentralScene
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.CentralScene
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:seq_number, non_neg_integer()}

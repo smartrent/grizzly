@@ -12,8 +12,10 @@ defmodule Grizzly.ZWave.Commands.SceneActivationSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.{SceneActivation, SceneActuatorConf}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.SceneActivation
+  alias Grizzly.ZWave.CommandClasses.SceneActuatorConf
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:scene_id, boolean}

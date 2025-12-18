@@ -3,9 +3,9 @@ defmodule Grizzly.ZWave.CommandClasses do
   Utilities for encoding and decoding command classes and command class lists.
   """
 
-  require Logger
-
   import Grizzly.ZWave.GeneratedMappings, only: [command_class_mappings: 0]
+
+  require Logger
 
   @type command_class_list :: [
           non_secure_supported: list(atom()),

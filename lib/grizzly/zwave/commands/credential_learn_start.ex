@@ -15,8 +15,9 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStart do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:user_id, 1..0xFFFF}

@@ -36,9 +36,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.Configuration
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.Configuration
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:param_number, non_neg_integer()}

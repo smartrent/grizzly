@@ -6,7 +6,8 @@ defmodule Grizzly.ZWave.QRCode do
   """
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{DSK, Security}
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
   alias Grizzly.ZWave.SmartStart.MetaExtension.UUID16
 
   require Logger

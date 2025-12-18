@@ -16,8 +16,9 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
+  alias Grizzly.ZWave.DecodeError
 
   @type mode :: :node_add_any | :node_add_stop | :node_add_any_s2
 

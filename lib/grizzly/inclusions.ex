@@ -168,7 +168,9 @@ defmodule Grizzly.Inclusions do
 
   alias Grizzly.Inclusions.StatusServer
   alias Grizzly.InclusionServer
-  alias Grizzly.ZWave.{Command, DSK, Security}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   @typedoc """
   Status of the inclusion server

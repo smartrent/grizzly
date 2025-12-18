@@ -3,7 +3,8 @@ defmodule Grizzly.Requests.Handlers.AggregateReportTest do
 
   alias Grizzly.Requests.Handlers.AggregateReport
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{AssociationReport, SwitchBinaryReport}
+  alias Grizzly.ZWave.Commands.AssociationReport
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
 
   test "when the waiting report has no reports to follow" do
     {:ok, state} =

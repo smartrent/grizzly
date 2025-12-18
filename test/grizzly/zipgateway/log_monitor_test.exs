@@ -1,7 +1,8 @@
 defmodule Grizzly.ZIPGateway.LogMonitorTest do
   use ExUnit.Case, async: false
 
-  alias Grizzly.ZIPGateway.{LogMonitor, SAPIMonitor}
+  alias Grizzly.ZIPGateway.LogMonitor
+  alias Grizzly.ZIPGateway.SAPIMonitor
 
   setup %{test: test} do
     Grizzly.Events.subscribe(:serial_api_status)

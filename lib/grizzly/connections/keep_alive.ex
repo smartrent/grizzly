@@ -4,7 +4,8 @@ defmodule Grizzly.Connections.KeepAlive do
   # module for working with the Z/IP Keep Alive command and handling the keep
   # alive information
 
-  alias Grizzly.{Requests, ZWave}
+  alias Grizzly.Requests
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands.ZIPKeepAlive
 
   @type opt :: {:owner, pid()}

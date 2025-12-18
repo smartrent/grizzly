@@ -6,8 +6,10 @@ defmodule Grizzly.Connections.RequestList do
 
   #### TODO separate out keep alive stuff ####
 
-  alias Grizzly.{Report, Requests, ZWave}
+  alias Grizzly.Report
+  alias Grizzly.Requests
   alias Grizzly.Requests.RequestRunner
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 
   # this command is the process or GenServer waiting for a response

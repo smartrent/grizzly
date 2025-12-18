@@ -16,8 +16,9 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
+  alias Grizzly.ZWave.DecodeError
 
   @type mode ::
           :start_failed_node_replace | :stop_failed_node_replace | :start_failed_node_replace_s2

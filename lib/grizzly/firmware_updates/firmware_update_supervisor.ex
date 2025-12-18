@@ -2,8 +2,9 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor do
   @moduledoc false
   use DynamicSupervisor
 
-  alias Grizzly.{FirmwareUpdates, Options}
+  alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
+  alias Grizzly.Options
 
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do

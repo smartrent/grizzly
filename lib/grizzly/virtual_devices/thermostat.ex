@@ -3,21 +3,19 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   Implementation of a virtual device for a thermostat
   """
 
-  use GenServer
-
   @behaviour Grizzly.VirtualDevices.Device
 
-  alias Grizzly.ZWave.{Command, DeviceClass}
+  use GenServer
 
-  alias Grizzly.ZWave.Commands.{
-    BasicReport,
-    SensorMultilevelReport,
-    SensorMultilevelSupportedSensorReport,
-    ThermostatFanModeReport,
-    ThermostatFanStateReport,
-    ThermostatModeReport,
-    ThermostatSetpointReport
-  }
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.BasicReport
+  alias Grizzly.ZWave.Commands.SensorMultilevelReport
+  alias Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport
+  alias Grizzly.ZWave.Commands.ThermostatFanModeReport
+  alias Grizzly.ZWave.Commands.ThermostatFanStateReport
+  alias Grizzly.ZWave.Commands.ThermostatModeReport
+  alias Grizzly.ZWave.Commands.ThermostatSetpointReport
+  alias Grizzly.ZWave.DeviceClass
 
   @impl Grizzly.VirtualDevices.Device
   def device_spec(_device_opts) do

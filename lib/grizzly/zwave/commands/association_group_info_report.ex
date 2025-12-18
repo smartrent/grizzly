@@ -17,8 +17,9 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
+  alias Grizzly.ZWave.DecodeError
 
   @type group_info() :: [group_id: byte(), profile: atom()]
   @type param() ::

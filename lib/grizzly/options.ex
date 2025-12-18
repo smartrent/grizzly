@@ -4,7 +4,8 @@ defmodule Grizzly.Options do
   """
 
   alias Grizzly.FirmwareUpdates.OTW.UpdateSpec
-  alias Grizzly.{Supervisor, Trace}
+  alias Grizzly.Supervisor
+  alias Grizzly.Trace
   alias Grizzly.ZIPGateway.Config
 
   require Logger

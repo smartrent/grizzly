@@ -6,6 +6,7 @@ defmodule Grizzly.ZWave.CommandClasses.ApplicationStatus do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
 
   @type status :: :try_again_later | :try_again_after_wait | :request_queued

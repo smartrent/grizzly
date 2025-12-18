@@ -41,15 +41,17 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
   @behaviour Grizzly.ZWave.Command
 
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.NodeId
+
   @type max_age() :: 1..14 | :infinity | :force_update
 
   @type param() ::
           {:seq_number, Grizzly.seq_number()}
           | {:node_id, Grizzly.ZWave.node_id()}
           | {:max_age, max_age()}
-
-  alias Grizzly.ZWave.{Command, DecodeError, NodeId}
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @impl Grizzly.ZWave.Command
   @spec new([param()]) :: {:ok, Command.t()}

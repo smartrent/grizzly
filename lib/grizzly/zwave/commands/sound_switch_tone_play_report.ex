@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonePlayReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SoundSwitch
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:tone_identifier, 0..255}
 

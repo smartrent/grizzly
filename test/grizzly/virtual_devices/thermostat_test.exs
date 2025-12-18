@@ -1,7 +1,8 @@
 defmodule Grizzly.VirtualDevices.ThermostatTest do
   use Grizzly.VirtualDeviceCase
 
-  alias Grizzly.{Node, Report}
+  alias Grizzly.Node
+  alias Grizzly.Report
   alias Grizzly.VirtualDevices.Thermostat
   alias Grizzly.ZWave.Command
 

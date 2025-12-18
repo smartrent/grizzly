@@ -13,9 +13,11 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.Basic
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.Basic
+  alias Grizzly.ZWave.DecodeError
 
   @type value :: :on | :off | :unknown | byte()
   @type duration :: non_neg_integer | :unknown

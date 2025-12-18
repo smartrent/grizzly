@@ -6,8 +6,14 @@ defmodule Grizzly.ZIPGateway.Supervisor do
   # Supervisor for the `zipgateway` system process
   use Supervisor
 
-  alias Grizzly.{Indicator, Options}
-  alias Grizzly.ZIPGateway.{Config, DatabaseChecker, ExitMonitor, LogMonitor, SAPIMonitor}
+  alias Grizzly.Indicator
+  alias Grizzly.Options
+  alias Grizzly.ZIPGateway.Config
+  alias Grizzly.ZIPGateway.DatabaseChecker
+  alias Grizzly.ZIPGateway.ExitMonitor
+  alias Grizzly.ZIPGateway.LogMonitor
+  alias Grizzly.ZIPGateway.SAPIMonitor
+
   require Logger
 
   @doc """

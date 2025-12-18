@@ -1,16 +1,14 @@
 defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.{FirmwareUpdate, Image}
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
   alias Grizzly.ZWave.Command
-
-  alias Grizzly.ZWave.Commands.{
-    FirmwareMDReport,
-    FirmwareUpdateActivationReport,
-    FirmwareUpdateMDGet,
-    FirmwareUpdateMDRequestReport,
-    FirmwareUpdateMDStatusReport
-  }
+  alias Grizzly.ZWave.Commands.FirmwareMDReport
+  alias Grizzly.ZWave.Commands.FirmwareUpdateActivationReport
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDGet
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport
+  alias Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport
 
   setup do
     image = Image.new("test/serialapi_controller_bridge_OTW_SD3503_US.gbl")

@@ -8,21 +8,18 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
   # For certification to pass, this must be at least the sum of the S2 bootstrapping
   # timeouts TA1 (10), TA2 (10), TA3 (10), TA4 (10), TA5 (10), TAI1 (240), and TAI2 (240).
-  @inclusion_timeout :timer.seconds(530)
-
-  require Logger
-
   alias Grizzly.Connection
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.SeqNumber
+  alias Grizzly.ZWave.Commands.LearnModeSet
+  alias Grizzly.ZWave.Commands.NodeAdd
+  alias Grizzly.ZWave.Commands.NodeAddDSKSet
+  alias Grizzly.ZWave.Commands.NodeAddKeysSet
+  alias Grizzly.ZWave.Commands.NodeRemove
 
-  alias Grizzly.ZWave.Commands.{
-    LearnModeSet,
-    NodeAdd,
-    NodeAddDSKSet,
-    NodeAddKeysSet,
-    NodeRemove
-  }
+  require Logger
+
+  @inclusion_timeout :timer.seconds(530)
 
   @impl Grizzly.Inclusions.NetworkAdapter
   def init() do

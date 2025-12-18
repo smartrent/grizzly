@@ -10,8 +10,9 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.BarrierOperator
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:target_value, BarrierOperator.target_value()}
 

@@ -1,7 +1,8 @@
 defmodule Grizzly.ZWave.Commands.CRC16EncapTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Commands.{CRC16Encap, SwitchMultilevelSet}
+  alias Grizzly.ZWave.Commands.CRC16Encap
+  alias Grizzly.ZWave.Commands.SwitchMultilevelSet
   alias Grizzly.ZWave.CRC
 
   test "creates the command and validates params" do

@@ -14,9 +14,9 @@ defmodule Grizzly.Inclusions.StatusServer do
 
   use GenServer
 
-  require Logger
-
   alias Grizzly.Inclusions
+
+  require Logger
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)

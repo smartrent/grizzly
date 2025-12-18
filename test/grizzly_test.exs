@@ -1,11 +1,13 @@
 defmodule Grizzly.Test do
   use ExUnit.Case, async: false
 
+  import ExUnit.CaptureLog, only: [capture_log: 2]
+
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinaryReport, ZIPPacket}
-
-  import ExUnit.CaptureLog, only: [capture_log: 2]
+  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   describe "SwitchBinary Commands" do
     @tag :integration

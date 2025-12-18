@@ -3,11 +3,12 @@ defmodule Grizzly.Trace.Record do
   Data structure for a single item in the trace log
   """
 
-  require Logger
-
-  alias Grizzly.{Trace, ZWave}
+  alias Grizzly.Trace
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
+
+  require Logger
 
   @type t() :: %__MODULE__{
           timestamp: Time.t(),

@@ -14,8 +14,10 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
 
   import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   require Logger
 

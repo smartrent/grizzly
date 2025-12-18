@@ -11,13 +11,20 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   use GenServer
 
-  alias Grizzly.{Connection, Connections, Options, Report, Transport, ZIPGateway, ZWave}
-  alias Grizzly.Connections.{KeepAlive, RequestList}
+  import Grizzly.NodeId, only: [is_zwave_node_id: 1]
+
+  alias Grizzly.Connection
+  alias Grizzly.Connections
+  alias Grizzly.Connections.KeepAlive
+  alias Grizzly.Connections.RequestList
+  alias Grizzly.Options
+  alias Grizzly.Report
   alias Grizzly.Requests.RequestRunner
+  alias Grizzly.Transport
+  alias Grizzly.ZIPGateway
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket
-
-  import Grizzly.NodeId, only: [is_zwave_node_id: 1]
 
   require Logger
 

@@ -17,8 +17,9 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
+  alias Grizzly.ZWave.DecodeError
 
   @type mode :: :disable | :direct_range_only | :allow_routed
   @type param ::

@@ -3,9 +3,9 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   User Credential command class
   """
 
-  alias Grizzly.ZWave.Encoding
-
   @behaviour Grizzly.ZWave.CommandClass
+
+  alias Grizzly.ZWave.Encoding
 
   @type user_type ::
           :general | :programming | :non_access | :duress | :disposable | :expiring | :remote_only

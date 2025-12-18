@@ -3,7 +3,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.{SwitchBinarySet, ZIPPacket}
+  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   describe "creating a new Z/IP Packet command" do
     test "with defaults" do

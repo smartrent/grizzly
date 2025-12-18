@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.ConfigurationNameReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Configuration
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:param_number, byte} | {:name, binary} | {:reports_to_follow, byte}
 

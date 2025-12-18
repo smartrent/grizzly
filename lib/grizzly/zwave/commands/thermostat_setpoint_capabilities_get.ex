@@ -9,8 +9,9 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
+  alias Grizzly.ZWave.DecodeError
 
   @type param() :: {:type, ThermostatSetpoint.type()}
 

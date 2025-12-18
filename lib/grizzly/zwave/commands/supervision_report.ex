@@ -13,9 +13,11 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.Supervision
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.Supervision
+  alias Grizzly.ZWave.DecodeError
 
   @type more_status_updates() :: :last_report | :more_reports
   @type status() :: :no_support | :working | :fail | :success

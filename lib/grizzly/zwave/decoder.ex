@@ -1,7 +1,10 @@
 defmodule Grizzly.ZWave.Decoder do
   @moduledoc false
 
-  alias Grizzly.ZWave.{Command, Commands, DecodeError, ZWaveError}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.ZWaveError
 
   @mappings %{
     # {command_class_byte, command_byte, command_module}

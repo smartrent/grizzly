@@ -4,10 +4,9 @@ defmodule Grizzly.ZIPGateway.Config do
   """
 
   # This module is for making the `zipgateway.cfg` file
+  alias Grizzly.Supervisor
 
   require Logger
-
-  alias Grizzly.Supervisor
 
   @type t :: %__MODULE__{
           ca_cert: Path.t(),

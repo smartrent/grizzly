@@ -1,13 +1,15 @@
 defmodule Grizzly.Connection do
   @moduledoc false
 
-  require Logger
-
-  alias Grizzly.Connections.{AsyncConnection, BinaryConnection, SyncConnection}
+  alias Grizzly.Connections.AsyncConnection
+  alias Grizzly.Connections.BinaryConnection
   alias Grizzly.Connections.Supervisor
+  alias Grizzly.Connections.SyncConnection
   alias Grizzly.Report
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
+
+  require Logger
 
   @type opt() :: {:mode, Grizzly.connection_mode()} | {:owner, pid()} | {:unnamed, boolean()}
 

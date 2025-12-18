@@ -2,8 +2,12 @@ defmodule Grizzly.Connections.Supervisor do
   @moduledoc false
   use DynamicSupervisor
 
-  alias Grizzly.{Connection, Options, ZWave}
-  alias Grizzly.Connections.{AsyncConnection, BinaryConnection, SyncConnection}
+  alias Grizzly.Connection
+  alias Grizzly.Connections.AsyncConnection
+  alias Grizzly.Connections.BinaryConnection
+  alias Grizzly.Connections.SyncConnection
+  alias Grizzly.Options
+  alias Grizzly.ZWave
 
   @spec start_link(Options.t()) :: Supervisor.on_start()
   def start_link(options) do

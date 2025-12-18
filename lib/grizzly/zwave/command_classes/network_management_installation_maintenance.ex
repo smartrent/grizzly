@@ -6,7 +6,11 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   data.
   """
 
+  @behaviour Grizzly.ZWave.CommandClass
+
   import Bitwise
+
+  alias Grizzly.ZWave.DecodeError
 
   @type route_type ::
           :no_route | :last_working_route | :next_to_last_working_route | :set_by_application
@@ -27,9 +31,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
           | {:speed, speeds}
   @type rssi ::
           :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -124..127
-
-  alias Grizzly.ZWave.DecodeError
-  @behaviour Grizzly.ZWave.CommandClass
 
   @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x67

@@ -12,8 +12,9 @@ defmodule Grizzly.ZWave.Commands.NodeLocationReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NodeNaming
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:location, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 

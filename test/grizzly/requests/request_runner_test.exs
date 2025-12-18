@@ -1,18 +1,16 @@
 defmodule Grizzly.Requests.RequestRunnerTest do
   use ExUnit.Case
 
-  alias Grizzly.{Report, SeqNumber}
+  alias Grizzly.Report
   alias Grizzly.Requests.RequestRunner
+  alias Grizzly.SeqNumber
   alias Grizzly.ZWave.Command
-
-  alias Grizzly.ZWave.Commands.{
-    NodeListGet,
-    NodeListReport,
-    SwitchBinaryGet,
-    SwitchBinaryReport,
-    SwitchBinarySet,
-    ZIPPacket
-  }
+  alias Grizzly.ZWave.Commands.NodeListGet
+  alias Grizzly.ZWave.Commands.NodeListReport
+  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "runs a basic application command that only expects an ack response" do
     {:ok, command} = SwitchBinarySet.new(target_value: :off)

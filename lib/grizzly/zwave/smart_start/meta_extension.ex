@@ -4,11 +4,13 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension do
   list
   """
 
-  alias Grizzly.ZWave
-  alias Grizzly.ZWave.{DeviceClasses, IconType, Security}
-  alias Grizzly.ZWave.SmartStart.MetaExtension.UUID16
-
   import Bitwise
+
+  alias Grizzly.ZWave
+  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.IconType
+  alias Grizzly.ZWave.Security
+  alias Grizzly.ZWave.SmartStart.MetaExtension.UUID16
 
   @advanced_joining 0x35
   @bootstrapping_mode 0x36

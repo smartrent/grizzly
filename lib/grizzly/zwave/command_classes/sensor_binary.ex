@@ -5,8 +5,9 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
 
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.DecodeError
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.DecodeError
 
   @type sensor_type() ::
           :general_purpose

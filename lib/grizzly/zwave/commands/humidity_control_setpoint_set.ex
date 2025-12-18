@@ -11,11 +11,12 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  import Grizzly.ZWave.Encoding
   import Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:setpoint_type, HumidityControlSetpoint.type()}

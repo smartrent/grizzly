@@ -11,8 +11,9 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SensorBinary
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:sensor_type, SensorBinary.sensor_type()}
 
