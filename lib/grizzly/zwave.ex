@@ -4,8 +4,8 @@ defmodule Grizzly.ZWave do
   """
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
-  alias Grizzly.ZWave.Decoder
 
   @type seq_number :: non_neg_integer()
 
@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave do
   def from_binary(binary) do
     Logger.metadata(zwave_command: inspect(binary, base: :hex, limit: 100))
 
-    Decoder.from_binary(binary)
+    Commands.decode(binary)
   end
 
   @spec to_binary(Command.t()) :: binary()

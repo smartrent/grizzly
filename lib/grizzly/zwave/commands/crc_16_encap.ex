@@ -15,7 +15,6 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
   alias Grizzly.ZWave.CommandClasses.CRC16Encap
   alias Grizzly.ZWave.CRC
   alias Grizzly.ZWave.DecodeError
-  alias Grizzly.ZWave.Decoder
 
   @type param :: {:command, Command.t()}
 
@@ -51,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
     with {:ok, encoded_params, checksum} <- extract_params_and_checksum(data_and_checksum),
          command_binary = <<command_class_byte, command_byte>> <> encoded_params,
          ^checksum <- CRC.crc16_aug_ccitt(command_binary),
-         {:ok, command} <- Decoder.from_binary(command_binary) do
+         {:ok, command} <- Grizzly.ZWave.from_binary(command_binary) do
       {:ok, [command: command]}
     else
       _other ->

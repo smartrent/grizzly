@@ -15,7 +15,6 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
-  alias Grizzly.ZWave.Decoder
 
   require Logger
 
@@ -123,14 +122,13 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   end
 
   defp specified_command([cc_byte, c_byte]) do
-    case Decoder.command_module(cc_byte, c_byte) do
-      {:error, :unsupported_command} ->
-        Logger.warning("[Grizzly] Unmapped class #{c_byte} of command class #{cc_byte}")
+    case Commands.spec_for(cc_byte, c_byte) do
+      {:error, :unknown_command} ->
+        Logger.warning("[Grizzly] Unmapped command #{c_byte} of command class #{cc_byte}")
         :unknown
 
-      {:ok, command_module} ->
-        {:ok, command} = command_module.new([])
-        command.name
+      {:ok, spec} ->
+        spec.name
     end
   end
 

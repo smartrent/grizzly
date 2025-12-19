@@ -340,7 +340,7 @@ defmodule Grizzly do
   """
   @spec list_commands() :: [atom()]
   def list_commands() do
-    Enum.map(Commands.dump(), fn {command, _} -> command end)
+    Map.keys(Commands.builtin_commands())
   end
 
   @doc """
@@ -348,12 +348,11 @@ defmodule Grizzly do
   """
   @spec commands_for_command_class(atom()) :: [atom()]
   def commands_for_command_class(command_class_name) do
-    Commands.dump()
-    |> Enum.filter(fn {_command, {command_module, _}} ->
-      {:ok, command} = command_module.new([])
-      command.command_class == command_class_name
+    Commands.builtin_commands()
+    |> Enum.filter(fn {_name, spec} ->
+      spec.command_class == command_class_name
     end)
-    |> Enum.map(fn {command, _} -> command end)
+    |> Keyword.keys()
   end
 
   @doc """

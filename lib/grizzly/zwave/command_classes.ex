@@ -25,11 +25,15 @@ defmodule Grizzly.ZWave.CommandClasses do
   end
 
   @spec from_byte(byte()) :: {:ok, command_class()} | {:error, :unsupported_command_class}
-
   def from_byte(byte) do
     Enum.find_value(command_class_mappings(), {:error, :unsupported_command_class}, fn {cc, b} ->
       if b == byte, do: {:ok, cc}
     end)
+  end
+
+  @spec valid?(command_class()) :: boolean()
+  def valid?(command_class) do
+    Map.has_key?(command_class_mappings(), command_class)
   end
 
   @doc """
