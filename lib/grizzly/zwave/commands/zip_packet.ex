@@ -7,10 +7,12 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
 
   import Bitwise
   import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, Decoder}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ZIP
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions
+  alias Grizzly.ZWave.Decoder
 
   @type flag ::
           :ack_response

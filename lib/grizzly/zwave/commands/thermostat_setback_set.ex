@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetback
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:type, ThermostatSetback.type()} | {:state, ThermostatSetback.state()}
 

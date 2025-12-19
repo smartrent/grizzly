@@ -13,6 +13,8 @@ defmodule Grizzly.ZWave.CommandClasses.Security2 do
   - **MOS** - Multicast Out-of-Sync
   """
 
+  @behaviour Grizzly.ZWave.CommandClass
+
   defmodule AAD do
     @moduledoc """
     S2 AAD (Additional Authenticated Data) structure
@@ -71,8 +73,6 @@ defmodule Grizzly.ZWave.CommandClasses.Security2 do
 
   @type kex_scheme :: :kex_scheme_1
   @type ecdh_profile :: :curve_25519
-
-  @behaviour Grizzly.ZWave.CommandClass
 
   @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x9F

@@ -5,8 +5,9 @@ defmodule Grizzly.ZWave.Commands.HumidityControlOperatingStateGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.HumidityControlOperatingState
+  alias Grizzly.ZWave.DecodeError
 
   @impl Grizzly.ZWave.Command
   @spec new(keyword()) :: {:ok, Command.t()}

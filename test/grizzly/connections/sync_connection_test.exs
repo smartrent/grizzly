@@ -1,8 +1,9 @@
 defmodule Grizzly.Connections.SyncConnectionTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.{Connection, Report}
+  alias Grizzly.Connection
   alias Grizzly.Connections.SyncConnection
+  alias Grizzly.Report
   alias Grizzly.ZWave.Commands.SwitchBinaryGet
 
   setup do

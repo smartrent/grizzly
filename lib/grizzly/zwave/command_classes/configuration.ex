@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.CommandClasses.Configuration do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
 
   @type format :: :signed_integer | :unsigned_integer | :enumerated | :bit_field

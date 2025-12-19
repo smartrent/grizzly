@@ -18,8 +18,9 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Antitheft
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:state, Antitheft.lock_state()}

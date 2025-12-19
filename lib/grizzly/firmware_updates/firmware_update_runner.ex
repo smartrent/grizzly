@@ -2,9 +2,14 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   @moduledoc false
   use GenServer
 
-  alias Grizzly.{Connection, FirmwareUpdates, Options, Report}
+  alias Grizzly.Connection
   alias Grizzly.Connections.AsyncConnection
-  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.{FirmwareUpdate, Image}
+  alias Grizzly.FirmwareUpdates
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate
+  alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
+  alias Grizzly.Options
+  alias Grizzly.Report
+
   require Logger
 
   @typedoc """

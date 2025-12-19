@@ -5,7 +5,10 @@ defmodule Grizzly.Transports.DTLS do
 
   @behaviour Grizzly.Transport
 
-  alias Grizzly.{Trace, Transport, ZWave}
+  alias Grizzly.Trace
+  alias Grizzly.Transport
+  alias Grizzly.ZWave
+
   require Logger
 
   @handshake_timeout Application.compile_env(:grizzly, :dtls_handshake_timeout, 10_000)

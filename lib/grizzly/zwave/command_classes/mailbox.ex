@@ -5,9 +5,9 @@ defmodule Grizzly.ZWave.CommandClasses.Mailbox do
   See Sections 5.2.3 and 5.2.4 of the Z-Wave Specification.
   """
 
-  import Bitwise
-
   @behaviour Grizzly.ZWave.CommandClass
+
+  import Bitwise
 
   @type mode :: :disabled | :service | :proxy
   @type supported_mode :: :service | :proxy

@@ -4,8 +4,8 @@ defmodule Grizzly.Transport do
   """
 
   alias Grizzly.ZIPGateway
-
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.DecodeError
 
   @opaque t() :: %__MODULE__{impl: module(), assigns: map()}
 

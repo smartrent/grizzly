@@ -19,8 +19,10 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Meter
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   @type meter_type :: :electric | :gas | :water | :heating | :cooling
   @type meter_scale :: atom()

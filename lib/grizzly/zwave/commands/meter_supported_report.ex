@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Meter
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:meter_reset, any()} | {:meter_type, any()} | {:scale_supported, any()}
 

@@ -10,8 +10,9 @@ defmodule Grizzly.ZWave.Commands.NodeNameSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NodeNaming
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:name, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 

@@ -1,9 +1,11 @@
 defmodule Grizzly.InclusionsTest do
   use ExUnit.Case, async: false
 
-  alias Grizzly.{Inclusions, Report}
-  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.Inclusions
+  alias Grizzly.Report
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.NodeAddStatus
+  alias Grizzly.ZWave.DSK
   alias GrizzlyTest.Server.Handler
 
   @moduletag :inclusion
@@ -13,7 +15,8 @@ defmodule Grizzly.InclusionsTest do
 
     @behaviour Grizzly.InclusionHandler
 
-    alias Grizzly.{Inclusions, Report}
+    alias Grizzly.Inclusions
+    alias Grizzly.Report
     alias Grizzly.ZWave.Command
 
     @impl Grizzly.InclusionHandler

@@ -11,8 +11,9 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
+  alias Grizzly.ZWave.DecodeError
 
   @type status :: :done | :busy
 

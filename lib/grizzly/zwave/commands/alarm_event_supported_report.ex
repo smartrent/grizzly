@@ -11,8 +11,11 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding, Notifications}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Alarm
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
+  alias Grizzly.ZWave.Notifications
 
   @type param :: {:type, atom()} | {:events, [atom()]}
 

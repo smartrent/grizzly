@@ -2,7 +2,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands.NodeAddStatus
-
   alias Grizzly.ZWave.DSK
 
   describe "decoding report" do

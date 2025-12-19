@@ -1,27 +1,25 @@
 defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.{Associations, Options}
+  alias Grizzly.Associations
+  alias Grizzly.Options
   alias Grizzly.UnsolicitedServer.ResponseHandler
   alias Grizzly.ZWave.Command
-
-  alias Grizzly.ZWave.Commands.{
-    AssociationGet,
-    AssociationGroupCommandListGet,
-    AssociationGroupInfoGet,
-    AssociationGroupingsGet,
-    AssociationGroupNameGet,
-    AssociationSet,
-    AssociationSpecificGroupGet,
-    MultiChannelAssociationGet,
-    MultiChannelAssociationGroupingsGet,
-    MultiChannelAssociationRemove,
-    MultiChannelAssociationSet,
-    SupervisionGet,
-    SwitchBinaryReport,
-    VersionCommandClassGet,
-    ZIPPacket
-  }
+  alias Grizzly.ZWave.Commands.AssociationGet
+  alias Grizzly.ZWave.Commands.AssociationGroupCommandListGet
+  alias Grizzly.ZWave.Commands.AssociationGroupInfoGet
+  alias Grizzly.ZWave.Commands.AssociationGroupingsGet
+  alias Grizzly.ZWave.Commands.AssociationGroupNameGet
+  alias Grizzly.ZWave.Commands.AssociationSet
+  alias Grizzly.ZWave.Commands.AssociationSpecificGroupGet
+  alias Grizzly.ZWave.Commands.MultiChannelAssociationGet
+  alias Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsGet
+  alias Grizzly.ZWave.Commands.MultiChannelAssociationRemove
+  alias Grizzly.ZWave.Commands.MultiChannelAssociationSet
+  alias Grizzly.ZWave.Commands.SupervisionGet
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands.VersionCommandClassGet
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   setup_all do
     options = %Options{associations_file: "/tmp/response_handler_assocs"}

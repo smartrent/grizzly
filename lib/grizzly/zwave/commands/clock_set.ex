@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.ClockSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Clock
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:weekday, Clock.weekday()} | {:hour, 0..23} | {:minute, 0..59}
 

@@ -1,7 +1,8 @@
 defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.{Command, Commands.UserCodeCapabilitiesReport}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.UserCodeCapabilitiesReport
 
   test "creates the command and validates params" do
     assert {:ok, %Command{}} = UserCodeCapabilitiesReport.new([])

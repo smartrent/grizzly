@@ -3,7 +3,12 @@ defmodule Grizzly.Network do
   Module for working with the Z-Wave network
   """
 
-  alias Grizzly.{Associations, Connections, Report, SeqNumber, VirtualDevices, ZWave}
+  alias Grizzly.Associations
+  alias Grizzly.Connections
+  alias Grizzly.Report
+  alias Grizzly.SeqNumber
+  alias Grizzly.VirtualDevices
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
 
   @typedoc """

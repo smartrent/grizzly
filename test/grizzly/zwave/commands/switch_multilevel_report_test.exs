@@ -1,6 +1,8 @@
 defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
   use ExUnit.Case, async: true
+
   import ExUnit.CaptureLog
+
   alias Grizzly.ZWave.Commands.SwitchMultilevelReport
 
   test "creates the command and validates params" do

@@ -22,8 +22,12 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, DeviceClasses, DSK, Security}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
+  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   @type tagged_command_classes() ::
           {:non_secure_supported, [CommandClasses.command_class()]}

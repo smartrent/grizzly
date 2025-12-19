@@ -25,8 +25,10 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
   @behaviour Grizzly.ZWave.Command
 
   import Grizzly.ZWave.Encoding
-  alias Grizzly.ZWave.{Command, DecodeError}
+
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Security2
+  alias Grizzly.ZWave.DecodeError
 
   @type extension_type :: :span | :mpan | :mgrp | :mos
 

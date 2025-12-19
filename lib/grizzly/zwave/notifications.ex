@@ -4,9 +4,13 @@ defmodule Grizzly.ZWave.Notifications do
   Notification command class.
   """
 
-  alias Grizzly.ZWave.CommandClasses.{NodeNaming, UserCode}
-  alias Grizzly.ZWave.Commands.{NodeLocationReport, UserCodeReport}
-  alias Grizzly.ZWave.{DecodeError, Decoder}
+  alias Grizzly.ZWave.CommandClasses.NodeNaming
+  alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.Commands.NodeLocationReport
+  alias Grizzly.ZWave.Commands.UserCodeReport
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Decoder
+
   require Logger
 
   @type event :: atom()

@@ -16,8 +16,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.DSK
 
   @type param ::
           {:seq_number, ZWave.seq_number()}

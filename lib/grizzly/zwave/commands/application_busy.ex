@@ -16,8 +16,9 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ApplicationStatus
+  alias Grizzly.ZWave.DecodeError
 
   # give me some type specs for your params
   @type param :: {:status, ApplicationStatus.status()} | {:wait_time, :byte}

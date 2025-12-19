@@ -17,8 +17,10 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DecodeError, DSK}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.DSK
 
   @type param ::
           {:seq_number, ZWave.seq_number()}

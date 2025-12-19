@@ -10,8 +10,9 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, Decoder}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.MultiCommand
+  alias Grizzly.ZWave.Decoder
 
   @type param :: {:commands, [Command.t()]}
 

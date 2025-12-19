@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.EncodingTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Encoding
+
   doctest Grizzly.ZWave.Encoding, import: true
 
   test "__float_bits_needed__/1" do

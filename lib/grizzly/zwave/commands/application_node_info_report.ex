@@ -10,8 +10,10 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, CommandClasses, DecodeError}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.ZIPGateway
+  alias Grizzly.ZWave.DecodeError
 
   @type tagged_command_classes ::
           {:non_secure_supported, [CommandClasses.command_class()]}

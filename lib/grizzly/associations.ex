@@ -5,7 +5,9 @@ defmodule Grizzly.Associations do
   """
 
   use GenServer
-  alias Grizzly.{Options, ZWave}
+
+  alias Grizzly.Options
+  alias Grizzly.ZWave
 
   @type grouping_id() :: byte()
 

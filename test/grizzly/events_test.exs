@@ -1,8 +1,11 @@
 defmodule Grizzly.EventsTest do
   use ExUnit.Case, async: false
 
-  alias Grizzly.{Events, Report}
-  alias Grizzly.ZWave.Commands.{AlarmReport, BasicReport, WakeUpIntervalReport}
+  alias Grizzly.Events
+  alias Grizzly.Report
+  alias Grizzly.ZWave.Commands.AlarmReport
+  alias Grizzly.ZWave.Commands.BasicReport
+  alias Grizzly.ZWave.Commands.WakeUpIntervalReport
 
   test "finding subscribers that match a particular report" do
     Supervisor.terminate_child(Grizzly.Supervisor, Grizzly.FirmwareUpdates.OTWUpdateRunner)

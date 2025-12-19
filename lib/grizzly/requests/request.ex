@@ -1,16 +1,19 @@
 defmodule Grizzly.Requests.Request do
   @moduledoc false
 
+  alias Grizzly.Report
+  alias Grizzly.Requests.Handlers.SupervisionReport
+  alias Grizzly.SeqNumber
+  alias Grizzly.ZWave
+  alias Grizzly.ZWave.Command, as: ZWaveCommand
+  alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.Commands.SupervisionGet
+  alias Grizzly.ZWave.Commands.ZIPPacket
+
   require Logger
 
   # Data structure for working with Z-Wave commands as they relate to the
   # Grizzly runtime
-  alias Grizzly.{Report, SeqNumber, ZWave}
-  alias Grizzly.Requests.Handlers.SupervisionReport
-  alias Grizzly.ZWave.Command, as: ZWaveCommand
-  alias Grizzly.ZWave.Commands
-  alias Grizzly.ZWave.Commands.{SupervisionGet, ZIPPacket}
-
   @type status :: :inflight | :queued | :complete
 
   @type t :: %__MODULE__{

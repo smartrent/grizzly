@@ -6,7 +6,8 @@ defmodule Grizzly.Storage.CommandWatcher do
 
   use GenServer
 
-  alias Grizzly.{Report, Storage}
+  alias Grizzly.Report
+  alias Grizzly.Storage
   alias Grizzly.ZWave.Command
 
   require Logger

@@ -13,8 +13,9 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Indicator
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:resources, [Indicator.resource()]} | {:value, byte}
 

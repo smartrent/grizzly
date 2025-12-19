@@ -4,7 +4,9 @@ defmodule Grizzly.Connections.RequestListTest do
   alias Grizzly.Connections.RequestList
   alias Grizzly.Report
   alias Grizzly.Requests.RequestRunner
-  alias Grizzly.ZWave.Commands.{SwitchBinaryGet, SwitchBinarySet, ZIPPacket}
+  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "create and monitor a command runtime" do
     {:ok, zwave_command} = SwitchBinaryGet.new()

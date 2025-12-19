@@ -3,7 +3,8 @@ defmodule Grizzly.ZIPGateway do
 
   # helper functions for working with the Z/IP Gateway
 
-  alias Grizzly.{Options, ZWave}
+  alias Grizzly.Options
+  alias Grizzly.ZWave
 
   # the host base is different for the LAN and PAN networks, we need to
   # probably handle this a little nicer

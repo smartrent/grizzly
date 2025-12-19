@@ -15,8 +15,10 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SensorMultilevel
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   # See Grizzly.ZWave.CommandClasses.SensorMultilevel for the full list of sensor type values
   @type sensor_type :: atom

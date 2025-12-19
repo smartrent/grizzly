@@ -11,8 +11,10 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
   @behaviour Grizzly.ZWave.Command
 
   import Grizzly.ZWave.Encoding
-  alias Grizzly.ZWave.{Command, DecodeError}
+
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:setpoint_types, [{ThermostatSetpoint.type(), boolean()}]}
 

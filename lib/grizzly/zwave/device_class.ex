@@ -7,8 +7,9 @@ defmodule Grizzly.ZWave.DeviceClass do
   provide mandatory and recommended command class support.
   """
 
-  alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.Commands.VersionReport
+  alias Grizzly.ZWave.DeviceClasses
 
   @type command_class_version() :: integer()
 

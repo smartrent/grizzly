@@ -3,13 +3,13 @@ defmodule Grizzly.VirtualDeviceCase do
 
   use ExUnit.CaseTemplate
 
+  alias Grizzly.VirtualDevices
+
   using do
     quote do
       import Grizzly.VirtualDeviceCase
     end
   end
-
-  alias Grizzly.VirtualDevices
 
   def generate_id() do
     {:virtual, System.unique_integer([:positive])}

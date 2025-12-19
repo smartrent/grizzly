@@ -15,8 +15,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, DSK}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NodeProvisioning
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.SmartStart.MetaExtension
 
   @type param() ::

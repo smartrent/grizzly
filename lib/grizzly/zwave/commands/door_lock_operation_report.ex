@@ -23,10 +23,13 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  require Logger
-  alias Grizzly.ZWave.{Command, DecodeError}
-  alias Grizzly.ZWave.CommandClasses.DoorLock
   import Grizzly.ZWave.Encoding
+
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses.DoorLock
+  alias Grizzly.ZWave.DecodeError
+
+  require Logger
 
   @typedoc """
   These modes tell if the handle can open the door locally or not.

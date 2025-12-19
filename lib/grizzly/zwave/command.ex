@@ -3,7 +3,8 @@ defmodule Grizzly.ZWave.Command do
   Data struct and behaviour for working with Z-Wave commands
   """
 
-  alias Grizzly.ZWave.{CommandClass, DecodeError}
+  alias Grizzly.ZWave.CommandClass
+  alias Grizzly.ZWave.DecodeError
 
   @type delay_seconds() :: non_neg_integer()
 

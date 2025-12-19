@@ -23,8 +23,11 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DecodeError, DSK, Security}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   @type status :: :done | :failed | :security_failed
   @type param ::

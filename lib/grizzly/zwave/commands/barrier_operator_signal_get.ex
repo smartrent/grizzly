@@ -9,8 +9,9 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.BarrierOperator
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:subsystem_type, BarrierOperator.subsystem_type()}
 

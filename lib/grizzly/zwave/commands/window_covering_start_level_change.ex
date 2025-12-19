@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStartLevelChange do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.WindowCovering
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:direction, :up | :down}

@@ -248,10 +248,11 @@ defmodule Grizzly.ZWave.DSK do
   end
 
   defimpl Inspect do
-    import Inspect.Algebra
-    alias Grizzly.ZWave.DSK
-
     @moduledoc false
+
+    import Inspect.Algebra
+
+    alias Grizzly.ZWave.DSK
 
     @spec inspect(DSK.t(), Inspect.Opts.t()) :: Inspect.Algebra.t()
     def inspect(v, opts) do

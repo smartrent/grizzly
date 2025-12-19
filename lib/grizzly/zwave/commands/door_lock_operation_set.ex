@@ -9,8 +9,9 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.DoorLock
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:mode, DoorLock.mode()}
 

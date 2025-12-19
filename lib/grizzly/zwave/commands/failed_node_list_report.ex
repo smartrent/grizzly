@@ -12,8 +12,10 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.{Command, DecodeError, NodeIdList}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.NodeIdList
 
   @type param() :: {:node_ids, [ZWave.node_id()]} | {:seq_number, ZWave.seq_number()}
 

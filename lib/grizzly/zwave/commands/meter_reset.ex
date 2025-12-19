@@ -15,8 +15,10 @@ defmodule Grizzly.ZWave.Commands.MeterReset do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Meter
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   @type param :: {:meter_type, any()} | {:rate_type, any()} | {:values, any()}
 

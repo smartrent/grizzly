@@ -1,16 +1,16 @@
 defmodule Grizzly.ZIPGateway.ReadyChecker do
   @moduledoc false
 
+  use GenServer, restart: :transient
+
+  require Logger
+
   @ready_timeout :timer.seconds(60)
 
   # Waits for Z/IP Gateway to signal its readiness by waiting for a node list
   # report. If 60 seconds pass and we haven't received the node list report,
   # we'll try to solicit one by sending a Node List Get. If that succeeds,
   # we'll signal that we're ready.
-
-  use GenServer, restart: :transient
-
-  require Logger
 
   @doc """
   Returns true if Z/IP Gateway has reported that it is ready.

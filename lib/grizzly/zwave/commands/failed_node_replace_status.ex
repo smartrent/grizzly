@@ -12,8 +12,9 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, Security}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.Security
 
   @type param ::
           {:seq_number, Grizzly.seq_number()}

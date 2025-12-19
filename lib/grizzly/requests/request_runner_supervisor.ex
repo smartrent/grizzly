@@ -5,7 +5,8 @@ defmodule Grizzly.Requests.RequestRunnerSupervisor do
 
   use DynamicSupervisor
 
-  alias Grizzly.Requests.{Request, RequestRunner}
+  alias Grizzly.Requests.Request
+  alias Grizzly.Requests.RequestRunner
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command, as: ZWaveCommand
 

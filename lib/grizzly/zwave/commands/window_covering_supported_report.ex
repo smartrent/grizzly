@@ -10,8 +10,9 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.WindowCovering
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:parameter_names, [WindowCovering.parameter_name()]}
 

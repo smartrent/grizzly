@@ -1,4 +1,5 @@
 defmodule Grizzly do
+  # quokka:skip-module-reordering
   use TelemetryRegistry
 
   telemetry_event %{
@@ -37,10 +38,16 @@ defmodule Grizzly do
   #{telemetry_docs()}
   """
 
-  alias Grizzly.{Connection, FirmwareUpdates, Inclusions, Report, VersionReports, VirtualDevices}
+  alias Grizzly.Connection
   alias Grizzly.Events
+  alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
-  alias Grizzly.{ZIPGateway, ZWave}
+  alias Grizzly.Inclusions
+  alias Grizzly.Report
+  alias Grizzly.VersionReports
+  alias Grizzly.VirtualDevices
+  alias Grizzly.ZIPGateway
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.RssiReport
 

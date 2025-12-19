@@ -11,8 +11,10 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SensorMultilevel
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   @type param :: {:sensor_type, atom()} | {:supported_scales, [byte()]}
 

@@ -11,8 +11,9 @@ defmodule Grizzly.ZWave.Commands.HumidityControlModeSupportedReport do
 
   import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.HumidityControlMode
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:modes, [HumidityControlMode.mode()]}
 

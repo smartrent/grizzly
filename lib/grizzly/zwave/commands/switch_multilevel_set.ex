@@ -14,8 +14,10 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
 
   import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   @type param :: {:target_value, :off | :previous | 0..99} | {:duration, Encoding.duration()}
 

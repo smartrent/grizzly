@@ -18,8 +18,9 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, Security}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.Security
 
   @impl Grizzly.ZWave.Command
   def new(params) do

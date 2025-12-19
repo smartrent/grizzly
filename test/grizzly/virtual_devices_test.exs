@@ -3,8 +3,11 @@ defmodule Grizzly.VirtualDeviceTest do
 
   import ExUnit.CaptureLog
 
-  alias Grizzly.{Node, Report, VirtualDevices}
-  alias Grizzly.VirtualDevices.{TemperatureSensor, Thermostat}
+  alias Grizzly.Node
+  alias Grizzly.Report
+  alias Grizzly.VirtualDevices
+  alias Grizzly.VirtualDevices.TemperatureSensor
+  alias Grizzly.VirtualDevices.Thermostat
   alias Grizzly.ZWave.Command
 
   defmodule Handler do

@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.CommandClasses.NodeNaming do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
 
   @impl Grizzly.ZWave.CommandClass

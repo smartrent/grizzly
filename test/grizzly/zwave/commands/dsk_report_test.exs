@@ -1,8 +1,9 @@
 defmodule Grizzly.ZWave.Commands.DSKReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.{Command, DSK}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.DSKReport
+  alias Grizzly.ZWave.DSK
 
   @dsk_string "50285-18819-09924-30691-15973-33711-04005-03623"
 

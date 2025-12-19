@@ -14,6 +14,7 @@ defmodule Grizzly.ZWave.Commands.S2TransferEnd do
   @behaviour Grizzly.ZWave.Command
 
   import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Security2
 

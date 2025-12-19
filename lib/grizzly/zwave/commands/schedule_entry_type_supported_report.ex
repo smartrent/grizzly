@@ -13,8 +13,9 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:number_of_slots_week_day, byte()}

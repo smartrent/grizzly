@@ -26,8 +26,10 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError, NodeId}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.NodeId
 
   @type status() :: :done | :failed
 

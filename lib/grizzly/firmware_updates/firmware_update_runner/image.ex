@@ -1,9 +1,9 @@
 defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image do
   @moduledoc false
 
-  @type t :: %__MODULE__{path: String.t(), fragments: [binary]}
-
   require Logger
+
+  @type t :: %__MODULE__{path: String.t(), fragments: [binary]}
 
   defstruct path: nil,
             fragments: []

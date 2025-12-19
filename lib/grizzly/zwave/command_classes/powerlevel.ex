@@ -9,6 +9,7 @@ defmodule Grizzly.ZWave.CommandClasses.Powerlevel do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
 
   @type power_level ::

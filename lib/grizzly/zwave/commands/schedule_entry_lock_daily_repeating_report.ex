@@ -23,8 +23,9 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:user_identifier, byte()}

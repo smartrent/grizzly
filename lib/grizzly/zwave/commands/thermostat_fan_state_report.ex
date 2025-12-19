@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanStateReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatFanState
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:state, ThermostatFanState.state()}
 

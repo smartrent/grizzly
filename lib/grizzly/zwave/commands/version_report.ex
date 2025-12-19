@@ -18,8 +18,9 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Version
+  alias Grizzly.ZWave.DecodeError
 
   @type library_type ::
           :static_controller

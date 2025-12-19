@@ -24,8 +24,9 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:set_action, :erase | :modify}

@@ -10,8 +10,9 @@ defmodule Grizzly.ZWave.Commands.S2NonceGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Security2
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:sequence_number, any()}
 

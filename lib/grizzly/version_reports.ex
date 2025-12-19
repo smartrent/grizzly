@@ -6,7 +6,8 @@ defmodule Grizzly.VersionReports do
   # as needed for Z-Wave certification and can be extended to support
   # other command classes and versions.
 
-  alias Grizzly.ZWave.{Command, CommandClasses}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.Commands.VersionCommandClassReport
 
   @extra_supported_commands [

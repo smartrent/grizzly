@@ -10,8 +10,9 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SensorMultilevel
+  alias Grizzly.ZWave.DecodeError
 
   # See Grizzly.ZWave.CommandClasses.SensorMultilevel for the full list of possible sensor types
   @type sensor_type :: atom

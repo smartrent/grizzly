@@ -8,6 +8,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   What type of commands does this command class support?
   """
 
+  @behaviour Grizzly.ZWave.CommandClass
+
+  alias Grizzly.ZWave.DecodeError
+
   @type type ::
           :na
           | :heating
@@ -29,10 +33,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
           {:type, type()}
           | {:scale, scale()}
           | {:value, number()}
-
-  @behaviour Grizzly.ZWave.CommandClass
-
-  alias Grizzly.ZWave.DecodeError
 
   @impl Grizzly.ZWave.CommandClass
   def byte(), do: 0x43

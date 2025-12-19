@@ -7,8 +7,10 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
 
   import Bitwise
 
-  alias Grizzly.ZWave.{Command, DecodeError, NodeIdList}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.NodeIdList
 
   @impl Grizzly.ZWave.Command
   def new(params) do

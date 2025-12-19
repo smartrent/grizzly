@@ -12,9 +12,10 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationReport do
 
   @behaviour Grizzly.ZWave.Command
 
+  import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.CentralScene
-  import Grizzly.ZWave.Encoding
 
   @impl Grizzly.ZWave.Command
   def new(params) do

@@ -17,8 +17,10 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReport do
 
   import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   @type param ::
           {:max_users, 0..0xFFFF}

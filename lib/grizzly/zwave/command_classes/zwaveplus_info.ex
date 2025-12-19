@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.CommandClasses.ZwaveplusInfo do
   """
 
   @behaviour Grizzly.ZWave.CommandClass
+
   alias Grizzly.ZWave.DecodeError
 
   @type role_type ::

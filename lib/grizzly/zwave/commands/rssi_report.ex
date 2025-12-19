@@ -14,8 +14,9 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
+  alias Grizzly.ZWave.DecodeError
 
   @type param() ::
           {:channels, [NetworkManagementInstallationMaintenance.rssi()]}

@@ -3,20 +3,20 @@ defmodule Grizzly.VirtualDevices.Reports do
 
   # Helper module for building various general reports for a virtual device
 
-  alias Grizzly.{Report, VirtualDevices}
-  alias Grizzly.ZWave.{Command, DeviceClass, DSK}
-
-  alias Grizzly.ZWave.Commands.{
-    AssociationReport,
-    BatteryReport,
-    ManufacturerSpecificDeviceSpecificReport,
-    ManufacturerSpecificReport,
-    NodeAddStatus,
-    NodeInfoCachedReport,
-    NodeRemoveStatus,
-    VersionCommandClassReport,
-    VersionReport
-  }
+  alias Grizzly.Report
+  alias Grizzly.VirtualDevices
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands.AssociationReport
+  alias Grizzly.ZWave.Commands.BatteryReport
+  alias Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport
+  alias Grizzly.ZWave.Commands.ManufacturerSpecificReport
+  alias Grizzly.ZWave.Commands.NodeAddStatus
+  alias Grizzly.ZWave.Commands.NodeInfoCachedReport
+  alias Grizzly.ZWave.Commands.NodeRemoveStatus
+  alias Grizzly.ZWave.Commands.VersionCommandClassReport
+  alias Grizzly.ZWave.Commands.VersionReport
+  alias Grizzly.ZWave.DeviceClass
+  alias Grizzly.ZWave.DSK
 
   @doc """
   Send the node add status message to the handler

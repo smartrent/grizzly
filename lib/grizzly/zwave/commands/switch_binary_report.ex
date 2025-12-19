@@ -14,8 +14,10 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
 
   import Grizzly.ZWave.Encoding
 
-  alias Grizzly.ZWave.{Command, DecodeError, Encoding}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.SwitchBinary
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
 
   @type value() :: :on | :off | :unknown
 

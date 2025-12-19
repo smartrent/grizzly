@@ -22,8 +22,9 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
+  alias Grizzly.ZWave.DecodeError
 
   @type learn_status ::
           :started

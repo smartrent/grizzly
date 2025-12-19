@@ -46,6 +46,8 @@ defmodule Grizzly.FirmwareUpdates do
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor
   alias Grizzly.FirmwareUpdates.OTWUpdateRunner
 
+  require Logger
+
   @type opt ::
           {:manufacturer_id, non_neg_integer}
           | {:firmware_id, non_neg_integer}
@@ -60,8 +62,6 @@ defmodule Grizzly.FirmwareUpdates do
           | {:max_fragment_retries, non_neg_integer()}
 
   @type image_path :: String.t()
-
-  require Logger
 
   @doc """
   Starts the firmware update process

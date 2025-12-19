@@ -1,7 +1,8 @@
 defmodule Grizzly.ZIPGatewayTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.{Options, ZIPGateway}
+  alias Grizzly.Options
+  alias Grizzly.ZIPGateway
 
   test "get IP for node id 1 with IPv6" do
     assert {0xFD00, 0xBBBB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01} ==

@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.DSKTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.DSK
+
   doctest DSK
 
   @dsk_string "33654-49908-42539-00289-58381-21884-63570-22247"

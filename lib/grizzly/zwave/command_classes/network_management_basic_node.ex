@@ -3,8 +3,9 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode do
   Command class for working with Z-Wave network updates and resetting the
   controller back to the factor defaults
   """
-  alias Grizzly.ZWave.DecodeError
   @behaviour Grizzly.ZWave.CommandClass
+
+  alias Grizzly.ZWave.DecodeError
 
   @type add_mode :: :learn | :add
   @type network_update_request_status :: :done | :abort | :wait | :disabled | :overflow

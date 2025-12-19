@@ -6,11 +6,15 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   to the Z-Wave network
   """
 
-  require Logger
-
   @behaviour Grizzly.ZWave.CommandClass
 
-  alias Grizzly.ZWave.{CommandClasses, DecodeError, DeviceClasses, DSK, Security}
+  alias Grizzly.ZWave.CommandClasses
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
+
+  require Logger
 
   @typedoc """
   The status of the inclusion process

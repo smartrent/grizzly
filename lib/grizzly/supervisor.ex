@@ -41,10 +41,12 @@ defmodule Grizzly.Supervisor do
   """
   use Supervisor
 
-  require Logger
-
-  alias Grizzly.{Options, Storage, Trace}
+  alias Grizzly.Options
+  alias Grizzly.Storage
+  alias Grizzly.Trace
   alias Grizzly.ZIPGateway.ReadyChecker
+
+  require Logger
 
   @typedoc """
   The RF region code you want the Z-Wave controller to operate at.

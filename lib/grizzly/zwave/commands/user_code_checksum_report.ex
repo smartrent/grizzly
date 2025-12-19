@@ -9,8 +9,10 @@ defmodule Grizzly.ZWave.Commands.UserCodeChecksumReport do
   @behaviour Grizzly.ZWave.Command
 
   import Bitwise
-  alias Grizzly.ZWave.{Command, DecodeError}
+
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:checksum, 0x0000..0xFFFF}
 

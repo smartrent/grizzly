@@ -9,8 +9,9 @@ defmodule Grizzly.ZWave.Commands.UserCodeKeypadModeReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, Commands}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.Commands
 
   @type param :: {:mode, UserCode.keypad_mode()}
 

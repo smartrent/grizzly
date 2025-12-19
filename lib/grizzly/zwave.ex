@@ -3,7 +3,9 @@ defmodule Grizzly.ZWave do
   Module for Z-Wave protocol specific functionality and information
   """
 
-  alias Grizzly.ZWave.{Command, DecodeError, Decoder}
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Decoder
 
   @type seq_number :: non_neg_integer()
 

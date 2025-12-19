@@ -2,19 +2,14 @@ defmodule Grizzly.Requests.RequestTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.Report
-  alias Grizzly.Requests.Request
-
-  alias Grizzly.ZWave.CommandClasses.ZIP
-
-  alias Grizzly.ZWave.Commands.{
-    SwitchBinaryGet,
-    SwitchBinaryReport,
-    SwitchBinarySet,
-    ZIPKeepAlive,
-    ZIPPacket
-  }
-
   alias Grizzly.Requests.Handlers.AckResponse
+  alias Grizzly.Requests.Request
+  alias Grizzly.ZWave.CommandClasses.ZIP
+  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "turns a Z-Wave command into a Grizzly request" do
     {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)

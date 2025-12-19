@@ -3,13 +3,14 @@ defmodule Grizzly.ZIPGateway.Database do
   Functions for inspecting and debugging Z/IP Gateway's SQLite database.
   """
 
-  require Grizzly.NodeId
-  alias Exqlite.Sqlite3
-  alias Grizzly.ZWave.{CommandClasses, DeviceClasses}
-  alias Grizzly.ZWave.DSK
-
   import Bitwise
 
+  alias Exqlite.Sqlite3
+  alias Grizzly.ZWave.CommandClasses
+  alias Grizzly.ZWave.DeviceClasses
+  alias Grizzly.ZWave.DSK
+
+  require Grizzly.NodeId
   require Logger
 
   @type query_result(result) :: {:ok, result} | {:error, Sqlite3.reason()}

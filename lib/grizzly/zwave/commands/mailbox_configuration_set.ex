@@ -13,6 +13,7 @@ defmodule Grizzly.ZWave.Commands.MailboxConfigurationSet do
   @behaviour Grizzly.ZWave.Command
 
   import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Mailbox
 

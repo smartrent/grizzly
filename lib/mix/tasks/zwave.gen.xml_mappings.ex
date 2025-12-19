@@ -1,5 +1,7 @@
 if Code.ensure_loaded?(SweetXml) do
   defmodule Mix.Tasks.Zwave.Gen.XmlMappings do
+    @shortdoc "Generates a module that provides mappings based on the data in `ZWave_custom_cmd_classes.xml`"
+
     @moduledoc """
     Generates a module that provides mappings based on the data in `ZWave_custom_cmd_classes.xml`.
 
@@ -15,8 +17,6 @@ if Code.ensure_loaded?(SweetXml) do
     use Mix.Task
 
     import SweetXml
-
-    @shortdoc "Generates a module that provides mappings based on the data in `ZWave_custom_cmd_classes.xml`"
 
     @switches [dry_run: :boolean]
 

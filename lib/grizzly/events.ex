@@ -17,10 +17,10 @@ defmodule Grizzly.Events do
   from this state) based on Z/IP Gateway's log output.
   """
 
+  import Grizzly.NodeId
+
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
-
-  import Grizzly.NodeId
 
   @type event :: :ready | :otw_firmware_update | :serial_api_status
   @type subject :: event() | Grizzly.command() | Grizzly.node_id() | {:node, Grizzly.node_id()}

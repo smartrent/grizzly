@@ -4,13 +4,10 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   """
 
   alias Grizzly.ZWave.Command
-
-  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.{
-    BinaryParser,
-    EncapsulationFormatInfo,
-    ExpectedDelay,
-    InstallationAndMaintenanceReport
-  }
+  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.BinaryParser
+  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatInfo
+  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.ExpectedDelay
+  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaintenanceReport
 
   require Logger
 

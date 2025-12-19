@@ -19,8 +19,9 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ZwaveplusInfo
+  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:zwaveplus_version, 1 | 2}

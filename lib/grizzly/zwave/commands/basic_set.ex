@@ -11,8 +11,9 @@ defmodule Grizzly.ZWave.Commands.BasicSet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.{Command, DecodeError}
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Basic
+  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:value, :on | :off}
 
