@@ -79,7 +79,7 @@ if Code.ensure_loaded?(SweetXml) do
 
     defp build_macro(name, value) do
       quote do
-        def unquote(name)(), do: unquote(value)
+        def unquote(name)(), do: unquote(Macro.escape(value))
       end
     end
 
@@ -89,14 +89,14 @@ if Code.ensure_loaded?(SweetXml) do
       |> Enum.map(key_name_mapper("COMMAND_CLASS_", @command_class_name_overrides))
       |> Enum.uniq_by(fn {key, _} -> key end)
       |> Enum.reject(&(elem(&1, 1) in @skip_command_classes))
-      |> Enum.sort()
+      |> Map.new(fn {a, b} -> {b, a} end)
     end
 
     defp basic_device_class_mappings(doc) do
       doc
       |> xpath(~x"//zw_classes/bas_dev"l, key: ~x"@key"s, name: ~x"@name"s)
       |> Enum.map(key_name_mapper("BASIC_TYPE_"))
-      |> Enum.sort()
+      |> Map.new(fn {a, b} -> {b, a} end)
     end
 
     defp generic_device_class_mappings(doc) do
@@ -104,6 +104,7 @@ if Code.ensure_loaded?(SweetXml) do
       |> xpath(~x"//zw_classes/gen_dev"l, key: ~x"@key"s, name: ~x"@name"s)
       |> Enum.map(key_name_mapper("GENERIC_TYPE_"))
       |> Enum.sort()
+      |> Map.new(fn {a, b} -> {b, a} end)
     end
 
     defp specific_device_class_mappings(doc) do
@@ -117,10 +118,10 @@ if Code.ensure_loaded?(SweetXml) do
           generic_type = parse_name(generic_type, "GENERIC_TYPE_")
           specific_type = parse_name(name, "SPECIFIC_TYPE_")
           key = parse_hex_string(key)
-          Macro.escape({generic_type, key, specific_type})
+          {generic_type, key, specific_type}
         end)
       end)
-      |> Enum.sort()
+      |> Map.new(fn {a, b, c} -> {{a, b}, c} end)
     end
 
     defp key_name_mapper(name_prefix, name_overrides \\ %{}) do

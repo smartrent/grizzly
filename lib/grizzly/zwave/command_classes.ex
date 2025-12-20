@@ -14,33 +14,22 @@ defmodule Grizzly.ZWave.CommandClasses do
           secure_controlled: list(atom())
         ]
 
-  mappings = command_class_mappings()
-
-  command_classes_union =
-    mappings
-    |> Enum.map(&elem(&1, 1))
-    |> Enum.reverse()
-    |> Enum.reduce(&{:|, [], [&1, &2]})
-
-  @type command_class :: unquote(command_classes_union)
+  @type command_class :: atom()
 
   @doc """
   Get the byte representation of the command class
   """
   @spec to_byte(command_class()) :: byte()
-  for {byte, command_class} <- mappings do
-    def to_byte(unquote(command_class)), do: unquote(byte)
+  def to_byte(command_class) do
+    Map.fetch!(command_class_mappings(), command_class)
   end
 
   @spec from_byte(byte()) :: {:ok, command_class()} | {:error, :unsupported_command_class}
-  for {byte, command_class} <- mappings do
-    def from_byte(unquote(byte)), do: {:ok, unquote(command_class)}
-  end
 
   def from_byte(byte) do
-    Logger.warning("[Grizzly] Unsupported command class from byte #{inspect(byte, base: :hex)}")
-
-    {:error, :unsupported_command_class}
+    Enum.find_value(command_class_mappings(), {:error, :unsupported_command_class}, fn {cc, b} ->
+      if b == byte, do: {:ok, cc}
+    end)
   end
 
   @doc """
