@@ -193,7 +193,6 @@ events will be outlined by the manufacture in the manual.
 | Firmware Update MD              |       7 |                                    |
 | Hail                            |       1 |                                    |
 | Indicator                       |       4 |                                    |
-| Mailbox                         |       2 |                                    |
 | Manufacturer-specific           |       2 |                                    |
 | Meter                           |       1 |                                    |
 | Multi-channel                   |       4 |                                    |
