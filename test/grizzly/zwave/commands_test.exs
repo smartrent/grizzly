@@ -3,7 +3,10 @@ defmodule Grizzly.ZWave.CommandsTest do
 
   alias Grizzly.Requests.Handlers.WaitReport
   alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.CommandSpec
   alias Grizzly.ZWave.DSK
+
+  doctest Grizzly.ZWave.Commands
 
   @special_cases [
     :keep_alive
@@ -60,12 +63,13 @@ defmodule Grizzly.ZWave.CommandsTest do
   @no_validate [:multi_channel_get_command_encapsulation]
 
   test "all entries map to a module that actually exists" do
-    for {table_name, handler_spec} <- Commands.dump() do
+    for {table_name, spec} <- Commands.builtin_commands() do
+      handler_spec = {spec.module, [handler: CommandSpec.handler_spec(spec)]}
       {command_module, opts} = Commands.format_handler_spec(handler_spec)
 
       assert Code.ensure_loaded?(command_module)
 
-      {:ok, cmd} = command_module.new([])
+      {:ok, cmd} = command_module.new(seq_number: 0, dsk: DSK.zeros())
 
       if table_name not in @no_validate do
         assert cmd.name == table_name, """

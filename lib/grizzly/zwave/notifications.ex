@@ -9,7 +9,6 @@ defmodule Grizzly.ZWave.Notifications do
   alias Grizzly.ZWave.Commands.NodeLocationReport
   alias Grizzly.ZWave.Commands.UserCodeReport
   alias Grizzly.ZWave.DecodeError
-  alias Grizzly.ZWave.Decoder
 
   require Logger
 
@@ -503,7 +502,7 @@ defmodule Grizzly.ZWave.Notifications do
 
   def decode_event_params(:access_control, zwave_event, params_binary)
       when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
-    with {:ok, user_code_report} <- Decoder.from_binary(params_binary) do
+    with {:ok, user_code_report} <- Grizzly.ZWave.from_binary(params_binary) do
       {:ok, user_code_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
@@ -518,7 +517,7 @@ defmodule Grizzly.ZWave.Notifications do
              :glass_breakage_location_provided,
              :motion_detection_location_provided
            ] do
-    with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
+    with {:ok, node_location_report} <- Grizzly.ZWave.from_binary(params_binary) do
       {:ok, node_location_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
@@ -549,7 +548,7 @@ defmodule Grizzly.ZWave.Notifications do
              :water_leak_detected_location_provided,
              :water_level_dropped_location_provided
            ] do
-    with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
+    with {:ok, node_location_report} <- Grizzly.ZWave.from_binary(params_binary) do
       {:ok, node_location_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->
@@ -562,7 +561,7 @@ defmodule Grizzly.ZWave.Notifications do
   end
 
   def decode_event_params(:smoke_alarm, :smoke_detected_location_provided, params_binary) do
-    with {:ok, node_location_report} <- Decoder.from_binary(params_binary) do
+    with {:ok, node_location_report} <- Grizzly.ZWave.from_binary(params_binary) do
       {:ok, node_location_report.params}
     else
       {:error, %DecodeError{}} = decode_error ->

@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ZIP
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions
-  alias Grizzly.ZWave.Decoder
 
   @type flag ::
           :ack_response
@@ -296,7 +295,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     if command_binary == "" do
       {:ok, nil}
     else
-      Decoder.from_binary(command_binary)
+      Grizzly.ZWave.from_binary(command_binary)
     end
   end
 
@@ -304,7 +303,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     if command_binary == "" do
       {:ok, nil}
     else
-      Decoder.from_binary(command_binary)
+      Grizzly.ZWave.from_binary(command_binary)
     end
   end
 

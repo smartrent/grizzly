@@ -1,6 +1,7 @@
 [
   inputs: ["{mix,.credo,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
   import_deps: [:telemetry_registry, :mimic],
+  locals_without_parens: [command: 2, command: 3, command: 4],
   plugins: [Quokka],
   quokka: [
     autosort: [],

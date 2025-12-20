@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.MultiCommand
-  alias Grizzly.ZWave.Decoder
 
   @type param :: {:commands, [Command.t()]}
 
@@ -61,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
   defp decode_command(
          <<_command_class_byte, _command_byte, _encoded_params::binary>> = command_binary
        ) do
-    {:ok, command} = Decoder.from_binary(command_binary)
+    {:ok, command} = Grizzly.ZWave.from_binary(command_binary)
     command
   end
 end

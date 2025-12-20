@@ -25,7 +25,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   alias Grizzly.ZWave.CommandClasses.MultiChannel
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
-  alias Grizzly.ZWave.Decoder
 
   @type param ::
           {:source_end_point, MultiChannel.end_point()}
@@ -128,7 +127,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
   end
 
   defp decode_command(command_class_byte, command_byte, parameters_binary) do
-    Decoder.from_binary(<<command_class_byte, command_byte>> <> parameters_binary)
+    Grizzly.ZWave.from_binary(<<command_class_byte, command_byte>> <> parameters_binary)
   end
 
   defp decode_destination_end_point(0, _bit_address?), do: 0

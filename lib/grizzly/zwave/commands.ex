@@ -3,626 +3,760 @@ defmodule Grizzly.ZWave.Commands do
   Lookup table for sendable Z-Wave commands.
   """
 
-  alias Grizzly.Requests.Handlers.AckResponse
+  use Grizzly.ZWave.Macros
+
   alias Grizzly.Requests.Handlers.AggregateReport
   alias Grizzly.Requests.Handlers.WaitReport
-  alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
+  alias Grizzly.ZWave.Commands, as: Cmds
+  alias Grizzly.ZWave.CommandSpec
+  alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.ZWaveError
 
-  @table %{
-    default_set:
-      {Commands.DefaultSet, handler: {WaitReport, complete_report: :default_set_complete}},
+  @after_verify __MODULE__
 
-    # Noop
-    no_operation: {Commands.NoOperation, handler: AckResponse},
+  command_class :alarm do
+    command :alarm_event_supported_get, 0x01
+    command :alarm_event_supported_report, 0x02
+    command :alarm_get, 0x04
+    command :alarm_report, 0x05
+    command :alarm_set, 0x06
+    command :alarm_type_supported_get, 0x07
+    command :alarm_type_supported_report, 0x08
+  end
 
-    # Basic
-    basic_get: {Commands.BasicGet, handler: {WaitReport, complete_report: :basic_report}},
-    basic_set: {Commands.BasicSet, handler: AckResponse},
+  command_class :antitheft do
+    command :antitheft_set, 0x01
+    command :antitheft_get, 0x02
+    command :antitheft_report, 0x03
+  end
 
-    # Battery
-    battery_get: {Commands.BatteryGet, handler: {WaitReport, complete_report: :battery_report}},
+  command_class :antitheft_unlock do
+    command :antitheft_unlock_get, 0x01
+    command :antitheft_unlock_report, 0x02
+    command :antitheft_unlock_set, 0x03
+  end
 
-    # Binary switches
-    switch_binary_get:
-      {Commands.SwitchBinaryGet, handler: {WaitReport, complete_report: :switch_binary_report}},
-    switch_binary_set: {Commands.SwitchBinarySet, handler: AckResponse},
+  command_class :application_status do
+    command :application_busy, 0x01
+    command :application_rejected_request, 0x02
+  end
 
-    # Configuration
-    configuration_set: {Commands.ConfigurationSet, handler: AckResponse},
-    configuration_get:
-      {Commands.ConfigurationGet, handler: {WaitReport, complete_report: :configuration_report}},
-    configuration_bulk_set: {Commands.ConfigurationBulkSet, handler: AckResponse},
-    configuration_bulk_get:
-      {Commands.ConfigurationBulkGet,
-       handler:
-         {AggregateReport, complete_report: :configuration_bulk_report, aggregate_param: :values}},
-    configuration_properties_get:
-      {Commands.ConfigurationPropertiesGet,
-       handler: {WaitReport, complete_report: :configuration_properties_report}},
-    configuration_name_get:
-      {Commands.ConfigurationNameGet,
-       handler:
-         {AggregateReport, complete_report: :configuration_name_report, aggregate_param: :name}},
-    configuration_info_get:
-      {Commands.ConfigurationInfoGet,
-       handler:
-         {AggregateReport, complete_report: :configuration_info_report, aggregate_param: :info}},
-    configuration_default_reset: {Commands.ConfigurationDefaultReset, handler: AckResponse},
+  command_class :association do
+    command :association_set, 0x01
+    command :association_get, 0x02, handler: {AggregateReport, aggregate_param: :nodes}
+    command :association_report, 0x03, default_params: [reports_to_follow: 0]
+    command :association_remove, 0x04
+    command :association_groupings_get, 0x05
+    command :association_groupings_report, 0x06
+    command :association_specific_group_get, 0x0B
+    command :association_specific_group_report, 0x0C
+  end
 
-    # Manufacturer specific
-    manufacturer_specific_get:
-      {Commands.ManufacturerSpecificGet,
-       handler: {WaitReport, complete_report: :manufacturer_specific_report}},
-    manufacturer_specific_device_specific_get:
-      {Commands.ManufacturerSpecificDeviceSpecificGet,
-       handler: {WaitReport, complete_report: :manufacturer_specific_device_specific_report}},
+  command_class :association_group_info do
+    command :association_group_name_get, 0x01
+    command :association_group_name_report, 0x02
+    command :association_group_info_get, 0x03
+    command :association_group_info_report, 0x04
+    command :association_group_command_list_get, 0x05
+    command :association_group_command_list_report, 0x06
+  end
 
-    # Multilevel switches
-    switch_multilevel_get:
-      {Commands.SwitchMultilevelGet,
-       handler: {WaitReport, complete_report: :switch_multilevel_report}},
-    switch_multilevel_set: {Commands.SwitchMultilevelSet, handler: AckResponse},
-    switch_multilevel_start_level_change:
-      {Commands.SwitchMultilevelStartLevelChange, handler: AckResponse},
-    switch_multilevel_stop_level_change:
-      {Commands.SwitchMultilevelStopLevelChange, handler: AckResponse},
+  command_class :barrier_operator do
+    command :barrier_operator_set, 0x01
+    command :barrier_operator_get, 0x02
+    command :barrier_operator_report, 0x03
+    command :barrier_operator_signal_supported_get, 0x04
+    command :barrier_operator_signal_supported_report, 0x05
+    command :barrier_operator_signal_set, 0x06
+    command :barrier_operator_signal_get, 0x07
+    command :barrier_operator_signal_report, 0x08
+  end
 
-    # Node management
-    node_list_get:
-      {Commands.NodeListGet, handler: {WaitReport, complete_report: :node_list_report}},
-    failed_node_list_get:
-      {Commands.FailedNodeListGet,
-       handler: {WaitReport, complete_report: :failed_node_list_report}},
-    node_add: {Commands.NodeAdd, handler: {WaitReport, complete_report: :node_add_status}},
-    failed_node_replace:
-      {Commands.FailedNodeReplace,
-       handler: {WaitReport, complete_report: :failed_node_replace_status}},
-    node_info_cached_get:
-      {Commands.NodeInfoCachedGet,
-       handler: {WaitReport, complete_report: :node_info_cached_report}},
-    node_remove:
-      {Commands.NodeRemove, handler: {WaitReport, complete_report: :node_remove_status}},
-    failed_node_remove:
-      {Commands.FailedNodeRemove,
-       handler: {WaitReport, complete_report: :failed_node_remove_status}},
-    learn_mode_set:
-      {Commands.LearnModeSet, handler: {WaitReport, complete_report: :learn_mode_set_status}},
-    network_update_request:
-      {Commands.NetworkUpdateRequest,
-       handler: {WaitReport, complete_report: :network_update_request_status}},
-    network_management_multi_channel_end_point_get:
-      {Commands.NetworkManagementMultiChannelEndPointGet,
-       handler: {WaitReport, complete_report: :network_management_multi_channel_end_point_report}},
-    network_management_multi_channel_capability_get:
-      {Commands.NetworkManagementMultiChannelCapabilityGet,
-       handler: {WaitReport, complete_report: :network_management_multi_channel_capability_report}},
-    node_neighbor_update_request:
-      {Commands.NodeNeighborUpdateRequest,
-       handler: {WaitReport, complete_report: :node_neighbor_update_status}},
-    node_information_send: {Commands.NodeInformationSend, handler: AckResponse},
+  command_class :basic do
+    command :basic_set, 0x01
+    command :basic_get, 0x02
+    command :basic_report, 0x03
+  end
 
-    # S0
-    # s0_commands_supported_get should technically use AggregateReport, but it would
-    # require changes to AggregateReport. Few devices support so many CCs that they
-    # don't all fit into one frame.
-    s0_nonce_get: {Commands.S0NonceGet, handler: {WaitReport, complete_report: :s0_nonce_report}},
-    s0_network_key_set:
-      {Commands.S0NetworkKeySet, handler: {WaitReport, complete_report: :s0_network_key_verify}},
-    s0_security_scheme_get:
-      {Commands.S0SecuritySchemeGet,
-       handler: {WaitReport, complete_report: :s0_security_scheme_report}},
-    s0_security_scheme_inherit:
-      {Commands.S0SecuritySchemeInherit,
-       handler: {WaitReport, complete_report: :s0_security_scheme_report}},
-    s0_commands_supported_get:
-      {Commands.S0CommandsSupportedGet,
-       handler: {WaitReport, complete_report: :s0_commands_supported_report}},
-    s0_message_encapsulation: {Commands.S0MessageEncapsulation, handler: AckResponse},
+  command_class :battery do
+    command :battery_get, 0x02
+    command :battery_report, 0x03
+  end
 
-    # S2
-    s2_kex_get:
-      {Commands.S2KexGet,
-       handler: {WaitReport, complete_report: :s2_kex_report, supports_supervision?: false}},
-    s2_kex_set:
-      {Commands.S2KexSet,
-       handler: {WaitReport, complete_report: :s2_kex_report, supports_supervision?: false}},
-    s2_kex_fail: {Commands.S2KexFail, handler: {AckResponse, supports_supervision?: false}},
-    s2_kex_report: {Commands.S2KexReport, handler: {AckResponse, supports_supervision?: false}},
-    s2_public_key_report:
-      {Commands.S2PublicKeyReport, handler: {AckResponse, supports_supervision?: false}},
-    s2_network_key_get:
-      {Commands.S2NetworkKeyGet,
-       handler:
-         {WaitReport, complete_report: :s2_network_key_report, supports_supervision?: false}},
-    s2_network_key_report:
-      {Commands.S2NetworkKeyReport, handler: {AckResponse, supports_supervision?: false}},
-    s2_network_key_verify:
-      {Commands.S2NetworkKeyVerify, handler: {AckResponse, supports_supervision?: false}},
-    s2_transfer_end:
-      {Commands.S2TransferEnd, handler: {AckResponse, supports_supervision?: false}},
-    s2_commands_supported_get:
-      {Commands.S2CommandsSupportedGet,
-       handler: {WaitReport, complete_report: :s2_commands_supported_report}},
+  command_class :central_scene do
+    command :central_scene_supported_get, 0x01
+    command :central_scene_supported_report, 0x02
+    command :central_scene_notification, 0x03
+    command :central_scene_configuration_set, 0x04
+    command :central_scene_configuration_get, 0x05
+    command :central_scene_configuration_report, 0x06
+  end
 
-    # DSKs
-    node_add_keys_set:
-      {Commands.NodeAddKeysSet, handler: {AckResponse, [supports_supervision?: false]}},
-    node_add_dsk_set:
-      {Commands.NodeAddDSKSet, handler: {AckResponse, [supports_supervision?: false]}},
-    dsk_get: {Commands.DSKGet, handler: {WaitReport, complete_report: :dsk_report}},
+  command_class :clock do
+    command :clock_set, 0x04
+    command :clock_get, 0x05
+    command :clock_report, 0x06
+  end
 
-    # Door Lock
-    door_lock_operation_set: {Commands.DoorLockOperationSet, handler: AckResponse},
-    door_lock_operation_get:
-      {Commands.DoorLockOperationGet,
-       handler: {WaitReport, complete_report: :door_lock_operation_report}},
-    door_lock_configuration_set: {Commands.DoorLockConfigurationSet, handler: AckResponse},
-    door_lock_configuration_get:
-      {Commands.DoorLockConfigurationGet,
-       handler: {WaitReport, complete_report: :door_lock_configuration_report}},
-    door_lock_capabilities_get:
-      {Commands.DoorLockCapabilitiesGet,
-       handler: {WaitReport, complete_report: :door_lock_capabilities_report}},
+  command_class :configuration do
+    command :configuration_default_reset, 0x01
+    command :configuration_set, 0x04
+    command :configuration_get, 0x05, report: :configuration_report
+    command :configuration_report, 0x06
+    command :configuration_bulk_set, 0x07
+    command :configuration_bulk_get, 0x08, handler: {AggregateReport, aggregate_param: :values}
+    command :configuration_bulk_report, 0x09
+    command :configuration_name_get, 0x0A, handler: {AggregateReport, aggregate_param: :name}
+    command :configuration_name_report, 0x0B
+    command :configuration_info_get, 0x0C, handler: {AggregateReport, aggregate_param: :info}
+    command :configuration_info_report, 0x0D
+    command :configuration_properties_get, 0x0E
+    command :configuration_properties_report, 0x0F
+  end
 
-    # Associations
-    association_set: {Commands.AssociationSet, handler: AckResponse},
-    association_get:
-      {Commands.AssociationGet,
-       handler: {AggregateReport, complete_report: :association_report, aggregate_param: :nodes}},
-    association_remove: {Commands.AssociationRemove, handler: AckResponse},
-    association_groupings_get:
-      {Commands.AssociationGroupingsGet,
-       handler: {WaitReport, complete_report: :association_groupings_report}},
-    association_specific_group_get:
-      {Commands.AssociationSpecificGroupGet,
-       handler: {WaitReport, complete_report: :association_specific_group_report}},
+  command_class :crc_16_encap do
+    command :crc_16_encap, 0x01, Cmds.CRC16Encap
+  end
 
-    # Multi Channel Associations
-    multi_channel_association_set: {Commands.MultiChannelAssociationSet, handler: AckResponse},
-    multi_channel_association_get:
-      {Commands.MultiChannelAssociationGet,
-       handler:
-         {AggregateReport,
-          complete_report: :multi_channel_association_report, aggregate_param: :nodes}},
-    multi_channel_association_remove:
-      {Commands.MultiChannelAssociationRemove, handler: AckResponse},
-    multi_channel_association_groupings_get:
-      {Commands.MultiChannelAssociationGroupingsGet,
-       handler: {WaitReport, complete_report: :multi_channel_association_groupings_report}},
+  command_class :device_reset_locally do
+    command :device_reset_locally_notification, 0x01
+  end
 
-    # Association Group Info
-    association_group_name_get:
-      {Commands.AssociationGroupNameGet,
-       handler: {WaitReport, complete_report: :association_group_name_report}},
-    association_group_info_get:
-      {Commands.AssociationGroupInfoGet,
-       handler: {WaitReport, complete_report: :association_group_info_report}},
-    association_group_command_list_get:
-      {Commands.AssociationGroupCommandListGet,
-       handler: {WaitReport, complete_report: :association_group_command_list_report}},
+  command_class :door_lock do
+    command :door_lock_operation_set, 0x01
+    command :door_lock_operation_get, 0x02
 
-    # Keep alive
-    keep_alive: {Commands.ZIPKeepAlive, handler: AckResponse},
+    command :door_lock_operation_report, 0x03,
+      default_params: [
+        inside_handles_mode: %{1 => :disabled, 2 => :disabled, 3 => :disabled, 4 => :disabled},
+        outside_handles_mode: %{1 => :disabled, 2 => :disabled, 3 => :disabled, 4 => :disabled},
+        latch_position: :open,
+        bolt_position: :locked,
+        door_state: :open,
+        timeout_minutes: 0,
+        timeout_seconds: 0
+      ]
 
-    # Version
-    version_get: {Commands.VersionGet, handler: {WaitReport, complete_report: :version_report}},
-    version_capabilities_get:
-      {Commands.VersionCapabilitiesGet,
-       handler: {WaitReport, complete_report: :version_capabilities_report}},
-    version_zwave_software_get:
-      {Commands.VersionZWaveSoftwareGet,
-       handler: {WaitReport, complete_report: :version_zwave_software_report}},
-    version_command_class_get:
-      {Commands.VersionCommandClassGet,
-       handler: {WaitReport, complete_report: :version_command_class_report}},
-    # Firmware update metadata
-    firmware_md_get:
-      {Commands.FirmwareMDGet, handler: {WaitReport, complete_report: :firmware_md_report}},
-    firmware_update_md_request_get:
-      {Commands.FirmwareUpdateMDRequestGet,
-       handler: {WaitReport, complete_report: :firmware_update_md_request_report}},
-    firmware_update_md_report: {Commands.FirmwareUpdateMDReport, handler: AckResponse},
-    firmware_update_activation_set:
-      {Commands.FirmwareUpdateActivationSet,
-       handler: {WaitReport, complete_report: :firmware_update_activation_report}},
+    command :door_lock_configuration_set, 0x04
+    command :door_lock_configuration_get, 0x05
+    command :door_lock_configuration_report, 0x06
+    command :door_lock_capabilities_get, 0x07
+    command :door_lock_capabilities_report, 0x08
+  end
 
-    # Wake up
-    wake_up_interval_get:
-      {Commands.WakeUpIntervalGet,
-       handler: {WaitReport, complete_report: :wake_up_interval_report}},
-    wake_up_interval_set: {Commands.WakeUpIntervalSet, handler: AckResponse},
-    wake_up_no_more_information: {Commands.WakeUpNoMoreInformation, handler: AckResponse},
-    wake_up_interval_capabilities_get:
-      {Commands.WakeUpIntervalCapabilitiesGet,
-       handler: {WaitReport, complete_report: :wake_up_interval_capabilities_report}},
+  command_class :firmware_update_md do
+    command :firmware_md_get, 0x01, Cmds.FirmwareMDGet
+    command :firmware_md_report, 0x02, Cmds.FirmwareMDReport
+    command :firmware_update_md_request_get, 0x03, Cmds.FirmwareUpdateMDRequestGet
+    command :firmware_update_md_request_report, 0x04, Cmds.FirmwareUpdateMDRequestReport
+    command :firmware_update_md_get, 0x05, Cmds.FirmwareUpdateMDGet
+    command :firmware_update_md_report, 0x06, Cmds.FirmwareUpdateMDReport
+    command :firmware_update_md_status_report, 0x07, Cmds.FirmwareUpdateMDStatusReport
+    command :firmware_update_activation_set, 0x08, report: :firmware_update_activation_report
+    command :firmware_update_activation_report, 0x09
+  end
 
-    # Sensor Multilevel
-    sensor_multilevel_get:
-      {Commands.SensorMultilevelGet,
-       handler: {WaitReport, complete_report: :sensor_multilevel_report}},
-    sensor_multilevel_supported_sensor_get:
-      {Commands.SensorMultilevelSupportedSensorGet,
-       handler: {WaitReport, complete_report: :sensor_multilevel_supported_sensor_report}},
-    sensor_multilevel_supported_scale_get:
-      {Commands.SensorMultilevelSupportedScaleGet,
-       handler: {WaitReport, complete_report: :sensor_multilevel_supported_scale_report}},
+  command_class :hail do
+    command :hail, 0x01
+  end
 
-    # User code
-    user_code_set: {Commands.UserCodeSet, handler: AckResponse},
-    user_code_get:
-      {Commands.UserCodeGet, handler: {WaitReport, complete_report: :user_code_report}},
-    user_code_users_number_get:
-      {Commands.UserCodeUsersNumberGet,
-       handler: {WaitReport, complete_report: :user_code_users_number_report}},
-    user_code_capabilities_get:
-      {Commands.UserCodeCapabilitiesGet,
-       handler: {WaitReport, complete_report: :user_code_capabilities_report}},
-    user_code_checksum_get:
-      {Commands.UserCodeChecksumGet,
-       handler: {WaitReport, complete_report: :user_code_checksum_report}},
-    extended_user_code_set: {Commands.ExtendedUserCodeSet, handler: AckResponse},
-    extended_user_code_get:
-      {Commands.ExtendedUserCodeGet,
-       handler: {WaitReport, complete_report: :extended_user_code_report}},
-    user_code_keypad_mode_set: {Commands.UserCodeKeypadModeSet, handler: AckResponse},
-    user_code_keypad_mode_get:
-      {Commands.UserCodeKeypadModeGet,
-       handler: {WaitReport, complete_report: :user_code_keypad_mode_report}},
-    admin_code_set: {Commands.AdminCodeSet, handler: AckResponse},
-    admin_code_get:
-      {Commands.AdminCodeGet, handler: {WaitReport, complete_report: :admin_code_report}},
+  command_class :humidity_control_mode do
+    command :humidity_control_mode_set, 0x01
+    command :humidity_control_mode_get, 0x02
+    command :humidity_control_mode_report, 0x03
+    command :humidity_control_mode_supported_get, 0x04
+    command :humidity_control_mode_supported_report, 0x05
+  end
 
-    # Meter
-    meter_get: {Commands.MeterGet, handler: {WaitReport, complete_report: :meter_report}},
-    meter_supported_get:
-      {Commands.MeterSupportedGet,
-       handler: {WaitReport, complete_report: :meter_supported_report}},
-    meter_reset: {Commands.MeterReset, handler: AckResponse},
+  command_class :humidity_control_operating_state do
+    command :humidity_control_operating_state_get, 0x01
+    command :humidity_control_operating_state_report, 0x02
+  end
 
-    # Thermostat mode
-    thermostat_mode_set: {Commands.ThermostatModeSet, handler: AckResponse},
-    thermostat_mode_get:
-      {Commands.ThermostatModeGet,
-       handler: {WaitReport, complete_report: :thermostat_mode_report}},
-    thermostat_mode_supported_get:
-      {Commands.ThermostatModeSupportedGet,
-       handler: {WaitReport, complete_report: :thermostat_mode_supported_report}},
+  command_class :humidity_control_setpoint do
+    command :humidity_control_setpoint_set, 0x01
+    command :humidity_control_setpoint_get, 0x02
+    command :humidity_control_setpoint_report, 0x03
+    command :humidity_control_setpoint_supported_get, 0x04
+    command :humidity_control_setpoint_supported_report, 0x05
+    command :humidity_control_setpoint_scale_supported_get, 0x06
+    command :humidity_control_setpoint_scale_supported_report, 0x07
+    command :humidity_control_setpoint_capabilities_get, 0x08
+    command :humidity_control_setpoint_capabilities_report, 0x09
+  end
 
-    # Thermostat setpoint
-    thermostat_setpoint_set: {Commands.ThermostatSetpointSet, handler: AckResponse},
-    thermostat_setpoint_get:
-      {Commands.ThermostatSetpointGet,
-       handler: {WaitReport, complete_report: :thermostat_setpoint_report}},
-    thermostat_setpoint_supported_get:
-      {Commands.ThermostatSetpointSupportedGet,
-       handler: {WaitReport, complete_report: :thermostat_setpoint_supported_report}},
-    thermostat_setpoint_capabilities_get:
-      {Commands.ThermostatSetpointCapabilitiesGet,
-       handler: {WaitReport, complete_report: :thermostat_setpoint_capabilities_report}},
+  command_class :indicator do
+    command :indicator_set, 0x01
+    command :indicator_get, 0x02
+    command :indicator_report, 0x03
+    command :indicator_supported_get, 0x04
+    command :indicator_supported_report, 0x05
+    command :indicator_description_get, 0x06
+    command :indicator_description_report, 0x07
+  end
 
-    # Thermostat fan mode
-    thermostat_fan_mode_set: {Commands.ThermostatFanModeSet, handler: AckResponse},
-    thermostat_fan_mode_get:
-      {Commands.ThermostatFanModeGet,
-       handler: {WaitReport, complete_report: :thermostat_fan_mode_report}},
-    thermostat_fan_mode_supported_get:
-      {Commands.ThermostatFanModeSupportedGet,
-       handler: {WaitReport, complete_report: :thermostat_fan_mode_supported_report}},
+  command_class :mailbox do
+    command :mailbox_configuration_get, 0x01
+    command :mailbox_configuration_set, 0x02
+    command :mailbox_configuration_report, 0x03
+    command :mailbox_queue, 0x04
+    command :mailbox_wake_up_notification, 0x05
+    command :mailbox_node_failing, 0x06
+  end
 
-    # Thermostat fan state
-    thermostat_fan_state_get:
-      {Commands.ThermostatFanStateGet,
-       handler: {WaitReport, complete_report: :thermostat_fan_state_report}},
+  command_class :manufacturer_specific do
+    command :manufacturer_specific_get, 0x04
+    command :manufacturer_specific_report, 0x05
+    command :manufacturer_specific_device_specific_get, 0x06
+    command :manufacturer_specific_device_specific_report, 0x07
+  end
 
-    # Thermostat setback
-    thermostat_setback_set: {Commands.ThermostatSetbackSet, handler: AckResponse},
-    thermostat_setback_get:
-      {Commands.ThermostatSetbackGet,
-       handler: {WaitReport, complete_report: :thermostat_setback_report}},
+  command_class :meter do
+    command :meter_get, 0x01
+    command :meter_report, 0x02
+    command :meter_supported_get, 0x03
+    command :meter_supported_report, 0x04
+    command :meter_reset, 0x05
+  end
 
-    # Thermostat operating state
-    thermostat_operating_state_get:
-      {Commands.ThermostatOperatingStateGet,
-       handler: {WaitReport, complete_report: :thermostat_operating_state_report}},
+  command_class :multi_channel do
+    command :multi_channel_endpoint_get, 0x07
+    command :multi_channel_endpoint_report, 0x08
+    command :multi_channel_capability_get, 0x09
+    command :multi_channel_capability_report, 0x0A
 
-    # Node provisioning
-    node_provisioning_set: {Commands.NodeProvisioningSet, handler: AckResponse},
-    node_provisioning_get:
-      {Commands.NodeProvisioningGet,
-       handler: {WaitReport, complete_report: :node_provisioning_report}},
-    node_provisioning_delete: {Commands.NodeProvisioningDelete, handler: AckResponse},
-    node_provisioning_list_iteration_get:
-      {Commands.NodeProvisioningListIterationGet,
-       handler: {WaitReport, complete_report: :node_provisioning_list_iteration_report}},
+    command :multi_channel_endpoint_find, 0x0B,
+      report: :multi_channel_endpoint_find_report,
+      handler: {AggregateReport, aggregate_param: :end_points}
 
-    # Supervision
-    supervision_get:
-      {Commands.SupervisionGet, handler: {WaitReport, complete_report: :supervision_report}},
+    command :multi_channel_endpoint_find_report, 0x0C
 
-    # Sensor binary
-    sensor_binary_get:
-      {Commands.SensorBinaryGet, handler: {WaitReport, complete_report: :sensor_binary_report}},
-    sensor_binary_supported_sensor_get:
-      {Commands.SensorBinarySupportedSensorGet,
-       handler: {WaitReport, complete_report: :sensor_binary_supported_sensor_report}},
+    command :multi_channel_get_command_encapsulation, 0x0D, Cmds.MultiChannelCommandEncapsulation,
+      report: :any,
+      handler: {WaitReport, complete_report: :any}
 
-    # Multi Channel
-    multi_channel_endpoint_get:
-      {Commands.MultiChannelEndpointGet,
-       handler: {WaitReport, complete_report: :multi_channel_endpoint_report}},
-    multi_channel_capability_get:
-      {Commands.MultiChannelCapabilityGet,
-       handler: {WaitReport, complete_report: :multi_channel_capability_report}},
-    multi_channel_endpoint_find:
-      {Commands.MultiChannelEndpointFind,
-       handler:
-         {AggregateReport,
-          complete_report: :multi_channel_endpoint_find_report, aggregate_param: :end_points}},
-    multi_channel_aggregated_members_get:
-      {Commands.MultiChannelAggregatedMembersGet,
-       handler: {WaitReport, complete_report: :multi_channel_aggregated_members_report}},
-    multi_channel_get_command_encapsulation:
-      {Commands.MultiChannelCommandEncapsulation, handler: {WaitReport, complete_report: :any}},
-    multi_channel_command_encapsulation:
-      {Commands.MultiChannelCommandEncapsulation, handler: AckResponse},
+    command :multi_channel_command_encapsulation, 0x0D
+    command :multi_channel_aggregated_members_get, 0x0E
+    command :multi_channel_aggregated_members_report, 0x0F
+  end
 
-    # Application
-    application_node_info_get:
-      {Commands.ApplicationNodeInfoGet,
-       handler: {WaitReport, complete_report: :application_node_info_report}},
+  command_class :multi_channel_association do
+    command :multi_channel_association_set, 0x01
 
-    # Node Naming and Location
-    node_name_get:
-      {Commands.NodeNameGet, handler: {WaitReport, complete_report: :node_name_report}},
-    node_name_set: {Commands.NodeNameSet, handler: AckResponse},
-    node_location_get:
-      {Commands.NodeLocationGet, handler: {WaitReport, complete_report: :node_location_report}},
-    node_location_set: {Commands.NodeLocationSet, handler: AckResponse},
+    command :multi_channel_association_get, 0x02,
+      report: :multi_channel_association_report,
+      handler: {AggregateReport, aggregate_param: :nodes}
 
-    # Time parameters
-    time_parameters_get:
-      {Commands.TimeParametersGet,
-       handler: {WaitReport, complete_report: :time_parameters_report}},
-    time_parameters_set: {Commands.TimeParametersSet, handler: AckResponse},
+    command :multi_channel_association_report, 0x03
+    command :multi_channel_association_remove, 0x04
+    command :multi_channel_association_groupings_get, 0x05
+    command :multi_channel_association_groupings_report, 0x06
+  end
 
-    # Alarm
-    alarm_get: {Commands.AlarmGet, handler: {WaitReport, complete_report: :alarm_report}},
-    alarm_set: {Commands.AlarmSet, handler: AckResponse},
-    alarm_type_supported_get:
-      {Commands.AlarmTypeSupportedGet,
-       handler: {WaitReport, complete_report: :alarm_type_supported_report}},
-    alarm_event_supported_get:
-      {Commands.AlarmEventSupportedGet,
-       handler: {WaitReport, complete_report: :alarm_event_supported_report}},
+  command_class :network_management_basic_node do
+    command :learn_mode_set, 0x01, report: :learn_mode_set_status
+    command :learn_mode_set_status, 0x02
+    command :network_update_request, 0x03, report: :network_update_request_status
+    command :network_update_request_status, 0x04
+    command :node_information_send, 0x05
+    command :default_set, 0x06, report: :default_set_complete
+    command :default_set_complete, 0x07
+    command :dsk_get, 0x08, Cmds.DSKGet, default_params: [add_mode: :learn]
+    command :dsk_report, 0x09, Cmds.DSKReport
+  end
 
-    # Time
-    time_get: {Commands.TimeGet, handler: {WaitReport, complete_report: :time_report}},
-    date_get: {Commands.DateGet, handler: {WaitReport, complete_report: :date_report}},
-    time_offset_get:
-      {Commands.TimeOffsetGet, handler: {WaitReport, complete_report: :time_offset_report}},
-    time_offset_set: {Commands.TimeOffsetSet, handler: AckResponse},
+  command_class :network_management_inclusion do
+    command :node_add, 0x01, report: :node_add_status
+    command :node_add_status, 0x02
+    command :node_remove, 0x03, report: :node_remove_status
+    command :node_remove_status, 0x04
+    command :failed_node_remove, 0x07, report: :failed_node_remove_status
+    command :failed_node_remove_status, 0x08
+    command :failed_node_replace, 0x09, report: :failed_node_replace_status
+    command :failed_node_replace_status, 0x0A
+    command :node_neighbor_update_request, 0x0B, report: :node_neighbor_update_status
+    command :node_neighbor_update_status, 0x0C
+    command :node_add_keys_report, 0x11
+    command :node_add_keys_set, 0x12, supports_supervision?: false
+    command :node_add_dsk_report, 0x13, Cmds.NodeAddDSKReport
+    command :node_add_dsk_set, 0x14, Cmds.NodeAddDSKSet, supports_supervision?: false
+    command :smart_start_join_started, 0x15
+    command :extended_node_add_status, 0x16
+    command :included_nif_report, 0x19, Cmds.IncludedNIFReport
+  end
 
-    # Indicator
-    indicator_get:
-      {Commands.IndicatorGet, handler: {WaitReport, complete_report: :indicator_report}},
-    indicator_set: {Commands.IndicatorSet, handler: AckResponse},
-    indicator_supported_get:
-      {Commands.IndicatorSupportedGet,
-       handler: {WaitReport, complete_report: :indicator_supported_report}},
-    indicator_description_get:
-      {Commands.IndicatorDescriptionGet,
-       handler: {WaitReport, complete_report: :indicator_description_report}},
+  command_class :network_management_installation_maintenance do
+    command :priority_route_set, 0x01
+    command :priority_route_get, 0x02
+    command :priority_route_report, 0x03
+    command :statistics_get, 0x04
+    command :statistics_report, 0x05
+    command :statistics_clear, 0x06
+    command :rssi_get, 0x07
+    command :rssi_report, 0x08
+    command :s2_resynchronization_event, 0x09, Cmds.S2ResynchronizationEvent
+    command :zwave_long_range_channel_set, 0x0A, Cmds.ZWaveLongRangeChannelSet
+    command :zwave_long_range_channel_get, 0x0D, Cmds.ZWaveLongRangeChannelGet
+    command :zwave_long_range_channel_report, 0x0E, Cmds.ZWaveLongRangeChannelReport
+  end
 
-    # Antitheft
-    antitheft_get:
-      {Commands.AntitheftGet, handler: {WaitReport, complete_report: :antitheft_report}},
-    antitheft_set: {Commands.AntitheftSet, handler: AckResponse},
+  command_class :network_management_proxy do
+    command :node_list_get, 0x01
+    command :node_list_report, 0x02
+    command :node_info_cached_get, 0x03, default_params: [max_age: 10]
+    command :node_info_cached_report, 0x04
+    command :network_management_multi_channel_end_point_get, 0x05
+    command :network_management_multi_channel_end_point_report, 0x06
+    command :network_management_multi_channel_capability_get, 0x07
+    command :network_management_multi_channel_capability_report, 0x08
+    command :failed_node_list_get, 0x0B
+    command :failed_node_list_report, 0x0C
+  end
 
-    # Antitheft unlock
-    antitheft_unlock_get:
-      {Commands.AntitheftUnlockGet,
-       handler: {WaitReport, complete_report: :antitheft_unlock_report}},
-    antitheft_unlock_set: {Commands.AntitheftUnlockSet, handler: AckResponse},
+  command_class :no_operation do
+    # TODO?
+    command :no_operation, 0x00
+  end
 
-    # Central scene
-    central_scene_supported_get:
-      {Commands.CentralSceneSupportedGet,
-       handler: {WaitReport, complete_report: :central_scene_supported_report}},
-    central_scene_configuration_get:
-      {Commands.CentralSceneConfigurationGet,
-       handler: {WaitReport, complete_report: :central_scene_configuration_report}},
-    central_scene_configuration_set:
-      {Commands.CentralSceneConfigurationSet, handler: AckResponse},
+  command_class :node_naming do
+    command :node_name_set, 0x01
+    command :node_name_get, 0x02
+    command :node_name_report, 0x03
+    command :node_location_set, 0x04
+    command :node_location_get, 0x05
+    command :node_location_report, 0x06
+  end
 
-    # Scene actuator configuration
-    scene_actuator_conf_get:
-      {Commands.SceneActuatorConfGet,
-       handler: {WaitReport, complete_report: :scene_actuator_conf_report}},
-    scene_actuator_conf_set: {Commands.SceneActuatorConfSet, handler: AckResponse},
+  command_class :node_provisioning do
+    command :node_provisioning_set, 0x01
+    command :node_provisioning_delete, 0x02
+    command :node_provisioning_list_iteration_get, 0x03, default_params: [remaining_counter: 0xFF]
 
-    # Scene activation
-    scene_activation_set: {Commands.SceneActivationSet, handler: AckResponse},
+    command :node_provisioning_list_iteration_report, 0x04,
+      default_params: [meta_extensions: [], dsk: ""]
 
-    # Powerlevel
-    powerlevel_get:
-      {Commands.PowerlevelGet, handler: {WaitReport, complete_report: :powerlevel_report}},
-    powerlevel_set: {Commands.PowerlevelSet, handler: AckResponse},
-    powerlevel_test_node_get:
-      {Commands.PowerlevelTestNodeGet,
-       handler: {WaitReport, complete_report: :powerlevel_test_node_report}},
-    powerlevel_test_node_set: {Commands.PowerlevelTestNodeSet, handler: AckResponse},
-    device_reset_locally_notification:
-      {Commands.DeviceResetLocallyNotification, handler: AckResponse},
+    command :node_provisioning_get, 0x05, default_params: [meta_extensions: []]
+    command :node_provisioning_report, 0x06, default_params: [meta_extensions: [], dsk: nil]
+  end
 
-    # Clock
-    clock_get: {Commands.ClockGet, handler: {WaitReport, complete_report: :clock_report}},
-    clock_set: {Commands.ClockSet, handler: AckResponse},
+  command_class :powerlevel do
+    command :powerlevel_set, 0x01
+    command :powerlevel_get, 0x02
+    command :powerlevel_report, 0x03
+    command :powerlevel_test_node_set, 0x04
+    command :powerlevel_test_node_get, 0x05
+    command :powerlevel_test_node_report, 0x06
+  end
 
-    # Network Management Installation Maintenance
-    priority_route_set: {Commands.PriorityRouteSet, handler: AckResponse},
-    priority_route_get:
-      {Commands.PriorityRouteGet, handler: {WaitReport, complete_report: :priority_route_report}},
-    statistics_get:
-      {Commands.StatisticsGet, handler: {WaitReport, complete_report: :statistics_report}},
-    statistics_clear: {Commands.StatisticsClear, handler: AckResponse},
-    rssi_get: {Commands.RssiGet, handler: {WaitReport, complete_report: :rssi_report}},
-    zwave_long_range_channel_set: {Commands.ZWaveLongRangeChannelSet, handler: AckResponse},
-    zwave_long_range_channel_get:
-      {Commands.ZWaveLongRangeChannelGet,
-       handler: {WaitReport, complete_report: :zwave_long_range_channel_report}},
+  command_class :scene_activation do
+    command :scene_activation_set, 0x01
+  end
 
-    # Zwaveplus Info
-    zwaveplus_info_get:
-      {Commands.ZwaveplusInfoGet, handler: {WaitReport, complete_report: :zwaveplus_info_report}},
+  command_class :scene_actuator_conf do
+    command :scene_actuator_conf_set, 0x01
+    command :scene_actuator_conf_get, 0x02
+    command :scene_actuator_conf_report, 0x03
+  end
 
-    # Schedule Entry Lock
-    schedule_entry_lock_week_day_get:
-      {Commands.ScheduleEntryLockWeekDayGet,
-       handler: {WaitReport, complete_report: :schedule_entry_lock_week_day_report}},
-    schedule_entry_lock_year_day_get:
-      {Commands.ScheduleEntryLockYearDayGet,
-       handler: {WaitReport, complete_report: :schedule_entry_lock_year_day_report}},
-    schedule_entry_type_supported_get:
-      {Commands.ScheduleEntryTypeSupportedGet,
-       handler: {WaitReport, complete_report: :schedule_entry_type_supported_report}},
-    schedule_entry_lock_time_offset_get:
-      {Commands.ScheduleEntryLockTimeOffsetGet,
-       handler: {WaitReport, complete_report: :schedule_entry_lock_time_offset_report}},
-    schedule_entry_lock_daily_repeating_get:
-      {Commands.ScheduleEntryLockDailyRepeatingGet,
-       handler: {WaitReport, complete_report: :schedule_entry_lock_daily_repeating_report}},
-    schedule_entry_lock_enable_set: {Commands.ScheduleEntryLockEnableSet, handler: AckResponse},
-    schedule_entry_lock_enable_all_set:
-      {Commands.ScheduleEntryLockEnableAllSet, handler: AckResponse},
-    schedule_entry_lock_week_day_set:
-      {Commands.ScheduleEntryLockWeekDaySet, handler: AckResponse},
-    schedule_entry_lock_year_day_set:
-      {Commands.ScheduleEntryLockYearDaySet, handler: AckResponse},
-    schedule_entry_lock_time_offset_set:
-      {Commands.ScheduleEntryLockTimeOffsetSet, handler: AckResponse},
-    schedule_entry_lock_daily_repeating_set:
-      {Commands.ScheduleEntryLockDailyRepeatingSet, handler: AckResponse},
+  command_class :schedule_entry_lock do
+    command :schedule_entry_lock_enable_set, 0x01
+    command :schedule_entry_lock_enable_all_set, 0x02
+    command :schedule_entry_lock_week_day_set, 0x03
+    command :schedule_entry_lock_week_day_get, 0x04
+    command :schedule_entry_lock_week_day_report, 0x05
+    command :schedule_entry_lock_year_day_set, 0x06
+    command :schedule_entry_lock_year_day_get, 0x07
+    command :schedule_entry_lock_year_day_report, 0x08
+    command :schedule_entry_type_supported_get, 0x09
+    command :schedule_entry_type_supported_report, 0x0A
+    command :schedule_entry_lock_time_offset_get, 0x0B
+    command :schedule_entry_lock_time_offset_report, 0x0C
+    command :schedule_entry_lock_time_offset_set, 0x0D
+    command :schedule_entry_lock_daily_repeating_get, 0x0E
+    command :schedule_entry_lock_daily_repeating_report, 0x0F
+    command :schedule_entry_lock_daily_repeating_set, 0x10
+  end
 
-    # Barrier Operator
-    barrier_operator_get:
-      {Commands.BarrierOperatorGet,
-       handler: {WaitReport, complete_report: :barrier_operator_report}},
-    barrier_operator_set: {Commands.BarrierOperatorSet, handler: AckResponse},
-    barrier_operator_signal_supported_get:
-      {Commands.BarrierOperatorSignalSupportedGet,
-       handler: {WaitReport, complete_report: :barrier_operator_signal_supported_report}},
-    barrier_operator_signal_get:
-      {Commands.BarrierOperatorSignalGet,
-       handler: {WaitReport, complete_report: :barrier_operator_signal_report}},
-    barrier_operator_signal_set: {Commands.BarrierOperatorSignalSet, handler: AckResponse},
+  command_class :security do
+    command :s0_commands_supported_get, 0x02
 
-    # Window Covering
-    window_covering_supported_get:
-      {Commands.WindowCoveringSupportedGet,
-       handler: {WaitReport, complete_report: :window_covering_supported_report}},
-    window_covering_get:
-      {Commands.WindowCoveringGet,
-       handler: {WaitReport, complete_report: :window_covering_report}},
-    window_covering_set: {Commands.WindowCoveringSet, handler: AckResponse},
-    window_covering_start_level_change:
-      {Commands.WindowCoveringStartLevelChange, handler: AckResponse},
-    window_covering_stop_level_change:
-      {Commands.WindowCoveringStopLevelChange, handler: AckResponse},
+    command :s0_commands_supported_report, 0x03, Cmds.S0CommandsSupportedReport,
+      default_params: [supported: [], controlled: [], reports_to_follow: 0]
 
-    # Mailbox
-    mailbox_configuration_get:
-      {Commands.MailboxConfigurationGet,
-       handler: {WaitReport, complete_report: :mailbox_configuration_report}},
-    mailbox_configuration_set: {Commands.MailboxConfigurationSet, handler: AckResponse},
-    mailbox_configuration_report: {Commands.MailboxConfigurationReport, handler: AckResponse},
-    # Mailbox Queue will sometimes require the `WaitReport` handler (such as with
-    # the pop operation). It is up to the caller to use the correct handler.
-    mailbox_queue: {Commands.MailboxQueue, handler: AckResponse},
+    command :s0_security_scheme_get, 0x04, Cmds.S0SecuritySchemeGet
+    command :s0_security_scheme_report, 0x05, Cmds.S0SecuritySchemeReport
+    command :s0_network_key_set, 0x06, Cmds.S0NetworkKeySet, report: :s0_network_key_verify
+    command :s0_network_key_verify, 0x07
 
-    # Sound Switch
-    sound_switch_tones_number_get:
-      {Commands.SoundSwitchTonesNumberGet,
-       handler: {WaitReport, complete_report: :sound_switch_tones_number_report}},
-    sound_switch_tone_info_get:
-      {Commands.SoundSwitchToneInfoGet,
-       handler: {WaitReport, complete_report: :sound_switch_tone_info_report}},
-    sound_switch_configuration_set: {Commands.SoundSwitchConfigurationSet, handler: AckResponse},
-    sound_switch_configuration_get:
-      {Commands.SoundSwitchConfigurationGet,
-       handler: {WaitReport, complete_report: :sound_switch_configuration_report}},
-    sound_switch_tone_play_set: {Commands.SoundSwitchTonePlaySet, handler: AckResponse},
-    sound_switch_tone_play_get:
-      {Commands.SoundSwitchTonePlayGet,
-       handler: {WaitReport, complete_report: :sound_switch_tone_play_report}},
+    command :s0_security_scheme_inherit, 0x08, Cmds.S0SecuritySchemeInherit,
+      report: :s0_security_scheme_report
 
-    # Humidity Control Setpoint
-    humidity_control_setpoint_set: {Commands.HumidityControlSetpointSet, handler: AckResponse},
-    humidity_control_setpoint_get:
-      {Commands.HumidityControlSetpointGet,
-       handler: {WaitReport, complete_report: :humidity_control_setpoint_report}},
-    humidity_control_setpoint_supported_get:
-      {Commands.HumidityControlSetpointSupportedGet,
-       handler: {WaitReport, complete_report: :humidity_control_setpoint_supported_report}},
-    humidity_control_setpoint_scale_supported_get:
-      {Commands.HumidityControlSetpointScaleSupportedGet,
-       handler: {WaitReport, complete_report: :humidity_control_setpoint_scale_supported_report}},
-    humidity_control_setpoint_capabilities_get:
-      {Commands.HumidityControlSetpointCapabilitiesGet,
-       handler: {WaitReport, complete_report: :humidity_control_setpoint_capabilities_report}},
+    command :s0_nonce_get, 0x40
+    command :s0_nonce_report, 0x80, Cmds.S0NonceReport
+    command :s0_message_encapsulation, 0x81, Cmds.S0MessageEncapsulation
+  end
 
-    # Humidity Control Mode
-    humidity_control_mode_set: {Commands.HumidityControlModeSet, handler: AckResponse},
-    humidity_control_mode_get:
-      {Commands.HumidityControlModeGet,
-       handler: {WaitReport, complete_report: :humidity_control_mode_report}},
-    humidity_control_mode_supported_get:
-      {Commands.HumidityControlModeSupportedGet,
-       handler: {WaitReport, complete_report: :humidity_control_mode_supported_report}},
+  command_class :security_2 do
+    command :s2_nonce_get, 0x01
+    command :s2_nonce_report, 0x02, Cmds.S2NonceReport
+    command :s2_message_encapsulation, 0x03, Cmds.S2MessageEncapsulation
+    command :s2_kex_get, 0x04, supports_supervision?: false
+    command :s2_kex_report, 0x05, Cmds.S2KexReport, supports_supervision?: false
+    command :s2_kex_set, 0x06, Cmds.S2KexSet, supports_supervision?: false
+    command :s2_kex_fail, 0x07, Cmds.S2KexFail, supports_supervision?: false
+    command :s2_public_key_report, 0x08, Cmds.S2PublicKeyReport, supports_supervision?: false
+    command :s2_network_key_get, 0x09, Cmds.S2NetworkKeyGet, supports_supervision?: false
+    command :s2_network_key_report, 0x0A, Cmds.S2NetworkKeyReport, supports_supervision?: false
+    command :s2_network_key_verify, 0x0B, supports_supervision?: false
+    command :s2_transfer_end, 0x0C, Cmds.S2TransferEnd, supports_supervision?: false
+    command :s2_commands_supported_get, 0x0D
 
-    # Humidity Control Operating State
-    humidity_control_operating_state_get:
-      {Commands.HumidityControlOperatingStateGet,
-       handler: {WaitReport, complete_report: :humidity_control_operating_state_report}},
+    command :s2_commands_supported_report, 0x0E, Cmds.S2CommandsSupportedReport,
+      default_params: [command_classes: []]
+  end
 
-    # User Credential
-    user_capabilities_get:
-      {Commands.UserCapabilitiesGet,
-       handler: {WaitReport, complete_report: :user_capabilities_report}},
-    credential_capabilities_get:
-      {Commands.CredentialCapabilitiesGet,
-       handler: {WaitReport, complete_report: :credential_capabilities_report}},
-    user_set: {Commands.UserSet, handler: AckResponse},
-    user_get: {Commands.UserGet, handler: {WaitReport, complete_report: :user_report}},
-    credential_set: {Commands.CredentialSet, handler: AckResponse},
-    credential_get:
-      {Commands.CredentialGet, handler: {WaitReport, complete_report: :credential_report}},
-    credential_learn_start: {Commands.CredentialLearnStart, handler: AckResponse},
-    credential_learn_cancel: {Commands.CredentialLearnCancel, handler: AckResponse},
-    user_credential_association_set:
-      {Commands.UserCredentialAssociationSet, handler: AckResponse},
-    all_users_checksum_get:
-      {Commands.AllUsersChecksumGet,
-       handler: {WaitReport, complete_report: :all_users_checksum_report}},
-    user_checksum_get:
-      {Commands.UserChecksumGet, handler: {WaitReport, complete_report: :user_checksum_report}},
-    credential_checksum_get:
-      {Commands.CredentialChecksumGet,
-       handler: {WaitReport, complete_report: :credential_checksum_report}},
-    admin_pin_code_set: {Commands.AdminPinCodeSet, handler: AckResponse},
-    admin_pin_code_get:
-      {Commands.AdminPinCodeGet, handler: {WaitReport, complete_report: :admin_pin_code_report}}
-  }
+  command_class :sensor_binary do
+    command :sensor_binary_supported_sensor_get, 0x01
+    command :sensor_binary_get, 0x02
+    command :sensor_binary_report, 0x03
+    command :sensor_binary_supported_sensor_report, 0x04
+  end
 
-  @spec lookup(Grizzly.command()) :: {module(), [Grizzly.command_opt()]}
+  command_class :sensor_multilevel do
+    command :sensor_multilevel_supported_sensor_get, 0x01
+    command :sensor_multilevel_supported_sensor_report, 0x02
+    command :sensor_multilevel_supported_scale_get, 0x03
+    command :sensor_multilevel_get, 0x04
+    command :sensor_multilevel_report, 0x05
+    command :sensor_multilevel_supported_scale_report, 0x06
+  end
+
+  command_class :sound_switch do
+    command :sound_switch_tones_number_get, 0x01
+    command :sound_switch_tones_number_report, 0x02
+    command :sound_switch_tone_info_get, 0x03
+    command :sound_switch_tone_info_report, 0x04
+    command :sound_switch_configuration_set, 0x05
+    command :sound_switch_configuration_get, 0x06
+    command :sound_switch_configuration_report, 0x07
+    command :sound_switch_tone_play_set, 0x08
+    command :sound_switch_tone_play_get, 0x09
+    command :sound_switch_tone_play_report, 0x0A
+  end
+
+  command_class :supervision do
+    command :supervision_get, 0x01
+    command :supervision_report, 0x02
+  end
+
+  command_class :switch_binary do
+    command :switch_binary_set, 0x01
+    command :switch_binary_get, 0x02
+    command :switch_binary_report, 0x03
+  end
+
+  command_class :switch_multilevel do
+    command :switch_multilevel_set, 0x01
+    command :switch_multilevel_get, 0x02
+    command :switch_multilevel_report, 0x03
+    command :switch_multilevel_start_level_change, 0x04
+    command :switch_multilevel_stop_level_change, 0x05
+  end
+
+  command_class :thermostat_fan_mode do
+    command :thermostat_fan_mode_set, 0x01
+    command :thermostat_fan_mode_get, 0x02
+    command :thermostat_fan_mode_report, 0x03
+    command :thermostat_fan_mode_supported_get, 0x04
+    command :thermostat_fan_mode_supported_report, 0x05
+  end
+
+  command_class :thermostat_fan_state do
+    command :thermostat_fan_state_get, 0x02
+    command :thermostat_fan_state_report, 0x03
+  end
+
+  command_class :thermostat_mode do
+    command :thermostat_mode_set, 0x01
+    command :thermostat_mode_get, 0x02
+    command :thermostat_mode_report, 0x03
+    command :thermostat_mode_supported_get, 0x04
+    command :thermostat_mode_supported_report, 0x05
+  end
+
+  command_class :thermostat_operating_state do
+    command :thermostat_operating_state_get, 0x02
+    command :thermostat_operating_state_report, 0x03
+  end
+
+  command_class :thermostat_setback do
+    command :thermostat_setback_set, 0x01
+    command :thermostat_setback_get, 0x02
+    command :thermostat_setback_report, 0x03
+  end
+
+  command_class :thermostat_setpoint do
+    command :thermostat_setpoint_set, 0x01
+    command :thermostat_setpoint_get, 0x02
+    command :thermostat_setpoint_report, 0x03
+    command :thermostat_setpoint_supported_get, 0x04
+    command :thermostat_setpoint_supported_report, 0x05
+    command :thermostat_setpoint_capabilities_get, 0x09
+    command :thermostat_setpoint_capabilities_report, 0x0A
+  end
+
+  command_class :time do
+    command :time_get, 0x01
+    command :time_report, 0x02
+    command :date_get, 0x03
+    command :date_report, 0x04
+    command :time_offset_set, 0x05
+    command :time_offset_get, 0x06
+    command :time_offset_report, 0x07
+  end
+
+  command_class :time_parameters do
+    command :time_parameters_set, 0x01
+    command :time_parameters_get, 0x02
+    command :time_parameters_report, 0x03
+  end
+
+  command_class :user_code do
+    command :user_code_set, 0x01
+    command :user_code_get, 0x02
+    command :user_code_report, 0x03
+    command :user_code_users_number_get, 0x04
+    command :user_code_users_number_report, 0x05
+    command :user_code_capabilities_get, 0x06
+    command :user_code_capabilities_report, 0x07
+    command :user_code_keypad_mode_set, 0x08
+    command :user_code_keypad_mode_get, 0x09
+    command :user_code_keypad_mode_report, 0x0A
+    command :extended_user_code_set, 0x0B
+    command :extended_user_code_get, 0x0C
+    command :extended_user_code_report, 0x0D
+    command :admin_code_set, 0x0E
+    command :admin_code_get, 0x0F
+    command :admin_code_report, 0x10
+    command :user_code_checksum_get, 0x11
+    command :user_code_checksum_report, 0x12
+  end
+
+  command_class :user_credential do
+    command :user_capabilities_get, 0x01
+    command :user_capabilities_report, 0x02
+    command :credential_capabilities_get, 0x03
+    command :credential_capabilities_report, 0x04
+    command :user_set, 0x05
+    command :user_get, 0x06
+    command :user_report, 0x07
+    command :credential_set, 0x0A
+    command :credential_get, 0x0B
+    command :credential_report, 0x0C
+    command :credential_learn_start, 0x0F
+    command :credential_learn_cancel, 0x10
+    command :credential_learn_status_report, 0x11
+    command :user_credential_association_set, 0x12
+    command :user_credential_association_report, 0x13
+    command :all_users_checksum_get, 0x14
+    command :all_users_checksum_report, 0x15
+    command :user_checksum_get, 0x16
+    command :user_checksum_report, 0x17
+    command :credential_checksum_get, 0x18
+    command :credential_checksum_report, 0x19
+    command :admin_pin_code_set, 0x1A
+    command :admin_pin_code_get, 0x1B
+    command :admin_pin_code_report, 0x1C
+  end
+
+  command_class :version do
+    command :version_get, 0x11
+    command :version_report, 0x12
+
+    command :version_command_class_get, 0x13,
+      report_matcher_fun: {Cmds.VersionCommandClassGet, :report_matches_get?}
+
+    command :version_command_class_report, 0x14
+    command :version_capabilities_get, 0x15
+    command :version_capabilities_report, 0x16
+    command :version_zwave_software_get, 0x17, Cmds.VersionZWaveSoftwareGet
+    command :version_zwave_software_report, 0x18, Cmds.VersionZWaveSoftwareReport
+  end
+
+  command_class :wake_up do
+    command :wake_up_interval_set, 0x04
+    command :wake_up_interval_get, 0x05
+    command :wake_up_interval_report, 0x06
+    command :wake_up_notification, 0x07
+    command :wake_up_no_more_information, 0x08
+    command :wake_up_interval_capabilities_get, 0x09
+    command :wake_up_interval_capabilities_report, 0x0A
+  end
+
+  command_class :window_covering do
+    command :window_covering_supported_get, 0x01
+    command :window_covering_supported_report, 0x02
+    command :window_covering_get, 0x03
+    command :window_covering_report, 0x04
+    command :window_covering_set, 0x05
+    command :window_covering_start_level_change, 0x06
+    command :window_covering_stop_level_change, 0x07
+  end
+
+  command_class :zip do
+    command :zip_packet, 0x02, Cmds.ZIPPacket,
+      default_params: [
+        source: 0x00,
+        dest: 0x00,
+        secure: true,
+        header_extensions: [],
+        flag: nil,
+        command: nil,
+        more_info: false
+      ]
+
+    command :keep_alive, 0x03, Cmds.ZIPKeepAlive
+  end
+
+  command_class :zip_gateway do
+    command :application_node_info_get, 0x0C
+    command :application_node_info_report, 0x0D
+  end
+
+  command_class :zwaveplus_info do
+    command :zwaveplus_info_get, 0x01
+    command :zwaveplus_info_report, 0x02
+  end
+
+  @doc """
+  Get the command spec for a given command name.
+
+  ## Examples
+
+      iex> Grizzly.ZWave.Commands.spec_for(:battery_get)
+      {:ok, %Grizzly.ZWave.CommandSpec{
+        name: :battery_get,
+        command_byte: 0x02,
+        command_class: :battery,
+        default_params: [],
+        module: Grizzly.ZWave.Commands.BatteryGet,
+        encode_fun: {Grizzly.ZWave.Commands.BatteryGet, :encode_params},
+        decode_fun: {Grizzly.ZWave.Commands.BatteryGet, :decode_params},
+        handler: {Grizzly.Requests.Handlers.WaitReport, complete_report: :battery_report},
+        report: :battery_report,
+        report_matcher_fun: nil,
+        supports_supervision?: false
+      }}
+  """
+  @spec spec_for(Grizzly.command()) :: {:ok, CommandSpec.t()} | {:error, :unknown_command}
+  def spec_for(command_name) do
+    case Map.fetch(builtin_commands(), command_name) do
+      {:ok, spec} -> {:ok, spec}
+      :error -> {:error, :unknown_command}
+    end
+  end
+
+  @doc """
+  Get the command spec for a given command class byte and command byte.
+  """
+  @spec spec_for(byte(), byte()) :: {:ok, CommandSpec.t()} | {:error, :unknown_command}
+  def spec_for(cc_byte, command_byte) do
+    Enum.find_value(builtin_commands(), {:error, :unknown_command}, fn {_command_name, spec} ->
+      cc = spec.command_class
+      cmd = spec.command_byte
+
+      if CommandClasses.to_byte(cc) == cc_byte and cmd == command_byte do
+        {:ok, spec}
+      end
+    end)
+  end
+
+  @doc "See `spec_for/1`."
+  @spec spec_for!(Grizzly.command()) :: CommandSpec.t()
+  def spec_for!(command_name) do
+    case spec_for(command_name) do
+      {:ok, spec} ->
+        spec
+
+      {:error, :unknown_command} ->
+        raise ArgumentError, "Command #{inspect(command_name)} does not exist"
+    end
+  end
+
+  @doc "See `spec_for/2`."
+  @spec spec_for!(byte(), byte()) :: CommandSpec.t()
+  def spec_for!(cc_byte, command_byte) do
+    case spec_for(cc_byte, command_byte) do
+      {:ok, spec} ->
+        spec
+
+      {:error, :unknown_command} ->
+        raise ArgumentError,
+              "Command with command class byte #{inspect(cc_byte)} and command byte #{inspect(command_byte)} does not exist"
+    end
+  end
+
+  @doc """
+  Look up the command module and handler options for a given command, either by
+  name or from its binary representation.
+  """
+  @spec lookup(Grizzly.command() | binary()) :: {module(), [Grizzly.command_opt()]}
+  def lookup(<<cc_byte, command_byte, _rest::binary>>) do
+    lookup(cc_byte, command_byte)
+  end
+
   def lookup(command_name) do
-    case Map.fetch(@table, command_name) do
-      {:ok, handler_spec} ->
-        handler_spec
+    case spec_for(command_name) do
+      {:ok, spec} ->
+        {spec.module, handler: CommandSpec.handler_spec(spec)}
 
-      :error ->
-        raise ArgumentError, """
-        The command #{inspect(command_name)} you are trying to send is not supported
-        """
+      {:error, :unknown_command} ->
+        raise ArgumentError, "Command #{inspect(command_name)} does not exist"
+    end
+  end
+
+  @doc """
+  Look up the command module and handler options for a given command class byte
+  and command byte.
+  """
+  @spec lookup(byte(), byte()) :: {module(), [Grizzly.command_opt()]}
+  def lookup(cc_byte, command_byte) do
+    case spec_for(cc_byte, command_byte) do
+      {:ok, spec} ->
+        {spec.module, handler: CommandSpec.handler_spec(spec)}
+
+      {:error, :unknown_command} ->
+        raise ArgumentError,
+              "Command with command class byte #{inspect(cc_byte)} and command byte #{inspect(command_byte)} does not exist"
+    end
+  end
+
+  @spec create(atom(), keyword()) :: {:error, :unknown_command} | {:ok, Grizzly.ZWave.Command.t()}
+  def create(command_name, params \\ []) do
+    with {:ok, spec} <- lookup(command_name) do
+      {:ok, spec.module.new(spec, params)}
+    end
+  end
+
+  @spec decode(binary()) ::
+          {:ok, Command.t()} | {:error, DecodeError.t() | ZWaveError.t()}
+  def decode(<<0x00>>) do
+    create(:no_operation, [])
+  end
+
+  def decode(<<cc_byte, command_byte, params::binary>> = binary) do
+    if !Keyword.has_key?(Logger.metadata(), :zwave_command) do
+      Logger.metadata(zwave_command: inspect(binary, base: :hex, limit: 100))
+    end
+
+    with {:ok, spec} <- spec_for(cc_byte, command_byte),
+         {:ok, decoded_params} <- spec.module.decode_params(params) do
+      spec.module.new(decoded_params)
+    else
+      {:error, :unknown_command} -> {:error, %ZWaveError{binary: binary}}
+      {:error, %DecodeError{}} = err -> err
     end
   end
 
@@ -644,13 +778,36 @@ defmodule Grizzly.ZWave.Commands do
   """
   @spec supports_supervision?(Grizzly.command()) :: boolean()
   def supports_supervision?(command_name) do
-    {module, default_opts} = handler(command_name)
-    module == AckResponse && default_opts[:supports_supervision?] != false
+    case Map.fetch(builtin_commands(), command_name) do
+      {:ok, %CommandSpec{supports_supervision?: v}} -> v
+      :error -> false
+    end
   end
 
   @spec format_handler_spec(module() | Grizzly.handler_spec()) :: Grizzly.handler_spec()
   def format_handler_spec({_handler, _args} = spec), do: spec
   def format_handler_spec(handler), do: {handler, []}
 
-  def dump(), do: @table
+  @doc false
+  def __after_verify__(module) do
+    commands = Enum.reverse(module.builtin_commands())
+
+    Enum.each(commands, fn {_name, command_spec} ->
+      {file, line} = Keyword.get(@command_spec_def_locations, command_spec.name)
+
+      case CommandSpec.validate(command_spec) do
+        {:ok, _} ->
+          :ok
+
+        {:error, reason} ->
+          IO.warn(
+            Exception.format(:error, reason),
+            module: __MODULE__,
+            function: {:command, 3},
+            file: file,
+            line: line
+          )
+      end
+    end)
+  end
 end
