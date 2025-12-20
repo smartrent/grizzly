@@ -197,15 +197,6 @@ defmodule Grizzly.ZWave.Commands do
     command :indicator_description_report, 0x07
   end
 
-  command_class :mailbox do
-    command :mailbox_configuration_get, 0x01
-    command :mailbox_configuration_set, 0x02
-    command :mailbox_configuration_report, 0x03
-    command :mailbox_queue, 0x04
-    command :mailbox_wake_up_notification, 0x05
-    command :mailbox_node_failing, 0x06
-  end
-
   command_class :manufacturer_specific do
     command :manufacturer_specific_get, 0x04
     command :manufacturer_specific_report, 0x05
