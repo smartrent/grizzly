@@ -6,6 +6,9 @@ defmodule Grizzly.Requests.Handlers.WaitReport do
   @behaviour Grizzly.Requests.Handler
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
+
+  require Logger
 
   @type state :: %{complete_report: atom(), get_command: Command.t()}
 
@@ -34,10 +37,15 @@ defmodule Grizzly.Requests.Handlers.WaitReport do
   end
 
   defp report_matches_get?(get, report) do
-    if function_exported?(get.impl, :report_matches_get?, 2) do
-      get.impl.report_matches_get?(get, report)
+    with {:ok, spec} <- Commands.spec_for(get.name),
+         {mod, fun} <- spec.report_matcher_fun do
+      apply(mod, fun, [get, report])
     else
-      true
+      {:error, :unknown_command} ->
+        true
+
+      nil ->
+        true
     end
   end
 end

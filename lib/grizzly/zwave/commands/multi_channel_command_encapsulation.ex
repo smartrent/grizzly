@@ -10,8 +10,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
 
     * `:destination_end_point` - the destination End Point. (defaults to 0 - - if 0, source_end_point must be non-zero)
 
-    * `:command_class` - the command class of the command sent (required)
-
     * `:command` - the name of the command (required)
 
     * `:parameters` - the command parameters (required)
@@ -30,7 +28,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
           {:source_end_point, MultiChannel.end_point()}
           | {:destination_end_point, MultiChannel.end_point()}
           | {:bit_address?, boolean()}
-          | {:command_class, CommandClasses.command_class()}
           | {:command, atom()}
           | {:parameters, Command.params()}
 
@@ -54,23 +51,13 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
     source_end_point = Command.param(command, :source_end_point, 0)
     destination_end_point = Command.param(command, :destination_end_point, 0)
     bit_address? = Command.param(command, :bit_address?, false)
-    command_class = Command.param!(command, :command_class)
     encapsulated_command_name = Command.param!(command, :command)
     parameters = Command.param!(command, :parameters)
     destination_end_point_byte = encode_destination_end_point(destination_end_point, bit_address?)
-    encoded_command_class = CommandClasses.to_byte(command_class)
     encapsulated_command = make_command(encapsulated_command_name, parameters)
-    encapsulated_parameters = encapsulated_command.impl.encode_params(encapsulated_command)
-    encapsulated_command_byte = encapsulated_command.command_byte
 
-    if encapsulated_command_byte == nil do
-      # The no_operation command has no command byte
-      <<0x00::1, source_end_point::7, destination_end_point_byte, encoded_command_class>>
-    else
-      <<0x00::1, source_end_point::7, destination_end_point_byte, encoded_command_class,
-        encapsulated_command_byte>>
-    end <>
-      encapsulated_parameters
+    <<0x00::1, source_end_point::7, destination_end_point_byte>> <>
+      Grizzly.ZWave.to_binary(encapsulated_command)
   end
 
   @impl Grizzly.ZWave.Command
