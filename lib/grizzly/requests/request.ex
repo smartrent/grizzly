@@ -111,8 +111,7 @@ defmodule Grizzly.Requests.Request do
 
     case zwave_command.name do
       :keep_alive ->
-        <<zwave_command.command_class.byte(), zwave_command.command_byte>> <>
-          ZWaveCommand.encode_params(zwave_command)
+        Grizzly.ZWave.to_binary(zwave_command)
 
       _other ->
         opts = make_zip_packet_command_opts(request)
