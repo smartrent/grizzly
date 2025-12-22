@@ -92,7 +92,7 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       report_matcher_fun: [
-        type: {:or, [{:tuple, [:atom, :atom]}, nil]},
+        type: {:or, [{:custom, __MODULE__, :validate_fun, [2]}, nil]},
         required: false,
         doc: """
         A 2-arity function or `{module, function}` tuple used to match a
@@ -149,14 +149,15 @@ defmodule Grizzly.ZWave.CommandSpec do
   @schema schema
 
   @typedoc "#{NimbleOptions.docs(schema)}"
+
   @type t :: %__MODULE__{
           name: atom(),
           command_class: atom(),
           command_byte: byte(),
           module: module(),
-          encode_fun: (Command.t() -> binary()) | {module(), atom()},
-          decode_fun: (binary() -> {:ok, keyword()} | {:error, any()}) | {module(), atom()},
-          report_matcher_fun: report_matcher() | nil,
+          encode_fun: {module(), atom()},
+          decode_fun: {module(), atom()},
+          report_matcher_fun: {module(), atom()} | nil,
           report: atom() | nil,
           handler: {module(), keyword()},
           supports_supervision?: boolean(),
@@ -233,7 +234,8 @@ defmodule Grizzly.ZWave.CommandSpec do
         [
           module: module,
           encode_fun: {module, :encode_params},
-          decode_fun: {module, :decode_params}
+          decode_fun: {module, :decode_params},
+          report_matcher_fun: report_matcher_fun_from_module(module)
         ] ++ fields
       end
 
@@ -311,6 +313,14 @@ defmodule Grizzly.ZWave.CommandSpec do
       String.ends_with?(c, "_report") -> true
       String.ends_with?(c, "_get") -> false
       true -> false
+    end
+  end
+
+  defp report_matcher_fun_from_module(module) do
+    if Code.ensure_loaded?(module) and function_exported?(module, :report_matches_get?, 2) do
+      {module, :report_matches_get?}
+    else
+      nil
     end
   end
 end
