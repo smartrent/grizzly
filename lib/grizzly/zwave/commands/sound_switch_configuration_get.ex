@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchConfigurationGet do
       name: :sound_switch_configuration_get,
       command_byte: 0x06,
       command_class: SoundSwitch,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

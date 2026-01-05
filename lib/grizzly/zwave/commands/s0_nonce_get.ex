@@ -13,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.S0NonceGet do
       name: :s0_nonce_get,
       command_byte: 0x40,
       command_class: S0,
-      params: [],
-      impl: __MODULE__
+      params: []
     }
 
     {:ok, command}

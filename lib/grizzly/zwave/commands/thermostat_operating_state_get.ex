@@ -19,8 +19,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatOperatingStateGet do
     command = %Command{
       name: :thermostat_operating_state_get,
       command_byte: 0x02,
-      command_class: ThermostatOperatingState,
-      impl: __MODULE__
+      command_class: ThermostatOperatingState
     }
 
     {:ok, command}

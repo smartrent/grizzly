@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpNoMoreInformation do
     command = %Command{
       name: :wake_up_no_more_information,
       command_byte: 0x08,
-      command_class: WakeUp,
-      impl: __MODULE__
+      command_class: WakeUp
     }
 
     {:ok, command}

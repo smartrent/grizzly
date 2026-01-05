@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.BasicGet do
     command = %Command{
       name: :basic_get,
       command_byte: 0x02,
-      command_class: Basic,
-      impl: __MODULE__
+      command_class: Basic
     }
 
     {:ok, command}

@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteGet do
       name: :priority_route_get,
       command_byte: 0x02,
       command_class: NetworkManagementInstallationMaintenance,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

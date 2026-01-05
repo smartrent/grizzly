@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
       name: :switch_binary_set,
       command_byte: 0x01,
       command_class: SwitchBinary,
-      params: opts,
-      impl: __MODULE__
+      params: opts
     }
 
     {:ok, command}

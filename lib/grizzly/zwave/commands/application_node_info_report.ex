@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoReport do
       name: :application_node_info_report,
       command_byte: 0x0D,
       command_class: ZIPGateway,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

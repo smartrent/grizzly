@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.TimeParametersGet do
     command = %Command{
       name: :time_parameters_get,
       command_byte: 0x02,
-      command_class: TimeParameters,
-      impl: __MODULE__
+      command_class: TimeParameters
     }
 
     {:ok, command}

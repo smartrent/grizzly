@@ -38,8 +38,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
       name: :multi_channel_capability_report,
       command_byte: 0x0A,
       command_class: MultiChannel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

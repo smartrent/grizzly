@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationSet do
       name: :door_lock_operation_set,
       command_byte: 0x01,
       command_class: DoorLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

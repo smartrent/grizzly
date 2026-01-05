@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.DateGet do
     command = %Command{
       name: :date_get,
       command_byte: 0x03,
-      command_class: Time,
-      impl: __MODULE__
+      command_class: Time
     }
 
     {:ok, command}

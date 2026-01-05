@@ -35,8 +35,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet do
       name: :schedule_entry_lock_time_offset_set,
       command_byte: 0x0D,
       command_class: ScheduleEntryLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

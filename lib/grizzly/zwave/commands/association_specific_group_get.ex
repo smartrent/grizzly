@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupGet do
       name: :association_specific_group_get,
       command_byte: 0x0B,
       command_class: Association,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

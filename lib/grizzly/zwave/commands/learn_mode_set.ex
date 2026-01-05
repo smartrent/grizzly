@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
       name: :learn_mode_set,
       command_byte: 0x01,
       command_class: NetworkManagementBasicNode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

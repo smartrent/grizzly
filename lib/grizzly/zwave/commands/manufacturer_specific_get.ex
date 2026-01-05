@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificGet do
     command = %Command{
       name: :manufacturer_specific_get,
       command_byte: 0x04,
-      command_class: ManufacturerSpecific,
-      impl: __MODULE__
+      command_class: ManufacturerSpecific
     }
 
     {:ok, command}

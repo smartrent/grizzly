@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlOperatingStateReport do
       name: :humidity_control_operating_state_report,
       command_byte: 0x02,
       command_class: HumidityControlOperatingState,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListGet do
       name: :failed_node_list_get,
       command_byte: 0x0B,
       command_class: NetworkManagementProxy,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

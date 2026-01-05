@@ -28,8 +28,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStarted do
       name: :smart_start_join_started,
       command_byte: 0x15,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

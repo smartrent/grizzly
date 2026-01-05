@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.AdminCodeReport do
       name: :admin_code_report,
       command_byte: 0x10,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

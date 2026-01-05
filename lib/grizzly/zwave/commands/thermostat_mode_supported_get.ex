@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedGet do
     command = %Command{
       name: :thermostat_mode_supported_get,
       command_byte: 0x04,
-      command_class: ThermostatMode,
-      impl: __MODULE__
+      command_class: ThermostatMode
     }
 
     {:ok, command}

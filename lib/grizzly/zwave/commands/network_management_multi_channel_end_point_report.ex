@@ -41,8 +41,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport do
       name: :network_management_multi_channel_end_point_report,
       command_byte: 0x06,
       command_class: NetworkManagementProxy,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

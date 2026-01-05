@@ -246,6 +246,10 @@ defmodule Grizzly.ZWave.Commands do
     command :multi_channel_association_groupings_report, 0x06
   end
 
+  command_class :multi_cmd do
+    command :multi_command_encapsulated, 0x01, Cmds.MultiCommandEncapsulated
+  end
+
   command_class :network_management_basic_node do
     command :learn_mode_set, 0x01, report: :learn_mode_set_status
     command :learn_mode_set_status, 0x02

@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.VersionCapabilitiesReport do
       name: :version_capabilities_report,
       command_byte: 0x16,
       command_class: Version,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

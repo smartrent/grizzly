@@ -29,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.MeterReset do
       name: :meter_reset,
       command_byte: 0x05,
       command_class: Meter,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

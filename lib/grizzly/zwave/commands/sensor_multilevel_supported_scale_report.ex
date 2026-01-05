@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
       name: :sensor_multilevel_supported_scale_report,
       command_byte: 0x06,
       command_class: SensorMultilevel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

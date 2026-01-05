@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorGet do
       name: :indicator_get,
       command_byte: 0x02,
       command_class: Indicator,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

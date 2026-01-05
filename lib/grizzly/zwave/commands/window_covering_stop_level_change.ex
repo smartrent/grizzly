@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStopLevelChange do
       name: :window_covering_stop_level_change,
       command_byte: 0x07,
       command_class: WindowCovering,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

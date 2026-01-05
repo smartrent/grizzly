@@ -31,8 +31,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeReport do
       name: :powerlevel_test_node_report,
       command_byte: 0x06,
       command_class: Powerlevel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

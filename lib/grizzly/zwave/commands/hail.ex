@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.Hail do
       name: :hail,
       command_byte: 0x01,
       command_class: Hail,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

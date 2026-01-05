@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorReport do
       name: :barrier_operator_report,
       command_byte: 0x03,
       command_class: BarrierOperator,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

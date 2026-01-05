@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsGet do
       name: :statistics_get,
       command_byte: 0x04,
       command_class: NetworkManagementInstallationMaintenance,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

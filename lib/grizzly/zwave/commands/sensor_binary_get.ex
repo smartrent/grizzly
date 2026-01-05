@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryGet do
       name: :sensor_binary_get,
       command_byte: 0x02,
       command_class: SensorBinary,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

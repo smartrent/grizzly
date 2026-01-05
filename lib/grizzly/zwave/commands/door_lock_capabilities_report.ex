@@ -48,8 +48,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
       name: :door_lock_capabilities_report,
       command_byte: 0x08,
       command_class: DoorLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

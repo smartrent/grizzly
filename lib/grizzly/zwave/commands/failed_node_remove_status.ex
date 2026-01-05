@@ -38,8 +38,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemoveStatus do
       name: :failed_node_remove_status,
       command_byte: 0x08,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.S2NonceGet do
       name: :s2_nonce_get,
       command_byte: 0x01,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

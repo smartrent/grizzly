@@ -29,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStartLevelChange do
       name: :window_covering_start_level_change,
       command_byte: 0x06,
       command_class: WindowCovering,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

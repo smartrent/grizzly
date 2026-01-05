@@ -63,8 +63,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
       name: :node_info_cached_report,
       command_byte: 0x04,
       command_class: NetworkManagementProxy,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

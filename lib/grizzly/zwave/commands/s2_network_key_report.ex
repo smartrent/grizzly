@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.S2NetworkKeyReport do
       name: :s2_network_key_report,
       command_byte: 0x0A,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

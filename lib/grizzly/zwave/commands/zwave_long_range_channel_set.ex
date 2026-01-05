@@ -28,7 +28,6 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelSet do
       name: :zwave_long_range_channel_set,
       command_byte: 0x0A,
       command_class: NetworkManagementInstallationMaintenance,
-      impl: __MODULE__,
       params: params
     }
 

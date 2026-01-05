@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpNotification do
     command = %Command{
       name: :wake_up_notification,
       command_byte: 0x07,
-      command_class: WakeUp,
-      impl: __MODULE__
+      command_class: WakeUp
     }
 
     {:ok, command}

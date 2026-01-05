@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
       name: :thermostat_setpoint_set,
       command_byte: 0x01,
       command_class: ThermostatSetpoint,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

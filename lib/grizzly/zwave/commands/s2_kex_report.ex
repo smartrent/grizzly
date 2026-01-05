@@ -36,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.S2KexReport do
       name: :s2_kex_report,
       command_byte: 0x05,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

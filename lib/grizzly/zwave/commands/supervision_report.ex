@@ -34,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
       name: :supervision_report,
       command_byte: 0x02,
       command_class: Supervision,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

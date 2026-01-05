@@ -34,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfSet do
       name: :scene_actuator_conf_set,
       command_byte: 0x01,
       command_class: SceneActuatorConf,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemove do
       name: :multi_channel_association_remove,
       command_byte: 0x04,
       command_class: MultiChannelAssociation,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

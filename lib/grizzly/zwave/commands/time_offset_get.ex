@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetGet do
     command = %Command{
       name: :time_offset_get,
       command_byte: 0x06,
-      command_class: Time,
-      impl: __MODULE__
+      command_class: Time
     }
 
     {:ok, command}

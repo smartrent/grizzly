@@ -42,8 +42,7 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
       name: :meter_report,
       command_byte: 0x02,
       command_class: Meter,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -29,7 +29,6 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport do
       name: :zwave_long_range_channel_report,
       command_byte: 0x0E,
       command_class: NetworkManagementInstallationMaintenance,
-      impl: __MODULE__,
       params: params
     }
 

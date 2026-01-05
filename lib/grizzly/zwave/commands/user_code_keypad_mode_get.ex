@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeKeypadModeGet do
     command = %Command{
       name: :user_code_keypad_mode_get,
       command_byte: 0x09,
-      command_class: UserCode,
-      impl: __MODULE__
+      command_class: UserCode
     }
 
     {:ok, command}

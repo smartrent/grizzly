@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGet do
       name: :multi_channel_association_get,
       command_byte: 0x02,
       command_class: MultiChannelAssociation,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

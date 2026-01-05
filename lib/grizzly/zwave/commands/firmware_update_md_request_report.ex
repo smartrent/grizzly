@@ -32,8 +32,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
       name: :firmware_update_md_request_report,
       command_byte: 0x04,
       command_class: FirmwareUpdateMD,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

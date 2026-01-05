@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupReport do
       name: :association_specific_group_report,
       command_byte: 0x0C,
       command_class: Association,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

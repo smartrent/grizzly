@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.VersionZWaveSoftwareGet do
     command = %Command{
       name: :version_zwave_software_get,
       command_byte: 0x17,
-      command_class: Version,
-      impl: __MODULE__
+      command_class: Version
     }
 
     {:ok, command}

@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.S0NetworkKeyVerify do
       name: :s0_network_key_verify,
       command_byte: 0x07,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.BasicSet do
       name: :basic_set,
       command_byte: 0x01,
       command_class: Basic,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

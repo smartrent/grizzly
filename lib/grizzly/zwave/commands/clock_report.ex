@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.ClockReport do
       name: :clock_report,
       command_byte: 0x06,
       command_class: Clock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

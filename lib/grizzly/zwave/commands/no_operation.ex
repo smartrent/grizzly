@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.NoOperation do
     command = %Command{
       name: :no_operation,
       command_byte: nil,
-      command_class: NoOperation,
-      impl: __MODULE__
+      command_class: NoOperation
     }
 
     {:ok, command}

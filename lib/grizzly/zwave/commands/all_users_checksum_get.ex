@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.AllUsersChecksumGet do
       name: :all_users_checksum_get,
       command_byte: 0x14,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

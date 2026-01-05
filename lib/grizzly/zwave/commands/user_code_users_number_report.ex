@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
       name: :user_code_users_number_report,
       command_byte: 0x05,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

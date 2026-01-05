@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificGet do
       name: :manufacturer_specific_device_specific_get,
       command_byte: 0x06,
       command_class: ManufacturerSpecific,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

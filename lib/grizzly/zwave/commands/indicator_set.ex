@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSet do
       name: :indicator_set,
       command_byte: 0x01,
       command_class: Indicator,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

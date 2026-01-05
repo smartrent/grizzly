@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedGet do
     command = %Command{
       name: :schedule_entry_type_supported_get,
       command_byte: 0x09,
-      command_class: ScheduleEntryLock,
-      impl: __MODULE__
+      command_class: ScheduleEntryLock
     }
 
     {:ok, command}

@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
       name: :node_provisioning_set,
       command_byte: 0x01,
       command_class: NodeProvisioning,
-      params: params_with_defaults(params),
-      impl: __MODULE__
+      params: params_with_defaults(params)
     }
 
     {:ok, command}

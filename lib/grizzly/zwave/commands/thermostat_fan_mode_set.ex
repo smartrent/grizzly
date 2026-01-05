@@ -26,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanModeSet do
       name: :thermostat_fan_mode_set,
       command_byte: 0x01,
       command_class: ThermostatFanMode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

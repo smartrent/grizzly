@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.NodeLocationReport do
       name: :node_location_report,
       command_byte: 0x06,
       command_class: NodeNaming,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -49,8 +49,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
       name: :zip_packet,
       command_byte: 0x02,
       command_class: ZIP,
-      params: Keyword.merge(@default_params, params),
-      impl: __MODULE__
+      params: Keyword.merge(@default_params, params)
     }
 
     {:ok, command}

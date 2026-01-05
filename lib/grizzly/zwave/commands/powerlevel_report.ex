@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.PowerlevelReport do
       name: :powerlevel_report,
       command_byte: 0x03,
       command_class: Powerlevel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

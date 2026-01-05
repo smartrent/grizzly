@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelGet do
     command = %Command{
       name: :zwave_long_range_channel_get,
       command_byte: 0x0D,
-      command_class: NetworkManagementInstallationMaintenance,
-      impl: __MODULE__
+      command_class: NetworkManagementInstallationMaintenance
     }
 
     {:ok, command}

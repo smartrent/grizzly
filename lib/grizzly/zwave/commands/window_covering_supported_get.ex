@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedGet do
     command = %Command{
       name: :window_covering_supported_get,
       command_byte: 0x01,
-      command_class: WindowCovering,
-      impl: __MODULE__
+      command_class: WindowCovering
     }
 
     {:ok, command}

@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.S0SecuritySchemeInherit do
       name: :s0_security_scheme_inherit,
       command_byte: 0x08,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

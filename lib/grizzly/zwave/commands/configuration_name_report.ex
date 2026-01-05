@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationNameReport do
       name: :configuration_name_report,
       command_byte: 0x0B,
       command_class: Configuration,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

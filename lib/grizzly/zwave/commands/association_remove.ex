@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.AssociationRemove do
       name: :association_remove,
       command_byte: 0x04,
       command_class: Association,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

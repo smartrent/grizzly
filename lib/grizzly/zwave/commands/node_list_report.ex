@@ -19,8 +19,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
       name: :node_list_report,
       command_byte: 0x02,
       command_class: NetworkManagementProxy,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

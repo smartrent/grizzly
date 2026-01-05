@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryGet do
     command = %Command{
       name: :switch_binary_get,
       command_byte: 0x02,
-      command_class: SwitchBinary,
-      impl: __MODULE__
+      command_class: SwitchBinary
     }
 
     {:ok, command}

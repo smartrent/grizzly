@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
       name: :rssi_report,
       command_byte: 0x08,
       command_class: NetworkManagementInstallationMaintenance,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

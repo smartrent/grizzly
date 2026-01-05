@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
       name: :s0_commands_supported_report,
       command_byte: 0x03,
       command_class: S0,
-      params: put_defaults(params),
-      impl: __MODULE__
+      params: put_defaults(params)
     }
 
     {:ok, command}

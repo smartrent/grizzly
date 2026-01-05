@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkGet do
       name: :configuration_bulk_get,
       command_byte: 0x08,
       command_class: Configuration,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

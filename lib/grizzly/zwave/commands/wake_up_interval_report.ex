@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalReport do
       name: :wake_up_interval_report,
       command_byte: 0x06,
       command_class: WakeUp,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.S2NetworkKeyVerify do
       name: :s2_network_key_verify,
       command_byte: 0x0B,
       command_class: Security2,
-      params: [],
-      impl: __MODULE__
+      params: []
     }
 
     {:ok, command}

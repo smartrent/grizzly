@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
       name: :application_busy,
       command_byte: 0x01,
       command_class: ApplicationStatus,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

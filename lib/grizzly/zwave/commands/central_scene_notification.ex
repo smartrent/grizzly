@@ -37,8 +37,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
       name: :central_scene_notification,
       command_byte: 0x03,
       command_class: CentralScene,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

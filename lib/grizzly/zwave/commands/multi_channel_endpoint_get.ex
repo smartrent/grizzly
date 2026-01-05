@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointGet do
     command = %Command{
       name: :multi_channel_endpoint_get,
       command_byte: 0x07,
-      command_class: MultiChannel,
-      impl: __MODULE__
+      command_class: MultiChannel
     }
 
     {:ok, command}

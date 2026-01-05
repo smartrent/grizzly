@@ -28,8 +28,7 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
       name: :alarm_get,
       command_byte: 0x04,
       command_class: Alarm,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

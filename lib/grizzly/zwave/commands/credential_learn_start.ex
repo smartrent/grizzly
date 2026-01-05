@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStart do
       name: :credential_learn_start,
       command_byte: 0x0F,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

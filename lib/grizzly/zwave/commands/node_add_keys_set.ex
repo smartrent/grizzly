@@ -29,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
       name: :node_add_keys_set,
       command_byte: 0x12,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

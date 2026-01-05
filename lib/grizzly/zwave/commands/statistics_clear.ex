@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsClear do
       name: :statistics_clear,
       command_byte: 0x06,
       command_class: NetworkManagementInstallationMaintenance,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSet do
       name: :schedule_entry_lock_enable_all_set,
       command_byte: 0x02,
       command_class: ScheduleEntryLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

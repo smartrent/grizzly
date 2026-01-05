@@ -57,8 +57,7 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetReport do
       name: :time_offset_report,
       command_byte: 0x07,
       command_class: Time,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

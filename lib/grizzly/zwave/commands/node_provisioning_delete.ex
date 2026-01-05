@@ -32,8 +32,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
       name: :node_provisioning_delete,
       command_byte: 0x02,
       command_class: NodeProvisioning,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

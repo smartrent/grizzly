@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.S2TransferEnd do
       name: :s2_transfer_end,
       command_byte: 0x0C,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedGet do
       name: :central_scene_supported_get,
       command_byte: 0x01,
       command_class: CentralScene,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

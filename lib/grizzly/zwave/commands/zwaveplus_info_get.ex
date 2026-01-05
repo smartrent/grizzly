@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoGet do
       name: :zwaveplus_info_get,
       command_byte: 0x01,
       command_class: ZwaveplusInfo,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

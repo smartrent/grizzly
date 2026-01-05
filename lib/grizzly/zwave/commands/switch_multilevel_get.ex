@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelGet do
     command = %Command{
       name: :switch_multilevel_get,
       command_byte: 0x02,
-      command_class: SwitchMultilevel,
-      impl: __MODULE__
+      command_class: SwitchMultilevel
     }
 
     {:ok, command}

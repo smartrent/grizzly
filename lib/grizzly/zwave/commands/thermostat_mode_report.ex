@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeReport do
       name: :thermostat_mode_report,
       command_byte: 0x03,
       command_class: ThermostatMode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

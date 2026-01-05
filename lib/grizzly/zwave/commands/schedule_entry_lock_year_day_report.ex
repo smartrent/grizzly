@@ -57,8 +57,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport do
       name: :schedule_entry_lock_year_day_report,
       command_byte: 0x08,
       command_class: ScheduleEntryLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

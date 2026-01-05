@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteReport do
       name: :priority_route_report,
       command_byte: 0x03,
       command_class: NMIM,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

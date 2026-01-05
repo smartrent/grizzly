@@ -34,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
       name: :node_add,
       command_byte: 0x01,
       command_class: NMI,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

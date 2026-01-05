@@ -19,8 +19,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackGet do
     command = %Command{
       name: :thermostat_setback_get,
       command_byte: 0x02,
-      command_class: ThermostatSetback,
-      impl: __MODULE__
+      command_class: ThermostatSetback
     }
 
     {:ok, command}

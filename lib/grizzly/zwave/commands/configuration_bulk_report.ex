@@ -40,8 +40,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
       name: :configuration_bulk_report,
       command_byte: 0x09,
       command_class: Configuration,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

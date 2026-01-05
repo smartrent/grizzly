@@ -13,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.S0NonceReport do
       name: :s0_nonce_report,
       command_byte: 0x80,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

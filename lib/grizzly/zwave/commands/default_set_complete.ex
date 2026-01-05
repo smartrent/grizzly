@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
       name: :default_set_complete,
       command_byte: 0x07,
       command_class: NetworkManagementBasicNode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

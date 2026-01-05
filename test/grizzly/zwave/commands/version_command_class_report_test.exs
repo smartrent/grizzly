@@ -10,8 +10,7 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
             %Command{
               name: :version_command_class_report,
               command_byte: 0x14,
-              command_class: Version,
-              impl: VersionCommandClassReport
+              command_class: Version
             }} = VersionCommandClassReport.new(command_class: :switch_binary, version: 2)
   end
 

@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedReport do
       name: :s2_commands_supported_report,
       command_byte: 0x0E,
       command_class: Security2,
-      params: put_defaults(params),
-      impl: __MODULE__
+      params: put_defaults(params)
     }
 
     {:ok, command}

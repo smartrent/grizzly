@@ -13,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.S0MessageEncapsulation do
       name: :s0_message_encapsulation,
       command_byte: 0x81,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

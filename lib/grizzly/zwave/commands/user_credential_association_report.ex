@@ -44,8 +44,7 @@ defmodule Grizzly.ZWave.Commands.UserCredentialAssociationReport do
       name: :user_credential_association_report,
       command_byte: 0x13,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}
