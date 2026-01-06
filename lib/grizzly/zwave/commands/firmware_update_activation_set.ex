@@ -36,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSet do
       name: :firmware_update_activation_set,
       command_byte: 0x08,
       command_class: FirmwareUpdateMD,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

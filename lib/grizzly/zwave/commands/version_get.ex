@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.VersionGet do
     command = %Command{
       name: :version_get,
       command_byte: 0x11,
-      command_class: Version,
-      impl: __MODULE__
+      command_class: Version
     }
 
     {:ok, command}

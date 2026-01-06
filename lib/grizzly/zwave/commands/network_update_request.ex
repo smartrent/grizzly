@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequest do
       name: :network_update_request,
       command_byte: 0x03,
       command_class: NetworkManagementBasicNode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

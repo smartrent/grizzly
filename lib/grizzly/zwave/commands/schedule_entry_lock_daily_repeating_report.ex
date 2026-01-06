@@ -43,8 +43,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport do
       name: :schedule_entry_lock_daily_repeating_report,
       command_byte: 0x0F,
       command_class: ScheduleEntryLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

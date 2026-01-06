@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonePlayReport do
       name: :sound_switch_tone_play_report,
       command_byte: 0x0A,
       command_class: SoundSwitch,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

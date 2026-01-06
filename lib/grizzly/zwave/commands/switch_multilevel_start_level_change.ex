@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
       name: :switch_multilevel_start_level_change,
       command_byte: 0x04,
       command_class: SwitchMultilevel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

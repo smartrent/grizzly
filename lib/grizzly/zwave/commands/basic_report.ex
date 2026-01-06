@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
       name: :basic_report,
       command_byte: 0x03,
       command_class: Basic,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

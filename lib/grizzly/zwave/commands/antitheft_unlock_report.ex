@@ -36,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
       name: :antitheft_unlock_report,
       command_byte: 0x02,
       command_class: AntitheftUnlock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

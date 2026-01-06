@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
       name: :multi_command_encapsulated,
       command_byte: 0x01,
       command_class: MultiCommand,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

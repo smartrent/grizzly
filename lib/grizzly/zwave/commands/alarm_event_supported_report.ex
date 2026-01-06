@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReport do
       name: :alarm_event_supported_report,
       command_byte: 0x02,
       command_class: Alarm,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

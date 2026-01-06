@@ -13,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.SensorBinarySupportedSensorGet do
     command = %Command{
       name: :sensor_binary_supported_sensor_get,
       command_byte: 0x01,
-      command_class: SensorBinary,
-      impl: __MODULE__
+      command_class: SensorBinary
     }
 
     {:ok, command}

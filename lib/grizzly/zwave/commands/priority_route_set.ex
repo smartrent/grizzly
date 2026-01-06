@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteSet do
       name: :priority_route_set,
       command_byte: 0x01,
       command_class: NMIM,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
       name: :manufacturer_specific_report,
       command_byte: 0x05,
       command_class: ManufacturerSpecific,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedGet do
       name: :s0_commands_supported_get,
       command_byte: 0x02,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

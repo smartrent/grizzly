@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesGet do
     command = %Command{
       name: :user_code_capabilities_get,
       command_byte: 0x06,
-      command_class: UserCode,
-      impl: __MODULE__
+      command_class: UserCode
     }
 
     {:ok, command}

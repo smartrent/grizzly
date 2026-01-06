@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGet do
       name: :node_provisioning_list_iteration_get,
       command_byte: 0x03,
       command_class: NodeProvisioning,
-      params: params_with_defaults(params),
-      impl: __MODULE__
+      params: params_with_defaults(params)
     }
 
     {:ok, command}

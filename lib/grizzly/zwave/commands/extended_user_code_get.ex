@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeGet do
       name: :extended_user_code_get,
       command_byte: 0x0C,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

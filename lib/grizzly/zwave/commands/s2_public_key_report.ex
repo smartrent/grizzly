@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.S2PublicKeyReport do
       name: :s2_public_key_report,
       command_byte: 0x08,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

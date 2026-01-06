@@ -19,8 +19,7 @@ defmodule Grizzly.ZWave.Commands.S0SecuritySchemeGet do
       name: :s0_security_scheme_get,
       command_byte: 0x04,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStopLevelChange do
       name: :switch_multilevel_stop_level_change,
       command_byte: 0x05,
       command_class: SwitchMultilevel,
-      params: [],
-      impl: __MODULE__
+      params: []
     }
 
     {:ok, command}

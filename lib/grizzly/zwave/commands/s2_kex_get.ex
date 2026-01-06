@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.S2KexGet do
       name: :s2_kex_get,
       command_byte: 0x04,
       command_class: Security2,
-      params: [],
-      impl: __MODULE__
+      params: []
     }
 
     {:ok, command}

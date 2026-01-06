@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGet do
       name: :network_management_multi_channel_capability_get,
       command_byte: 0x07,
       command_class: NetworkManagementProxy,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
       name: :sensor_multilevel_get,
       command_byte: 0x04,
       command_class: SensorMultilevel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

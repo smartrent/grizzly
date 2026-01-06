@@ -36,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
       name: :association_report,
       command_byte: 0x03,
       command_class: Association,
-      params: Keyword.merge(@default_params, params),
-      impl: __MODULE__
+      params: Keyword.merge(@default_params, params)
     }
 
     {:ok, command}

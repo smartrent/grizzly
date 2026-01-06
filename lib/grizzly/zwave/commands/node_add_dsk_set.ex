@@ -34,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
       name: :node_add_dsk_set,
       command_byte: 0x14,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

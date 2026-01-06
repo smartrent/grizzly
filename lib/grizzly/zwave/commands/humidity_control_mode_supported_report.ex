@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlModeSupportedReport do
       name: :humidity_control_mode_supported_report,
       command_byte: 0x05,
       command_class: HumidityControlMode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

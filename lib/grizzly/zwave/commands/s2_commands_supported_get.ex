@@ -15,8 +15,7 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedGet do
       name: :s2_commands_supported_get,
       command_byte: 0x0D,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

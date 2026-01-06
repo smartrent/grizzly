@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.SensorBinarySupportedSensorReport do
       name: :sensor_binary_supported_sensor_report,
       command_byte: 0x04,
       command_class: SensorBinary,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

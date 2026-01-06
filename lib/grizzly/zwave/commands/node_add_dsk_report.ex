@@ -42,8 +42,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
       name: :node_add_dsk_report,
       command_byte: 0x13,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

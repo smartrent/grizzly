@@ -181,8 +181,7 @@ defmodule Grizzly.ZWave.CommandSpec do
       name: spec.name,
       command_class: spec.command_class,
       command_byte: spec.command_byte,
-      params: Keyword.merge(spec.default_params, params),
-      impl: spec.module
+      params: Keyword.merge(spec.default_params, params)
     }
 
     {:ok, cmd}

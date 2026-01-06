@@ -39,8 +39,7 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReport do
       name: :user_capabilities_report,
       command_byte: 0x02,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -53,8 +53,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
       name: :extended_node_add_status,
       command_byte: 0x16,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

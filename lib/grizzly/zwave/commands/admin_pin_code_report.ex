@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeReport do
       name: :admin_pin_code_report,
       command_byte: 0x1C,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

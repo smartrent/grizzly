@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationNameGet do
       name: :configuration_name_get,
       command_byte: 0x0A,
       command_class: Configuration,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

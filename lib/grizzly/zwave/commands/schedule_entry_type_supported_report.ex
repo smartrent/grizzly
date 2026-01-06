@@ -29,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
       name: :schedule_entry_type_supported_report,
       command_byte: 0x0A,
       command_class: ScheduleEntryLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

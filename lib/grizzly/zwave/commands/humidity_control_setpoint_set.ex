@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSet do
       name: :humidity_control_setpoint_set,
       command_byte: 0x01,
       command_class: HumidityControlSetpoint,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

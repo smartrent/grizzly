@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeKeypadModeReport do
       name: :user_code_keypad_mode_report,
       command_byte: 0x0A,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

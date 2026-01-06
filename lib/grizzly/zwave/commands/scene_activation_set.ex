@@ -28,8 +28,7 @@ defmodule Grizzly.ZWave.Commands.SceneActivationSet do
       name: :scene_activation_set,
       command_byte: 0x01,
       command_class: SceneActivation,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

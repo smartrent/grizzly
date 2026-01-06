@@ -4,6 +4,7 @@ defmodule Grizzly.ZWave.Command do
   """
 
   alias Grizzly.ZWave.CommandClass
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
 
   @type delay_seconds() :: non_neg_integer()
@@ -18,28 +19,25 @@ defmodule Grizzly.ZWave.Command do
   * `:command_byte` - the byte representation of the command
   * `:params` - the parameters for the command as outlined by the Z-Wave
     specification
-  * `:impl` - the module that implements the Command behaviour
+  * `:spec` - the command spec as defined in Grizzly.ZWave.Commands
   """
   @type t() :: %__MODULE__{
           name: atom(),
           command_class: CommandClass.t(),
           # Allow for the NoOperation command which has no command byte, only a command class byte
           command_byte: byte() | nil,
-          params: params(),
-          impl: module()
+          params: params()
         }
 
   @enforce_keys [
     :name,
     :command_class,
-    :command_byte,
-    :impl
+    :command_byte
   ]
   defstruct name: nil,
             command_byte: nil,
             command_class: nil,
-            params: [],
-            impl: nil
+            params: []
 
   @doc """
   Make a new `Command.t()` from the params provided
@@ -145,7 +143,8 @@ defmodule Grizzly.ZWave.Command do
     if command.params == [] do
       <<>>
     else
-      command.impl.encode_params(command)
+      {mod, fun} = Commands.spec_for!(command.name).encode_fun
+      apply(mod, fun, [command])
     end
   end
 

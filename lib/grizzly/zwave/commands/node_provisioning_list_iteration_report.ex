@@ -35,8 +35,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReport do
       name: :node_provisioning_list_iteration_report,
       command_byte: 0x04,
       command_class: NodeProvisioning,
-      params: params_with_defaults(params),
-      impl: __MODULE__
+      params: params_with_defaults(params)
     }
 
     {:ok, command}

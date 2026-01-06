@@ -56,8 +56,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
       name: :node_add_status,
       command_byte: 0x02,
       command_class: NMI,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
       name: :switch_binary_report,
       command_byte: 0x03,
       command_class: SwitchBinary,
-      params: opts,
-      impl: __MODULE__
+      params: opts
     }
 
     {:ok, command}

@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
       name: :node_remove,
       command_byte: 0x03,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

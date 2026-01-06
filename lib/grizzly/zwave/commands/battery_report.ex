@@ -44,8 +44,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
       name: :battery_report,
       command_byte: 0x03,
       command_class: Battery,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

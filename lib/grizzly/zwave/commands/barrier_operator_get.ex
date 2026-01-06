@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorGet do
     command = %Command{
       name: :barrier_operator_get,
       command_byte: 0x02,
-      command_class: BarrierOperator,
-      impl: __MODULE__
+      command_class: BarrierOperator
     }
 
     {:ok, command}

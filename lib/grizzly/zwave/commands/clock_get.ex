@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.ClockGet do
       name: :clock_get,
       command_byte: 0x05,
       command_class: Clock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

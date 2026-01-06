@@ -19,8 +19,7 @@ defmodule Grizzly.ZWave.Commands.AdminCodeGet do
       name: :admin_code_get,
       command_byte: 0x0F,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

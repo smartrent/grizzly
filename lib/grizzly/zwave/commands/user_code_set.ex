@@ -26,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeSet do
       name: :user_code_set,
       command_byte: 0x01,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

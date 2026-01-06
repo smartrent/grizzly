@@ -34,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSet do
       name: :credential_set,
       command_byte: 0x0A,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

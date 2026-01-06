@@ -52,8 +52,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
       name: :central_scene_supported_report,
       command_byte: 0x02,
       command_class: CentralScene,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

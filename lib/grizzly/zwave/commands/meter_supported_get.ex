@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedGet do
       name: :meter_supported_get,
       command_byte: 0x03,
       command_class: Meter,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

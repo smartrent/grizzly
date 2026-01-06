@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningGet do
       name: :node_provisioning_get,
       command_byte: 0x05,
       command_class: NodeProvisioning,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

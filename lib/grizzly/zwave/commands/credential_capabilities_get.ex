@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesGet do
       name: :credential_capabilities_get,
       command_byte: 0x03,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

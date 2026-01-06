@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.IncludedNIFReport do
       name: :included_nif_report,
       command_byte: 0x19,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

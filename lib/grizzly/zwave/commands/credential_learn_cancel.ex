@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnCancel do
       name: :credential_learn_cancel,
       command_byte: 0x10,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -16,8 +16,7 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeGet do
       name: :admin_pin_code_get,
       command_byte: 0x1B,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

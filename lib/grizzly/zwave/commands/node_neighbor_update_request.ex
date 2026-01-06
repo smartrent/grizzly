@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateRequest do
       name: :node_neighbor_update_request,
       command_byte: 0x0B,
       command_class: NetworkManagementInclusion,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

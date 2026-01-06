@@ -26,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.DateReport do
       name: :date_report,
       command_byte: 0x04,
       command_class: Time,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

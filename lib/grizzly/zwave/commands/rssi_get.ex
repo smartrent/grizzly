@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.RssiGet do
       name: :rssi_get,
       command_byte: 0x07,
       command_class: NetworkManagementInstallationMaintenance,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

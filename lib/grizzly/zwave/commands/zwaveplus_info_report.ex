@@ -37,8 +37,7 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReport do
       name: :zwaveplus_info_report,
       command_byte: 0x02,
       command_class: ZwaveplusInfo,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

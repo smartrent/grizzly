@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationDefaultReset do
     command = %Command{
       name: :configuration_default_reset,
       command_byte: 0x01,
-      command_class: Configuration,
-      impl: __MODULE__
+      command_class: Configuration
     }
 
     {:ok, command}

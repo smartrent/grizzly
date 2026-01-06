@@ -34,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
       name: :failed_node_replace,
       command_byte: 0x09,
       command_class: NMI,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -45,8 +45,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
       name: :schedule_entry_lock_week_day_set,
       command_byte: 0x03,
       command_class: ScheduleEntryLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

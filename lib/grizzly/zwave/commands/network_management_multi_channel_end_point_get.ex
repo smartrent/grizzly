@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet do
       name: :network_management_multi_channel_end_point_get,
       command_byte: 0x05,
       command_class: NetworkManagementProxy,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

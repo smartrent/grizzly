@@ -31,8 +31,7 @@ defmodule Grizzly.ZWave.Commands.S2KexSet do
       name: :s2_kex_set,
       command_byte: 0x06,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.AlarmSet do
       name: :alarm_set,
       command_byte: 0x06,
       command_class: Alarm,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

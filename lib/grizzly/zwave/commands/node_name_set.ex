@@ -22,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeNameSet do
       name: :node_name_set,
       command_byte: 0x01,
       command_class: NodeNaming,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

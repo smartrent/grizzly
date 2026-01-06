@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionGet do
       name: :supervision_get,
       command_byte: 0x01,
       command_class: Supervision,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

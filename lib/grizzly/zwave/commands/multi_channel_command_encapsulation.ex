@@ -38,8 +38,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
       name: :multi_channel_command_encapsulation,
       command_byte: 0x0D,
       command_class: MultiChannel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

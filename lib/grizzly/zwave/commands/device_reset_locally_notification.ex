@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.DeviceResetLocallyNotification do
       name: :device_reset_locally_notification,
       command_byte: 0x01,
       command_class: DeviceResetLocally,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

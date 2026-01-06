@@ -38,8 +38,7 @@ defmodule Grizzly.ZWave.Commands.TimeParametersSet do
       name: :time_parameters_set,
       command_byte: 0x01,
       command_class: TimeParameters,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

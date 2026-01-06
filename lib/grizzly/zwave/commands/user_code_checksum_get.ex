@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeChecksumGet do
       name: :user_code_checksum_get,
       command_byte: 0x11,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

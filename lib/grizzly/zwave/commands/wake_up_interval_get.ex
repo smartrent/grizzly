@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalGet do
     command = %Command{
       name: :wake_up_interval_get,
       command_byte: 0x05,
-      command_class: WakeUp,
-      impl: __MODULE__
+      command_class: WakeUp
     }
 
     {:ok, command}

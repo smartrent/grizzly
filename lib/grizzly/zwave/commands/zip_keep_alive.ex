@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
       name: :keep_alive,
       command_byte: 0x03,
       command_class: ZIP,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

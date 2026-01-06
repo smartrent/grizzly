@@ -36,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
       name: :multi_channel_endpoint_find_report,
       command_byte: 0x0C,
       command_class: MultiChannel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

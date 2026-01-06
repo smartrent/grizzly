@@ -13,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.S0NetworkKeySet do
       name: :s0_network_key_set,
       command_byte: 0x06,
       command_class: S0,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

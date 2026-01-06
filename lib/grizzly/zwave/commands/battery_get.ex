@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.BatteryGet do
     command = %Command{
       name: :battery_get,
       command_byte: 0x02,
-      command_class: Battery,
-      impl: __MODULE__
+      command_class: Battery
     }
 
     {:ok, command}

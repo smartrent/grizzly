@@ -40,8 +40,7 @@ defmodule Grizzly.ZWave.Commands.S2NonceReport do
       name: :s2_nonce_report,
       command_byte: 0x02,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

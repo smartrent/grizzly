@@ -54,8 +54,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
       name: :configuration_set,
       command_byte: 0x04,
       command_class: Configuration,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

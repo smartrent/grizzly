@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReport do
       name: :window_covering_supported_report,
       command_byte: 0x02,
       command_class: WindowCovering,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

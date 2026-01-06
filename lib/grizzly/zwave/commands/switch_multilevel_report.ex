@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
       name: :switch_multilevel_report,
       command_byte: 0x03,
       command_class: SwitchMultilevel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
       name: :node_information_send,
       command_byte: 0x05,
       command_class: NetworkManagementBasicNode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

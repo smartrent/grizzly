@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReport do
       name: :multi_channel_aggregated_members_report,
       command_byte: 0x0F,
       command_class: MultiChannel,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

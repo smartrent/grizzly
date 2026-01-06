@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
       name: :crc_16_encap,
       command_byte: 0x01,
       command_class: CRC16Encap,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

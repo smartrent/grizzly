@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationGet do
       name: :door_lock_configuration_get,
       command_byte: 0x05,
       command_class: DoorLock,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

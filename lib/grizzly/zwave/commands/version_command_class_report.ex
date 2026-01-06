@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReport do
       name: :version_command_class_report,
       command_byte: 0x14,
       command_class: Version,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

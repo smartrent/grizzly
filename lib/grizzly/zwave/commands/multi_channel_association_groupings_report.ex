@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport do
       name: :multi_channel_association_groupings_report,
       command_byte: 0x06,
       command_class: MultiChannelAssociation,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

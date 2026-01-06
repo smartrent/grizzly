@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationRejectedRequest do
       name: :application_rejected_request,
       command_byte: 0x02,
       command_class: ApplicationStatus,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

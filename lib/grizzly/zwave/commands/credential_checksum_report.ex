@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.CredentialChecksumReport do
       name: :credential_checksum_report,
       command_byte: 0x19,
       command_class: UserCredential,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

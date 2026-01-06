@@ -53,8 +53,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
       name: :s2_message_encapsulation,
       command_byte: 0x03,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

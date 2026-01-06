@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDGet do
     command = %Command{
       name: :firmware_md_get,
       command_byte: 0x01,
-      command_class: FirmwareUpdateMD,
-      impl: __MODULE__
+      command_class: FirmwareUpdateMD
     }
 
     {:ok, command}

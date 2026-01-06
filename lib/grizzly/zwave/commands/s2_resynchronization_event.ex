@@ -35,8 +35,7 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
       name: :s2_resynchronization_event,
       command_byte: 0x09,
       command_class: NetworkManagementInstallationMaintenance,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

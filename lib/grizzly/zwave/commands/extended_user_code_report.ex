@@ -26,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeReport do
       name: :extended_user_code_report,
       command_byte: 0x0D,
       command_class: UserCode,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

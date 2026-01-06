@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.S2KexFail do
       name: :s2_kex_fail,
       command_byte: 0x07,
       command_class: Security2,
-      params: params,
-      impl: __MODULE__
+      params: params
     }
 
     {:ok, command}

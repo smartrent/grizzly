@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
       name: :dsk_get,
       command_byte: 0x08,
       command_class: NetworkManagementBasicNode,
-      params: Keyword.merge(@default_params, params),
-      impl: __MODULE__
+      params: Keyword.merge(@default_params, params)
     }
 
     {:ok, command}
