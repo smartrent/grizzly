@@ -5,6 +5,9 @@ defmodule Grizzly.ZWave.CommandClasses do
 
   import Grizzly.ZWave.GeneratedMappings, only: [command_class_mappings: 0]
 
+  alias CommandClasses.NetworkManagementInstallationMaintenance, as: NMIM
+  alias Grizzly.ZWave.CommandClasses
+
   require Logger
 
   @type command_class_list :: [
@@ -15,6 +18,73 @@ defmodule Grizzly.ZWave.CommandClasses do
         ]
 
   @type command_class :: atom()
+
+  def cc_module!(command_class) do
+    case command_class do
+      :alarm -> CommandClasses.Alarm
+      :antitheft -> CommandClasses.Antitheft
+      :antitheft_unlock -> CommandClasses.AntitheftUnlock
+      :application_status -> CommandClasses.ApplicationStatus
+      :association -> CommandClasses.Association
+      :association_group_info -> CommandClasses.AssociationGroupInfo
+      :barrier_operator -> CommandClasses.BarrierOperator
+      :basic -> CommandClasses.Basic
+      :battery -> CommandClasses.Battery
+      :crc_16_encap -> CommandClasses.CRC16Encap
+      :central_scene -> CommandClasses.CentralScene
+      :clock -> CommandClasses.Clock
+      :configuration -> CommandClasses.Configuration
+      :device_reset_locally -> CommandClasses.DeviceResetLocally
+      :door_lock -> CommandClasses.DoorLock
+      :firmware_update_md -> CommandClasses.FirmwareUpdateMD
+      :hail -> CommandClasses.Hail
+      :humidity_control_mode -> CommandClasses.HumidityControlMode
+      :humidity_control_operating_state -> CommandClasses.HumidityControlOperatingState
+      :humidity_control_setpoint -> CommandClasses.HumidityControlSetpoint
+      :indicator -> CommandClasses.Indicator
+      :manufacturer_specific -> CommandClasses.ManufacturerSpecific
+      :meter -> CommandClasses.Meter
+      :multi_channel -> CommandClasses.MultiChannel
+      :multi_channel_association -> CommandClasses.MultiChannelAssociation
+      :multi_cmd -> CommandClasses.MultiCommand
+      :network_management_basic_node -> CommandClasses.NetworkManagementBasicNode
+      :network_management_inclusion -> CommandClasses.NetworkManagementInclusion
+      :network_management_installation_maintenance -> NMIM
+      :network_management_proxy -> CommandClasses.NetworkManagementProxy
+      :no_operation -> CommandClasses.NoOperation
+      :node_naming -> CommandClasses.NodeNaming
+      :node_provisioning -> CommandClasses.NodeProvisioning
+      :powerlevel -> CommandClasses.Powerlevel
+      :s0 -> CommandClasses.S0
+      :scene_activation -> CommandClasses.SceneActivation
+      :scene_actuator_conf -> CommandClasses.SceneActuatorConf
+      :schedule_entry_lock -> CommandClasses.ScheduleEntryLock
+      :security_2 -> CommandClasses.Security2
+      :sensor_binary -> CommandClasses.SensorBinary
+      :sensor_multilevel -> CommandClasses.SensorMultilevel
+      :sound_switch -> CommandClasses.SoundSwitch
+      :supervision -> CommandClasses.Supervision
+      :switch_binary -> CommandClasses.SwitchBinary
+      :switch_multilevel -> CommandClasses.SwitchMultilevel
+      :thermostat_fan_mode -> CommandClasses.ThermostatFanMode
+      :thermostat_fan_state -> CommandClasses.ThermostatFanState
+      :thermostat_mode -> CommandClasses.ThermostatMode
+      :thermostat_operating_state -> CommandClasses.ThermostatOperatingState
+      :thermostat_setback -> CommandClasses.ThermostatSetback
+      :thermostat_setpoint -> CommandClasses.ThermostatSetpoint
+      :time -> CommandClasses.Time
+      :time_parameters -> CommandClasses.TimeParameters
+      :user_code -> CommandClasses.UserCode
+      :user_credential -> CommandClasses.UserCredential
+      :version -> CommandClasses.Version
+      :wake_up -> CommandClasses.WakeUp
+      :window_covering -> CommandClasses.WindowCovering
+      :zip -> CommandClasses.ZIP
+      :zip_gateway -> CommandClasses.ZIPGateway
+      :zwaveplus_info -> CommandClasses.ZwaveplusInfo
+      _ -> raise ArgumentError, "Unknown command class: #{inspect(command_class)}"
+    end
+  end
 
   @doc """
   Get the byte representation of the command class

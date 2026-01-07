@@ -68,7 +68,7 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       encode_fun: [
-        type: {:custom, __MODULE__, :validate_fun, [1]},
+        type: {:custom, __MODULE__, :__validate_fun__, [1]},
         required: true,
         doc: """
         A function or `{module, function}` tuple used to encode the command's
@@ -79,8 +79,8 @@ defmodule Grizzly.ZWave.CommandSpec do
         type:
           {:or,
            [
-             {:custom, __MODULE__, :validate_fun, [1]},
-             {:custom, __MODULE__, :validate_fun, [2]}
+             {:custom, __MODULE__, :__validate_fun__, [1]},
+             {:custom, __MODULE__, :__validate_fun__, [2]}
            ]},
         required: true,
         doc: """
@@ -92,7 +92,7 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       report_matcher_fun: [
-        type: {:or, [{:custom, __MODULE__, :validate_fun, [2]}, nil]},
+        type: {:or, [{:custom, __MODULE__, :__validate_fun__, [2]}, nil]},
         required: false,
         doc: """
         A 2-arity function or `{module, function}` tuple used to match a
@@ -137,11 +137,23 @@ defmodule Grizzly.ZWave.CommandSpec do
         Z/IP Gateway.
         """
       ],
+      validate_fun: [
+        type: {:or, [{:custom, __MODULE__, :__validate_fun__, [1]}, nil]},
+        required: false,
+        doc: """
+        A `{module, function}` tuple indicating a function that validates
+        the command parameters. The function should return `{:ok, params}` if the
+        parameters are valid or have been updated, or `{:error, reason}` if the
+        parameters are invalid.
+        """
+      ],
       default_params: [
         type: :keyword_list,
         default: [],
         doc: """
-        A keyword list of default parameters for this command.
+        A keyword list of default parameters for the command. These parameters
+        will be merged with any parameters passed to `create_command/2` before
+        validation.
         """
       ]
     )
@@ -157,6 +169,8 @@ defmodule Grizzly.ZWave.CommandSpec do
           module: module(),
           encode_fun: {module(), atom()},
           decode_fun: {module(), atom()},
+          validate_fun:
+            {module(), atom()} | (keyword() -> {:ok, keyword()} | {:error, any()}) | nil,
           report_matcher_fun: {module(), atom()} | nil,
           report: atom() | nil,
           handler: {module(), keyword()},
@@ -170,6 +184,7 @@ defmodule Grizzly.ZWave.CommandSpec do
             module: nil,
             encode_fun: nil,
             decode_fun: nil,
+            validate_fun: nil,
             report_matcher_fun: nil,
             report: nil,
             handler: {AckResponse, []},
@@ -177,14 +192,18 @@ defmodule Grizzly.ZWave.CommandSpec do
             default_params: []
 
   def create_command(%__MODULE__{} = spec, params) do
-    cmd = %Grizzly.ZWave.Command{
-      name: spec.name,
-      command_class: spec.command_class,
-      command_byte: spec.command_byte,
-      params: Keyword.merge(spec.default_params, params)
-    }
+    params = Keyword.merge(spec.default_params, params)
 
-    {:ok, cmd}
+    with {:ok, params} <- validate_params(spec, params) do
+      cmd = %Grizzly.ZWave.Command{
+        name: spec.name,
+        command_class: CommandClasses.cc_module!(spec.command_class),
+        command_byte: spec.command_byte,
+        params: params
+      }
+
+      {:ok, cmd}
+    end
   end
 
   def new(command_class, name, byte, mod, opts) when is_list(opts) do
@@ -234,7 +253,8 @@ defmodule Grizzly.ZWave.CommandSpec do
           module: module,
           encode_fun: {module, :encode_params},
           decode_fun: {module, :decode_params},
-          report_matcher_fun: report_matcher_fun_from_module(module)
+          validate_fun: maybe_fun_from_module(module, :validate_params, 1),
+          report_matcher_fun: maybe_fun_from_module(module, :report_matches_get?, 2)
         ] ++ fields
       end
 
@@ -246,6 +266,19 @@ defmodule Grizzly.ZWave.CommandSpec do
       )
 
     struct!(__MODULE__, fields)
+  end
+
+  def validate_params(%__MODULE__{validate_fun: nil} = _spec, params) do
+    {:ok, params}
+  end
+
+  def validate_params(%__MODULE__{validate_fun: {mod, fun}} = _spec, params) do
+    apply(mod, fun, [params])
+  end
+
+  def validate_params(%__MODULE__{validate_fun: fun} = _spec, params)
+      when is_function(fun, 1) do
+    fun.(params)
   end
 
   def validate(%__MODULE__{} = spec) do
@@ -264,7 +297,7 @@ defmodule Grizzly.ZWave.CommandSpec do
   end
 
   @doc false
-  def validate_fun({mod, fun} = v, arity) when is_atom(mod) and is_atom(fun) do
+  def __validate_fun__({mod, fun} = v, arity) when is_atom(mod) and is_atom(fun) do
     cond do
       Code.ensure_loaded?(mod) == false ->
         {:error, "module #{inspect(mod)} is not loaded"}
@@ -278,7 +311,7 @@ defmodule Grizzly.ZWave.CommandSpec do
     end
   end
 
-  def validate_fun(v, _arity), do: {:error, inspect(v)}
+  def __validate_fun__(v, _arity), do: {:error, inspect(v)}
 
   def handler_spec(%__MODULE__{} = spec) do
     {module, opts} = spec.handler
@@ -315,9 +348,9 @@ defmodule Grizzly.ZWave.CommandSpec do
     end
   end
 
-  defp report_matcher_fun_from_module(module) do
-    if Code.ensure_loaded?(module) and function_exported?(module, :report_matches_get?, 2) do
-      {module, :report_matches_get?}
+  defp maybe_fun_from_module(module, fun, arity) do
+    if Code.ensure_loaded?(module) and function_exported?(module, fun, arity) do
+      {module, fun}
     else
       nil
     end

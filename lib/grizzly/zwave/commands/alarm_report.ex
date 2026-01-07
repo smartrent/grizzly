@@ -51,6 +51,11 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   end
 
   @impl Grizzly.ZWave.Command
+  def validate_params(params) do
+    {:ok, build_params(params)}
+  end
+
+  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     cond do
