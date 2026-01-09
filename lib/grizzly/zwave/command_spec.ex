@@ -349,7 +349,7 @@ defmodule Grizzly.ZWave.CommandSpec do
   end
 
   defp maybe_fun_from_module(module, fun, arity) do
-    Code.ensure_compiled!(module)
+    _ = Code.ensure_compiled(module)
 
     if function_exported?(module, fun, arity) do
       {module, fun}
