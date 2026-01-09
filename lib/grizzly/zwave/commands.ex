@@ -69,9 +69,9 @@ defmodule Grizzly.ZWave.Commands do
     command :barrier_operator_report, 0x03
     command :barrier_operator_signal_supported_get, 0x04, Cmds.GenericNoPayload
     command :barrier_operator_signal_supported_report, 0x05
-    command :barrier_operator_signal_set, 0x06
+    command :barrier_operator_signal_set, 0x06, Cmds.BarrierOperatorSignalSetReport
     command :barrier_operator_signal_get, 0x07
-    command :barrier_operator_signal_report, 0x08
+    command :barrier_operator_signal_report, 0x08, Cmds.BarrierOperatorSignalSetReport
   end
 
   command_class :basic do
@@ -95,9 +95,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :clock do
-    command :clock_set, 0x04
+    command :clock_set, 0x04, Cmds.ClockSetReport
     command :clock_get, 0x05, Cmds.GenericNoPayload
-    command :clock_report, 0x06
+    command :clock_report, 0x06, Cmds.ClockSetReport
   end
 
   command_class :configuration do
@@ -139,9 +139,9 @@ defmodule Grizzly.ZWave.Commands do
         timeout_seconds: 0
       ]
 
-    command :door_lock_configuration_set, 0x04
+    command :door_lock_configuration_set, 0x04, Cmds.DoorLockConfigurationSetReport
     command :door_lock_configuration_get, 0x05, Cmds.GenericNoPayload
-    command :door_lock_configuration_report, 0x06
+    command :door_lock_configuration_report, 0x06, Cmds.DoorLockConfigurationSetReport
     command :door_lock_capabilities_get, 0x07, Cmds.GenericNoPayload
     command :door_lock_capabilities_report, 0x08
   end
@@ -163,9 +163,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :humidity_control_mode do
-    command :humidity_control_mode_set, 0x01
+    command :humidity_control_mode_set, 0x01, Cmds.HumidityControlModeSetReport
     command :humidity_control_mode_get, 0x02, Cmds.GenericNoPayload
-    command :humidity_control_mode_report, 0x03
+    command :humidity_control_mode_report, 0x03, Cmds.HumidityControlModeSetReport
     command :humidity_control_mode_supported_get, 0x04, Cmds.GenericNoPayload
     command :humidity_control_mode_supported_report, 0x05
   end
@@ -176,9 +176,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :humidity_control_setpoint do
-    command :humidity_control_setpoint_set, 0x01
+    command :humidity_control_setpoint_set, 0x01, Cmds.HumidityControlSetpointSetReport
     command :humidity_control_setpoint_get, 0x02
-    command :humidity_control_setpoint_report, 0x03
+    command :humidity_control_setpoint_report, 0x03, Cmds.HumidityControlSetpointSetReport
     command :humidity_control_setpoint_supported_get, 0x04, Cmds.GenericNoPayload
     command :humidity_control_setpoint_supported_report, 0x05
     command :humidity_control_setpoint_scale_supported_get, 0x06
@@ -234,14 +234,14 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :multi_channel_association do
-    command :multi_channel_association_set, 0x01
+    command :multi_channel_association_set, 0x01, Cmds.MultiChannelAssociationSetRemove
 
     command :multi_channel_association_get, 0x02,
       report: :multi_channel_association_report,
       handler: {AggregateReport, aggregate_param: :nodes}
 
     command :multi_channel_association_report, 0x03
-    command :multi_channel_association_remove, 0x04
+    command :multi_channel_association_remove, 0x04, Cmds.MultiChannelAssociationSetRemove
     command :multi_channel_association_groupings_get, 0x05, Cmds.GenericNoPayload
     command :multi_channel_association_groupings_report, 0x06
   end
@@ -367,8 +367,12 @@ defmodule Grizzly.ZWave.Commands do
     command :schedule_entry_type_supported_get, 0x09, Cmds.GenericNoPayload
     command :schedule_entry_type_supported_report, 0x0A
     command :schedule_entry_lock_time_offset_get, 0x0B, Cmds.GenericNoPayload
-    command :schedule_entry_lock_time_offset_report, 0x0C
-    command :schedule_entry_lock_time_offset_set, 0x0D
+
+    command :schedule_entry_lock_time_offset_report,
+            0x0C,
+            Cmds.ScheduleEntryLockTimeOffsetSetReport
+
+    command :schedule_entry_lock_time_offset_set, 0x0D, Cmds.ScheduleEntryLockTimeOffsetSetReport
     command :schedule_entry_lock_daily_repeating_get, 0x0E
     command :schedule_entry_lock_daily_repeating_report, 0x0F
     command :schedule_entry_lock_daily_repeating_set, 0x10
@@ -436,9 +440,9 @@ defmodule Grizzly.ZWave.Commands do
     command :sound_switch_configuration_set, 0x05
     command :sound_switch_configuration_get, 0x06, Cmds.GenericNoPayload
     command :sound_switch_configuration_report, 0x07
-    command :sound_switch_tone_play_set, 0x08
+    command :sound_switch_tone_play_set, 0x08, Cmds.SoundSwitchTonePlaySetReport
     command :sound_switch_tone_play_get, 0x09, Cmds.GenericNoPayload
-    command :sound_switch_tone_play_report, 0x0A
+    command :sound_switch_tone_play_report, 0x0A, Cmds.SoundSwitchTonePlaySetReport
   end
 
   command_class :supervision do
@@ -474,9 +478,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :thermostat_mode do
-    command :thermostat_mode_set, 0x01
+    command :thermostat_mode_set, 0x01, Cmds.ThermostatModeSetReport
     command :thermostat_mode_get, 0x02, Cmds.GenericNoPayload
-    command :thermostat_mode_report, 0x03
+    command :thermostat_mode_report, 0x03, Cmds.ThermostatModeSetReport
     command :thermostat_mode_supported_get, 0x04, Cmds.GenericNoPayload
     command :thermostat_mode_supported_report, 0x05
   end
@@ -487,9 +491,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :thermostat_setback do
-    command :thermostat_setback_set, 0x01
+    command :thermostat_setback_set, 0x01, Cmds.ThermostatSetbackSetReport
     command :thermostat_setback_get, 0x02, Cmds.GenericNoPayload
-    command :thermostat_setback_report, 0x03
+    command :thermostat_setback_report, 0x03, Cmds.ThermostatSetbackSetReport
   end
 
   command_class :thermostat_setpoint do
@@ -507,15 +511,15 @@ defmodule Grizzly.ZWave.Commands do
     command :time_report, 0x02
     command :date_get, 0x03, Cmds.GenericNoPayload
     command :date_report, 0x04
-    command :time_offset_set, 0x05
+    command :time_offset_set, 0x05, Cmds.TimeOffsetSetReport
     command :time_offset_get, 0x06, Cmds.GenericNoPayload
-    command :time_offset_report, 0x07
+    command :time_offset_report, 0x07, Cmds.TimeOffsetSetReport
   end
 
   command_class :time_parameters do
-    command :time_parameters_set, 0x01
+    command :time_parameters_set, 0x01, Cmds.TimeParametersSetReport
     command :time_parameters_get, 0x02, Cmds.GenericNoPayload
-    command :time_parameters_report, 0x03
+    command :time_parameters_report, 0x03, Cmds.TimeParametersSetReport
   end
 
   command_class :user_code do
@@ -526,15 +530,15 @@ defmodule Grizzly.ZWave.Commands do
     command :user_code_users_number_report, 0x05
     command :user_code_capabilities_get, 0x06, Cmds.GenericNoPayload
     command :user_code_capabilities_report, 0x07
-    command :user_code_keypad_mode_set, 0x08
+    command :user_code_keypad_mode_set, 0x08, Cmds.UserCodeKeypadModeSetReport
     command :user_code_keypad_mode_get, 0x09, Cmds.GenericNoPayload
-    command :user_code_keypad_mode_report, 0x0A
+    command :user_code_keypad_mode_report, 0x0A, Cmds.UserCodeKeypadModeSetReport
     command :extended_user_code_set, 0x0B
     command :extended_user_code_get, 0x0C
     command :extended_user_code_report, 0x0D
-    command :admin_code_set, 0x0E
+    command :admin_code_set, 0x0E, Cmds.AdminCodeSetReport
     command :admin_code_get, 0x0F, Cmds.GenericNoPayload
-    command :admin_code_report, 0x10
+    command :admin_code_report, 0x10, Cmds.AdminCodeSetReport
     command :user_code_checksum_get, 0x11, Cmds.GenericNoPayload
     command :user_code_checksum_report, 0x12
   end
@@ -581,9 +585,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :wake_up do
-    command :wake_up_interval_set, 0x04
+    command :wake_up_interval_set, 0x04, Cmds.WakeUpIntervalSetReport
     command :wake_up_interval_get, 0x05, Cmds.GenericNoPayload
-    command :wake_up_interval_report, 0x06
+    command :wake_up_interval_report, 0x06, Cmds.WakeUpIntervalSetReport
     command :wake_up_notification, 0x07, Cmds.GenericNoPayload
     command :wake_up_no_more_information, 0x08, Cmds.GenericNoPayload
     command :wake_up_interval_capabilities_get, 0x09, Cmds.GenericNoPayload
@@ -751,8 +755,20 @@ defmodule Grizzly.ZWave.Commands do
          {:ok, decoded_params} <- apply(mod, fun, [params]) do
       CommandSpec.create_command(spec, decoded_params)
     else
-      {:error, :unknown_command} -> {:error, %ZWaveError{binary: binary}}
-      {:error, %DecodeError{}} = err -> err
+      {:error, :unknown_command} ->
+        {:error, %ZWaveError{binary: binary}}
+
+      {:error, %DecodeError{command: nil} = err} ->
+        err =
+          case spec_for(cc_byte, command_byte) do
+            {:ok, spec} -> %DecodeError{err | command: spec.name}
+            _ -> err
+          end
+
+        {:error, err}
+
+      other ->
+        other
     end
   end
 
