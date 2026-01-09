@@ -31,7 +31,13 @@ defmodule Grizzly.ZWave.Macros do
 
   defmacro command(name, byte, mod, opts) when is_list(mod) do
     opts = Keyword.merge(mod, opts)
-    mod = Module.concat([Grizzly, ZWave, Commands, Macro.camelize(Atom.to_string(name))])
+
+    cmd_mod_name = name |> Atom.to_string() |> Macro.camelize() |> String.to_atom()
+
+    # Have to define this as an AST node. If we build it with with Module.concat,
+    # the compiler doesn't recognize that it needs to be a compile-time dependency.
+    mod = {:__aliases__, [alias: false], [:Grizzly, :ZWave, :Commands, cmd_mod_name]}
+
     do_command(__CALLER__, name, byte, mod, opts)
   end
 

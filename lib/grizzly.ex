@@ -50,6 +50,7 @@ defmodule Grizzly do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.RssiReport
+  alias Grizzly.ZWave.CommandSpec
 
   require Logger
 
@@ -212,8 +213,7 @@ defmodule Grizzly do
   def send_command(node_id, command_name, args \\ [], opts \\ [])
 
   def send_command(node_id, command_name, args, _opts) when is_virtual_device(node_id) do
-    with {command_module, _default_opts} <- Commands.lookup(command_name),
-         {:ok, command} <- command_module.new(args) do
+    with {:ok, command} <- Commands.create(command_name, args) do
       VirtualDevices.send_command(node_id, command)
     end
   end
@@ -236,10 +236,11 @@ defmodule Grizzly do
     open_opts = Keyword.take(opts, [:mode])
 
     with :ok <- can_send_command?(),
-         {command_module, default_opts} <- Commands.lookup(command_name),
-         {:ok, command} <- command_module.new(args),
+         {:ok, spec} <- Commands.spec_for(command_name),
+         {:ok, command} <- CommandSpec.create_command(spec, args),
          {:ok, _} <- Connection.open(node_id, open_opts) do
-      Connection.send_command(node_id, command, Keyword.merge(default_opts, opts))
+      opts = Keyword.merge([handler: CommandSpec.handler_spec(spec)], opts)
+      Connection.send_command(node_id, command, opts)
     end
   end
 
@@ -250,9 +251,10 @@ defmodule Grizzly do
           send_command_response()
   def send_async_command_via(conn, node_id, command_name, args \\ [], opts \\ []) do
     with :ok <- can_send_command?(),
-         {command_module, default_opts} <- Commands.lookup(command_name),
-         {:ok, command} <- command_module.new(args) do
-      Connection.send_async_command_via(conn, node_id, command, Keyword.merge(default_opts, opts))
+         {:ok, spec} <- Commands.spec_for(command_name),
+         {:ok, command} <- CommandSpec.create_command(spec, args) do
+      opts = Keyword.merge([handler: CommandSpec.handler_spec(spec)], opts)
+      Connection.send_async_command_via(conn, node_id, command, opts)
     end
   end
 
