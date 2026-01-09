@@ -18,25 +18,11 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
   alias Grizzly.ZWave.DecodeError
 
   @type group_info() :: [group_id: byte(), profile: atom()]
   @type param() ::
           {:groups_info, [group_info()]} | {:dynamic, boolean() | {:list_mode, boolean()}}
-
-  @impl Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :association_group_info_report,
-      command_byte: 0x04,
-      command_class: AssociationGroupInfo,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Command
   def encode_params(command) do

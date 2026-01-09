@@ -15,23 +15,9 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:up_down, :up | :down} | {:duration, byte}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :switch_multilevel_start_level_change,
-      command_byte: 0x04,
-      command_class: SwitchMultilevel,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

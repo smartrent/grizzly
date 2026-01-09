@@ -7,21 +7,6 @@ defmodule Grizzly.ZWave.Commands.AlarmTypeSupportedGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Alarm
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :alarm_type_supported_get,
-      command_byte: 0x07,
-      command_class: Alarm,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

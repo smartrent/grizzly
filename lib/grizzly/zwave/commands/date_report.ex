@@ -16,22 +16,8 @@ defmodule Grizzly.ZWave.Commands.DateReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Time
 
   @type param :: {:year, integer()} | {:month, 1..12} | {:day, 1..31}
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :date_report,
-      command_byte: 0x04,
-      command_class: Time,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(command) do
     year = Command.param!(command, :year)

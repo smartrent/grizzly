@@ -21,19 +21,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanStateReport do
   @type param :: {:state, ThermostatFanState.state()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_fan_state_report,
-      command_byte: 0x03,
-      command_class: ThermostatFanState,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     state_byte = ThermostatFanState.encode_state(Command.param!(command, :state))
     <<0x00::4, state_byte::4>>

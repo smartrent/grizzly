@@ -15,22 +15,8 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationSet do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.CentralScene
 
   @type param :: {:slow_refresh, boolean}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :central_scene_configuration_set,
-      command_byte: 0x04,
-      command_class: CentralScene,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

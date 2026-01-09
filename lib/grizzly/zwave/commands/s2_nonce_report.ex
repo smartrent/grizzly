@@ -24,7 +24,6 @@ defmodule Grizzly.ZWave.Commands.S2NonceReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
@@ -32,19 +31,6 @@ defmodule Grizzly.ZWave.Commands.S2NonceReport do
           | {:mpan_out_of_sync?, boolean()}
           | {:span_out_of_sync?, boolean()}
           | {:receivers_entropy_input, <<_::128>>}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :s2_nonce_report,
-      command_byte: 0x02,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

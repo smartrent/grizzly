@@ -19,18 +19,6 @@ defmodule Grizzly.ZWave.Commands.NodeLocationReport do
   @type param :: {:location, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 
   @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :node_location_report,
-      command_byte: 0x06,
-      command_class: NodeNaming,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     encoding = Command.param!(command, :encoding)
     location = Command.param!(command, :location)

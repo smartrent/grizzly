@@ -9,19 +9,6 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStopLevelChange do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :switch_multilevel_stop_level_change,
-      command_byte: 0x05,
-      command_class: SwitchMultilevel,
-      params: []
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

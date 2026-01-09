@@ -10,23 +10,10 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ManufacturerSpecific
   alias Grizzly.ZWave.DecodeError
 
   @type device_id_type :: :oem_factory_default_device_id_type | :serial_number | :pseudo_random
   @type param :: {:device_id_type, device_id_type}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :manufacturer_specific_device_specific_get,
-      command_byte: 0x06,
-      command_class: ManufacturerSpecific,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

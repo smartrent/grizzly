@@ -8,21 +8,6 @@ defmodule Grizzly.ZWave.Commands.RssiGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :rssi_get,
-      command_byte: 0x07,
-      command_class: NetworkManagementInstallationMaintenance,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

@@ -9,18 +9,6 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.WindowCovering
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :window_covering_supported_get,
-      command_byte: 0x01,
-      command_class: WindowCovering
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

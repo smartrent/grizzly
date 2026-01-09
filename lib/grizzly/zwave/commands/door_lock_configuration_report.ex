@@ -41,19 +41,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReport do
           | {:block_to_block?, boolean}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :door_lock_configuration_report,
-      command_byte: 0x06,
-      command_class: DoorLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     operation_type_byte =

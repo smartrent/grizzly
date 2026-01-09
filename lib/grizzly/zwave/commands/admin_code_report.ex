@@ -10,22 +10,8 @@ defmodule Grizzly.ZWave.Commands.AdminCodeReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCode
 
   @type param :: {:code, String.t()}
-
-  @impl Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :admin_code_report,
-      command_byte: 0x10,
-      command_class: UserCode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Command
   @spec encode_params(Command.t()) :: binary()

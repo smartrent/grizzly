@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Alarm
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Notifications
 
@@ -20,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
           {:type, byte()}
           | {:zwave_type, Notifications.type()}
           | {:zwave_event, Notifications.event()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :alarm_get,
-      command_byte: 0x04,
-      command_class: Alarm,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

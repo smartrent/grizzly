@@ -11,22 +11,8 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequest do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
 
   @type param :: {:seq_number, Grizzly.seq_number()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :network_update_request,
-      command_byte: 0x03,
-      command_class: NetworkManagementBasicNode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

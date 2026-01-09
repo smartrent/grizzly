@@ -15,23 +15,9 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonePlayReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SoundSwitch
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:tone_identifier, 0..255}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :sound_switch_tone_play_report,
-      command_byte: 0x0A,
-      command_class: SoundSwitch,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

@@ -9,20 +9,6 @@ defmodule Grizzly.ZWave.Commands.WakeUpNotification do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.WakeUp
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :wake_up_notification,
-      command_byte: 0x07,
-      command_class: WakeUp
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

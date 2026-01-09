@@ -23,19 +23,6 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringReport do
           | {:duration, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :window_covering_report,
-      command_byte: 0x04,
-      command_class: WindowCovering,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     parameter_id =

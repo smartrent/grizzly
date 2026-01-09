@@ -9,19 +9,6 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Powerlevel
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :powerlevel_test_node_get,
-      command_byte: 0x05,
-      command_class: Powerlevel,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

@@ -24,7 +24,6 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatus do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.Security
@@ -37,18 +36,6 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatus do
           | {:granted_keys, [Security.key()]}
           | {:kex_fail_type, Security.key_exchange_fail_type()}
           | {:dsk, DSK.t()}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :learn_mode_set_status,
-      command_byte: 0x02,
-      command_class: NetworkManagementBasicNode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

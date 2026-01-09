@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryReport do
   @type param :: {:sensor_type, SensorBinary.sensor_type()} | {:triggered, boolean()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :sensor_binary_report,
-      command_byte: 0x03,
-      command_class: SensorBinary,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     triggered = Command.param!(command, :triggered)
     sensor_type = Command.param(command, :sensor_type)

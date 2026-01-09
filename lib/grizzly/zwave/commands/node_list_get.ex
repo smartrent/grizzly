@@ -9,22 +9,8 @@ defmodule Grizzly.ZWave.Commands.NodeListGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @type param :: {:seq_number, non_neg_integer()}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    # TODO: validate params
-    command = %Command{
-      name: :node_list_get,
-      command_byte: 0x01,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

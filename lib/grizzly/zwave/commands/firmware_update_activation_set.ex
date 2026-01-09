@@ -20,7 +20,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
 
   @type param ::
           {:manufacturer_id, non_neg_integer}
@@ -28,19 +27,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSet do
           | {:checksum, non_neg_integer}
           | {:firmware_target, byte}
           | {:hardware_version, byte}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :firmware_update_activation_set,
-      command_byte: 0x08,
-      command_class: FirmwareUpdateMD,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

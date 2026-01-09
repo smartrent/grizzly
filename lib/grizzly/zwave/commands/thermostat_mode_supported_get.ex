@@ -8,21 +8,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ThermostatMode
-
-  @impl Grizzly.ZWave.Command
-  @spec new([]) :: {:ok, Command.t()}
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :thermostat_mode_supported_get,
-      command_byte: 0x04,
-      command_class: ThermostatMode
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

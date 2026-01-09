@@ -16,19 +16,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersGet do
   @type param :: {:end_point, MultiChannel.end_point()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :multi_channel_aggregated_members_get,
-      command_byte: 0x0E,
-      command_class: MultiChannel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     aggregated_end_point = Command.param!(command, :aggregated_end_point)
     <<0x00::1, aggregated_end_point::7>>

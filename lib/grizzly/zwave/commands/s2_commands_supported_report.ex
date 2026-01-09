@@ -7,24 +7,10 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.Security2
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:command_classes, [CommandClasses.command_class()]}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :s2_commands_supported_report,
-      command_byte: 0x0E,
-      command_class: Security2,
-      params: put_defaults(params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
@@ -45,10 +31,5 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedReport do
       |> Enum.map(&elem(CommandClasses.from_byte(&1), 1))
 
     {:ok, [command_classes: ccs]}
-  end
-
-  defp put_defaults(params) do
-    params
-    |> Keyword.put_new(:command_classes, [])
   end
 end

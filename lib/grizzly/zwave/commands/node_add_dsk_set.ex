@@ -17,7 +17,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.DSK
 
   @type param ::
@@ -25,20 +24,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
           | {:accept, boolean()}
           | {:input_dsk_length, 0..0xF}
           | {:input_dsk, DSK.t()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    # TODO validate params
-    command = %Command{
-      name: :node_add_dsk_set,
-      command_byte: 0x14,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

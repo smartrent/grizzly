@@ -22,19 +22,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   alias Grizzly.ZWave.Encoding
 
   @impl Command
-  @spec new([ThermostatSetpoint.param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_setpoint_report,
-      command_byte: 0x03,
-      command_class: ThermostatSetpoint,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Command
   def encode_params(command) do
     type = Command.param!(command, :type)
     scale_byte = Command.param!(command, :scale) |> ThermostatSetpoint.encode_scale()

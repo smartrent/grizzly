@@ -6,21 +6,7 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnCancel do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCredential
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.Command
-  @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :credential_learn_cancel,
-      command_byte: 0x10,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

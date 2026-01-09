@@ -11,25 +11,11 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ZIP
   alias Grizzly.ZWave.DecodeError
 
   @type ack_flag :: :ack_response | :ack_request
 
   @type param :: {:ack_flag, ack_flag()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :keep_alive,
-      command_byte: 0x03,
-      command_class: ZIP,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(params) do

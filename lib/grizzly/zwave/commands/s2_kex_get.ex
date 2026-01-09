@@ -6,21 +6,6 @@ defmodule Grizzly.ZWave.Commands.S2KexGet do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
-
-  @impl Grizzly.ZWave.Command
-  def new(_params \\ []) do
-    command = %Command{
-      name: :s2_kex_get,
-      command_byte: 0x04,
-      command_class: Security2,
-      params: []
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command), do: <<>>
 

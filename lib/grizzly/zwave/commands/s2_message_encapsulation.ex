@@ -27,7 +27,6 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
   alias Grizzly.ZWave.DecodeError
 
   @type extension_type :: :span | :mpan | :mgrp | :mos
@@ -42,22 +41,6 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
           | {:extensions, list()}
           | {:encrypted_extensions?, boolean()}
           | {:encrypted_payload, binary()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    # MPAN is an encrypted extension, so reject it if it was included
-    {:ok, params} = validate_params(params)
-
-    command = %Command{
-      name: :s2_message_encapsulation,
-      command_byte: 0x03,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def validate_params(params) do

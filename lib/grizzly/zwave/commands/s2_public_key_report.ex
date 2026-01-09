@@ -9,22 +9,8 @@ defmodule Grizzly.ZWave.Commands.S2PublicKeyReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
 
   @type param :: {:ecdh_public_key, binary()} | {:including_node, boolean()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :s2_public_key_report,
-      command_byte: 0x08,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

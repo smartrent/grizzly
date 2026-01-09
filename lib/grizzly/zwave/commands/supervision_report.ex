@@ -16,7 +16,6 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Supervision
   alias Grizzly.ZWave.DecodeError
 
   @type more_status_updates() :: :last_report | :more_reports
@@ -26,19 +25,6 @@ defmodule Grizzly.ZWave.Commands.SupervisionReport do
           | {:status, status}
           | {:duration, :unknown | non_neg_integer()}
           | {:session_id, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :supervision_report,
-      command_byte: 0x02,
-      command_class: Supervision,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

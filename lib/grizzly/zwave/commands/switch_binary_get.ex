@@ -7,20 +7,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchBinary
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :switch_binary_get,
-      command_byte: 0x02,
-      command_class: SwitchBinary
-    }
-
-    {:ok, command}
-  end
-
   # TODO: make default implementation via using
   @impl Grizzly.ZWave.Command
   def decode_params(_), do: {:ok, []}

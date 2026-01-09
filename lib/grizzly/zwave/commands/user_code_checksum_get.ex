@@ -9,20 +9,6 @@ defmodule Grizzly.ZWave.Commands.UserCodeChecksumGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCode
-
-  @impl Grizzly.ZWave.Command
-  @spec new([]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_code_checksum_get,
-      command_byte: 0x11,
-      command_class: UserCode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

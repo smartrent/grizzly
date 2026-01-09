@@ -19,7 +19,6 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Version
   alias Grizzly.ZWave.DecodeError
 
   @type library_type ::
@@ -41,18 +40,6 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
           | {:firmware_version, firmware_version}
           | {:hardware_version, non_neg_integer}
           | {:other_firmware_versions, [firmware_version]}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :version_report,
-      command_byte: 0x12,
-      command_class: Version,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   # Version 1

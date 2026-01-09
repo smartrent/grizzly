@@ -16,7 +16,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
 
   @type param ::
           {:manufacturer_id, non_neg_integer}
@@ -26,19 +25,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
           | {:fragment_size, non_neg_integer}
           | {:hardware_version, byte}
           | {:activation_may_be_delayed?, boolean}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :firmware_update_md_request_get,
-      command_byte: 0x03,
-      command_class: FirmwareUpdateMD,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   # version 1
@@ -104,7 +90,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
     params = command.params |> Enum.into(%{})
 
     case params do
-      # v5,6,7
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
@@ -112,6 +97,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         firmware_target: firmware_target,
         fragment_size: fragment_size,
         activation_may_be_delayed?: activation_may_be_delayed?,
+        # v5,6,7
         hardware_version: hardware_version
       } ->
         activation = if activation_may_be_delayed?, do: 0x01, else: 0x00
@@ -119,13 +105,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
           0x00::7, activation::1, hardware_version>>
 
-      # v4
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
         checksum: checksum,
         firmware_target: firmware_target,
         fragment_size: fragment_size,
+        # v4
         activation_may_be_delayed?: activation_may_be_delayed?
       } ->
         activation = if activation_may_be_delayed?, do: 0x01, else: 0x00
@@ -133,20 +119,20 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet do
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16,
           0x00::7, activation::1>>
 
-      # v3
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
         checksum: checksum,
         firmware_target: firmware_target,
+        # v3
         fragment_size: fragment_size
       } ->
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_target, fragment_size::16>>
 
-      # v1
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
+        # v1
         checksum: checksum
       } ->
         <<manufacturer_id::16, firmware_id::16, checksum::16>>

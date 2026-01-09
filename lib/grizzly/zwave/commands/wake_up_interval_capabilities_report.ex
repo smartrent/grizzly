@@ -15,7 +15,6 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.WakeUp
 
   @type param ::
           {:minimum_seconds, non_neg_integer}
@@ -24,18 +23,6 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport do
           | {:default_seconds, non_neg_integer}
           | {:step_seconds, non_neg_integer}
           | {:on_demand, boolean}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :wake_up_interval_capabilities_report,
-      command_byte: 0x0A,
-      command_class: WakeUp,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

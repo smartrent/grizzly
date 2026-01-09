@@ -13,25 +13,11 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ManufacturerSpecific
 
   @type param ::
           {:manufacturer_id, non_neg_integer()}
           | {:product_type_id, non_neg_integer()}
           | {:product_id, non_neg_integer()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :manufacturer_specific_report,
-      command_byte: 0x05,
-      command_class: ManufacturerSpecific,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

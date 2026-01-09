@@ -6,21 +6,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanModeSupportedGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ThermostatFanMode
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.Command
-  @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_fan_mode_supported_get,
-      command_byte: 0x04,
-      command_class: ThermostatFanMode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

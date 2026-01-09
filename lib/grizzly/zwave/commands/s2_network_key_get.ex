@@ -7,23 +7,9 @@ defmodule Grizzly.ZWave.Commands.S2NetworkKeyGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
   alias Grizzly.ZWave.Security
 
   @type param :: {:requested_key, Security.key()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :s2_network_key_get,
-      command_byte: 0x09,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

@@ -13,25 +13,12 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
 
   require Logger
 
   @type param() :: {:group_id, byte()} | {:commands, [atom()]}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :association_group_command_list_report,
-      command_byte: 0x06,
-      command_class: AssociationGroupInfo,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

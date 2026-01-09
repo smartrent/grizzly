@@ -8,22 +8,8 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   import Bitwise
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.NodeIdList
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    # TODO: validate params
-    command = %Command{
-      name: :node_list_report,
-      command_byte: 0x02,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

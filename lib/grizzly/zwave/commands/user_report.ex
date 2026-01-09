@@ -50,19 +50,6 @@ defmodule Grizzly.ZWave.Commands.UserReport do
           | {:username, binary()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_report,
-      command_byte: 0x07,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     report_type = Command.param!(command, :report_type)

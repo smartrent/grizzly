@@ -6,20 +6,6 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
-
-  @impl Grizzly.ZWave.Command
-  @spec new([]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :s2_commands_supported_get,
-      command_byte: 0x0D,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

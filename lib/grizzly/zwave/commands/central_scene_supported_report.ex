@@ -46,19 +46,6 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReport do
           | {:bit_mask_bytes, 1..3}
           | {:supported_key_attributes, [CentralScene.key_attributes()]}
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :central_scene_supported_report,
-      command_byte: 0x02,
-      command_class: CentralScene,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     supported_scenes = Command.param!(command, :supported_scenes)

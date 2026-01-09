@@ -12,24 +12,11 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Alarm
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Notifications
 
   @type param :: {:type, atom()} | {:events, [atom()]}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :alarm_event_supported_report,
-      command_byte: 0x02,
-      command_class: Alarm,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

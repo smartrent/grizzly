@@ -16,19 +16,6 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalGet do
   @type param :: {:subsystem_type, BarrierOperator.subsystem_type()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :barrier_operator_signal_get,
-      command_byte: 0x07,
-      command_class: BarrierOperator,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     subsystem_type = Command.param!(command, :subsystem_type)

@@ -9,20 +9,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :schedule_entry_type_supported_get,
-      command_byte: 0x09,
-      command_class: ScheduleEntryLock
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

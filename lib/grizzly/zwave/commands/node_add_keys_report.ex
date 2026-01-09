@@ -15,21 +15,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.Security
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    # TODO validate params
-    command = %Command{
-      name: :node_add_keys_report,
-      command_byte: 0x11,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

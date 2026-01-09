@@ -12,24 +12,11 @@ defmodule Grizzly.ZWave.Commands.AlarmTypeSupportedReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Alarm
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Notifications
 
   @type param :: {:types, [Notifications.type()]}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :alarm_type_supported_report,
-      command_byte: 0x08,
-      command_class: Alarm,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

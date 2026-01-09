@@ -8,21 +8,7 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ZIPGateway
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.Command
-  @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :application_node_info_get,
-      command_byte: 0x0C,
-      command_class: ZIPGateway,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

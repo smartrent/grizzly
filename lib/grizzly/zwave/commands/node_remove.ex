@@ -15,23 +15,9 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.DecodeError
 
   @type mode :: :remove_node_any | :remove_node_stop
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    # TODO validate params
-    command = %Command{
-      name: :node_remove,
-      command_byte: 0x03,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

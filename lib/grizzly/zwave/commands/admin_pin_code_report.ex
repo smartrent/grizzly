@@ -11,7 +11,6 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCredential
   alias Grizzly.ZWave.DecodeError
 
   @type result ::
@@ -25,19 +24,6 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeReport do
           | :unspecified_error
 
   @type param :: {:result, result()} | {:code, binary()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :admin_pin_code_report,
-      command_byte: 0x1C,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

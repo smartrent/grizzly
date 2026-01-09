@@ -9,19 +9,6 @@ defmodule Grizzly.ZWave.Commands.NodeNameGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NodeNaming
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :node_name_get,
-      command_byte: 0x02,
-      command_class: NodeNaming,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

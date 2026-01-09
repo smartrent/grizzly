@@ -6,21 +6,6 @@ defmodule Grizzly.ZWave.Commands.S0SecuritySchemeInherit do
   """
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.S0
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :s0_security_scheme_inherit,
-      command_byte: 0x08,
-      command_class: S0,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command), do: <<0::8>>
 

@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointGet do
   @type param() :: {:type, ThermostatSetpoint.type()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_setpoint_get,
-      command_byte: 0x02,
-      command_class: ThermostatSetpoint,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     type_byte = ThermostatSetpoint.encode_type(Command.param!(command, :type))
     <<0x00::4, type_byte::4>>

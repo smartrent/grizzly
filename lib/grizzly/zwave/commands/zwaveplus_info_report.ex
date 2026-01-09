@@ -31,19 +31,6 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReport do
           | {:user_icon_type, non_neg_integer}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :zwaveplus_info_report,
-      command_byte: 0x02,
-      command_class: ZwaveplusInfo,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     zwaveplus_version = Command.param!(command, :zwaveplus_version)

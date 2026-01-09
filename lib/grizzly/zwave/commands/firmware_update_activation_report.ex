@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
   alias Grizzly.ZWave.DecodeError
 
   @type status :: :invalid_identification | :activation_error | :success
@@ -33,19 +32,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
           | {:firmware_target, byte}
           | {:status, status}
           | {:hardware_version, byte}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :firmware_update_activation_report,
-      command_byte: 0x09,
-      command_class: FirmwareUpdateMD,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

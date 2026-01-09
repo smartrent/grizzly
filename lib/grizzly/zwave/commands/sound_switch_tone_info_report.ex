@@ -20,19 +20,6 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchToneInfoReport do
           | {:name, binary()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :sound_switch_tone_info_report,
-      command_byte: 0x04,
-      command_class: SoundSwitch,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     tone_identifier = Command.param!(command, :tone_identifier)

@@ -25,19 +25,6 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfReport do
           | {:level, SceneActuatorConf.level()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :scene_actuator_conf_report,
-      command_byte: 0x03,
-      command_class: SceneActuatorConf,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     scene_id = Command.param!(command, :scene_id)

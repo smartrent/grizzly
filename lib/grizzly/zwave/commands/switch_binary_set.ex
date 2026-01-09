@@ -14,24 +14,10 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchBinary
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
 
   @type param :: {:target_value, :on | :off} | {:duration, Encoding.duration()}
-
-  @impl Grizzly.ZWave.Command
-  def new(opts) do
-    # TODO: validate opts
-    command = %Command{
-      name: :switch_binary_set,
-      command_byte: 0x01,
-      command_class: SwitchBinary,
-      params: opts
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

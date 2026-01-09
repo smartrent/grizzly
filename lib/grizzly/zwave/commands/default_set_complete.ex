@@ -12,26 +12,11 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
   alias Grizzly.ZWave.DecodeError
 
   @type status :: :done | :busy
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:status, status()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    # TODO: validate params
-    command = %Command{
-      name: :default_set_complete,
-      command_byte: 0x07,
-      command_class: NetworkManagementBasicNode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

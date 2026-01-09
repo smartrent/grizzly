@@ -15,23 +15,9 @@ defmodule Grizzly.ZWave.Commands.IncludedNIFReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.DSK
 
   @type param :: {:seq_number, byte()} | {:dsk, DSK.t()}
-
-  @impl Command
-  @spec new([param()]) :: {:ok, Grizzly.ZWave.Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :included_nif_report,
-      command_byte: 0x19,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Command
   @spec encode_params(Command.t()) :: binary()

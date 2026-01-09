@@ -30,19 +30,6 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
           | {:locking_entity_id, non_neg_integer}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :antitheft_unlock_report,
-      command_byte: 0x02,
-      command_class: AntitheftUnlock,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     state_bit = Command.param!(command, :state) |> AntitheftUnlock.state_to_bit()
     restricted? = Command.param!(command, :restricted)

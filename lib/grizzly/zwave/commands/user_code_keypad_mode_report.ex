@@ -16,19 +16,6 @@ defmodule Grizzly.ZWave.Commands.UserCodeKeypadModeReport do
   @type param :: {:mode, UserCode.keypad_mode()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_code_keypad_mode_report,
-      command_byte: 0x0A,
-      command_class: UserCode,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   defdelegate encode_params(command), to: Commands.UserCodeKeypadModeSet
 

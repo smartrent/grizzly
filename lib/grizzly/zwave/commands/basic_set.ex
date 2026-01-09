@@ -12,22 +12,9 @@ defmodule Grizzly.ZWave.Commands.BasicSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Basic
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:value, :on | :off}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :basic_set,
-      command_byte: 0x01,
-      command_class: Basic,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

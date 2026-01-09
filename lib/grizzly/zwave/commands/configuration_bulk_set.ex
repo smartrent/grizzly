@@ -21,7 +21,6 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
 
   @type param ::
           {:default, boolean}
@@ -29,19 +28,6 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSet do
           | {:handshake, boolean}
           | {:offset, non_neg_integer()}
           | {:values, [integer]}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :configuration_bulk_set,
-      command_byte: 0x07,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

@@ -10,7 +10,6 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
 
   @typedoc """
   The long range channel
@@ -21,19 +20,6 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport do
   Parameters to the command
   """
   @type param() :: {:channel, long_range_channel()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :zwave_long_range_channel_report,
-      command_byte: 0x0E,
-      command_class: NetworkManagementInstallationMaintenance,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def decode_params(<<0x01>>), do: {:ok, [channel: :primary]}

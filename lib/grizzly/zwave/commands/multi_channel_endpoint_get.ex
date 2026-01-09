@@ -9,18 +9,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.MultiChannel
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :multi_channel_endpoint_get,
-      command_byte: 0x07,
-      command_class: MultiChannel
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

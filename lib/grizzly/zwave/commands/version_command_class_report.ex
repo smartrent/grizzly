@@ -13,23 +13,9 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.Version
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:command_class, CommandClasses.command_class()} | {:version, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :version_command_class_report,
-      command_byte: 0x14,
-      command_class: Version,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

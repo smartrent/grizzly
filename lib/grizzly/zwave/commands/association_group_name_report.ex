@@ -12,22 +12,8 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupNameReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
 
   @type param() :: {:group_id, byte} | {:name, String.t()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :association_group_name_report,
-      command_byte: 0x02,
-      command_class: AssociationGroupInfo,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

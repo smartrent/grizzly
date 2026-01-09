@@ -30,19 +30,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
           | {:end_points, [end_point]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :multi_channel_endpoint_find_report,
-      command_byte: 0x0C,
-      command_class: MultiChannel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     reports_to_follow = Command.param!(command, :reports_to_follow)

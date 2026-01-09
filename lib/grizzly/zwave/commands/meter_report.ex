@@ -36,19 +36,6 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
           | {:previous_value, number() | :unknown}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :meter_report,
-      command_byte: 0x02,
-      command_class: Meter,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     if Command.has_param?(command, :rate_type) || Command.has_param?(command, :delta_time) do
       do_encode_params(:v5, command)

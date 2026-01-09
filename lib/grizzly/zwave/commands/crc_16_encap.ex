@@ -12,24 +12,10 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.CRC16Encap
   alias Grizzly.ZWave.CRC
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:command, Command.t()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :crc_16_encap,
-      command_byte: 0x01,
-      command_class: CRC16Encap,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

@@ -15,23 +15,9 @@ defmodule Grizzly.ZWave.Commands.TimeReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Time
 
   @type param ::
           {:hour, 0..23} | {:minute, 0..59} | {:second, 0..59}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :time_report,
-      command_byte: 0x02,
-      command_class: Time,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

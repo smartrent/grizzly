@@ -18,19 +18,6 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteSet do
           | {:speed, NMIM.speed()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :priority_route_set,
-      command_byte: 0x01,
-      command_class: NMIM,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)

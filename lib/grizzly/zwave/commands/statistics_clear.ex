@@ -9,19 +9,6 @@ defmodule Grizzly.ZWave.Commands.StatisticsClear do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :statistics_clear,
-      command_byte: 0x06,
-      command_class: NetworkManagementInstallationMaintenance,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

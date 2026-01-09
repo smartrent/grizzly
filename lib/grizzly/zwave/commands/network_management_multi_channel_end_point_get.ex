@@ -12,20 +12,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.NodeId
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :network_management_multi_channel_end_point_get,
-      command_byte: 0x05,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command, encode_opts \\ []) do

@@ -31,19 +31,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReport do
   @marker 0x00
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :multi_channel_association_report,
-      command_byte: 0x03,
-      command_class: MultiChannelAssociation,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     grouping_identifier = Command.param!(command, :grouping_identifier)

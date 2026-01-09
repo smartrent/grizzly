@@ -21,7 +21,6 @@ defmodule Grizzly.ZWave.Commands.TimeParametersReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.TimeParameters
 
   @type param ::
           {:year, non_neg_integer}
@@ -30,19 +29,6 @@ defmodule Grizzly.ZWave.Commands.TimeParametersReport do
           | {:hour_utc, 0..23}
           | {:minute_utc, 0..59}
           | {:second_utc, 0..59}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :time_parameters_report,
-      command_byte: 0x03,
-      command_class: TimeParameters,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

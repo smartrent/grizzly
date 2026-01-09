@@ -11,20 +11,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ThermostatSetback
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :thermostat_setback_get,
-      command_byte: 0x02,
-      command_class: ThermostatSetback
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

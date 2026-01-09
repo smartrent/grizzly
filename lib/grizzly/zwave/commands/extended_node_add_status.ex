@@ -46,20 +46,6 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
           | {:kex_fail_type, Security.key_exchange_fail_type()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    # TODO: validate params
-    command = %Command{
-      name: :extended_node_add_status,
-      command_byte: 0x16,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
     status = Command.param!(command, :status)

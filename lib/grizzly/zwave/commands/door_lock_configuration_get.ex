@@ -9,19 +9,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.DoorLock
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :door_lock_configuration_get,
-      command_byte: 0x05,
-      command_class: DoorLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

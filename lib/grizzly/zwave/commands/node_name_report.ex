@@ -19,18 +19,6 @@ defmodule Grizzly.ZWave.Commands.NodeNameReport do
   @type param :: {:name, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 
   @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :node_name_report,
-      command_byte: 0x03,
-      command_class: NodeNaming,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     encoding = Command.param!(command, :encoding)
     name = Command.param!(command, :name)

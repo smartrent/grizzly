@@ -16,25 +16,11 @@ defmodule Grizzly.ZWave.Commands.BasicReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Basic
   alias Grizzly.ZWave.DecodeError
 
   @type value :: :on | :off | :unknown | byte()
   @type duration :: non_neg_integer | :unknown
   @type param :: {:value, value()} | {:target_value, value()} | {:duration, duration()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :basic_report,
-      command_byte: 0x03,
-      command_class: Basic,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

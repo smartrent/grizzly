@@ -23,19 +23,6 @@ defmodule Grizzly.ZWave.Commands.MeterReset do
   @type param :: {:meter_type, any()} | {:rate_type, any()} | {:values, any()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :meter_reset,
-      command_byte: 0x05,
-      command_class: Meter,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     if Command.has_param?(command, :meter_type) || Command.has_param?(command, :rate_type) ||

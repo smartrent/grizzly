@@ -7,25 +7,11 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.S0
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:supported | :controlled, [CommandClasses.command_class()]}
           | {:reports_to_follow, non_neg_integer()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :s0_commands_supported_report,
-      command_byte: 0x03,
-      command_class: S0,
-      params: put_defaults(params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
@@ -56,12 +42,5 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
       end
 
     {:ok, [reports_to_follow: reports_to_follow, supported: supported, controlled: controlled]}
-  end
-
-  defp put_defaults(params) do
-    params
-    |> Keyword.put_new(:supported, [])
-    |> Keyword.put_new(:controlled, [])
-    |> Keyword.put_new(:reports_to_follow, 0)
   end
 end

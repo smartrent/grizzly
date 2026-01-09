@@ -26,20 +26,7 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
   alias Grizzly.ZWave.NodeId
-
-  @impl Command
-  def new(params) do
-    command = %Command{
-      name: :s2_resynchronization_event,
-      command_byte: 0x09,
-      command_class: NetworkManagementInstallationMaintenance,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Command
   def encode_params(command) do

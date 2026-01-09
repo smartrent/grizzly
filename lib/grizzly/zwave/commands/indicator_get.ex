@@ -17,19 +17,6 @@ defmodule Grizzly.ZWave.Commands.IndicatorGet do
   @type param :: {:indicator_id, Indicator.indicator_id()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :indicator_get,
-      command_byte: 0x02,
-      command_class: Indicator,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     indicator_id = Command.param(command, :indicator_id)
