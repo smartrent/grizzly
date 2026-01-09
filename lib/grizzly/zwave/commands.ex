@@ -22,18 +22,18 @@ defmodule Grizzly.ZWave.Commands do
     command :alarm_get, 0x04
     command :alarm_report, 0x05
     command :alarm_set, 0x06
-    command :alarm_type_supported_get, 0x07
+    command :alarm_type_supported_get, 0x07, Cmds.GenericNoPayload
     command :alarm_type_supported_report, 0x08
   end
 
   command_class :antitheft do
     command :antitheft_set, 0x01
-    command :antitheft_get, 0x02
+    command :antitheft_get, 0x02, Cmds.GenericNoPayload
     command :antitheft_report, 0x03
   end
 
   command_class :antitheft_unlock do
-    command :antitheft_unlock_get, 0x01
+    command :antitheft_unlock_get, 0x01, Cmds.GenericNoPayload
     command :antitheft_unlock_report, 0x02
     command :antitheft_unlock_set, 0x03
   end
@@ -48,9 +48,9 @@ defmodule Grizzly.ZWave.Commands do
     command :association_get, 0x02, handler: {AggregateReport, aggregate_param: :nodes}
     command :association_report, 0x03, default_params: [reports_to_follow: 0]
     command :association_remove, 0x04
-    command :association_groupings_get, 0x05
+    command :association_groupings_get, 0x05, Cmds.GenericNoPayload
     command :association_groupings_report, 0x06
-    command :association_specific_group_get, 0x0B
+    command :association_specific_group_get, 0x0B, Cmds.GenericNoPayload
     command :association_specific_group_report, 0x0C
   end
 
@@ -65,9 +65,9 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :barrier_operator do
     command :barrier_operator_set, 0x01
-    command :barrier_operator_get, 0x02
+    command :barrier_operator_get, 0x02, Cmds.GenericNoPayload
     command :barrier_operator_report, 0x03
-    command :barrier_operator_signal_supported_get, 0x04
+    command :barrier_operator_signal_supported_get, 0x04, Cmds.GenericNoPayload
     command :barrier_operator_signal_supported_report, 0x05
     command :barrier_operator_signal_set, 0x06
     command :barrier_operator_signal_get, 0x07
@@ -76,32 +76,32 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :basic do
     command :basic_set, 0x01
-    command :basic_get, 0x02
+    command :basic_get, 0x02, Cmds.GenericNoPayload
     command :basic_report, 0x03
   end
 
   command_class :battery do
-    command :battery_get, 0x02
+    command :battery_get, 0x02, Cmds.GenericNoPayload
     command :battery_report, 0x03
   end
 
   command_class :central_scene do
-    command :central_scene_supported_get, 0x01
+    command :central_scene_supported_get, 0x01, Cmds.GenericNoPayload
     command :central_scene_supported_report, 0x02
     command :central_scene_notification, 0x03
     command :central_scene_configuration_set, 0x04
-    command :central_scene_configuration_get, 0x05
+    command :central_scene_configuration_get, 0x05, Cmds.GenericNoPayload
     command :central_scene_configuration_report, 0x06
   end
 
   command_class :clock do
     command :clock_set, 0x04
-    command :clock_get, 0x05
+    command :clock_get, 0x05, Cmds.GenericNoPayload
     command :clock_report, 0x06
   end
 
   command_class :configuration do
-    command :configuration_default_reset, 0x01
+    command :configuration_default_reset, 0x01, Cmds.GenericNoPayload
     command :configuration_set, 0x04
     command :configuration_get, 0x05, report: :configuration_report
     command :configuration_report, 0x06
@@ -121,12 +121,12 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :device_reset_locally do
-    command :device_reset_locally_notification, 0x01
+    command :device_reset_locally_notification, 0x01, Cmds.GenericNoPayload
   end
 
   command_class :door_lock do
     command :door_lock_operation_set, 0x01
-    command :door_lock_operation_get, 0x02
+    command :door_lock_operation_get, 0x02, Cmds.GenericNoPayload
 
     command :door_lock_operation_report, 0x03,
       default_params: [
@@ -140,14 +140,14 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :door_lock_configuration_set, 0x04
-    command :door_lock_configuration_get, 0x05
+    command :door_lock_configuration_get, 0x05, Cmds.GenericNoPayload
     command :door_lock_configuration_report, 0x06
-    command :door_lock_capabilities_get, 0x07
+    command :door_lock_capabilities_get, 0x07, Cmds.GenericNoPayload
     command :door_lock_capabilities_report, 0x08
   end
 
   command_class :firmware_update_md do
-    command :firmware_md_get, 0x01, Cmds.FirmwareMDGet
+    command :firmware_md_get, 0x01, Cmds.GenericNoPayload
     command :firmware_md_report, 0x02, Cmds.FirmwareMDReport
     command :firmware_update_md_request_get, 0x03, Cmds.FirmwareUpdateMDRequestGet
     command :firmware_update_md_request_report, 0x04, Cmds.FirmwareUpdateMDRequestReport
@@ -159,19 +159,19 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :hail do
-    command :hail, 0x01
+    command :hail, 0x01, Cmds.GenericNoPayload
   end
 
   command_class :humidity_control_mode do
     command :humidity_control_mode_set, 0x01
-    command :humidity_control_mode_get, 0x02
+    command :humidity_control_mode_get, 0x02, Cmds.GenericNoPayload
     command :humidity_control_mode_report, 0x03
-    command :humidity_control_mode_supported_get, 0x04
+    command :humidity_control_mode_supported_get, 0x04, Cmds.GenericNoPayload
     command :humidity_control_mode_supported_report, 0x05
   end
 
   command_class :humidity_control_operating_state do
-    command :humidity_control_operating_state_get, 0x01
+    command :humidity_control_operating_state_get, 0x01, Cmds.GenericNoPayload
     command :humidity_control_operating_state_report, 0x02
   end
 
@@ -179,7 +179,7 @@ defmodule Grizzly.ZWave.Commands do
     command :humidity_control_setpoint_set, 0x01
     command :humidity_control_setpoint_get, 0x02
     command :humidity_control_setpoint_report, 0x03
-    command :humidity_control_setpoint_supported_get, 0x04
+    command :humidity_control_setpoint_supported_get, 0x04, Cmds.GenericNoPayload
     command :humidity_control_setpoint_supported_report, 0x05
     command :humidity_control_setpoint_scale_supported_get, 0x06
     command :humidity_control_setpoint_scale_supported_report, 0x07
@@ -198,7 +198,7 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :manufacturer_specific do
-    command :manufacturer_specific_get, 0x04
+    command :manufacturer_specific_get, 0x04, Cmds.GenericNoPayload
     command :manufacturer_specific_report, 0x05
     command :manufacturer_specific_device_specific_get, 0x06
     command :manufacturer_specific_device_specific_report, 0x07
@@ -207,13 +207,13 @@ defmodule Grizzly.ZWave.Commands do
   command_class :meter do
     command :meter_get, 0x01
     command :meter_report, 0x02
-    command :meter_supported_get, 0x03
+    command :meter_supported_get, 0x03, Cmds.GenericNoPayload
     command :meter_supported_report, 0x04
     command :meter_reset, 0x05
   end
 
   command_class :multi_channel do
-    command :multi_channel_endpoint_get, 0x07
+    command :multi_channel_endpoint_get, 0x07, Cmds.GenericNoPayload
     command :multi_channel_endpoint_report, 0x08
     command :multi_channel_capability_get, 0x09
     command :multi_channel_capability_report, 0x0A
@@ -242,7 +242,7 @@ defmodule Grizzly.ZWave.Commands do
 
     command :multi_channel_association_report, 0x03
     command :multi_channel_association_remove, 0x04
-    command :multi_channel_association_groupings_get, 0x05
+    command :multi_channel_association_groupings_get, 0x05, Cmds.GenericNoPayload
     command :multi_channel_association_groupings_report, 0x06
   end
 
@@ -288,12 +288,12 @@ defmodule Grizzly.ZWave.Commands do
     command :priority_route_report, 0x03
     command :statistics_get, 0x04
     command :statistics_report, 0x05
-    command :statistics_clear, 0x06
-    command :rssi_get, 0x07
+    command :statistics_clear, 0x06, Cmds.GenericNoPayload
+    command :rssi_get, 0x07, Cmds.GenericNoPayload
     command :rssi_report, 0x08
     command :s2_resynchronization_event, 0x09, Cmds.S2ResynchronizationEvent
     command :zwave_long_range_channel_set, 0x0A, Cmds.ZWaveLongRangeChannelSet
-    command :zwave_long_range_channel_get, 0x0D, Cmds.ZWaveLongRangeChannelGet
+    command :zwave_long_range_channel_get, 0x0D, Cmds.GenericNoPayload
     command :zwave_long_range_channel_report, 0x0E, Cmds.ZWaveLongRangeChannelReport
   end
 
@@ -312,15 +312,15 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :no_operation do
     # TODO?
-    command :no_operation, 0x00
+    command :no_operation, 0x00, Cmds.GenericNoPayload
   end
 
   command_class :node_naming do
     command :node_name_set, 0x01
-    command :node_name_get, 0x02
+    command :node_name_get, 0x02, Cmds.GenericNoPayload
     command :node_name_report, 0x03
     command :node_location_set, 0x04
-    command :node_location_get, 0x05
+    command :node_location_get, 0x05, Cmds.GenericNoPayload
     command :node_location_report, 0x06
   end
 
@@ -338,10 +338,10 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :powerlevel do
     command :powerlevel_set, 0x01
-    command :powerlevel_get, 0x02
+    command :powerlevel_get, 0x02, Cmds.GenericNoPayload
     command :powerlevel_report, 0x03
     command :powerlevel_test_node_set, 0x04
-    command :powerlevel_test_node_get, 0x05
+    command :powerlevel_test_node_get, 0x05, Cmds.GenericNoPayload
     command :powerlevel_test_node_report, 0x06
   end
 
@@ -364,9 +364,9 @@ defmodule Grizzly.ZWave.Commands do
     command :schedule_entry_lock_year_day_set, 0x06
     command :schedule_entry_lock_year_day_get, 0x07
     command :schedule_entry_lock_year_day_report, 0x08
-    command :schedule_entry_type_supported_get, 0x09
+    command :schedule_entry_type_supported_get, 0x09, Cmds.GenericNoPayload
     command :schedule_entry_type_supported_report, 0x0A
-    command :schedule_entry_lock_time_offset_get, 0x0B
+    command :schedule_entry_lock_time_offset_get, 0x0B, Cmds.GenericNoPayload
     command :schedule_entry_lock_time_offset_report, 0x0C
     command :schedule_entry_lock_time_offset_set, 0x0D
     command :schedule_entry_lock_daily_repeating_get, 0x0E
@@ -375,7 +375,7 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :security do
-    command :s0_commands_supported_get, 0x02
+    command :s0_commands_supported_get, 0x02, Cmds.GenericNoPayload
 
     command :s0_commands_supported_report, 0x03, Cmds.S0CommandsSupportedReport,
       default_params: [supported: [], controlled: [], reports_to_follow: 0]
@@ -383,44 +383,44 @@ defmodule Grizzly.ZWave.Commands do
     command :s0_security_scheme_get, 0x04, Cmds.S0SecuritySchemeGet
     command :s0_security_scheme_report, 0x05, Cmds.S0SecuritySchemeReport
     command :s0_network_key_set, 0x06, Cmds.S0NetworkKeySet, report: :s0_network_key_verify
-    command :s0_network_key_verify, 0x07
+    command :s0_network_key_verify, 0x07, Cmds.GenericNoPayload
 
     command :s0_security_scheme_inherit, 0x08, Cmds.S0SecuritySchemeInherit,
       report: :s0_security_scheme_report
 
-    command :s0_nonce_get, 0x40
+    command :s0_nonce_get, 0x40, Cmds.GenericNoPayload
     command :s0_nonce_report, 0x80, Cmds.S0NonceReport
     command :s0_message_encapsulation, 0x81, Cmds.S0MessageEncapsulation
   end
 
   command_class :security_2 do
-    command :s2_nonce_get, 0x01
+    command :s2_nonce_get, 0x01, Cmds.GenericNoPayload
     command :s2_nonce_report, 0x02, Cmds.S2NonceReport
     command :s2_message_encapsulation, 0x03, Cmds.S2MessageEncapsulation
-    command :s2_kex_get, 0x04, supports_supervision?: false
+    command :s2_kex_get, 0x04, Cmds.GenericNoPayload, supports_supervision?: false
     command :s2_kex_report, 0x05, Cmds.S2KexReport, supports_supervision?: false
     command :s2_kex_set, 0x06, Cmds.S2KexSet, supports_supervision?: false
     command :s2_kex_fail, 0x07, Cmds.S2KexFail, supports_supervision?: false
     command :s2_public_key_report, 0x08, Cmds.S2PublicKeyReport, supports_supervision?: false
     command :s2_network_key_get, 0x09, Cmds.S2NetworkKeyGet, supports_supervision?: false
     command :s2_network_key_report, 0x0A, Cmds.S2NetworkKeyReport, supports_supervision?: false
-    command :s2_network_key_verify, 0x0B, supports_supervision?: false
+    command :s2_network_key_verify, 0x0B, Cmds.GenericNoPayload, supports_supervision?: false
     command :s2_transfer_end, 0x0C, Cmds.S2TransferEnd, supports_supervision?: false
-    command :s2_commands_supported_get, 0x0D
+    command :s2_commands_supported_get, 0x0D, Cmds.GenericNoPayload
 
     command :s2_commands_supported_report, 0x0E, Cmds.S2CommandsSupportedReport,
       default_params: [command_classes: []]
   end
 
   command_class :sensor_binary do
-    command :sensor_binary_supported_sensor_get, 0x01
+    command :sensor_binary_supported_sensor_get, 0x01, Cmds.GenericNoPayload
     command :sensor_binary_get, 0x02
     command :sensor_binary_report, 0x03
     command :sensor_binary_supported_sensor_report, 0x04
   end
 
   command_class :sensor_multilevel do
-    command :sensor_multilevel_supported_sensor_get, 0x01
+    command :sensor_multilevel_supported_sensor_get, 0x01, Cmds.GenericNoPayload
     command :sensor_multilevel_supported_sensor_report, 0x02
     command :sensor_multilevel_supported_scale_get, 0x03
     command :sensor_multilevel_get, 0x04
@@ -429,15 +429,15 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :sound_switch do
-    command :sound_switch_tones_number_get, 0x01
+    command :sound_switch_tones_number_get, 0x01, Cmds.GenericNoPayload
     command :sound_switch_tones_number_report, 0x02
     command :sound_switch_tone_info_get, 0x03
     command :sound_switch_tone_info_report, 0x04
     command :sound_switch_configuration_set, 0x05
-    command :sound_switch_configuration_get, 0x06
+    command :sound_switch_configuration_get, 0x06, Cmds.GenericNoPayload
     command :sound_switch_configuration_report, 0x07
     command :sound_switch_tone_play_set, 0x08
-    command :sound_switch_tone_play_get, 0x09
+    command :sound_switch_tone_play_get, 0x09, Cmds.GenericNoPayload
     command :sound_switch_tone_play_report, 0x0A
   end
 
@@ -448,47 +448,47 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :switch_binary do
     command :switch_binary_set, 0x01
-    command :switch_binary_get, 0x02
+    command :switch_binary_get, 0x02, Cmds.GenericNoPayload
     command :switch_binary_report, 0x03
   end
 
   command_class :switch_multilevel do
     command :switch_multilevel_set, 0x01
-    command :switch_multilevel_get, 0x02
+    command :switch_multilevel_get, 0x02, Cmds.GenericNoPayload
     command :switch_multilevel_report, 0x03
     command :switch_multilevel_start_level_change, 0x04
-    command :switch_multilevel_stop_level_change, 0x05
+    command :switch_multilevel_stop_level_change, 0x05, Cmds.GenericNoPayload
   end
 
   command_class :thermostat_fan_mode do
     command :thermostat_fan_mode_set, 0x01
-    command :thermostat_fan_mode_get, 0x02
+    command :thermostat_fan_mode_get, 0x02, Cmds.GenericNoPayload
     command :thermostat_fan_mode_report, 0x03
-    command :thermostat_fan_mode_supported_get, 0x04
+    command :thermostat_fan_mode_supported_get, 0x04, Cmds.GenericNoPayload
     command :thermostat_fan_mode_supported_report, 0x05
   end
 
   command_class :thermostat_fan_state do
-    command :thermostat_fan_state_get, 0x02
+    command :thermostat_fan_state_get, 0x02, Cmds.GenericNoPayload
     command :thermostat_fan_state_report, 0x03
   end
 
   command_class :thermostat_mode do
     command :thermostat_mode_set, 0x01
-    command :thermostat_mode_get, 0x02
+    command :thermostat_mode_get, 0x02, Cmds.GenericNoPayload
     command :thermostat_mode_report, 0x03
-    command :thermostat_mode_supported_get, 0x04
+    command :thermostat_mode_supported_get, 0x04, Cmds.GenericNoPayload
     command :thermostat_mode_supported_report, 0x05
   end
 
   command_class :thermostat_operating_state do
-    command :thermostat_operating_state_get, 0x02
+    command :thermostat_operating_state_get, 0x02, Cmds.GenericNoPayload
     command :thermostat_operating_state_report, 0x03
   end
 
   command_class :thermostat_setback do
     command :thermostat_setback_set, 0x01
-    command :thermostat_setback_get, 0x02
+    command :thermostat_setback_get, 0x02, Cmds.GenericNoPayload
     command :thermostat_setback_report, 0x03
   end
 
@@ -496,25 +496,25 @@ defmodule Grizzly.ZWave.Commands do
     command :thermostat_setpoint_set, 0x01
     command :thermostat_setpoint_get, 0x02
     command :thermostat_setpoint_report, 0x03
-    command :thermostat_setpoint_supported_get, 0x04
+    command :thermostat_setpoint_supported_get, 0x04, Cmds.GenericNoPayload
     command :thermostat_setpoint_supported_report, 0x05
     command :thermostat_setpoint_capabilities_get, 0x09
     command :thermostat_setpoint_capabilities_report, 0x0A
   end
 
   command_class :time do
-    command :time_get, 0x01
+    command :time_get, 0x01, Cmds.GenericNoPayload
     command :time_report, 0x02
-    command :date_get, 0x03
+    command :date_get, 0x03, Cmds.GenericNoPayload
     command :date_report, 0x04
     command :time_offset_set, 0x05
-    command :time_offset_get, 0x06
+    command :time_offset_get, 0x06, Cmds.GenericNoPayload
     command :time_offset_report, 0x07
   end
 
   command_class :time_parameters do
     command :time_parameters_set, 0x01
-    command :time_parameters_get, 0x02
+    command :time_parameters_get, 0x02, Cmds.GenericNoPayload
     command :time_parameters_report, 0x03
   end
 
@@ -522,27 +522,27 @@ defmodule Grizzly.ZWave.Commands do
     command :user_code_set, 0x01
     command :user_code_get, 0x02
     command :user_code_report, 0x03
-    command :user_code_users_number_get, 0x04
+    command :user_code_users_number_get, 0x04, Cmds.GenericNoPayload
     command :user_code_users_number_report, 0x05
-    command :user_code_capabilities_get, 0x06
+    command :user_code_capabilities_get, 0x06, Cmds.GenericNoPayload
     command :user_code_capabilities_report, 0x07
     command :user_code_keypad_mode_set, 0x08
-    command :user_code_keypad_mode_get, 0x09
+    command :user_code_keypad_mode_get, 0x09, Cmds.GenericNoPayload
     command :user_code_keypad_mode_report, 0x0A
     command :extended_user_code_set, 0x0B
     command :extended_user_code_get, 0x0C
     command :extended_user_code_report, 0x0D
     command :admin_code_set, 0x0E
-    command :admin_code_get, 0x0F
+    command :admin_code_get, 0x0F, Cmds.GenericNoPayload
     command :admin_code_report, 0x10
-    command :user_code_checksum_get, 0x11
+    command :user_code_checksum_get, 0x11, Cmds.GenericNoPayload
     command :user_code_checksum_report, 0x12
   end
 
   command_class :user_credential do
-    command :user_capabilities_get, 0x01
+    command :user_capabilities_get, 0x01, Cmds.GenericNoPayload
     command :user_capabilities_report, 0x02
-    command :credential_capabilities_get, 0x03
+    command :credential_capabilities_get, 0x03, Cmds.GenericNoPayload
     command :credential_capabilities_report, 0x04
     command :user_set, 0x05
     command :user_get, 0x06
@@ -551,47 +551,47 @@ defmodule Grizzly.ZWave.Commands do
     command :credential_get, 0x0B
     command :credential_report, 0x0C
     command :credential_learn_start, 0x0F
-    command :credential_learn_cancel, 0x10
+    command :credential_learn_cancel, 0x10, Cmds.GenericNoPayload
     command :credential_learn_status_report, 0x11
     command :user_credential_association_set, 0x12
     command :user_credential_association_report, 0x13
-    command :all_users_checksum_get, 0x14
+    command :all_users_checksum_get, 0x14, Cmds.GenericNoPayload
     command :all_users_checksum_report, 0x15
     command :user_checksum_get, 0x16
     command :user_checksum_report, 0x17
     command :credential_checksum_get, 0x18
     command :credential_checksum_report, 0x19
     command :admin_pin_code_set, 0x1A
-    command :admin_pin_code_get, 0x1B
+    command :admin_pin_code_get, 0x1B, Cmds.GenericNoPayload
     command :admin_pin_code_report, 0x1C
   end
 
   command_class :version do
-    command :version_get, 0x11
+    command :version_get, 0x11, Cmds.GenericNoPayload
     command :version_report, 0x12
 
     command :version_command_class_get, 0x13,
       report_matcher_fun: {Cmds.VersionCommandClassGet, :report_matches_get?}
 
     command :version_command_class_report, 0x14
-    command :version_capabilities_get, 0x15
+    command :version_capabilities_get, 0x15, Cmds.GenericNoPayload
     command :version_capabilities_report, 0x16
-    command :version_zwave_software_get, 0x17, Cmds.VersionZWaveSoftwareGet
+    command :version_zwave_software_get, 0x17, Cmds.GenericNoPayload
     command :version_zwave_software_report, 0x18, Cmds.VersionZWaveSoftwareReport
   end
 
   command_class :wake_up do
     command :wake_up_interval_set, 0x04
-    command :wake_up_interval_get, 0x05
+    command :wake_up_interval_get, 0x05, Cmds.GenericNoPayload
     command :wake_up_interval_report, 0x06
-    command :wake_up_notification, 0x07
-    command :wake_up_no_more_information, 0x08
-    command :wake_up_interval_capabilities_get, 0x09
+    command :wake_up_notification, 0x07, Cmds.GenericNoPayload
+    command :wake_up_no_more_information, 0x08, Cmds.GenericNoPayload
+    command :wake_up_interval_capabilities_get, 0x09, Cmds.GenericNoPayload
     command :wake_up_interval_capabilities_report, 0x0A
   end
 
   command_class :window_covering do
-    command :window_covering_supported_get, 0x01
+    command :window_covering_supported_get, 0x01, Cmds.GenericNoPayload
     command :window_covering_supported_report, 0x02
     command :window_covering_get, 0x03
     command :window_covering_report, 0x04
@@ -616,12 +616,12 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :zip_gateway do
-    command :application_node_info_get, 0x0C
+    command :application_node_info_get, 0x0C, Cmds.GenericNoPayload
     command :application_node_info_report, 0x0D
   end
 
   command_class :zwaveplus_info do
-    command :zwaveplus_info_get, 0x01
+    command :zwaveplus_info_get, 0x01, Cmds.GenericNoPayload
     command :zwaveplus_info_report, 0x02
   end
 
@@ -630,17 +630,17 @@ defmodule Grizzly.ZWave.Commands do
 
   ## Examples
 
-      iex> Grizzly.ZWave.Commands.spec_for(:battery_get)
+      iex> Grizzly.ZWave.Commands.spec_for(:thermostat_setpoint_get)
       {:ok, %Grizzly.ZWave.CommandSpec{
-        name: :battery_get,
+        name: :thermostat_setpoint_get,
         command_byte: 0x02,
-        command_class: :battery,
+        command_class: :thermostat_setpoint,
         default_params: [],
-        module: Grizzly.ZWave.Commands.BatteryGet,
-        encode_fun: {Grizzly.ZWave.Commands.BatteryGet, :encode_params},
-        decode_fun: {Grizzly.ZWave.Commands.BatteryGet, :decode_params},
-        handler: {Grizzly.Requests.Handlers.WaitReport, complete_report: :battery_report},
-        report: :battery_report,
+        module: Grizzly.ZWave.Commands.ThermostatSetpointGet,
+        encode_fun: {Grizzly.ZWave.Commands.ThermostatSetpointGet, :encode_params},
+        decode_fun: {Grizzly.ZWave.Commands.ThermostatSetpointGet, :decode_params},
+        handler: {Grizzly.Requests.Handlers.WaitReport, complete_report: :thermostat_setpoint_report},
+        report: :thermostat_setpoint_report,
         report_matcher_fun: nil,
         supports_supervision?: false
       }}

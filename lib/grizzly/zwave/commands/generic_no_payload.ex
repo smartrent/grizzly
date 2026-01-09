@@ -1,10 +1,6 @@
-defmodule Grizzly.ZWave.Commands.VersionCapabilitiesGet do
+defmodule Grizzly.ZWave.Commands.GenericNoPayload do
   @moduledoc """
-  This module implements command VERSION_CAPABILITIES_GET of command class
-  COMMAND_CLASS_VERSION
-
-  Params: - none -
-
+  A generic command module for Z-Wave commands that have no payload.
   """
 
   @behaviour Grizzly.ZWave.Command
