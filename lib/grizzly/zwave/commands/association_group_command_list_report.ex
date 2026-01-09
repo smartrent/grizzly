@@ -12,6 +12,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.CommandClasses.AssociationGroupInfo
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
@@ -53,23 +54,12 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   end
 
   defp encode_commands(command_names) do
-    commands =
-      for command_name <- command_names do
-        {:ok, command} = make_command(command_name)
-        command
-      end
+    specs = Enum.map(command_names, &Commands.spec_for!/1)
 
-    for command <- commands, into: <<>> do
-      command_class_module = command.command_class
-      command_class_byte = command_class_module.byte()
-      <<command_class_byte, command.command_byte>>
+    for spec <- specs, into: <<>> do
+      command_class_byte = CommandClasses.to_byte(spec.command_class)
+      <<command_class_byte, spec.command_byte>>
     end
-  end
-
-  defp make_command(command_name) do
-    {command_module, _} = Commands.lookup(command_name)
-
-    command_module.new([])
   end
 
   defp decode_commands(length, encoded_commands_list) do
