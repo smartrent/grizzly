@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.WindowCoveringStopLevelChangeTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.WindowCoveringStopLevelChange
 
   test "creates the command and validates params" do
     params = [parameter_name: :out_left_positioned]
-    {:ok, _command} = WindowCoveringStopLevelChange.new(params)
+    {:ok, _command} = Commands.create(:window_covering_stop_level_change, params)
   end
 
   test "encodes params correctly" do
     params = [parameter_name: :out_left_positioned]
-    {:ok, command} = WindowCoveringStopLevelChange.new(params)
+    {:ok, command} = Commands.create(:window_covering_stop_level_change, params)
     expected_binary = <<1>>
     assert expected_binary == WindowCoveringStopLevelChange.encode_params(command)
   end

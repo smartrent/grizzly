@@ -1,12 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ThermostatFanModeSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatFanModeSupportedReport
 
   test "encodes params correctly" do
     modes = [:auto_low, :low, :auto_high, :auto_medium]
 
-    {:ok, cmd} = ThermostatFanModeSupportedReport.new(modes: modes)
+    {:ok, cmd} = Commands.create(:thermostat_fan_mode_supported_report, modes: modes)
 
     expected_binary = <<0b00010111>>
 

@@ -2,11 +2,12 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AlarmReport
 
   describe "creates the command and validates params" do
     test "v1" do
-      {:ok, command} = AlarmReport.new(type: 0x16, level: 0x17)
+      {:ok, command} = Commands.create(:alarm_report, type: 0x16, level: 0x17)
 
       assert Command.param!(command, :type) == 0x16
       assert Command.param!(command, :level) == 0x17
@@ -14,7 +15,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
     test "v2 with defaults" do
       {:ok, command} =
-        AlarmReport.new(
+        Commands.create(
+          :alarm_report,
           type: 0x10,
           level: 0x25,
           zwave_status: :enabled,
@@ -33,7 +35,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
     test "v2 override defaults" do
       {:ok, command} =
-        AlarmReport.new(
+        Commands.create(
+          :alarm_report,
           type: 0x10,
           level: 0x25,
           zwave_status: :disabled,
@@ -55,14 +58,15 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
   describe "encodes params correctly" do
     test "v1" do
-      {:ok, command} = AlarmReport.new(type: 0x16, level: 0x17)
+      {:ok, command} = Commands.create(:alarm_report, type: 0x16, level: 0x17)
 
       assert <<0x16, 0x17>> == AlarmReport.encode_params(command)
     end
 
     test "v2 with no event params" do
       {:ok, command} =
-        AlarmReport.new(
+        Commands.create(
+          :alarm_report,
           type: 0x10,
           level: 0x25,
           zwave_status: :disabled,
@@ -76,7 +80,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
     test "v2 with event params" do
       {:ok, command} =
-        AlarmReport.new(
+        Commands.create(
+          :alarm_report,
           type: 0x10,
           level: 0x25,
           zwave_status: :disabled,
@@ -91,7 +96,8 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
     test "v8 with sequence number" do
       {:ok, command} =
-        AlarmReport.new(
+        Commands.create(
+          :alarm_report,
           type: 0x10,
           level: 0x25,
           zwave_status: :disabled,

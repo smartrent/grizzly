@@ -1,12 +1,13 @@
 defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ConfigurationPropertiesReport
 
   describe "creates the command and validates params" do
     test "v1, size 0" do
       params = [param_number: 2, format: :unsigned_integer, size: 0, next_param_number: 3]
-      {:ok, _command} = ConfigurationPropertiesReport.new(params)
+      {:ok, _command} = Commands.create(:configuration_properties_report, params)
     end
 
     test "v1, size > 0" do
@@ -20,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
         next_param_number: 3
       ]
 
-      {:ok, _command} = ConfigurationPropertiesReport.new(params)
+      {:ok, _command} = Commands.create(:configuration_properties_report, params)
     end
 
     test "v4, size 0" do
@@ -35,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
         next_param_number: 3
       ]
 
-      {:ok, _command} = ConfigurationPropertiesReport.new(params)
+      {:ok, _command} = Commands.create(:configuration_properties_report, params)
     end
 
     test "v4, size > 0" do
@@ -53,14 +54,14 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
         next_param_number: 3
       ]
 
-      {:ok, _command} = ConfigurationPropertiesReport.new(params)
+      {:ok, _command} = Commands.create(:configuration_properties_report, params)
     end
   end
 
   describe "encodes params correctly" do
     test "v1, size 0" do
       params = [param_number: 2, format: :unsigned_integer, size: 0, next_param_number: 3]
-      {:ok, command} = ConfigurationPropertiesReport.new(params)
+      {:ok, command} = Commands.create(:configuration_properties_report, params)
 
       expected_params_binary =
         <<0x02::16, 0x00::2, 0x01::3, 0x00::3, 0x03::16>>
@@ -79,7 +80,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
         next_param_number: 3
       ]
 
-      {:ok, command} = ConfigurationPropertiesReport.new(params)
+      {:ok, command} = Commands.create(:configuration_properties_report, params)
 
       expected_params_binary =
         <<0x02::16, 0x00::2, 0x00::3, 0x01::3, 0xF6, 0x0A, 0x01, 0x03::16>>
@@ -99,7 +100,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
         next_param_number: 3
       ]
 
-      {:ok, command} = ConfigurationPropertiesReport.new(params)
+      {:ok, command} = Commands.create(:configuration_properties_report, params)
 
       expected_params_binary =
         <<0x02::16, 0x01::1, 0x00::1, 0x01::3, 0x00::3, 0x03::16, 0x00::6, 0x00::1, 0x01::1>>
@@ -122,7 +123,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReportTest do
         next_param_number: 3
       ]
 
-      {:ok, command} = ConfigurationPropertiesReport.new(params)
+      {:ok, command} = Commands.create(:configuration_properties_report, params)
 
       expected_params_binary =
         <<0x02::16, 0x01::1, 0x00::1, 0x01::3, 0x01::3, 0x00, 0x0A, 0x01, 0x03::16, 0x00::6,

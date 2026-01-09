@@ -1,43 +1,44 @@
 defmodule Grizzly.ZWave.Commands.AlarmGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AlarmGet
 
   describe "creates the command and validates params" do
     test "v1" do
       params = [type: 3]
-      {:ok, _command} = AlarmGet.new(params)
+      {:ok, _command} = Commands.create(:alarm_get, params)
     end
 
     test "v2" do
       params = [type: 0, zwave_type: :home_security]
-      {:ok, _command} = AlarmGet.new(params)
+      {:ok, _command} = Commands.create(:alarm_get, params)
     end
 
     test "v3+" do
       params = [type: 0, zwave_type: :home_security, zwave_event: :intrusion]
-      {:ok, _command} = AlarmGet.new(params)
+      {:ok, _command} = Commands.create(:alarm_get, params)
     end
   end
 
   describe "encodes params correctly" do
     test "v1" do
       params = [type: 3]
-      {:ok, command} = AlarmGet.new(params)
+      {:ok, command} = Commands.create(:alarm_get, params)
       expected_binary = <<0x03>>
       assert expected_binary == AlarmGet.encode_params(command)
     end
 
     test "v2" do
       params = [type: 0, zwave_type: :home_security]
-      {:ok, command} = AlarmGet.new(params)
+      {:ok, command} = Commands.create(:alarm_get, params)
       expected_binary = <<0x00, 0x07>>
       assert expected_binary == AlarmGet.encode_params(command)
     end
 
     test "v3+" do
       params = [type: 0, zwave_type: :home_security, zwave_event: :intrusion]
-      {:ok, command} = AlarmGet.new(params)
+      {:ok, command} = Commands.create(:alarm_get, params)
       expected_binary = <<0x00, 0x07, 0x02>>
       assert expected_binary == AlarmGet.encode_params(command)
     end

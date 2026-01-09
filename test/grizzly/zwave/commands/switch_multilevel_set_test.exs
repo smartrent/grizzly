@@ -1,40 +1,41 @@
 defmodule Grizzly.ZWave.Commands.SwitchMultilevelSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SwitchMultilevelSet
 
   test "creates the command and validates params" do
     params = [target_value: :off]
-    {:ok, _command} = SwitchMultilevelSet.new(params)
+    {:ok, _command} = Commands.create(:switch_multilevel_set, params)
   end
 
   test "encodes v1 params correctly" do
     params = [target_value: 99]
-    {:ok, command} = SwitchMultilevelSet.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_set, params)
     expected_binary = <<0x63>>
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
   end
 
   test "encodes v2 params correctly" do
     params = [target_value: 99, duration: 10]
-    {:ok, command} = SwitchMultilevelSet.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_set, params)
     expected_binary = <<0x63, 0x0A>>
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
 
     params = [target_value: 99, duration: :default]
-    {:ok, command} = SwitchMultilevelSet.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_set, params)
     expected_binary = <<0x63, 0xFF>>
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
 
     params = [target_value: 99, duration: 180]
-    {:ok, command} = SwitchMultilevelSet.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_set, params)
     expected_binary = <<0x63, 0x82>>
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
   end
 
   test "encodes v2 params correctly - accept level 100" do
     params = [target_value: 100, duration: 10]
-    {:ok, command} = SwitchMultilevelSet.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_set, params)
     expected_binary = <<0x63, 0x0A>>
     assert expected_binary == SwitchMultilevelSet.encode_params(command)
   end

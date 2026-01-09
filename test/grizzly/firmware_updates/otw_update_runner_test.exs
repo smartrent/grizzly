@@ -4,7 +4,7 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
 
   alias Grizzly.FirmwareUpdates.OTWUpdateRunner
   alias Grizzly.Report
-  alias Grizzly.ZWave.Commands.VersionZWaveSoftwareReport
+  alias Grizzly.ZWave.Commands
 
   require Logger
 
@@ -46,7 +46,9 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
       stub(Grizzly.stop_zipgateway(), do: :ok)
 
       expect Grizzly.send_command(1, :version_zwave_software_get) do
-        {:ok, cmd} = VersionZWaveSoftwareReport.new(host_interface_version: "7.23.1")
+        {:ok, cmd} =
+          Commands.create(:version_z_wave_software_report, host_interface_version: "7.23.1")
+
         {:ok, Report.new(:complete, :command, 1, command: cmd)}
       end
 
@@ -97,7 +99,9 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
       stub(Grizzly.stop_zipgateway(), do: :ok)
 
       expect Grizzly.send_command(1, :version_zwave_software_get) do
-        {:ok, cmd} = VersionZWaveSoftwareReport.new(host_interface_version: "7.23.1")
+        {:ok, cmd} =
+          Commands.create(:version_z_wave_software_report, host_interface_version: "7.23.1")
+
         {:ok, Report.new(:complete, :command, 1, command: cmd)}
       end
 
@@ -142,7 +146,9 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
       stub(Grizzly.stop_zipgateway(), do: :ok)
 
       expect Grizzly.send_command(1, :version_zwave_software_get) do
-        {:ok, cmd} = VersionZWaveSoftwareReport.new(host_interface_version: "7.23.1")
+        {:ok, cmd} =
+          Commands.create(:version_z_wave_software_report, host_interface_version: "7.23.1")
+
         {:ok, Report.new(:complete, :command, 1, command: cmd)}
       end
 
@@ -221,7 +227,9 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
       stub(Grizzly.stop_zipgateway(), do: :ok)
 
       expect Grizzly.send_command(1, :version_zwave_software_get) do
-        {:ok, cmd} = VersionZWaveSoftwareReport.new(host_interface_version: "7.23.1")
+        {:ok, cmd} =
+          Commands.create(:version_z_wave_software_report, host_interface_version: "7.23.1")
+
         {:ok, Report.new(:complete, :command, 1, command: cmd)}
       end
 

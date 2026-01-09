@@ -7,7 +7,6 @@ defmodule Grizzly.Requests.Request do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command, as: ZWaveCommand
   alias Grizzly.ZWave.Commands
-  alias Grizzly.ZWave.Commands.SupervisionGet
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   require Logger
@@ -245,7 +244,7 @@ defmodule Grizzly.Requests.Request do
       encapsulated_command = ZWaveCommand.to_binary(zwave_command)
 
       {:ok, command} =
-        SupervisionGet.new(
+        Commands.create(:supervision_get,
           status_updates: :one_now_more_later,
           session_id: Grizzly.SessionId.get_and_inc(node_id),
           encapsulated_command: encapsulated_command

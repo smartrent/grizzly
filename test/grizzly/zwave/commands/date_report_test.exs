@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.DateReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.DateReport
 
   test "creates the command and validates params" do
     params = [year: 2020, month: 7, day: 16]
-    {:ok, _command} = DateReport.new(params)
+    {:ok, _command} = Commands.create(:date_report, params)
   end
 
   test "encodes params correctly" do
     params = [year: 2020, month: 7, day: 16]
-    {:ok, command} = DateReport.new(params)
+    {:ok, command} = Commands.create(:date_report, params)
     expected_binary = <<2020::16, 7, 16>>
     assert expected_binary == DateReport.encode_params(command)
   end

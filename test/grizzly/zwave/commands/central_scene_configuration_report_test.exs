@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CentralSceneConfigurationReport
 
   test "creates the command and validates params" do
     params = [slow_refresh: true]
-    {:ok, _command} = CentralSceneConfigurationReport.new(params)
+    {:ok, _command} = Commands.create(:central_scene_configuration_report, params)
   end
 
   test "encodes params correctly" do
     params = [slow_refresh: true]
-    {:ok, command} = CentralSceneConfigurationReport.new(params)
+    {:ok, command} = Commands.create(:central_scene_configuration_report, params)
     expected_params_binary = <<0x01::1, 0x00::7>>
     assert expected_params_binary == CentralSceneConfigurationReport.encode_params(command)
   end

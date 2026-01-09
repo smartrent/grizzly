@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport
 
   test "creates the command and validates params" do
@@ -20,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
       ]
     ]
 
-    {:ok, _command} = ThermostatSetpointSupportedReport.new(params)
+    {:ok, _command} = Commands.create(:thermostat_setpoint_supported_report, params)
   end
 
   test "encodes params correctly" do
@@ -36,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
       ]
     ]
 
-    {:ok, command} = ThermostatSetpointSupportedReport.new(params)
+    {:ok, command} = Commands.create(:thermostat_setpoint_supported_report, params)
 
     ThermostatSetpointSupportedReport.encode_params(command)
 
@@ -53,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
       ]
     ]
 
-    {:ok, command} = ThermostatSetpointSupportedReport.new(params)
+    {:ok, command} = Commands.create(:thermostat_setpoint_supported_report, params)
 
     ThermostatSetpointSupportedReport.encode_params(command)
 
@@ -62,7 +63,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
     # just heating
     params = [setpoint_types: [:heating]]
 
-    {:ok, command} = ThermostatSetpointSupportedReport.new(params)
+    {:ok, command} = Commands.create(:thermostat_setpoint_supported_report, params)
 
     ThermostatSetpointSupportedReport.encode_params(command)
 

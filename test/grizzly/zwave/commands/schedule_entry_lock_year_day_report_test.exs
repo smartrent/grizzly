@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport
 
   test "creates the command and validates params" do
@@ -19,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReportTest do
       stop_minute: 42
     ]
 
-    {:ok, _command} = ScheduleEntryLockYearDayReport.new(params)
+    {:ok, _command} = Commands.create(:schedule_entry_lock_year_day_report, params)
   end
 
   test "encodes params correctly" do
@@ -38,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReportTest do
       stop_minute: 42
     ]
 
-    {:ok, command} = ScheduleEntryLockYearDayReport.new(params)
+    {:ok, command} = Commands.create(:schedule_entry_lock_year_day_report, params)
     expected_binary = <<20, 5, 97, 10, 7, 2, 42, 99, 12, 31, 2, 42>>
     assert expected_binary == ScheduleEntryLockYearDayReport.encode_params(command)
   end

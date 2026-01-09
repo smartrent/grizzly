@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesGet
 
   test "encodes params correctly" do
@@ -8,7 +9,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesGetTest do
       type: :heating
     ]
 
-    {:ok, cmd} = ThermostatSetpointCapabilitiesGet.new(params)
+    {:ok, cmd} = Commands.create(:thermostat_setpoint_capabilities_get, params)
 
     expected_binary = <<0::4, 1::4>>
     assert expected_binary == ThermostatSetpointCapabilitiesGet.encode_params(cmd)

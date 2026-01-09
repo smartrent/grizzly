@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeProvisioningListIterationGet
 
   test "creates the command and validates params" do
     params = [seq_number: 0x01, remaining_counter: 2]
-    {:ok, _command} = NodeProvisioningListIterationGet.new(params)
+    {:ok, _command} = Commands.create(:node_provisioning_list_iteration_get, params)
   end
 
   test "encodes params correctly" do
     params = [seq_number: 0x01, remaining_counter: 2]
-    {:ok, command} = NodeProvisioningListIterationGet.new(params)
+    {:ok, command} = Commands.create(:node_provisioning_list_iteration_get, params)
     expected_binary = <<0x01, 0x02>>
     assert expected_binary == NodeProvisioningListIterationGet.encode_params(command)
   end

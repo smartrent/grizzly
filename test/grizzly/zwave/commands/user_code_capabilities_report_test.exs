@@ -2,10 +2,11 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserCodeCapabilitiesReport
 
   test "creates the command and validates params" do
-    assert {:ok, %Command{}} = UserCodeCapabilitiesReport.new([])
+    assert {:ok, %Command{}} = Commands.create(:user_code_capabilities_report, [])
   end
 
   test "encodes params correctly" do
@@ -21,8 +22,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
     ]
 
     binary =
-      params
-      |> UserCodeCapabilitiesReport.new()
+      Commands.create(:user_code_capabilities_report, params)
       |> elem(1)
       |> UserCodeCapabilitiesReport.encode_params()
 

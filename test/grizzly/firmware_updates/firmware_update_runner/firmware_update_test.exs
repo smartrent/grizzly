@@ -4,11 +4,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.FirmwareMDReport
-  alias Grizzly.ZWave.Commands.FirmwareUpdateActivationReport
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDGet
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport
+  alias Grizzly.ZWave.Commands
 
   setup do
     image = Image.new("test/serialapi_controller_bridge_OTW_SD3503_US.gbl")
@@ -26,21 +22,27 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
   describe "handling incoming command" do
     test "firmware update request report command - go", context do
       firmware_update = context[:firmware_update]
-      {:ok, command} = FirmwareUpdateMDRequestReport.new(status: :ok)
+      {:ok, command} = Commands.create(:firmware_update_md_request_report, status: :ok)
       new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
       assert new_firmware_update.state == :updating
     end
 
     test "firmware update request report command - stop", context do
       firmware_update = context[:firmware_update]
-      {:ok, command} = FirmwareUpdateMDRequestReport.new(status: :insufficient_battery_level)
+
+      {:ok, command} =
+        Commands.create(:firmware_update_md_request_report, status: :insufficient_battery_level)
+
       new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
       assert new_firmware_update.state == :complete
     end
 
     test "firmware update get command", context do
       firmware_update = %{context[:firmware_update] | state: :updating}
-      {:ok, command} = FirmwareUpdateMDGet.new(number_of_reports: 2, report_number: 1)
+
+      {:ok, command} =
+        Commands.create(:firmware_update_md_get, number_of_reports: 2, report_number: 1)
+
       new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
       assert new_firmware_update.state == :uploading
       assert new_firmware_update.fragments_wanted == 2
@@ -51,7 +53,10 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
       firmware_update = %{context[:firmware_update] | state: :updating}
 
       {:ok, command} =
-        FirmwareUpdateMDStatusReport.new(status: :successful_restarting, wait_time: 10)
+        Commands.create(:firmware_update_md_status_report,
+          status: :successful_restarting,
+          wait_time: 10
+        )
 
       new_firmware_update = FirmwareUpdate.handle_command(firmware_update, command)
       assert new_firmware_update.state == :complete
@@ -61,7 +66,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
       firmware_update = %{context[:firmware_update] | state: :uploading}
 
       {:ok, command} =
-        FirmwareMDReport.new(
+        Commands.create(
+          :firmware_md_report,
           manufacturer_id: 1,
           firmware_id: 2,
           checksum: 3,
@@ -82,7 +88,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdateTest do
       firmware_update = %{context[:firmware_update] | state: :activating}
 
       {:ok, command} =
-        FirmwareUpdateActivationReport.new(
+        Commands.create(
+          :firmware_update_activation_report,
           manufacturer_id: 1,
           firmware_id: 2,
           hardware_version: 0,

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport
 
   test "encodes params correctly" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReportTest do
       max_value: 30
     ]
 
-    {:ok, cmd} = ThermostatSetpointCapabilitiesReport.new(params)
+    {:ok, cmd} = Commands.create(:thermostat_setpoint_capabilities_report, params)
 
     expected_binary = <<0::4, 1::4, 1::3, 0::2, 1::3, 105, 0::3, 0::2, 1::3, 30>>
     assert expected_binary == ThermostatSetpointCapabilitiesReport.encode_params(cmd)
@@ -25,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReportTest do
       max_value: -1
     ]
 
-    {:ok, cmd} = ThermostatSetpointCapabilitiesReport.new(params)
+    {:ok, cmd} = Commands.create(:thermostat_setpoint_capabilities_report, params)
 
     expected_binary = <<0::4, 1::4, 1::3, 0::2, 1::3, 151, 0::3, 0::2, 1::3, 0xFF>>
 

@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport
 
   test "ensure command byte" do
-    {:ok, command} = NetworkManagementMultiChannelCapabilityReport.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_capability_report)
 
     assert command.command_byte == 0x08
   end
 
   test "ensure name" do
-    {:ok, command} = NetworkManagementMultiChannelCapabilityReport.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_capability_report)
     assert command.name == :network_management_multi_channel_capability_report
   end
 
@@ -45,7 +46,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
 
     test "version 2-3 - no data for end point" do
       {:ok, command} =
-        NetworkManagementMultiChannelCapabilityReport.new(
+        Commands.create(
+          :network_management_multi_channel_capability_report,
           seq_number: 0x01,
           node_id: 0x02,
           end_point: 0x00,
@@ -64,7 +66,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
 
     test "version 4 - no data for end point" do
       {:ok, command} =
-        NetworkManagementMultiChannelCapabilityReport.new(
+        Commands.create(
+          :network_management_multi_channel_capability_report,
           seq_number: 0x01,
           node_id: 0x02,
           end_point: 0x00,
@@ -163,7 +166,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
     ]
 
     {:ok, cmd} =
-      NetworkManagementMultiChannelCapabilityReport.new(
+      Commands.create(
+        :network_management_multi_channel_capability_report,
         seq_number: 0x01,
         node_id: node_id,
         end_point: 0x01,

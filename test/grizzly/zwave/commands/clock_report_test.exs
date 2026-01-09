@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ClockReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ClockReport
 
   test "creates the command and validates params" do
     params = [weekday: :monday, hour: 12, minute: 30]
-    {:ok, _command} = ClockReport.new(params)
+    {:ok, _command} = Commands.create(:clock_report, params)
   end
 
   test "encodes params correctly" do
     params = [weekday: :monday, hour: 12, minute: 30]
-    {:ok, command} = ClockReport.new(params)
+    {:ok, command} = Commands.create(:clock_report, params)
     expected_binary = <<0x01::3, 12::5, 30>>
     assert expected_binary == ClockReport.encode_params(command)
   end

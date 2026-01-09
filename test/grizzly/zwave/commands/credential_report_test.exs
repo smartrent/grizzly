@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.CredentialReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CredentialReport
 
   test "encodes params correctly" do
@@ -17,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReportTest do
       next_credential_slot: 2
     ]
 
-    {:ok, command} = CredentialReport.new(params)
+    {:ok, command} = Commands.create(:credential_report, params)
 
     assert CredentialReport.encode_params(command) == <<
              0,
@@ -46,7 +47,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReportTest do
       next_credential_slot: 2
     ]
 
-    {:ok, command} = CredentialReport.new(params)
+    {:ok, command} = Commands.create(:credential_report, params)
 
     assert CredentialReport.encode_params(command) == <<
              0x09,

@@ -8,16 +8,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   alias Grizzly.VersionReports
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.AssociationGroupCommandListReport
-  alias Grizzly.ZWave.Commands.AssociationGroupInfoReport
-  alias Grizzly.ZWave.Commands.AssociationGroupingsReport
-  alias Grizzly.ZWave.Commands.AssociationGroupNameReport
-  alias Grizzly.ZWave.Commands.AssociationReport
-  alias Grizzly.ZWave.Commands.AssociationSpecificGroupReport
-  alias Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsReport
-  alias Grizzly.ZWave.Commands.MultiChannelAssociationReport
-  alias Grizzly.ZWave.Commands.SupervisionReport
-  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   require Logger
@@ -88,7 +79,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   defp handle_keep_alive(cmd) do
     case Command.param!(cmd, :ack_flag) do
       :ack_request ->
-        {:ok, ack_response} = ZIPKeepAlive.new(ack_flag: :ack_response)
+        {:ok, ack_response} = Commands.create(:keep_alive, ack_flag: :ack_response)
         [{:send_raw, ack_response}]
 
       _ ->
@@ -153,7 +144,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   end
 
   defp handle_command(_node_id, %Command{name: :association_specific_group_get}, _) do
-    case AssociationSpecificGroupReport.new(group: 0) do
+    case Commands.create(:association_specific_group_report, group: 0) do
       {:ok, command} -> [{:send, command}]
     end
   end
@@ -169,14 +160,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     {:ok, respond_with_command} =
       case Associations.get(associations_server, 1) do
         nil ->
-          AssociationReport.new(
+          Commands.create(:association_report,
             grouping_identifier: 1,
             max_nodes_supported: 1,
             nodes: []
           )
 
         association ->
-          AssociationReport.new(
+          Commands.create(:association_report,
             grouping_identifier: association.grouping_id,
             max_nodes_supported: 1,
             nodes: association.node_ids
@@ -206,7 +197,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   end
 
   defp handle_command(_node_id, %Command{name: :association_groupings_get}, _opts) do
-    case AssociationGroupingsReport.new(supported_groupings: 1) do
+    case Commands.create(:association_groupings_report, supported_groupings: 1) do
       {:ok, command} -> [{:send, command}]
     end
   end
@@ -249,14 +240,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   defp handle_command(_node_id, %Command{name: :association_group_name_get}, _opts) do
     # Always just return the lifeline group (group_id == 1) as of right now
     # because that is all that Grizzly supports right now.
-    case AssociationGroupNameReport.new(group_id: 1, name: "Lifeline") do
+    case Commands.create(:association_group_name_report, group_id: 1, name: "Lifeline") do
       {:ok, command} -> [{:send, command}]
     end
   end
 
   defp handle_command(_node_id, %Command{name: :association_group_info_get} = command, _opts) do
     {:ok, report} =
-      AssociationGroupInfoReport.new(
+      Commands.create(:association_group_info_report,
         dynamic: false,
         groups_info: [[group_id: 1, profile: :general_lifeline]],
         list_mode: Command.param(command, :all, false)
@@ -267,7 +258,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
 
   defp handle_command(_node_id, %Command{name: :association_group_command_list_get}, _opts) do
     {:ok, report} =
-      AssociationGroupCommandListReport.new(
+      Commands.create(:association_group_command_list_report,
         group_id: 0x01,
         commands: [:device_reset_locally_notification]
       )
@@ -276,7 +267,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   end
 
   defp handle_command(_node_id, %Command{name: :multi_channel_association_groupings_get}, _opts) do
-    {:ok, report} = MultiChannelAssociationGroupingsReport.new(supported_groupings: 1)
+    {:ok, report} =
+      Commands.create(:multi_channel_association_groupings_report, supported_groupings: 1)
 
     [{:send, report}]
   end
@@ -292,7 +284,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     {:ok, respond_with_command} =
       case Associations.get(associations_server, 1) do
         nil ->
-          MultiChannelAssociationReport.new(
+          Commands.create(:multi_channel_association_report,
             grouping_identifier: 1,
             max_nodes_supported: 1,
             nodes: [],
@@ -303,7 +295,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
         association ->
           {endpoints, nodes} = Enum.split_with(association.node_ids, fn v -> is_tuple(v) end)
 
-          MultiChannelAssociationReport.new(
+          Commands.create(:multi_channel_association_report,
             grouping_identifier: association.grouping_id,
             max_nodes_supported: 1,
             nodes: nodes,
@@ -462,7 +454,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
   defp make_supervision_report(%Command{name: :supervision_get} = command, status) do
     session_id = Command.param!(command, :session_id)
 
-    SupervisionReport.new(
+    Commands.create(:supervision_report,
       session_id: session_id,
       status: status,
       more_status_updates: :last_report,

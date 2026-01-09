@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.SensorBinaryReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SensorBinaryReport
 
   test "creates the command and validates params" do
     params = [triggered: true]
-    {:ok, _command} = SensorBinaryReport.new(params)
+    {:ok, _command} = Commands.create(:sensor_binary_report, params)
   end
 
   test "encodes v1 params correctly" do
     params = [triggered: true]
-    {:ok, command} = SensorBinaryReport.new(params)
+    {:ok, command} = Commands.create(:sensor_binary_report, params)
     expected_binary = <<0xFF>>
     assert expected_binary == SensorBinaryReport.encode_params(command)
   end
@@ -23,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryReportTest do
 
   test "encodes v2 params correctly" do
     params = [sensor_type: :door_window, triggered: true]
-    {:ok, command} = SensorBinaryReport.new(params)
+    {:ok, command} = Commands.create(:sensor_binary_report, params)
     expected_binary = <<0xFF, 0x0A>>
     assert expected_binary == SensorBinaryReport.encode_params(command)
   end

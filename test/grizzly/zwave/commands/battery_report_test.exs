@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.BatteryReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.BatteryReport
 
   test "creates the command and validates params" do
     params = [level: 50]
-    {:ok, _command} = BatteryReport.new(params)
+    {:ok, _command} = Commands.create(:battery_report, params)
   end
 
   test "encodes v1 params correctly" do
     params = [level: 0x20]
-    {:ok, command} = BatteryReport.new(params)
+    {:ok, command} = Commands.create(:battery_report, params)
     expected_binary = <<0x20>>
     assert expected_binary == BatteryReport.encode_params(command)
   end
@@ -27,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
       disconnected: false
     ]
 
-    {:ok, command} = BatteryReport.new(params)
+    {:ok, command} = Commands.create(:battery_report, params)
 
     expected_binary =
       <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::7, 0x00::1>>
@@ -48,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
       disconnected: false
     ]
 
-    {:ok, command} = BatteryReport.new(params)
+    {:ok, command} = Commands.create(:battery_report, params)
 
     expected_binary =
       <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::6, 0x00::1, 0x00::1>>

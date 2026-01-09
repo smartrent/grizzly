@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.DoorLockCapabilitiesReport
 
   test "creates the command and validates params" do
@@ -16,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReportTest do
       block_to_block_supported?: false
     ]
 
-    {:ok, _command} = DoorLockCapabilitiesReport.new(params)
+    {:ok, _command} = Commands.create(:door_lock_capabilities_report, params)
   end
 
   test "encodes params correctly" do
@@ -32,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReportTest do
       block_to_block_supported?: false
     ]
 
-    {:ok, command} = DoorLockCapabilitiesReport.new(params)
+    {:ok, command} = Commands.create(:door_lock_capabilities_report, params)
 
     expected_params_binary =
       <<0x00::3, 0x01::5, 0x06, 0x02, 0x00, 0xFF, 0x03::4, 0x0C::4, 0x06, 0x00::4, 0x01::1,

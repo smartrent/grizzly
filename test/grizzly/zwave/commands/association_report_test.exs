@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AssociationReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AssociationReport
 
   test "creates the command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReportTest do
       reports_to_follow: 0
     ]
 
-    {:ok, _command} = AssociationReport.new(params)
+    {:ok, _command} = Commands.create(:association_report, params)
   end
 
   # (<<gi, max_nodes, reports_to_follow, nodes_bin::binary>>)
@@ -23,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReportTest do
       reports_to_follow: 0
     ]
 
-    {:ok, command} = AssociationReport.new(params)
+    {:ok, command} = Commands.create(:association_report, params)
     expected_binary = <<0x02, 0x05, 0x00, 0x04, 0x05, 0x06>>
     assert expected_binary == AssociationReport.encode_params(command)
   end

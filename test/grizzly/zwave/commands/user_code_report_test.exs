@@ -1,16 +1,22 @@
 defmodule Grizzly.ZWave.Commands.UserCodeReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserCodeReport
 
   test "creates the command and validates params" do
-    assert {:ok, _command} = UserCodeReport.new(user_id: 1, status: :available, user_code: "1234")
+    assert {:ok, _command} =
+             Commands.create(:user_code_report, user_id: 1, status: :available, user_code: "1234")
   end
 
   describe "encodes params correctly" do
     test "setting user code available" do
       {:ok, command} =
-        UserCodeReport.new(user_id: 9, user_id_status: :available, user_code: "0000")
+        Commands.create(:user_code_report,
+          user_id: 9,
+          user_id_status: :available,
+          user_code: "0000"
+        )
 
       expected_binary = <<0x09, 0x00, 0x30, 0x30, 0x30, 0x30>>
 
@@ -19,7 +25,11 @@ defmodule Grizzly.ZWave.Commands.UserCodeReportTest do
 
     test "setting user code occupied" do
       {:ok, command} =
-        UserCodeReport.new(user_id: 5, user_id_status: :occupied, user_code: "12345")
+        Commands.create(:user_code_report,
+          user_id: 5,
+          user_id_status: :occupied,
+          user_code: "12345"
+        )
 
       expected_binary = <<0x05, 0x01, 0x31, 0x32, 0x33, 0x34, 0x35>>
 

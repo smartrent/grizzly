@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.SmartStartJoinStartedTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SmartStartJoinStarted
   alias GrizzlyTest.Utils
 
@@ -10,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStartedTest do
       dsk: Utils.mkdsk()
     ]
 
-    {:ok, _command} = SmartStartJoinStarted.new(params)
+    {:ok, _command} = Commands.create(:smart_start_join_started, params)
   end
 
   test "encodes params correctly" do
@@ -19,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStartedTest do
       dsk: Utils.mkdsk()
     ]
 
-    {:ok, command} = SmartStartJoinStarted.new(params)
+    {:ok, command} = Commands.create(:smart_start_join_started, params)
 
     expected_binary =
       <<0x01, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>

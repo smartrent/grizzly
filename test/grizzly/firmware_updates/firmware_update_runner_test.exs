@@ -4,7 +4,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
 
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport
+  alias Grizzly.ZWave.Commands
   alias GrizzlyTest.Utils
 
   setup :set_mimic_global
@@ -86,7 +86,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
              |> elem(1)
              |> Command.param!(:flag)
 
-    {:ok, cmd} = FirmwareUpdateMDStatusReport.new(status: :successful_restarting)
+    {:ok, cmd} =
+      Commands.create(:firmware_update_md_status_report, status: :successful_restarting)
 
     send(
       runner,

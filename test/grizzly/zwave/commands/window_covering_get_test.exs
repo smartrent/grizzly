@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.WindowCoveringGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.WindowCoveringGet
 
   test "creates the command and validates params" do
     params = [parameter_name: :out_left_positioned]
-    {:ok, _command} = WindowCoveringGet.new(params)
+    {:ok, _command} = Commands.create(:window_covering_get, params)
   end
 
   test "encodes params correctly" do
     params = [parameter_name: :out_left_positioned]
-    {:ok, command} = WindowCoveringGet.new(params)
+    {:ok, command} = Commands.create(:window_covering_get, params)
     expected_binary = <<1>>
     assert expected_binary == WindowCoveringGet.encode_params(command)
   end

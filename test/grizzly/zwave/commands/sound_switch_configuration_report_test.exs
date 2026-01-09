@@ -1,11 +1,13 @@
 defmodule Grizzly.ZWave.Commands.SoundSwitchConfigurationReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SoundSwitchConfigurationReport
 
   test "encodes params correctly" do
     {:ok, command} =
-      SoundSwitchConfigurationReport.new(
+      Commands.create(
+        :sound_switch_configuration_report,
         volume: 95,
         default_tone_identifier: 18
       )

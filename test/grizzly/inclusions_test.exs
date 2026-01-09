@@ -4,7 +4,7 @@ defmodule Grizzly.InclusionsTest do
   alias Grizzly.Inclusions
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.NodeAddStatus
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DSK
   alias GrizzlyTest.Server.Handler
 
@@ -245,7 +245,8 @@ defmodule Grizzly.InclusionsTest do
     Grizzly.InclusionServer.smart_start_join_started(dsk)
 
     {:ok, node_add_status} =
-      NodeAddStatus.new(
+      Commands.create(
+        :node_add_status,
         status: :done,
         node_id: 101,
         seq_number: 1,

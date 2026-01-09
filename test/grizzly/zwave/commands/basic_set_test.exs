@@ -1,11 +1,12 @@
 defmodule Grizzly.ZWave.Commands.BasicSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.BasicSet
 
   test "creates the command and validates params" do
     params = [value: :off]
-    {:ok, _command} = BasicSet.new(params)
+    {:ok, _command} = Commands.create(:basic_set, params)
   end
 
   test "encodes params correctly" do

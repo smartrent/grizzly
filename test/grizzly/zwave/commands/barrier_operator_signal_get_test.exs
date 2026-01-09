@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.BarrierOperatorSignalGet
 
   test "creates the command and validates params" do
     params = [subsystem_type: :audible_notification]
-    {:ok, _command} = BarrierOperatorSignalGet.new(params)
+    {:ok, _command} = Commands.create(:barrier_operator_signal_get, params)
   end
 
   test "encodes params correctly" do
     params = [subsystem_type: :audible_notification]
-    {:ok, command} = BarrierOperatorSignalGet.new(params)
+    {:ok, command} = Commands.create(:barrier_operator_signal_get, params)
     expected_binary = <<0x01>>
     assert expected_binary == BarrierOperatorSignalGet.encode_params(command)
   end

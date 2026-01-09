@@ -6,15 +6,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   alias Grizzly.Report
   alias Grizzly.VirtualDevices
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.AssociationReport
-  alias Grizzly.ZWave.Commands.BatteryReport
-  alias Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport
-  alias Grizzly.ZWave.Commands.ManufacturerSpecificReport
-  alias Grizzly.ZWave.Commands.NodeAddStatus
-  alias Grizzly.ZWave.Commands.NodeInfoCachedReport
-  alias Grizzly.ZWave.Commands.NodeRemoveStatus
-  alias Grizzly.ZWave.Commands.VersionCommandClassReport
-  alias Grizzly.ZWave.Commands.VersionReport
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DeviceClass
   alias Grizzly.ZWave.DSK
 
@@ -26,7 +18,7 @@ defmodule Grizzly.VirtualDevices.Reports do
     {handler, handler_opts} = ensure_handler_with_opts(handler)
 
     {:ok, node_add_status} =
-      NodeAddStatus.new(
+      Commands.create(:node_add_status,
         seq_number: 0x00,
         node_id: device_entry.id,
         status: :done,
@@ -51,7 +43,7 @@ defmodule Grizzly.VirtualDevices.Reports do
     {handler, handler_opts} = ensure_handler_with_opts(handler)
 
     {:ok, node_remove_status} =
-      NodeRemoveStatus.new(seq_number: 0x01, status: :done, node_id: device_id)
+      Commands.create(:node_remove_status, seq_number: 0x01, status: :done, node_id: device_id)
 
     report = Report.new(:complete, :command, device_id, command: node_remove_status)
 
@@ -74,7 +66,7 @@ defmodule Grizzly.VirtualDevices.Reports do
     seq_number = Command.param!(node_info_get, :seq_number)
 
     {:ok, node_info_report} =
-      NodeInfoCachedReport.new(
+      Commands.create(:node_info_cached_report,
         seq_number: seq_number,
         status: :ok,
         age: 1,
@@ -94,7 +86,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @spec build_manufacturer_specific_report(VirtualDevices.device_entry()) :: Report.t()
   def build_manufacturer_specific_report(entry) do
     {:ok, manufacturer_report} =
-      ManufacturerSpecificReport.new(
+      Commands.create(:manufacturer_specific_report,
         manufacturer_id: entry.device_class.manufacturer_id,
         product_id: entry.device_class.product_id,
         product_type_id: entry.device_class.product_type_id
@@ -118,7 +110,10 @@ defmodule Grizzly.VirtualDevices.Reports do
 
       version ->
         {:ok, version_report} =
-          VersionCommandClassReport.new(command_class: command_class, version: version)
+          Commands.create(:version_command_class_report,
+            command_class: command_class,
+            version: version
+          )
 
         build_report(entry, version_report)
     end
@@ -130,7 +125,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @spec build_association_report(VirtualDevices.device_entry()) :: Report.t()
   def build_association_report(entry) do
     {:ok, report} =
-      AssociationReport.new(
+      Commands.create(:association_report,
         nodes: [1],
         grouping_identifier: 1,
         max_nodes_supported: 1,
@@ -145,7 +140,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   """
   @spec build_battery_report(VirtualDevices.device_entry()) :: Report.t()
   def build_battery_report(entry) do
-    {:ok, report} = BatteryReport.new(level: 100)
+    {:ok, report} = Commands.create(:battery_report, level: 100)
 
     build_report(entry, report)
   end
@@ -156,7 +151,7 @@ defmodule Grizzly.VirtualDevices.Reports do
   @spec build_version_report(VirtualDevices.device_entry()) :: Report.t()
   def build_version_report(entry) do
     {:ok, report} =
-      VersionReport.new(
+      Commands.create(:version_report,
         library_type: entry.device_class.library_type,
         protocol_version: "7.16",
         firmware_version: "7.16",
@@ -171,7 +166,7 @@ defmodule Grizzly.VirtualDevices.Reports do
     case Command.param!(command, :device_id_type) do
       :serial_number ->
         {:ok, report} =
-          ManufacturerSpecificDeviceSpecificReport.new(
+          Commands.create(:manufacturer_specific_device_specific_report,
             device_id_type: :serial_number,
             device_id: "0000"
           )

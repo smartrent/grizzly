@@ -1,28 +1,29 @@
 defmodule Grizzly.ZWave.Commands.BasicReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.BasicReport
 
   test "creates the command and validates params - v1" do
     params = [value: :off]
-    {:ok, _command} = BasicReport.new(params)
+    {:ok, _command} = Commands.create(:basic_report, params)
   end
 
   test "creates the command and validates params - v2" do
     params = [value: :on, target_value: :off, duration: 10]
-    {:ok, _command} = BasicReport.new(params)
+    {:ok, _command} = Commands.create(:basic_report, params)
   end
 
   test "encodes v1 params correctly" do
     params = [value: :on]
-    {:ok, command} = BasicReport.new(params)
+    {:ok, command} = Commands.create(:basic_report, params)
     expected_binary = <<0xFF>>
     assert expected_binary == BasicReport.encode_params(command)
   end
 
   test "encodes v2 params correctly" do
     params = [value: :on, target_value: :off, duration: 10]
-    {:ok, command} = BasicReport.new(params)
+    {:ok, command} = Commands.create(:basic_report, params)
     expected_binary = <<0xFF, 0x00, 0x0A>>
     assert expected_binary == BasicReport.encode_params(command)
   end

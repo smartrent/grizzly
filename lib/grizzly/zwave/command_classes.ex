@@ -56,9 +56,11 @@ defmodule Grizzly.ZWave.CommandClasses do
       :node_provisioning -> CommandClasses.NodeProvisioning
       :powerlevel -> CommandClasses.Powerlevel
       :s0 -> CommandClasses.S0
+      :security -> CommandClasses.S0
       :scene_activation -> CommandClasses.SceneActivation
       :scene_actuator_conf -> CommandClasses.SceneActuatorConf
       :schedule_entry_lock -> CommandClasses.ScheduleEntryLock
+      :s2 -> CommandClasses.Security2
       :security_2 -> CommandClasses.Security2
       :sensor_binary -> CommandClasses.SensorBinary
       :sensor_multilevel -> CommandClasses.SensorMultilevel

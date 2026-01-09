@@ -1,21 +1,22 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelEndpointReport
 
   test "creates the command and validates params" do
     params = [dynamic: false, identical: true, endpoints: 3]
-    {:ok, _command} = MultiChannelEndpointReport.new(params)
+    {:ok, _command} = Commands.create(:multi_channel_endpoint_report, params)
   end
 
   test "creates the command and validates params - v4" do
     params = [dynamic: false, identical: true, endpoints: 3, aggregated_endpoints: 2]
-    {:ok, _command} = MultiChannelEndpointReport.new(params)
+    {:ok, _command} = Commands.create(:multi_channel_endpoint_report, params)
   end
 
   test "encodes params correctly" do
     params = [dynamic: false, identical: true, endpoints: 3]
-    {:ok, command} = MultiChannelEndpointReport.new(params)
+    {:ok, command} = Commands.create(:multi_channel_endpoint_report, params)
 
     expected_binary =
       <<0x00::1, 0x01::1, 0x00::6, 0x00::1, 0x03::7>>
@@ -25,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReportTest do
 
   test "encodes params correctly - v4" do
     params = [dynamic: false, identical: true, endpoints: 3, aggregated_endpoints: 2]
-    {:ok, command} = MultiChannelEndpointReport.new(params)
+    {:ok, command} = Commands.create(:multi_channel_endpoint_report, params)
 
     expected_binary =
       <<0x00::1, 0x01::1, 0x00::6, 0x00::1, 0x03::7, 0x00::1, 0x02::7>>

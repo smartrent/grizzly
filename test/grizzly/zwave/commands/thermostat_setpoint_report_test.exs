@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatSetpointReport
 
   test "creates the command and validates params" do
     params = [type: :heating, scale: :f, value: 75.5]
-    {:ok, _command} = ThermostatSetpointReport.new(params)
+    {:ok, _command} = Commands.create(:thermostat_setpoint_report, params)
   end
 
   test "encodes params correctly" do
     params = [type: :heating, scale: :f, value: 75.5]
-    {:ok, command} = ThermostatSetpointReport.new(params)
+    {:ok, command} = Commands.create(:thermostat_setpoint_report, params)
 
     expected_binary =
       <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0x02, 0xF3>>
@@ -18,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
     assert expected_binary == ThermostatSetpointReport.encode_params(command)
 
     params = [type: :heating, scale: :f, value: -75.5]
-    {:ok, command} = ThermostatSetpointReport.new(params)
+    {:ok, command} = Commands.create(:thermostat_setpoint_report, params)
 
     expected_binary =
       <<0x00::4, 0x01::4, 0x01::3, 0x01::2, 0x02::3, 0xFD, 0x0D>>
@@ -56,7 +57,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReportTest do
 
   test "encodes :na type" do
     {:ok, command} =
-      ThermostatSetpointReport.new(
+      Commands.create(
+        :thermostat_setpoint_report,
         type: :na,
         value: 70,
         scale: :f

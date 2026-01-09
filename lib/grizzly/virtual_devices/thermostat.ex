@@ -8,13 +8,7 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   use GenServer
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.BasicReport
-  alias Grizzly.ZWave.Commands.SensorMultilevelReport
-  alias Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport
-  alias Grizzly.ZWave.Commands.ThermostatFanModeReport
-  alias Grizzly.ZWave.Commands.ThermostatFanStateReport
-  alias Grizzly.ZWave.Commands.ThermostatModeReport
-  alias Grizzly.ZWave.Commands.ThermostatSetpointReport
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DeviceClass
 
   @impl Grizzly.VirtualDevices.Device
@@ -82,7 +76,13 @@ defmodule Grizzly.VirtualDevices.Thermostat do
         {:reply, {:error, :timeout}, state}
 
       value ->
-        response = ThermostatSetpointReport.new(type: type, value: value, scale: state.scale)
+        response =
+          Commands.create(:thermostat_setpoint_report,
+            type: type,
+            value: value,
+            scale: state.scale
+          )
+
         {:reply, response, state}
     end
   end
@@ -111,13 +111,13 @@ defmodule Grizzly.VirtualDevices.Thermostat do
   end
 
   def handle_call({:handle_command, %Command{name: :thermostat_fan_mode_get}}, _from, state) do
-    response = ThermostatFanModeReport.new(mode: state.fan_mode)
+    response = Commands.create(:thermostat_fan_mode_report, mode: state.fan_mode)
 
     {:reply, response, state}
   end
 
   def handle_call({:handle_command, %Command{name: :thermostat_fan_state_get}}, _from, state) do
-    response = ThermostatFanStateReport.new(state: state.fan_state)
+    response = Commands.create(:thermostat_fan_state_report, state: state.fan_state)
 
     {:reply, response, state}
   end
@@ -144,13 +144,17 @@ defmodule Grizzly.VirtualDevices.Thermostat do
 
   def handle_call({:handle_command, %Command{name: :sensor_multilevel_get}}, _from, state) do
     response =
-      SensorMultilevelReport.new(sensor_type: :temperature, scale: 1, value: state.temperature)
+      Commands.create(:sensor_multilevel_report,
+        sensor_type: :temperature,
+        scale: 1,
+        value: state.temperature
+      )
 
     {:reply, response, state}
   end
 
   def handle_call({:handle_command, %Command{name: :thermostat_mode_get}}, _from, state) do
-    response = ThermostatModeReport.new(mode: state.mode)
+    response = Commands.create(:thermostat_mode_report, mode: state.mode)
     {:reply, response, state}
   end
 
@@ -168,12 +172,14 @@ defmodule Grizzly.VirtualDevices.Thermostat do
         _from,
         state
       ) do
-    response = SensorMultilevelSupportedSensorReport.new(sensor_types: [:temperature])
+    response =
+      Commands.create(:sensor_multilevel_supported_sensor_report, sensor_types: [:temperature])
+
     {:reply, response, state}
   end
 
   def handle_call({:handle_command, %Command{name: :basic_get}}, _from, state) do
-    response = BasicReport.new(value: state.basic)
+    response = Commands.create(:basic_report, value: state.basic)
     {:reply, response, state}
   end
 

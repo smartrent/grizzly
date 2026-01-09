@@ -3,6 +3,7 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Version
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.VersionCommandClassReport
 
   test "creates the command and validates params" do
@@ -11,11 +12,17 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
               name: :version_command_class_report,
               command_byte: 0x14,
               command_class: Version
-            }} = VersionCommandClassReport.new(command_class: :switch_binary, version: 2)
+            }} =
+             Commands.create(:version_command_class_report,
+               command_class: :switch_binary,
+               version: 2
+             )
   end
 
   test "encodes params correctly" do
-    {:ok, command} = VersionCommandClassReport.new(command_class: :switch_binary, version: 2)
+    {:ok, command} =
+      Commands.create(:version_command_class_report, command_class: :switch_binary, version: 2)
+
     expected_binary = <<0x25, 0x02>>
     assert expected_binary == VersionCommandClassReport.encode_params(command)
   end

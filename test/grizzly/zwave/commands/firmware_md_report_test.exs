@@ -2,11 +2,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FirmwareMDReport
 
   test "creates the command and validates params" do
     {:ok, report} =
-      FirmwareMDReport.new(
+      Commands.create(
+        :firmware_md_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3
@@ -71,7 +73,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
 
   test "encodes params correctly - v1" do
     {:ok, report} =
-      FirmwareMDReport.new(
+      Commands.create(
+        :firmware_md_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3
@@ -83,7 +86,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
 
   test "encodes params correctly - v3" do
     {:ok, report} =
-      FirmwareMDReport.new(
+      Commands.create(
+        :firmware_md_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -100,7 +104,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
 
   test "encodes params correctly - v5" do
     {:ok, report} =
-      FirmwareMDReport.new(
+      Commands.create(
+        :firmware_md_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -118,7 +123,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
 
   test "encodes params correctly - v6-7" do
     {:ok, report} =
-      FirmwareMDReport.new(
+      Commands.create(
+        :firmware_md_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,

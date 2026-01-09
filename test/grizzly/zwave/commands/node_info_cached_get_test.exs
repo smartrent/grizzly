@@ -1,23 +1,25 @@
 defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeInfoCachedGet
 
   test "ensure correct byte" do
-    {:ok, cmd} = NodeInfoCachedGet.new()
+    {:ok, cmd} = Commands.create(:node_info_cached_get)
 
     assert cmd.command_byte == 0x03
   end
 
   test "ensure correct name" do
-    {:ok, cmd} = NodeInfoCachedGet.new()
+    {:ok, cmd} = Commands.create(:node_info_cached_get)
 
     assert cmd.name == :node_info_cached_get
   end
 
   describe "encoding" do
     test "version 1-3 - 8 bit node id" do
-      {:ok, cmd} = NodeInfoCachedGet.new(seq_number: 0x01, node_id: 0x04, max_age: 0x03)
+      {:ok, cmd} =
+        Commands.create(:node_info_cached_get, seq_number: 0x01, node_id: 0x04, max_age: 0x03)
 
       expected_bin = <<0x01, 0x03, 0x04>>
 
@@ -27,7 +29,8 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
     end
 
     test "version 4 - 8 bit node id" do
-      {:ok, cmd} = NodeInfoCachedGet.new(seq_number: 0x01, node_id: 0x04, max_age: 0x03)
+      {:ok, cmd} =
+        Commands.create(:node_info_cached_get, seq_number: 0x01, node_id: 0x04, max_age: 0x03)
 
       expected_bin = <<0x01, 0x03, 0x04, 0x04::16>>
 
@@ -35,7 +38,8 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
     end
 
     test "version 4 - 16 bit node id" do
-      {:ok, cmd} = NodeInfoCachedGet.new(seq_number: 0x01, node_id: 0x04AA, max_age: 0x03)
+      {:ok, cmd} =
+        Commands.create(:node_info_cached_get, seq_number: 0x01, node_id: 0x04AA, max_age: 0x03)
 
       expected_bin = <<0x01, 0x03, 0xFF, 0x04, 0xAA>>
 

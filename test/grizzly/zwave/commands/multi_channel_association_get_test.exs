@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelAssociationGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelAssociationGet
 
   test "creates the command and validates params" do
     params = [grouping_identifier: 2]
-    {:ok, _command} = MultiChannelAssociationGet.new(params)
+    {:ok, _command} = Commands.create(:multi_channel_association_get, params)
   end
 
   test "encodes params correctly" do
     params = [grouping_identifier: 2]
-    {:ok, command} = MultiChannelAssociationGet.new(params)
+    {:ok, command} = Commands.create(:multi_channel_association_get, params)
     expected_binary = <<0x02>>
     assert expected_binary == MultiChannelAssociationGet.encode_params(command)
   end

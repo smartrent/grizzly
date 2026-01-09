@@ -5,14 +5,11 @@ defmodule Grizzly.Requests.RequestTest do
   alias Grizzly.Requests.Handlers.AckResponse
   alias Grizzly.Requests.Request
   alias Grizzly.ZWave.CommandClasses.ZIP
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
-  alias Grizzly.ZWave.Commands.SwitchBinarySet
-  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "turns a Z-Wave command into a Grizzly request" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
 
     request = Request.from_zwave_command(zwave_command, 1, self())
 
@@ -32,7 +29,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "makes the Grizzly command into a binary" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
     request = Request.from_zwave_command(zwave_command, 1, self())
     expected_binary = <<35, 2, 128, 80, request.seq_number, 0, 0, 37, 1, 255>>
 
@@ -40,7 +37,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handles Z/IP Packet for an ack response" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
     request = Request.from_zwave_command(zwave_command, 1, self())
 
     ack_response = ZIPPacket.make_ack_response(request.seq_number)
@@ -56,8 +53,8 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handles Z/IP Packet for an report" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
-    {:ok, switch_report} = SwitchBinaryReport.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
+    {:ok, switch_report} = Commands.create(:switch_binary_report, target_value: :on)
 
     request = Request.from_zwave_command(zwave_command, 1, self())
     ack_response = ZIPPacket.make_ack_response(request.seq_number)
@@ -73,7 +70,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handles Z/IP Packet for queued" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
     request = Request.from_zwave_command(zwave_command, 1, self())
 
     nack_waiting = ZIPPacket.make_nack_waiting_response(request.seq_number, 2)
@@ -90,7 +87,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handles when a queued command is completed" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
 
     request = Request.from_zwave_command(zwave_command, 1, self())
     request = %Request{request | status: :queued}
@@ -109,7 +106,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handles Z/IP Packet for nack response with retries" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
     request = Request.from_zwave_command(zwave_command, 1, self(), retries: 2)
 
     nack_response = ZIPPacket.make_nack_response(request.seq_number)
@@ -121,7 +118,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handles Z/IP Packet for nack response with no retries" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
     request = Request.from_zwave_command(zwave_command, 1, self(), retries: 0)
 
     nack_response = ZIPPacket.make_nack_response(request.seq_number)
@@ -134,7 +131,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do
-    {:ok, keep_alive} = ZIPKeepAlive.new(ack_flag: :ack_request)
+    {:ok, keep_alive} = Commands.create(:keep_alive, ack_flag: :ack_request)
     request = Request.from_zwave_command(keep_alive, 1, self())
     expected_binary = <<ZIP.byte(), 0x03, 0x80>>
 
@@ -142,7 +139,7 @@ defmodule Grizzly.Requests.RequestTest do
   end
 
   test "handle when ZIP command reports stats" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
 
     request =
       Request.from_zwave_command(zwave_command, 1, self(), transmission_stats: true)

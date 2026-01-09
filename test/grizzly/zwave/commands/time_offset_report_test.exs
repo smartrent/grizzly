@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.TimeOffsetReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.TimeOffsetReport
 
   test "creates the command and validates params" do
@@ -18,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetReportTest do
       hour_end_dst: 2
     ]
 
-    {:ok, _command} = TimeOffsetReport.new(params)
+    {:ok, _command} = Commands.create(:time_offset_report, params)
   end
 
   test "encodes params correctly" do
@@ -36,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetReportTest do
       hour_end_dst: 2
     ]
 
-    {:ok, command} = TimeOffsetReport.new(params)
+    {:ok, command} = Commands.create(:time_offset_report, params)
 
     expected_binary =
       <<0x01::1, 4::7, 0, 0x00::1, 60::7, 3, 23, 2, 10, 22, 2>>

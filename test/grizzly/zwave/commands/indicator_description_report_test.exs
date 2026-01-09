@@ -1,17 +1,18 @@
 defmodule Grizzly.ZWave.Commands.IndicatorDescriptionReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.IndicatorDescriptionReport
 
   test "creates the command and validates params" do
     params = [indicator_id: :armed, description: "Alarm will sound"]
-    {:ok, _command} = IndicatorDescriptionReport.new(params)
+    {:ok, _command} = Commands.create(:indicator_description_report, params)
   end
 
   test "encodes params correctly" do
     description = "Alarm will sound"
     params = [indicator_id: :armed, description: description]
-    {:ok, command} = IndicatorDescriptionReport.new(params)
+    {:ok, command} = Commands.create(:indicator_description_report, params)
     size = byte_size(description)
     expected_params_binary = <<0x01, size>> <> description
     assert expected_params_binary == IndicatorDescriptionReport.encode_params(command)

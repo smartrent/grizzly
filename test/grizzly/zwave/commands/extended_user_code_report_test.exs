@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ExtendedUserCodeReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ExtendedUserCodeReport
 
   test "encodes params correctly" do
@@ -12,11 +13,8 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeReportTest do
       next_user_id: 38
     ]
 
-    binary =
-      params
-      |> ExtendedUserCodeReport.new()
-      |> elem(1)
-      |> ExtendedUserCodeReport.encode_params()
+    {:ok, command} = Commands.create(:extended_user_code_report, params)
+    binary = ExtendedUserCodeReport.encode_params(command)
 
     expected_binary =
       <<2::8, 36::16, 1::8, 6::8, "873227"::binary, 37::16, 2::8, 8::8, "12345678"::binary,

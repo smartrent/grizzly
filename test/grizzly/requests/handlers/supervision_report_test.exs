@@ -2,7 +2,7 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.Requests.Handlers.SupervisionReport, as: Handler
-  alias Grizzly.ZWave.Commands.SupervisionReport
+  alias Grizzly.ZWave.Commands
 
   setup do
     ref = make_ref()
@@ -25,7 +25,8 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
 
   test "continues when session id does not match", %{state: state} do
     {:ok, command} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: :last_report,
         status: :success,
         duration: :unknown,
@@ -37,7 +38,8 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
 
   test "continues when more_status_updates equals :more_reports", %{state: state} do
     {:ok, command} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: :more_reports,
         status: :working,
         duration: :unknown,
@@ -49,7 +51,8 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
 
   test "completes when more_status_updates equals :last_report", %{state: state} do
     {:ok, command} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: :last_report,
         status: :working,
         duration: :unknown,
@@ -63,7 +66,8 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
     state = %{state | status_updates?: true}
 
     {:ok, update1} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: :more_reports,
         status: :working,
         duration: :unknown,
@@ -73,7 +77,8 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
     assert {:continue, ^state} = Handler.handle_command(update1, state)
 
     {:ok, update2} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: :more_reports,
         status: :working,
         duration: :unknown,
@@ -83,7 +88,8 @@ defmodule Grizzly.Requests.Handlers.SupervisionReportTest do
     assert {:continue, ^state} = Handler.handle_command(update2, state)
 
     {:ok, final} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: :last_report,
         status: :working,
         duration: :unknown,

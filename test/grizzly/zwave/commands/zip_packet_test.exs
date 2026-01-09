@@ -3,12 +3,12 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   describe "creating a new Z/IP Packet command" do
     test "with defaults" do
-      {:ok, command} = ZIPPacket.new()
+      {:ok, command} = Commands.create(:zip_packet)
 
       assert Command.param!(command, :source) == 0x00
       assert Command.param!(command, :dest) == 0x00
@@ -18,14 +18,14 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
     end
 
     test "with a Z-Wave command" do
-      {:ok, switch_set} = SwitchBinarySet.new(target_value: :on)
-      {:ok, zip_packet} = ZIPPacket.new(command: switch_set)
+      {:ok, switch_set} = Commands.create(:switch_binary_set, target_value: :on)
+      {:ok, zip_packet} = Commands.create(:zip_packet, command: switch_set)
 
       assert Command.param!(zip_packet, :command) == switch_set
     end
 
     test "create a Z/IP command with a Z-Wave command, default flag to :ack_response, secure true" do
-      {:ok, switch_set} = SwitchBinarySet.new(target_value: :off)
+      {:ok, switch_set} = Commands.create(:switch_binary_set, target_value: :off)
       {:ok, command} = ZIPPacket.with_zwave_command(switch_set, 0x10)
 
       assert Command.param!(command, :command) == switch_set
@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
 
   describe "encoding commands" do
     test "when there is no command" do
-      {:ok, command} = ZIPPacket.new(seq_number: 0x10)
+      {:ok, command} = Commands.create(:zip_packet, seq_number: 0x10)
 
       expected_binary = <<0x00, 0x10, 0x10, 0x00, 0x00>>
 
@@ -67,7 +67,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
     end
 
     test "when there is command" do
-      {:ok, switch_set} = SwitchBinarySet.new(target_value: :on)
+      {:ok, switch_set} = Commands.create(:switch_binary_set, target_value: :on)
       {:ok, command} = ZIPPacket.with_zwave_command(switch_set, 0xA0)
 
       expected_binary = <<0x80, 0x50, 0xA0, 0x00, 0x00>> <> ZWave.to_binary(switch_set)

@@ -15,9 +15,7 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
 
   alias Grizzly.VirtualDevices
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.BasicReport
-  alias Grizzly.ZWave.Commands.SensorMultilevelReport
-  alias Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DeviceClass
 
   @typedoc """
@@ -91,7 +89,7 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
 
   @impl GenServer
   def handle_call({:handle_command, %Command{name: :basic_get}}, _from, state) do
-    report = BasicReport.new(value: state.temp)
+    report = Commands.create(:basic_report, value: state.temp)
 
     {:reply, report, state}
   end
@@ -105,7 +103,8 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
         _from,
         state
       ) do
-    result = SensorMultilevelSupportedSensorReport.new(sensor_types: [:temperature])
+    result =
+      Commands.create(:sensor_multilevel_supported_sensor_report, sensor_types: [:temperature])
 
     {:reply, result, state}
   end
@@ -119,7 +118,7 @@ defmodule Grizzly.VirtualDevices.TemperatureSensor do
     # type requested is not supported we are to respond with a default supported
     # type and/or scale. This virtual device only supports temperature and scale 1
     # so we will always report those.
-    SensorMultilevelReport.new(sensor_type: :temperature, scale: 1, value: value)
+    Commands.create(:sensor_multilevel_report, sensor_type: :temperature, scale: 1, value: value)
   end
 
   # simulate reading a temperature sensor

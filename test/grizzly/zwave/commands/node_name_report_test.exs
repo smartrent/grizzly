@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.NodeNameReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeNameReport
 
   test "creates the command and validates params" do
     params = [encoding: :ascii, name: "motion"]
-    {:ok, _command} = NodeNameReport.new(params)
+    {:ok, _command} = Commands.create(:node_name_report, params)
   end
 
   test "encodes params correctly" do
     params = [encoding: :ascii, name: "motion"]
-    {:ok, command} = NodeNameReport.new(params)
+    {:ok, command} = Commands.create(:node_name_report, params)
     expected_binary = <<0x00::5, 0x00::3, 109, 111, 116, 105, 111, 110>>
     assert expected_binary == NodeNameReport.encode_params(command)
   end

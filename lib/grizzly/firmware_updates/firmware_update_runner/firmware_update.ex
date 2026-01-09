@@ -7,8 +7,8 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   alias Grizzly.FirmwareUpdates
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FirmwareUpdateMDReport
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestGet
   alias Grizzly.ZWave.CRC
 
   require Logger
@@ -181,14 +181,17 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
 
   def next_command(firmware_update, :updating) do
     params = params_for(:firmware_update_md_request_get, firmware_update)
-    {:ok, command} = FirmwareUpdateMDRequestGet.new(params)
+    {:ok, command} = Commands.create(:firmware_update_md_request_get, params)
 
     {command, firmware_update_requested(firmware_update, params)}
   end
 
   def next_command(firmware_update, :uploading) do
     {:ok, command} =
-      FirmwareUpdateMDReport.new(params_for(:firmware_update_md_update_report, firmware_update))
+      Commands.create(
+        :firmware_update_md_report,
+        params_for(:firmware_update_md_update_report, firmware_update)
+      )
 
     last? = Command.param!(command, :last?)
     {command, firmware_fragment_uploaded(firmware_update, last?)}
@@ -225,7 +228,11 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
     #  Calculate the checksum of the entire command (minus the checksum)
 
     {:ok, command_without_checksum} =
-      FirmwareUpdateMDReport.new(report_number: report_number, last?: last?, data: data)
+      Commands.create(:firmware_update_md_report,
+        report_number: report_number,
+        last?: last?,
+        data: data
+      )
 
     params_binary = FirmwareUpdateMDReport.encode_params(command_without_checksum)
     command_binary = <<0x7A, 0x06>> <> params_binary

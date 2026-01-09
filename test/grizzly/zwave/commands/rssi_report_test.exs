@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.RssiReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.RssiReport
 
   test "creates the command and validates params" do
     params = [channels: [:rssi_max_power_saturated, -94, :rssi_not_available]]
-    {:ok, _command} = RssiReport.new(params)
+    {:ok, _command} = Commands.create(:rssi_report, params)
   end
 
   test "encodes params correctly" do
     params = [channels: [:rssi_max_power_saturated, -94, :rssi_not_available]]
-    {:ok, command} = RssiReport.new(params)
+    {:ok, command} = Commands.create(:rssi_report, params)
     expected_binary = <<0x7E, 0xA2, 0x7F>>
     assert expected_binary == RssiReport.encode_params(command)
   end
@@ -29,7 +30,8 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
 
   test "encode version 4 - long range channels" do
     {:ok, cmd} =
-      RssiReport.new(
+      Commands.create(
+        :rssi_report,
         channels: [
           :rssi_max_power_saturated,
           -94,
@@ -116,7 +118,8 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
 
   test "encodes out-of-spec (but technically valid) values" do
     {:ok, cmd} =
-      RssiReport.new(
+      Commands.create(
+        :rssi_report,
         channels: [-98, -25, -25],
         long_range_primary_channel: -10,
         long_range_secondary_channel: :rssi_max_power_saturated
@@ -129,7 +132,8 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     assert expected_binary == RssiReport.encode_params(cmd)
 
     {:ok, cmd} =
-      RssiReport.new(
+      Commands.create(
+        :rssi_report,
         channels: [100, -106, 20],
         long_range_primary_channel: 50,
         long_range_secondary_channel: :rssi_max_power_saturated

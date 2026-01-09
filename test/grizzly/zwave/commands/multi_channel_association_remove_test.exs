@@ -1,12 +1,13 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemoveTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelAssociationRemove
 
   describe "creates the command and validates params" do
     test "without node endpoints" do
       params = [grouping_identifier: 2, nodes: [4, 5, 6], node_endpoints: []]
-      {:ok, _command} = MultiChannelAssociationRemove.new(params)
+      {:ok, _command} = Commands.create(:multi_channel_association_remove, params)
     end
 
     test "with node endpoints" do
@@ -19,14 +20,14 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemoveTest do
         ]
       ]
 
-      {:ok, _command} = MultiChannelAssociationRemove.new(params)
+      {:ok, _command} = Commands.create(:multi_channel_association_remove, params)
     end
   end
 
   describe "encodes params correctly" do
     test "without node endpoints" do
       params = [grouping_identifier: 2, nodes: [4, 5, 6], node_endpoints: []]
-      {:ok, command} = MultiChannelAssociationRemove.new(params)
+      {:ok, command} = Commands.create(:multi_channel_association_remove, params)
       expected_binary = <<0x02, 0x04, 0x05, 0x06>>
       assert expected_binary == MultiChannelAssociationRemove.encode_params(command)
     end
@@ -41,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationRemoveTest do
         ]
       ]
 
-      {:ok, command} = MultiChannelAssociationRemove.new(params)
+      {:ok, command} = Commands.create(:multi_channel_association_remove, params)
 
       expected_binary =
         <<0x02, 0x04, 0x05, 0x06, 0x00, 0x07, 0x00::1, 0x02::7, 0x08, 0x01::1, 0x03::7>>

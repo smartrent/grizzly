@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CredentialLearnStatusReport
 
   test "encodes params correctly" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReportTest do
       steps_remaining: 5
     ]
 
-    {:ok, command} = CredentialLearnStatusReport.new(params)
+    {:ok, command} = Commands.create(:credential_learn_status_report, params)
 
     assert CredentialLearnStatusReport.encode_params(command) ==
              <<0, 1::16, 2, 1::16, 5>>

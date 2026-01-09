@@ -3,9 +3,7 @@ defmodule Grizzly.EventsTest do
 
   alias Grizzly.Events
   alias Grizzly.Report
-  alias Grizzly.ZWave.Commands.AlarmReport
-  alias Grizzly.ZWave.Commands.BasicReport
-  alias Grizzly.ZWave.Commands.WakeUpIntervalReport
+  alias Grizzly.ZWave.Commands
 
   test "finding subscribers that match a particular report" do
     Supervisor.terminate_child(Grizzly.Supervisor, Grizzly.FirmwareUpdates.OTWUpdateRunner)
@@ -53,9 +51,9 @@ defmodule Grizzly.EventsTest do
     assert_receive :subscribed
     assert_receive :subscribed
 
-    {:ok, basic_report} = BasicReport.new(value: :on)
-    {:ok, wake_up_interval_report} = WakeUpIntervalReport.new([])
-    {:ok, alarm_report} = AlarmReport.new([])
+    {:ok, basic_report} = Commands.create(:basic_report, value: :on)
+    {:ok, wake_up_interval_report} = Commands.create(:wake_up_interval_report, [])
+    {:ok, alarm_report} = Commands.create(:alarm_report, [])
 
     assert [^pid1] = Events.__subs_for_report__(Report.unsolicited(1, basic_report))
     assert [^pid1] = Events.__subs_for_report__(Report.unsolicited({:virtual, 1}, basic_report))

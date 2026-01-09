@@ -1,11 +1,12 @@
 defmodule Grizzly.ZWave.Commands.NodeAddDSKReportTest do
   use ExUnit.Case, async: true
 
-  alias Grizzly.ZWave.Commands.NodeAddDSKReport
+  alias Grizzly.ZWave.Commands
 
   test "create a new NodeAddDSKReport" do
     assert {:ok, command} =
-             NodeAddDSKReport.new(
+             Commands.create(
+               :node_add_dsk_report,
                seq_number: 0x01,
                input_dsk_length: 1,
                dsk: "50285-18819-09924-30691-15973-33711-04005-03623"

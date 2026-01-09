@@ -1,13 +1,14 @@
 defmodule Grizzly.ZWave.Commands.HumidityControlSetpointGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.HumidityControlSetpointGet
 
   test "encode/1 correctly encodes command" do
-    {:ok, command} = HumidityControlSetpointGet.new(setpoint_type: :humidify)
+    {:ok, command} = Commands.create(:humidity_control_setpoint_get, setpoint_type: :humidify)
     assert <<1>> == HumidityControlSetpointGet.encode_params(command)
 
-    {:ok, command} = HumidityControlSetpointGet.new(setpoint_type: :auto)
+    {:ok, command} = Commands.create(:humidity_control_setpoint_get, setpoint_type: :auto)
     assert <<3>> == HumidityControlSetpointGet.encode_params(command)
   end
 

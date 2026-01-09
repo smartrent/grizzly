@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.WindowCoveringReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.WindowCoveringReport
 
   test "creates the command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringReportTest do
       duration: 5
     ]
 
-    {:ok, _command} = WindowCoveringReport.new(params)
+    {:ok, _command} = Commands.create(:window_covering_report, params)
   end
 
   test "encodes params correctly" do
@@ -22,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringReportTest do
       duration: 5
     ]
 
-    {:ok, command} = WindowCoveringReport.new(params)
+    {:ok, command} = Commands.create(:window_covering_report, params)
     expected_binary = <<1, 1, 10, 5>>
     assert expected_binary == WindowCoveringReport.encode_params(command)
   end

@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.SensorBinaryGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SensorBinaryGet
 
   test "creates the command and validates params" do
     params = [sensor_type: :door_window]
-    {:ok, _command} = SensorBinaryGet.new(params)
+    {:ok, _command} = Commands.create(:sensor_binary_get, params)
   end
 
   test "encodes params correctly" do
     params = [sensor_type: :door_window]
-    {:ok, command} = SensorBinaryGet.new(params)
+    {:ok, command} = Commands.create(:sensor_binary_get, params)
     expected_binary = <<0x0A>>
     assert expected_binary == SensorBinaryGet.encode_params(command)
   end

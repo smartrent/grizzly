@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.UserCodeGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserCodeGet
 
   test "creates the command and validates params" do
     params = [user_id: 2]
-    {:ok, _command} = UserCodeGet.new(params)
+    {:ok, _command} = Commands.create(:user_code_get, params)
   end
 
   test "encodes params correctly" do
     params = [user_id: 2]
-    {:ok, command} = UserCodeGet.new(params)
+    {:ok, command} = Commands.create(:user_code_get, params)
 
     expected_binary = <<0x02>>
 

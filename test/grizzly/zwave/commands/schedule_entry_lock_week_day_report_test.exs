@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport
 
   test "creates the command and validates params" do
@@ -14,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReportTest do
       stop_minute: 42
     ]
 
-    {:ok, _command} = ScheduleEntryLockWeekDayReport.new(params)
+    {:ok, _command} = Commands.create(:schedule_entry_lock_week_day_report, params)
   end
 
   test "encodes params correctly" do
@@ -28,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReportTest do
       stop_minute: 42
     ]
 
-    {:ok, command} = ScheduleEntryLockWeekDayReport.new(params)
+    {:ok, command} = Commands.create(:schedule_entry_lock_week_day_report, params)
     expected_binary = <<20, 5, 0, 2, 42, 2, 42>>
     assert expected_binary == ScheduleEntryLockWeekDayReport.encode_params(command)
   end

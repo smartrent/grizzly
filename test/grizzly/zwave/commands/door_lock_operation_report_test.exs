@@ -3,11 +3,11 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReportTest do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.DoorLockOperationReport
+  alias Grizzly.ZWave.Commands
 
   describe "creates the command and validates params" do
     test "with defaults" do
-      {:ok, command} = DoorLockOperationReport.new(mode: :unsecured)
+      {:ok, command} = Commands.create(:door_lock_operation_report, mode: :unsecured)
 
       assert Command.param!(command, :outside_handles_mode) == handles_default()
       assert Command.param!(command, :inside_handles_mode) == handles_default()
@@ -19,7 +19,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReportTest do
     end
 
     test "override defaults" do
-      {:ok, command} = DoorLockOperationReport.new(mode: :unsecured, latch_position: :closed)
+      {:ok, command} =
+        Commands.create(:door_lock_operation_report, mode: :unsecured, latch_position: :closed)
 
       assert Command.param!(command, :latch_position) == :closed
     end
@@ -27,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReportTest do
 
   describe "encodes params correctly" do
     test "defaults" do
-      {:ok, command} = DoorLockOperationReport.new(mode: :secured)
+      {:ok, command} = Commands.create(:door_lock_operation_report, mode: :secured)
 
       expected_binary = <<0x62, 0x03, 0xFF, 0x00, 0x00, 0x00, 0x00>>
 
@@ -36,7 +37,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReportTest do
 
     test "with custom params" do
       {:ok, command} =
-        DoorLockOperationReport.new(
+        Commands.create(
+          :door_lock_operation_report,
           mode: :unsecured,
           latch_position: :closed,
           timeout_minutes: 120,
@@ -78,7 +80,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReportTest do
   describe "encodes v4 params correctly" do
     test "with custom params" do
       {:ok, command} =
-        DoorLockOperationReport.new(
+        Commands.create(
+          :door_lock_operation_report,
           mode: :unsecured,
           latch_position: :closed,
           timeout_minutes: 120,

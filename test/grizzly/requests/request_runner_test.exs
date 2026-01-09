@@ -5,15 +5,11 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   alias Grizzly.Requests.RequestRunner
   alias Grizzly.SeqNumber
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.NodeListGet
-  alias Grizzly.ZWave.Commands.NodeListReport
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
-  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "runs a basic application command that only expects an ack response" do
-    {:ok, command} = SwitchBinarySet.new(target_value: :off)
+    {:ok, command} = Commands.create(:switch_binary_set, target_value: :off)
     {:ok, runner} = RequestRunner.start_link(command, 1)
     ref = RequestRunner.reference(runner)
 
@@ -24,7 +20,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "runs a network command that has the seq number as part of the command" do
-    {:ok, command} = NodeListGet.new(seq_number: SeqNumber.get_and_inc())
+    {:ok, command} = Commands.create(:node_list_get, seq_number: SeqNumber.get_and_inc())
     {:ok, runner} = RequestRunner.start_link(command, 1)
     ref = RequestRunner.reference(runner)
 
@@ -34,7 +30,8 @@ defmodule Grizzly.Requests.RequestRunnerTest do
     assert command_seq_number == RequestRunner.seq_number(runner)
 
     {:ok, node_list_report} =
-      NodeListReport.new(
+      Commands.create(
+        :node_list_report,
         status: :latest,
         seq_number: command_seq_number,
         controller_id: 1,
@@ -49,11 +46,11 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "runs a basic application command that expects a report" do
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
     {:ok, runner} = RequestRunner.start_link(command, 1)
     ref = RequestRunner.reference(runner)
 
-    {:ok, switch_binary_report} = SwitchBinaryReport.new(target_value: :on)
+    {:ok, switch_binary_report} = Commands.create(:switch_binary_report, target_value: :on)
 
     report = Report.new(:complete, :command, 1, command: switch_binary_report, command_ref: ref)
 
@@ -64,7 +61,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "runs command that will receive a nack response" do
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
     {:ok, runner} = RequestRunner.start_link(command, 1, retries: 0)
 
     nack_response = ZIPPacket.make_nack_response(RequestRunner.seq_number(runner))
@@ -74,11 +71,14 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "handles :nack_queue_full response" do
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
     {:ok, runner} = RequestRunner.start_link(command, 1, retries: 0)
 
     {:ok, nack_queue_full} =
-      ZIPPacket.new(seq_number: RequestRunner.seq_number(runner), flag: :nack_queue_full)
+      Commands.create(:zip_packet,
+        seq_number: RequestRunner.seq_number(runner),
+        flag: :nack_queue_full
+      )
 
     assert %Grizzly.Report{status: :complete, type: :queue_full, queued: false} =
              RequestRunner.handle_zip_command(runner, nack_queue_full)
@@ -87,7 +87,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "ignores nack_response not for command" do
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
     {:ok, runner} = RequestRunner.start_link(command, 1)
 
     nack_response = ZIPPacket.make_nack_response(RequestRunner.seq_number(runner) + 1)
@@ -96,7 +96,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "handles a queued command" do
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
     {:ok, runner} = RequestRunner.start_link(command, 1)
     command_ref = RequestRunner.reference(runner)
 
@@ -113,7 +113,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "handles queued complete command" do
-    {:ok, command} = SwitchBinarySet.new(target_value: :off)
+    {:ok, command} = Commands.create(:switch_binary_set, target_value: :off)
     {:ok, runner} = RequestRunner.start_link(command, 1)
     command_ref = RequestRunner.reference(runner)
 
@@ -141,7 +141,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
 
   @tag :integration
   test "handles queued complete command with long timeout" do
-    {:ok, command} = SwitchBinarySet.new(target_value: :off)
+    {:ok, command} = Commands.create(:switch_binary_set, target_value: :off)
     {:ok, runner} = RequestRunner.start_link(command, 1)
     command_ref = RequestRunner.reference(runner)
 
@@ -167,7 +167,7 @@ defmodule Grizzly.Requests.RequestRunnerTest do
   end
 
   test "encodes a command" do
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
     {:ok, runner} = RequestRunner.start_link(command, 1)
     seq_number = RequestRunner.seq_number(runner)
 
@@ -177,14 +177,14 @@ defmodule Grizzly.Requests.RequestRunnerTest do
 
   describe "seq numbering" do
     test "assign a seq number for a command without one" do
-      {:ok, command} = SwitchBinaryGet.new()
+      {:ok, command} = Commands.create(:switch_binary_get)
       {:ok, runner} = RequestRunner.start_link(command, 1)
 
       assert RequestRunner.seq_number(runner)
     end
 
     test "use the seq number for a command that has one" do
-      {:ok, command} = NodeListGet.new(seq_number: SeqNumber.get_and_inc())
+      {:ok, command} = Commands.create(:node_list_get, seq_number: SeqNumber.get_and_inc())
       {:ok, runner} = RequestRunner.start_link(command, 1)
       command_seq_number = Command.param!(command, :seq_number)
 

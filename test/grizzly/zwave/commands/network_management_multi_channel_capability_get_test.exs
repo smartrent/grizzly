@@ -1,23 +1,25 @@
 defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGet
 
   test "ensure command byte" do
-    {:ok, command} = NetworkManagementMultiChannelCapabilityGet.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_capability_get)
 
     assert command.command_byte == 0x07
   end
 
   test "ensure name" do
-    {:ok, command} = NetworkManagementMultiChannelCapabilityGet.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_capability_get)
     assert command.name == :network_management_multi_channel_capability_get
   end
 
   describe "encoding" do
     test "version 2-3" do
       {:ok, command} =
-        NetworkManagementMultiChannelCapabilityGet.new(
+        Commands.create(
+          :network_management_multi_channel_capability_get,
           seq_number: 0x01,
           node_id: 0x04,
           end_point: 0x01
@@ -32,7 +34,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGetTest 
 
     test "version 4" do
       {:ok, command} =
-        NetworkManagementMultiChannelCapabilityGet.new(
+        Commands.create(
+          :network_management_multi_channel_capability_get,
           seq_number: 0x01,
           node_id: 0x0110,
           end_point: 0x03

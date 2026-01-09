@@ -1,11 +1,13 @@
 defmodule Grizzly.ZWave.Commands.S2MessageEncapsulationTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.S2MessageEncapsulation
 
   test "encodes params correctly" do
     {:ok, cmd} =
-      S2MessageEncapsulation.new(
+      Commands.create(
+        :s2_message_encapsulation,
         seq_number: 0xAB,
         extensions: [
           span: <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>>,
@@ -27,7 +29,8 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulationTest do
                15, 16, 3, 0b11000011, 20, 2, 0b000000100, 0xDE, 0xAD, 0xBE, 0xEF>>
 
     {:ok, cmd} =
-      S2MessageEncapsulation.new(
+      Commands.create(
+        :s2_message_encapsulation,
         seq_number: 0xEE,
         extensions: [mos: false],
         encrypted_payload: <<0xDE, 0xAD, 0xBE, 0xEF>>

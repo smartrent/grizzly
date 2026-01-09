@@ -1,23 +1,27 @@
 defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet
 
   test "ensure command byte" do
-    {:ok, command} = NetworkManagementMultiChannelEndPointGet.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_end_point_get)
 
     assert command.command_byte == 0x05
   end
 
   test "ensure name" do
-    {:ok, command} = NetworkManagementMultiChannelEndPointGet.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_end_point_get)
     assert command.name == :network_management_multi_channel_end_point_get
   end
 
   describe "encoding" do
     test "version 2-3" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointGet.new(seq_number: 0x01, node_id: 0x04)
+        Commands.create(:network_management_multi_channel_end_point_get,
+          seq_number: 0x01,
+          node_id: 0x04
+        )
 
       for v <- 2..3 do
         assert NetworkManagementMultiChannelEndPointGet.encode_params(command,
@@ -28,7 +32,10 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
 
     test "version 4" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointGet.new(seq_number: 0x01, node_id: 0x0110)
+        Commands.create(:network_management_multi_channel_end_point_get,
+          seq_number: 0x01,
+          node_id: 0x0110
+        )
 
       assert NetworkManagementMultiChannelEndPointGet.encode_params(command) ==
                <<0x01, 0xFF, 0x01, 0x10>>

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ExtendedUserCodeSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ExtendedUserCodeSet
 
   test "encodes params correctly" do
@@ -12,8 +13,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeSetTest do
     ]
 
     binary =
-      params
-      |> ExtendedUserCodeSet.new()
+      Commands.create(:extended_user_code_set, params)
       |> elem(1)
       |> ExtendedUserCodeSet.encode_params()
 

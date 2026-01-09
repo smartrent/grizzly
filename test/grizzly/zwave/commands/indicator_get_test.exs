@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.IndicatorGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.IndicatorGet
 
   test "creates the command and validates params" do
     params = [indicator_id: :armed]
-    {:ok, _command} = IndicatorGet.new(params)
+    {:ok, _command} = Commands.create(:indicator_get, params)
   end
 
   test "encodes params correctly" do
     params = [indicator_id: :armed]
-    {:ok, command} = IndicatorGet.new(params)
+    {:ok, command} = Commands.create(:indicator_get, params)
     expected_params_binary = <<0x01>>
     assert expected_params_binary == IndicatorGet.encode_params(command)
   end

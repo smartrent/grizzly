@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulatedTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.BasicSet
   alias Grizzly.ZWave.Commands.MultiCommandEncapsulated
   alias Grizzly.ZWave.Commands.SwitchMultilevelSet
@@ -19,12 +20,12 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulatedTest do
 
   test "creates the command and validates params", %{commands: commands} do
     params = [commands: commands]
-    {:ok, _command} = MultiCommandEncapsulated.new(params)
+    {:ok, _command} = Commands.create(:multi_command_encapsulated, params)
   end
 
   test "encodes params correctly", %{commands: commands} do
     params = [commands: commands]
-    {:ok, command} = MultiCommandEncapsulated.new(params)
+    {:ok, command} = Commands.create(:multi_command_encapsulated, params)
     basic_set_binary = <<0x03>> <> <<0x20, 0x01, 0xFF>>
     switch_multilevel_set_binary = <<0x04>> <> <<0x26, 0x01, 0x32, 0x0A>>
     expected_binary = <<0x02>> <> basic_set_binary <> switch_multilevel_set_binary

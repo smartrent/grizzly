@@ -1,11 +1,12 @@
 defmodule Grizzly.ZWave.Commands.BarrierOperatorReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.BarrierOperatorReport
 
   test "creates the command and validates params" do
     params = [state: :closed]
-    {:ok, _command} = BarrierOperatorReport.new(params)
+    {:ok, _command} = Commands.create(:barrier_operator_report, params)
   end
 
   describe "encodes params correctly" do

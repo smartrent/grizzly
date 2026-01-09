@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.DSKReport
   alias Grizzly.ZWave.DSK
 
@@ -16,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
       add_mode: :learn
     ]
 
-    assert {:ok, %Command{}} = DSKReport.new(params)
+    assert {:ok, %Command{}} = Commands.create(:dsk_report, params)
   end
 
   test "encodes params correctly" do
@@ -28,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
       add_mode: :learn
     ]
 
-    {:ok, command} = DSKReport.new(params)
+    {:ok, command} = Commands.create(:dsk_report, params)
 
     expected_binary =
       <<0x01, 0x00, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.UserReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserReport
 
   test "encodes params correctly" do
@@ -18,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.UserReportTest do
       username: "test_user"
     ]
 
-    assert {:ok, command} = UserReport.new(params)
+    assert {:ok, command} = Commands.create(:user_report, params)
 
     assert UserReport.encode_params(command) == <<
              0,
@@ -49,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.UserReportTest do
       username: "test_user"
     ]
 
-    assert {:ok, command} = UserReport.new(params)
+    assert {:ok, command} = Commands.create(:user_report, params)
 
     assert UserReport.encode_params(command) == <<
              4,
