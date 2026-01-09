@@ -20,24 +20,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
 
   require Logger
 
   @type param ::
           {:size, 1 | 2 | 4} | {:value, integer()} | {:param_number, byte()}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :configuration_report,
-      command_byte: 0x06,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

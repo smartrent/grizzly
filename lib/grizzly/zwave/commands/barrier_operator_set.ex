@@ -17,19 +17,6 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSet do
   @type param :: {:target_value, BarrierOperator.target_value()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :barrier_operator_set,
-      command_byte: 0x01,
-      command_class: BarrierOperator,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     target_value = Command.param!(command, :target_value)

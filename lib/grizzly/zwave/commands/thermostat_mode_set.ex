@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSet do
   @type param :: {:mode, ThermostatMode.mode()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_mode_set,
-      command_byte: 0x01,
-      command_class: ThermostatMode,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     mode = Command.param!(command, :mode)
 

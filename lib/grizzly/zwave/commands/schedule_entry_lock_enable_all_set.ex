@@ -11,22 +11,8 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
 
   @type param :: {:enabled, boolean()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :schedule_entry_lock_enable_all_set,
-      command_byte: 0x02,
-      command_class: ScheduleEntryLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

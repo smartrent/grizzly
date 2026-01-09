@@ -23,7 +23,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
@@ -34,19 +33,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReport do
           | {:start_minute, 0..59}
           | {:stop_hour, 0..23}
           | {:stop_minute, 0..59}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :schedule_entry_lock_week_day_report,
-      command_byte: 0x05,
-      command_class: ScheduleEntryLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

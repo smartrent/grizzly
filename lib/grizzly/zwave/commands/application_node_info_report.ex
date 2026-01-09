@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.ZIPGateway
   alias Grizzly.ZWave.DecodeError
 
   @type tagged_command_classes ::
@@ -22,19 +21,6 @@ defmodule Grizzly.ZWave.Commands.ApplicationNodeInfoReport do
           | {:secure_controlled, [CommandClasses.command_class()]}
 
   @type param :: {:command_classes, [tagged_command_classes()]}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :application_node_info_report,
-      command_byte: 0x0D,
-      command_class: ZIPGateway,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

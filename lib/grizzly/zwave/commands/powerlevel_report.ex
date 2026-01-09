@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.PowerlevelReport do
   @type param :: {:power_level, Powerlevel.power_level()} | {:timeout, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :powerlevel_report,
-      command_byte: 0x03,
-      command_class: Powerlevel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     power_level_byte = Command.param!(command, :power_level) |> Powerlevel.power_level_to_byte()

@@ -6,21 +6,7 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCredential
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.Command
-  @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :admin_pin_code_get,
-      command_byte: 0x1B,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

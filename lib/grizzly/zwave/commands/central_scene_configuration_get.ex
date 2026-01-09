@@ -8,21 +8,6 @@ defmodule Grizzly.ZWave.Commands.CentralSceneConfigurationGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.CentralScene
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :central_scene_configuration_get,
-      command_byte: 0x05,
-      command_class: CentralScene,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

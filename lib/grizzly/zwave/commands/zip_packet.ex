@@ -10,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ZIP
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions
 
   @type flag ::
@@ -31,29 +31,6 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
           | {:header_extensions, [HeaderExtensions.extension()]}
           | {:secure, boolean()}
           | {:more_info, boolean()}
-
-  @default_params [
-    source: 0x00,
-    dest: 0x00,
-    secure: true,
-    header_extensions: [],
-    flag: nil,
-    command: nil,
-    more_info: false
-  ]
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    # TODO: validate params
-    command = %Command{
-      name: :zip_packet,
-      command_byte: 0x02,
-      command_class: ZIP,
-      params: Keyword.merge(@default_params, params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
@@ -174,7 +151,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     more_info = Keyword.get(opts, :more_info, [])
 
     {:ok, command} =
-      new(
+      Commands.create(:zip_packet,
         seq_number: seq_number,
         flag: :ack_response,
         header_extensions: header_extensions,
@@ -189,7 +166,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   """
   @spec make_nack_response(ZWave.seq_number()) :: Command.t()
   def make_nack_response(seq_number) do
-    {:ok, command} = new(seq_number: seq_number, flag: :nack_response)
+    {:ok, command} = Commands.create(:zip_packet, seq_number: seq_number, flag: :nack_response)
     command
   end
 
@@ -197,7 +174,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
           Command.t()
   def make_nack_waiting_response(seq_number, delay_in_seconds) do
     {:ok, command} =
-      new(
+      Commands.create(:zip_packet,
         seq_number: seq_number,
         flag: :nack_waiting,
         header_extensions: [{:expected_delay, delay_in_seconds}]
@@ -223,14 +200,14 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   Make a Z/IP Packet Command that encapsulates another Z-Wave command
   """
   @spec with_zwave_command(Command.t() | binary(), ZWave.seq_number(), [param()]) ::
-          {:ok, Command.t()}
+          {:ok, Command.t()} | {:error, :unknown_command}
   def with_zwave_command(zwave_command, seq_number, params \\ []) do
     params =
       [flag: :ack_request]
       |> Keyword.merge(params)
       |> Keyword.merge(command: zwave_command, seq_number: seq_number)
 
-    new(params)
+    Commands.create(:zip_packet, params)
   end
 
   @spec command_name(Command.t()) :: atom() | nil

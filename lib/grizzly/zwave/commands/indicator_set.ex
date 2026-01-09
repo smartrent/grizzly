@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.IndicatorSet do
   @type param :: {:value, Indicator.value()} | {:resource, [Indicator.resource()]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :indicator_set,
-      command_byte: 0x01,
-      command_class: Indicator,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     value = Command.param(command, :value)

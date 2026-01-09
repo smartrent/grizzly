@@ -20,19 +20,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackReport do
   @type param :: {:type, ThermostatSetback.type()} | {:state, ThermostatSetback.state()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_setback_report,
-      command_byte: 0x03,
-      command_class: ThermostatSetback,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     type_byte = Command.param!(command, :type) |> ThermostatSetback.encode_type()

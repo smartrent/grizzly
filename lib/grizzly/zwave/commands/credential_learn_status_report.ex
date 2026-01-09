@@ -44,19 +44,6 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReport do
           | {:steps_remaining, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :credential_learn_status_report,
-      command_byte: 0x11,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     status = Command.param!(command, :status)

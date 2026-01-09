@@ -49,20 +49,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:input_dsk, DSK.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    # TODO: validate params
-    command = %Command{
-      name: :node_add_status,
-      command_byte: 0x02,
-      command_class: NMI,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     node_id = Command.param!(command, :node_id)
     status = Command.param!(command, :status)

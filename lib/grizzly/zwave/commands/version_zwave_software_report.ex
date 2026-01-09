@@ -10,19 +10,6 @@ defmodule Grizzly.ZWave.Commands.VersionZWaveSoftwareReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Version, as: CCVersion
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :version_zwave_software_report,
-      command_byte: 0x18,
-      command_class: CCVersion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

@@ -22,19 +22,6 @@ defmodule Grizzly.ZWave.Commands.UserCredentialAssociationSet do
           | {:destination_user_id, 1..0xFFFF}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_credential_association_set,
-      command_byte: 0x12,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     credential_type = Command.param!(command, :credential_type)

@@ -9,18 +9,6 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :switch_multilevel_get,
-      command_byte: 0x02,
-      command_class: SwitchMultilevel
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def decode_params(_), do: {:ok, []}

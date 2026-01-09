@@ -13,23 +13,9 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:user_identifier, byte()} | {:schedule_slot_id, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :schedule_entry_lock_year_day_get,
-      command_byte: 0x07,
-      command_class: ScheduleEntryLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

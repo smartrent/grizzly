@@ -11,23 +11,9 @@ defmodule Grizzly.ZWave.Commands.ConfigurationNameGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:param_number, byte}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :configuration_name_get,
-      command_byte: 0x0A,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

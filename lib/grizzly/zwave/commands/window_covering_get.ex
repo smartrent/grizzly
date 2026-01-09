@@ -17,19 +17,6 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringGet do
   @type param :: {:parameter_name, WindowCovering.parameter_name()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :window_covering_get,
-      command_byte: 0x03,
-      command_class: WindowCovering,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     parameter_id =

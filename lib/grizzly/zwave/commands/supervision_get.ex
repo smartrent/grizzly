@@ -15,26 +15,12 @@ defmodule Grizzly.ZWave.Commands.SupervisionGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Supervision
 
   @type status_updates :: :one_now | :one_now_more_later
   @type param ::
           {:status_updates, status_updates()}
           | {:session_id, byte}
           | {:encapsulated_command, binary}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :supervision_get,
-      command_byte: 0x01,
-      command_class: Supervision,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

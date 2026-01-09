@@ -21,19 +21,6 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReport do
   @type param :: {:meter_reset, any()} | {:meter_type, any()} | {:scale_supported, any()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :meter_supported_report,
-      command_byte: 0x04,
-      command_class: Meter,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     meter_reset_supported_bit =

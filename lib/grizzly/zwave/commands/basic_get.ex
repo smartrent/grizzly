@@ -9,18 +9,6 @@ defmodule Grizzly.ZWave.Commands.BasicGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Basic
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :basic_get,
-      command_byte: 0x02,
-      command_class: Basic
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

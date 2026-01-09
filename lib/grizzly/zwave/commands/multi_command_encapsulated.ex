@@ -11,21 +11,8 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulated do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.MultiCommand
 
   @type param :: {:commands, [Command.t()]}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :multi_command_encapsulated,
-      command_byte: 0x01,
-      command_class: MultiCommand,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

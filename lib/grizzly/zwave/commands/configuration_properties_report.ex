@@ -56,19 +56,6 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
           | {:no_bulk_support, boolean | nil}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :configuration_properties_report,
-      command_byte: 0x0F,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     param_number = Command.param!(command, :param_number)

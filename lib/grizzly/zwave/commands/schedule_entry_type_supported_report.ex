@@ -14,26 +14,12 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:number_of_slots_week_day, byte()}
           | {:number_of_slots_year_day, byte()}
           | {:number_of_slots_daily_repeating, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :schedule_entry_type_supported_report,
-      command_byte: 0x0A,
-      command_class: ScheduleEntryLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

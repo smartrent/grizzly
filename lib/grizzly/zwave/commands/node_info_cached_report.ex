@@ -25,7 +25,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.DeviceClasses
 
   @typedoc """
@@ -54,20 +53,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
           | {:basic_device_class, DeviceClasses.basic_device_class()}
           | {:generic_device_class, DeviceClasses.generic_device_class()}
           | {:specific_device_class, DeviceClasses.specific_device_class()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param]) :: {:ok, Grizzly.ZWave.Command.t()}
-  def new(params) do
-    # TODO validate params
-    command = %Command{
-      name: :node_info_cached_report,
-      command_byte: 0x04,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

@@ -28,19 +28,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport do
           | {:max_value, number()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_setpoint_capabilities_report,
-      command_byte: 0x0A,
-      command_class: ThermostatSetpoint,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     type = Command.param!(command, :type)

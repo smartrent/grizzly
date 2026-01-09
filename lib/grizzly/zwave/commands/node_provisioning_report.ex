@@ -24,19 +24,6 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReport do
           | {:meta_extensions, [MetaExtension.extension()]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :node_provisioning_report,
-      command_byte: 0x06,
-      command_class: NodeProvisioning,
-      params: params_with_defaults(params)
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
@@ -62,10 +49,5 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReport do
        dsk: dsk,
        meta_extensions: meta_extensions
      ]}
-  end
-
-  defp params_with_defaults(params) do
-    defaults = [meta_extensions: [], dsk: nil]
-    Keyword.merge(defaults, params)
   end
 end

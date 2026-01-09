@@ -12,22 +12,8 @@ defmodule Grizzly.ZWave.Commands.AssociationGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Association
 
   @type param :: {:grouping_identifier, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :association_get,
-      command_byte: 0x02,
-      command_class: Association,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

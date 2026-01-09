@@ -10,20 +10,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :firmware_md_get,
-      command_byte: 0x01,
-      command_class: FirmwareUpdateMD
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

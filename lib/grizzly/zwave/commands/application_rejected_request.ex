@@ -9,21 +9,6 @@ defmodule Grizzly.ZWave.Commands.ApplicationRejectedRequest do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ApplicationStatus
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :application_rejected_request,
-      command_byte: 0x02,
-      command_class: ApplicationStatus,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     # "status" must always be 0

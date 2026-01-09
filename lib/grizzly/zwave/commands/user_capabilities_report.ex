@@ -33,19 +33,6 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReport do
           | {:supported_user_types, [UserCredential.user_type()]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_capabilities_report,
-      command_byte: 0x02,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     max_users = Command.param!(command, :max_users)

@@ -13,22 +13,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
 
   @type param :: {:number_of_parameters, non_neg_integer} | {:offset, non_neg_integer()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :configuration_bulk_get,
-      command_byte: 0x08,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

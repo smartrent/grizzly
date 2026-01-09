@@ -19,7 +19,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.ScheduleEntryLock
 
   @type param ::
           {:sign_tzo, :plus | :minus}
@@ -27,19 +26,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet do
           | {:minute_tzo, integer()}
           | {:sign_offset_tzo, :plus | :minus}
           | {:minute_offset_dst, integer()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :schedule_entry_lock_time_offset_set,
-      command_byte: 0x0D,
-      command_class: ScheduleEntryLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

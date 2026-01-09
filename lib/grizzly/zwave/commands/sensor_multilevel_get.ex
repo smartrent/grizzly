@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
   @type param :: {:sensor_type, sensor_type} | {:scale, 0..3}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :sensor_multilevel_get,
-      command_byte: 0x04,
-      command_class: SensorMultilevel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     case Command.param(command, :sensor_type) do
       nil ->

@@ -27,19 +27,6 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStart do
           | {:learn_timeout, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :credential_learn_start,
-      command_byte: 0x0F,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_id = Command.param!(command, :user_id)

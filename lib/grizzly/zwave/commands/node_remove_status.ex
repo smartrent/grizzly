@@ -27,24 +27,10 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.NodeId
 
   @type status() :: :done | :failed
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    # TODO validate params
-    command = %Command{
-      name: :node_remove_status,
-      command_byte: 0x04,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command, opts \\ []) do

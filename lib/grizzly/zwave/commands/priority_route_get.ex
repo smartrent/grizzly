@@ -11,22 +11,8 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
 
   @type param :: {:node_id, byte}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :priority_route_get,
-      command_byte: 0x02,
-      command_class: NetworkManagementInstallationMaintenance,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

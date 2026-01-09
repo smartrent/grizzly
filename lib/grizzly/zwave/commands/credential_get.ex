@@ -21,19 +21,6 @@ defmodule Grizzly.ZWave.Commands.CredentialGet do
           | {:credential_slot, 0..0xFFFF}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :credential_get,
-      command_byte: 0x0B,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_id = Command.param!(command, :user_id)

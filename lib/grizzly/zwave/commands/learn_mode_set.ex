@@ -18,7 +18,6 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
   alias Grizzly.ZWave.DecodeError
 
   @type mode :: :disable | :direct_range_only | :allow_routed
@@ -26,18 +25,6 @@ defmodule Grizzly.ZWave.Commands.LearnModeSet do
           {:seq_number, ZWave.seq_number()}
           | {:return_interview_status, :on | :off}
           | {:mode, mode}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :learn_mode_set,
-      command_byte: 0x01,
-      command_class: NetworkManagementBasicNode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

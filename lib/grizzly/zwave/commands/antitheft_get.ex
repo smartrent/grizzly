@@ -9,21 +9,6 @@ defmodule Grizzly.ZWave.Commands.AntitheftGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Antitheft
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :antitheft_get,
-      command_byte: 0x02,
-      command_class: Antitheft,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

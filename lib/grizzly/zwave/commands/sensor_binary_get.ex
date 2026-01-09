@@ -18,19 +18,6 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryGet do
   @type param :: {:sensor_type, SensorBinary.sensor_type()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :sensor_binary_get,
-      command_byte: 0x02,
-      command_class: SensorBinary,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     sensor_type = Command.param!(command, :sensor_type)
     <<SensorBinary.encode_type(sensor_type)>>

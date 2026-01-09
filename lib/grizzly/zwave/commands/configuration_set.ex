@@ -38,7 +38,6 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
@@ -46,19 +45,6 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
           | {:format, :signed_integer | :unsigned_integer | :enumerated | :bit_field}
           | {:value, integer() | :default}
           | {:param_number, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :configuration_set,
-      command_byte: 0x04,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

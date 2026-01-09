@@ -19,7 +19,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
 
   @type param ::
           {:manufacturer_id, non_neg_integer}
@@ -31,19 +30,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
           | {:hardware_version, byte}
           | {:activation_supported?, boolean}
           | {:active_during_transfer?, boolean}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :firmware_md_report,
-      command_byte: 0x02,
-      command_class: FirmwareUpdateMD,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   # version 1
@@ -124,7 +110,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
     params = command.params |> Enum.into(%{})
 
     case params do
-      # v6-7
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
@@ -134,6 +119,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         other_firmware_ids: other_firmware_ids,
         hardware_version: hardware_version,
         activation_supported?: activation_supported?,
+        # v6-7
         active_during_transfer?: active_during_transfer?
       } ->
         firmware_targets = Enum.count(other_firmware_ids)
@@ -147,7 +133,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
           firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version, 0x00::6,
           activation_supported::1, cc::1>>
 
-      # v5
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
@@ -155,6 +140,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
         firmware_upgradable?: firmware_upgradable?,
         max_fragment_size: max_fragment_size,
         other_firmware_ids: other_firmware_ids,
+        # v5
         hardware_version: hardware_version
       } ->
         firmware_targets = Enum.count(other_firmware_ids)
@@ -165,13 +151,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
           firmware_targets, max_fragment_size::16,
           firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version>>
 
-      # v3
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
         checksum: checksum,
         firmware_upgradable?: firmware_upgradable?,
         max_fragment_size: max_fragment_size,
+        # v3
         other_firmware_ids: other_firmware_ids
       } ->
         firmware_targets = Enum.count(other_firmware_ids)
@@ -182,10 +168,10 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
           firmware_targets, max_fragment_size::16,
           firmware_target_ids::binary-size(firmware_targets)-unit(16)>>
 
-      # v1
       %{
         manufacturer_id: manufacturer_id,
         firmware_id: firmware_id,
+        # v1
         checksum: checksum
       } ->
         <<manufacturer_id::16, firmware_id::16, checksum::16>>

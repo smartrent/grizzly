@@ -16,18 +16,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityGet do
   @type param :: {:end_point, MultiChannel.end_point()}
 
   @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :multi_channel_capability_get,
-      command_byte: 0x09,
-      command_class: MultiChannel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     end_point = Command.param!(command, :end_point)
     <<0x00::1, end_point::7>>

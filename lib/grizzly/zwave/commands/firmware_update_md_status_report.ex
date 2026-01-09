@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.FirmwareUpdateMD
   alias Grizzly.ZWave.DecodeError
 
   @type status ::
@@ -29,18 +28,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport do
           | :successful_not_restarting
           | :successful_restarting
   @type param :: {:status, status} | {:wait_time, non_neg_integer}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :firmware_update_md_status_report,
-      command_byte: 0x07,
-      command_class: FirmwareUpdateMD,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

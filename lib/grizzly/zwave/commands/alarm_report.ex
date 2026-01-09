@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Alarm
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Notifications
 
@@ -35,20 +34,6 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
           | {:zwave_type, Notifications.type()}
           | {:sequence_number, byte()}
           | {:event_parameters, [byte()]}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    # TODO: validate params
-    command = %Command{
-      name: :alarm_report,
-      command_byte: 0x05,
-      command_class: Alarm,
-      params: build_params(params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def validate_params(params) do

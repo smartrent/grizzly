@@ -18,23 +18,8 @@ defmodule Grizzly.ZWave.Commands.DSKGet do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
 
-  @default_params [add_mode: :learn]
-
   @type param ::
           {:seq_number, ZWave.seq_number()} | {:add_mode, NetworkManagementBasicNode.add_mode()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :dsk_get,
-      command_byte: 0x08,
-      command_class: NetworkManagementBasicNode,
-      params: Keyword.merge(@default_params, params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

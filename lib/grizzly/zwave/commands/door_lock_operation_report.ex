@@ -90,19 +90,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
           | {:duration, :unknown | non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :door_lock_operation_report,
-      command_byte: 0x03,
-      command_class: DoorLock,
-      params: params_with_defaults(params)
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     mode = Command.param!(command, :mode)
@@ -228,22 +215,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     <<byte>> = <<0::5, latch_bit::1, bolt_bit::1, door_bit::1>>
 
     byte
-  end
-
-  defp params_with_defaults(params) do
-    handles_modes_default = %{1 => :disabled, 2 => :disabled, 3 => :disabled, 4 => :disabled}
-
-    defaults = [
-      inside_handles_mode: handles_modes_default,
-      outside_handles_mode: handles_modes_default,
-      latch_position: :open,
-      bolt_position: :locked,
-      door_state: :open,
-      timeout_minutes: 0,
-      timeout_seconds: 0
-    ]
-
-    Keyword.merge(defaults, params)
   end
 
   defp latch_bit_from_position(:open), do: 0

@@ -24,19 +24,6 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
   @type param :: {:status, ApplicationStatus.status()} | {:wait_time, :byte}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :application_busy,
-      command_byte: 0x01,
-      command_class: ApplicationStatus,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     status_byte = Command.param!(command, :status) |> ApplicationStatus.status_to_byte()

@@ -15,7 +15,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchBinary
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
 
@@ -25,19 +24,6 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
           {:target_value, value()}
           | {:duration, Encoding.duration()}
           | {:current_value, value()}
-
-  @impl Grizzly.ZWave.Command
-  def new(opts) do
-    # TODO: validate opts
-    command = %Command{
-      name: :switch_binary_report,
-      command_byte: 0x03,
-      command_class: SwitchBinary,
-      params: opts
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

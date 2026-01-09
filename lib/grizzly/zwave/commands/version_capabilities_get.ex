@@ -9,20 +9,6 @@ defmodule Grizzly.ZWave.Commands.VersionCapabilitiesGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Version
-
-  @impl Grizzly.ZWave.Command
-  def new(_opts \\ []) do
-    command = %Command{
-      name: :version_capabilities_get,
-      command_byte: 0x15,
-      command_class: Version
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command), do: <<>>
 

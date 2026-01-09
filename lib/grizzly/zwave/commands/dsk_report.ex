@@ -28,19 +28,6 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
           | {:dsk, DSK.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :dsk_report,
-      command_byte: 0x09,
-      command_class: NetworkManagementBasicNode,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)

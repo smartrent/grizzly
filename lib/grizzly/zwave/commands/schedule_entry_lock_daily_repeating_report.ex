@@ -37,19 +37,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport do
           | {:duration_minute, 0..59}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :schedule_entry_lock_daily_repeating_report,
-      command_byte: 0x0F,
-      command_class: ScheduleEntryLock,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_identifier = Command.param!(command, :user_identifier)

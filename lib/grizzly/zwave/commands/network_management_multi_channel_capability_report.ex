@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.DeviceClasses
   alias Grizzly.ZWave.NodeId
 
@@ -33,19 +32,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
           | {:generic_device_class, DeviceClasses.generic_device_class()}
           | {:specific_device_class, DeviceClasses.specific_device_class()}
           | {:command_classes, list()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :network_management_multi_channel_capability_report,
-      command_byte: 0x08,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command, encode_opts \\ []) do

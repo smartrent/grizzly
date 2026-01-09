@@ -8,21 +8,7 @@ defmodule Grizzly.ZWave.Commands.AllUsersChecksumGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCredential
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.Command
-  @spec new(keyword()) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :all_users_checksum_get,
-      command_byte: 0x14,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

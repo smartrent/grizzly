@@ -19,18 +19,6 @@ defmodule Grizzly.ZWave.Commands.MeterGet do
           | {:scale2, byte()}
 
   @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :meter_get,
-      command_byte: 0x01,
-      command_class: Meter,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     cond do
       Command.has_param?(command, :scale2) -> encode_v4_and_later_raw(command)

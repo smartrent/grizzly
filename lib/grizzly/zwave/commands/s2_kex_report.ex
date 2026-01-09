@@ -30,19 +30,6 @@ defmodule Grizzly.ZWave.Commands.S2KexReport do
           | {:requested_keys, [Security.key()]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :s2_kex_report,
-      command_byte: 0x05,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     request_csa = Command.param(command, :request_csa, false)
     echo = Command.param(command, :echo, false)

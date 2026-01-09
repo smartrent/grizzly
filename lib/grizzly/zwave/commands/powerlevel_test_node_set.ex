@@ -27,19 +27,6 @@ defmodule Grizzly.ZWave.Commands.PowerlevelTestNodeSet do
           | {:test_frame_count, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :powerlevel_test_node_set,
-      command_byte: 0x04,
-      command_class: Powerlevel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     test_node_id = Command.param!(command, :test_node_id)

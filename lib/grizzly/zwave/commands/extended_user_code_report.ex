@@ -20,19 +20,6 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeReport do
           | {:next_user_id, UserCode.extended_user_id()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :extended_user_code_report,
-      command_byte: 0x0D,
-      command_class: UserCode,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     user_codes = Command.param!(command, :user_codes)

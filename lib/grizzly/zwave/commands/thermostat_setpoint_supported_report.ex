@@ -19,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
   @type param :: {:setpoint_types, [{ThermostatSetpoint.type(), boolean()}]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :thermostat_setpoint_supported_report,
-      command_byte: 0x05,
-      command_class: ThermostatSetpoint,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     setpoint_types = Command.param!(command, :setpoint_types)

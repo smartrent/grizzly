@@ -11,23 +11,9 @@ defmodule Grizzly.ZWave.Commands.UserCodeChecksumReport do
   import Bitwise
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCode
   alias Grizzly.ZWave.DecodeError
 
   @type param :: {:checksum, 0x0000..0xFFFF}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_code_checksum_report,
-      command_byte: 0x12,
-      command_class: UserCode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

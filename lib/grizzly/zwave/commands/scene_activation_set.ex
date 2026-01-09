@@ -13,26 +13,12 @@ defmodule Grizzly.ZWave.Commands.SceneActivationSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SceneActivation
   alias Grizzly.ZWave.CommandClasses.SceneActuatorConf
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:scene_id, boolean}
           | {:dimming_duration, SceneActuatorConf.dimming_duration()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :scene_activation_set,
-      command_byte: 0x01,
-      command_class: SceneActivation,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

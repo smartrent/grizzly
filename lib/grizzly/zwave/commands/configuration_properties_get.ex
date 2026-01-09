@@ -11,21 +11,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
 
   @type param :: {:param_number, non_neg_integer}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :configuration_properties_get,
-      command_byte: 0x0E,
-      command_class: Configuration,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

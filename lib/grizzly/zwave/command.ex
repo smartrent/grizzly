@@ -40,13 +40,6 @@ defmodule Grizzly.ZWave.Command do
             params: []
 
   @doc """
-  Make a new `Command.t()` from the params provided
-
-  Param validation should take place here.
-  """
-  @callback new(params :: keyword()) :: {:ok, t()} | {:error, reason :: any()}
-
-  @doc """
   Validate the command's parameters.
 
   The callback should return `{:ok, validated_params}` if the parameters are valid,

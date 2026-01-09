@@ -9,19 +9,6 @@ defmodule Grizzly.ZWave.Commands.NodeLocationGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NodeNaming
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :node_location_get,
-      command_byte: 0x05,
-      command_class: NodeNaming,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

@@ -2,13 +2,13 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulatedTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Commands
-  alias Grizzly.ZWave.Commands.BasicSet
   alias Grizzly.ZWave.Commands.MultiCommandEncapsulated
-  alias Grizzly.ZWave.Commands.SwitchMultilevelSet
 
   setup_all do
-    {:ok, basic_set} = BasicSet.new(value: :on)
-    {:ok, switch_multilevel_set} = SwitchMultilevelSet.new(target_value: 0x32, duration: 0x0A)
+    {:ok, basic_set} = Commands.create(:basic_set, value: :on)
+
+    {:ok, switch_multilevel_set} =
+      Commands.create(:switch_multilevel_set, target_value: 0x32, duration: 0x0A)
 
     commands = [
       basic_set,

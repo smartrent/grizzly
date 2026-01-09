@@ -42,7 +42,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.NodeId
 
@@ -52,21 +51,6 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
           {:seq_number, Grizzly.seq_number()}
           | {:node_id, Grizzly.ZWave.node_id()}
           | {:max_age, max_age()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    params = set_defaults(params)
-    # TODO: validate params
-    command = %Command{
-      name: :node_info_cached_get,
-      command_byte: 0x03,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t(), keyword()) :: binary()
@@ -111,8 +95,4 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
 
   def decode_max_age(n),
     do: {:error, %DecodeError{value: n, param: :max_age, command: :node_info_cached_get}}
-
-  defp set_defaults(params) do
-    Keyword.put_new(params, :max_age, 10)
-  end
 end

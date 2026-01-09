@@ -17,19 +17,6 @@ defmodule Grizzly.ZWave.Commands.CredentialChecksumGet do
   @type param :: {:credential_type, UserCredential.credential_type()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :credential_checksum_get,
-      command_byte: 0x18,
-      command_class: UserCredential,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     credential_type = Command.param!(command, :credential_type)

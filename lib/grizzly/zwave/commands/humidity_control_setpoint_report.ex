@@ -12,23 +12,9 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
   alias Grizzly.ZWave.Commands.HumidityControlSetpointSet
 
   @type param :: HumidityControlSetpointSet.param()
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :humidity_control_setpoint_report,
-      command_byte: 0x03,
-      command_class: HumidityControlSetpoint,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

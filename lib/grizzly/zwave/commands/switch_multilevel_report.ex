@@ -15,26 +15,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SwitchMultilevel
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
 
   require Logger
 
   @type param :: {:value, 0..99 | :off | :unknown} | {:duration, Encoding.duration()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :switch_multilevel_report,
-      command_byte: 0x03,
-      command_class: SwitchMultilevel,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

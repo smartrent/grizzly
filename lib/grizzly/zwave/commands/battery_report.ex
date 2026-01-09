@@ -23,7 +23,6 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Battery
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
@@ -36,19 +35,6 @@ defmodule Grizzly.ZWave.Commands.BatteryReport do
           | {:replace_recharge, :unknown | :soon | :now}
           | {:disconnected, boolean}
           | {:low_temperature, boolean}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :battery_report,
-      command_byte: 0x03,
-      command_class: Battery,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

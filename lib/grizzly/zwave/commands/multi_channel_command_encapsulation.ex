@@ -32,19 +32,6 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
           | {:parameters, Command.params()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :multi_channel_command_encapsulation,
-      command_byte: 0x0D,
-      command_class: MultiChannel,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     source_end_point = Command.param(command, :source_end_point, 0)

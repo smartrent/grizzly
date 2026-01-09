@@ -18,29 +18,12 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Association
-
-  @default_params [reports_to_follow: 0]
 
   @type param ::
           {:grouping_identifier, byte()}
           | {:max_nodes_supported, byte()}
           | {:reports_to_follow, byte()}
           | {:nodes, [ZWave.node_id()]}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param]) :: {:ok, Command.t()}
-  def new(params) do
-    # TODO: validate params
-    command = %Command{
-      name: :association_report,
-      command_byte: 0x03,
-      command_class: Association,
-      params: Keyword.merge(@default_params, params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

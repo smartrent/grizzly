@@ -25,7 +25,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
   alias Grizzly.ZWave.NodeId
 
   @type param() ::
@@ -33,19 +32,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport do
           | {:node_id, ZWave.node_id()}
           | {:individual_end_points, 0..127}
           | {:aggregated_end_points, 0..127}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :network_management_multi_channel_end_point_report,
-      command_byte: 0x06,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command, encode_opts \\ []) do

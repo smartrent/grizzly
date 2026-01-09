@@ -9,21 +9,6 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupingsGet do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Association
-
-  @impl Grizzly.ZWave.Command
-  def new(params \\ []) do
-    command = %Command{
-      name: :association_groupings_get,
-      command_byte: 0x05,
-      command_class: Association,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
   @impl Grizzly.ZWave.Command
   def encode_params(_command) do
     <<>>

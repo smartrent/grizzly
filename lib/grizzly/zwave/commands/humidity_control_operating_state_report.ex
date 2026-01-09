@@ -16,19 +16,6 @@ defmodule Grizzly.ZWave.Commands.HumidityControlOperatingStateReport do
   @type param :: {:state, HumidityControlOperatingState.state()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :humidity_control_operating_state_report,
-      command_byte: 0x02,
-      command_class: HumidityControlOperatingState,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     state = Command.param!(command, :state)

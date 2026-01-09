@@ -12,22 +12,9 @@ defmodule Grizzly.ZWave.Commands.VersionCapabilitiesReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Version
 
   @type param ::
           {:zwave_software, boolean()} | {:command_class, boolean()} | {:version, boolean()}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :version_capabilities_report,
-      command_byte: 0x16,
-      command_class: Version,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

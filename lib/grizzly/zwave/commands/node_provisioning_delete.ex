@@ -19,24 +19,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningDelete do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NodeProvisioning
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.DSK
 
   @type param :: {:seq_number, ZWave.seq_number()} | {:dsk, DSK.t()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :node_provisioning_delete,
-      command_byte: 0x02,
-      command_class: NodeProvisioning,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

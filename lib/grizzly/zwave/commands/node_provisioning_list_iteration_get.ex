@@ -16,22 +16,9 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGet do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NodeProvisioning
 
   @type param ::
           {:seq_number, ZWave.seq_number()} | {:remaining_counter, non_neg_integer()}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :node_provisioning_list_iteration_get,
-      command_byte: 0x03,
-      command_class: NodeProvisioning,
-      params: params_with_defaults(params)
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do
@@ -47,10 +34,5 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGet do
     else
       {:ok, [seq_number: seq_number, remaining_counter: remaining_counter]}
     end
-  end
-
-  defp params_with_defaults(params) do
-    defaults = [remaining_counter: 0xFF]
-    Keyword.merge(defaults, params)
   end
 end

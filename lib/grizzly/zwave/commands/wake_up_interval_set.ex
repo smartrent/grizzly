@@ -15,22 +15,8 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.WakeUp
 
   @type param :: {:seconds, non_neg_integer} | {:node_id, byte}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :wake_up_interval_set,
-      command_byte: 0x04,
-      command_class: WakeUp,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

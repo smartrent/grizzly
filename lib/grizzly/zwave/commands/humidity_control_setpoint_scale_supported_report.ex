@@ -18,19 +18,6 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointScaleSupportedReport do
   @type param :: {:scales, [HumidityControlSetpoint.scale()]}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :humidity_control_setpoint_scale_supported_report,
-      command_byte: 0x07,
-      command_class: HumidityControlSetpoint,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     command

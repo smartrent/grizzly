@@ -24,19 +24,6 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
           | {:long_range_secondary_channel, NetworkManagementInstallationMaintenance.rssi()}
 
   @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :rssi_report,
-      command_byte: 0x08,
-      command_class: NetworkManagementInstallationMaintenance,
-      params: params
-    }
-
-    {:ok, command}
-  end
-
-  @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
   def encode_params(command) do
     channels = Command.param!(command, :channels)

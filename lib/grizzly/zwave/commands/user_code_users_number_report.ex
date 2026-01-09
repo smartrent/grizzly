@@ -12,22 +12,8 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCode
 
   @type param :: {:supported_users, byte()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :user_code_users_number_report,
-      command_byte: 0x05,
-      command_class: UserCode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

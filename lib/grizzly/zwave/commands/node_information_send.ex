@@ -15,7 +15,6 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
   import Bitwise
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
 
   @type tx_opt :: :ack | :low_power | :no_route | :explore
 
@@ -23,18 +22,6 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
           {:seq_number, Grizzly.seq_number()}
           | {:destination_node_id, Grizzly.node_id()}
           | {:tx_options, [tx_opt()]}
-
-  @impl Grizzly.ZWave.Command
-  def new(params) do
-    command = %Command{
-      name: :node_information_send,
-      command_byte: 0x05,
-      command_class: NetworkManagementBasicNode,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

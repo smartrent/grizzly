@@ -14,25 +14,11 @@ defmodule Grizzly.ZWave.Commands.SmartStartJoinStarted do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.DSK
 
   @type param ::
           {:seq_number, Grizzly.ZWave.seq_number()}
           | {:dsk, DSK.t()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :smart_start_join_started,
-      command_byte: 0x15,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

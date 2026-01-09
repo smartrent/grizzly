@@ -16,22 +16,8 @@ defmodule Grizzly.ZWave.Commands.S2TransferEnd do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Security2
 
   @type param :: {:key_verified, boolean(), key_request_complete: boolean()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params \\ []) do
-    command = %Command{
-      name: :s2_transfer_end,
-      command_byte: 0x0C,
-      command_class: Security2,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

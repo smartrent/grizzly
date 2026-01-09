@@ -7,20 +7,6 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonesNumberGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SoundSwitch
-
-  @impl Grizzly.ZWave.Command
-  @spec new([]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :sound_switch_tones_number_get,
-      command_byte: 0x01,
-      command_class: SoundSwitch,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

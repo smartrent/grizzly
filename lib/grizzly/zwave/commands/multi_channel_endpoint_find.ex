@@ -14,25 +14,11 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFind do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.MultiChannel
   alias Grizzly.ZWave.DeviceClasses, as: DC
 
   @type param ::
           {:generic_device_class, DC.generic_device_class() | :all}
           | {:specific_device_class, DC.specific_device_class() | :all}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :multi_channel_endpoint_find,
-      command_byte: 0x0B,
-      command_class: MultiChannel,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

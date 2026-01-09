@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion
   alias Grizzly.ZWave.DecodeError
 
   @type status :: :done | :failed
@@ -20,19 +19,6 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateStatus do
   @type param ::
           {:seq_number, Grizzly.seq_number()}
           | {:status, status()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :node_neighbor_update_status,
-      command_byte: 0x0C,
-      command_class: NetworkManagementInclusion,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

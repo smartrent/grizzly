@@ -6,20 +6,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.UserCode
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.Command
-  @spec new([]) :: {:ok, Command.t()}
-  def new(_) do
-    command = %Command{
-      name: :user_code_capabilities_get,
-      command_byte: 0x06,
-      command_class: UserCode
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

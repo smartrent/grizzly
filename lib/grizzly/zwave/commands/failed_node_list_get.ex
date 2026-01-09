@@ -12,23 +12,9 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListGet do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NetworkManagementProxy
 
   @type param ::
           {:seq_number, ZWave.seq_number()}
-
-  @impl Grizzly.ZWave.Command
-  @spec new([param()]) :: {:ok, Command.t()}
-  def new(params) do
-    command = %Command{
-      name: :failed_node_list_get,
-      command_byte: 0x0B,
-      command_class: NetworkManagementProxy,
-      params: params
-    }
-
-    {:ok, command}
-  end
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
