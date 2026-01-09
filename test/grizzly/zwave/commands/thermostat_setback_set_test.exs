@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ThermostatSetbackSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatSetbackSet
 
   test "creates the command and validates params" do
     params = [type: :no_override, state: :frost_protection]
-    {:ok, _command} = ThermostatSetbackSet.new(params)
+    {:ok, _command} = Commands.create(:thermostat_setback_set, params)
   end
 
   test "encodes params correctly" do
     params = [type: :temporary_override, state: -12.7]
-    {:ok, command} = ThermostatSetbackSet.new(params)
+    {:ok, command} = Commands.create(:thermostat_setback_set, params)
     expected_binary = <<0x00::6, 0x01::2, 0x81>>
     assert expected_binary == ThermostatSetbackSet.encode_params(command)
   end

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReport
 
   test "creates the command and validates params" do
@@ -8,7 +9,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
       sensor_types: [:temperature, :luminance, :seismic_magnitude, :water_temperature]
     ]
 
-    {:ok, _command} = SensorMultilevelSupportedSensorReport.new(params)
+    {:ok, _command} = Commands.create(:sensor_multilevel_supported_sensor_report, params)
   end
 
   test "encodes params correctly" do
@@ -22,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
       ]
     ]
 
-    {:ok, command} = SensorMultilevelSupportedSensorReport.new(params)
+    {:ok, command} = Commands.create(:sensor_multilevel_supported_sensor_report, params)
     expected_binary = <<17, 0, 64, 2, 0, 0, 0, 0, 0, 0, 128>>
 
     assert expected_binary ==

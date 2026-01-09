@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ThermostatOperatingStateReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatOperatingStateReport
 
   test "creates the command and validates params" do
     params = [state: :heating]
-    {:ok, _command} = ThermostatOperatingStateReport.new(params)
+    {:ok, _command} = Commands.create(:thermostat_operating_state_report, params)
   end
 
   test "encodes params correctly" do
     params = [state: :heating]
-    {:ok, command} = ThermostatOperatingStateReport.new(params)
+    {:ok, command} = Commands.create(:thermostat_operating_state_report, params)
     expected_binary = <<0x01>>
     assert expected_binary == ThermostatOperatingStateReport.encode_params(command)
   end

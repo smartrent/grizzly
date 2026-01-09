@@ -5,20 +5,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   alias Grizzly.Options
   alias Grizzly.UnsolicitedServer.ResponseHandler
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.AssociationGet
-  alias Grizzly.ZWave.Commands.AssociationGroupCommandListGet
-  alias Grizzly.ZWave.Commands.AssociationGroupInfoGet
-  alias Grizzly.ZWave.Commands.AssociationGroupingsGet
-  alias Grizzly.ZWave.Commands.AssociationGroupNameGet
-  alias Grizzly.ZWave.Commands.AssociationSet
-  alias Grizzly.ZWave.Commands.AssociationSpecificGroupGet
-  alias Grizzly.ZWave.Commands.MultiChannelAssociationGet
-  alias Grizzly.ZWave.Commands.MultiChannelAssociationGroupingsGet
-  alias Grizzly.ZWave.Commands.MultiChannelAssociationRemove
-  alias Grizzly.ZWave.Commands.MultiChannelAssociationSet
-  alias Grizzly.ZWave.Commands.SupervisionGet
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
-  alias Grizzly.ZWave.Commands.VersionCommandClassGet
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   setup_all do
@@ -40,14 +27,14 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   end
 
   test "handle non-extra command" do
-    {:ok, report} = SwitchBinaryReport.new(target_value: :off)
+    {:ok, report} = Commands.create(:switch_binary_report, target_value: :off)
     response = make_response(report)
 
     assert [:ack, {:notify, report}] == ResponseHandler.handle_response(5, response)
   end
 
   test "handle association specific group get" do
-    {:ok, asgg} = AssociationSpecificGroupGet.new()
+    {:ok, asgg} = Commands.create(:association_specific_group_get)
 
     response = make_response(asgg)
 
@@ -58,7 +45,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   end
 
   test "handle association get for known support grouping identifier", %{assoc_server: server} do
-    {:ok, assoc_get} = AssociationGet.new(grouping_identifier: 1)
+    {:ok, assoc_get} = Commands.create(:association_get, grouping_identifier: 1)
 
     response = make_response(assoc_get)
 
@@ -70,7 +57,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   end
 
   test "handles association get for an unknown grouping identifier", %{assoc_server: server} do
-    {:ok, assoc_get} = AssociationGet.new(grouping_identifier: 100)
+    {:ok, assoc_get} = Commands.create(:association_get, grouping_identifier: 100)
 
     response = make_response(assoc_get)
 
@@ -83,7 +70,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   end
 
   test "handle association set", %{assoc_server: server} do
-    {:ok, assoc_set} = AssociationSet.new(grouping_identifier: 1, nodes: [1, 2, 3])
+    {:ok, assoc_set} = Commands.create(:association_set, grouping_identifier: 1, nodes: [1, 2, 3])
 
     response = make_response(assoc_set)
 
@@ -91,7 +78,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   end
 
   test "handle association groupings get" do
-    {:ok, agg} = AssociationGroupingsGet.new()
+    {:ok, agg} = Commands.create(:association_groupings_get)
     assert [:ack, {:send, agr}] = ResponseHandler.handle_response(5, make_response(agg))
 
     assert agr.name == :association_groupings_report
@@ -99,7 +86,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
   describe "association group" do
     test "name get - known group (lifeline)" do
-      {:ok, agng} = AssociationGroupNameGet.new(group_id: 1)
+      {:ok, agng} = Commands.create(:association_group_name_get, group_id: 1)
       assert [:ack, {:send, agnr}] = ResponseHandler.handle_response(5, make_response(agng))
 
       assert agnr.name == :association_group_name_report
@@ -108,7 +95,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     end
 
     test "name get - unknown group" do
-      {:ok, agng} = AssociationGroupNameGet.new(group_id: 123)
+      {:ok, agng} = Commands.create(:association_group_name_get, group_id: 123)
 
       assert [:ack, {:send, agnr}] = ResponseHandler.handle_response(5, make_response(agng))
 
@@ -119,7 +106,11 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     test "info get" do
       {:ok, agig} =
-        AssociationGroupInfoGet.new(refresh_cache: false, group_id: 1, refresh_cache: false)
+        Commands.create(:association_group_info_get,
+          refresh_cache: false,
+          group_id: 1,
+          refresh_cache: false
+        )
 
       assert [:ack, {:send, agir}] = ResponseHandler.handle_response(5, make_response(agig))
 
@@ -128,7 +119,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     end
 
     test "command list get" do
-      {:ok, agclg} = AssociationGroupCommandListGet.new(cache_allowed: false, group_id: 1)
+      {:ok, agclg} =
+        Commands.create(:association_group_command_list_get, cache_allowed: false, group_id: 1)
 
       assert [:ack, {:send, agclr}] = ResponseHandler.handle_response(5, make_response(agclg))
 
@@ -140,7 +132,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   describe "supervision" do
     test "get" do
       {:ok, sup_get} =
-        SupervisionGet.new(
+        Commands.create(
+          :supervision_get,
           status_updates: :one_now,
           session_id: 11,
           encapsulated_command: <<113, 5, 0, 0, 0, 255, 6, 254, 0>>
@@ -160,7 +153,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
   describe "multi channel association" do
     test "groupings get" do
-      {:ok, mcagg} = MultiChannelAssociationGroupingsGet.new()
+      {:ok, mcagg} = Commands.create(:multi_channel_association_groupings_get)
 
       assert [:ack, {:send, mcagr}] = ResponseHandler.handle_response(5, make_response(mcagg))
 
@@ -170,7 +163,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
     end
 
     test "get", %{multi_channel_server: server} do
-      {:ok, mcag} = MultiChannelAssociationGet.new(grouping_identifier: 1)
+      {:ok, mcag} = Commands.create(:multi_channel_association_get, grouping_identifier: 1)
 
       assert [:ack, {:send, mcar}] =
                ResponseHandler.handle_response(5, make_response(mcag),
@@ -183,7 +176,8 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     test "set", %{multi_channel_server: server} do
       {:ok, mcas} =
-        MultiChannelAssociationSet.new(
+        Commands.create(
+          :multi_channel_association_set,
           grouping_identifier: 1,
           nodes: [1, 2, 3, 4],
           node_endpoints: [%{node: 5, endpoint: 6, bit_address: 0}]
@@ -197,7 +191,11 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
 
     test "remove", %{multi_channel_server: server} do
       {:ok, mcar} =
-        MultiChannelAssociationRemove.new(grouping_identifier: 1, nodes: [], node_endpoints: [])
+        Commands.create(:multi_channel_association_remove,
+          grouping_identifier: 1,
+          nodes: [],
+          node_endpoints: []
+        )
 
       assert [:ack] =
                ResponseHandler.handle_response(5, make_response(mcar),
@@ -207,7 +205,7 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   end
 
   test "version get query" do
-    {:ok, version_get} = VersionCommandClassGet.new(command_class: :association)
+    {:ok, version_get} = Commands.create(:version_command_class_get, command_class: :association)
 
     assert [:ack, {:send, version_report}] =
              ResponseHandler.handle_response(5, make_response(version_get))

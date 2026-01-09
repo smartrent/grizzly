@@ -2,11 +2,13 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ManufacturerSpecificReport
 
   test "creates the command and validates params" do
     {:ok, report} =
-      ManufacturerSpecificReport.new(
+      Commands.create(
+        :manufacturer_specific_report,
         manufacturer_id: 0x01,
         product_id: 0x01,
         product_type_id: 0x01
@@ -19,7 +21,8 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReportTest do
 
   test "encodes params correctly" do
     {:ok, report} =
-      ManufacturerSpecificReport.new(
+      Commands.create(
+        :manufacturer_specific_report,
         manufacturer_id: 0x01,
         product_id: 0x11,
         product_type_id: 0xFFFF

@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.AssociationSpecificGroupReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AssociationSpecificGroupReport
 
   test "creates the command and validates params" do
     params = [group: 5]
-    {:ok, _command} = AssociationSpecificGroupReport.new(params)
+    {:ok, _command} = Commands.create(:association_specific_group_report, params)
   end
 
   test "encodes params correctly" do
     params = [group: 5]
-    {:ok, command} = AssociationSpecificGroupReport.new(params)
+    {:ok, command} = Commands.create(:association_specific_group_report, params)
     expected_binary = <<0x05>>
     assert AssociationSpecificGroupReport.encode_params(command) == expected_binary
   end

@@ -7,19 +7,9 @@ defmodule GrizzlyTest.Server.Handler do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInclusion, as: NMI
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDGet
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport
-  alias Grizzly.ZWave.Commands.LearnModeSetStatus
-  alias Grizzly.ZWave.Commands.NodeAddDSKReport
-  alias Grizzly.ZWave.Commands.NodeAddKeysReport
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeAddStatus
-  alias Grizzly.ZWave.Commands.NodeListReport
   alias Grizzly.ZWave.Commands.NodeRemoveStatus
-  alias Grizzly.ZWave.Commands.SupervisionReport
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
-  alias Grizzly.ZWave.Commands.VersionCommandClassReport
-  alias Grizzly.ZWave.Commands.ZIPKeepAlive
   alias Grizzly.ZWave.Commands.ZIPPacket
   alias Grizzly.ZWave.DSK
   alias ThousandIsland.Socket
@@ -35,7 +25,8 @@ defmodule GrizzlyTest.Server.Handler do
 
   def learn_mode_success(node_id) do
     {:ok, cmd} =
-      LearnModeSetStatus.new(
+      Commands.create(
+        :learn_mode_set_status,
         seq_number: 1,
         status: :done,
         new_node_id: 5,
@@ -68,7 +59,7 @@ defmodule GrizzlyTest.Server.Handler do
         ]
       ]
       |> Keyword.merge(params)
-      |> NodeAddStatus.new()
+      |> then(&Commands.create(:node_add_status, &1))
 
     send_command(node_id, cmd)
   end
@@ -78,7 +69,7 @@ defmodule GrizzlyTest.Server.Handler do
     {:ok, cmd} =
       [seq_number: 1, status: status, node_id: if(status == :done, do: 15, else: 0)]
       |> Keyword.merge(params)
-      |> NodeRemoveStatus.new()
+      |> then(&Commands.create(:node_remove_status, &1))
 
     send_command(node_id, cmd)
   end
@@ -232,14 +223,15 @@ defmodule GrizzlyTest.Server.Handler do
   def only_send_report_for_node_add_or_remove_stop(socket, zip_packet) do
     command = Command.param!(zip_packet, :command)
 
-    with {:ok, status_failed} <- get_node_add_remove_command(command, zip_packet) do
-      seq_number = SeqNumber.get_and_inc()
+    _ =
+      with {:ok, status_failed} <- get_node_add_remove_command(command, zip_packet) do
+        seq_number = SeqNumber.get_and_inc()
 
-      {:ok, out_packet} = ZIPPacket.with_zwave_command(status_failed, seq_number, flag: nil)
-      :ok = Socket.send(socket, ZWave.to_binary(out_packet))
+        {:ok, out_packet} = ZIPPacket.with_zwave_command(status_failed, seq_number, flag: nil)
+        :ok = Socket.send(socket, ZWave.to_binary(out_packet))
 
-      :ok
-    end
+        :ok
+      end
 
     :ok
   end
@@ -248,7 +240,7 @@ defmodule GrizzlyTest.Server.Handler do
     seq_number = Command.param!(zip_packet, :seq_number)
 
     if Command.param!(command, :mode) == :node_add_stop do
-      NodeAddStatus.new(
+      Commands.create(:node_add_status,
         seq_number: seq_number,
         node_id: 15,
         status: :failed,
@@ -265,7 +257,7 @@ defmodule GrizzlyTest.Server.Handler do
     seq_number = Command.param!(zip_packet, :seq_number)
 
     if Command.param!(command, :mode) == :remove_node_stop do
-      NodeRemoveStatus.new(
+      Commands.create(:node_remove_status,
         seq_number: seq_number,
         node_id: 15,
         status: :failed
@@ -325,7 +317,7 @@ defmodule GrizzlyTest.Server.Handler do
 
   defp handle_keep_alive(socket, keep_alive) do
     with :ack_request <- Command.param!(keep_alive, :ack_flag) do
-      {:ok, response} = ZIPKeepAlive.new(ack_flag: :ack_response)
+      {:ok, response} = Commands.create(:keep_alive, ack_flag: :ack_response)
 
       :ok = Socket.send(socket, ZWave.to_binary(response))
     end
@@ -378,7 +370,10 @@ defmodule GrizzlyTest.Server.Handler do
     seq_number = SeqNumber.get_and_inc()
 
     {:ok, command} =
-      FirmwareUpdateMDGet.new(number_of_reports: number_of_reports, report_number: report_number)
+      Commands.create(:firmware_update_md_get,
+        number_of_reports: number_of_reports,
+        report_number: report_number
+      )
 
     {:ok, out_packet} = ZIPPacket.with_zwave_command(command, seq_number, flag: nil)
     :ok = Socket.send(socket, ZWave.to_binary(out_packet))
@@ -392,7 +387,8 @@ defmodule GrizzlyTest.Server.Handler do
     case {cmd.name, Command.param(cmd, :mode)} do
       {:learn_mode_set, :disable} ->
         {:ok, learn_mode_set_status} =
-          LearnModeSetStatus.new(
+          Commands.create(
+            :learn_mode_set_status,
             seq_number: 1,
             status: :failed,
             new_node_id: 0
@@ -431,7 +427,8 @@ defmodule GrizzlyTest.Server.Handler do
     seq_number = Command.param!(incoming_zip_packet, :seq_number)
 
     {:ok, keys_report} =
-      NodeAddKeysReport.new(
+      Commands.create(
+        :node_add_keys_report,
         csa: false,
         requested_keys: [:s2_unauthenticated, :s2_authenticated],
         seq_number: seq_number
@@ -452,7 +449,8 @@ defmodule GrizzlyTest.Server.Handler do
         {:ok, dsk} = DSK.parse("50285-18819-09924-30691-15973-33711-04005-03623")
 
         {:ok, dsk_report} =
-          NodeAddDSKReport.new(
+          Commands.create(
+            :node_add_dsk_report,
             seq_number: seq_number,
             input_dsk_length: 0,
             dsk: dsk
@@ -468,7 +466,8 @@ defmodule GrizzlyTest.Server.Handler do
         {:ok, dsk} = DSK.parse("00000-18819-09924-30691-15973-33711-04005-03623")
 
         {:ok, dsk_report} =
-          NodeAddDSKReport.new(
+          Commands.create(
+            :node_add_dsk_report,
             seq_number: seq_number,
             input_dsk_length: 2,
             dsk: dsk
@@ -502,7 +501,8 @@ defmodule GrizzlyTest.Server.Handler do
       end
 
     {:ok, report} =
-      SupervisionReport.new(
+      Commands.create(
+        :supervision_report,
         more_status_updates: more_status_updates,
         status: status,
         duration: 100,
@@ -523,7 +523,8 @@ defmodule GrizzlyTest.Server.Handler do
   defp do_build_report(:node_list_get, zip_packet) do
     seq_number = Command.param!(zip_packet, :seq_number)
 
-    NodeListReport.new(
+    Commands.create(
+      :node_list_report,
       status: :latest,
       seq_number: seq_number,
       node_ids: [1, 2, 3, 4, 5, 100, 101, 102],
@@ -541,7 +542,8 @@ defmodule GrizzlyTest.Server.Handler do
       secure_controlled: [:door_lock, :user_code]
     ]
 
-    NodeAddStatus.new(
+    Commands.create(
+      :node_add_status,
       seq_number: seq_number,
       node_id: 15,
       status: :done,
@@ -556,7 +558,8 @@ defmodule GrizzlyTest.Server.Handler do
   defp do_build_report(:node_remove, zip_packet) do
     seq_number = Command.param!(zip_packet, :seq_number)
 
-    NodeRemoveStatus.new(
+    Commands.create(
+      :node_remove_status,
       seq_number: seq_number,
       node_id: 15,
       status: :done
@@ -564,18 +567,19 @@ defmodule GrizzlyTest.Server.Handler do
   end
 
   defp do_build_report(:firmware_update_md_request_get, _zip_packet) do
-    FirmwareUpdateMDRequestReport.new(status: :ok)
+    Commands.create(:firmware_update_md_request_report, status: :ok)
   end
 
   defp do_build_report(:firmware_update_md_report, _zip_packet) do
-    FirmwareUpdateMDStatusReport.new(
+    Commands.create(
+      :firmware_update_md_status_report,
       status: :successful_restarting,
       wait_time: 5
     )
   end
 
   defp do_build_report(:switch_binary_get, _) do
-    SwitchBinaryReport.new(target_value: :off)
+    Commands.create(:switch_binary_report, target_value: :off)
   end
 
   defp build_s2_node_add_status(zip_packet) do
@@ -591,7 +595,8 @@ defmodule GrizzlyTest.Server.Handler do
 
     case Command.param!(encapsulated_command, :input_dsk_length) do
       0 ->
-        NodeAddStatus.new(
+        Commands.create(
+          :node_add_status,
           seq_number: seq_number,
           node_id: 15,
           status: :done,
@@ -605,7 +610,8 @@ defmodule GrizzlyTest.Server.Handler do
         )
 
       2 ->
-        NodeAddStatus.new(
+        Commands.create(
+          :node_add_status,
           seq_number: seq_number,
           node_id: 15,
           status: :done,
@@ -668,7 +674,7 @@ defmodule GrizzlyTest.Server.Handler do
 
       cc = second |> Command.param!(:command) |> Command.param!(:command_class)
       v = if(cc == :alarm, do: 1, else: 2)
-      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: v)
+      {:ok, reply} = Commands.create(:version_command_class_report, command_class: cc, version: v)
 
       {:ok, out_packet} = ZIPPacket.with_zwave_command(reply, Grizzly.SeqNumber.get_and_inc())
       :ok = Socket.send(socket, ZWave.to_binary(out_packet))
@@ -677,7 +683,7 @@ defmodule GrizzlyTest.Server.Handler do
 
       cc = first |> Command.param!(:command) |> Command.param!(:command_class)
       v = if(cc == :alarm, do: 1, else: 2)
-      {:ok, reply} = VersionCommandClassReport.new(command_class: cc, version: v)
+      {:ok, reply} = Commands.create(:version_command_class_report, command_class: cc, version: v)
 
       {:ok, out_packet} = ZIPPacket.with_zwave_command(reply, Grizzly.SeqNumber.get_and_inc())
       :ok = Socket.send(socket, ZWave.to_binary(out_packet))

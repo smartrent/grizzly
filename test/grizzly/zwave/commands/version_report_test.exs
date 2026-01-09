@@ -2,11 +2,13 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.VersionReport
 
   test "creates the command and validates params" do
     {:ok, report} =
-      VersionReport.new(
+      Commands.create(
+        :version_report,
         library_type: :static_controller,
         protocol_version: "2.0",
         firmware_version: "3.1",
@@ -23,7 +25,8 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
 
   test "encodes params correctly - v1" do
     {:ok, report} =
-      VersionReport.new(
+      Commands.create(
+        :version_report,
         library_type: :static_controller,
         protocol_version: "2.0",
         firmware_version: "3.1"
@@ -47,7 +50,8 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
 
   test "encodes params correctly - v2" do
     {:ok, report} =
-      VersionReport.new(
+      Commands.create(
+        :version_report,
         library_type: :static_controller,
         protocol_version: "2.0",
         firmware_version: "3.1",

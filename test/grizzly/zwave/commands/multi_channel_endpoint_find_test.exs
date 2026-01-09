@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelEndpointFind
 
   test "creates the command and validates params" do
@@ -9,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
       specific_device_class: :power_strip
     ]
 
-    {:ok, _command} = MultiChannelEndpointFind.new(params)
+    {:ok, _command} = Commands.create(:multi_channel_endpoint_find, params)
   end
 
   test "encodes params correctly" do
@@ -18,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
       specific_device_class: :power_strip
     ]
 
-    {:ok, command} = MultiChannelEndpointFind.new(params)
+    {:ok, command} = Commands.create(:multi_channel_endpoint_find, params)
     expected_binary = <<0x10, 0x04>>
     assert expected_binary == MultiChannelEndpointFind.encode_params(command)
 
@@ -27,11 +28,11 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
       specific_device_class: :all
     ]
 
-    {:ok, command} = MultiChannelEndpointFind.new(params)
+    {:ok, command} = Commands.create(:multi_channel_endpoint_find, params)
     expected_binary = <<0xFF, 0xFF>>
     assert expected_binary == MultiChannelEndpointFind.encode_params(command)
 
-    {:ok, command} = MultiChannelEndpointFind.new([])
+    {:ok, command} = Commands.create(:multi_channel_endpoint_find, [])
     expected_binary = <<0xFF, 0xFF>>
     assert expected_binary == MultiChannelEndpointFind.encode_params(command)
   end

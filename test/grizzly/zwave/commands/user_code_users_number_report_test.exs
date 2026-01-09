@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserCodeUsersNumberReport
 
   # V1
@@ -8,19 +9,19 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReportTest do
   describe "creates the command and validates params" do
     test "v1" do
       params = [supported_users: 24]
-      {:ok, _command} = UserCodeUsersNumberReport.new(params)
+      {:ok, _command} = Commands.create(:user_code_users_number_report, params)
     end
 
     test "v2" do
       params = [supported_users: 24, extended_supported_users: 24]
-      {:ok, _command} = UserCodeUsersNumberReport.new(params)
+      {:ok, _command} = Commands.create(:user_code_users_number_report, params)
     end
   end
 
   describe "encodes params correctly" do
     test "v1" do
       params = [supported_users: 24]
-      {:ok, command} = UserCodeUsersNumberReport.new(params)
+      {:ok, command} = Commands.create(:user_code_users_number_report, params)
 
       expected_binary = <<0x18>>
 
@@ -29,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReportTest do
 
     test "v2" do
       params = [supported_users: 24, extended_supported_users: 24]
-      {:ok, command} = UserCodeUsersNumberReport.new(params)
+      {:ok, command} = Commands.create(:user_code_users_number_report, params)
 
       expected_binary = <<0x18, 0x00, 0x18>>
 

@@ -1,10 +1,11 @@
 defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ThermostatModeSupportedReport
 
   test "creates the command and validates params" do
-    {:ok, _command} = ThermostatModeSupportedReport.new(modes: [])
+    {:ok, _command} = Commands.create(:thermostat_mode_supported_report, modes: [])
 
     modes = [
       :off,
@@ -25,11 +26,11 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
       :manufacturer_specific
     ]
 
-    {:ok, _command} = ThermostatModeSupportedReport.new(modes: modes)
+    {:ok, _command} = Commands.create(:thermostat_mode_supported_report, modes: modes)
   end
 
   test "encodes params correctly" do
-    {:ok, command} = ThermostatModeSupportedReport.new(modes: [])
+    {:ok, command} = Commands.create(:thermostat_mode_supported_report, modes: [])
     assert <<>> = ThermostatModeSupportedReport.encode_params(command)
 
     modes = [
@@ -42,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
       :energy_cool
     ]
 
-    {:ok, command} = ThermostatModeSupportedReport.new(modes: modes)
+    {:ok, command} = Commands.create(:thermostat_mode_supported_report, modes: modes)
     assert <<0x1F, 0x18>> = ThermostatModeSupportedReport.encode_params(command)
 
     modes = [
@@ -64,7 +65,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
       :manufacturer_specific
     ]
 
-    {:ok, command} = ThermostatModeSupportedReport.new(modes: modes)
+    {:ok, command} = Commands.create(:thermostat_mode_supported_report, modes: modes)
     assert <<0xFF, 0xBF, 0x0, 0x80>> = ThermostatModeSupportedReport.encode_params(command)
   end
 

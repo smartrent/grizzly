@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.LearnModeSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.LearnModeSet
 
   test "creates the command and validates params" do
     params = [seq_number: 3, return_interview_status: :on, mode: :allow_routed]
-    {:ok, _command} = LearnModeSet.new(params)
+    {:ok, _command} = Commands.create(:learn_mode_set, params)
   end
 
   test "encodes params correctly" do
     params = [seq_number: 3, return_interview_status: :on, mode: :allow_routed]
-    {:ok, command} = LearnModeSet.new(params)
+    {:ok, command} = Commands.create(:learn_mode_set, params)
     expected_binary = <<0x03, 0x01, 0x02>>
     assert expected_binary == LearnModeSet.encode_params(command)
   end

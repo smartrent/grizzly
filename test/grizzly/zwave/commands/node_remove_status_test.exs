@@ -1,15 +1,16 @@
 defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeRemoveStatus
 
   test "correct command byte" do
-    {:ok, cmd} = NodeRemoveStatus.new()
+    {:ok, cmd} = Commands.create(:node_remove_status)
     assert cmd.command_byte == 0x04
   end
 
   test "correct name" do
-    {:ok, cmd} = NodeRemoveStatus.new()
+    {:ok, cmd} = Commands.create(:node_remove_status)
     assert cmd.name == :node_remove_status
   end
 
@@ -19,7 +20,8 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
 
       for v <- [1, 2, 3] do
         {:ok, cmd} =
-          NodeRemoveStatus.new(
+          Commands.create(
+            :node_remove_status,
             seq_number: 0x01,
             node_id: 0x05,
             status: :done
@@ -30,7 +32,8 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
     end
 
     test "version 4 - with 8 bit node id" do
-      {:ok, cmd} = NodeRemoveStatus.new(seq_number: 0x01, node_id: 0x05, status: :done)
+      {:ok, cmd} =
+        Commands.create(:node_remove_status, seq_number: 0x01, node_id: 0x05, status: :done)
 
       expected_binary = <<0x01, 0x06, 0x05, 0x05::16>>
 
@@ -38,7 +41,8 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
     end
 
     test "version 4 - with 16 bit node id" do
-      {:ok, cmd} = NodeRemoveStatus.new(seq_number: 0x01, node_id: 0x1010, status: :done)
+      {:ok, cmd} =
+        Commands.create(:node_remove_status, seq_number: 0x01, node_id: 0x1010, status: :done)
 
       expected_binary = <<0x01, 0x06, 0xFF, 0x10, 0x10>>
 

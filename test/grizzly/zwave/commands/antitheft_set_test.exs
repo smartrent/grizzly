@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AntitheftSet
 
   describe "creates the command and validates params" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
         antitheft_hint: "rabbit"
       ]
 
-      {:ok, _command} = AntitheftSet.new(params)
+      {:ok, _command} = Commands.create(:antitheft_set, params)
     end
 
     test "v3" do
@@ -24,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
         locking_entity_id: 341
       ]
 
-      {:ok, _command} = AntitheftSet.new(params)
+      {:ok, _command} = Commands.create(:antitheft_set, params)
     end
   end
 
@@ -40,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
         antitheft_hint: hint
       ]
 
-      {:ok, command} = AntitheftSet.new(params)
+      {:ok, command} = Commands.create(:antitheft_set, params)
 
       expected_binary =
         <<0x01::1, 10::7>> <>
@@ -62,7 +63,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
         locking_entity_id: 341
       ]
 
-      {:ok, command} = AntitheftSet.new(params)
+      {:ok, command} = Commands.create(:antitheft_set, params)
 
       expected_binary =
         <<0x01::1, 10::7>> <>

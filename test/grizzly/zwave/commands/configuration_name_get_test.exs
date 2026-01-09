@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ConfigurationNameGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ConfigurationNameGet
 
   test "creates the command and validates params" do
     params = [param_number: 2]
-    {:ok, _command} = ConfigurationNameGet.new(params)
+    {:ok, _command} = Commands.create(:configuration_name_get, params)
   end
 
   test "encodes params correctly" do
     params = [param_number: 2]
-    {:ok, command} = ConfigurationNameGet.new(params)
+    {:ok, command} = Commands.create(:configuration_name_get, params)
     expected_params_binary = <<0x02::16>>
     assert expected_params_binary == ConfigurationNameGet.encode_params(command)
   end

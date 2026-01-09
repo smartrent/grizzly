@@ -1,23 +1,25 @@
 defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReport
 
   test "ensure command byte" do
-    {:ok, command} = NetworkManagementMultiChannelEndPointReport.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_end_point_report)
 
     assert command.command_byte == 0x06
   end
 
   test "ensure name" do
-    {:ok, command} = NetworkManagementMultiChannelEndPointReport.new()
+    {:ok, command} = Commands.create(:network_management_multi_channel_end_point_report)
     assert command.name == :network_management_multi_channel_end_point_report
   end
 
   describe "encoding" do
     test "version 2-3 default to 0 aggregated end points" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointReport.new(
+        Commands.create(
+          :network_management_multi_channel_end_point_report,
           seq_number: 0x01,
           node_id: 0x04,
           individual_end_points: 10
@@ -32,7 +34,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
     test "version 2-3 with aggregated end points" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointReport.new(
+        Commands.create(
+          :network_management_multi_channel_end_point_report,
           seq_number: 0x01,
           node_id: 0x04,
           individual_end_points: 10,
@@ -48,7 +51,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
     test "version 4 default no aggregated end points 8 bit node id" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointReport.new(
+        Commands.create(
+          :network_management_multi_channel_end_point_report,
           seq_number: 0x01,
           node_id: 0x01,
           individual_end_points: 10
@@ -60,7 +64,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
     test "version 4 default no aggregated end points 16 bit node id" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointReport.new(
+        Commands.create(
+          :network_management_multi_channel_end_point_report,
           seq_number: 0x01,
           node_id: 0x0110,
           individual_end_points: 10
@@ -72,7 +77,8 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
     test "version 4 with aggregated end points" do
       {:ok, command} =
-        NetworkManagementMultiChannelEndPointReport.new(
+        Commands.create(
+          :network_management_multi_channel_end_point_report,
           seq_number: 0x01,
           node_id: 0x0110,
           individual_end_points: 10,

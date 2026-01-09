@@ -2,11 +2,16 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FirmwareUpdateMDReport
 
   test "creates the command and validates params" do
     {:ok, command} =
-      FirmwareUpdateMDReport.new(last?: false, report_number: 2, data: <<0x01, 0x02, 0x03>>)
+      Commands.create(:firmware_update_md_report,
+        last?: false,
+        report_number: 2,
+        data: <<0x01, 0x02, 0x03>>
+      )
 
     assert Command.param!(command, :last?) == false
     assert Command.param!(command, :report_number) == 2
@@ -15,7 +20,11 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDReportTest do
 
   test "encodes params correctly" do
     {:ok, command} =
-      FirmwareUpdateMDReport.new(last?: false, report_number: 2, data: <<0x01, 0x02, 0x03>>)
+      Commands.create(:firmware_update_md_report,
+        last?: false,
+        report_number: 2,
+        data: <<0x01, 0x02, 0x03>>
+      )
 
     data = Command.param!(command, :data)
     expected_params_binary = <<0x00::1, 0x02::15, data::binary>>

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.SupervisionGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SupervisionGet
 
   test "creates the command and validates params" do
@@ -10,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionGetTest do
       encapsulated_command: <<113, 5, 25, 1, 0, 255, 6, 4, 0>>
     ]
 
-    {:ok, _command} = SupervisionGet.new(params)
+    {:ok, _command} = Commands.create(:supervision_get, params)
   end
 
   test "encodes params correctly" do
@@ -20,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionGetTest do
       encapsulated_command: <<113, 5, 25, 1, 0, 255, 6, 4, 0>>
     ]
 
-    {:ok, command} = SupervisionGet.new(params)
+    {:ok, command} = Commands.create(:supervision_get, params)
 
     expected_binary = <<0x01, 0x09, 113, 5, 25, 1, 0, 255, 6, 4, 0>>
 

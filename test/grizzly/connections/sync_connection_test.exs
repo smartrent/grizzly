@@ -4,7 +4,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
   alias Grizzly.Connection
   alias Grizzly.Connections.SyncConnection
   alias Grizzly.Report
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands
 
   setup do
     # establish the connections for the tests
@@ -19,7 +19,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, conn} =
       SyncConnection.start_link(GrizzlyTest.Utils.default_options(), 101, unnamed: true)
 
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
 
     # 101 node_id will always return a nack_response
     assert {:ok, %Report{status: :complete, type: :nack_response, node_id: 101}} =
@@ -30,7 +30,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, conn} =
       SyncConnection.start_link(GrizzlyTest.Utils.default_options(), 102, unnamed: true)
 
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
 
     # 102 will always respond with nack waiting with 2 seconds
     assert {:ok,
@@ -51,7 +51,7 @@ defmodule Grizzly.Connections.SyncConnectionTest do
     {:ok, conn} =
       SyncConnection.start_link(GrizzlyTest.Utils.default_options(), 100, unnamed: true)
 
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
 
     assert {:ok, %Report{type: :timeout, node_id: 100}} =
              SyncConnection.send_command(conn, command, timeout: 250)

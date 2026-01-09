@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CentralSceneSupportedReport
 
   test "creates the command and validates params" do
@@ -19,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       ]
     ]
 
-    {:ok, _command} = CentralSceneSupportedReport.new(params)
+    {:ok, _command} = Commands.create(:central_scene_supported_report, params)
   end
 
   describe "encodes params correctly" do
@@ -40,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
         ]
       ]
 
-      {:ok, command} = CentralSceneSupportedReport.new(params)
+      {:ok, command} = Commands.create(:central_scene_supported_report, params)
 
       expected_params_binary =
         <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x00::1, 0b00001111, 0b00000001>>
@@ -64,7 +65,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
         ]
       ]
 
-      {:ok, command} = CentralSceneSupportedReport.new(params)
+      {:ok, command} = Commands.create(:central_scene_supported_report, params)
 
       expected_params_binary =
         <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x01::1, 0b00001111>>

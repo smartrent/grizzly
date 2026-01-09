@@ -3,15 +3,15 @@ defmodule Grizzly.Requests.Handlers.AggregateReportTest do
 
   alias Grizzly.Requests.Handlers.AggregateReport
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.AssociationReport
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands
 
   test "when the waiting report has no reports to follow" do
     {:ok, state} =
       AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, association_report} =
-      AssociationReport.new(
+      Commands.create(
+        :association_report,
         grouping_identifier: 1,
         max_nodes_supported: 5,
         reports_to_follow: 0,
@@ -29,7 +29,8 @@ defmodule Grizzly.Requests.Handlers.AggregateReportTest do
       AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, association_report_one} =
-      AssociationReport.new(
+      Commands.create(
+        :association_report,
         grouping_identifier: 1,
         max_nodes_supported: 5,
         reports_to_follow: 1,
@@ -39,7 +40,8 @@ defmodule Grizzly.Requests.Handlers.AggregateReportTest do
     {:continue, new_state} = AggregateReport.handle_command(association_report_one, state)
 
     {:ok, association_report_two} =
-      AssociationReport.new(
+      Commands.create(
+        :association_report,
         grouping_identifier: 1,
         max_nodes_supported: 5,
         reports_to_follow: 0,
@@ -57,7 +59,8 @@ defmodule Grizzly.Requests.Handlers.AggregateReportTest do
       AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
     {:ok, association_report} =
-      AssociationReport.new(
+      Commands.create(
+        :association_report,
         grouping_identifier: 1,
         max_nodes_supported: 5,
         reports_to_follow: 1,
@@ -74,7 +77,7 @@ defmodule Grizzly.Requests.Handlers.AggregateReportTest do
     {:ok, state} =
       AggregateReport.init(nil, complete_report: :association_report, aggregate_param: :nodes)
 
-    {:ok, switch_binary_report} = SwitchBinaryReport.new(target_value: :on)
+    {:ok, switch_binary_report} = Commands.create(:switch_binary_report, target_value: :on)
 
     assert {:continue, state} == AggregateReport.handle_command(switch_binary_report, state)
   end

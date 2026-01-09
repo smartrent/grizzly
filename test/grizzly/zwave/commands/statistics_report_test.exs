@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.StatisticsReport
 
   test "creates the command and validates params" do
@@ -17,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
     ]
 
     params = [node_id: 4, statistics: statistics]
-    {:ok, _command} = StatisticsReport.new(params)
+    {:ok, _command} = Commands.create(:statistics_report, params)
   end
 
   test "encodes params correctly" do
@@ -34,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
     ]
 
     params = [node_id: 4, statistics: statistics]
-    {:ok, command} = StatisticsReport.new(params)
+    {:ok, command} = Commands.create(:statistics_report, params)
     route_change = <<0x00, 0x01, 0x02>>
     transmission_count = <<0x01, 0x01, 0x0A>>
 

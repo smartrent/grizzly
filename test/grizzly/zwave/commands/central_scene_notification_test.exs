@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.CentralSceneNotificationTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CentralSceneNotification
 
   test "creates the command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotificationTest do
       scene_number: 2
     ]
 
-    {:ok, _command} = CentralSceneNotification.new(params)
+    {:ok, _command} = Commands.create(:central_scene_notification, params)
   end
 
   test "encodes params correctly" do
@@ -22,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotificationTest do
       scene_number: 2
     ]
 
-    {:ok, command} = CentralSceneNotification.new(params)
+    {:ok, command} = Commands.create(:central_scene_notification, params)
     expected_params_binary = <<0x0A, 0x01::1, 0x00::4, 0x03::3, 0x02>>
     assert expected_params_binary == CentralSceneNotification.encode_params(command)
   end

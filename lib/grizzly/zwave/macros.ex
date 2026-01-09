@@ -36,13 +36,7 @@ defmodule Grizzly.ZWave.Macros do
   end
 
   defmacro command(name, byte, mod, opts) do
-    do_command(
-      __CALLER__,
-      name,
-      byte,
-      Macro.expand_literals(mod, %{__CALLER__ | function: {:fun, 0}}),
-      opts
-    )
+    do_command(__CALLER__, name, byte, mod, opts)
   end
 
   defmacro param(name, type, size, opts \\ []) do

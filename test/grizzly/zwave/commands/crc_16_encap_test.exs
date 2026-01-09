@@ -1,20 +1,21 @@
 defmodule Grizzly.ZWave.Commands.CRC16EncapTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CRC16Encap
   alias Grizzly.ZWave.Commands.SwitchMultilevelSet
   alias Grizzly.ZWave.CRC
 
   test "creates the command and validates params" do
-    {:ok, encap_command} = SwitchMultilevelSet.new(target_value: :off)
+    {:ok, encap_command} = Commands.create(:switch_multilevel_set, target_value: :off)
     params = [command: encap_command]
-    {:ok, _command} = CRC16Encap.new(params)
+    {:ok, _command} = Commands.create(:crc_16_encap, params)
   end
 
   test "encodes params correctly" do
-    {:ok, encap_command} = SwitchMultilevelSet.new(target_value: :off)
+    {:ok, encap_command} = Commands.create(:switch_multilevel_set, target_value: :off)
     params = [command: encap_command]
-    {:ok, command} = CRC16Encap.new(params)
+    {:ok, command} = Commands.create(:crc_16_encap, params)
     encoded_encap_params = SwitchMultilevelSet.encode_params(encap_command)
     command_binary = <<0x26, 0x01>> <> encoded_encap_params
     checksum = CRC.crc16_aug_ccitt(command_binary)
@@ -23,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.CRC16EncapTest do
   end
 
   test "decodes params correctly" do
-    {:ok, encap_command} = SwitchMultilevelSet.new(target_value: :off)
+    {:ok, encap_command} = Commands.create(:switch_multilevel_set, target_value: :off)
     encoded_encap_params = SwitchMultilevelSet.encode_params(encap_command)
     command_binary = <<0x26, 0x01>> <> encoded_encap_params
     checksum = CRC.crc16_aug_ccitt(command_binary)

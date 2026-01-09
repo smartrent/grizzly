@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.AlarmSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AlarmSet
 
   test "creates the command and validates params" do
     params = [zwave_type: :home_security, status: :enabled]
-    {:ok, _command} = AlarmSet.new(params)
+    {:ok, _command} = Commands.create(:alarm_set, params)
   end
 
   test "encodes params correctly" do
     params = [zwave_type: :home_security, status: :enabled]
-    {:ok, command} = AlarmSet.new(params)
+    {:ok, command} = Commands.create(:alarm_set, params)
     expected_binary = <<0x07, 0xFF>>
     assert expected_binary == AlarmSet.encode_params(command)
   end

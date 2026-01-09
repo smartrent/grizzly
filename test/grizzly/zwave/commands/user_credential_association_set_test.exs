@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.UserCredentialAssociationSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserCredentialAssociationSet
 
   test "encodes params correctly" do
@@ -10,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.UserCredentialAssociationSetTest do
       destination_user_id: 2
     ]
 
-    {:ok, command} = UserCredentialAssociationSet.new(params)
+    {:ok, command} = Commands.create(:user_credential_association_set, params)
 
     assert UserCredentialAssociationSet.encode_params(command) ==
              <<2, 1::16, 2::16>>

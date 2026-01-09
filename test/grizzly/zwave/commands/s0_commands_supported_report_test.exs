@@ -1,16 +1,21 @@
 defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.S0CommandsSupportedReport
 
   test "creates the command and validates params" do
     {:ok, _} =
-      S0CommandsSupportedReport.new(supported: [:user_code], controlled: [:association])
+      Commands.create(:s0_commands_supported_report,
+        supported: [:user_code],
+        controlled: [:association]
+      )
   end
 
   test "encodes params correctly" do
     {:ok, cmd} =
-      S0CommandsSupportedReport.new(
+      Commands.create(
+        :s0_commands_supported_report,
         supported: [:user_code],
         controlled: [:association],
         reports_to_follow: 15
@@ -19,11 +24,11 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReportTest do
     bin = S0CommandsSupportedReport.encode_params(cmd)
     assert <<0xF, 0x63, 0xEF, 0x85>> = bin
 
-    {:ok, cmd} = S0CommandsSupportedReport.new(supported: [:user_code])
+    {:ok, cmd} = Commands.create(:s0_commands_supported_report, supported: [:user_code])
     bin = S0CommandsSupportedReport.encode_params(cmd)
     assert <<0x0, 0x63, 0xEF>> = bin
 
-    {:ok, cmd} = S0CommandsSupportedReport.new(controlled: [:user_code])
+    {:ok, cmd} = Commands.create(:s0_commands_supported_report, controlled: [:user_code])
     bin = S0CommandsSupportedReport.encode_params(cmd)
     assert <<0x0, 0xEF, 0x63>> = bin
   end

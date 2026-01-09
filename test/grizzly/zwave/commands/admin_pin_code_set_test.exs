@@ -1,11 +1,12 @@
 defmodule Grizzly.ZWave.Commands.AdminPinCodeSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AdminPinCodeSet
 
   test "encodes params correctly" do
     params = [code: "0123456789ABCDEF01234"]
-    {:ok, command} = AdminPinCodeSet.new(params)
+    {:ok, command} = Commands.create(:admin_pin_code_set, params)
 
     assert AdminPinCodeSet.encode_params(command) ==
              <<0::4, 15::4, "0123456789ABCDE">>

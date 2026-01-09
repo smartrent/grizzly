@@ -3,33 +3,34 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReportTest do
 
   import ExUnit.CaptureLog
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SwitchMultilevelReport
 
   test "creates the command and validates params" do
     params = [value: :off]
-    {:ok, _command} = SwitchMultilevelReport.new(params)
+    {:ok, _command} = Commands.create(:switch_multilevel_report, params)
   end
 
   test "encodes v1 params correctly" do
     params = [value: 99]
-    {:ok, command} = SwitchMultilevelReport.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_report, params)
     expected_binary = <<0x63>>
     assert expected_binary == SwitchMultilevelReport.encode_params(command)
   end
 
   test "encodes v2 params correctly" do
     params = [value: 99, duration: 10]
-    {:ok, command} = SwitchMultilevelReport.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_report, params)
     expected_binary = <<0x63, 0x0A>>
     assert expected_binary == SwitchMultilevelReport.encode_params(command)
 
     params = [value: 99, duration: :default]
-    {:ok, command} = SwitchMultilevelReport.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_report, params)
     expected_binary = <<0x63, 0xFF>>
     assert expected_binary == SwitchMultilevelReport.encode_params(command)
 
     params = [value: 99, duration: 180]
-    {:ok, command} = SwitchMultilevelReport.new(params)
+    {:ok, command} = Commands.create(:switch_multilevel_report, params)
     expected_binary = <<0x63, 0x82>>
     assert expected_binary == SwitchMultilevelReport.encode_params(command)
   end

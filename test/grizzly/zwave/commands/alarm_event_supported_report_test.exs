@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AlarmEventSupportedReport
 
   test "creates the command and validates params" do
@@ -17,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReportTest do
       ]
     ]
 
-    {:ok, _command} = AlarmEventSupportedReport.new(params)
+    {:ok, _command} = Commands.create(:alarm_event_supported_report, params)
   end
 
   test "encodes params correctly" do
@@ -34,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedReportTest do
       ]
     ]
 
-    {:ok, command} = AlarmEventSupportedReport.new(params)
+    {:ok, command} = Commands.create(:alarm_event_supported_report, params)
     expected_binary = <<0x06, 0x00::3, 0x02::5, 0b01111110, 0b00001000>>
     assert expected_binary == AlarmEventSupportedReport.encode_params(command)
   end

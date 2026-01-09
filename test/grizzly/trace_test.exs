@@ -3,8 +3,7 @@ defmodule Grizzly.TraceTest do
 
   alias Grizzly.Trace
   alias Grizzly.ZWave
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias Grizzly.ZWave.Commands.ZIPKeepAlive
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   setup %{test: test} = ctx do
@@ -20,7 +19,7 @@ defmodule Grizzly.TraceTest do
 
   @tag size: 2
   test "log/3", %{tracer: tracer} do
-    {:ok, cmd} = SwitchBinaryGet.new()
+    {:ok, cmd} = Commands.create(:switch_binary_get)
 
     # The sleeps are to ensure records get different timestamps
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 1)
@@ -59,7 +58,7 @@ defmodule Grizzly.TraceTest do
 
   @tag size: 1
   test "resize/2", %{tracer: tracer} do
-    {:ok, cmd} = SwitchBinaryGet.new()
+    {:ok, cmd} = Commands.create(:switch_binary_get)
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 1)
     Trace.log(tracer, :grizzly, 4, ZWave.to_binary(zip_packet))
@@ -104,7 +103,7 @@ defmodule Grizzly.TraceTest do
   end
 
   test "clear/1", %{tracer: tracer} do
-    {:ok, cmd} = SwitchBinaryGet.new()
+    {:ok, cmd} = Commands.create(:switch_binary_get)
 
     {:ok, zip_packet} = ZIPPacket.with_zwave_command(cmd, 1)
     Trace.log(tracer, :grizzly, 1, ZWave.to_binary(zip_packet))
@@ -122,10 +121,10 @@ defmodule Grizzly.TraceTest do
   end
 
   test "records keepalives by default", %{tracer: tracer} do
-    {:ok, keepalive} = ZIPKeepAlive.new(ack_flag: :ack_request)
+    {:ok, keepalive} = Commands.create(:keep_alive, ack_flag: :ack_request)
     Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
-    {:ok, keepalive} = ZIPKeepAlive.new(ack_flag: :ack_response)
+    {:ok, keepalive} = Commands.create(:keep_alive, ack_flag: :ack_response)
     Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     list = Trace.list(tracer)
@@ -139,7 +138,7 @@ defmodule Grizzly.TraceTest do
 
   @tag record_keepalives: false
   test "enable/disable keepalives", %{tracer: tracer} do
-    {:ok, keepalive} = ZIPKeepAlive.new(ack_flag: :ack_request)
+    {:ok, keepalive} = Commands.create(:keep_alive, ack_flag: :ack_request)
     Trace.log(tracer, :grizzly, 1, ZWave.to_binary(keepalive))
 
     list = Trace.list(tracer)

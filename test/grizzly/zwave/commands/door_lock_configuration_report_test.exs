@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.DoorLockConfigurationReport
 
   describe "creates the command and validates params" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
         lock_timeout: 65
       ]
 
-      {:ok, _command} = DoorLockConfigurationReport.new(params)
+      {:ok, _command} = Commands.create(:door_lock_configuration_report, params)
     end
 
     test "v4" do
@@ -27,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
         twist_assist?: false
       ]
 
-      {:ok, _command} = DoorLockConfigurationReport.new(params)
+      {:ok, _command} = Commands.create(:door_lock_configuration_report, params)
     end
   end
 
@@ -40,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
         lock_timeout: 65
       ]
 
-      {:ok, command} = DoorLockConfigurationReport.new(params)
+      {:ok, command} = Commands.create(:door_lock_configuration_report, params)
       expected_params_binary = DoorLockConfigurationReport.encode_params(command)
       assert <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05>> == expected_params_binary
     end
@@ -57,7 +58,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationReportTest do
         twist_assist?: false
       ]
 
-      {:ok, command} = DoorLockConfigurationReport.new(params)
+      {:ok, command} = Commands.create(:door_lock_configuration_report, params)
       expected_params_binary = DoorLockConfigurationReport.encode_params(command)
 
       assert <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05, 125::16, 30::16, 0x00::6, 0x01::1, 0x00::1>> ==

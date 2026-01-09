@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.AssociationGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AssociationGet
 
   test "creates the command and validates params" do
     params = [grouping_identifier: 2]
-    {:ok, _command} = AssociationGet.new(params)
+    {:ok, _command} = Commands.create(:association_get, params)
   end
 
   test "encodes params correctly" do
     params = [grouping_identifier: 2]
-    {:ok, command} = AssociationGet.new(params)
+    {:ok, command} = Commands.create(:association_get, params)
     expected_binary = <<0x02>>
     assert expected_binary == AssociationGet.encode_params(command)
   end

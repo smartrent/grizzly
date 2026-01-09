@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MeterSupportedReport
 
   test "creates the command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
       rate_type: :import_export
     ]
 
-    {:ok, _command} = MeterSupportedReport.new(params)
+    {:ok, _command} = Commands.create(:meter_supported_report, params)
   end
 
   test "encodes v2 params correctly" do
@@ -21,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
       supported_scales: [:kwh, :kvah, :w]
     ]
 
-    {:ok, command} = MeterSupportedReport.new(params)
+    {:ok, command} = Commands.create(:meter_supported_report, params)
     expected_binary = <<1::1, 0::2, 1::5, 0::4, 7::4>>
     assert expected_binary == MeterSupportedReport.encode_params(command)
   end
@@ -34,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
       rate_type: :import_export
     ]
 
-    {:ok, command} = MeterSupportedReport.new(params)
+    {:ok, command} = Commands.create(:meter_supported_report, params)
     expected_binary = <<1::1, 3::2, 1::5, 1::1, 7::7, 1, 3>>
     assert expected_binary == MeterSupportedReport.encode_params(command)
   end

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.IndicatorSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.IndicatorSupportedReport
 
   test "creates the command and validates params" do
@@ -10,7 +11,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReportTest do
       property_ids: [:multilevel, :timeout_seconds, :sound_level]
     ]
 
-    {:ok, _command} = IndicatorSupportedReport.new(params)
+    {:ok, _command} = Commands.create(:indicator_supported_report, params)
   end
 
   test "encodes params correctly" do
@@ -20,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReportTest do
       property_ids: [:multilevel, :timeout_seconds, :sound_level]
     ]
 
-    {:ok, command} = IndicatorSupportedReport.new(params)
+    {:ok, command} = Commands.create(:indicator_supported_report, params)
     expected_params_binary = <<0x01, 0x03, 0x02, 0x82, 0x02>>
     assert expected_params_binary == IndicatorSupportedReport.encode_params(command)
   end

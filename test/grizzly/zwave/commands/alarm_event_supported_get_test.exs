@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.AlarmEventSupportedGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AlarmEventSupportedGet
 
   test "creates the command and validates params" do
     params = [type: :access_control]
-    {:ok, _command} = AlarmEventSupportedGet.new(params)
+    {:ok, _command} = Commands.create(:alarm_event_supported_get, params)
   end
 
   test "encodes params correctly" do
     params = [type: :access_control]
-    {:ok, command} = AlarmEventSupportedGet.new(params)
+    {:ok, command} = Commands.create(:alarm_event_supported_get, params)
     expected_params_binary = <<0x06>>
     assert expected_params_binary == AlarmEventSupportedGet.encode_params(command)
   end

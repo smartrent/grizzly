@@ -11,11 +11,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
   alias Grizzly.Connection
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.SeqNumber
-  alias Grizzly.ZWave.Commands.LearnModeSet
-  alias Grizzly.ZWave.Commands.NodeAdd
-  alias Grizzly.ZWave.Commands.NodeAddDSKSet
-  alias Grizzly.ZWave.Commands.NodeAddKeysSet
-  alias Grizzly.ZWave.Commands.NodeRemove
+  alias Grizzly.ZWave.Commands
 
   require Logger
 
@@ -40,7 +36,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
     params = opts |> Keyword.take([:mode, :tx_opt]) |> Keyword.put(:seq_number, seq_number)
 
-    with {:ok, command} <- NodeAdd.new(params),
+    with {:ok, command} <- Commands.create(:node_add, params),
          :ok <- connect(controller_id),
          {:ok, command_ref} <-
            AsyncConnection.send_command(controller_id, command, timeout: timeout) do
@@ -52,7 +48,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
   def add_node_stop(state) do
     seq_number = SeqNumber.get_and_inc()
 
-    {:ok, command} = NodeAdd.new(seq_number: seq_number, mode: :node_add_stop)
+    {:ok, command} = Commands.create(:node_add, seq_number: seq_number, mode: :node_add_stop)
 
     connect(state.controller_id)
     {:ok, command_ref} = AsyncConnection.send_command(state.controller_id, command)
@@ -67,7 +63,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     timeout = opts[:timeout] || @inclusion_timeout
 
     connect(controller_id)
-    {:ok, command} = NodeRemove.new(seq_number: seq_number)
+    {:ok, command} = Commands.create(:node_remove, seq_number: seq_number)
     {:ok, command_ref} = AsyncConnection.send_command(controller_id, command, timeout: timeout)
 
     {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
@@ -77,7 +73,8 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
   def remove_node_stop(state) do
     seq_number = SeqNumber.get_and_inc()
 
-    {:ok, command} = NodeRemove.new(seq_number: seq_number, mode: :remove_node_stop)
+    {:ok, command} =
+      Commands.create(:node_remove, seq_number: seq_number, mode: :remove_node_stop)
 
     connect(state.controller_id)
     {:ok, command_ref} = AsyncConnection.send_command(state.controller_id, command)
@@ -98,7 +95,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
       |> Keyword.put_new(:mode, :direct_range_only)
       |> Keyword.put_new(:return_interview_status, :off)
 
-    {:ok, command} = LearnModeSet.new(params)
+    {:ok, command} = Commands.create(:learn_mode_set, params)
 
     connect(controller_id)
     {:ok, command_ref} = AsyncConnection.send_command(controller_id, command, timeout: timeout)
@@ -111,7 +108,11 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     seq_number = SeqNumber.get_and_inc()
 
     {:ok, command} =
-      LearnModeSet.new(seq_number: seq_number, mode: :disable, return_interview_status: :off)
+      Commands.create(:learn_mode_set,
+        seq_number: seq_number,
+        mode: :disable,
+        return_interview_status: :off
+      )
 
     {:ok, command_ref} = AsyncConnection.send_command(state.controller_id, command)
 
@@ -123,7 +124,12 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     seq_number = SeqNumber.get_and_inc()
 
     {:ok, command} =
-      NodeAddKeysSet.new(seq_number: seq_number, granted_keys: s2_keys, csa: false, accept: true)
+      Commands.create(:node_add_keys_set,
+        seq_number: seq_number,
+        granted_keys: s2_keys,
+        csa: false,
+        accept: true
+      )
 
     connect(state.controller_id)
 
@@ -138,7 +144,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     seq_number = SeqNumber.get_and_inc()
 
     {:ok, command} =
-      NodeAddDSKSet.new(
+      Commands.create(:node_add_dsk_set,
         seq_number: seq_number,
         accept: true,
         input_dsk_length: requested_length,

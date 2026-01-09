@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.FailedNodeListReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FailedNodeListReport
 
   test "creates the command and validates params" do
     params = [seq_number: 10, node_ids: [1, 2, 3, 9]]
-    {:ok, _command} = FailedNodeListReport.new(params)
+    {:ok, _command} = Commands.create(:failed_node_list_report, params)
   end
 
   test "encodes params correctly" do
     params = [seq_number: 10, node_ids: [1, 2, 3, 9, 256]]
-    {:ok, command} = FailedNodeListReport.new(params)
+    {:ok, command} = Commands.create(:failed_node_list_report, params)
 
     expected_binary =
       <<0x0A, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

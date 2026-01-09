@@ -2,11 +2,15 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReport
 
   test "creates the command and validates params" do
     {:ok, command} =
-      FirmwareUpdateMDStatusReport.new(status: :successful_restarting, wait_time: 10)
+      Commands.create(:firmware_update_md_status_report,
+        status: :successful_restarting,
+        wait_time: 10
+      )
 
     assert Command.param!(command, :status) == :successful_restarting
     assert Command.param!(command, :wait_time) == 10
@@ -14,7 +18,10 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDStatusReportTest do
 
   test "encodes params correctly" do
     {:ok, command} =
-      FirmwareUpdateMDStatusReport.new(status: :successful_restarting, wait_time: 10)
+      Commands.create(:firmware_update_md_status_report,
+        status: :successful_restarting,
+        wait_time: 10
+      )
 
     expected_params_binary = <<0xFF, 0x00, 0x0A>>
     assert expected_params_binary == FirmwareUpdateMDStatusReport.encode_params(command)

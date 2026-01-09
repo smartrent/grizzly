@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.MeterReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MeterReport
 
   test "creates the command and validates params" do
     params = [meter_type: :electric, scale: :kwh, value: 1.25]
-    {:ok, _command} = MeterReport.new(params)
+    {:ok, _command} = Commands.create(:meter_report, params)
   end
 
   test "encodes v1 params correctly" do
     params = [meter_type: :electric, scale: :kwh, value: 1.25]
-    {:ok, command} = MeterReport.new(params)
+    {:ok, command} = Commands.create(:meter_report, params)
     expected_binary = <<0x01, 0x02::3, 0x00::2, 0x01::3, 0x7D>>
     assert expected_binary == MeterReport.encode_params(command)
   end
@@ -25,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.MeterReportTest do
       previous_value: 1.15
     ]
 
-    {:ok, command} = MeterReport.new(params)
+    {:ok, command} = Commands.create(:meter_report, params)
     expected_binary = <<0::1, 2::2, 1::5, 2::3, 3::2, 1::3, 0x7D, 0, 1, 115, 0>>
     assert expected_binary == MeterReport.encode_params(command)
 
@@ -36,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.MeterReportTest do
       rate_type: :export
     ]
 
-    {:ok, command} = MeterReport.new(params)
+    {:ok, command} = Commands.create(:meter_report, params)
     expected_binary = <<0::1, 2::2, 1::5, 2::3, 3::2, 1::3, 0x7D, 0, 0, 0>>
     assert expected_binary == MeterReport.encode_params(command)
 
@@ -49,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.MeterReportTest do
       scale: :kvarh
     ]
 
-    {:ok, command} = MeterReport.new(params)
+    {:ok, command} = Commands.create(:meter_report, params)
     expected_binary = <<1::1, 2::2, 1::5, 2::3, 3::2, 1::3, 0x7D, 0, 1, 115, 1>>
     assert expected_binary == MeterReport.encode_params(command)
   end

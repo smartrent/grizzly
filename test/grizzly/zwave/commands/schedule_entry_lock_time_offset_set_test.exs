@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSet
 
   test "creates the command and validates params" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSetTest do
       minute_offset_dst: 100
     ]
 
-    {:ok, _command} = ScheduleEntryLockTimeOffsetSet.new(params)
+    {:ok, _command} = Commands.create(:schedule_entry_lock_time_offset_set, params)
   end
 
   test "encodes params correctly" do
@@ -24,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSetTest do
       minute_offset_dst: 100
     ]
 
-    {:ok, command} = ScheduleEntryLockTimeOffsetSet.new(params)
+    {:ok, command} = Commands.create(:schedule_entry_lock_time_offset_set, params)
     expected_binary = <<0::1, 4::7, 20::8, 0::1, 100::7>>
     assert expected_binary == ScheduleEntryLockTimeOffsetSet.encode_params(command)
   end

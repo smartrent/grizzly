@@ -3,13 +3,13 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
 
   alias Grizzly.Connections.AsyncConnection
   alias Grizzly.Requests.Handlers.AckResponse
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
+  alias Grizzly.ZWave.Commands
 
   test "can stop a running command" do
     {:ok, conn} =
       AsyncConnection.start_link(GrizzlyTest.Utils.default_options(), 400, unnamed: true)
 
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
 
     {:ok, command_ref} = AsyncConnection.send_command(conn, command, handler: AckResponse)
 
@@ -23,7 +23,7 @@ defmodule Grizzly.Connections.AsyncConnectionTest do
     {:ok, conn} =
       AsyncConnection.start_link(GrizzlyTest.Utils.default_options(), 400, unnamed: true)
 
-    {:ok, command} = SwitchBinaryGet.new()
+    {:ok, command} = Commands.create(:switch_binary_get)
 
     {:ok, command_ref} =
       AsyncConnection.send_command(conn, command, timeout: 100, handler: AckResponse)

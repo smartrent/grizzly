@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZwaveplusInfoReport
 
   test "creates the command and validates params" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReportTest do
       user_icon_type: 0x0500
     ]
 
-    {:ok, _command} = ZwaveplusInfoReport.new(params)
+    {:ok, _command} = Commands.create(:zwaveplus_info_report, params)
   end
 
   test "encodes params correctly" do
@@ -24,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReportTest do
       user_icon_type: 0x0500
     ]
 
-    {:ok, command} = ZwaveplusInfoReport.new(params)
+    {:ok, command} = Commands.create(:zwaveplus_info_report, params)
 
     expected_binary = <<0x02, 0x00, 0x00, 0x0100::16, 0x0500::16>>
     assert expected_binary == ZwaveplusInfoReport.encode_params(command)

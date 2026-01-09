@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.WakeUpIntervalSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.WakeUpIntervalSet
 
   test "creates the command and validates params" do
     params = [seconds: 1000, node_id: 1]
-    {:ok, _command} = WakeUpIntervalSet.new(params)
+    {:ok, _command} = Commands.create(:wake_up_interval_set, params)
   end
 
   test "encodes params correctly" do
     params = [seconds: 1000, node_id: 1]
-    {:ok, command} = WakeUpIntervalSet.new(params)
+    {:ok, command} = Commands.create(:wake_up_interval_set, params)
     expected_binary = <<0x00, 0x03, 0xE8, 0x01>>
     assert expected_binary == WakeUpIntervalSet.encode_params(command)
   end

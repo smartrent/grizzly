@@ -6,6 +6,7 @@ defmodule Grizzly.ZWave.Notifications do
 
   alias Grizzly.ZWave.CommandClasses.NodeNaming
   alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeLocationReport
   alias Grizzly.ZWave.Commands.UserCodeReport
   alias Grizzly.ZWave.DecodeError
@@ -437,7 +438,7 @@ defmodule Grizzly.ZWave.Notifications do
 
   def encode_event_params(:access_control, zwave_event, event_params_list)
       when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation, :new_user_code_added] do
-    {:ok, user_code_report} = UserCodeReport.new(event_params_list)
+    {:ok, user_code_report} = Commands.create(:user_code_report, event_params_list)
 
     <<UserCode.byte(), user_code_report.command_byte>> <>
       UserCodeReport.encode_params(user_code_report)
@@ -449,14 +450,14 @@ defmodule Grizzly.ZWave.Notifications do
              :glass_breakage_location_provided,
              :motion_detection_location_provided
            ] do
-    {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
+    {:ok, node_location_report} = Commands.create(:node_location_report, event_params_list)
 
     <<NodeNaming.byte(), node_location_report.command_byte>> <>
       NodeLocationReport.encode_params(node_location_report)
   end
 
   def encode_event_params(:smoke_alarm, :smoke_detected_location_provided, event_params_list) do
-    {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
+    {:ok, node_location_report} = Commands.create(:node_location_report, event_params_list)
 
     <<NodeNaming.byte(), node_location_report.command_byte>> <>
       NodeLocationReport.encode_params(node_location_report)
@@ -467,7 +468,7 @@ defmodule Grizzly.ZWave.Notifications do
              :water_leak_detected_location_provided,
              :water_level_dropped_location_provided
            ] do
-    {:ok, node_location_report} = NodeLocationReport.new(event_params_list)
+    {:ok, node_location_report} = Commands.create(:node_location_report, event_params_list)
 
     <<NodeNaming.byte(), node_location_report.command_byte>> <>
       NodeLocationReport.encode_params(node_location_report)

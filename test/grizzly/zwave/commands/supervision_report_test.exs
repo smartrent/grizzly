@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.SupervisionReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SupervisionReport
 
   test "creates the command and validates params" do
     params = [more_status_updates: :last_report, session_id: 1, status: :working, duration: 180]
-    {:ok, _command} = SupervisionReport.new(params)
+    {:ok, _command} = Commands.create(:supervision_report, params)
   end
 
   test "encodes params correctly" do
     params = [more_status_updates: :last_report, session_id: 1, status: :working, duration: 180]
-    {:ok, command} = SupervisionReport.new(params)
+    {:ok, command} = Commands.create(:supervision_report, params)
 
     expected_binary = <<0x01, 0x01, 0x82>>
 

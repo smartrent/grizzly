@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeProvisioningListIterationReport
   alias GrizzlyTest.Utils
 
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
       meta_extensions: []
     ]
 
-    {:ok, _command} = NodeProvisioningListIterationReport.new(params)
+    {:ok, _command} = Commands.create(:node_provisioning_list_iteration_report, params)
   end
 
   test "encodes params correctly" do
@@ -23,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
       meta_extensions: []
     ]
 
-    {:ok, command} = NodeProvisioningListIterationReport.new(params)
+    {:ok, command} = Commands.create(:node_provisioning_list_iteration_report, params)
 
     expected_binary =
       <<0x01, 0x02, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14,

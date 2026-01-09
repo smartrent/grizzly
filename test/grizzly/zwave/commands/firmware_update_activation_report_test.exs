@@ -2,11 +2,13 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FirmwareUpdateActivationReport
 
   test "creates the command and validates params" do
     {:ok, command} =
-      FirmwareUpdateActivationReport.new(
+      Commands.create(
+        :firmware_update_activation_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -25,7 +27,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
 
   test "encodes params correctly - v1" do
     {:ok, command} =
-      FirmwareUpdateActivationReport.new(
+      Commands.create(
+        :firmware_update_activation_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,
@@ -40,7 +43,8 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
 
   test "decodes params correctly -v5" do
     {:ok, command} =
-      FirmwareUpdateActivationReport.new(
+      Commands.create(
+        :firmware_update_activation_report,
         manufacturer_id: 1,
         firmware_id: 2,
         checksum: 3,

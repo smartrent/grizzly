@@ -2,16 +2,21 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDGetTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FirmwareUpdateMDGet
 
   test "creates the command and validates params" do
-    {:ok, command} = FirmwareUpdateMDGet.new(number_of_reports: 2, report_number: 1)
+    {:ok, command} =
+      Commands.create(:firmware_update_md_get, number_of_reports: 2, report_number: 1)
+
     assert Command.param!(command, :number_of_reports) == 2
     assert Command.param!(command, :report_number) == 1
   end
 
   test "encodes params correctly" do
-    {:ok, command} = FirmwareUpdateMDGet.new(number_of_reports: 2, report_number: 1)
+    {:ok, command} =
+      Commands.create(:firmware_update_md_get, number_of_reports: 2, report_number: 1)
+
     number_of_reports = Command.param!(command, :number_of_reports)
     report_number = Command.param!(command, :report_number)
 

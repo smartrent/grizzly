@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.FailedNodeListGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FailedNodeListGet
 
   test "creates the command and validates params" do
     params = [seq_number: 0x01]
-    {:ok, _command} = FailedNodeListGet.new(params)
+    {:ok, _command} = Commands.create(:failed_node_list_get, params)
   end
 
   test "encodes params correctly" do
     params = [seq_number: 0x01]
-    {:ok, command} = FailedNodeListGet.new(params)
+    {:ok, command} = Commands.create(:failed_node_list_get, params)
     expected_binary = <<0x01>>
 
     assert expected_binary == FailedNodeListGet.encode_params(command)

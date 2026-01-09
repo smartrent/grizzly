@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ScheduleEntryLockEnableSet
 
   test "creates the command and validates params" do
     params = [user_identifier: 10, enabled: true]
-    {:ok, _command} = ScheduleEntryLockEnableSet.new(params)
+    {:ok, _command} = Commands.create(:schedule_entry_lock_enable_set, params)
   end
 
   test "encodes params correctly" do
     params = [user_identifier: 10, enabled: true]
-    {:ok, command} = ScheduleEntryLockEnableSet.new(params)
+    {:ok, command} = Commands.create(:schedule_entry_lock_enable_set, params)
     expected_binary = <<10, 0x01>>
     assert expected_binary == ScheduleEntryLockEnableSet.encode_params(command)
   end

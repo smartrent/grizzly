@@ -1,11 +1,13 @@
 defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatusTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FailedNodeReplaceStatus
 
   test "encodes params correctly" do
     {:ok, command} =
-      FailedNodeReplaceStatus.new(
+      Commands.create(
+        :failed_node_replace_status,
         seq_number: 54,
         status: :security_failed,
         node_id: 5,
@@ -17,7 +19,8 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatusTest do
     assert expected_binary == FailedNodeReplaceStatus.encode_params(command)
 
     {:ok, command} =
-      FailedNodeReplaceStatus.new(
+      Commands.create(
+        :failed_node_replace_status,
         seq_number: 10,
         status: :done,
         node_id: 3,

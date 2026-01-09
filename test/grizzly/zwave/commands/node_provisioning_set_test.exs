@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.NodeProvisioningSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeProvisioningSet
   alias Grizzly.ZWave.DSK
   alias GrizzlyTest.Utils
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSetTest do
       meta_extensions: []
     ]
 
-    {:ok, _command} = NodeProvisioningSet.new(params)
+    {:ok, _command} = Commands.create(:node_provisioning_set, params)
   end
 
   test "encodes params correctly" do
@@ -22,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSetTest do
       meta_extensions: []
     ]
 
-    {:ok, command} = NodeProvisioningSet.new(params)
+    {:ok, command} = Commands.create(:node_provisioning_set, params)
 
     expected_binary =
       <<0x01, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>

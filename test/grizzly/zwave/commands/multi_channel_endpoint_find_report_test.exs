@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelEndpointFindReport
 
   test "creates the command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReportTest do
       end_points: [2, 3]
     ]
 
-    {:ok, _command} = MultiChannelEndpointFindReport.new(params)
+    {:ok, _command} = Commands.create(:multi_channel_endpoint_find_report, params)
   end
 
   test "encodes params correctly" do
@@ -22,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReportTest do
       end_points: [2, 3]
     ]
 
-    {:ok, command} = MultiChannelEndpointFindReport.new(params)
+    {:ok, command} = Commands.create(:multi_channel_endpoint_find_report, params)
     expected_binary = <<0x00, 0x10, 0x04, 0x02, 0x03>>
     assert expected_binary == MultiChannelEndpointFindReport.encode_params(command)
 
@@ -33,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReportTest do
       end_points: [2, 3]
     ]
 
-    {:ok, command} = MultiChannelEndpointFindReport.new(params)
+    {:ok, command} = Commands.create(:multi_channel_endpoint_find_report, params)
     expected_binary = <<0x00, 0xFF, 0xFF, 0x02, 0x03>>
     assert expected_binary == MultiChannelEndpointFindReport.encode_params(command)
   end

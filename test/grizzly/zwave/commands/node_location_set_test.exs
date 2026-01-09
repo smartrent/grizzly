@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.NodeLocationSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeLocationSet
 
   test "creates the command and validates params" do
     params = [encoding: :ascii, location: "hall"]
-    {:ok, _command} = NodeLocationSet.new(params)
+    {:ok, _command} = Commands.create(:node_location_set, params)
   end
 
   test "encodes params correctly" do
     params = [encoding: :ascii, location: "hall"]
-    {:ok, command} = NodeLocationSet.new(params)
+    {:ok, command} = Commands.create(:node_location_set, params)
     expected_binary = <<0x00::5, 0x00::3, 104, 97, 108, 108>>
     assert expected_binary == NodeLocationSet.encode_params(command)
   end

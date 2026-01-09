@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.WindowCoveringSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.WindowCoveringSet
 
   test "creates the command and validates params" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSetTest do
       duration: 5
     ]
 
-    {:ok, _command} = WindowCoveringSet.new(params)
+    {:ok, _command} = Commands.create(:window_covering_set, params)
   end
 
   test "encodes params correctly" do
@@ -24,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSetTest do
       duration: 5
     ]
 
-    {:ok, command} = WindowCoveringSet.new(params)
+    {:ok, command} = Commands.create(:window_covering_set, params)
     expected_binary = <<0x00::3, 0x02::5, 1, 10, 3, 30, 5>>
     assert expected_binary == WindowCoveringSet.encode_params(command)
   end

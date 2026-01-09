@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.VersionCommandClassGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.VersionCommandClassGet
 
   test "creates the command and validates params" do
     params = [command_class: :association_get]
-    {:ok, _command} = VersionCommandClassGet.new(params)
+    {:ok, _command} = Commands.create(:version_command_class_get, params)
   end
 
   test "encodes params correctly" do
     params = [command_class: :basic]
-    {:ok, command} = VersionCommandClassGet.new(params)
+    {:ok, command} = Commands.create(:version_command_class_get, params)
     expected_params_binary = <<0x20>>
     assert expected_params_binary == VersionCommandClassGet.encode_params(command)
   end

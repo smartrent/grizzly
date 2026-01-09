@@ -1,12 +1,13 @@
 defmodule Grizzly.ZWave.Commands.IndicatorSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.IndicatorSet
 
   describe "creates the command and validates params" do
     test "v1" do
       params = [value: 0]
-      {:ok, _command} = IndicatorSet.new(params)
+      {:ok, _command} = Commands.create(:indicator_set, params)
     end
 
     test "v2" do
@@ -17,14 +18,14 @@ defmodule Grizzly.ZWave.Commands.IndicatorSetTest do
         ]
       ]
 
-      {:ok, _command} = IndicatorSet.new(params)
+      {:ok, _command} = Commands.create(:indicator_set, params)
     end
   end
 
   describe "encodes params correctly" do
     test "v1" do
       params = [value: 0]
-      {:ok, command} = IndicatorSet.new(params)
+      {:ok, command} = Commands.create(:indicator_set, params)
       expected_params_binary = <<0x00>>
       assert expected_params_binary == IndicatorSet.encode_params(command)
     end
@@ -37,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSetTest do
         ]
       ]
 
-      {:ok, command} = IndicatorSet.new(params)
+      {:ok, command} = Commands.create(:indicator_set, params)
       expected_params_binary = <<0x00, 0x02, 0x01, 0x02, 0xFF, 0x03, 0x01, 0x00>>
       assert expected_params_binary == IndicatorSet.encode_params(command)
     end

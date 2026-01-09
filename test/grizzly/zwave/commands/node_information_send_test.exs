@@ -1,18 +1,24 @@
 defmodule Grizzly.ZWave.Commands.NodeInformationSendTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.NodeInformationSend
 
   test "creates the command and validates params" do
     assert {:ok, command} =
-             NodeInformationSend.new(seq_number: 1, destination_node_id: 1, tx_options: [:ack])
+             Commands.create(:node_information_send,
+               seq_number: 1,
+               destination_node_id: 1,
+               tx_options: [:ack]
+             )
 
     assert command.command_byte == 0x05
   end
 
   test "encodes params correctly" do
     {:ok, command} =
-      NodeInformationSend.new(
+      Commands.create(
+        :node_information_send,
         seq_number: 10,
         destination_node_id: 15,
         tx_options: [:explore, :no_route, :low_power, :ack]

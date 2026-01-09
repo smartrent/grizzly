@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelCapabilityReport
 
   test "creates the command and validates params" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReportTest do
       command_classes: [:basic, :switch_binary]
     ]
 
-    {:ok, _command} = MultiChannelCapabilityReport.new(params)
+    {:ok, _command} = Commands.create(:multi_channel_capability_report, params)
   end
 
   test "encodes params correctly" do
@@ -24,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReportTest do
       command_classes: [:basic, :switch_binary]
     ]
 
-    {:ok, command} = MultiChannelCapabilityReport.new(params)
+    {:ok, command} = Commands.create(:multi_channel_capability_report, params)
     expected_binary = <<0x00::1, 0x01::7, 0x10, 0x04, 0x20, 0x25>>
     assert expected_binary == MultiChannelCapabilityReport.encode_params(command)
   end

@@ -5,8 +5,7 @@ defmodule Grizzly.Test do
 
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias Grizzly.ZWave.Commands.SwitchBinaryReport
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   describe "SwitchBinary Commands" do
@@ -24,7 +23,7 @@ defmodule Grizzly.Test do
 
     @tag :integration
     test "SwitchBinaryGet" do
-      {:ok, switch_report} = SwitchBinaryReport.new(target_value: :off)
+      {:ok, switch_report} = Commands.create(:switch_binary_report, target_value: :off)
 
       assert {:ok,
               %Report{status: :complete, type: :command, command: ^switch_report, node_id: 2}} =
@@ -86,7 +85,7 @@ defmodule Grizzly.Test do
 
   @tag :integration
   test "send a command to a node that hasn't been connected to yet" do
-    {:ok, switch_report} = SwitchBinaryReport.new(target_value: :off)
+    {:ok, switch_report} = Commands.create(:switch_binary_report, target_value: :off)
 
     assert {:ok, %Report{status: :complete, type: :command, command: ^switch_report, node_id: 50}} =
              Grizzly.send_command(50, :switch_binary_get)
@@ -102,7 +101,7 @@ defmodule Grizzly.Test do
 
   @tag :integration
   test "send a binary packet" do
-    {:ok, switch_get} = SwitchBinaryGet.new()
+    {:ok, switch_get} = Commands.create(:switch_binary_get)
     {:ok, packet} = ZIPPacket.with_zwave_command(switch_get, 0xA0)
     binary = Grizzly.ZWave.to_binary(packet)
 

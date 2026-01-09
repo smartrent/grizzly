@@ -1,11 +1,13 @@
 defmodule Grizzly.ZWave.Commands.HumidityControlSetpointReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.HumidityControlSetpointReport
 
   test "encodes params correctly" do
     {:ok, command} =
-      HumidityControlSetpointReport.new(
+      Commands.create(
+        :humidity_control_setpoint_report,
         setpoint_type: :humidify,
         value: 1.1,
         scale: :absolute

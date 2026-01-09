@@ -4,12 +4,11 @@ defmodule Grizzly.Connections.RequestListTest do
   alias Grizzly.Connections.RequestList
   alias Grizzly.Report
   alias Grizzly.Requests.RequestRunner
-  alias Grizzly.ZWave.Commands.SwitchBinaryGet
-  alias Grizzly.ZWave.Commands.SwitchBinarySet
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
   test "create and monitor a command runtime" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
 
     {:ok, runner, _ref, request_list} =
       RequestList.create(RequestList.empty(), zwave_command, 1, self())
@@ -19,7 +18,7 @@ defmodule Grizzly.Connections.RequestListTest do
   end
 
   test "response for complete" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
 
     {:ok, runner, ref, request_list} =
       RequestList.create(RequestList.empty(), zwave_command, 1, self())
@@ -33,7 +32,7 @@ defmodule Grizzly.Connections.RequestListTest do
   end
 
   test "response for nack response" do
-    {:ok, zwave_command} = SwitchBinarySet.new(target_value: :on)
+    {:ok, zwave_command} = Commands.create(:switch_binary_set, target_value: :on)
 
     {:ok, runner, _ref, request_list} =
       RequestList.create(RequestList.empty(), zwave_command, 1, self(), retries: 0)
@@ -51,7 +50,7 @@ defmodule Grizzly.Connections.RequestListTest do
   end
 
   test "response for queued" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
 
     {:ok, runner, ref, request_list} =
       RequestList.create(RequestList.empty(), zwave_command, 1, self())
@@ -68,7 +67,7 @@ defmodule Grizzly.Connections.RequestListTest do
   end
 
   test "response for retry" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
 
     {:ok, runner, _ref, request_list} =
       RequestList.create(RequestList.empty(), zwave_command, 1, self(), retries: 2)
@@ -82,7 +81,7 @@ defmodule Grizzly.Connections.RequestListTest do
   end
 
   test "response for continue" do
-    {:ok, zwave_command} = SwitchBinaryGet.new()
+    {:ok, zwave_command} = Commands.create(:switch_binary_get)
 
     {:ok, runner, _ref, request_list} =
       RequestList.create(RequestList.empty(), zwave_command, 1, self())

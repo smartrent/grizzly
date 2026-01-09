@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayGet
 
   test "creates the command and validates params" do
     params = [user_identifier: 2, schedule_slot_id: 3]
-    {:ok, _command} = ScheduleEntryLockWeekDayGet.new(params)
+    {:ok, _command} = Commands.create(:schedule_entry_lock_week_day_get, params)
   end
 
   test "encodes params correctly" do
     params = [user_identifier: 2, schedule_slot_id: 3]
-    {:ok, command} = ScheduleEntryLockWeekDayGet.new(params)
+    {:ok, command} = Commands.create(:schedule_entry_lock_week_day_get, params)
     expected_binary = <<2, 3>>
     assert expected_binary == ScheduleEntryLockWeekDayGet.encode_params(command)
   end

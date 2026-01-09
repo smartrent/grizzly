@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatusTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ExtendedNodeAddStatus
 
   test "ensure command byte is right" do
-    {:ok, command} = ExtendedNodeAddStatus.new()
+    {:ok, command} = Commands.create(:extended_node_add_status)
 
     assert command.command_byte == 0x16
   end
 
   test "ensure name is right" do
-    {:ok, command} = ExtendedNodeAddStatus.new()
+    {:ok, command} = Commands.create(:extended_node_add_status)
 
     assert command.name == :extended_node_add_status
   end

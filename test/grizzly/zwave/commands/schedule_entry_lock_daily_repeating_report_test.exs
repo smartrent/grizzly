@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReport
 
   test "creates the command and validates params" do
@@ -14,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReportTest do
       duration_minute: 42
     ]
 
-    {:ok, _command} = ScheduleEntryLockDailyRepeatingReport.new(params)
+    {:ok, _command} = Commands.create(:schedule_entry_lock_daily_repeating_report, params)
   end
 
   test "encodes params correctly" do
@@ -28,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReportTest do
       duration_minute: 42
     ]
 
-    {:ok, command} = ScheduleEntryLockDailyRepeatingReport.new(params)
+    {:ok, command} = Commands.create(:schedule_entry_lock_daily_repeating_report, params)
     expected_bitmask = <<0::1, 0::1, 0::1, 0::1, 0::1, 0::1, 1::1, 1::1>>
     expected_binary = <<20, 5>> <> expected_bitmask <> <<2, 42, 2, 42>>
     assert expected_binary == ScheduleEntryLockDailyRepeatingReport.encode_params(command)

@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.SceneActivationSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.SceneActivationSet
 
   test "creates the command and validates params" do
     params = [scene_id: 1, dimming_duration: :instantly]
-    {:ok, _command} = SceneActivationSet.new(params)
+    {:ok, _command} = Commands.create(:scene_activation_set, params)
   end
 
   test "encodes params correctly" do
     params = [scene_id: 1, dimming_duration: :instantly]
-    {:ok, command} = SceneActivationSet.new(params)
+    {:ok, command} = Commands.create(:scene_activation_set, params)
     expected_binary = <<1, 0>>
     assert expected_binary == SceneActivationSet.encode_params(command)
   end

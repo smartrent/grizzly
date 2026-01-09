@@ -15,7 +15,7 @@ defmodule Grizzly.Connections.SyncConnection do
   alias Grizzly.ZIPGateway
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.ZIPPacket
+  alias Grizzly.ZWave.Commands
 
   require Logger
 
@@ -191,7 +191,7 @@ defmodule Grizzly.Connections.SyncConnection do
       end
 
     {:ok, ack_response} =
-      ZIPPacket.new(
+      Commands.create(:zip_packet,
         secure: secure,
         header_extensions: header_extensions,
         seq_number: seq_number,

@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.CredentialSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.CredentialSet
 
   test "encodes params correctly" do
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSetTest do
       credential_data: <<0x01, 0x02, 0x03>>
     ]
 
-    assert {:ok, command} = CredentialSet.new(params)
+    assert {:ok, command} = Commands.create(:credential_set, params)
 
     assert CredentialSet.encode_params(command) == <<
              1::16,
@@ -33,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSetTest do
       credential_data: "abc"
     ]
 
-    assert {:ok, command} = CredentialSet.new(params)
+    assert {:ok, command} = Commands.create(:credential_set, params)
 
     assert CredentialSet.encode_params(command) == <<
              1::16,

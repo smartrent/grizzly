@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.UserCapabilitiesReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.UserCapabilitiesReport
 
   test "encodes params correctly" do
@@ -15,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReportTest do
       supported_user_types: [:general, :programming, :remote_only]
     ]
 
-    {:ok, command} = UserCapabilitiesReport.new(params)
+    {:ok, command} = Commands.create(:user_capabilities_report, params)
     encoded_params = UserCapabilitiesReport.encode_params(command)
 
     assert <<100::16, 0b00000110, 10, 0b10110100, 2, 0b00001001, 0b10>> = encoded_params

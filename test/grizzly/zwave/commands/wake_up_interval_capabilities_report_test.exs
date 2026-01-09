@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReport
 
   test "creates the v2 command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
       step_seconds: 500
     ]
 
-    {:ok, _command} = WakeUpIntervalCapabilitiesReport.new(params)
+    {:ok, _command} = Commands.create(:wake_up_interval_capabilities_report, params)
   end
 
   test "creates the v3 command and validates params" do
@@ -23,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
       on_demand: true
     ]
 
-    {:ok, _command} = WakeUpIntervalCapabilitiesReport.new(params)
+    {:ok, _command} = Commands.create(:wake_up_interval_capabilities_report, params)
   end
 
   test "encodes v2 params correctly" do
@@ -34,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
       step_seconds: 500
     ]
 
-    {:ok, command} = WakeUpIntervalCapabilitiesReport.new(params)
+    {:ok, command} = Commands.create(:wake_up_interval_capabilities_report, params)
     expected_binary = <<0x00, 0x03, 0xE8, 0x00, 0x07, 0xD0, 0x00, 0x05, 0xDC, 0x00, 0x01, 0xF4>>
     assert expected_binary == WakeUpIntervalCapabilitiesReport.encode_params(command)
   end
@@ -48,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
       on_demand: true
     ]
 
-    {:ok, command} = WakeUpIntervalCapabilitiesReport.new(params)
+    {:ok, command} = Commands.create(:wake_up_interval_capabilities_report, params)
 
     expected_binary =
       <<0x00, 0x03, 0xE8, 0x00, 0x07, 0xD0, 0x00, 0x05, 0xDC, 0x00, 0x01, 0xF4, 0x00::7, 0x01::1>>

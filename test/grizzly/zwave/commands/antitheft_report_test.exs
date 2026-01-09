@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.AntitheftReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AntitheftReport
 
   test "creates the command and validates params" do
@@ -11,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReportTest do
       locking_entity_id: 341
     ]
 
-    {:ok, _command} = AntitheftReport.new(params)
+    {:ok, _command} = Commands.create(:antitheft_report, params)
   end
 
   test "encodes params correctly" do
@@ -24,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReportTest do
       locking_entity_id: 341
     ]
 
-    {:ok, command} = AntitheftReport.new(params)
+    {:ok, command} = Commands.create(:antitheft_report, params)
     expected_binary = <<0x01, 126::16, 6>> <> hint <> <<341::16>>
     assert expected_binary == AntitheftReport.encode_params(command)
   end

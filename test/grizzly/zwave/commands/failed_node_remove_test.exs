@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.FailedNodeRemoveTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.FailedNodeRemove
 
   test "creates the command and validates params" do
     params = [seq_number: 2, node_id: 4]
-    {:ok, _command} = FailedNodeRemove.new(params)
+    {:ok, _command} = Commands.create(:failed_node_remove, params)
   end
 
   describe "encoding" do
     test "version 1-3 - only 8 bit node ids" do
-      {:ok, command} = FailedNodeRemove.new(seq_number: 0x02, node_id: 0x04)
+      {:ok, command} = Commands.create(:failed_node_remove, seq_number: 0x02, node_id: 0x04)
 
       for v <- 1..3 do
         assert FailedNodeRemove.encode_params(command, command_class_version: v) == <<0x02, 0x04>>
@@ -18,13 +19,13 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemoveTest do
     end
 
     test "version 4 - with 8 bit node id" do
-      {:ok, command} = FailedNodeRemove.new(seq_number: 0x01, node_id: 0x04)
+      {:ok, command} = Commands.create(:failed_node_remove, seq_number: 0x01, node_id: 0x04)
 
       assert FailedNodeRemove.encode_params(command) == <<0x01, 0x04, 0x04::16>>
     end
 
     test "version 4 - with 16 bit node id" do
-      {:ok, command} = FailedNodeRemove.new(seq_number: 0x01, node_id: 0x0401)
+      {:ok, command} = Commands.create(:failed_node_remove, seq_number: 0x01, node_id: 0x0401)
 
       assert FailedNodeRemove.encode_params(command) == <<0x01, 0xFF, 0x04, 0x01>>
     end

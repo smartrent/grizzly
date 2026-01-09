@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.LearnModeSetStatus
   alias GrizzlyTest.Utils
 
@@ -12,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
         new_node_id: 10
       ]
 
-      {:ok, _command} = LearnModeSetStatus.new(params)
+      {:ok, _command} = Commands.create(:learn_mode_set_status, params)
     end
 
     test "v2" do
@@ -25,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
         dsk: Utils.mkdsk()
       ]
 
-      {:ok, _command} = LearnModeSetStatus.new(params)
+      {:ok, _command} = Commands.create(:learn_mode_set_status, params)
     end
   end
 
@@ -37,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
         new_node_id: 10
       ]
 
-      {:ok, command} = LearnModeSetStatus.new(params)
+      {:ok, command} = Commands.create(:learn_mode_set_status, params)
       expected_binary = <<0x03, 0x06, 0x00, 0x0A>>
       assert expected_binary == LearnModeSetStatus.encode_params(command)
     end
@@ -52,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetStatusTest do
         dsk: Utils.mkdsk()
       ]
 
-      {:ok, command} = LearnModeSetStatus.new(params)
+      {:ok, command} = Commands.create(:learn_mode_set_status, params)
 
       expected_binary =
         <<0x03, 0x06, 0x00, 0x0A, 0x02, 0x00>> <>

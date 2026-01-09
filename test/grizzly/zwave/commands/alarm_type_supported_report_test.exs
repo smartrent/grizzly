@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.AlarmTypeSupportedReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.AlarmTypeSupportedReport
 
   test "creates the command and validates params" do
     params = [types: [:smoke_alarm, :home_security, :siren, :gas_alarm]]
-    {:ok, _command} = AlarmTypeSupportedReport.new(params)
+    {:ok, _command} = Commands.create(:alarm_type_supported_report, params)
   end
 
   test "encodes params correctly" do
     params = [types: [:smoke_alarm, :home_security, :siren, :gas_alarm]]
-    {:ok, command} = AlarmTypeSupportedReport.new(params)
+    {:ok, command} = Commands.create(:alarm_type_supported_report, params)
     expected_binary = <<0x00::3, 0x03::5, 0b10000010, 0b01000000, 0b00000100>>
     assert expected_binary == AlarmTypeSupportedReport.encode_params(command)
   end

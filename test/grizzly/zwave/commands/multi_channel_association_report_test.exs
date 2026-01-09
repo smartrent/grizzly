@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.MultiChannelAssociationReport
 
   describe "creates the command and validates params" do
@@ -13,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReportTest do
         node_endpoints: []
       ]
 
-      {:ok, _command} = MultiChannelAssociationReport.new(params)
+      {:ok, _command} = Commands.create(:multi_channel_association_report, params)
     end
 
     test "with node endpoints" do
@@ -28,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReportTest do
         ]
       ]
 
-      {:ok, _command} = MultiChannelAssociationReport.new(params)
+      {:ok, _command} = Commands.create(:multi_channel_association_report, params)
     end
   end
 
@@ -42,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReportTest do
         node_endpoints: []
       ]
 
-      {:ok, command} = MultiChannelAssociationReport.new(params)
+      {:ok, command} = Commands.create(:multi_channel_association_report, params)
       expected_binary = <<0x02, 0x0A, 0x00, 0x04, 0x05, 0x06>>
       assert expected_binary == MultiChannelAssociationReport.encode_params(command)
     end
@@ -59,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReportTest do
         ]
       ]
 
-      {:ok, command} = MultiChannelAssociationReport.new(params)
+      {:ok, command} = Commands.create(:multi_channel_association_report, params)
 
       expected_binary =
         <<0x02, 0x0A, 0x00, 0x04, 0x05, 0x06, 0x00, 0x07, 0x00::1, 0x02::7, 0x08, 0x01::1,

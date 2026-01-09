@@ -1,6 +1,7 @@
 defmodule Grizzly.ZWave.Commands.ConfigurationBulkReportTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ConfigurationBulkReport
 
   test "creates the command and validates params" do
@@ -13,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReportTest do
       values: [1, 2, 3]
     ]
 
-    {:ok, _command} = ConfigurationBulkReport.new(params)
+    {:ok, _command} = Commands.create(:configuration_bulk_report, params)
   end
 
   test "encodes params correctly" do
@@ -26,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReportTest do
       values: [1, 2, 3]
     ]
 
-    {:ok, command} = ConfigurationBulkReport.new(params)
+    {:ok, command} = Commands.create(:configuration_bulk_report, params)
 
     expected_params_binary =
       <<0x00::16, 0x03, 0x01, 0x00::1, 0x01::1, 0x00::3, 0x02::3, 0x01::16, 0x02::16, 0x03::16>>

@@ -1,16 +1,17 @@
 defmodule Grizzly.ZWave.Commands.TimeParametersSetTest do
   use ExUnit.Case, async: true
 
+  alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.TimeParametersSet
 
   test "creates the command and validates params" do
     params = [year: 2020, month: 7, day: 17, hour_utc: 14, minute_utc: 30, second_utc: 45]
-    {:ok, _command} = TimeParametersSet.new(params)
+    {:ok, _command} = Commands.create(:time_parameters_set, params)
   end
 
   test "encodes params correctly" do
     params = [year: 2020, month: 7, day: 17, hour_utc: 14, minute_utc: 30, second_utc: 45]
-    {:ok, command} = TimeParametersSet.new(params)
+    {:ok, command} = Commands.create(:time_parameters_set, params)
     expected_binary = <<2020::16, 7, 17, 14, 30, 45>>
     assert expected_binary == TimeParametersSet.encode_params(command)
   end
