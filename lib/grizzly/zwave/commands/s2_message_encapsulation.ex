@@ -47,7 +47,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
   @spec new([param()]) :: {:ok, Command.t()}
   def new(params) do
     # MPAN is an encrypted extension, so reject it if it was included
-    params = Keyword.replace(params, :extensions, reject_mpan(params[:extensions] || []))
+    {:ok, params} = validate_params(params)
 
     command = %Command{
       name: :s2_message_encapsulation,
@@ -57,6 +57,12 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
     }
 
     {:ok, command}
+  end
+
+  @impl Grizzly.ZWave.Command
+  def validate_params(params) do
+    params = Keyword.replace(params, :extensions, reject_mpan(params[:extensions] || []))
+    {:ok, params}
   end
 
   @impl Grizzly.ZWave.Command

@@ -49,6 +49,14 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   end
 
   @impl Grizzly.ZWave.Command
+  def validate_params(params) do
+    :ok = validate_seq_number(params)
+    :ok = validate_dsk(params)
+    params = validate_and_ensure_input_dsk_length(params)
+    {:ok, params}
+  end
+
+  @impl Grizzly.ZWave.Command
   def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     input_dsk_length = Command.param!(command, :input_dsk_length)

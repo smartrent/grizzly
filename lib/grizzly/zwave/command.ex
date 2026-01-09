@@ -47,6 +47,16 @@ defmodule Grizzly.ZWave.Command do
   @callback new(params :: keyword()) :: {:ok, t()} | {:error, reason :: any()}
 
   @doc """
+  Validate the command's parameters.
+
+  The callback should return `{:ok, validated_params}` if the parameters are valid,
+  or `{:error, reason}` if they are not. Implementers may modify the parameters
+  during validation (e.g., setting defaults).
+  """
+  @callback validate_params(params :: keyword()) ::
+              {:ok, validated_params :: keyword()} | {:error, reason :: any()}
+
+  @doc """
   Encode the command parameters
   """
   @callback encode_params(t()) :: binary()
@@ -76,7 +86,7 @@ defmodule Grizzly.ZWave.Command do
   """
   @callback report_matches_get?(get :: t(), report :: t()) :: boolean()
 
-  @optional_callbacks encode_params: 2, report_matches_get?: 2
+  @optional_callbacks encode_params: 2, report_matches_get?: 2, validate_params: 1
 
   @doc """
   Encode the `Command.t()` into it's binary representation

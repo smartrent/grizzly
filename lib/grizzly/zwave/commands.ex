@@ -325,7 +325,7 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :node_provisioning do
-    command :node_provisioning_set, 0x01
+    command :node_provisioning_set, 0x01, default_params: [meta_extensions: []]
     command :node_provisioning_delete, 0x02
     command :node_provisioning_list_iteration_get, 0x03, default_params: [remaining_counter: 0xFF]
 
@@ -730,8 +730,8 @@ defmodule Grizzly.ZWave.Commands do
 
   @spec create(atom(), keyword()) :: {:error, :unknown_command} | {:ok, Grizzly.ZWave.Command.t()}
   def create(command_name, params \\ []) do
-    with {:ok, spec} <- lookup(command_name) do
-      {:ok, spec.module.new(spec, params)}
+    with {:ok, spec} <- spec_for(command_name) do
+      CommandSpec.create_command(spec, params)
     end
   end
 
@@ -747,8 +747,9 @@ defmodule Grizzly.ZWave.Commands do
     end
 
     with {:ok, spec} <- spec_for(cc_byte, command_byte),
-         {:ok, decoded_params} <- spec.module.decode_params(params) do
-      spec.module.new(decoded_params)
+         {mod, fun} = spec.decode_fun,
+         {:ok, decoded_params} <- apply(mod, fun, [params]) do
+      CommandSpec.create_command(spec, decoded_params)
     else
       {:error, :unknown_command} -> {:error, %ZWaveError{binary: binary}}
       {:error, %DecodeError{}} = err -> err
