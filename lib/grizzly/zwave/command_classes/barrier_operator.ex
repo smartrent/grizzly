@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.BarrierOperator do
   The Barrier Operator Command Class is used to control and query the status of motorized barriers.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   import Bitwise
 
   alias Grizzly.ZWave.DecodeError
@@ -15,12 +13,6 @@ defmodule Grizzly.ZWave.CommandClasses.BarrierOperator do
   @type state :: :closed | 0x01..0x63 | :closing | :stopped | :opening | :open
   @type subsystem_type :: :audible_notification | :visual_notification
   @type subsystem_state :: :on | :off
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x66
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :barrier_operator
 
   @spec target_value_to_byte(:close | :open) :: 0x00 | 0xFF
   def target_value_to_byte(:close), do: 0x00

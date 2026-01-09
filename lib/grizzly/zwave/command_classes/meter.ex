@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
   The Meter Command Class is used to advertise instantaneous and accumulated numerical readings.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
 
@@ -26,12 +24,6 @@ defmodule Grizzly.ZWave.CommandClasses.Meter do
           | :w
 
   @type meter_rate_type :: :export | :import | :import_export | :default
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x32
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :meter
 
   @doc """
   Encode meter type

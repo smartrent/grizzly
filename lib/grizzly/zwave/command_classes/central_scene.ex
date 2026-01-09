@@ -6,8 +6,6 @@ defmodule Grizzly.ZWave.CommandClasses.CentralScene do
   controller
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   @type key_attributes :: [key_attribute]
   @type key_attribute ::
           :key_pressed_1_time
@@ -17,12 +15,6 @@ defmodule Grizzly.ZWave.CommandClasses.CentralScene do
           | :key_pressed_3_times
           | :key_pressed_4_times
           | :key_pressed_5_times
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x5B
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :central_scene
 
   def validate_supported_key_attributes(
         [scene_1_keys | other_scene_keys] = supported_attribute_keys,

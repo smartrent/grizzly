@@ -32,8 +32,6 @@ defmodule Grizzly.ZWave.Commands.CRC16EncapTest do
     {:ok, params} = CRC16Encap.decode_params(params_binary)
     encap_command = Keyword.get(params, :command)
     assert encap_command.command_byte == 0x01
-    encap_command_class_byte = encap_command.command_class.byte()
-    assert encap_command_class_byte == 0x26
     encap_params = encap_command.params
     assert Keyword.get(encap_params, :target_value) == :off
   end

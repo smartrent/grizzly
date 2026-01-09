@@ -6,8 +6,6 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
   door lock devices
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   require Logger
@@ -25,12 +23,6 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
   @type operation_type :: :constant_operation | :timed_operation
 
   @type door_components :: :bolt | :latch | :door
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x62
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :door_lock
 
   @spec mode_to_byte(mode()) :: byte()
   def mode_to_byte(:unsecured), do: 0x00

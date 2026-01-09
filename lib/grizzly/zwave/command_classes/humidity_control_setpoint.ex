@@ -3,18 +3,10 @@ defmodule Grizzly.ZWave.CommandClasses.HumidityControlSetpoint do
   HumidityControlSetpoint Command Class
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   require Logger
 
   @type type :: :humidify | :dehumidify | :auto
   @type scale :: :percentage | :absolute
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x64
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :humidity_control_setpoint
 
   @spec encode_type(type()) :: 1 | 2 | 3
   def encode_type(:humidify), do: 0x01

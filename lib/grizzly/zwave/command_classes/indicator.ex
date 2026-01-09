@@ -6,8 +6,6 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
   application provided by a supporting node.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type value :: byte | :on | :off | :restore
@@ -103,12 +101,6 @@ defmodule Grizzly.ZWave.CommandClasses.Indicator do
           | :sound_level
           | :low_power
           | :undefined
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x87
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :indicator
 
   def indicator_id_to_byte(:undefined), do: 0x00
   def indicator_id_to_byte(:armed), do: 0x01

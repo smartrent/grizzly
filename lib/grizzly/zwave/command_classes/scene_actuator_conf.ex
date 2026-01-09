@@ -6,18 +6,10 @@ defmodule Grizzly.ZWave.CommandClasses.SceneActuatorConf do
   supporting an actuator Command Class, e.g. a multilevel switch, binary switch etc.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type dimming_duration :: :instantly | [seconds: 1..127] | [minutes: 1..127] | :factory_settings
   @type level :: :on | :off | 1..99
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x2C
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :scene_actuator_conf
 
   @spec dimming_duration_to_byte(dimming_duration) :: byte
   def dimming_duration_to_byte(:instantly), do: 0

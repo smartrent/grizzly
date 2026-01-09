@@ -4,7 +4,7 @@ defmodule Grizzly.Requests.RequestTest do
   alias Grizzly.Report
   alias Grizzly.Requests.Handlers.AckResponse
   alias Grizzly.Requests.Request
-  alias Grizzly.ZWave.CommandClasses.ZIP
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
@@ -133,7 +133,7 @@ defmodule Grizzly.Requests.RequestTest do
   test "if Z/IP keep alive command, does not encode as a Z/IP Packet" do
     {:ok, keep_alive} = Commands.create(:keep_alive, ack_flag: :ack_request)
     request = Request.from_zwave_command(keep_alive, 1, self())
-    expected_binary = <<ZIP.byte(), 0x03, 0x80>>
+    expected_binary = <<CommandClasses.to_byte(:zip), 0x03, 0x80>>
 
     assert expected_binary == Request.to_binary(request)
   end

@@ -6,8 +6,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   to the Z-Wave network
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.DeviceClasses
@@ -29,12 +27,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   @type node_add_status() :: :done | :failed | :security_failed
 
   @type tx_opt :: :null | :low_power | :explore
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x34
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :network_management_inclusion
 
   @doc """
   Parse the node add status byte into an atom
@@ -66,15 +58,6 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
     do: {:error, %DecodeError{value: byte, param: :tx_opt}}
 
   @typedoc """
-  Command classes have different ways they are support for each device
-  """
-  @type tagged_command_classes() ::
-          {:non_secure_supported, [CommandClasses.command_class()]}
-          | {:non_secure_controlled, [CommandClasses.command_class()]}
-          | {:secure_supported, [CommandClasses.command_class()]}
-          | {:secure_controlled, [CommandClasses.command_class()]}
-
-  @typedoc """
   Node info report
 
   node information from a node add status report
@@ -98,7 +81,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           required(:basic_device_class) => DeviceClasses.basic_device_class(),
           required(:generic_device_class) => DeviceClasses.generic_device_class(),
           required(:specific_device_class) => DeviceClasses.specific_device_class(),
-          required(:command_classes) => [tagged_command_classes()],
+          required(:command_classes) => CommandClasses.command_class_list(),
           optional(:granted_keys) => [Security.key()],
           optional(:kex_fail_type) => Security.key_exchange_fail_type(),
           optional(:input_dsk) => Security.key_exchange_fail_type()
@@ -122,7 +105,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
           required(:basic_device_class) => DeviceClasses.basic_device_class(),
           required(:generic_device_class) => DeviceClasses.generic_device_class(),
           required(:specific_device_class) => DeviceClasses.specific_device_class(),
-          required(:command_classes) => [tagged_command_classes()],
+          required(:command_classes) => CommandClasses.command_class_list(),
           required(:granted_keys) => [Security.key()],
           required(:kex_fail_type) => Security.key_exchange_fail_type()
         }

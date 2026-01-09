@@ -2,7 +2,6 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Version
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.VersionCommandClassReport
 
@@ -11,7 +10,7 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
             %Command{
               name: :version_command_class_report,
               command_byte: 0x14,
-              command_class: Version
+              command_class: :version
             }} =
              Commands.create(:version_command_class_report,
                command_class: :switch_binary,

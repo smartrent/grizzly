@@ -11,9 +11,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.MultiChannel
 
-  @type param :: {:end_point, MultiChannel.end_point()}
+  @type param :: {:end_point, 1..127}
 
   @impl Grizzly.ZWave.Command
   def encode_params(command) do

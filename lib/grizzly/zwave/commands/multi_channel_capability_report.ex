@@ -21,11 +21,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCapabilityReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.MultiChannel
   alias Grizzly.ZWave.DeviceClasses
 
   @type param ::
-          {:end_point, MultiChannel.end_point()}
+          {:end_point, 1..127}
           | {:dynamic?, boolean()}
           | {:generic_device_class, DeviceClasses.generic_device_class()}
           | {:specific_device_class, DeviceClasses.specific_device_class()}

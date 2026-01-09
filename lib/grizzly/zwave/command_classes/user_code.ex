@@ -3,8 +3,6 @@ defmodule Grizzly.ZWave.CommandClasses.UserCode do
   Command Class for working with user codes
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   @type user_id_status ::
           :available
           | :occupied
@@ -23,12 +21,6 @@ defmodule Grizzly.ZWave.CommandClasses.UserCode do
         }
 
   @type keypad_mode :: :normal | :vacation | :privacy | :lockout | :unknown
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x63
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :user_code
 
   @spec user_id_status_to_byte(user_id_status()) :: byte()
   def user_id_status_to_byte(:available), do: 0x00

@@ -3,14 +3,6 @@ defmodule Grizzly.ZWave.CommandClasses.S0 do
   S0 (Security) Command Class
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x98
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :security
-
   @authentication_vector <<0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
                            0x55, 0x55, 0x55, 0x55>>
 

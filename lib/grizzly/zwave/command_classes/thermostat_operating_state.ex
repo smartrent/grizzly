@@ -6,8 +6,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatOperatingState do
   thermostat.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type state ::
@@ -23,12 +21,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatOperatingState do
           | :cooling_stage_2
           | :aux_heat_stage_2
           | :aux_heat_stage_3
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x42
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :thermostat_operating_state
 
   @spec encode_state(state) :: byte
   def encode_state(:idle), do: 0x00

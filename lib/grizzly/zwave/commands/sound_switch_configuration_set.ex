@@ -13,11 +13,10 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchConfigurationSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SoundSwitch
 
   @type param ::
-          {:volume, SoundSwitch.volume()}
-          | {:default_tone_identifier, SoundSwitch.tone_identifier()}
+          {:volume, Grizzly.ZWave.sound_switch_volume()}
+          | {:default_tone_identifier, byte()}
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

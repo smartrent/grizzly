@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatFanState do
   The Thermostat Fan State Command Class is used to obtain the fan operating state of the thermostat.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type state ::
@@ -19,12 +17,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatFanState do
           | :right_left_circulation
           | :up_down_circulation
           | :quiet_circulation
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x45
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :thermostat_fan_state
 
   @spec encode_state(state) :: byte
   def encode_state(:off), do: 0x00

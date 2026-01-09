@@ -11,9 +11,8 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchToneInfoGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SoundSwitch
 
-  @type param :: {:tone_identifier, SoundSwitch.tone_identifier()}
+  @type param :: {:tone_identifier, byte()}
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()

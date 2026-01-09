@@ -6,15 +6,7 @@ defmodule Grizzly.ZWave.CommandClasses.Time do
   network.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   @type sign :: :plus | :minus
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x8A
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :time
 
   def encode_sign(:plus), do: 0
   def encode_sign(:minus), do: 1
