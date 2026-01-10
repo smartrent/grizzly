@@ -11,11 +11,10 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchToneInfoReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SoundSwitch
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
-          {:tone_identifier, SoundSwitch.tone_identifier()}
+          {:tone_identifier, byte()}
           | {:tone_duration, 0..65535}
           | {:name, binary()}
 

@@ -20,13 +20,12 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulation do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.MultiChannel
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
 
   @type param ::
-          {:source_end_point, MultiChannel.end_point()}
-          | {:destination_end_point, MultiChannel.end_point()}
+          {:source_end_point, 1..127}
+          | {:destination_end_point, 1..127}
           | {:bit_address?, boolean()}
           | {:command, atom()}
           | {:parameters, Command.params()}

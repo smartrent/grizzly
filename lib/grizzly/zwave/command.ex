@@ -3,7 +3,7 @@ defmodule Grizzly.ZWave.Command do
   Data struct and behaviour for working with Z-Wave commands
   """
 
-  alias Grizzly.ZWave.CommandClass
+  alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
 
@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Command do
   """
   @type t() :: %__MODULE__{
           name: atom(),
-          command_class: CommandClass.t(),
+          command_class: atom(),
           # Allow for the NoOperation command which has no command byte, only a command class byte
           command_byte: byte() | nil,
           params: params()
@@ -86,7 +86,8 @@ defmodule Grizzly.ZWave.Command do
   """
   @spec to_binary(t()) :: binary()
   def to_binary(command) do
-    command_class_byte = command.command_class.byte()
+    spec = Commands.spec_for!(command.name)
+    command_class_byte = CommandClasses.to_byte(spec.command_class)
 
     if command.command_byte != nil do
       params_bin = encode_params(command)

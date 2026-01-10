@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatMode do
   The Thermostat Mode Command Class is used to control which mode a thermostat operates.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type mode ::
@@ -26,12 +24,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatMode do
           | :away
           | :full_power
           | :manufacturer_specific
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x40
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :thermostat_mode
 
   @spec encode_mode(mode) :: byte
   def encode_mode(:off), do: 0x00

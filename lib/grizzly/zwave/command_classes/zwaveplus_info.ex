@@ -6,8 +6,6 @@ defmodule Grizzly.ZWave.CommandClasses.ZwaveplusInfo do
   Z-Wave devices.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type role_type ::
@@ -22,12 +20,6 @@ defmodule Grizzly.ZWave.CommandClasses.ZwaveplusInfo do
           | :network_aware_end_node
 
   @type node_type :: :zwaveplus_node | :zwaveplus_for_ip_gateway
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x5E
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :zwaveplus_info
 
   def role_type_to_byte(:central_static_controller), do: 0x00
   def role_type_to_byte(:sub_static_controller), do: 0x01

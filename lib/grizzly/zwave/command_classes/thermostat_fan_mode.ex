@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatFanMode do
   What type of commands does this command class support?
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type mode ::
@@ -22,11 +20,6 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatFanMode do
           | :up_down
           | :quiet
           | :external_circulation
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x44
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :thermostat_fan_mode
 
   @spec encode_mode(mode) :: byte
   def encode_mode(:auto_low), do: 0x00

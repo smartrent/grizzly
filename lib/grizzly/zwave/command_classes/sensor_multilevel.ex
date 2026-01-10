@@ -5,15 +5,7 @@ defmodule Grizzly.ZWave.CommandClasses.SensorMultilevel do
   The Multilevel Sensor Command Class is used to advertise numerical sensor readings.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.Encoding
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x31
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :sensor_multilevel
 
   @sensor_types [
     # id, name, scales (in order by byte value)

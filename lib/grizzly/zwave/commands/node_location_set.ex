@@ -10,9 +10,9 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSet do
 
   @behaviour Grizzly.ZWave.Command
 
+  import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.NodeNaming
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:location, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 
@@ -20,17 +20,12 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSet do
   def encode_params(command) do
     encoding = Command.param!(command, :encoding)
     location = Command.param!(command, :location)
-    encoding_byte = NodeNaming.encoding_to_byte(encoding)
+    encoding_byte = encode_string_encoding(encoding)
     <<0x00::5, encoding_byte::3>> <> location
   end
 
   @impl Grizzly.ZWave.Command
   def decode_params(<<_reserved::5, encoding_byte::3, location::binary>>) do
-    with {:ok, encoding} <- NodeNaming.encoding_from_byte(encoding_byte) do
-      {:ok, [encoding: encoding, location: location]}
-    else
-      {:error, %DecodeError{}} = error ->
-        error
-    end
+    {:ok, [encoding: decode_string_encoding(encoding_byte), location: location]}
   end
 end

@@ -5,18 +5,10 @@ defmodule Grizzly.ZWave.CommandClasses.Clock do
   The Clock Command Class is used to implement a simple clock functionality.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type weekday ::
           :sunday | :monday | :tuesday | :wednesday | :thursday | :friday | :saturday | :unknown
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x81
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :clock
 
   @spec encode_weekday(weekday()) :: byte
   def encode_weekday(weekday) do

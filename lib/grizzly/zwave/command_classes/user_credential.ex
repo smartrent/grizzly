@@ -3,8 +3,6 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   User Credential command class
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.Encoding
 
   @type user_type ::
@@ -43,12 +41,6 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   @type credential_learn_operation :: :add | :modify
 
   @type modifier_type :: :dne | :unknown | :zwave | :local | :other
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x83
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :user_credential
 
   @doc "Encodes a credential rule to a byte value"
   @spec encode_credential_rule(credential_rule()) :: byte()

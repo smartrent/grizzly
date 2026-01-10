@@ -4,11 +4,8 @@ defmodule Grizzly.ZWave.Notifications do
   Notification command class.
   """
 
-  alias Grizzly.ZWave.CommandClasses.NodeNaming
-  alias Grizzly.ZWave.CommandClasses.UserCode
+  alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands
-  alias Grizzly.ZWave.Commands.NodeLocationReport
-  alias Grizzly.ZWave.Commands.UserCodeReport
   alias Grizzly.ZWave.DecodeError
 
   require Logger
@@ -440,8 +437,7 @@ defmodule Grizzly.ZWave.Notifications do
       when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation, :new_user_code_added] do
     {:ok, user_code_report} = Commands.create(:user_code_report, event_params_list)
 
-    <<UserCode.byte(), user_code_report.command_byte>> <>
-      UserCodeReport.encode_params(user_code_report)
+    ZWave.to_binary(user_code_report)
   end
 
   def encode_event_params(:home_security, zwave_event, event_params_list)
@@ -452,15 +448,13 @@ defmodule Grizzly.ZWave.Notifications do
            ] do
     {:ok, node_location_report} = Commands.create(:node_location_report, event_params_list)
 
-    <<NodeNaming.byte(), node_location_report.command_byte>> <>
-      NodeLocationReport.encode_params(node_location_report)
+    ZWave.to_binary(node_location_report)
   end
 
   def encode_event_params(:smoke_alarm, :smoke_detected_location_provided, event_params_list) do
     {:ok, node_location_report} = Commands.create(:node_location_report, event_params_list)
 
-    <<NodeNaming.byte(), node_location_report.command_byte>> <>
-      NodeLocationReport.encode_params(node_location_report)
+    ZWave.to_binary(node_location_report)
   end
 
   def encode_event_params(:water_alarm, zwave_event, event_params_list)
@@ -470,8 +464,7 @@ defmodule Grizzly.ZWave.Notifications do
            ] do
     {:ok, node_location_report} = Commands.create(:node_location_report, event_params_list)
 
-    <<NodeNaming.byte(), node_location_report.command_byte>> <>
-      NodeLocationReport.encode_params(node_location_report)
+    ZWave.to_binary(node_location_report)
   end
 
   def encode_event_params(zwave_type, zwave_event, event_params) do

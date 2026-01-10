@@ -5,15 +5,7 @@ defmodule Grizzly.ZWave.CommandClasses.AntitheftUnlock do
   This Command Class is used to unlock a device that has been locked by the Anti-theft Command Class.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   @type state :: :locked | :unlocked
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x7E
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :antitheft_unlock
 
   def state_to_bit(:unlocked), do: 0x00
   def state_to_bit(:locked), do: 0x01

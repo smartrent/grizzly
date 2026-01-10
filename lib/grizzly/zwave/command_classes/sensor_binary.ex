@@ -3,8 +3,6 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
   Deprecated command class for triggered/not triggered sensors.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.DecodeError
@@ -23,12 +21,6 @@ defmodule Grizzly.ZWave.CommandClasses.SensorBinary do
           | :tilt
           | :motion
           | :glass_break
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x30
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :sensor_binary
 
   @doc """
   Encode the type value for the sensor report

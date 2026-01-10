@@ -3,17 +3,9 @@ defmodule Grizzly.ZWave.CommandClasses.HumidityControlOperatingState do
   HumidityControlOperatingState
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   require Logger
 
   @type state :: :idle | :humidifying | :dehumidifying
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x6E
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :humidity_control_operating_state
 
   def encode_state(:idle), do: 0x00
   def encode_state(:humidifying), do: 0x01

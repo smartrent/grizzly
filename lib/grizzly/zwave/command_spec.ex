@@ -197,7 +197,7 @@ defmodule Grizzly.ZWave.CommandSpec do
     with {:ok, params} <- validate_params(spec, params) do
       cmd = %Grizzly.ZWave.Command{
         name: spec.name,
-        command_class: CommandClasses.cc_module!(spec.command_class),
+        command_class: spec.command_class,
         command_byte: spec.command_byte,
         params: params
       }

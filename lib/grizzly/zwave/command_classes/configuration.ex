@@ -6,17 +6,9 @@ defmodule Grizzly.ZWave.CommandClasses.Configuration do
   parameters
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type format :: :signed_integer | :unsigned_integer | :enumerated | :bit_field
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x70
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :configuration
 
   def format_to_byte(:signed_integer), do: 0x00
   def format_to_byte(:unsigned_integer), do: 0x01

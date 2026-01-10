@@ -19,10 +19,9 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.MultiChannel
   alias Grizzly.ZWave.DeviceClasses
 
-  @type end_point :: MultiChannel.end_point()
+  @type end_point :: 1..127
   @type param ::
           {:reports_to_follow, byte}
           | {:generic_device_class, DeviceClasses.generic_device_class()}

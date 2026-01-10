@@ -6,18 +6,10 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetback do
   thermostat.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type type :: :no_override | :temporary_override | :permanent_override
   @type state :: number | :frost_protection | :energy_saving
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x47
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :thermostat_setback
 
   @spec encode_type(type) :: byte
   def encode_type(:no_override), do: 0x00

@@ -6,16 +6,8 @@ defmodule Grizzly.ZWave.CommandClasses.NodeProvisioning do
   called the "Node Provisioning List", in SmartStart controller or gateway.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.SmartStart.MetaExtension
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x78
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :node_provisioning
 
   def encode_meta_extensions(meta_extensions),
     do:

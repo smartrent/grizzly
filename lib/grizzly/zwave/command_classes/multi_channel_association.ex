@@ -6,19 +6,11 @@ defmodule Grizzly.ZWave.CommandClasses.MultiChannelAssociation do
   Point destinations as well as to NodeID destinations.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave
 
   @marker 0x00
 
   @type node_endpoint :: [node: ZWave.node_id(), bit_address: 0 | 1, endpoint: 1..127]
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x8E
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :multi_channel_association
 
   @spec encode_node_endpoints([node_endpoint]) :: binary
   def encode_node_endpoints(node_endpoints) do

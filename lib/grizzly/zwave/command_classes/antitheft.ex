@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.Antitheft do
   This Command Class is used to lock (and possibly unlock) a node.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type lock_state :: :locked | :unlocked
@@ -14,12 +12,6 @@ defmodule Grizzly.ZWave.CommandClasses.Antitheft do
           :protection_disabled_unlocked
           | :protection_enabled_locked_fully_functional
           | :protection_enabled_locked_restricted
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x5D
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :antitheft
 
   def state_to_bit(:unlocked), do: 0x00
   def state_to_bit(:locked), do: 0x01

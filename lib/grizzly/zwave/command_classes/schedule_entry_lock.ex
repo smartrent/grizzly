@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses.ScheduleEntryLock do
   The Schedule Entry Lock Command Class provides Z-Wave devices the capability to exchange scheduling information.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   @type week_day ::
           :saturday
           | :friday
@@ -17,12 +15,6 @@ defmodule Grizzly.ZWave.CommandClasses.ScheduleEntryLock do
           | :sunday
 
   @weekdays [:sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday]
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x4E
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :schedule_entry_lock
 
   def weekdays_to_bitmask(active_days) do
     active_day_indices =

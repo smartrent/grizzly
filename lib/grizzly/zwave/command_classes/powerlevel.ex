@@ -8,8 +8,6 @@ defmodule Grizzly.ZWave.CommandClasses.Powerlevel do
   power level.
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type power_level ::
@@ -25,12 +23,6 @@ defmodule Grizzly.ZWave.CommandClasses.Powerlevel do
           | :minus9dBm
 
   @type status_of_operation :: :test_failed | :test_success | :test_in_progress
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x73
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :powerlevel
 
   def power_level_to_byte(:normal_power), do: 0x00
   def power_level_to_byte(:minus1dBm), do: 0x01

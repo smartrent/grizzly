@@ -5,15 +5,7 @@ defmodule Grizzly.ZWave.CommandClasses.WindowCovering do
   Command class for window coverings which can be opened or closed
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x6A
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :window_covering
 
   @type parameter_name ::
           :out_left

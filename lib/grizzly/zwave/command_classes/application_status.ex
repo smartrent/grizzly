@@ -5,17 +5,9 @@ defmodule Grizzly.ZWave.CommandClasses.ApplicationStatus do
   This command class is used by devices to report an exceptional status for a received command request (try later or rejected.)
   """
 
-  @behaviour Grizzly.ZWave.CommandClass
-
   alias Grizzly.ZWave.DecodeError
 
   @type status :: :try_again_later | :try_again_after_wait | :request_queued
-
-  @impl Grizzly.ZWave.CommandClass
-  def byte(), do: 0x22
-
-  @impl Grizzly.ZWave.CommandClass
-  def name(), do: :application_status
 
   def status_to_byte(:try_again_later), do: 0x00
   def status_to_byte(:try_again_after_wait), do: 0x01

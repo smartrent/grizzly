@@ -16,10 +16,9 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonePlaySet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SoundSwitch
   alias Grizzly.ZWave.DecodeError
 
-  @type param :: {:tone_identifier, 0..255} | {:volume, SoundSwitch.volume()}
+  @type param :: {:tone_identifier, 0..255} | {:volume, Grizzly.ZWave.sound_switch_volume()}
 
   @impl Grizzly.ZWave.Command
   @spec encode_params(Command.t()) :: binary()
