@@ -53,19 +53,13 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGet do
           | {:max_age, max_age()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t(), keyword()) :: binary()
-  def encode_params(command, opts \\ []) do
+  @spec encode_params(Command.t()) :: binary()
+  def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     max_age = Command.param!(command, :max_age)
     node_id = Command.param!(command, :node_id)
 
-    case Keyword.get(opts, :command_class_version, 4) do
-      4 ->
-        <<seq_number, encode_max_age(max_age), NodeId.encode_extended(node_id)::binary>>
-
-      v when v < 4 ->
-        <<seq_number, encode_max_age(max_age), node_id>>
-    end
+    <<seq_number, encode_max_age(max_age), NodeId.encode_extended(node_id)::binary>>
   end
 
   @impl Grizzly.ZWave.Command

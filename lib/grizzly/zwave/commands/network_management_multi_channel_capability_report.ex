@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
           | {:command_classes, list()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command, encode_opts \\ []) do
+  def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
     end_point = Command.param!(command, :end_point)
@@ -49,18 +49,11 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
       |> Command.param!(:command_classes)
       |> CommandClasses.command_class_list_to_binary()
 
-    case Keyword.get(encode_opts, :command_class_version, 4) do
-      4 ->
-        delimiter =
-          <<cc_list_byte_size(cc_binary), 0::1, end_point::7, generic_device_class_byte,
-            specific_device_class_byte, cc_binary::binary>>
+    delimiter =
+      <<cc_list_byte_size(cc_binary), 0::1, end_point::7, generic_device_class_byte,
+        specific_device_class_byte, cc_binary::binary>>
 
-        <<seq_number, NodeId.encode_extended(node_id, delimiter: delimiter)::binary>>
-
-      v when v < 4 ->
-        <<seq_number, NodeId.encode(node_id)::binary, cc_list_byte_size(cc_binary), end_point,
-          generic_device_class_byte, specific_device_class_byte, cc_binary::binary>>
-    end
+    <<seq_number, NodeId.encode_extended(node_id, delimiter: delimiter)::binary>>
   end
 
   defp cc_list_byte_size(<<0>>), do: 0

@@ -16,18 +16,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
   end
 
   describe "encoding" do
-    test "version 2-3" do
-      command = mk_cmd(0x04)
-
-      for v <- 2..3 do
-        assert NetworkManagementMultiChannelCapabilityReport.encode_params(command,
-                 command_class_version: v
-               ) ==
-                 <<0x01, 0x04, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF,
-                   0x62, 0x63>>
-      end
-    end
-
     test "version 4 with 8 bit node id" do
       command = mk_cmd(0x04)
 
@@ -42,26 +30,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
       assert NetworkManagementMultiChannelCapabilityReport.encode_params(command) ==
                <<0x01, 0xFF, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF,
                  0x62, 0x63, 0x40, 0x01>>
-    end
-
-    test "version 2-3 - no data for end point" do
-      {:ok, command} =
-        Commands.create(
-          :network_management_multi_channel_capability_report,
-          seq_number: 0x01,
-          node_id: 0x02,
-          end_point: 0x00,
-          generic_device_class: 0x00,
-          specific_device_class: 0x00,
-          command_classes: []
-        )
-
-      for v <- 2..3 do
-        assert NetworkManagementMultiChannelCapabilityReport.encode_params(command,
-                 command_class_version: v
-               ) ==
-                 <<0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00>>
-      end
     end
 
     test "version 4 - no data for end point" do

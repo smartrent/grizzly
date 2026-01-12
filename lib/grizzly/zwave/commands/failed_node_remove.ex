@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   by passing the `:command_class_version` to the encode options
 
   ```elixir
-  Grizzly.ZWave.Commands.FailedNodeRemove.encode_params(failed_node_remove, command_class_version: 3)
+  Grizzly.ZWave.Commands.FailedNodeRemove.encode_params(failed_node_remove)
   ```
 
   If there is no command class version specified this will encode to version 4 of the
@@ -29,17 +29,11 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   @type param() :: {:node_id, char()} | {:seq_number, ZWave.seq_number()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command, opts \\ []) do
+  def encode_params(command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
 
-    case Keyword.get(opts, :command_class_version, 4) do
-      4 ->
-        <<seq_number, NodeId.encode_extended(node_id)::binary>>
-
-      n when n < 4 ->
-        <<seq_number, node_id>>
-    end
+    <<seq_number, NodeId.encode_extended(node_id)::binary>>
   end
 
   @impl Grizzly.ZWave.Command
