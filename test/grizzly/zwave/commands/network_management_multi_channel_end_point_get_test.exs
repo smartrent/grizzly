@@ -16,20 +16,6 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
   end
 
   describe "encoding" do
-    test "version 2-3" do
-      {:ok, command} =
-        Commands.create(:network_management_multi_channel_end_point_get,
-          seq_number: 0x01,
-          node_id: 0x04
-        )
-
-      for v <- 2..3 do
-        assert NetworkManagementMultiChannelEndPointGet.encode_params(command,
-                 command_class_version: v
-               ) == <<0x01, 0x04>>
-      end
-    end
-
     test "version 4" do
       {:ok, command} =
         Commands.create(:network_management_multi_channel_end_point_get,

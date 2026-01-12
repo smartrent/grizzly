@@ -55,16 +55,6 @@ defmodule Grizzly.ZWave.Command do
   @callback encode_params(t()) :: binary()
 
   @doc """
-  Encode the command parameters with encoding options
-
-  The encoding options help pass extra context to how the parameters for the
-  command should be encoded.
-
-  This is an optional callback.
-  """
-  @callback encode_params(t(), opts :: keyword()) :: binary()
-
-  @doc """
   Decode the binary string of command params
   """
   @callback decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
@@ -79,7 +69,7 @@ defmodule Grizzly.ZWave.Command do
   """
   @callback report_matches_get?(get :: t(), report :: t()) :: boolean()
 
-  @optional_callbacks encode_params: 2, report_matches_get?: 2, validate_params: 1
+  @optional_callbacks report_matches_get?: 2, validate_params: 1
 
   @doc """
   Encode the `Command.t()` into it's binary representation
