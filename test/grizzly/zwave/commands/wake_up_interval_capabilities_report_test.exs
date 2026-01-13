@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
 
     {:ok, command} = Commands.create(:wake_up_interval_capabilities_report, params)
     expected_binary = <<0x00, 0x03, 0xE8, 0x00, 0x07, 0xD0, 0x00, 0x05, 0xDC, 0x00, 0x01, 0xF4>>
-    assert expected_binary == WakeUpIntervalCapabilitiesReport.encode_params(command)
+    assert expected_binary == WakeUpIntervalCapabilitiesReport.encode_params(nil, command)
   end
 
   test "encodes v3 params correctly" do
@@ -54,12 +54,12 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
     expected_binary =
       <<0x00, 0x03, 0xE8, 0x00, 0x07, 0xD0, 0x00, 0x05, 0xDC, 0x00, 0x01, 0xF4, 0x00::7, 0x01::1>>
 
-    assert expected_binary == WakeUpIntervalCapabilitiesReport.encode_params(command)
+    assert expected_binary == WakeUpIntervalCapabilitiesReport.encode_params(nil, command)
   end
 
   test "decodes v2 params correctly" do
     binary_params = <<0x00, 0x03, 0xE8, 0x00, 0x07, 0xD0, 0x00, 0x05, 0xDC, 0x00, 0x01, 0xF4>>
-    {:ok, params} = WakeUpIntervalCapabilitiesReport.decode_params(binary_params)
+    {:ok, params} = WakeUpIntervalCapabilitiesReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :minimum_seconds) == 1000
     assert Keyword.get(params, :maximum_seconds) == 2000
     assert Keyword.get(params, :default_seconds) == 1500
@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.WakeUpIntervalCapabilitiesReportTest do
     binary_params =
       <<0x00, 0x03, 0xE8, 0x00, 0x07, 0xD0, 0x00, 0x05, 0xDC, 0x00, 0x01, 0xF4, 0x01>>
 
-    {:ok, params} = WakeUpIntervalCapabilitiesReport.decode_params(binary_params)
+    {:ok, params} = WakeUpIntervalCapabilitiesReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :minimum_seconds) == 1000
     assert Keyword.get(params, :maximum_seconds) == 2000
     assert Keyword.get(params, :default_seconds) == 1500

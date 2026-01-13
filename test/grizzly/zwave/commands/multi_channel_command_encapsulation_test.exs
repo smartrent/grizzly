@@ -32,14 +32,14 @@ defmodule Grizzly.ZWave.Commands.MultiChannelCommandEncapsulationTest do
     expected_binary =
       <<0x00::1, 0x01::7, 0x01::1, 0x04::7, 0x25, 0x01, 0xFF, 0x00>>
 
-    assert expected_binary == MultiChannelCommandEncapsulation.encode_params(command)
+    assert expected_binary == MultiChannelCommandEncapsulation.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary =
       <<0x00::1, 0x01::7, 0x01::1, 0x04::7, 0x25, 0x01, 0xFF, 0x00>>
 
-    {:ok, params} = MultiChannelCommandEncapsulation.decode_params(params_binary)
+    {:ok, params} = MultiChannelCommandEncapsulation.decode_params(nil, params_binary)
     assert Keyword.get(params, :source_end_point) == 1
     assert Keyword.get(params, :destination_end_point) == 3
     assert Keyword.get(params, :bit_address?) == true

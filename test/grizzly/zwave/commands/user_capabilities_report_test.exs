@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReportTest do
     ]
 
     {:ok, command} = Commands.create(:user_capabilities_report, params)
-    encoded_params = UserCapabilitiesReport.encode_params(command)
+    encoded_params = UserCapabilitiesReport.encode_params(nil, command)
 
     assert <<100::16, 0b00000110, 10, 0b10110100, 2, 0b00001001, 0b10>> = encoded_params
   end
@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReportTest do
   test "decodes params correctly" do
     encoded_params = <<100::16, 0b00000110, 10, 0b10110100, 2, 0b00001001, 0b10>>
 
-    {:ok, params} = UserCapabilitiesReport.decode_params(encoded_params)
+    {:ok, params} = UserCapabilitiesReport.decode_params(nil, encoded_params)
 
     assert params == [
              max_users: 100,

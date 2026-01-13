@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
           | {:command_classes, list()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
     end_point = Command.param!(command, :end_point)
@@ -82,7 +82,10 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, node_id, 0x00, _reserved::1, end_point::7, 0x00, 0x00, 0x00>>) do
+  def decode_params(
+        _spec,
+        <<seq_number, node_id, 0x00, _reserved::1, end_point::7, 0x00, 0x00, 0x00>>
+      ) do
     {:ok,
      [
        seq_number: seq_number,
@@ -94,7 +97,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReport d
      ]}
   end
 
-  def decode_params(<<seq_number, params::binary>>) do
+  def decode_params(_spec, <<seq_number, params::binary>>) do
     <<_node_id, cc_len, _reserved::1, end_point::7, generic_device_class, specific_device_class,
       command_classes::binary-size(cc_len), _rest::binary>> = params
 

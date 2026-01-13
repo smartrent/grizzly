@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleGetTest do
     params = [sensor_type: :temperature]
     {:ok, command} = Commands.create(:sensor_multilevel_supported_scale_get, params)
     expected_binary = <<0x01>>
-    assert expected_binary == SensorMultilevelSupportedScaleGet.encode_params(command)
+    assert expected_binary == SensorMultilevelSupportedScaleGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x01>>
-    {:ok, params} = SensorMultilevelSupportedScaleGet.decode_params(binary_params)
+    {:ok, params} = SensorMultilevelSupportedScaleGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :sensor_type) == :temperature
   end
 end

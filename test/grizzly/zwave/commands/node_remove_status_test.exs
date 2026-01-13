@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
 
       expected_binary = <<0x01, 0x06, 0x05, 0x05::16>>
 
-      assert NodeRemoveStatus.encode_params(cmd) == expected_binary
+      assert NodeRemoveStatus.encode_params(nil, cmd) == expected_binary
     end
 
     test "version 4 - with 16 bit node id" do
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
 
       expected_binary = <<0x01, 0x06, 0xFF, 0x10, 0x10>>
 
-      assert NodeRemoveStatus.encode_params(cmd) == expected_binary
+      assert NodeRemoveStatus.encode_params(nil, cmd) == expected_binary
     end
   end
 
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
         node_id: 0x05
       ]
 
-      {:ok, result} = NodeRemoveStatus.decode_params(<<0x01, 0x06, 0x05>>)
+      {:ok, result} = NodeRemoveStatus.decode_params(nil, <<0x01, 0x06, 0x05>>)
 
       assert_params(expected_params, result)
     end
@@ -54,7 +54,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
         node_id: 0x05
       ]
 
-      {:ok, result} = NodeRemoveStatus.decode_params(<<0x01, 0x06, 0x05, 0x00, 0x00>>)
+      {:ok, result} = NodeRemoveStatus.decode_params(nil, <<0x01, 0x06, 0x05, 0x00, 0x00>>)
 
       assert_params(expected_params, result)
     end
@@ -66,7 +66,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatusTest do
         node_id: 0x10A1
       ]
 
-      {:ok, result} = NodeRemoveStatus.decode_params(<<0x01, 0x06, 0xFF, 0x10, 0xA1>>)
+      {:ok, result} = NodeRemoveStatus.decode_params(nil, <<0x01, 0x06, 0xFF, 0x10, 0xA1>>)
 
       assert_params(expected_params, result)
     end

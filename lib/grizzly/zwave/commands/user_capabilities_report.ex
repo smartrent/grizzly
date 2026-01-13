@@ -19,7 +19,6 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
 
   @type param ::
@@ -33,8 +32,7 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReport do
           | {:supported_user_types, [UserCredential.user_type()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     max_users = Command.param!(command, :max_users)
     supported_credential_rules = Command.param!(command, :supported_credential_rules)
     username_max_length = Command.param!(command, :username_max_length)
@@ -68,8 +66,8 @@ defmodule Grizzly.ZWave.Commands.UserCapabilitiesReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<max_users::16, supported_credential_rules::1-bytes, username_max_length,
           user_schedule_supported?::1, all_users_checksum_supported?::1,
           user_checksum_supported?::1, utf16_supported?::1, extended_ascii_supported?::1,

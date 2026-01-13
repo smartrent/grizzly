@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
   @type param :: {:target_value, :off | :previous | 0..99} | {:duration, Encoding.duration()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     target_value_byte = encode_target_value(Command.param!(command, :target_value))
 
     case Command.param(command, :duration) do
@@ -42,13 +42,13 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
   def encode_target_value(target_value), do: target_value
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<target_value_byte>>) do
+  def decode_params(_spec, <<target_value_byte>>) do
     with {:ok, target_value} <- target_value_from_byte(target_value_byte) do
       {:ok, [target_value: target_value]}
     end
   end
 
-  def decode_params(<<target_value_byte, duration_byte>>) do
+  def decode_params(_spec, <<target_value_byte, duration_byte>>) do
     with {:ok, target_value} <- target_value_from_byte(target_value_byte) do
       {:ok, [target_value: target_value, duration: decode_duration(duration_byte)]}
     end

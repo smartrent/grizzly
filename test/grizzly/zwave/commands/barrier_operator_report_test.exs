@@ -12,20 +12,20 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorReportTest do
   describe "encodes params correctly" do
     test "completed state" do
       binary_params = <<0xFF>>
-      {:ok, params} = BarrierOperatorReport.decode_params(binary_params)
+      {:ok, params} = BarrierOperatorReport.decode_params(nil, binary_params)
       assert Keyword.get(params, :state) == :open
     end
 
     test "stopped state" do
       binary_params = <<0x10>>
-      {:ok, params} = BarrierOperatorReport.decode_params(binary_params)
+      {:ok, params} = BarrierOperatorReport.decode_params(nil, binary_params)
       assert Keyword.get(params, :state) == 0x10
     end
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00>>
-    {:ok, params} = BarrierOperatorReport.decode_params(binary_params)
+    {:ok, params} = BarrierOperatorReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :state) == :closed
   end
 end

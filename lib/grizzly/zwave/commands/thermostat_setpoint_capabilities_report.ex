@@ -28,8 +28,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport do
           | {:max_value, number()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type = Command.param!(command, :type)
     min_scale = Command.param!(command, :min_scale)
     min_value = Command.param!(command, :min_value)
@@ -46,8 +45,8 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<_::4, type::4, min_precision::3, min_scale::2, min_byte_size::3,
           min_int_value::signed-size(min_byte_size)-unit(8), max_precision::3, max_scale::2,
           max_byte_size::3, max_int_value::signed-size(max_byte_size)-unit(8)>>
@@ -71,6 +70,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesReport do
   # Fallback for Building36 B36-T10 / Alarm.com ADC-T2000, which sends incorrect
   # values for precision (sends 1, should be 0) and size (sends 2, should be 1).
   def decode_params(
+        _spec,
         <<_::4, type::4, 1::3, min_scale::2, 2::3, min_value, 1::3, max_scale::2, 2::3,
           max_value>>
       ) do

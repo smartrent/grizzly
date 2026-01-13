@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
           | {:product_id, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     manufacturer_id = Command.param!(command, :manufacturer_id)
     product_type_id = Command.param!(command, :product_type_id)
     product = Command.param!(command, :product_id)
@@ -30,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<manufacturer_id::16, product_type_id::16, product_id::16>>) do
+  def decode_params(_spec, <<manufacturer_id::16, product_type_id::16, product_id::16>>) do
     {:ok,
      [manufacturer_id: manufacturer_id, product_type_id: product_type_id, product_id: product_id]}
   end

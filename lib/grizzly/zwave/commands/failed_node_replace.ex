@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
   @type param :: {:mode, mode()} | {:tx_opt, tx_opt()} | {:seq_number, Grizzly.seq_number()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
     mode = Command.param(command, :mode, :start_failed_node_replace_s2)
@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, node_id, tx_opt_byte, mode_byte>>) do
+  def decode_params(_spec, <<seq_number, node_id, tx_opt_byte, mode_byte>>) do
     with {:ok, mode} <- decode_mode(mode_byte),
          {:ok, tx_opt} <- NMI.tx_opt_from_byte(tx_opt_byte) do
       {:ok, [mode: mode, seq_number: seq_number, node_id: node_id, tx_opt: tx_opt]}

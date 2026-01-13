@@ -7,7 +7,7 @@ defmodule Grizzly.ZWave.Commands.S0MessageEncapsulation do
   alias Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     sender_nonce = Command.param!(command, :sender_nonce)
     # second_frame? = Command.param!(command, :second_frame?)
     # sequenced? = Command.param!(command, :sequenced?)
@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.S0MessageEncapsulation do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<sender_nonce::binary-size(8), rest::binary>>) do
+  def decode_params(_spec, <<sender_nonce::binary-size(8), rest::binary>>) do
     encrypted_payload = binary_slice(rest, 0..-10//1)
     <<receiver_nonce_identifier::8, mac::binary>> = binary_slice(rest, -9..-1)
 

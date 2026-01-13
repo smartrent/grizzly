@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
   @type mode :: :remove_node_any | :remove_node_stop
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     mode = Command.param(command, :mode, :remove_node_any)
 
@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, _, mode_byte>>) do
+  def decode_params(_spec, <<seq_number, _, mode_byte>>) do
     case decode_mode(mode_byte) do
       {:ok, mode} ->
         {:ok, [seq_number: seq_number, mode: mode]}

@@ -752,7 +752,7 @@ defmodule Grizzly.ZWave.Commands do
 
     with {:ok, spec} <- spec_for(cc_byte, command_byte),
          {mod, fun} = spec.decode_fun,
-         {:ok, decoded_params} <- apply(mod, fun, [params]) do
+         {:ok, decoded_params} <- apply(mod, fun, [spec, params]) do
       CommandSpec.create_command(spec, decoded_params)
     else
       {:error, :unknown_command} ->

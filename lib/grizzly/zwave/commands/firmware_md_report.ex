@@ -18,8 +18,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  alias Grizzly.ZWave.Command
-
   @type param ::
           {:manufacturer_id, non_neg_integer}
           | {:firmware_id, non_neg_integer}
@@ -33,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   @impl Grizzly.ZWave.Command
   # version 1
-  def decode_params(<<manufacturer_id::16, firmware_id::16, checksum::16>>) do
+  def decode_params(_spec, <<manufacturer_id::16, firmware_id::16, checksum::16>>) do
     {:ok,
      [
        manufacturer_id: manufacturer_id,
@@ -44,6 +42,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   # version 3
   def decode_params(
+        _spec,
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_upgradable,
           firmware_targets, max_fragment_size::16,
           firmware_target_ids::binary-size(firmware_targets)-unit(16)>>
@@ -63,6 +62,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   # version 5
   def decode_params(
+        _spec,
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_upgradable,
           firmware_targets, max_fragment_size::16,
           firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version>>
@@ -83,6 +83,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
 
   # versions 6-7
   def decode_params(
+        _spec,
         <<manufacturer_id::16, firmware_id::16, checksum::16, firmware_upgradable,
           firmware_targets, max_fragment_size::16,
           firmware_target_ids::binary-size(firmware_targets)-unit(16), hardware_version,
@@ -105,8 +106,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     params = command.params |> Enum.into(%{})
 
     case params do

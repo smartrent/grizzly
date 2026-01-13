@@ -44,6 +44,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   @impl Grizzly.ZWave.Command
   # Version 1
   def decode_params(
+        _spec,
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version>>
       ) do
@@ -62,6 +63,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
   # Version 2
   def decode_params(
+        _spec,
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version, hardware_version, firmware_targets,
           other_firmware_version_data::binary-size(firmware_targets)-unit(16)>>
@@ -85,6 +87,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
   # Version 3 - patch for zipgateway 7.14.2 and 7.15
   def decode_params(
+        _spec,
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version, hardware_version, firmware_targets,
           other_firmware_version_data::binary-size(2)-unit(16)>>
@@ -109,6 +112,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
 
   # Safe fallback
   def decode_params(
+        _spec,
         <<library_type, protocol_version, protocol_sub_version, firmware_version,
           firmware_sub_version, _ignore::binary>>
       ) do
@@ -126,7 +130,7 @@ defmodule Grizzly.ZWave.Commands.VersionReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     library_type = Command.param!(command, :library_type)
     protocol_version = Command.param!(command, :protocol_version)
     firmware_version = Command.param!(command, :firmware_version)

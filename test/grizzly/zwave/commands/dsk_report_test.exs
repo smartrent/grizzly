@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
     expected_binary =
       <<0x01, 0x00, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
-    assert expected_binary == DSKReport.encode_params(command)
+    assert expected_binary == DSKReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -43,7 +43,7 @@ defmodule Grizzly.ZWave.Commands.DSKReportTest do
     binary =
       <<0x01, 0x00, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
-    {:ok, params} = DSKReport.decode_params(binary)
+    {:ok, params} = DSKReport.decode_params(nil, binary)
 
     assert Keyword.get(params, :seq_number) == 0x01
     assert Keyword.get(params, :add_mode) == :learn

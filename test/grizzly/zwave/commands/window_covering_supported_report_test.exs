@@ -31,12 +31,12 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReportTest do
 
     {:ok, command} = Commands.create(:window_covering_supported_report, params)
     expected_binary = <<0::4, 3::4, 168, 0, 160>>
-    assert expected_binary == WindowCoveringSupportedReport.encode_params(command)
+    assert expected_binary == WindowCoveringSupportedReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0::4, 3::4, 168, 0, 160>>
-    {:ok, params} = WindowCoveringSupportedReport.decode_params(binary_params)
+    {:ok, params} = WindowCoveringSupportedReport.decode_params(nil, binary_params)
 
     assert Enum.sort(Keyword.get(params, :parameter_names)) ==
              Enum.sort([

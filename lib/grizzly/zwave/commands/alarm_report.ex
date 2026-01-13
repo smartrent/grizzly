@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Notifications
 
   @type param ::
@@ -36,13 +35,12 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
           | {:event_parameters, [byte()]}
 
   @impl Grizzly.ZWave.Command
-  def validate_params(params) do
+  def validate_params(_spec, params) do
     {:ok, build_params(params)}
   end
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     cond do
       Command.param(command, :sequence_number) != nil ->
         encode_v8(command)
@@ -56,25 +54,27 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<type, level>>) do
+  def decode_params(_spec, <<type, level>>) do
     {:ok, [type: type, level: level]}
   end
 
-  def decode_params(<<
-        type,
-        level,
-        zensor_node_id,
-        status_byte,
-        zwave_type_byte,
-        zwave_event_byte,
-        0x00::1,
-        0x00::2,
-        params_length::5,
-        event_params::binary-size(params_length),
-        # Sometimes a 0 seq_number is added
-        _::binary
-      >>) do
+  def decode_params(
+        _spec,
+        <<
+          type,
+          level,
+          zensor_node_id,
+          status_byte,
+          zwave_type_byte,
+          zwave_event_byte,
+          0x00::1,
+          0x00::2,
+          params_length::5,
+          event_params::binary-size(params_length),
+          # Sometimes a 0 seq_number is added
+          _::binary
+        >>
+      ) do
     zwave_type = type_from_byte(zwave_type_byte)
     zwave_event = event_from_byte(zwave_type, zwave_event_byte)
 
@@ -95,6 +95,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
   end
 
   def decode_params(
+        _spec,
         <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte, 0x01::1,
           0x00::2, params_length::5, event_params::binary-size(params_length), sequence_number>>
       ) do
@@ -120,6 +121,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReport do
 
   # Params sent by Schlage 468ZP
   def decode_params(
+        _spec,
         <<type, level, zensor_node_id, status_byte, zwave_type_byte, zwave_event_byte>>
       ) do
     zwave_type = type_from_byte(zwave_type_byte)

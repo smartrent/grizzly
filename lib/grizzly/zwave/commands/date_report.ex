@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.DateReport do
 
   @type param :: {:year, integer()} | {:month, 1..12} | {:day, 1..31}
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     year = Command.param!(command, :year)
     month = Command.param!(command, :month)
     day = Command.param!(command, :day)
@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.DateReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<year::16, month, day>>) do
+  def decode_params(_spec, <<year::16, month, day>>) do
     {:ok, [year: year, month: month, day: day]}
   end
 end

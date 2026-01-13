@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReport do
           {:node_id, byte} | {:statistics, NetworkManagementInstallationMaintenance.statistics()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     node_id = Command.param!(command, :node_id)
 
     statistics_binary =
@@ -32,8 +31,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<node_id, statistics_binary::binary>>) do
+  def decode_params(_spec, <<node_id, statistics_binary::binary>>) do
     with {:ok, statistics} <-
            NetworkManagementInstallationMaintenance.statistics_from_binary(statistics_binary) do
       {:ok, [node_id: node_id, statistics: statistics]}

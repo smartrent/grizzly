@@ -23,12 +23,12 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReportTest do
 
     {:ok, command} = Commands.create(:indicator_supported_report, params)
     expected_params_binary = <<0x01, 0x03, 0x02, 0x82, 0x02>>
-    assert expected_params_binary == IndicatorSupportedReport.encode_params(command)
+    assert expected_params_binary == IndicatorSupportedReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x01, 0x03, 0x02, 0x82, 0x02>>
-    {:ok, params} = IndicatorSupportedReport.decode_params(params_binary)
+    {:ok, params} = IndicatorSupportedReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :indicator_id) == :armed
     assert Keyword.get(params, :next_indicator_id) == :ready
 

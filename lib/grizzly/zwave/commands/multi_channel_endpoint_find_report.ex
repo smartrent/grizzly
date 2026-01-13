@@ -29,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
           | {:end_points, [end_point]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     reports_to_follow = Command.param!(command, :reports_to_follow)
     generic_device_class = Command.param!(command, :generic_device_class)
     generic_device_class_byte = encode_generic_class(generic_device_class)
@@ -48,8 +47,8 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
+        _spec,
         <<reports_to_follow, generic_device_class_byte, specific_device_class_byte,
           end_points_binary::binary>>
       ) do

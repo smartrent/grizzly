@@ -26,12 +26,12 @@ defmodule Grizzly.ZWave.Commands.AssociationReportTest do
 
     {:ok, command} = Commands.create(:association_report, params)
     expected_binary = <<0x02, 0x05, 0x00, 0x04, 0x05, 0x06>>
-    assert expected_binary == AssociationReport.encode_params(command)
+    assert expected_binary == AssociationReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02, 0x05, 0x00, 0x04, 0x05, 0x06>>
-    {:ok, params} = AssociationReport.decode_params(binary_params)
+    {:ok, params} = AssociationReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :grouping_identifier) == 2
     assert Keyword.get(params, :max_nodes_supported) == 5
     assert Keyword.get(params, :reports_to_follow) == 0

@@ -21,6 +21,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<0x00::5, device_id_type_byte::3, device_id_data_format::3, device_id_data_length::5,
           device_id_integer::size(device_id_data_length)-unit(8)>>
       ) do
@@ -34,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     device_id_type = Command.param!(command, :device_id_type)
     device_id = Command.param!(command, :device_id)
     {device_id_data_format, device_id_data_length, device_id_bytes} = encode_device_id(device_id)

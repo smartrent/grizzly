@@ -26,7 +26,7 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
           | {:current_value, value()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     target_value_byte = encode_target_value(Command.param!(command, :target_value))
 
     case Command.param(command, :current_value) do
@@ -46,13 +46,13 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReport do
   def encode_target_value(:on), do: 0xFF
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<target_value_byte>>) do
+  def decode_params(_spec, <<target_value_byte>>) do
     with {:ok, target_value} <- value_from_byte(target_value_byte) do
       {:ok, [target_value: target_value]}
     end
   end
 
-  def decode_params(<<current_value, target_value, duration_byte>>) do
+  def decode_params(_spec, <<current_value, target_value, duration_byte>>) do
     with {:ok, target_value} <- value_from_byte(target_value),
          {:ok, current_value} <- value_from_byte(current_value) do
       {:ok,

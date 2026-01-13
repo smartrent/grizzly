@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.AssociationGetTest do
     params = [grouping_identifier: 2]
     {:ok, command} = Commands.create(:association_get, params)
     expected_binary = <<0x02>>
-    assert expected_binary == AssociationGet.encode_params(command)
+    assert expected_binary == AssociationGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02>>
-    {:ok, params} = AssociationGet.decode_params(binary_params)
+    {:ok, params} = AssociationGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :grouping_identifier) == 2
   end
 end

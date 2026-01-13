@@ -12,7 +12,6 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateStatus do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type status :: :done | :failed
 
@@ -21,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateStatus do
           | {:status, status()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     status = status_to_byte(Command.param!(command, :status))
 
@@ -30,8 +28,7 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, status_byte>>) do
+  def decode_params(_spec, <<seq_number, status_byte>>) do
     status = status_from_byte(status_byte)
 
     {:ok, [seq_number: seq_number, status: status]}

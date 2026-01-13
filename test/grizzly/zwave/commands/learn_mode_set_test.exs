@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.LearnModeSetTest do
     params = [seq_number: 3, return_interview_status: :on, mode: :allow_routed]
     {:ok, command} = Commands.create(:learn_mode_set, params)
     expected_binary = <<0x03, 0x01, 0x02>>
-    assert expected_binary == LearnModeSet.encode_params(command)
+    assert expected_binary == LearnModeSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x03, 0x01, 0x02>>
-    {:ok, params} = LearnModeSet.decode_params(params_binary)
+    {:ok, params} = LearnModeSet.decode_params(nil, params_binary)
     assert Keyword.get(params, :seq_number) == 3
     assert Keyword.get(params, :return_interview_status) == :on
     assert Keyword.get(params, :mode) == :allow_routed

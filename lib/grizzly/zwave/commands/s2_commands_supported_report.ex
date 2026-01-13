@@ -7,14 +7,12 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:command_classes, [CommandClasses.command_class()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(cmd) do
+  def encode_params(_spec, cmd) do
     ccs = Command.param!(cmd, :command_classes)
 
     for cc <- ccs, into: <<>> do
@@ -23,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.S2CommandsSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(binary) do
+  def decode_params(_spec, binary) do
     ccs =
       binary
       |> :erlang.binary_to_list()

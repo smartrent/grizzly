@@ -10,11 +10,13 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointScaleSupportedReportTest
         scales: [:percentage, :absolute]
       )
 
-    assert <<0b11>> == HumidityControlSetpointScaleSupportedReport.encode_params(command)
+    assert <<0b11>> == HumidityControlSetpointScaleSupportedReport.encode_params(nil, command)
   end
 
   test "decode/1 correctly decodes command" do
-    assert {:ok, params} = HumidityControlSetpointScaleSupportedReport.decode_params(<<0b11>>)
+    assert {:ok, params} =
+             HumidityControlSetpointScaleSupportedReport.decode_params(nil, <<0b11>>)
+
     assert params[:scales] == [:percentage, :absolute]
   end
 end

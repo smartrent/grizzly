@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReportTest do
       <<0x01::1, 0x00::1, 0x02::6, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x20,
         0x01, 0x00, 0x00, 0x00>>
 
-    assert expected_binary == AssociationGroupInfoReport.encode_params(command)
+    assert expected_binary == AssociationGroupInfoReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReportTest do
       <<0x01::1, 0x00::1, 0x02::6, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x20,
         0x01, 0x00, 0x00, 0x00>>
 
-    {:ok, params} = AssociationGroupInfoReport.decode_params(binary_params)
+    {:ok, params} = AssociationGroupInfoReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :dynamic) == false
     [group_1_info, group_2_info] = Keyword.get(params, :groups_info)
     assert Keyword.get(group_1_info, :group_id) == 1

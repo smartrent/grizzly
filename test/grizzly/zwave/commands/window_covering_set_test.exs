@@ -27,12 +27,12 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSetTest do
 
     {:ok, command} = Commands.create(:window_covering_set, params)
     expected_binary = <<0x00::3, 0x02::5, 1, 10, 3, 30, 5>>
-    assert expected_binary == WindowCoveringSet.encode_params(command)
+    assert expected_binary == WindowCoveringSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00::3, 0x02::5, 1, 10, 3, 30, 5>>
-    {:ok, params} = WindowCoveringSet.decode_params(binary_params)
+    {:ok, params} = WindowCoveringSet.decode_params(nil, binary_params)
     parameters = Keyword.get(params, :parameters)
 
     parameter =

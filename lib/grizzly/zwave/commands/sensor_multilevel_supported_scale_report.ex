@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
   @type param :: {:sensor_type, atom()} | {:supported_scales, [byte()]}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     sensor_type = Command.param(command, :sensor_type)
 
     supported_scales =
@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedScaleReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<sensor_type_byte, 0x00::4, scales_bitmask::4>>) do
+  def decode_params(_spec, <<sensor_type_byte, 0x00::4, scales_bitmask::4>>) do
     case SensorMultilevel.decode_sensor_type(sensor_type_byte) do
       {:ok, sensor_type} ->
         {:ok,

@@ -16,20 +16,20 @@ defmodule Grizzly.ZWave.Commands.CRC16EncapTest do
     {:ok, encap_command} = Commands.create(:switch_multilevel_set, target_value: :off)
     params = [command: encap_command]
     {:ok, command} = Commands.create(:crc_16_encap, params)
-    encoded_encap_params = SwitchMultilevelSet.encode_params(encap_command)
+    encoded_encap_params = SwitchMultilevelSet.encode_params(nil, encap_command)
     command_binary = <<0x26, 0x01>> <> encoded_encap_params
     checksum = CRC.crc16_aug_ccitt(command_binary)
     expected_binary = command_binary <> <<checksum::16>>
-    assert expected_binary == CRC16Encap.encode_params(command)
+    assert expected_binary == CRC16Encap.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     {:ok, encap_command} = Commands.create(:switch_multilevel_set, target_value: :off)
-    encoded_encap_params = SwitchMultilevelSet.encode_params(encap_command)
+    encoded_encap_params = SwitchMultilevelSet.encode_params(nil, encap_command)
     command_binary = <<0x26, 0x01>> <> encoded_encap_params
     checksum = CRC.crc16_aug_ccitt(command_binary)
     params_binary = command_binary <> <<checksum::16>>
-    {:ok, params} = CRC16Encap.decode_params(params_binary)
+    {:ok, params} = CRC16Encap.decode_params(nil, params_binary)
     encap_command = Keyword.get(params, :command)
     assert encap_command.command_byte == 0x01
     encap_params = encap_command.params

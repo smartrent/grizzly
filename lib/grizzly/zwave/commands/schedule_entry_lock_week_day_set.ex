@@ -25,7 +25,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:set_action, :erase | :modify}
@@ -38,8 +37,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
           | {:stop_minute, 0..59}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     set_action = Command.param!(command, :set_action)
     user_identifier = Command.param!(command, :user_identifier)
     schedule_slot_id = Command.param!(command, :schedule_slot_id)
@@ -56,8 +54,8 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDaySet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<action_byte, user_identifier, schedule_slot_id, day_of_week, start_hour, start_minute,
           stop_hour, stop_minute>>
       ) do

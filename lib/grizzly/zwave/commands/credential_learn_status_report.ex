@@ -24,7 +24,6 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
 
   @type learn_status ::
           :started
@@ -44,8 +43,7 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReport do
           | {:steps_remaining, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     status = Command.param!(command, :status)
     user_id = Command.param!(command, :user_id)
     credential_type = Command.param!(command, :credential_type)
@@ -57,8 +55,8 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<status, user_id::16, credential_type, credential_slot::16, steps_remaining>>
       ) do
     {:ok,

@@ -14,13 +14,13 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockSetTest do
     params = [magic_code: magic_code]
     {:ok, command} = Commands.create(:antitheft_unlock_set, params)
     expected_params_binary = <<0x00::4, 0x0A::4>> <> magic_code
-    assert expected_params_binary == AntitheftUnlockSet.encode_params(command)
+    assert expected_params_binary == AntitheftUnlockSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     magic_code = "hocuspocus"
     params_binary = <<0x00::4, 0x0A::4>> <> magic_code
-    {:ok, params} = AntitheftUnlockSet.decode_params(params_binary)
+    {:ok, params} = AntitheftUnlockSet.decode_params(nil, params_binary)
     assert Keyword.get(params, :magic_code) == magic_code
   end
 end

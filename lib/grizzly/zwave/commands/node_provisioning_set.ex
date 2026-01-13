@@ -27,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
           | {:meta_extensions, [MetaExtension.extension()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     dsk = dsk_bin_from_command!(command)
 
@@ -41,9 +40,10 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+
   # TODO: same problem with no function call
   def decode_params(
+        _spec,
         <<seq_number, _::3, dsk_byte_size::5, dsk_binary::binary-size(dsk_byte_size)-unit(8),
           meta_extensions_binary::binary>>
       ) do

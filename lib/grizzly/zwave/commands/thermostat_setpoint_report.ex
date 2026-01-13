@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
   alias Grizzly.ZWave.Encoding
 
   @impl Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type = Command.param!(command, :type)
     scale_byte = Command.param!(command, :scale) |> ThermostatSetpoint.encode_scale()
     value = get_value(command, type)
@@ -42,6 +42,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointReport do
 
   @impl Command
   def decode_params(
+        _spec,
         <<_::4, type_byte::4, precision::3, scale_byte::2, byte_size::3,
           int_value::signed-size(byte_size)-unit(8), _::binary>>
         # trailing binary to capture extra 0 sent by the Aidoo

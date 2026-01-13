@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteGetTest do
     params = [node_id: 4]
     {:ok, command} = Commands.create(:priority_route_get, params)
     expected_binary = <<0x04>>
-    assert expected_binary == PriorityRouteGet.encode_params(command)
+    assert expected_binary == PriorityRouteGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x04>>
-    {:ok, params} = PriorityRouteGet.decode_params(binary_params)
+    {:ok, params} = PriorityRouteGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :node_id) == 4
   end
 end

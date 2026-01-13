@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesGetTest do
     params = [param_number: 2]
     {:ok, command} = Commands.create(:configuration_properties_get, params)
     expected_params_binary = <<0x02::16>>
-    assert expected_params_binary == ConfigurationPropertiesGet.encode_params(command)
+    assert expected_params_binary == ConfigurationPropertiesGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x02::16>>
-    {:ok, params} = ConfigurationPropertiesGet.decode_params(params_binary)
+    {:ok, params} = ConfigurationPropertiesGet.decode_params(nil, params_binary)
     assert Keyword.get(params, :param_number) == 2
   end
 end

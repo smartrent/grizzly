@@ -7,15 +7,13 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:supported | :controlled, [CommandClasses.command_class()]}
           | {:reports_to_follow, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(cmd) do
+  def encode_params(_spec, cmd) do
     supported = Command.param!(cmd, :supported)
     controlled = Command.param!(cmd, :controlled)
     reports_to_follow = Command.param!(cmd, :reports_to_follow)
@@ -28,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.S0CommandsSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<reports_to_follow::8, rest::binary>>) do
+  def decode_params(_spec, <<reports_to_follow::8, rest::binary>>) do
     {supported, controlled} =
       rest
       |> :erlang.binary_to_list()

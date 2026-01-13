@@ -23,7 +23,6 @@ defmodule Grizzly.ZWave.Commands.UserReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
 
   @type report_type ::
@@ -50,8 +49,7 @@ defmodule Grizzly.ZWave.Commands.UserReport do
           | {:username, binary()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     report_type = Command.param!(command, :report_type)
     next_user_id = Command.param!(command, :next_user_id)
     modifier_type = Command.param!(command, :modifier_type)
@@ -74,23 +72,25 @@ defmodule Grizzly.ZWave.Commands.UserReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<
-        report_type,
-        next_user_id::16,
-        modifier_type,
-        modifier_node_id::16,
-        user_id::16,
-        user_type,
-        _::7,
-        user_active?::1,
-        credential_rule,
-        expiring_timeout_minutes::16,
-        _::5,
-        username_encoding::3,
-        username_length::8,
-        username::binary-size(username_length)
-      >>) do
+  def decode_params(
+        _spec,
+        <<
+          report_type,
+          next_user_id::16,
+          modifier_type,
+          modifier_node_id::16,
+          user_id::16,
+          user_type,
+          _::7,
+          user_active?::1,
+          credential_rule,
+          expiring_timeout_minutes::16,
+          _::5,
+          username_encoding::3,
+          username_length::8,
+          username::binary-size(username_length)
+        >>
+      ) do
     username_encoding = decode_string_encoding(username_encoding)
 
     {:ok,

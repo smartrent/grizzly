@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSetTest do
       params = [value: 0]
       {:ok, command} = Commands.create(:indicator_set, params)
       expected_params_binary = <<0x00>>
-      assert expected_params_binary == IndicatorSet.encode_params(command)
+      assert expected_params_binary == IndicatorSet.encode_params(nil, command)
     end
 
     test "v2" do
@@ -40,20 +40,20 @@ defmodule Grizzly.ZWave.Commands.IndicatorSetTest do
 
       {:ok, command} = Commands.create(:indicator_set, params)
       expected_params_binary = <<0x00, 0x02, 0x01, 0x02, 0xFF, 0x03, 0x01, 0x00>>
-      assert expected_params_binary == IndicatorSet.encode_params(command)
+      assert expected_params_binary == IndicatorSet.encode_params(nil, command)
     end
   end
 
   describe "decodes params correctly" do
     test "v1" do
       params_binary = <<0x01>>
-      {:ok, params} = IndicatorSet.decode_params(params_binary)
+      {:ok, params} = IndicatorSet.decode_params(nil, params_binary)
       assert Keyword.get(params, :value) == 0x01
     end
 
     test "v2" do
       params_binary = <<0x00, 0x02, 0x01, 0x02, 0xFF, 0x03, 0x01, 0x00>>
-      {:ok, params} = IndicatorSet.decode_params(params_binary)
+      {:ok, params} = IndicatorSet.decode_params(nil, params_binary)
       [first, second] = Keyword.fetch!(params, :resources) |> Enum.sort()
       assert Keyword.get(first, :indicator_id) == :armed
       assert Keyword.get(first, :property_id) == :binary

@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReport do
   @type param :: {:meter_reset, any()} | {:meter_type, any()} | {:scale_supported, any()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     meter_reset_supported_bit =
       if Command.param!(command, :meter_reset_supported) == true, do: 1, else: 0
 
@@ -48,8 +47,8 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<meter_reset_supported_bit::1, rate_type_bin::2, meter_type_bin::5, scales_bitmask1::8>>
       ) do
     with {:ok, rate_type} <- Meter.decode_rate_type(rate_type_bin),
@@ -72,6 +71,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReport do
   end
 
   def decode_params(
+        _spec,
         <<meter_reset_supported_bit::1, rate_type_bin::2, meter_type_bin::5, 1::1,
           scales_bitmask1::7, 1, scales_bitmask2::binary>>
       ) do

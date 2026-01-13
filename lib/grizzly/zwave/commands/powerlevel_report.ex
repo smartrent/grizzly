@@ -19,16 +19,14 @@ defmodule Grizzly.ZWave.Commands.PowerlevelReport do
   @type param :: {:power_level, Powerlevel.power_level()} | {:timeout, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     power_level_byte = Command.param!(command, :power_level) |> Powerlevel.power_level_to_byte()
     timeout = Command.param!(command, :timeout)
     <<power_level_byte, timeout>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<power_level_byte, timeout>>) do
+  def decode_params(_spec, <<power_level_byte, timeout>>) do
     with {:ok, power_level} <- Powerlevel.power_level_from_byte(power_level_byte) do
       {:ok, [power_level: power_level, timeout: timeout]}
     else

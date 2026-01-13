@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
           magic_code <>
           <<126::16, 6>> <> hint
 
-      assert expected_binary == AntitheftSet.encode_params(command)
+      assert expected_binary == AntitheftSet.encode_params(nil, command)
     end
 
     test "v3" do
@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
           magic_code <>
           <<126::16, 6>> <> hint <> <<341::16>>
 
-      assert expected_binary == AntitheftSet.encode_params(command)
+      assert expected_binary == AntitheftSet.encode_params(nil, command)
     end
   end
 
@@ -84,7 +84,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
           magic_code <>
           <<126::16, 6>> <> hint
 
-      {:ok, params} = AntitheftSet.decode_params(params_binary)
+      {:ok, params} = AntitheftSet.decode_params(nil, params_binary)
       assert Keyword.get(params, :state) == :locked
       assert Keyword.get(params, :magic_code) == magic_code
       assert Keyword.get(params, :manufacturer_id) == 126
@@ -100,7 +100,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSetTest do
           magic_code <>
           <<126::16, 6>> <> hint <> <<341::16>>
 
-      {:ok, params} = AntitheftSet.decode_params(params_binary)
+      {:ok, params} = AntitheftSet.decode_params(nil, params_binary)
       assert Keyword.get(params, :state) == :locked
       assert Keyword.get(params, :magic_code) == magic_code
       assert Keyword.get(params, :manufacturer_id) == 126

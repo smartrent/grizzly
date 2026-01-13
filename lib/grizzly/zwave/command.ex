@@ -5,6 +5,7 @@ defmodule Grizzly.ZWave.Command do
 
   alias Grizzly.ZWave.CommandClasses
   alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.CommandSpec
   alias Grizzly.ZWave.DecodeError
 
   @type delay_seconds() :: non_neg_integer()
@@ -46,18 +47,19 @@ defmodule Grizzly.ZWave.Command do
   or `{:error, reason}` if they are not. Implementers may modify the parameters
   during validation (e.g., setting defaults).
   """
-  @callback validate_params(params :: keyword()) ::
+  @callback validate_params(CommandSpec.t(), params :: keyword()) ::
               {:ok, validated_params :: keyword()} | {:error, reason :: any()}
 
   @doc """
   Encode the command parameters
   """
-  @callback encode_params(t()) :: binary()
+  @callback encode_params(CommandSpec.t(), t()) :: binary()
 
   @doc """
-  Decode the binary string of command params
+  Encode the command parameters
   """
-  @callback decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
+  @callback decode_params(CommandSpec.t(), binary()) ::
+              {:ok, keyword()} | {:error, DecodeError.t()}
 
   @doc """
   Returns true if the report is a good match for the get command. This is useful
@@ -69,7 +71,7 @@ defmodule Grizzly.ZWave.Command do
   """
   @callback report_matches_get?(get :: t(), report :: t()) :: boolean()
 
-  @optional_callbacks report_matches_get?: 2, validate_params: 1
+  @optional_callbacks report_matches_get?: 2, validate_params: 2
 
   @doc """
   Encode the `Command.t()` into it's binary representation
@@ -138,7 +140,7 @@ defmodule Grizzly.ZWave.Command do
       <<>>
     else
       {mod, fun} = Commands.spec_for!(command.name).encode_fun
-      apply(mod, fun, [command])
+      apply(mod, fun, [Commands.spec_for!(command.name), command])
     end
   end
 

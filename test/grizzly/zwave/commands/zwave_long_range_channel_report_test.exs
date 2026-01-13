@@ -20,23 +20,25 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelReportTest do
     test "version 4 with primary channel" do
       {:ok, cmd} = Commands.create(:zwave_long_range_channel_report, channel: :primary)
 
-      assert ZWaveLongRangeChannelReport.encode_params(cmd) == <<0x01>>
+      assert ZWaveLongRangeChannelReport.encode_params(nil, cmd) == <<0x01>>
     end
 
     test "version 4 with secondary channel" do
       {:ok, cmd} = Commands.create(:zwave_long_range_channel_report, channel: :secondary)
 
-      assert ZWaveLongRangeChannelReport.encode_params(cmd) == <<0x02>>
+      assert ZWaveLongRangeChannelReport.encode_params(nil, cmd) == <<0x02>>
     end
   end
 
   describe "parse" do
     test "version 4 with primary channel" do
-      assert {:ok, [channel: :primary]} == ZWaveLongRangeChannelReport.decode_params(<<0x01>>)
+      assert {:ok, [channel: :primary]} ==
+               ZWaveLongRangeChannelReport.decode_params(nil, <<0x01>>)
     end
 
     test "version 4 with secondary channel" do
-      assert {:ok, [channel: :secondary]} == ZWaveLongRangeChannelReport.decode_params(<<0x02>>)
+      assert {:ok, [channel: :secondary]} ==
+               ZWaveLongRangeChannelReport.decode_params(nil, <<0x02>>)
     end
   end
 end

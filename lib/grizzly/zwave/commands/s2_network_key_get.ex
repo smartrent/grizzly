@@ -12,14 +12,14 @@ defmodule Grizzly.ZWave.Commands.S2NetworkKeyGet do
   @type param :: {:requested_key, Security.key()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     requested_key = Command.param!(command, :requested_key)
 
     <<Security.key_to_byte(requested_key)::8>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<requested_key::8>>) do
+  def decode_params(_spec, <<requested_key::8>>) do
     requested_key = Security.key_from_byte(requested_key)
 
     {:ok, [requested_key: requested_key]}

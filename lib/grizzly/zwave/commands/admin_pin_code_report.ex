@@ -11,7 +11,6 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type result ::
           :modified
@@ -26,16 +25,14 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeReport do
   @type param :: {:result, result()} | {:code, binary()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     result = Command.param!(command, :result)
     code = Command.param!(command, :code) |> binary_slice(0, 15)
     <<encode_result(result)::4, byte_size(code)::4, code::binary>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<result::4, length::4, code::binary-size(length)>>) do
+  def decode_params(_spec, <<result::4, length::4, code::binary-size(length)>>) do
     {:ok,
      [
        result: decode_result(result),

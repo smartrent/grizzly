@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0xFF>>
 
-    assert expected_param_binary == FirmwareUpdateActivationReport.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateActivationReport.encode_params(nil, command)
   end
 
   test "decodes params correctly -v5" do
@@ -55,6 +55,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReportTest do
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0xFF, 0x04>>
 
-    assert expected_param_binary == FirmwareUpdateActivationReport.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateActivationReport.encode_params(nil, command)
   end
 end

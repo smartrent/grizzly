@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReportTest do
     >>
 
     assert expected_params_binary ==
-             ManufacturerSpecificDeviceSpecificReport.encode_params(report)
+             ManufacturerSpecificDeviceSpecificReport.encode_params(nil, report)
   end
 
   test "decodes params correctly" do
@@ -62,7 +62,7 @@ defmodule Grizzly.ZWave.Commands.ManufacturerSpecificDeviceSpecificReportTest do
       0x33
     >>
 
-    {:ok, params} = ManufacturerSpecificDeviceSpecificReport.decode_params(params_binary)
+    {:ok, params} = ManufacturerSpecificDeviceSpecificReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :device_id_type) == :serial_number
     assert Keyword.get(params, :device_id) == "h'30313233"
   end

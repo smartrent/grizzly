@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.CentralScene
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:seq_number, non_neg_integer()}
@@ -31,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
           | {:scene_number, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     slow_refresh_bit = Command.param!(command, :slow_refresh) |> bool_to_bit()
 
@@ -45,8 +43,8 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotification do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<seq_number, slow_refresh_bit::1, 0x00::4, key_attribute_byte::3, scene_number>>
       ) do
     {:ok,

@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
   @type param :: {:resources, [Indicator.resource()]} | {:value, byte}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     resources = Command.param(command, :resources)
 
     if resources == nil do
@@ -50,12 +49,11 @@ defmodule Grizzly.ZWave.Commands.IndicatorReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<value>>) do
+  def decode_params(_spec, <<value>>) do
     {:ok, [value: value, resources: [[indicator_id: 0x00, property_id: 0x01, value: value]]]}
   end
 
-  def decode_params(<<value0, 0x00::3, _count::5, resources_binary::binary>>) do
+  def decode_params(_spec, <<value0, 0x00::3, _count::5, resources_binary::binary>>) do
     result =
       :binary.bin_to_list(resources_binary)
       |> Enum.chunk_every(3)

@@ -21,14 +21,14 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
       {:ok, configuration_set} =
         Commands.create(:configuration_set, value: :default, param_number: 15)
 
-      assert <<0x0F, 0x81, 0x00>> == ConfigurationSet.encode_params(configuration_set)
+      assert <<0x0F, 0x81, 0x00>> == ConfigurationSet.encode_params(nil, configuration_set)
     end
 
     test "when a 1 byte neg value is set - default signed_integer format" do
       {:ok, configuration_set} =
         Commands.create(:configuration_set, value: -126, param_number: 15, size: 1)
 
-      assert <<0x0F, 0x01, 0x82>> == ConfigurationSet.encode_params(configuration_set)
+      assert <<0x0F, 0x01, 0x82>> == ConfigurationSet.encode_params(nil, configuration_set)
     end
 
     test "when a 1 byte neg value is set" do
@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :signed_integer
         )
 
-      assert <<0x0F, 0x01, 0x82>> == ConfigurationSet.encode_params(configuration_set)
+      assert <<0x0F, 0x01, 0x82>> == ConfigurationSet.encode_params(nil, configuration_set)
     end
 
     test "when a 1 byte pos value is set" do
@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :signed_integer
         )
 
-      assert <<0x0F, 0x01, 0x73>> == ConfigurationSet.encode_params(configuration_set)
+      assert <<0x0F, 0x01, 0x73>> == ConfigurationSet.encode_params(nil, configuration_set)
     end
 
     test "when a 2 byte neg value is set" do
@@ -64,7 +64,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :signed_integer
         )
 
-      assert <<0x0F, 0x02, 0xC8, 0x17>> == ConfigurationSet.encode_params(command)
+      assert <<0x0F, 0x02, 0xC8, 0x17>> == ConfigurationSet.encode_params(nil, command)
     end
 
     test "when a 2 byte pos value is set" do
@@ -76,7 +76,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :signed_integer
         )
 
-      assert <<0x0F, 0x02, 0x73, 0x17>> == ConfigurationSet.encode_params(command)
+      assert <<0x0F, 0x02, 0x73, 0x17>> == ConfigurationSet.encode_params(nil, command)
     end
 
     test "when a 4 byte neg value is set" do
@@ -89,7 +89,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :signed_integer
         )
 
-      assert <<0x0F, 0x04, 0xFF, 0xC8, 0x17, 0x01>> == ConfigurationSet.encode_params(command)
+      assert <<0x0F, 0x04, 0xFF, 0xC8, 0x17, 0x01>> ==
+               ConfigurationSet.encode_params(nil, command)
     end
 
     test "when a 4 byte pos value is set" do
@@ -101,7 +102,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :signed_integer
         )
 
-      assert <<0x0F, 0x04, 0x00, 0x73, 0x17, 0x01>> == ConfigurationSet.encode_params(command)
+      assert <<0x0F, 0x04, 0x00, 0x73, 0x17, 0x01>> ==
+               ConfigurationSet.encode_params(nil, command)
     end
 
     test "when an illegal 3 byte value is set" do
@@ -118,7 +120,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
                message:
                  "Invalid parameter. 7542529 with format :signed_integer will not fit in 3 bytes"
              } ==
-               catch_error(ConfigurationSet.encode_params(command))
+               catch_error(ConfigurationSet.encode_params(nil, command))
     end
 
     test "when an out-of-range byte value is set" do
@@ -135,7 +137,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
                message:
                  "Invalid parameter. 128 with format :signed_integer will not fit in 1 bytes"
              } ==
-               catch_error(ConfigurationSet.encode_params(command))
+               catch_error(ConfigurationSet.encode_params(nil, command))
     end
   end
 
@@ -144,7 +146,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
       {:ok, configuration_set} =
         Commands.create(:configuration_set, value: -126, param_number: 15, size: 1)
 
-      assert <<0x0F, 0x01, 0x82>> == ConfigurationSet.encode_params(configuration_set)
+      assert <<0x0F, 0x01, 0x82>> == ConfigurationSet.encode_params(nil, configuration_set)
     end
 
     test "when a 1 byte neg value is set" do
@@ -156,7 +158,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :unsigned_integer
         )
 
-      assert <<0x0F, 0x01, 0x80>> == ConfigurationSet.encode_params(configuration_set)
+      assert <<0x0F, 0x01, 0x80>> == ConfigurationSet.encode_params(nil, configuration_set)
     end
 
     test "when a 2 byte pos value is set" do
@@ -168,7 +170,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :unsigned_integer
         )
 
-      assert <<0x0F, 0x02, 0xEA, 0x60>> == ConfigurationSet.encode_params(command)
+      assert <<0x0F, 0x02, 0xEA, 0x60>> == ConfigurationSet.encode_params(nil, command)
     end
 
     test "when a 4 byte neg value is set" do
@@ -181,7 +183,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
           format: :unsigned_integer
         )
 
-      assert <<0x0F, 0x04, 0xFF, 0xFF, 0xFF, 0xFF>> == ConfigurationSet.encode_params(command)
+      assert <<0x0F, 0x04, 0xFF, 0xFF, 0xFF, 0xFF>> ==
+               ConfigurationSet.encode_params(nil, command)
     end
 
     test "when an illegal 3 byte value is set" do
@@ -199,7 +202,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
                message:
                  "Invalid parameter. 4294967296 with format :unsigned_integer will not fit in 3 bytes"
              } ==
-               catch_error(ConfigurationSet.encode_params(command))
+               catch_error(ConfigurationSet.encode_params(nil, command))
     end
 
     test "when an out-of-range byte value is set" do
@@ -216,14 +219,14 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
                message:
                  "Invalid parameter. 256 with format :unsigned_integer will not fit in 1 bytes"
              } ==
-               catch_error(ConfigurationSet.encode_params(command))
+               catch_error(ConfigurationSet.encode_params(nil, command))
     end
   end
 
   describe "decodes params correctly" do
     test "when default flag is set" do
       binary = <<0x0F, 0x80, 0x00>>
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == :default
     end
@@ -231,42 +234,42 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSetTest do
     test "when 1 byte pos value" do
       binary = <<0x0F, 0x01, 0x01>>
 
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == 0x01
     end
 
     test "when 1 byte neg value" do
       binary = <<0x0F, 0x01, 0x82>>
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == -126
     end
 
     test "when 2 byte pos value" do
       binary = <<0x0F, 0x02, 0x73, 0x17>>
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == 29463
     end
 
     test "when 2 byte net value" do
       binary = <<0x0F, 0x02, 0xC8, 0x17>>
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == -14313
     end
 
     test "when 3 byte pos value" do
       binary = <<0x0F, 0x03, 0x73, 0x17, 0x01>>
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == 7_542_529
     end
 
     test "when 3 byte neg value" do
       binary = <<0x0F, 0x03, 0xC8, 0x17, 0x01>>
-      assert {:ok, params} = ConfigurationSet.decode_params(binary)
+      assert {:ok, params} = ConfigurationSet.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :value) == -3_664_127
     end

@@ -13,13 +13,11 @@ defmodule Grizzly.ZWave.Commands.HumidityControlModeSupportedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.HumidityControlMode
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:modes, [HumidityControlMode.mode()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     command
     |> Command.param!(:modes)
     |> Enum.map(&HumidityControlMode.encode_mode/1)
@@ -27,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlModeSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(binary) do
+  def decode_params(_spec, binary) do
     modes =
       binary
       |> decode_bitmask()

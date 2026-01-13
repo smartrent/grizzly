@@ -8,7 +8,6 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands
-  alias Grizzly.ZWave.Commands.FirmwareUpdateMDReport
   alias Grizzly.ZWave.CRC
 
   require Logger
@@ -234,8 +233,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
         data: data
       )
 
-    params_binary = FirmwareUpdateMDReport.encode_params(command_without_checksum)
-    command_binary = <<0x7A, 0x06>> <> params_binary
+    command_binary = Grizzly.ZWave.to_binary(command_without_checksum)
     checksum = checksum(command_binary)
     [report_number: report_number, data: data, last?: last?, checksum: checksum]
   end

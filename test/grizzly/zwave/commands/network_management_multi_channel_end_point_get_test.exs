@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
           node_id: 0x0110
         )
 
-      assert NetworkManagementMultiChannelEndPointGet.encode_params(command) ==
+      assert NetworkManagementMultiChannelEndPointGet.encode_params(nil, command) ==
                <<0x01, 0xFF, 0x01, 0x10>>
     end
   end
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
   describe "parsing" do
     test "version 2-3" do
       expected_params = [seq_number: 0x01, node_id: 0x04]
-      {:ok, params} = NetworkManagementMultiChannelEndPointGet.decode_params(<<0x01, 0x04>>)
+      {:ok, params} = NetworkManagementMultiChannelEndPointGet.decode_params(nil, <<0x01, 0x04>>)
 
       for {param, value} <- expected_params do
         assert params[param] == value
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
       expected_params = [seq_number: 0x01, node_id: 0x10]
 
       {:ok, params} =
-        NetworkManagementMultiChannelEndPointGet.decode_params(<<0x01, 0x10, 0x00::16>>)
+        NetworkManagementMultiChannelEndPointGet.decode_params(nil, <<0x01, 0x10, 0x00::16>>)
 
       for {param, value} <- expected_params do
         assert params[param] == value
@@ -53,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGetTest do
       expected_params = [seq_number: 0x01, node_id: 0x1010]
 
       {:ok, params} =
-        NetworkManagementMultiChannelEndPointGet.decode_params(<<0x01, 0xFF, 0x10, 0x10>>)
+        NetworkManagementMultiChannelEndPointGet.decode_params(nil, <<0x01, 0xFF, 0x10, 0x10>>)
 
       for {param, value} <- expected_params do
         assert params[param] == value

@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReportTest do
 
       expected_binary = <<0x18>>
 
-      assert expected_binary == UserCodeUsersNumberReport.encode_params(command)
+      assert expected_binary == UserCodeUsersNumberReport.encode_params(nil, command)
     end
 
     test "v2" do
@@ -34,7 +34,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReportTest do
 
       expected_binary = <<0x18, 0x00, 0x18>>
 
-      assert expected_binary == UserCodeUsersNumberReport.encode_params(command)
+      assert expected_binary == UserCodeUsersNumberReport.encode_params(nil, command)
     end
   end
 
@@ -42,14 +42,14 @@ defmodule Grizzly.ZWave.Commands.UserCodeUsersNumberReportTest do
     test "v1" do
       binary_params = <<0x18>>
 
-      {:ok, params} = UserCodeUsersNumberReport.decode_params(binary_params)
+      {:ok, params} = UserCodeUsersNumberReport.decode_params(nil, binary_params)
       assert Keyword.get(params, :supported_users) == 24
     end
 
     test "v2" do
       binary_params = <<0x18, 0x00, 0x18>>
 
-      {:ok, params} = UserCodeUsersNumberReport.decode_params(binary_params)
+      {:ok, params} = UserCodeUsersNumberReport.decode_params(nil, binary_params)
       assert Keyword.get(params, :supported_users) == 24
       assert Keyword.get(params, :extended_supported_users) == 24
     end

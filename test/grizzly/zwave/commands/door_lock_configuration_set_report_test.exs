@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReportTest do
       ]
 
       {:ok, command} = Commands.create(:door_lock_configuration_report, params)
-      expected_params_binary = DoorLockConfigurationSetReport.encode_params(command)
+      expected_params_binary = DoorLockConfigurationSetReport.encode_params(nil, command)
       assert <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05>> == expected_params_binary
     end
 
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReportTest do
       ]
 
       {:ok, command} = Commands.create(:door_lock_configuration_report, params)
-      expected_params_binary = DoorLockConfigurationSetReport.encode_params(command)
+      expected_params_binary = DoorLockConfigurationSetReport.encode_params(nil, command)
 
       assert <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05, 125::16, 30::16, 0x00::6, 0x01::1, 0x00::1>> ==
                expected_params_binary
@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReportTest do
   describe "decodes params correctly" do
     test "v1-3" do
       params_binary = <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05>>
-      {:ok, params} = DoorLockConfigurationSetReport.decode_params(params_binary)
+      {:ok, params} = DoorLockConfigurationSetReport.decode_params(nil, params_binary)
       assert Keyword.get(params, :operation_type) == :constant_operation
       assert Enum.sort(Keyword.get(params, :manual_outside_door_handles)) == [1, 2]
       assert Enum.sort(Keyword.get(params, :manual_inside_door_handles)) == [3, 4]
@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReportTest do
       params_binary =
         <<0x01, 0x03::4, 0x0C::4, 0x01, 0x05, 125::16, 30::16, 0x00::6, 0x01::1, 0x00::1>>
 
-      {:ok, params} = DoorLockConfigurationSetReport.decode_params(params_binary)
+      {:ok, params} = DoorLockConfigurationSetReport.decode_params(nil, params_binary)
       assert Keyword.get(params, :operation_type) == :constant_operation
       assert Enum.sort(Keyword.get(params, :manual_outside_door_handles)) == [1, 2]
       assert Enum.sort(Keyword.get(params, :manual_inside_door_handles)) == [3, 4]

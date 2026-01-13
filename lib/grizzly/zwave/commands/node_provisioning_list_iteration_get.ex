@@ -21,14 +21,14 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGet do
           {:seq_number, ZWave.seq_number()} | {:remaining_counter, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     remaining_counter = Command.param(command, :remaining_counter, 0xFF)
     seq_number = Command.param!(command, :seq_number)
     <<seq_number, remaining_counter>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, remaining_counter>>) do
+  def decode_params(_spec, <<seq_number, remaining_counter>>) do
     if remaining_counter == 0xFF do
       {:ok, [seq_number: seq_number]}
     else

@@ -31,8 +31,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReport do
   @marker 0x00
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     grouping_identifier = Command.param!(command, :grouping_identifier)
     max_nodes_supported = Command.param!(command, :max_nodes_supported)
     reports_to_follow = Command.param!(command, :reports_to_follow)
@@ -52,8 +51,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAssociationReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary) :: {:ok, [param()]}
-  def decode_params(<<grouping_identifier, max_nodes_supported, reports_to_follow, rest::binary>>) do
+  def decode_params(
+        _spec,
+        <<grouping_identifier, max_nodes_supported, reports_to_follow, rest::binary>>
+      ) do
     {node_ids, node_endpoints} = MultiChannelAssociation.decode_nodes_and_node_endpoints(rest)
 
     {:ok,

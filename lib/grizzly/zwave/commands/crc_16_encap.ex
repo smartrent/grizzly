@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
   @type param :: {:command, Command.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     command = Command.param!(command, :command)
     command_binary = Grizzly.ZWave.to_binary(command)
     checksum = CRC.crc16_aug_ccitt(command_binary)
@@ -27,8 +26,10 @@ defmodule Grizzly.ZWave.Commands.CRC16Encap do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<command_class_byte, command_byte, data_and_checksum::binary>> = binary) do
+  def decode_params(
+        _spec,
+        <<command_class_byte, command_byte, data_and_checksum::binary>> = binary
+      ) do
     with {:ok, encoded_params, checksum} <- extract_params_and_checksum(data_and_checksum),
          command_binary = <<command_class_byte, command_byte>> <> encoded_params,
          ^checksum <- CRC.crc16_aug_ccitt(command_binary),

@@ -13,18 +13,18 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     params = [channels: [:rssi_max_power_saturated, -94, :rssi_not_available]]
     {:ok, command} = Commands.create(:rssi_report, params)
     expected_binary = <<0x7E, 0xA2, 0x7F>>
-    assert expected_binary == RssiReport.encode_params(command)
+    assert expected_binary == RssiReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x7E, 0xA2, 0x7F>>
-    {:ok, params} = RssiReport.decode_params(params_binary)
+    {:ok, params} = RssiReport.decode_params(nil, params_binary)
     assert [:rssi_max_power_saturated, -94, :rssi_not_available] == Keyword.get(params, :channels)
   end
 
   test "ignore non-standard channel" do
     params_binary = <<0x7E, 0xA2, 0x9E>>
-    {:ok, params} = RssiReport.decode_params(params_binary)
+    {:ok, params} = RssiReport.decode_params(nil, params_binary)
     assert [:rssi_max_power_saturated, -94, -98] == Keyword.get(params, :channels)
   end
 
@@ -41,7 +41,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
         long_range_secondary_channel: :rssi_not_available
       )
 
-    assert RssiReport.encode_params(cmd) == <<0x7E, 0xA2, 0x7F, 0xA2, 0x7F>>
+    assert RssiReport.encode_params(nil, cmd) == <<0x7E, 0xA2, 0x7F, 0xA2, 0x7F>>
   end
 
   test "parses version 4 - long range channels" do
@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     ]
 
     binary = <<0x7E, 0xA2, 0x7F, 0xA2, 0x7F>>
-    {:ok, params} = RssiReport.decode_params(binary)
+    {:ok, params} = RssiReport.decode_params(nil, binary)
     assert expected_params == params
 
     expected_params = [
@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     ]
 
     binary = <<0x7E, 0xA2, 0x7F, 0x7F, 0x00>>
-    {:ok, params} = RssiReport.decode_params(binary)
+    {:ok, params} = RssiReport.decode_params(nil, binary)
     assert expected_params == params
 
     expected_params = [
@@ -84,7 +84,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     ]
 
     binary = <<0x7E, 0xA2, 0x7F, 0x7F, 0xA2>>
-    {:ok, params} = RssiReport.decode_params(binary)
+    {:ok, params} = RssiReport.decode_params(nil, binary)
     assert expected_params == params
   end
 
@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     ]
 
     binary = <<0x9D, 0x9A, 0x9A, 0x7F, 0x00>>
-    {:ok, params} = RssiReport.decode_params(binary)
+    {:ok, params} = RssiReport.decode_params(nil, binary)
 
     assert expected_params == params
   end
@@ -111,7 +111,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     # Received this from Z/IP Gateway sending this while I was jamming channels
     # 1 and 2 with a dev kit
     binary = <<0x9E, 0xE7, 0xE7, 0xF6, 0x7E>>
-    {:ok, params} = RssiReport.decode_params(binary)
+    {:ok, params} = RssiReport.decode_params(nil, binary)
 
     assert expected_params == params
   end
@@ -129,7 +129,7 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     # 1 and 2 with a dev kit
     expected_binary = <<0x9E, 0xE7, 0xE7, 0xF6, 0x7E>>
 
-    assert expected_binary == RssiReport.encode_params(cmd)
+    assert expected_binary == RssiReport.encode_params(nil, cmd)
 
     {:ok, cmd} =
       Commands.create(
@@ -143,6 +143,6 @@ defmodule Grizzly.ZWave.Commands.RssiReportTest do
     # 1 and 2 with a dev kit
     expected_binary = <<0x64, 0x96, 0x14, 0x32, 0x7E>>
 
-    assert expected_binary == RssiReport.encode_params(cmd)
+    assert expected_binary == RssiReport.encode_params(nil, cmd)
   end
 end

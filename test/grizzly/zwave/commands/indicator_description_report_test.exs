@@ -15,14 +15,14 @@ defmodule Grizzly.ZWave.Commands.IndicatorDescriptionReportTest do
     {:ok, command} = Commands.create(:indicator_description_report, params)
     size = byte_size(description)
     expected_params_binary = <<0x01, size>> <> description
-    assert expected_params_binary == IndicatorDescriptionReport.encode_params(command)
+    assert expected_params_binary == IndicatorDescriptionReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     description = "Alarm will sound"
     size = byte_size(description)
     params_binary = <<0x01, size>> <> description
-    {:ok, params} = IndicatorDescriptionReport.decode_params(params_binary)
+    {:ok, params} = IndicatorDescriptionReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :indicator_id) == :armed
     assert Keyword.get(params, :description) == description
   end

@@ -27,12 +27,15 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockTimeOffsetSetReportTest do
 
     {:ok, command} = Commands.create(:schedule_entry_lock_time_offset_set, params)
     expected_binary = <<0::1, 4::7, 20::8, 0::1, 100::7>>
-    assert expected_binary == ScheduleEntryLockTimeOffsetSetReport.encode_params(command)
+    assert expected_binary == ScheduleEntryLockTimeOffsetSetReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0::1, 4::7, 20::8, 0::1, 100::7>>
-    {:ok, expected_params} = ScheduleEntryLockTimeOffsetSetReport.decode_params(binary_params)
+
+    {:ok, expected_params} =
+      ScheduleEntryLockTimeOffsetSetReport.decode_params(nil, binary_params)
+
     assert Keyword.get(expected_params, :sign_tzo) == :plus
     assert Keyword.get(expected_params, :hour_tzo) == 4
     assert Keyword.get(expected_params, :minute_tzo) == 20

@@ -27,7 +27,6 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type extension_type :: :span | :mpan | :mgrp | :mos
 
@@ -43,14 +42,13 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
           | {:encrypted_payload, binary()}
 
   @impl Grizzly.ZWave.Command
-  def validate_params(params) do
+  def validate_params(_spec, params) do
     params = Keyword.replace(params, :extensions, reject_mpan(params[:extensions] || []))
     {:ok, params}
   end
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(cmd) do
+  def encode_params(_spec, cmd) do
     seq_number = Command.param!(cmd, :seq_number)
     extensions = Command.param(cmd, :extensions, [])
     encrypted_extensions? = Command.param(cmd, :encrypted_extensions?, false)
@@ -64,8 +62,10 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number::8, _reserved::6, encrypted_ext?::1, ext?::1, rest::binary>>) do
+  def decode_params(
+        _spec,
+        <<seq_number::8, _reserved::6, encrypted_ext?::1, ext?::1, rest::binary>>
+      ) do
     {extensions, encrypted_payload} =
       if(ext? == 1,
         do: decode_extensions(rest),

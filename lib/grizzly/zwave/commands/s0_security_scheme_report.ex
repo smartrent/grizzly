@@ -12,8 +12,8 @@ defmodule Grizzly.ZWave.Commands.S0SecuritySchemeReport do
   @behaviour Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  def encode_params(_command), do: <<0::8>>
+  def encode_params(_spec, _command), do: <<0::8>>
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<_::8>>), do: {:ok, [supported_security_schemes: [:s0]]}
+  def decode_params(_spec, <<_::8>>), do: {:ok, [supported_security_schemes: [:s0]]}
 end

@@ -15,14 +15,13 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupNameGet do
   @type param() :: {:group_id, byte}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     group_id = Command.param!(command, :group_id)
     <<group_id>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<group_id>>) do
+  def decode_params(_spec, <<group_id>>) do
     {:ok, [group_id: group_id]}
   end
 end

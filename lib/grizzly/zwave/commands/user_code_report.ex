@@ -20,8 +20,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeReport do
           {:user_id, byte()} | {:user_id_status, user_id_status()} | {:user_code, String.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     user_id = Command.param!(command, :user_id)
     user_id_status = Command.param!(command, :user_id_status)
     user_code = Command.param!(command, :user_code)
@@ -30,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<user_id, user_id_status_byte, user_code_binary::binary>>) do
+  def decode_params(_spec, <<user_id, user_id_status_byte, user_code_binary::binary>>) do
     {:ok,
      [
        user_id: user_id,

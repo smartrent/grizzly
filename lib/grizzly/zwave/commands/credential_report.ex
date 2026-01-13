@@ -25,7 +25,6 @@ defmodule Grizzly.ZWave.Commands.CredentialReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
 
   @type report_type ::
           :added
@@ -53,8 +52,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReport do
           | {:next_credential_slot, 0..0xFFFF}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     report_type = Command.param!(command, :report_type)
     user_id = Command.param!(command, :user_id)
     credential_type = Command.param!(command, :credential_type)
@@ -85,21 +83,23 @@ defmodule Grizzly.ZWave.Commands.CredentialReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<
-        report_type,
-        user_id::16,
-        credential_type,
-        credential_slot::16,
-        read_back_supported?::1,
-        _::7,
-        credential_data_length::8,
-        credential_data::binary-size(credential_data_length),
-        modifier_type,
-        modifier_node_id::16,
-        next_credential_type,
-        next_credential_slot::16
-      >>) do
+  def decode_params(
+        _spec,
+        <<
+          report_type,
+          user_id::16,
+          credential_type,
+          credential_slot::16,
+          read_back_supported?::1,
+          _::7,
+          credential_data_length::8,
+          credential_data::binary-size(credential_data_length),
+          modifier_type,
+          modifier_node_id::16,
+          next_credential_type,
+          next_credential_slot::16
+        >>
+      ) do
     credential_type = UserCredential.decode_credential_type(credential_type)
 
     {:ok,

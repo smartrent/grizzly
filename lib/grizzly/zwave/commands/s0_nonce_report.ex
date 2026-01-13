@@ -7,11 +7,11 @@ defmodule Grizzly.ZWave.Commands.S0NonceReport do
   alias Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     nonce = Command.param!(command, :nonce)
     <<nonce::binary-size(8)>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<nonce::binary-size(8)>>), do: {:ok, [nonce: nonce]}
+  def decode_params(_spec, <<nonce::binary-size(8)>>), do: {:ok, [nonce: nonce]}
 end

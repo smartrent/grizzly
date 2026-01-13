@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetbackSetReportTest do
     params = [type: :temporary_override, state: -12.7]
     {:ok, command} = Commands.create(:thermostat_setback_set, params)
     expected_binary = <<0x00::6, 0x01::2, 0x81>>
-    assert expected_binary == ThermostatSetbackSetReport.encode_params(command)
+    assert expected_binary == ThermostatSetbackSetReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00::6, 0x02::2, 0x7A>>
-    {:ok, params} = ThermostatSetbackSetReport.decode_params(binary_params)
+    {:ok, params} = ThermostatSetbackSetReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :type) == :permanent_override
     assert Keyword.get(params, :state) == :energy_saving
   end

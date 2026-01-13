@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReport do
           | {:members, [1..127]}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     aggregated_end_point = Command.param!(command, :aggregated_end_point)
     members = Command.param!(command, :members)
     encoded_members = encode_members(members)
@@ -28,7 +28,10 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<0x00::1, aggregated_end_point::7, count, bitmasks::binary-size(count)>>) do
+  def decode_params(
+        _spec,
+        <<0x00::1, aggregated_end_point::7, count, bitmasks::binary-size(count)>>
+      ) do
     members = decode_members(bitmasks)
     {:ok, [aggregated_end_point: aggregated_end_point, members: members]}
   end

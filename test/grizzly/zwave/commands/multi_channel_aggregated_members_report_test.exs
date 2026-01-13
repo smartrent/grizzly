@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.MultiChannelAggregatedMembersReportTest do
     params = [aggregated_end_point: 1, members: [2, 8, 9]]
     {:ok, command} = Commands.create(:multi_channel_aggregated_members_report, params)
     expected_binary = <<0x00::1, 0x01::7, 0x02, 0x82, 0x01>>
-    assert expected_binary == MultiChannelAggregatedMembersReport.encode_params(command)
+    assert expected_binary == MultiChannelAggregatedMembersReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x00::1, 0x01::7, 0x02, 0x82, 0x01>>
-    {:ok, params} = MultiChannelAggregatedMembersReport.decode_params(params_binary)
+    {:ok, params} = MultiChannelAggregatedMembersReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :aggregated_end_point) == 1
     assert Keyword.get(params, :members) == [2, 8, 9]
   end

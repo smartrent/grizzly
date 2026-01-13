@@ -11,16 +11,16 @@ defmodule Grizzly.ZWave.Commands.BasicSetTest do
 
   test "encodes params correctly" do
     binary_params = <<0xFF>>
-    {:ok, params} = BasicSet.decode_params(binary_params)
+    {:ok, params} = BasicSet.decode_params(nil, binary_params)
     assert Keyword.get(params, :value) == :on
   end
 
   test "decodes params correctly" do
     binary_params = <<0xFF>>
-    {:ok, params} = BasicSet.decode_params(binary_params)
+    {:ok, params} = BasicSet.decode_params(nil, binary_params)
     assert Keyword.get(params, :value) == :on
     binary_params = <<0x01>>
-    {:ok, params} = BasicSet.decode_params(binary_params)
+    {:ok, params} = BasicSet.decode_params(nil, binary_params)
     assert Keyword.get(params, :value) == :on
   end
 end

@@ -20,8 +20,8 @@ defmodule Grizzly.ZWave.Commands.IncludedNIFReport do
   @type param :: {:seq_number, byte()} | {:dsk, DSK.t()}
 
   @impl Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+
+  def encode_params(_spec, command) do
     sequence_number = Command.param!(command, :seq_number)
     %DSK{raw: dsk} = Command.param!(command, :dsk)
 
@@ -29,8 +29,8 @@ defmodule Grizzly.ZWave.Commands.IncludedNIFReport do
   end
 
   @impl Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<seq_number::8, _::3, dsk_length::5, dsk::binary-size(dsk_length)>>) do
+
+  def decode_params(_spec, <<seq_number::8, _::3, dsk_length::5, dsk::binary-size(dsk_length)>>) do
     {:ok, seq_number: seq_number, dsk: DSK.new(dsk)}
   end
 end

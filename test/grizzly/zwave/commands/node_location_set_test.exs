@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.NodeLocationSetTest do
     params = [encoding: :ascii, location: "hall"]
     {:ok, command} = Commands.create(:node_location_set, params)
     expected_binary = <<0x00::5, 0x00::3, 104, 97, 108, 108>>
-    assert expected_binary == NodeLocationSet.encode_params(command)
+    assert expected_binary == NodeLocationSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00::5, 0x00::3, 104, 97, 108, 108>>
-    {:ok, params} = NodeLocationSet.decode_params(binary_params)
+    {:ok, params} = NodeLocationSet.decode_params(nil, binary_params)
     assert Keyword.get(params, :encoding) == :ascii
     assert Keyword.get(params, :location) == "hall"
   end

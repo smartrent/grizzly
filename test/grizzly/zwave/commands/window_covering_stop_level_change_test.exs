@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStopLevelChangeTest do
     params = [parameter_name: :out_left_positioned]
     {:ok, command} = Commands.create(:window_covering_stop_level_change, params)
     expected_binary = <<1>>
-    assert expected_binary == WindowCoveringStopLevelChange.encode_params(command)
+    assert expected_binary == WindowCoveringStopLevelChange.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<1>>
-    {:ok, params} = WindowCoveringStopLevelChange.decode_params(binary_params)
+    {:ok, params} = WindowCoveringStopLevelChange.decode_params(nil, binary_params)
     assert Keyword.get(params, :parameter_name) == :out_left_positioned
   end
 end

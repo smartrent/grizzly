@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReportTest do
 
     {:ok, command} = Commands.create(:multi_channel_endpoint_find_report, params)
     expected_binary = <<0x00, 0x10, 0x04, 0x02, 0x03>>
-    assert expected_binary == MultiChannelEndpointFindReport.encode_params(command)
+    assert expected_binary == MultiChannelEndpointFindReport.encode_params(nil, command)
 
     params = [
       reports_to_follow: 0,
@@ -36,19 +36,19 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindReportTest do
 
     {:ok, command} = Commands.create(:multi_channel_endpoint_find_report, params)
     expected_binary = <<0x00, 0xFF, 0xFF, 0x02, 0x03>>
-    assert expected_binary == MultiChannelEndpointFindReport.encode_params(command)
+    assert expected_binary == MultiChannelEndpointFindReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x00, 0x10, 0x04, 0x02, 0x03>>
-    {:ok, params} = MultiChannelEndpointFindReport.decode_params(params_binary)
+    {:ok, params} = MultiChannelEndpointFindReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :reports_to_follow) == 0
     assert Keyword.get(params, :generic_device_class) == :switch_binary
     assert Keyword.get(params, :specific_device_class) == :power_strip
     assert Enum.sort(Keyword.get(params, :end_points)) == [2, 3]
 
     params_binary = <<0x00, 0xFF, 0xFF, 0x02, 0x03>>
-    {:ok, params} = MultiChannelEndpointFindReport.decode_params(params_binary)
+    {:ok, params} = MultiChannelEndpointFindReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :reports_to_follow) == 0
     assert Keyword.get(params, :generic_device_class) == :all
     assert Keyword.get(params, :specific_device_class) == :all

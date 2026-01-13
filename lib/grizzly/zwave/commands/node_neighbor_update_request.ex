@@ -15,15 +15,14 @@ defmodule Grizzly.ZWave.Commands.NodeNeighborUpdateRequest do
   alias Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
     <<seq_number, node_id>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, node_id>>) do
+  def decode_params(_spec, <<seq_number, node_id>>) do
     {:ok, [seq_number: seq_number, node_id: node_id]}
   end
 end

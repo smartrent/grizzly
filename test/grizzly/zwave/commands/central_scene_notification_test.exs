@@ -25,12 +25,12 @@ defmodule Grizzly.ZWave.Commands.CentralSceneNotificationTest do
 
     {:ok, command} = Commands.create(:central_scene_notification, params)
     expected_params_binary = <<0x0A, 0x01::1, 0x00::4, 0x03::3, 0x02>>
-    assert expected_params_binary == CentralSceneNotification.encode_params(command)
+    assert expected_params_binary == CentralSceneNotification.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x0A, 0x01::1, 0x00::4, 0x03::3, 0x02>>
-    {:ok, params} = CentralSceneNotification.decode_params(params_binary)
+    {:ok, params} = CentralSceneNotification.decode_params(nil, params_binary)
     assert Keyword.get(params, :seq_number) == 10
     assert Keyword.get(params, :slow_refresh) == true
     assert Keyword.get(params, :key_attribute) == :key_pressed_2_times

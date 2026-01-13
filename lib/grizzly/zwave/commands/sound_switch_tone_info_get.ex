@@ -15,15 +15,13 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchToneInfoGet do
   @type param :: {:tone_identifier, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     tone_identifier = Command.param!(command, :tone_identifier)
     <<tone_identifier::8>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<tone_identifier::8>>) do
+  def decode_params(_spec, <<tone_identifier::8>>) do
     {:ok, [tone_identifier: tone_identifier]}
   end
 end

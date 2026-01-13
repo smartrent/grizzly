@@ -15,13 +15,13 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStartTest do
 
     {:ok, command} = Commands.create(:credential_learn_start, params)
 
-    assert CredentialLearnStart.encode_params(command) == <<1::16, 2, 1::16, 1, 30>>
+    assert CredentialLearnStart.encode_params(nil, command) == <<1::16, 2, 1::16, 1, 30>>
   end
 
   test "decodes params correctly" do
     binary = <<1::16, 2, 1::16, 1, 30>>
 
-    assert {:ok, params} = CredentialLearnStart.decode_params(binary)
+    assert {:ok, params} = CredentialLearnStart.decode_params(nil, binary)
 
     assert params[:user_id] == 1
     assert params[:credential_type] == :password

@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.UserSetTest do
 
     assert {:ok, command} = Commands.create(:user_set, params)
 
-    assert UserSet.encode_params(command) == <<
+    assert UserSet.encode_params(nil, command) == <<
              0b00000000,
              1::16,
              # general
@@ -48,7 +48,7 @@ defmodule Grizzly.ZWave.Commands.UserSetTest do
 
     assert {:ok, command} = Commands.create(:user_set, params)
 
-    assert UserSet.encode_params(command) == <<
+    assert UserSet.encode_params(nil, command) == <<
              2,
              1024::16,
              # expiring
@@ -79,7 +79,7 @@ defmodule Grizzly.ZWave.Commands.UserSetTest do
       "test_user"
     >>
 
-    assert {:ok, params} = UserSet.decode_params(binary)
+    assert {:ok, params} = UserSet.decode_params(nil, binary)
 
     assert params[:operation_type] == :add
     assert params[:user_id] == 1
@@ -107,7 +107,7 @@ defmodule Grizzly.ZWave.Commands.UserSetTest do
       "test_user"::utf16
     >>
 
-    assert {:ok, params} = UserSet.decode_params(binary)
+    assert {:ok, params} = UserSet.decode_params(nil, binary)
 
     assert params[:operation_type] == :delete
     assert params[:user_id] == 1024

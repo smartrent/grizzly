@@ -10,10 +10,10 @@ defmodule Grizzly.ZWave.Commands.UserCodeChecksumReportTest do
 
   test "encodes params correctly" do
     {:ok, command} = Commands.create(:user_code_checksum_report, checksum: 0xEAAD)
-    assert <<0xEA, 0xAD>> == UserCodeChecksumReport.encode_params(command)
+    assert <<0xEA, 0xAD>> == UserCodeChecksumReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
-    assert {:ok, [checksum: 0xEAAD]} == UserCodeChecksumReport.decode_params(<<0xEA, 0xAD>>)
+    assert {:ok, [checksum: 0xEAAD]} == UserCodeChecksumReport.decode_params(nil, <<0xEA, 0xAD>>)
   end
 end

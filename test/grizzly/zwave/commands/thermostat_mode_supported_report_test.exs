@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
 
   test "encodes params correctly" do
     {:ok, command} = Commands.create(:thermostat_mode_supported_report, modes: [])
-    assert <<>> = ThermostatModeSupportedReport.encode_params(command)
+    assert <<>> = ThermostatModeSupportedReport.encode_params(nil, command)
 
     modes = [
       :off,
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
     ]
 
     {:ok, command} = Commands.create(:thermostat_mode_supported_report, modes: modes)
-    assert <<0x1F, 0x18>> = ThermostatModeSupportedReport.encode_params(command)
+    assert <<0x1F, 0x18>> = ThermostatModeSupportedReport.encode_params(nil, command)
 
     modes = [
       :off,
@@ -66,11 +66,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSupportedReportTest do
     ]
 
     {:ok, command} = Commands.create(:thermostat_mode_supported_report, modes: modes)
-    assert <<0xFF, 0xBF, 0x0, 0x80>> = ThermostatModeSupportedReport.encode_params(command)
+    assert <<0xFF, 0xBF, 0x0, 0x80>> = ThermostatModeSupportedReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
-    assert {:ok, [modes: modes]} = ThermostatModeSupportedReport.decode_params(<<0x1F, 0x18>>)
+    assert {:ok, [modes: modes]} =
+             ThermostatModeSupportedReport.decode_params(nil, <<0x1F, 0x18>>)
 
     assert :off in modes
     assert :heat in modes

@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGetTest 
           end_point: 0x03
         )
 
-      assert NetworkManagementMultiChannelCapabilityGet.encode_params(command) ==
+      assert NetworkManagementMultiChannelCapabilityGet.encode_params(nil, command) ==
                <<0x01, 0xFF, 0x03, 0x01, 0x10>>
     end
   end
@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGetTest 
       expected_params = [seq_number: 0x01, node_id: 0x04, end_point: 0x02]
 
       {:ok, params} =
-        NetworkManagementMultiChannelCapabilityGet.decode_params(<<0x01, 0x04, 0x02>>)
+        NetworkManagementMultiChannelCapabilityGet.decode_params(nil, <<0x01, 0x04, 0x02>>)
 
       for {param, value} <- expected_params do
         assert params[param] == value
@@ -46,7 +46,10 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGetTest 
       expected_params = [seq_number: 0x01, node_id: 0x10, end_point: 0x05]
 
       {:ok, params} =
-        NetworkManagementMultiChannelCapabilityGet.decode_params(<<0x01, 0x10, 0x05, 0x00::16>>)
+        NetworkManagementMultiChannelCapabilityGet.decode_params(
+          nil,
+          <<0x01, 0x10, 0x05, 0x00::16>>
+        )
 
       for {param, value} <- expected_params do
         assert params[param] == value
@@ -57,7 +60,10 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityGetTest 
       expected_params = [seq_number: 0x01, node_id: 0x1010, end_point: 0x05]
 
       {:ok, params} =
-        NetworkManagementMultiChannelCapabilityGet.decode_params(<<0x01, 0xFF, 0x05, 0x10, 0x10>>)
+        NetworkManagementMultiChannelCapabilityGet.decode_params(
+          nil,
+          <<0x01, 0xFF, 0x05, 0x10, 0x10>>
+        )
 
       for {param, value} <- expected_params do
         assert params[param] == value

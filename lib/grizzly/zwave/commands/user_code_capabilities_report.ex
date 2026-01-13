@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
-  alias Grizzly.ZWave.DecodeError
 
   @type ascii_char :: 0..127
 
@@ -37,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
           | {:supported_keypad_keys, [ascii_char()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     mc = Command.param(command, :admin_code_supported?, false) |> bool_to_bit()
     mcd = Command.param(command, :admin_code_deactivation_supported?, false) |> bool_to_bit()
     ucc = Command.param(command, :user_code_checksum_supported?, false) |> bool_to_bit()
@@ -68,8 +66,8 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<mc_support::1, mcd_support::1, _reserved::1, user_id_status_len::5,
           supported_user_id_statuses::binary-size(user_id_status_len), ucc_support::1,
           mucr_support::1, mucs_support::1, keypad_modes_len::5,

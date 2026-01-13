@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequestStatus do
           {:seq_number, Grizzly.seq_number()}
           | {:status, NetworkManagementBasicNode.network_update_request_status()}
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
 
     status_byte =
@@ -33,8 +32,7 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequestStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, status_byte>>) do
+  def decode_params(_spec, <<seq_number, status_byte>>) do
     with {:ok, status} <-
            NetworkManagementBasicNode.network_update_request_status_from_byte(status_byte) do
       {:ok, [seq_number: seq_number, status: status]}

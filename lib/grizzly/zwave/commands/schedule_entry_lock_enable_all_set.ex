@@ -15,14 +15,14 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSet do
   @type param :: {:enabled, boolean()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     enabled = Command.param!(command, :enabled)
     status = status_to_byte(enabled)
     <<status>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<enabled>>) do
+  def decode_params(_spec, <<enabled>>) do
     {:ok, [enabled: byte_to_status(enabled)]}
   end
 

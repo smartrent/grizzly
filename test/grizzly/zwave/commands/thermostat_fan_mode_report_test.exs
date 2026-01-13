@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatFanModeReportTest do
     params = [mode: :auto_high]
     {:ok, command} = Commands.create(:thermostat_fan_mode_report, params)
     expected_binary = <<0x00::4, 0x02::4>>
-    assert expected_binary == ThermostatFanModeReport.encode_params(command)
+    assert expected_binary == ThermostatFanModeReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00::4, 0x03::4>>
-    {:ok, params} = ThermostatFanModeReport.decode_params(binary_params)
+    {:ok, params} = ThermostatFanModeReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :mode) == :high
   end
 end

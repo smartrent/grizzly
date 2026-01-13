@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
   alias Grizzly.ZWave.Security
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     csa = Command.param!(command, :csa)
     accepted = Command.param!(command, :accept)
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, _::6, csa::1, accepted::1, granted_keys>>) do
+  def decode_params(_spec, <<seq_number, _::6, csa::1, accepted::1, granted_keys>>) do
     {:ok,
      [
        seq_number: seq_number,

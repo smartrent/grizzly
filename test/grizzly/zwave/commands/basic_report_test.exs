@@ -18,28 +18,28 @@ defmodule Grizzly.ZWave.Commands.BasicReportTest do
     params = [value: :on]
     {:ok, command} = Commands.create(:basic_report, params)
     expected_binary = <<0xFF>>
-    assert expected_binary == BasicReport.encode_params(command)
+    assert expected_binary == BasicReport.encode_params(nil, command)
   end
 
   test "encodes v2 params correctly" do
     params = [value: :on, target_value: :off, duration: 10]
     {:ok, command} = Commands.create(:basic_report, params)
     expected_binary = <<0xFF, 0x00, 0x0A>>
-    assert expected_binary == BasicReport.encode_params(command)
+    assert expected_binary == BasicReport.encode_params(nil, command)
   end
 
   test "decodes v1 params correctly" do
     binary_params = <<0xFF>>
-    {:ok, params} = BasicReport.decode_params(binary_params)
+    {:ok, params} = BasicReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :value) == :on
     binary_params = <<0x63>>
-    {:ok, params} = BasicReport.decode_params(binary_params)
+    {:ok, params} = BasicReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :value) == :on
   end
 
   test "decodes v2 params correctly" do
     binary_params = <<0xFE, 0x00, 0x81>>
-    {:ok, params} = BasicReport.decode_params(binary_params)
+    {:ok, params} = BasicReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :value) == :unknown
     assert Keyword.get(params, :target_value) == :off
     assert Keyword.get(params, :duration) == 120

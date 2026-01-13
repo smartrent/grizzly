@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSetTest do
     expected_binary =
       <<0x01, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
-    assert expected_binary == NodeProvisioningSet.encode_params(command)
+    assert expected_binary == NodeProvisioningSet.encode_params(nil, command)
 
     params = [
       seq_number: 0x01,
@@ -37,14 +37,17 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningSetTest do
     ]
 
     assert {:ok, params} ==
-             NodeProvisioningSet.decode_params(NodeProvisioningSet.encode_params(command))
+             NodeProvisioningSet.decode_params(
+               nil,
+               NodeProvisioningSet.encode_params(nil, command)
+             )
   end
 
   test "decodes params correctly" do
     binary_params =
       <<0x01, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
-    {:ok, params} = NodeProvisioningSet.decode_params(binary_params)
+    {:ok, params} = NodeProvisioningSet.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 1
     assert Keyword.get(params, :dsk) == DSK.to_string(Utils.mkdsk())
     assert Keyword.get(params, :meta_extensions) == []

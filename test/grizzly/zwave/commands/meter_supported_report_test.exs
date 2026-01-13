@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
 
     {:ok, command} = Commands.create(:meter_supported_report, params)
     expected_binary = <<1::1, 0::2, 1::5, 0::4, 7::4>>
-    assert expected_binary == MeterSupportedReport.encode_params(command)
+    assert expected_binary == MeterSupportedReport.encode_params(nil, command)
   end
 
   test "encodes v5 params correctly" do
@@ -37,12 +37,12 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
 
     {:ok, command} = Commands.create(:meter_supported_report, params)
     expected_binary = <<1::1, 3::2, 1::5, 1::1, 7::7, 1, 3>>
-    assert expected_binary == MeterSupportedReport.encode_params(command)
+    assert expected_binary == MeterSupportedReport.encode_params(nil, command)
   end
 
   test "decodes v2 params correctly" do
     binary_params = <<1::1, 0::2, 1::5, 0::4, 7::4>>
-    {:ok, params} = MeterSupportedReport.decode_params(binary_params)
+    {:ok, params} = MeterSupportedReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :meter_type) == :electric
     supported_scales = Keyword.get(params, :supported_scales)
     assert Enum.sort(supported_scales) == [:kvah, :kwh, :w]
@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.Commands.MeterSupportedReportTest do
 
   test "decodes v5 params correctly" do
     binary_params = <<1::1, 3::2, 1::5, 1::1, 7::7, 1, 3>>
-    {:ok, params} = MeterSupportedReport.decode_params(binary_params)
+    {:ok, params} = MeterSupportedReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :meter_type) == :electric
     supported_scales = Keyword.get(params, :supported_scales)
     assert Enum.sort(supported_scales) == [:kvah, :kvar, :kvarh, :kwh, :w]

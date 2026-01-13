@@ -31,12 +31,12 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockWeekDayReportTest do
 
     {:ok, command} = Commands.create(:schedule_entry_lock_week_day_report, params)
     expected_binary = <<20, 5, 0, 2, 42, 2, 42>>
-    assert expected_binary == ScheduleEntryLockWeekDayReport.encode_params(command)
+    assert expected_binary == ScheduleEntryLockWeekDayReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<20, 5, 0, 2, 42, 2, 42>>
-    {:ok, expected_params} = ScheduleEntryLockWeekDayReport.decode_params(binary_params)
+    {:ok, expected_params} = ScheduleEntryLockWeekDayReport.decode_params(nil, binary_params)
     assert Keyword.get(expected_params, :user_identifier) == 20
     assert Keyword.get(expected_params, :schedule_slot_id) == 5
     assert Keyword.get(expected_params, :day_of_week) == 0

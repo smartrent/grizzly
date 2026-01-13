@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.UserReportTest do
 
     assert {:ok, command} = Commands.create(:user_report, params)
 
-    assert UserReport.encode_params(command) == <<
+    assert UserReport.encode_params(nil, command) == <<
              0,
              2::16,
              2,
@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.Commands.UserReportTest do
 
     assert {:ok, command} = Commands.create(:user_report, params)
 
-    assert UserReport.encode_params(command) == <<
+    assert UserReport.encode_params(nil, command) == <<
              4,
              4096::16,
              1,
@@ -84,7 +84,7 @@ defmodule Grizzly.ZWave.Commands.UserReportTest do
       "test_user"
     >>
 
-    assert {:ok, params} = UserReport.decode_params(binary)
+    assert {:ok, params} = UserReport.decode_params(nil, binary)
 
     assert params[:report_type] == :added
     assert params[:next_user_id] == 2
@@ -113,7 +113,7 @@ defmodule Grizzly.ZWave.Commands.UserReportTest do
       "test_user"::utf16
     >>
 
-    assert {:ok, params} = UserReport.decode_params(binary)
+    assert {:ok, params} = UserReport.decode_params(nil, binary)
 
     assert params[:report_type] == :response_to_get
     assert params[:next_user_id] == 4096

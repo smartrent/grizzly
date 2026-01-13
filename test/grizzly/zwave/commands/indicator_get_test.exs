@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.IndicatorGetTest do
     params = [indicator_id: :armed]
     {:ok, command} = Commands.create(:indicator_get, params)
     expected_params_binary = <<0x01>>
-    assert expected_params_binary == IndicatorGet.encode_params(command)
+    assert expected_params_binary == IndicatorGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x02>>
-    {:ok, params} = IndicatorGet.decode_params(params_binary)
+    {:ok, params} = IndicatorGet.decode_params(nil, params_binary)
     assert Keyword.get(params, :indicator_id) == :disarmed
   end
 end

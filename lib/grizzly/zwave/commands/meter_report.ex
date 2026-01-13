@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
           | {:previous_value, number() | :unknown}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     if Command.has_param?(command, :rate_type) || Command.has_param?(command, :delta_time) do
       do_encode_params(:v5, command)
     else
@@ -102,9 +102,10 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+
   # v1
   def decode_params(
+        _spec,
         <<0::3, meter_type_byte::5, precision::3, scale_byte::2, size::3,
           int_value::size(size)-unit(8)>>
       ) do
@@ -129,6 +130,7 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
 
   # v2-v5
   def decode_params(
+        _spec,
         <<scale1_msb::1, rate_type_bin::2, meter_type_bin::5, precision::3, scale1_rest::2,
           size::3, int_value::size(size)-unit(8), delta_time::16, rest::binary>>
       ) do

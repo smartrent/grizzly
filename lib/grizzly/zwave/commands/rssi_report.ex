@@ -16,7 +16,6 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance
-  alias Grizzly.ZWave.DecodeError
 
   @type param() ::
           {:channels, [NetworkManagementInstallationMaintenance.rssi()]}
@@ -24,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
           | {:long_range_secondary_channel, NetworkManagementInstallationMaintenance.rssi()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     channels = Command.param!(command, :channels)
 
     channels_bin =
@@ -55,12 +53,11 @@ defmodule Grizzly.ZWave.Commands.RssiReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<channels::binary-size(3)>>) do
+  def decode_params(_spec, <<channels::binary-size(3)>>) do
     {:ok, [channels: parse_channels(channels)]}
   end
 
-  def decode_params(<<channels_bin::binary-size(3), lr_primary, lr_secondary>>) do
+  def decode_params(_spec, <<channels_bin::binary-size(3), lr_primary, lr_secondary>>) do
     channels = parse_channels(channels_bin)
 
     parsed_lr_primary = NetworkManagementInstallationMaintenance.rssi_from_byte(lr_primary)

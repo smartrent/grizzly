@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.TimeReport do
           {:hour, 0..23} | {:minute, 0..59} | {:second, 0..59}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     rtc_failure? = Command.param(command, :rtc_failure?, false)
     hour = Command.param!(command, :hour)
     minute = Command.param!(command, :minute)
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.TimeReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<rtc_failure_bit::1, 0x00::2, hour::5, minute, second>>) do
+  def decode_params(_spec, <<rtc_failure_bit::1, 0x00::2, hour::5, minute, second>>) do
     rtc_failure? = rtc_failure_bit == 1
     {:ok, [rtc_failure?: rtc_failure?, hour: hour, minute: minute, second: second]}
   end

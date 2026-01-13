@@ -15,16 +15,14 @@ defmodule Grizzly.ZWave.Commands.UserCodeKeypadModeSetReport do
   @type param :: {:mode, UserCode.keypad_mode()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     mode = Command.param!(command, :mode)
 
     <<UserCode.keypad_mode_to_byte(mode)>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<mode::8>>) do
+  def decode_params(_spec, <<mode::8>>) do
     {:ok, [mode: UserCode.keypad_mode_from_byte(mode)]}
   end
 end

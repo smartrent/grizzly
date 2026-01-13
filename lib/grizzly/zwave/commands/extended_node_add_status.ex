@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
           | {:kex_fail_type, Security.key_exchange_fail_type()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     node_id = Command.param!(command, :node_id)
     status = Command.param!(command, :status)
     seq_number = Command.param!(command, :seq_number)
@@ -78,7 +78,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, status_byte, node_id::16, node_info_bin::binary>>) do
+  def decode_params(_spec, <<seq_number, status_byte, node_id::16, node_info_bin::binary>>) do
     node_info = NetworkManagementInclusion.parse_node_info(node_info_bin)
 
     params =
@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatus do
     {:ok, params}
   end
 
-  def decode_params(<<seq_number, status_byte, node_id::16, 0x01>>) do
+  def decode_params(_spec, <<seq_number, status_byte, node_id::16, 0x01>>) do
     {:ok,
      [
        status: NetworkManagementInclusion.parse_node_add_status(status_byte),

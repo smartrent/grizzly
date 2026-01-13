@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         specific_device_class: :static_installer_tool
       ]
 
-      {:ok, params} = NodeAddStatus.decode_params(report)
+      {:ok, params} = NodeAddStatus.decode_params(nil, report)
 
       for {param_name, value} <- expected_params do
         assert params[param_name] == value
@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
       ]
 
-      {:ok, params} = NodeAddStatus.decode_params(report)
+      {:ok, params} = NodeAddStatus.decode_params(nil, report)
 
       for {param_name, value} <- expected_params do
         assert params[param_name] == value
@@ -96,7 +96,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         input_dsk: expected_dsk
       ]
 
-      {:ok, params} = NodeAddStatus.decode_params(report)
+      {:ok, params} = NodeAddStatus.decode_params(nil, report)
 
       for {param_name, value} <- expected_params do
         assert params[param_name] == value
@@ -146,7 +146,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatusTest do
         command_classes: expected_command_classes
       ]
 
-      {:ok, params} = NodeAddStatus.decode_params(report)
+      {:ok, params} = NodeAddStatus.decode_params(nil, report)
 
       for {param_name, value} <- expected_params do
         assert params[param_name] == value

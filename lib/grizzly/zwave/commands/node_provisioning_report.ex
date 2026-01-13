@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReport do
           | {:meta_extensions, [MetaExtension.extension()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     dsk_binary = NodeProvisioning.optional_dsk_to_binary(Command.param!(command, :dsk))
     dsk_byte_size = byte_size(dsk_binary)
@@ -37,6 +36,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<seq_number, _::3, dsk_byte_size::5, dsk_binary::binary-size(dsk_byte_size)-unit(8),
           meta_extensions_binary::binary>>
       ) do

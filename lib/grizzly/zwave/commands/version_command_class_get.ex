@@ -17,14 +17,13 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassGet do
   @type param :: {:command_class, atom}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     cc = Command.param!(command, :command_class)
     <<CommandClasses.to_byte(cc)>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<cc_byte>>) do
+  def decode_params(_spec, <<cc_byte>>) do
     case CommandClasses.from_byte(cc_byte) do
       {:ok, cc} ->
         {:ok, command_class: cc}

@@ -32,14 +32,14 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReportTest do
     expected_params_binary =
       <<0x00::16, 0x03, 0x01, 0x00::1, 0x01::1, 0x00::3, 0x02::3, 0x01::16, 0x02::16, 0x03::16>>
 
-    assert expected_params_binary == ConfigurationBulkReport.encode_params(command)
+    assert expected_params_binary == ConfigurationBulkReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary =
       <<0x00::16, 0x03, 0x01, 0x00::1, 0x01::1, 0x00::3, 0x02::3, 0x01::16, 0x02::16, 0x03::16>>
 
-    {:ok, params} = ConfigurationBulkReport.decode_params(params_binary)
+    {:ok, params} = ConfigurationBulkReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :reports_to_follow) == 1
     assert Keyword.get(params, :default) == false
     assert Keyword.get(params, :handshake) == true

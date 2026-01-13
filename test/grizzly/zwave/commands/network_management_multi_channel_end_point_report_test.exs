@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
           individual_end_points: 10
         )
 
-      assert NetworkManagementMultiChannelEndPointReport.encode_params(command) ==
+      assert NetworkManagementMultiChannelEndPointReport.encode_params(nil, command) ==
                <<0x01, 0x01, 0x00, 0x0A, 0x00, 0x01::16>>
     end
 
@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
           individual_end_points: 10
         )
 
-      assert NetworkManagementMultiChannelEndPointReport.encode_params(command) ==
+      assert NetworkManagementMultiChannelEndPointReport.encode_params(nil, command) ==
                <<0x01, 0xFF, 0x00, 0x0A, 0x00, 0x01, 0x10>>
     end
 
@@ -52,7 +52,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
           aggregated_end_points: 15
         )
 
-      assert NetworkManagementMultiChannelEndPointReport.encode_params(command) ==
+      assert NetworkManagementMultiChannelEndPointReport.encode_params(nil, command) ==
                <<0x01, 0xFF, 0x00, 0x0A, 0x0F, 0x01, 0x10>>
     end
   end
@@ -68,6 +68,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
       {:ok, params} =
         NetworkManagementMultiChannelEndPointReport.decode_params(
+          nil,
           <<0x01, 0x04, 0x00, 0x64, 0x0A>>
         )
 
@@ -86,6 +87,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
       {:ok, params} =
         NetworkManagementMultiChannelEndPointReport.decode_params(
+          nil,
           <<0x01, 0x10, 0x00, 0x64, 0x0A, 0x10::16>>
         )
 
@@ -104,6 +106,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointReportTest
 
       {:ok, params} =
         NetworkManagementMultiChannelEndPointReport.decode_params(
+          nil,
           <<0x01, 0xFF, 0x00, 0x64, 0x0A, 0x10, 0x10>>
         )
 

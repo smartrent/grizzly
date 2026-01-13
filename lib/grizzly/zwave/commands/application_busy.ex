@@ -24,16 +24,14 @@ defmodule Grizzly.ZWave.Commands.ApplicationBusy do
   @type param :: {:status, ApplicationStatus.status()} | {:wait_time, :byte}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     status_byte = Command.param!(command, :status) |> ApplicationStatus.status_to_byte()
     wait_time = Command.param!(command, :wait_time)
     <<status_byte, wait_time>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<status_byte, wait_time>>) do
+  def decode_params(_spec, <<status_byte, wait_time>>) do
     with {:ok, status} <- ApplicationStatus.status_from_byte(status_byte) do
       {:ok, [status: status, wait_time: wait_time]}
     else

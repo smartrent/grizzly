@@ -24,7 +24,6 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:credential_checksum_supported?, boolean()}
@@ -37,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesReport do
              }}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     credential_checksum_supported? = Command.param!(command, :credential_checksum_supported?)
     admin_code_supported? = Command.param!(command, :admin_code_supported?)
 
@@ -76,8 +74,8 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<credential_checksum_supported?::1, admin_code_supported?::1,
           admin_code_deactivation_supported?::1, _reserved::5, num_credential_types,
           credential_type_bytes::binary-size(num_credential_types),

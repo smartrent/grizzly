@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.CredentialGetTest do
 
     assert {:ok, command} = Commands.create(:credential_get, params)
 
-    assert CredentialGet.encode_params(command) == <<
+    assert CredentialGet.encode_params(nil, command) == <<
              1::16,
              0x06,
              2::16
@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.CredentialGetTest do
       2::16
     >>
 
-    assert {:ok, params} = CredentialGet.decode_params(binary)
+    assert {:ok, params} = CredentialGet.decode_params(nil, binary)
     assert params[:user_id] == 1
     assert params[:credential_type] == :uwb
     assert params[:credential_slot] == 2

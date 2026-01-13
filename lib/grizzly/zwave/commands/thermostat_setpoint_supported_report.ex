@@ -14,13 +14,11 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:setpoint_types, [{ThermostatSetpoint.type(), boolean()}]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     setpoint_types = Command.param!(command, :setpoint_types)
 
     setpoint_types
@@ -29,11 +27,10 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<first_bitmask>>),
-    do: decode_params(<<first_bitmask, 0x0>>)
+  def decode_params(spec, <<first_bitmask>>),
+    do: decode_params(spec, <<first_bitmask, 0x0>>)
 
-  def decode_params(binary) do
+  def decode_params(_spec, binary) do
     setpoint_types =
       binary
       |> decode_bitmask()

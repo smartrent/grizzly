@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReport do
           | {:aggregated_endpoints, byte}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     dynamic_bit = if Command.param!(command, :dynamic), do: 0x01, else: 0x00
     identical_bit = if Command.param!(command, :identical), do: 0x01, else: 0x00
     endpoints = Command.param!(command, :endpoints)
@@ -40,6 +40,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReport do
   @impl Grizzly.ZWave.Command
   # v4
   def decode_params(
+        _spec,
         <<dynamic_bit::1, identical_bit::1, 0x00::6, 0x00::1, endpoints::7, 0x00::1,
           aggregated_endpoints::7>>
       ) do
@@ -55,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointReport do
      ]}
   end
 
-  def decode_params(<<dynamic_bit::1, identical_bit::1, 0x00::6, 0x00::1, endpoints::7>>) do
+  def decode_params(_spec, <<dynamic_bit::1, identical_bit::1, 0x00::6, 0x00::1, endpoints::7>>) do
     dynamic? = dynamic_bit == 0x01
     identical? = identical_bit == 0x01
 

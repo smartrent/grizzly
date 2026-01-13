@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   @type param() :: {:node_id, char()} | {:seq_number, ZWave.seq_number()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
 
@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemove do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, node_id::binary>>) do
+  def decode_params(_spec, <<seq_number, node_id::binary>>) do
     {:ok,
      [
        seq_number: seq_number,

@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   @type param :: {:mode, mode()} | {:tx_opt, tx_opt()} | {:seq_number, Grizzly.seq_number()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     mode = Command.param(command, :mode, :node_add_s2_any)
     tx_opt = Command.param(command, :tx_opt, :explore)
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, _reserved, mode_byte, tx_opt_byte>>) do
+  def decode_params(_spec, <<seq_number, _reserved, mode_byte, tx_opt_byte>>) do
     with {:ok, mode} <- decode_mode(mode_byte),
          {:ok, tx_opt} <- NMI.tx_opt_from_byte(tx_opt_byte) do
       {:ok, [mode: mode, seq_number: seq_number, tx_opt: tx_opt]}

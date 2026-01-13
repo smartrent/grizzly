@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
           {:groups_info, [group_info()]} | {:dynamic, boolean() | {:list_mode, boolean()}}
 
   @impl Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     list_mode = get_list_mode(command)
     dynamic? = Command.param!(command, :dynamic)
     dynamic_bit = if dynamic?, do: 0x01, else: 0x00
@@ -43,7 +43,10 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupInfoReport do
   end
 
   @impl Command
-  def decode_params(<<list_mode::1, dynamic_bit::1, group_count::6, encoded_groups_info::binary>>) do
+  def decode_params(
+        _spec,
+        <<list_mode::1, dynamic_bit::1, group_count::6, encoded_groups_info::binary>>
+      ) do
     dynamic? = dynamic_bit == 0x01
     list_mode? = list_mode == 0x01
 

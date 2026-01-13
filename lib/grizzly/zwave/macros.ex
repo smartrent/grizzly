@@ -45,11 +45,10 @@ defmodule Grizzly.ZWave.Macros do
     do_command(__CALLER__, name, byte, mod, opts)
   end
 
-  defmacro param(name, type, size, opts \\ []) do
+  defmacro param(name, type, opts \\ []) do
     quote bind_quoted: [
             name: name,
             type: type,
-            size: size,
             opts: opts
           ] do
       {name,
@@ -57,8 +56,7 @@ defmodule Grizzly.ZWave.Macros do
          Grizzly.ZWave.CommandSpec.Param,
          Keyword.merge(opts,
            name: name,
-           type: type,
-           size: size
+           type: type
          )
        )}
     end

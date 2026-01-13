@@ -26,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
           | {:input_dsk, DSK.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     accept = Command.param!(command, :accept)
     input_dsk_length = Command.param!(command, :input_dsk_length)
@@ -39,8 +38,8 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
+        _spec,
         <<seq_number, accept::1, _::3, input_dsk_length::4,
           input_dsk::binary-size(input_dsk_length)-unit(8)>>
       ) do

@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassGetTest do
     params = [command_class: :basic]
     {:ok, command} = Commands.create(:version_command_class_get, params)
     expected_params_binary = <<0x20>>
-    assert expected_params_binary == VersionCommandClassGet.encode_params(command)
+    assert expected_params_binary == VersionCommandClassGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x20>>
-    {:ok, params} = VersionCommandClassGet.decode_params(params_binary)
+    {:ok, params} = VersionCommandClassGet.decode_params(nil, params_binary)
     assert Keyword.get(params, :command_class) == :basic
   end
 end

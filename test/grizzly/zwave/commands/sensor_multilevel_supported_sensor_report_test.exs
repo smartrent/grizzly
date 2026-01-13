@@ -27,12 +27,12 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelSupportedSensorReportTest do
     expected_binary = <<17, 0, 64, 2, 0, 0, 0, 0, 0, 0, 128>>
 
     assert expected_binary ==
-             SensorMultilevelSupportedSensorReport.encode_params(command)
+             SensorMultilevelSupportedSensorReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<17, 0, 64, 2, 0, 0, 0, 0, 0, 0, 128>>
-    {:ok, params} = SensorMultilevelSupportedSensorReport.decode_params(binary_params)
+    {:ok, params} = SensorMultilevelSupportedSensorReport.decode_params(nil, binary_params)
 
     sensor_types = Keyword.get(params, :sensor_types)
 

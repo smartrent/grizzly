@@ -18,7 +18,7 @@ defmodule Grizzly.ZWave.Commands.MeterResetTest do
     params = []
     {:ok, command} = Commands.create(:meter_reset, params)
     expected_binary = <<>>
-    assert expected_binary == MeterReset.encode_params(command)
+    assert expected_binary == MeterReset.encode_params(nil, command)
   end
 
   test "encodes v6 params correctly" do
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.MeterResetTest do
 
     {:ok, command} = Commands.create(:meter_reset, params)
     expected_binary = <<0::1, 2::2, 1::5, 2::3, 2::2, 1::3, 0x7D, 0>>
-    assert expected_binary == MeterReset.encode_params(command)
+    assert expected_binary == MeterReset.encode_params(nil, command)
 
     params = [
       meter_type: :electric,
@@ -42,25 +42,25 @@ defmodule Grizzly.ZWave.Commands.MeterResetTest do
 
     {:ok, command} = Commands.create(:meter_reset, params)
     expected_binary = <<1::1, 2::2, 1::5, 2::3, 3::2, 1::3, 0x7D, 1>>
-    assert expected_binary == MeterReset.encode_params(command)
+    assert expected_binary == MeterReset.encode_params(nil, command)
   end
 
   test "decodes v2 params correctly" do
     binary_params = <<>>
-    {:ok, params} = MeterReset.decode_params(binary_params)
+    {:ok, params} = MeterReset.decode_params(nil, binary_params)
     assert params == []
   end
 
   test "decodes v6 params correctly" do
     binary_params = <<0::1, 2::2, 1::5, 2::3, 2::2, 1::3, 0x7D, 0>>
-    {:ok, params} = MeterReset.decode_params(binary_params)
+    {:ok, params} = MeterReset.decode_params(nil, binary_params)
     assert params[:meter_type] == :electric
     assert params[:scale] == :w
     assert params[:rate_type] == :export
     assert params[:value] == 1.25
 
     binary_params = <<1::1, 2::2, 1::5, 2::3, 3::2, 1::3, 0x7D, 1>>
-    {:ok, params} = MeterReset.decode_params(binary_params)
+    {:ok, params} = MeterReset.decode_params(nil, binary_params)
     assert params[:meter_type] == :electric
     assert params[:scale] == :kvarh
     assert params[:rate_type] == :export
