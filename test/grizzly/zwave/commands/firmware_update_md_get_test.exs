@@ -23,12 +23,12 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDGetTest do
     expected_params_binary =
       <<number_of_reports, 0x00::1, report_number::15>>
 
-    assert expected_params_binary == FirmwareUpdateMDGet.encode_params(command)
+    assert expected_params_binary == FirmwareUpdateMDGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<2, 0x00::1, 10::15>>
-    {:ok, params} = FirmwareUpdateMDGet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateMDGet.decode_params(nil, params_binary)
     assert Keyword.get(params, :number_of_reports) == 2
     assert Keyword.get(params, :report_number) == 10
   end

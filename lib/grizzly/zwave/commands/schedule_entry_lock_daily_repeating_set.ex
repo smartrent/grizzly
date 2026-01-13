@@ -38,8 +38,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingSet do
           | {:duration_minute, 0..59}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     set_action = Command.param!(command, :set_action)
     user_identifier = Command.param!(command, :user_identifier)
     schedule_slot_id = Command.param!(command, :schedule_slot_id)
@@ -58,6 +57,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingSet do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<action_byte, user_identifier, schedule_slot_id, week_day_bitmask, start_hour,
           start_minute, duration_hour, duration_minute>>
       ) do

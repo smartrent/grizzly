@@ -43,12 +43,12 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDaySetTest do
 
     {:ok, command} = Commands.create(:schedule_entry_lock_year_day_set, params)
     expected_binary = <<0, 20, 5, 97, 10, 7, 2, 42, 99, 12, 31, 2, 42>>
-    assert expected_binary == ScheduleEntryLockYearDaySet.encode_params(command)
+    assert expected_binary == ScheduleEntryLockYearDaySet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0, 20, 5, 97, 10, 7, 2, 42, 99, 12, 31, 2, 42>>
-    {:ok, expected_params} = ScheduleEntryLockYearDaySet.decode_params(binary_params)
+    {:ok, expected_params} = ScheduleEntryLockYearDaySet.decode_params(nil, binary_params)
     assert Keyword.get(expected_params, :set_action) == :erase
     assert Keyword.get(expected_params, :user_identifier) == 20
     assert Keyword.get(expected_params, :schedule_slot_id) == 5

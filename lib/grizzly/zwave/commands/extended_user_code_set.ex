@@ -18,8 +18,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeSet do
   @type param :: {:user_codes, [UserCode.extended_user_code()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     user_codes = Command.param!(command, :user_codes)
 
     for code <- user_codes, into: <<length(user_codes)::8>> do
@@ -28,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<_user_codes_count::8, user_codes::binary>>) do
+  def decode_params(_spec, <<_user_codes_count::8, user_codes::binary>>) do
     {codes, _rest} = UserCode.decode_extended_user_codes(user_codes)
 
     {:ok,

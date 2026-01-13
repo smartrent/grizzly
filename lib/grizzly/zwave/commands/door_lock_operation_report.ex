@@ -90,8 +90,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
           | {:duration, :unknown | non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     mode = Command.param!(command, :mode)
     outside_door_handles = Command.param!(command, :outside_handles_mode)
     inside_door_handles = Command.param!(command, :inside_handles_mode)
@@ -124,8 +123,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<mode_byte, outside_handles_int::4, inside_handles_int::4, door_condition_byte,
           timeout_minutes, timeout_seconds>>
       ) do
@@ -156,10 +155,12 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   end
 
   # This is to support a lock that erroneously omits the timeout_seconds field.
-  def decode_params(bin) when byte_size(bin) == 4, do: decode_params(<<bin::binary, 0>>)
+  def decode_params(spec, bin) when byte_size(bin) == 4,
+    do: decode_params(spec, <<bin::binary, 0>>)
 
   # Version 4
   def decode_params(
+        _spec,
         <<mode_byte, outside_handles_int::4, inside_handles_int::4, door_condition_byte,
           timeout_minutes, timeout_seconds, target_mode_byte, duration_byte,
           invalid_extra::binary>> = binary

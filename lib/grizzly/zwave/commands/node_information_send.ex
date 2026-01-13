@@ -24,8 +24,7 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
           | {:tx_options, [tx_opt()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     destination_node_id = Command.param!(command, :destination_node_id)
     tx_options = Command.param(command, :tx_options, []) |> encode_tx_options()
@@ -34,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<seq_number::8, _reserved::8, destination_node_id::8, tx_options::8>>) do
+  def decode_params(_spec, <<seq_number::8, _reserved::8, destination_node_id::8, tx_options::8>>) do
     {:ok,
      [
        seq_number: seq_number,

@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.NodeNameSet do
   @type param :: {:name, String.t()} | {:encoding, :ascii | :extended_ascii | :utf_16}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     encoding = Command.param!(command, :encoding)
     name = Command.param!(command, :name)
     encoding_byte = encode_string_encoding(encoding)
@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.NodeNameSet do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<_reserved::5, encoding_byte::3, name::binary>>) do
+  def decode_params(_spec, <<_reserved::5, encoding_byte::3, name::binary>>) do
     {:ok, [encoding: decode_string_encoding(encoding_byte), name: name]}
   end
 end

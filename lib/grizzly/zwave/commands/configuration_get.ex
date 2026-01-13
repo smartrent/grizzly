@@ -15,13 +15,13 @@ defmodule Grizzly.ZWave.Commands.ConfigurationGet do
   @type param :: {:param_number, byte}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     param_number = Command.param!(command, :param_number)
     <<param_number>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<param_number>>) do
+  def decode_params(_spec, <<param_number>>) do
     {:ok, [param_number: param_number]}
   end
 end

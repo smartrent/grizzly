@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
     expected_binary =
       <<0x01, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
-    assert expected_binary == NodeProvisioningReport.encode_params(command)
+    assert expected_binary == NodeProvisioningReport.encode_params(nil, command)
   end
 
   test "encodes params correctly with no DSK" do
@@ -41,14 +41,14 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
 
     expected_binary = <<0x01, 0x00>>
 
-    assert expected_binary == NodeProvisioningReport.encode_params(command)
+    assert expected_binary == NodeProvisioningReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params =
       <<0x01, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14, 39>>
 
-    {:ok, params} = NodeProvisioningReport.decode_params(binary_params)
+    {:ok, params} = NodeProvisioningReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 1
     assert Keyword.get(params, :dsk) == Utils.mkdsk()
     assert Keyword.get(params, :meta_extensions) == []
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningReportTest do
   test "decodes params correctly with empty dsk" do
     binary_params = <<0x01, 0x00>>
 
-    {:ok, params} = NodeProvisioningReport.decode_params(binary_params)
+    {:ok, params} = NodeProvisioningReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 1
     assert Keyword.get(params, :dsk) == DSK.zeros()
     assert Keyword.get(params, :meta_extensions) == []

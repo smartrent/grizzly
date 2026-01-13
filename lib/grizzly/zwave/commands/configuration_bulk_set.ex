@@ -30,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSet do
           | {:values, [integer]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     default? = Command.param(command, :default, false)
     default_bit = if default?, do: 1, else: 0
     handshake? = Command.param(command, :handshake, false)
@@ -47,6 +46,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSet do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<offset::16, _count, default_bit::1, handshake_bit::1, _reserved::3, size::3,
           values_bin::binary>>
       ) do

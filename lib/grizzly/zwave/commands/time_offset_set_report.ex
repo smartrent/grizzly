@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetSetReport do
           | {:hour_end_dst, 0..59}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     sign_tzo = Command.param!(command, :sign_tzo)
     hour_tzo = Command.param!(command, :hour_tzo)
     minute_tzo = Command.param!(command, :minute_tzo)
@@ -70,6 +70,7 @@ defmodule Grizzly.ZWave.Commands.TimeOffsetSetReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<sign_tzo_bit::1, hour_tzo::7, minute_tzo, sign_offset_dst_bit::1, minute_offset_dst::7,
           month_start_dst, day_start_dst, hour_start_dst, month_end_dst, day_end_dst,
           hour_end_dst>>

@@ -28,17 +28,17 @@ defmodule Grizzly.ZWave.Commands.SwitchBinaryReportTest do
       params = [current_value: :on, target_value: :off, duration: 10]
       {:ok, command} = Commands.create(:switch_binary_report, params)
       expected_binary = <<0xFF, 0x00, 0x0A>>
-      assert expected_binary == SwitchBinaryReport.encode_params(command)
+      assert expected_binary == SwitchBinaryReport.encode_params(nil, command)
 
       params = [current_value: :on, target_value: :off, duration: :default]
       {:ok, command} = Commands.create(:switch_binary_report, params)
       expected_binary = <<0xFF, 0x00, 0xFF>>
-      assert expected_binary == SwitchBinaryReport.encode_params(command)
+      assert expected_binary == SwitchBinaryReport.encode_params(nil, command)
 
       params = [current_value: :on, target_value: :off, duration: 180]
       {:ok, command} = Commands.create(:switch_binary_report, params)
       expected_binary = <<0xFF, 0x00, 0x82>>
-      assert expected_binary == SwitchBinaryReport.encode_params(command)
+      assert expected_binary == SwitchBinaryReport.encode_params(nil, command)
     end
 
     test "decodes correctly on" do

@@ -15,15 +15,13 @@ defmodule Grizzly.ZWave.Commands.PriorityRouteGet do
   @type param :: {:node_id, byte}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     node_id = Command.param!(command, :node_id)
     <<node_id>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<node_id>>) do
+  def decode_params(_spec, <<node_id>>) do
     {:ok, [node_id: node_id]}
   end
 end

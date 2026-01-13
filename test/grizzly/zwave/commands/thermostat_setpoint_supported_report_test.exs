@@ -39,9 +39,10 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
 
     {:ok, command} = Commands.create(:thermostat_setpoint_supported_report, params)
 
-    ThermostatSetpointSupportedReport.encode_params(command)
+    ThermostatSetpointSupportedReport.encode_params(nil, command)
 
-    assert <<0b10101010, 0b00001010>> == ThermostatSetpointSupportedReport.encode_params(command)
+    assert <<0b10101010, 0b00001010>> ==
+             ThermostatSetpointSupportedReport.encode_params(nil, command)
 
     # all the even bits
     params = [
@@ -56,25 +57,26 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
 
     {:ok, command} = Commands.create(:thermostat_setpoint_supported_report, params)
 
-    ThermostatSetpointSupportedReport.encode_params(command)
+    ThermostatSetpointSupportedReport.encode_params(nil, command)
 
-    assert <<0b01010100, 0b00000101>> == ThermostatSetpointSupportedReport.encode_params(command)
+    assert <<0b01010100, 0b00000101>> ==
+             ThermostatSetpointSupportedReport.encode_params(nil, command)
 
     # just heating
     params = [setpoint_types: [:heating]]
 
     {:ok, command} = Commands.create(:thermostat_setpoint_supported_report, params)
 
-    ThermostatSetpointSupportedReport.encode_params(command)
+    ThermostatSetpointSupportedReport.encode_params(nil, command)
 
-    assert <<0b10, 0b0>> == ThermostatSetpointSupportedReport.encode_params(command)
+    assert <<0b10, 0b0>> == ThermostatSetpointSupportedReport.encode_params(nil, command)
   end
 
   describe "decodes params correctly" do
     test "two bytes of bitmasks" do
       # odd bits are set in both bitmasks
       assert {:ok, setpoint_types: setpoint_types} =
-               ThermostatSetpointSupportedReport.decode_params(<<0b10101010, 0b10101010>>)
+               ThermostatSetpointSupportedReport.decode_params(nil, <<0b10101010, 0b10101010>>)
 
       assert setpoint_types == [
                :heating,
@@ -87,7 +89,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
 
       # even bits are set in both bitmasks
       assert {:ok, setpoint_types: setpoint_types} =
-               ThermostatSetpointSupportedReport.decode_params(<<0b01010101, 0b01010101>>)
+               ThermostatSetpointSupportedReport.decode_params(nil, <<0b01010101, 0b01010101>>)
 
       assert setpoint_types == [
                :cooling,
@@ -99,7 +101,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
 
       # all bits are set
       assert {:ok, setpoint_types: setpoint_types} =
-               ThermostatSetpointSupportedReport.decode_params(<<0xFF, 0xFF>>)
+               ThermostatSetpointSupportedReport.decode_params(nil, <<0xFF, 0xFF>>)
 
       assert setpoint_types == [
                :heating,
@@ -117,14 +119,14 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
 
       # no bits are set
       assert {:ok, setpoint_types: setpoint_types} =
-               ThermostatSetpointSupportedReport.decode_params(<<0x0, 0x0>>)
+               ThermostatSetpointSupportedReport.decode_params(nil, <<0x0, 0x0>>)
 
       assert setpoint_types == []
     end
 
     test "just one byte" do
       assert {:ok, setpoint_types: setpoint_types} =
-               ThermostatSetpointSupportedReport.decode_params(<<0xFF>>)
+               ThermostatSetpointSupportedReport.decode_params(nil, <<0xFF>>)
 
       assert setpoint_types == [
                :heating,
@@ -140,7 +142,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReportTest do
     test "extra bytes" do
       # just one byte
       assert {:ok, setpoint_types: setpoint_types} =
-               ThermostatSetpointSupportedReport.decode_params(<<0x00, 0x00, 0xFF>>)
+               ThermostatSetpointSupportedReport.decode_params(nil, <<0x00, 0x00, 0xFF>>)
 
       assert setpoint_types == []
     end

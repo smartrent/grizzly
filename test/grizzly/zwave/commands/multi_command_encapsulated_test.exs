@@ -29,14 +29,14 @@ defmodule Grizzly.ZWave.Commands.MultiCommandEncapsulatedTest do
     basic_set_binary = <<0x03>> <> <<0x20, 0x01, 0xFF>>
     switch_multilevel_set_binary = <<0x04>> <> <<0x26, 0x01, 0x32, 0x0A>>
     expected_binary = <<0x02>> <> basic_set_binary <> switch_multilevel_set_binary
-    assert expected_binary == MultiCommandEncapsulated.encode_params(command)
+    assert expected_binary == MultiCommandEncapsulated.encode_params(nil, command)
   end
 
   test "decodes params correctly", %{commands: commands} do
     basic_set_binary = <<0x03>> <> <<0x20, 0x01, 0xFF>>
     switch_multilevel_set_binary = <<0x04>> <> <<0x26, 0x01, 0x32, 0x0A>>
     params_binary = <<0x02>> <> basic_set_binary <> switch_multilevel_set_binary
-    {:ok, params} = MultiCommandEncapsulated.decode_params(params_binary)
+    {:ok, params} = MultiCommandEncapsulated.decode_params(nil, params_binary)
 
     assert Enum.sort(Keyword.get(params, :commands)) == Enum.sort(commands)
   end

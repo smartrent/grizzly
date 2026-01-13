@@ -7,10 +7,10 @@ defmodule Grizzly.ZWave.Commands.S0NetworkKeySet do
   alias Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     Command.param!(command, :network_key)
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<network_key::binary>>), do: {:ok, [network_key: network_key]}
+  def decode_params(_spec, <<network_key::binary>>), do: {:ok, [network_key: network_key]}
 end

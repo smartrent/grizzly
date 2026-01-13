@@ -25,13 +25,13 @@ defmodule Grizzly.ZWave.Commands.SupervisionGetTest do
 
     expected_binary = <<0x01, 0x09, 113, 5, 25, 1, 0, 255, 6, 4, 0>>
 
-    assert expected_binary == SupervisionGet.encode_params(command)
+    assert expected_binary == SupervisionGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x01, 0x09, 113, 5, 25, 1, 0, 255, 6, 4, 0>>
 
-    {:ok, params} = SupervisionGet.decode_params(binary_params)
+    {:ok, params} = SupervisionGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :status_updates) == :one_now
     assert Keyword.get(params, :session_id) == 1
     assert Keyword.get(params, :encapsulated_command) == <<113, 5, 25, 1, 0, 255, 6, 4, 0>>

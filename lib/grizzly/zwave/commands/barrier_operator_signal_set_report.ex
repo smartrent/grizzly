@@ -14,15 +14,13 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalSetReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.BarrierOperator
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:subsystem_type, BarrierOperator.subsystem_type()}
           | {:subsystem_state, BarrierOperator.subsystem_state()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     subsystem_type = Command.param!(command, :subsystem_type)
     subsystem_type_byte = BarrierOperator.subsystem_type_to_byte(subsystem_type)
     subsystem_state = Command.param!(command, :subsystem_state)
@@ -32,8 +30,7 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalSetReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<subsystem_type_byte, subsystem_state_byte>>) do
+  def decode_params(_spec, <<subsystem_type_byte, subsystem_state_byte>>) do
     with {:ok, subsystem_type} <- BarrierOperator.subsystem_type_from_byte(subsystem_type_byte),
          {:ok, subsystem_state} <- BarrierOperator.subsystem_state_from_byte(subsystem_state_byte) do
       {:ok, [subsystem_type: subsystem_type, subsystem_state: subsystem_state]}

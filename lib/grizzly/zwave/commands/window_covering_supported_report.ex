@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReport do
   @type param :: {:parameter_names, [WindowCovering.parameter_name()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     parameter_names = Command.param!(command, :parameter_names)
 
     parameter_ids =
@@ -30,8 +29,10 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<_reserved::4, number_of_parameter_masks::4, parameter_masks::binary>>) do
+  def decode_params(
+        _spec,
+        <<_reserved::4, number_of_parameter_masks::4, parameter_masks::binary>>
+      ) do
     case bitmasks_to_parameter_names(parameter_masks, number_of_parameter_masks) do
       {:ok, parameter_names} ->
         {:ok, [parameter_names: parameter_names]}

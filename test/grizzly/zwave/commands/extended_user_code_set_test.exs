@@ -12,10 +12,8 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeSetTest do
       ]
     ]
 
-    binary =
-      Commands.create(:extended_user_code_set, params)
-      |> elem(1)
-      |> ExtendedUserCodeSet.encode_params()
+    {:ok, cmd} = Commands.create(:extended_user_code_set, params)
+    binary = ExtendedUserCodeSet.encode_params(nil, cmd)
 
     expected_binary =
       <<2::8, 36::16, 1::8, 6::8, "873227"::binary, 37::16, 2::8, 8::8, "12345678"::binary>>
@@ -27,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeSetTest do
     input =
       <<2::8, 36::16, 1::8, 6::8, "873227"::binary, 37::16, 2::8, 8::8, "12345678"::binary>>
 
-    {:ok, params} = ExtendedUserCodeSet.decode_params(input)
+    {:ok, params} = ExtendedUserCodeSet.decode_params(nil, input)
 
     assert [code1, code2] = params[:user_codes]
 

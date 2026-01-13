@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
   alias Grizzly.ZWave.NodeId
 
   @impl Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     node_id = Command.param!(command, :node_id)
     reason = Command.param!(command, :reason)
 
@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.S2ResynchronizationEvent do
   end
 
   @impl Command
-  def decode_params(<<_node_id_8, reason, _node_id_16::binary>> = params) do
+  def decode_params(_spec, <<_node_id_8, reason, _node_id_16::binary>> = params) do
     node_id = NodeId.parse(params, delimiter_size: 1)
 
     {:ok, [node_id: node_id, reason: reason]}

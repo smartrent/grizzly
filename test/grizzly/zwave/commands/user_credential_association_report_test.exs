@@ -14,14 +14,14 @@ defmodule Grizzly.ZWave.Commands.UserCredentialAssociationReportTest do
 
     {:ok, command} = Commands.create(:user_credential_association_report, params)
 
-    assert UserCredentialAssociationReport.encode_params(command) ==
+    assert UserCredentialAssociationReport.encode_params(nil, command) ==
              <<2, 1::16, 2::16, 5>>
   end
 
   test "decodes params correctly" do
     binary = <<2, 1::16, 2::16, 5>>
 
-    assert {:ok, params} = UserCredentialAssociationReport.decode_params(binary)
+    assert {:ok, params} = UserCredentialAssociationReport.decode_params(nil, binary)
 
     assert params[:credential_type] == :password
     assert params[:credential_slot] == 1

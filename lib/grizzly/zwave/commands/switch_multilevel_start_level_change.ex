@@ -15,12 +15,11 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:up_down, :up | :down} | {:duration, byte}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     up_down = encode_up_down(Command.param!(command, :up_down))
 
     case Command.param(command, :duration) do
@@ -55,35 +54,40 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<
-        # Reserved
-        _reserved::1,
-        up_down_byte::1,
-        # A controlling device SHOULD set the Ignore Start Level bit to 1.
-        0x01::1,
-        # Reserved
-        _other_reserved::5,
-        # Start level is ignored
-        _start_level
-      >>) do
+  def decode_params(
+        _spec,
+        <<
+          # Reserved
+          _reserved::1,
+          up_down_byte::1,
+          # A controlling device SHOULD set the Ignore Start Level bit to 1.
+          0x01::1,
+          # Reserved
+          _other_reserved::5,
+          # Start level is ignored
+          _start_level
+        >>
+      ) do
     {:ok, [up_down: decode_up_down(up_down_byte)]}
   end
 
   # v2
-  def decode_params(<<
-        # Reserved
-        _reserved::1,
-        up_down::1,
-        # A controlling device SHOULD set the Ignore Start Level bit to 1.
-        0x01::1,
-        # Reserved
-        _other_reserved::5,
-        # Start level is ignored
-        _start_level,
-        duration,
-        _rest::binary
-      >>) do
+  def decode_params(
+        _spec,
+        <<
+          # Reserved
+          _reserved::1,
+          up_down::1,
+          # A controlling device SHOULD set the Ignore Start Level bit to 1.
+          0x01::1,
+          # Reserved
+          _other_reserved::5,
+          # Start level is ignored
+          _start_level,
+          duration,
+          _rest::binary
+        >>
+      ) do
     {:ok, [up_down: decode_up_down(up_down), duration: duration]}
   end
 

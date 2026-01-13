@@ -46,7 +46,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       expected_params_binary =
         <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x00::1, 0b00001111, 0b00000001>>
 
-      assert expected_params_binary == CentralSceneSupportedReport.encode_params(command)
+      assert expected_params_binary == CentralSceneSupportedReport.encode_params(nil, command)
     end
 
     test "identical" do
@@ -70,7 +70,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       expected_params_binary =
         <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x01::1, 0b00001111>>
 
-      assert expected_params_binary == CentralSceneSupportedReport.encode_params(command)
+      assert expected_params_binary == CentralSceneSupportedReport.encode_params(nil, command)
     end
   end
 
@@ -79,7 +79,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       params_binary =
         <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x00::1, 0b00001111, 0b00000001>>
 
-      {:ok, params} = CentralSceneSupportedReport.decode_params(params_binary)
+      {:ok, params} = CentralSceneSupportedReport.decode_params(nil, params_binary)
       assert Keyword.get(params, :supported_scenes) == 2
       assert Keyword.get(params, :slow_refresh_support) == true
       assert Keyword.get(params, :identical) == false
@@ -101,7 +101,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
       params_binary =
         <<0x02, 0x01::1, 0x00::4, 0x01::2, 0x01::1, 0b00000001>>
 
-      {:ok, params} = CentralSceneSupportedReport.decode_params(params_binary)
+      {:ok, params} = CentralSceneSupportedReport.decode_params(nil, params_binary)
       assert Keyword.get(params, :supported_scenes) == 2
       assert Keyword.get(params, :slow_refresh_support) == true
       assert Keyword.get(params, :identical) == true
@@ -112,7 +112,7 @@ defmodule Grizzly.ZWave.Commands.CentralSceneSupportedReportTest do
     test "identical and superfluous" do
       params_binary = <<2, 3, 31, 0, 0, 0>>
 
-      {:ok, params} = CentralSceneSupportedReport.decode_params(params_binary)
+      {:ok, params} = CentralSceneSupportedReport.decode_params(nil, params_binary)
 
       assert Keyword.get(params, :supported_scenes) == 2
       assert Keyword.get(params, :slow_refresh_support) == false

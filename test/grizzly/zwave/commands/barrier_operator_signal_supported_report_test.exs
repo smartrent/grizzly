@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalSupportedReportTest do
     params = [subsystem_types: [:audible_notification, :visual_notification]]
     {:ok, command} = Commands.create(:barrier_operator_signal_supported_report, params)
     expected_binary = <<0x03>>
-    assert expected_binary == BarrierOperatorSignalSupportedReport.encode_params(command)
+    assert expected_binary == BarrierOperatorSignalSupportedReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x03>>
-    {:ok, params} = BarrierOperatorSignalSupportedReport.decode_params(binary_params)
+    {:ok, params} = BarrierOperatorSignalSupportedReport.decode_params(nil, binary_params)
     subsystem_types = Keyword.get(params, :subsystem_types, [])
     assert :audible_notification in subsystem_types
     assert :visual_notification in subsystem_types

@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     params = [level: 0x20]
     {:ok, command} = Commands.create(:battery_report, params)
     expected_binary = <<0x20>>
-    assert expected_binary == BatteryReport.encode_params(command)
+    assert expected_binary == BatteryReport.encode_params(nil, command)
   end
 
   test "encodes v2 params correctly" do
@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     expected_binary =
       <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::7, 0x00::1>>
 
-    assert expected_binary == BatteryReport.encode_params(command)
+    assert expected_binary == BatteryReport.encode_params(nil, command)
   end
 
   test "encodes v3 params correctly" do
@@ -54,29 +54,29 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     expected_binary =
       <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::6, 0x00::1, 0x00::1>>
 
-    assert expected_binary == BatteryReport.encode_params(command)
+    assert expected_binary == BatteryReport.encode_params(nil, command)
   end
 
   test "decodes v1 params correctly" do
-    {:ok, params} = BatteryReport.decode_params(<<0x20>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<0x20>>)
     assert Keyword.get(params, :level) == 0x20
 
-    {:ok, params} = BatteryReport.decode_params(<<0xFF>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<0xFF>>)
     assert Keyword.get(params, :level) == 0
 
-    {:ok, params} = BatteryReport.decode_params(<<0>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<0>>)
     assert Keyword.get(params, :level) == 0
 
-    {:ok, params} = BatteryReport.decode_params(<<1>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<1>>)
     assert Keyword.get(params, :level) == 1
 
-    {:ok, params} = BatteryReport.decode_params(<<100>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<100>>)
     assert Keyword.get(params, :level) == 100
 
-    {:ok, params} = BatteryReport.decode_params(<<101>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<101>>)
     assert Keyword.get(params, :level) == 100
 
-    {:ok, params} = BatteryReport.decode_params(<<254>>)
+    {:ok, params} = BatteryReport.decode_params(nil, <<254>>)
     assert Keyword.get(params, :level) == 100
   end
 
@@ -84,7 +84,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     binary_params =
       <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::7, 0x00::1>>
 
-    {:ok, params} = BatteryReport.decode_params(binary_params)
+    {:ok, params} = BatteryReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :charging_status) == :charging
     assert Keyword.get(params, :rechargeable) == true
     assert Keyword.get(params, :backup) == false
@@ -98,7 +98,7 @@ defmodule Grizzly.ZWave.Commands.BatteryReportTest do
     binary_params =
       <<0x20, 0x01::2, 0x01::1, 0x00::1, 0x00::1, 0x00::1, 0x01::2, 0x00::6, 0x00::1, 0x00::1>>
 
-    {:ok, params} = BatteryReport.decode_params(binary_params)
+    {:ok, params} = BatteryReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :charging_status) == :charging
     assert Keyword.get(params, :rechargeable) == true
     assert Keyword.get(params, :backup) == false

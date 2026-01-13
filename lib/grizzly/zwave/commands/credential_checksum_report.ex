@@ -13,13 +13,11 @@ defmodule Grizzly.ZWave.Commands.CredentialChecksumReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:credential_type, UserCredential.credential_type()} | {:checksum, 0..0xFFFF}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     credential_type = Command.param!(command, :credential_type)
     checksum = Command.param!(command, :checksum)
 
@@ -27,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.CredentialChecksumReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<credential_type::8, checksum::16>>) do
+  def decode_params(_spec, <<credential_type::8, checksum::16>>) do
     {:ok,
      [
        credential_type: UserCredential.decode_credential_type(credential_type),

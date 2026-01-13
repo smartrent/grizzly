@@ -20,7 +20,6 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.Antitheft
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:state, Antitheft.lock_state()}
@@ -30,8 +29,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
           | {:locking_entity_id, non_neg_integer}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     state_bit = Command.param!(command, :state) |> Antitheft.state_to_bit()
     magic_code = Command.param!(command, :magic_code) |> Antitheft.validate_magic_code_or_hint()
     manufacturer_id = Command.param!(command, :manufacturer_id)
@@ -56,9 +54,10 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+
   # v3
   def decode_params(
+        _spec,
         <<state_bit::1, magic_code_length::7, magic_code::binary-size(magic_code_length),
           manufacturer_id::16, antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length), locking_entity_id::16>>
@@ -77,6 +76,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
 
   # v2
   def decode_params(
+        _spec,
         <<state_bit::1, magic_code_length::7, magic_code::binary-size(magic_code_length),
           manufacturer_id::16, antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length)>>

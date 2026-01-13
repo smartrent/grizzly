@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ConfigurationNameReportTest do
     params = [param_number: 2, name: "something"]
     {:ok, command} = Commands.create(:configuration_name_report, params)
     expected_params_binary = <<0x02::16, 0x00>> <> "something"
-    assert expected_params_binary == ConfigurationNameReport.encode_params(command)
+    assert expected_params_binary == ConfigurationNameReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x02::16, 0x00>> <> "something"
-    {:ok, params} = ConfigurationNameReport.decode_params(params_binary)
+    {:ok, params} = ConfigurationNameReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :param_number) == 2
     assert Keyword.get(params, :name) == "something"
   end

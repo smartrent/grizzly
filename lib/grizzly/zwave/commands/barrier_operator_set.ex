@@ -17,16 +17,14 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSet do
   @type param :: {:target_value, BarrierOperator.target_value()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     target_value = Command.param!(command, :target_value)
     target_value_byte = BarrierOperator.target_value_to_byte(target_value)
     <<target_value_byte>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<target_value_byte>>) do
+  def decode_params(_spec, <<target_value_byte>>) do
     case BarrierOperator.target_value_from_byte(target_value_byte) do
       {:ok, target_value} ->
         {:ok, [target_value: target_value]}

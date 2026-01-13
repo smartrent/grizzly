@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
           | {:zwave_event, Notifications.event()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type = Command.param(command, :type, 0x00)
     zwave_type = Command.param(command, :zwave_type)
     zwave_event = Command.param(command, :zwave_event)
@@ -43,10 +42,9 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<type>>), do: {:ok, [type: type]}
+  def decode_params(_spec, <<type>>), do: {:ok, [type: type]}
 
-  def decode_params(<<type, zwave_type_byte>>) do
+  def decode_params(_spec, <<type, zwave_type_byte>>) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte) do
       {:ok, [type: type, zwave_type: zwave_type]}
     else
@@ -55,7 +53,7 @@ defmodule Grizzly.ZWave.Commands.AlarmGet do
     end
   end
 
-  def decode_params(<<type, zwave_type_byte, zwave_event_byte>>) do
+  def decode_params(_spec, <<type, zwave_type_byte, zwave_event_byte>>) do
     with {:ok, zwave_type} <- Notifications.type_from_byte(zwave_type_byte),
          {:ok, zwave_event} <- Notifications.event_from_byte(zwave_type, zwave_event_byte) do
       {:ok, [type: type, zwave_type: zwave_type, zwave_event: zwave_event]}

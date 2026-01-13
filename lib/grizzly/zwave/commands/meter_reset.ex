@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.MeterReset do
   @type param :: {:meter_type, any()} | {:rate_type, any()} | {:values, any()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     if Command.has_param?(command, :meter_type) || Command.has_param?(command, :rate_type) ||
          Command.has_param?(command, :scale) || Command.has_param?(command, :value) do
       rate_type = Command.param!(command, :rate_type)
@@ -46,14 +45,15 @@ defmodule Grizzly.ZWave.Commands.MeterReset do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+
   # v2-v5
-  def decode_params(<<>>) do
+  def decode_params(_spec, <<>>) do
     {:ok, []}
   end
 
   # v6
   def decode_params(
+        _spec,
         <<scale1_msb::1, rate_type_bin::2, meter_type_bin::5, precision::3, scale1_rest::2,
           size::3, int_value::size(size)-unit(8), scale2::8>>
       ) do

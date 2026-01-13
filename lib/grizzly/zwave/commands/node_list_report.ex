@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   alias Grizzly.ZWave.NodeIdList
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     node_ids = encode_node_ids(Command.param!(command, :node_ids))
     status = encode_status(Command.param!(command, :status))
@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, status, controller_id, node_ids::binary>>) do
+  def decode_params(_spec, <<seq_number, status, controller_id, node_ids::binary>>) do
     case decode_status(status) do
       {:ok, status} ->
         controller_id = decode_controller_id(controller_id)

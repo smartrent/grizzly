@@ -21,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.SceneActivationSet do
           | {:dimming_duration, SceneActuatorConf.dimming_duration()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     scene_id = Command.param!(command, :scene_id)
 
     dimming_duration_byte =
@@ -32,8 +31,7 @@ defmodule Grizzly.ZWave.Commands.SceneActivationSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<scene_id, dimming_duration_byte>>) do
+  def decode_params(_spec, <<scene_id, dimming_duration_byte>>) do
     with {:ok, dimming_duration} <-
            SceneActuatorConf.dimming_duration_from_byte(dimming_duration_byte) do
       {:ok,

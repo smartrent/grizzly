@@ -15,14 +15,14 @@ defmodule Grizzly.ZWave.Commands.CredentialLearnStatusReportTest do
 
     {:ok, command} = Commands.create(:credential_learn_status_report, params)
 
-    assert CredentialLearnStatusReport.encode_params(command) ==
+    assert CredentialLearnStatusReport.encode_params(nil, command) ==
              <<0, 1::16, 2, 1::16, 5>>
   end
 
   test "decodes params correctly" do
     binary = <<0, 1::16, 2, 1::16, 5>>
 
-    assert {:ok, params} = CredentialLearnStatusReport.decode_params(binary)
+    assert {:ok, params} = CredentialLearnStatusReport.decode_params(nil, binary)
 
     assert params[:status] == :started
     assert params[:user_id] == 1

@@ -22,7 +22,6 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.DSK
 
   @type param ::
@@ -31,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
           | {:dsk, DSK.t()}
 
   @impl Grizzly.ZWave.Command
-  def validate_params(params) do
+  def validate_params(_spec, params) do
     :ok = validate_seq_number(params)
     :ok = validate_dsk(params)
     params = validate_and_ensure_input_dsk_length(params)
@@ -39,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     input_dsk_length = Command.param!(command, :input_dsk_length)
 
@@ -49,8 +48,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, _::4, input_dsk_length::4, dsk_bin::binary>>) do
+  def decode_params(_spec, <<seq_number, _::4, input_dsk_length::4, dsk_bin::binary>>) do
     {:ok, [seq_number: seq_number, input_dsk_length: input_dsk_length, dsk: DSK.new(dsk_bin)]}
   end
 

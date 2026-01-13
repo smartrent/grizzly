@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ThermostatOperatingStateReportTest do
     params = [state: :heating]
     {:ok, command} = Commands.create(:thermostat_operating_state_report, params)
     expected_binary = <<0x01>>
-    assert expected_binary == ThermostatOperatingStateReport.encode_params(command)
+    assert expected_binary == ThermostatOperatingStateReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02>>
-    {:ok, params} = ThermostatOperatingStateReport.decode_params(binary_params)
+    {:ok, params} = ThermostatOperatingStateReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :state) == :cooling
   end
 end

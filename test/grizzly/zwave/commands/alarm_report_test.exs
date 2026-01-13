@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
     test "v1" do
       {:ok, command} = Commands.create(:alarm_report, type: 0x16, level: 0x17)
 
-      assert <<0x16, 0x17>> == AlarmReport.encode_params(command)
+      assert <<0x16, 0x17>> == AlarmReport.encode_params(nil, command)
     end
 
     test "v2 with no event params" do
@@ -75,7 +75,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         )
 
       assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x00>> ==
-               AlarmReport.encode_params(command)
+               AlarmReport.encode_params(nil, command)
     end
 
     test "v2 with event params" do
@@ -91,7 +91,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         )
 
       assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x04, 0x63, 0x03, 0xFB, 0x01>> ==
-               AlarmReport.encode_params(command)
+               AlarmReport.encode_params(nil, command)
     end
 
     test "v8 with sequence number" do
@@ -109,7 +109,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
 
       assert <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x01::1, 0x00::2, 0x04::5, 0x63, 0x03, 0xFB,
                0x01, 0x09>> ==
-               AlarmReport.encode_params(command)
+               AlarmReport.encode_params(nil, command)
     end
   end
 
@@ -118,13 +118,13 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
       binary = <<0x05, 0x10>>
       expected_params = [type: 0x05, level: 0x10]
 
-      assert {:ok, expected_params} == AlarmReport.decode_params(binary)
+      assert {:ok, expected_params} == AlarmReport.decode_params(nil, binary)
     end
 
     test "v2 with no event params" do
       binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x02, 0x00>>
 
-      {:ok, params} = AlarmReport.decode_params(binary)
+      {:ok, params} = AlarmReport.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
@@ -138,7 +138,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
     test "v2 no parameters or parameter length" do
       binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06>>
 
-      {:ok, params} = AlarmReport.decode_params(binary)
+      {:ok, params} = AlarmReport.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
@@ -151,7 +151,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
     test "v2 with event params" do
       binary = <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x04, 0x63, 0x03, 0xFB, 0x01>>
 
-      {:ok, params} = AlarmReport.decode_params(binary)
+      {:ok, params} = AlarmReport.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
@@ -170,7 +170,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
     test "v2 with undefined zwave_event and zwave_type" do
       binary = <<0x10, 0x25, 0x00, 0x00, 0xB9, 0x9B, 0x04, 0x63, 0x03, 0xFB, 0x01>>
 
-      {:ok, params} = AlarmReport.decode_params(binary)
+      {:ok, params} = AlarmReport.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25
@@ -185,7 +185,7 @@ defmodule Grizzly.ZWave.Commands.AlarmReportTest do
         <<0x10, 0x25, 0x00, 0x00, 0x06, 0x06, 0x01::1, 0x00::2, 0x04::5, 0x63, 0x03, 0xFB, 0x01,
           0x09>>
 
-      {:ok, params} = AlarmReport.decode_params(binary)
+      {:ok, params} = AlarmReport.decode_params(nil, binary)
 
       assert Keyword.fetch!(params, :type) == 0x10
       assert Keyword.fetch!(params, :level) == 0x25

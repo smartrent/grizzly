@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   @type status() :: :done | :failed
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     status = Command.param!(command, :status)
     node_id = Command.param!(command, :node_id)
@@ -42,8 +42,7 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, keyword()} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, status_byte, node_id::binary>>) do
+  def decode_params(_spec, <<seq_number, status_byte, node_id::binary>>) do
     case decode_status(status_byte) do
       {:ok, status} ->
         {:ok,

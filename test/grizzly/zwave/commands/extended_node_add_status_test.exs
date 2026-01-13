@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedNodeAddStatusTest do
         granted_keys: [:s2_access_control, :s2_authenticated, :s2_unauthenticated]
       ]
 
-      {:ok, params} = ExtendedNodeAddStatus.decode_params(report)
+      {:ok, params} = ExtendedNodeAddStatus.decode_params(nil, report)
 
       for {param_name, value} <- expected_params do
         assert params[param_name] == value

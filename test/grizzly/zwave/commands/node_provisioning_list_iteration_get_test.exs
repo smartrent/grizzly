@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationGetTest do
     params = [seq_number: 0x01, remaining_counter: 2]
     {:ok, command} = Commands.create(:node_provisioning_list_iteration_get, params)
     expected_binary = <<0x01, 0x02>>
-    assert expected_binary == NodeProvisioningListIterationGet.encode_params(command)
+    assert expected_binary == NodeProvisioningListIterationGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x01, 0x02>>
-    {:ok, params} = NodeProvisioningListIterationGet.decode_params(binary_params)
+    {:ok, params} = NodeProvisioningListIterationGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 1
     assert Keyword.get(params, :remaining_counter) == 2
   end

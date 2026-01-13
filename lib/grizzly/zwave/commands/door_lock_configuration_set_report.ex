@@ -28,7 +28,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.DoorLock
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:operation_type, DoorLock.operation_type()}
@@ -41,8 +40,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReport do
           | {:block_to_block?, boolean}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     operation_type_byte =
       Command.param!(command, :operation_type) |> DoorLock.operation_type_to_byte()
 
@@ -76,9 +74,10 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
+
   # v1-3
   def decode_params(
+        _spec,
         <<operation_type_byte, manual_outside_door_handles_bitmask::4,
           manual_inside_door_handles_bitmask::4, lock_timeout_mins, lock_timeout_secs>>
       ) do
@@ -103,6 +102,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockConfigurationSetReport do
 
   # v4
   def decode_params(
+        _spec,
         <<operation_type_byte, manual_outside_door_handles_bitmask::4,
           manual_inside_door_handles_bitmask::4, lock_timeout_mins, lock_timeout_secs,
           auto_relock_time::16, hold_and_release_time::16, _reserved::6, block_to_block_bit::1,

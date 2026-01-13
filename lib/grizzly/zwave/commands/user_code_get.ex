@@ -18,13 +18,13 @@ defmodule Grizzly.ZWave.Commands.UserCodeGet do
   @type param :: {:user_id, 1..255}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     user_id = Command.param!(command, :user_id)
     <<user_id>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<user_id>>) do
+  def decode_params(_spec, <<user_id>>) do
     {:ok, [user_id: user_id]}
   end
 end

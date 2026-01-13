@@ -12,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.VersionZWaveSoftwareReport do
   alias Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     sdk_version = Command.param(command, :sdk_version)
     app_framework_api_version = Command.param(command, :application_framework_api_version)
     app_framework_build_number = Command.param(command, :application_framework_build_number)
@@ -32,6 +32,7 @@ defmodule Grizzly.ZWave.Commands.VersionZWaveSoftwareReport do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<sdk_version::24, app_framework_api_version::24, application_framework_build_number::16,
           host_interface_version::24, host_interface_build_number::16, zwave_protocol_version::24,
           zwave_protocol_build_number::16, application_version::24, application_build_number::16>>

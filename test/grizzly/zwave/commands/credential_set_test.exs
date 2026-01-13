@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSetTest do
 
     assert {:ok, command} = Commands.create(:credential_set, params)
 
-    assert CredentialSet.encode_params(command) == <<
+    assert CredentialSet.encode_params(nil, command) == <<
              1::16,
              0x03,
              2::16,
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSetTest do
 
     assert {:ok, command} = Commands.create(:credential_set, params)
 
-    assert CredentialSet.encode_params(command) == <<
+    assert CredentialSet.encode_params(nil, command) == <<
              1::16,
              0x02,
              2::16,
@@ -58,7 +58,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSetTest do
       0x03
     >>
 
-    assert {:ok, params} = CredentialSet.decode_params(binary)
+    assert {:ok, params} = CredentialSet.decode_params(nil, binary)
 
     assert params[:user_id] == 1
     assert params[:credential_type] == :rfid
@@ -80,7 +80,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSetTest do
       ?c
     >>
 
-    assert {:ok, params} = CredentialSet.decode_params(binary)
+    assert {:ok, params} = CredentialSet.decode_params(nil, binary)
 
     assert params[:user_id] == 1
     assert params[:credential_type] == :password

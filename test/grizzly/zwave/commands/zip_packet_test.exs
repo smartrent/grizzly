@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
     test "ack response, no headers, no command" do
       binary_params = <<0x40, 0x10, 0x10, 0x00, 0x00>>
 
-      {:ok, decoded_params} = ZIPPacket.decode_params(binary_params)
+      {:ok, decoded_params} = ZIPPacket.decode_params(nil, binary_params)
 
       assert Keyword.fetch!(decoded_params, :flag) == :ack_response
       assert Keyword.fetch!(decoded_params, :seq_number) == 0x10
@@ -49,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
     test "nak waiting for 3 seconds" do
       binary_params = <<0x30, 0x90, 0x01, 0x00, 0x00, 0x06, 0x01, 0x03, 0x00, 0x00, 0x03>>
 
-      {:ok, decoded_params} = ZIPPacket.decode_params(binary_params)
+      {:ok, decoded_params} = ZIPPacket.decode_params(nil, binary_params)
 
       assert Keyword.fetch!(decoded_params, :flag) == :nack_waiting
       assert Keyword.fetch!(decoded_params, :seq_number) == 0x01
@@ -63,7 +63,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
 
       expected_binary = <<0x00, 0x10, 0x10, 0x00, 0x00>>
 
-      assert expected_binary == ZIPPacket.encode_params(command)
+      assert expected_binary == ZIPPacket.encode_params(nil, command)
     end
 
     test "when there is command" do
@@ -72,7 +72,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacketTest do
 
       expected_binary = <<0x80, 0x50, 0xA0, 0x00, 0x00>> <> ZWave.to_binary(switch_set)
 
-      assert expected_binary == ZIPPacket.encode_params(command)
+      assert expected_binary == ZIPPacket.encode_params(nil, command)
     end
   end
 end

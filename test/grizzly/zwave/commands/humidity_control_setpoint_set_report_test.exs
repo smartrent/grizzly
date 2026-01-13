@@ -14,13 +14,13 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReportTest do
       )
 
     assert <<0x01, 0b00101001, 11>> ==
-             HumidityControlSetpointSetReport.encode_params(command)
+             HumidityControlSetpointSetReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary = <<0x01, 0b00101001, 11>>
 
-    assert {:ok, params} = HumidityControlSetpointSetReport.decode_params(binary)
+    assert {:ok, params} = HumidityControlSetpointSetReport.decode_params(nil, binary)
     assert params[:setpoint_type] == :humidify
     assert params[:value] == 1.1
     assert params[:scale] == :absolute

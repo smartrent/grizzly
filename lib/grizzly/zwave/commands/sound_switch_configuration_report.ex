@@ -18,16 +18,14 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchConfigurationReport do
           | {:default_tone_identifier, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     volume = Command.param!(command, :volume)
     default_tone_identifier = Command.param!(command, :default_tone_identifier)
     <<volume::8, default_tone_identifier::8>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
-  def decode_params(<<volume::8, default_tone_identifier::8>>) do
+  def decode_params(_spec, <<volume::8, default_tone_identifier::8>>) do
     {:ok, [volume: volume, default_tone_identifier: default_tone_identifier]}
   end
 end

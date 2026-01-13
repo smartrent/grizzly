@@ -16,21 +16,23 @@ defmodule Grizzly.ZWave.CommandSpec do
     Data structure describing a parameter for a Z-Wave command.
     """
 
-    @type type :: :integer | :atom | :boolean | :binary | :any
+    @type type :: :int | :uint | :boolean | :binary | :enum | :any
 
     @type t :: %__MODULE__{
             name: atom(),
             type: type(),
             size: non_neg_integer() | :variable,
             default: any(),
-            required: boolean()
+            required: boolean(),
+            opts: keyword()
           }
 
     defstruct name: nil,
               type: nil,
               size: 8,
               default: nil,
-              required: false
+              required: false,
+              opts: []
   end
 
   schema =
@@ -68,7 +70,7 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       encode_fun: [
-        type: {:custom, __MODULE__, :__validate_fun__, [1]},
+        type: {:custom, __MODULE__, :__validate_fun__, [2]},
         required: true,
         doc: """
         A function or `{module, function}` tuple used to encode the command's
@@ -76,12 +78,7 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       decode_fun: [
-        type:
-          {:or,
-           [
-             {:custom, __MODULE__, :__validate_fun__, [1]},
-             {:custom, __MODULE__, :__validate_fun__, [2]}
-           ]},
+        type: {:custom, __MODULE__, :__validate_fun__, [2]},
         required: true,
         doc: """
         A function or `{module, function}` tuple used to decode the command's
@@ -138,7 +135,7 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       validate_fun: [
-        type: {:or, [{:custom, __MODULE__, :__validate_fun__, [1]}, nil]},
+        type: {:or, [{:custom, __MODULE__, :__validate_fun__, [2]}, nil]},
         required: false,
         doc: """
         A `{module, function}` tuple indicating a function that validates
@@ -146,6 +143,11 @@ defmodule Grizzly.ZWave.CommandSpec do
         parameters are valid or have been updated, or `{:error, reason}` if the
         parameters are invalid.
         """
+      ],
+      params: [
+        type: :keyword_list,
+        keys: [*: [type: {:struct, Param}]],
+        default: []
       ],
       default_params: [
         type: :keyword_list,
@@ -175,6 +177,7 @@ defmodule Grizzly.ZWave.CommandSpec do
           report: atom() | nil,
           handler: {module(), keyword()},
           supports_supervision?: boolean(),
+          params: list({atom(), Param.t()}),
           default_params: keyword()
         }
 
@@ -189,6 +192,7 @@ defmodule Grizzly.ZWave.CommandSpec do
             report: nil,
             handler: {AckResponse, []},
             supports_supervision?: false,
+            params: [],
             default_params: []
 
   def create_command(%__MODULE__{} = spec, params) do
@@ -251,9 +255,9 @@ defmodule Grizzly.ZWave.CommandSpec do
       else
         [
           module: module,
-          encode_fun: {module, :encode_params},
-          decode_fun: {module, :decode_params},
-          validate_fun: maybe_fun_from_module(module, :validate_params, 1),
+          encode_fun: maybe_fun_from_module(module, :encode_params, 2),
+          decode_fun: maybe_fun_from_module(module, :decode_params, 2),
+          validate_fun: maybe_fun_from_module(module, :validate_params, 2),
           report_matcher_fun: maybe_fun_from_module(module, :report_matches_get?, 2)
         ] ++ fields
       end
@@ -272,13 +276,13 @@ defmodule Grizzly.ZWave.CommandSpec do
     {:ok, params}
   end
 
-  def validate_params(%__MODULE__{validate_fun: {mod, fun}} = _spec, params) do
-    apply(mod, fun, [params])
+  def validate_params(%__MODULE__{validate_fun: {mod, fun}} = spec, params) do
+    apply(mod, fun, [spec, params])
   end
 
-  def validate_params(%__MODULE__{validate_fun: fun} = _spec, params)
-      when is_function(fun, 1) do
-    fun.(params)
+  def validate_params(%__MODULE__{validate_fun: fun} = spec, params)
+      when is_function(fun, 2) do
+    fun.(spec, params)
   end
 
   def validate(%__MODULE__{} = spec) do

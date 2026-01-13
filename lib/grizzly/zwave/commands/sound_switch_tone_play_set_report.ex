@@ -16,13 +16,11 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonePlaySetReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:tone_identifier, 0..255} | {:volume, Grizzly.ZWave.sound_switch_volume()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     tone_identifier = Command.param!(command, :tone_identifier)
     volume = Command.param(command, :volume)
 
@@ -36,12 +34,11 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchTonePlaySetReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<tone_identifier::8, volume::8>>) do
+  def decode_params(_spec, <<tone_identifier::8, volume::8>>) do
     {:ok, [tone_identifier: tone_identifier, volume: volume]}
   end
 
-  def decode_params(<<tone_identifier::8>>) do
+  def decode_params(_spec, <<tone_identifier::8>>) do
     {:ok, [tone_identifier: tone_identifier, volume: nil]}
   end
 end

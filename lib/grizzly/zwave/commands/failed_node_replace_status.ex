@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatus do
           | {:kex_fail_type, Security.key_exchange_fail_type()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     status = Command.param!(command, :status)
     node_id = Command.param!(command, :node_id)
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, status, node_id, granted_keys, kex_fail_type>>) do
+  def decode_params(_spec, <<seq_number, status, node_id, granted_keys, kex_fail_type>>) do
     {:ok,
      [
        seq_number: seq_number,

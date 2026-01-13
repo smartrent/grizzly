@@ -38,7 +38,6 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:size, 1 | 2 | 4}
@@ -47,8 +46,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
           | {:param_number, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     if Command.param!(command, :value) == :default do
       encode_default(command)
     else
@@ -57,12 +55,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<param_number, 1::1, _rest::7, _>>) do
+  def decode_params(_spec, <<param_number, 1::1, _rest::7, _>>) do
     {:ok, [param_number: param_number, value: :default]}
   end
 
-  def decode_params(<<param_number, _::5, size::3, value::binary>>) do
+  def decode_params(_spec, <<param_number, _::5, size::3, value::binary>>) do
     <<value_int::signed-integer-size(size)-unit(8)>> = value
     {:ok, [param_number: param_number, value: value_int, size: size]}
   end

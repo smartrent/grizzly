@@ -13,14 +13,14 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChangeTest do
     params = [up_down: :up]
     {:ok, command} = Commands.create(:switch_multilevel_start_level_change, params)
     expected_binary = <<0x00::1, 0x00::1, 0x01::1, 0x00::5, 0x00>>
-    assert expected_binary == SwitchMultilevelStartLevelChange.encode_params(command)
+    assert expected_binary == SwitchMultilevelStartLevelChange.encode_params(nil, command)
   end
 
   test "encodes v2 params correctly" do
     params = [up_down: :down, duration: 10]
     {:ok, command} = Commands.create(:switch_multilevel_start_level_change, params)
     expected_binary = <<0x00::1, 0x01::1, 0x01::1, 0x00::5, 0x00, 0x0A>>
-    assert expected_binary == SwitchMultilevelStartLevelChange.encode_params(command)
+    assert expected_binary == SwitchMultilevelStartLevelChange.encode_params(nil, command)
   end
 
   test "decodes v1 params correctly" do
@@ -37,7 +37,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChangeTest do
       0
     >>
 
-    {:ok, params} = SwitchMultilevelStartLevelChange.decode_params(binary_params)
+    {:ok, params} = SwitchMultilevelStartLevelChange.decode_params(nil, binary_params)
     assert Keyword.get(params, :up_down) == :up
   end
 
@@ -57,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChangeTest do
       0x0B
     >>
 
-    {:ok, params} = SwitchMultilevelStartLevelChange.decode_params(binary_params)
+    {:ok, params} = SwitchMultilevelStartLevelChange.decode_params(nil, binary_params)
     assert Keyword.get(params, :up_down) == :down
     assert Keyword.get(params, :duration) == 11
   end

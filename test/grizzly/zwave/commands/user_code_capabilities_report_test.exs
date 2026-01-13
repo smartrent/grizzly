@@ -21,10 +21,8 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
       supported_keypad_keys: ~c"()*+,-./014567"
     ]
 
-    binary =
-      Commands.create(:user_code_capabilities_report, params)
-      |> elem(1)
-      |> UserCodeCapabilitiesReport.encode_params()
+    {:ok, cmd} = Commands.create(:user_code_capabilities_report, params)
+    binary = UserCodeCapabilitiesReport.encode_params(nil, cmd)
 
     expected_binary =
       <<1::1, 1::1, 0::1, 1::5, 0b0011::8, 1::1, 0::1, 0::1, 1::5, 0b0101::8, 0::3, 7::5, 0b0,
@@ -38,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
       <<1::1, 1::1, 0::1, 1::5, 0b11010::8, 1::1, 0::1, 0::1, 1::5, 0b0101::8, 0::3, 7::5, 0b0,
         0b0, 0b0, 0b0, 0b0, 0b11111111, 0b11110011>>
 
-    {:ok, params} = UserCodeCapabilitiesReport.decode_params(input)
+    {:ok, params} = UserCodeCapabilitiesReport.decode_params(nil, input)
 
     assert params[:admin_code_supported?]
     assert params[:admin_code_deactivation_supported?]
@@ -65,6 +63,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeCapabilitiesReportTest do
   test "decodes params from a real device" do
     {:ok, params} =
       UserCodeCapabilitiesReport.decode_params(
+        nil,
         <<0x81, 0x0F, 0x01, 0x07, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x03>>
       )
 

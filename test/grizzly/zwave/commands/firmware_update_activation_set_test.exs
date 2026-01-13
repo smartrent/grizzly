@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSetTest do
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00>>
 
-    assert expected_param_binary == FirmwareUpdateActivationSet.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateActivationSet.encode_params(nil, command)
   end
 
   test "encodes params correctly - v5" do
@@ -51,12 +51,12 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSetTest do
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x04>>
 
-    assert expected_param_binary == FirmwareUpdateActivationSet.encode_params(command)
+    assert expected_param_binary == FirmwareUpdateActivationSet.encode_params(nil, command)
   end
 
   test "decodes params correctly v1" do
     params_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00>>
-    {:ok, params} = FirmwareUpdateActivationSet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateActivationSet.decode_params(nil, params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -65,7 +65,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationSetTest do
 
   test "decodes params correctly v5" do
     params_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x04>>
-    {:ok, params} = FirmwareUpdateActivationSet.decode_params(params_binary)
+    {:ok, params} = FirmwareUpdateActivationSet.decode_params(nil, params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3

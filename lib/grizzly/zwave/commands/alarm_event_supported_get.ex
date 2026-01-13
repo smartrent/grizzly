@@ -17,16 +17,14 @@ defmodule Grizzly.ZWave.Commands.AlarmEventSupportedGet do
   @type param :: {:type, atom()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type = Command.param!(command, :type)
     type_byte = Notifications.type_to_byte(type)
     <<type_byte>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<type_byte>>) do
+  def decode_params(_spec, <<type_byte>>) do
     with {:ok, type} <- Notifications.type_from_byte(type_byte) do
       {:ok, [type: type]}
     else

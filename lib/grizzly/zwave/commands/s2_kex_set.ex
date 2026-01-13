@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.S2KexSet do
           | {:granted_keys, [Security.key()]}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     request_csa = Command.param(command, :request_csa, false)
     echo = Command.param(command, :echo, false)
     supported_kex_schemes = Command.param(command, :supported_kex_schemes, [:kex_scheme_1])
@@ -40,6 +40,7 @@ defmodule Grizzly.ZWave.Commands.S2KexSet do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<_reserved::6, request_csa::1, echo::1, supported_kex_schemes::8,
           supported_ecdh_profiles::8, granted_keys::8>>
       ) do

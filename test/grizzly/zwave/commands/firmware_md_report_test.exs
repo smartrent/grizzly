@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
 
   test "decodes params correctly - v1 " do
     params_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03>>
-    {:ok, params} = FirmwareMDReport.decode_params(params_binary)
+    {:ok, params} = FirmwareMDReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
     params_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06>>
 
-    {:ok, params} = FirmwareMDReport.decode_params(params_binary)
+    {:ok, params} = FirmwareMDReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
     params_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06, 0x04>>
 
-    {:ok, params} = FirmwareMDReport.decode_params(params_binary)
+    {:ok, params} = FirmwareMDReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -59,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06, 0x04,
         0x00::6, 0x01::1, 0x00::1>>
 
-    {:ok, params} = FirmwareMDReport.decode_params(params_binary)
+    {:ok, params} = FirmwareMDReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :manufacturer_id) == 1
     assert Keyword.get(params, :firmware_id) == 2
     assert Keyword.get(params, :checksum) == 3
@@ -81,7 +81,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
       )
 
     expected_param_binary = <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03>>
-    assert expected_param_binary == FirmwareMDReport.encode_params(report)
+    assert expected_param_binary == FirmwareMDReport.encode_params(nil, report)
   end
 
   test "encodes params correctly - v3" do
@@ -99,7 +99,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
     expected_param_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06>>
 
-    assert expected_param_binary == FirmwareMDReport.encode_params(report)
+    assert expected_param_binary == FirmwareMDReport.encode_params(nil, report)
   end
 
   test "encodes params correctly - v5" do
@@ -118,7 +118,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
     expected_param_binary =
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06, 0x04>>
 
-    assert expected_param_binary == FirmwareMDReport.encode_params(report)
+    assert expected_param_binary == FirmwareMDReport.encode_params(nil, report)
   end
 
   test "encodes params correctly - v6-7" do
@@ -140,6 +140,6 @@ defmodule Grizzly.ZWave.Commands.FirmwareMDReportTest do
       <<0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0xFF, 0x02, 0x00, 0x0A, 0x00, 0x05, 0x00, 0x06, 0x04,
         0x00::6, 0x01::1, 0x00::1>>
 
-    assert expected_param_binary == FirmwareMDReport.encode_params(report)
+    assert expected_param_binary == FirmwareMDReport.encode_params(nil, report)
   end
 end

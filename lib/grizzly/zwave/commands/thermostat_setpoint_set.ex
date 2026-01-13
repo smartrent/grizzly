@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
   alias Grizzly.ZWave.Encoding
 
   @impl Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type_byte = Command.param!(command, :type) |> ThermostatSetpoint.encode_type()
     scale_byte = Command.param!(command, :scale) |> ThermostatSetpoint.encode_scale()
     value = Command.param!(command, :value)
@@ -34,6 +34,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSet do
 
   @impl Command
   def decode_params(
+        _spec,
         <<_::4, type_byte::4, precision::3, scale_byte::2, byte_size::3,
           int_value::signed-size(byte_size)-unit(8)>>
       ) do

@@ -28,13 +28,13 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReportTest do
     {:ok, command} = Commands.create(:zwaveplus_info_report, params)
 
     expected_binary = <<0x02, 0x00, 0x00, 0x0100::16, 0x0500::16>>
-    assert expected_binary == ZwaveplusInfoReport.encode_params(command)
+    assert expected_binary == ZwaveplusInfoReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02, 0x00, 0x00, 0x0100::16, 0x0500::16>>
 
-    {:ok, params} = ZwaveplusInfoReport.decode_params(binary_params)
+    {:ok, params} = ZwaveplusInfoReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :zwaveplus_version) == 2
     assert Keyword.get(params, :role_type) == :central_static_controller
     assert Keyword.get(params, :node_type) == :zwaveplus_node

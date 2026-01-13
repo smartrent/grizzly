@@ -11,20 +11,17 @@ defmodule Grizzly.ZWave.Commands.HumidityControlOperatingStateReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.HumidityControlOperatingState
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:state, HumidityControlOperatingState.state()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     state = Command.param!(command, :state)
     <<0::4, HumidityControlOperatingState.encode_state(state)::4>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<_::4, state::4>>) do
+  def decode_params(_spec, <<_::4, state::4>>) do
     {:ok, [state: HumidityControlOperatingState.decode_state(state)]}
   end
 end

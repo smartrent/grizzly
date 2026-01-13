@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.NetworkUpdateRequestTest do
     params = [seq_number: 2]
     {:ok, command} = Commands.create(:network_update_request, params)
     expected_binary = <<0x02>>
-    assert expected_binary == NetworkUpdateRequest.encode_params(command)
+    assert expected_binary == NetworkUpdateRequest.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02>>
-    {:ok, params} = NetworkUpdateRequest.decode_params(binary_params)
+    {:ok, params} = NetworkUpdateRequest.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 2
   end
 end

@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
       <<0x01, 0x02, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14,
         39>>
 
-    assert expected_binary == NodeProvisioningListIterationReport.encode_params(command)
+    assert expected_binary == NodeProvisioningListIterationReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.NodeProvisioningListIterationReportTest do
       <<0x01, 0x02, 0x10, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14,
         39>>
 
-    {:ok, params} = NodeProvisioningListIterationReport.decode_params(binary_params)
+    {:ok, params} = NodeProvisioningListIterationReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 1
     assert Keyword.get(params, :remaining_count) == 2
     assert Keyword.get(params, :dsk) == Utils.mkdsk()

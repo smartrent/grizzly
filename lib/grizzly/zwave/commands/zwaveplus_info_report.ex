@@ -31,8 +31,7 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReport do
           | {:user_icon_type, non_neg_integer}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     zwaveplus_version = Command.param!(command, :zwaveplus_version)
     role_type_byte = Command.param!(command, :role_type) |> ZwaveplusInfo.role_type_to_byte()
     node_type_byte = Command.param!(command, :node_type) |> ZwaveplusInfo.node_type_to_byte()
@@ -44,8 +43,8 @@ defmodule Grizzly.ZWave.Commands.ZwaveplusInfoReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<zwaveplus_version, role_type_byte, node_type_byte, installer_icon_type::16,
           user_icon_type::16>>
       ) do

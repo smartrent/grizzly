@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
     test "version 4 with 8 bit node id" do
       command = mk_cmd(0x04)
 
-      assert NetworkManagementMultiChannelCapabilityReport.encode_params(command) ==
+      assert NetworkManagementMultiChannelCapabilityReport.encode_params(nil, command) ==
                <<0x01, 0x04, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF,
                  0x62, 0x63, 0x04::16>>
     end
@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
     test "version 4 with 16 bit node id" do
       command = mk_cmd(0x4001)
 
-      assert NetworkManagementMultiChannelCapabilityReport.encode_params(command) ==
+      assert NetworkManagementMultiChannelCapabilityReport.encode_params(nil, command) ==
                <<0x01, 0xFF, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF,
                  0x62, 0x63, 0x40, 0x01>>
     end
@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
           command_classes: []
         )
 
-      assert NetworkManagementMultiChannelCapabilityReport.encode_params(command) ==
+      assert NetworkManagementMultiChannelCapabilityReport.encode_params(nil, command) ==
                <<0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02::16>>
     end
   end
@@ -53,6 +53,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
     test "version 2-3" do
       {:ok, params} =
         NetworkManagementMultiChannelCapabilityReport.decode_params(
+          nil,
           <<0x01, 0x04, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF, 0x62,
             0x63>>
         )
@@ -74,6 +75,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
 
       {:ok, params} =
         NetworkManagementMultiChannelCapabilityReport.decode_params(
+          nil,
           <<0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00>>
         )
 
@@ -85,6 +87,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
     test "version 4 with 8 bit node id" do
       {:ok, params} =
         NetworkManagementMultiChannelCapabilityReport.decode_params(
+          nil,
           <<0x01, 0x04, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF, 0x62,
             0x63, 0x04::16>>
         )
@@ -97,6 +100,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelCapabilityReportTe
     test "version 4 with 16 bit node id" do
       {:ok, params} =
         NetworkManagementMultiChannelCapabilityReport.decode_params(
+          nil,
           <<0x01, 0xFF, 0x09, 0x01, 0x10, 0x01, 0x20, 0x32, 0xF1, 0x00, 0x71, 0x25, 0xEF, 0x62,
             0x63, 0x1010::16>>
         )

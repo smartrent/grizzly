@@ -25,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReport do
           | {:property_ids, [Indicator.property_id()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     indicator_id_byte = Command.param!(command, :indicator_id) |> Indicator.indicator_id_to_byte()
 
     next_indicator_id_byte =
@@ -40,8 +39,8 @@ defmodule Grizzly.ZWave.Commands.IndicatorSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<indicator_id_byte, next_indicator_id_byte, 0x00::3, _count::5,
           property_id_masks::binary>>
       ) do

@@ -14,12 +14,12 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListGetTest do
     {:ok, command} = Commands.create(:failed_node_list_get, params)
     expected_binary = <<0x01>>
 
-    assert expected_binary == FailedNodeListGet.encode_params(command)
+    assert expected_binary == FailedNodeListGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02>>
-    {:ok, params} = FailedNodeListGet.decode_params(binary_params)
+    {:ok, params} = FailedNodeListGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :seq_number) == 0x02
   end
 end

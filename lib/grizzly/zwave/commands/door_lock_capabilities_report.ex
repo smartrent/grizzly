@@ -28,7 +28,6 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.DoorLock
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:supported_operations, [DoorLock.operation_type()]}
@@ -42,8 +41,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
           | {:block_to_block_supported?, boolean}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     supported_operations_bitmask =
       Command.param!(command, :supported_operations) |> operations_to_binary()
 
@@ -85,8 +83,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         # Assuming a single supported operations bitmask
         <<0x00::3, 0x01::5, supported_operations_bitmask, supported_modes_list_length,
           supported_door_lock_modes_binary::binary-size(supported_modes_list_length),

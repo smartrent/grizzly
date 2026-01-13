@@ -16,13 +16,11 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeGet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCode
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:user_id, UserCode.extended_user_id()} | {:report_more?, boolean()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     user_id = Command.param!(command, :user_id)
     report_more? = Command.param(command, :report_more?, false)
 
@@ -30,8 +28,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeGet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<user_id::16, _reserved::7, report_more?::1>>) do
+  def decode_params(_spec, <<user_id::16, _reserved::7, report_more?::1>>) do
     {:ok,
      [
        user_id: user_id,

@@ -33,8 +33,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
           | {:more_info, boolean()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     zwave_command = Command.param(command, :command)
     flag = Command.param(command, :flag)
     seq_number = Command.param!(command, :seq_number)
@@ -52,8 +51,8 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]}
   def decode_params(
+        _spec,
         <<flag_byte, meta_byte, seq_number, source, dest, extensions_and_command::binary>>
       ) do
     meta = meta_from_byte(meta_byte)

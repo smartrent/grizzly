@@ -10,11 +10,11 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSupportedReportTest do
         setpoint_types: [:humidify, :auto]
       )
 
-    assert <<0b1010>> == HumidityControlSetpointSupportedReport.encode_params(command)
+    assert <<0b1010>> == HumidityControlSetpointSupportedReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
-    assert {:ok, params} = HumidityControlSetpointSupportedReport.decode_params(<<0b1010>>)
+    assert {:ok, params} = HumidityControlSetpointSupportedReport.decode_params(nil, <<0b1010>>)
     assert params[:setpoint_types] == [:humidify, :auto]
   end
 end

@@ -16,13 +16,16 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockSet do
   @type param :: {:magic_code, String.t()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     magic_code = Command.param!(command, :magic_code) |> AntitheftUnlock.validate_magic_code()
     <<0x00::4, byte_size(magic_code)::size(4)>> <> magic_code
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<0x00::4, magic_code_size::4, magic_code::binary-size(magic_code_size)>>) do
+  def decode_params(
+        _spec,
+        <<0x00::4, magic_code_size::4, magic_code::binary-size(magic_code_size)>>
+      ) do
     {:ok, [magic_code: magic_code]}
   end
 end

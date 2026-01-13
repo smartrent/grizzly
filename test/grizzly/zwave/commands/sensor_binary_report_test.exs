@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryReportTest do
     params = [triggered: true]
     {:ok, command} = Commands.create(:sensor_binary_report, params)
     expected_binary = <<0xFF>>
-    assert expected_binary == SensorBinaryReport.encode_params(command)
+    assert expected_binary == SensorBinaryReport.encode_params(nil, command)
   end
 
   test "decodes v1 params correctly" do
     binary_params = <<0x00>>
-    {:ok, params} = SensorBinaryReport.decode_params(binary_params)
+    {:ok, params} = SensorBinaryReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :triggered) == false
   end
 
@@ -26,12 +26,12 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryReportTest do
     params = [sensor_type: :door_window, triggered: true]
     {:ok, command} = Commands.create(:sensor_binary_report, params)
     expected_binary = <<0xFF, 0x0A>>
-    assert expected_binary == SensorBinaryReport.encode_params(command)
+    assert expected_binary == SensorBinaryReport.encode_params(nil, command)
   end
 
   test "decodes v2 params correctly" do
     binary_params = <<0x00, 0x0A>>
-    {:ok, params} = SensorBinaryReport.decode_params(binary_params)
+    {:ok, params} = SensorBinaryReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :sensor_type) == :door_window
     assert Keyword.get(params, :triggered) == false
   end

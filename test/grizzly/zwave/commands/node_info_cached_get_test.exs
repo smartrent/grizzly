@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
 
       expected_bin = <<0x01, 0x03, 0x04, 0x04::16>>
 
-      assert NodeInfoCachedGet.encode_params(cmd) == expected_bin
+      assert NodeInfoCachedGet.encode_params(nil, cmd) == expected_bin
     end
 
     test "version 4 - 16 bit node id" do
@@ -32,28 +32,28 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedGetTest do
 
       expected_bin = <<0x01, 0x03, 0xFF, 0x04, 0xAA>>
 
-      assert NodeInfoCachedGet.encode_params(cmd) == expected_bin
+      assert NodeInfoCachedGet.encode_params(nil, cmd) == expected_bin
     end
   end
 
   describe "decoding" do
     test "version 1-3 - 8 bit node id" do
       expected_params = [seq_number: 0x01, node_id: 0x07, max_age: 0x05]
-      {:ok, params} = NodeInfoCachedGet.decode_params(<<0x01, 0x05, 0x07>>)
+      {:ok, params} = NodeInfoCachedGet.decode_params(nil, <<0x01, 0x05, 0x07>>)
 
       assert_params(expected_params, params)
     end
 
     test "version 4 - 8 bit node id" do
       expected_params = [seq_number: 0x01, node_id: 0x07, max_age: 0x05]
-      {:ok, params} = NodeInfoCachedGet.decode_params(<<0x01, 0x05, 0x07, 0x00, 0x00>>)
+      {:ok, params} = NodeInfoCachedGet.decode_params(nil, <<0x01, 0x05, 0x07, 0x00, 0x00>>)
 
       assert_params(expected_params, params)
     end
 
     test "version 4 - 16 bit node id" do
       expected_params = [seq_number: 0x01, node_id: 0x07A1, max_age: 0x05]
-      {:ok, params} = NodeInfoCachedGet.decode_params(<<0x01, 0x05, 0xFF, 0x07, 0xA1>>)
+      {:ok, params} = NodeInfoCachedGet.decode_params(nil, <<0x01, 0x05, 0xFF, 0x07, 0xA1>>)
 
       assert_params(expected_params, params)
     end

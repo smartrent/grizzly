@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ClockSetReportTest do
     params = [weekday: :monday, hour: 12, minute: 30]
     {:ok, command} = Commands.create(:clock_set, params)
     expected_binary = <<0x01::3, 12::5, 30>>
-    assert expected_binary == ClockSetReport.encode_params(command)
+    assert expected_binary == ClockSetReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x01::3, 12::5, 30>>
-    {:ok, params} = ClockSetReport.decode_params(binary_params)
+    {:ok, params} = ClockSetReport.decode_params(nil, binary_params)
 
     assert Keyword.get(params, :weekday) == :monday
     assert Keyword.get(params, :hour) == 12

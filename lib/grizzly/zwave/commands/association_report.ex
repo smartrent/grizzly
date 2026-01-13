@@ -26,8 +26,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
           | {:nodes, [ZWave.node_id()]}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     gi = Command.param!(command, :grouping_identifier)
     max_nodes = Command.param!(command, :max_nodes_supported)
     reports_to_follow = Command.param!(command, :reports_to_follow)
@@ -36,8 +35,7 @@ defmodule Grizzly.ZWave.Commands.AssociationReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param]}
-  def decode_params(<<gi, max_nodes, reports_to_follow, nodes_bin::binary>>) do
+  def decode_params(_spec, <<gi, max_nodes, reports_to_follow, nodes_bin::binary>>) do
     {:ok,
      [
        grouping_identifier: gi,

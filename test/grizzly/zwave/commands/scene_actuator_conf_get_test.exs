@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfGetTest do
     params = [scene_id: 1]
     {:ok, command} = Commands.create(:scene_actuator_conf_get, params)
     expected_binary = <<1>>
-    assert expected_binary == SceneActuatorConfGet.encode_params(command)
+    assert expected_binary == SceneActuatorConfGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<1>>
-    {:ok, params} = SceneActuatorConfGet.decode_params(params_binary)
+    {:ok, params} = SceneActuatorConfGet.decode_params(nil, params_binary)
     assert Keyword.get(params, :scene_id) == 1
   end
 end

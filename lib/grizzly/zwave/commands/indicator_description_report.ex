@@ -19,8 +19,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorDescriptionReport do
   @type param :: {:indicator_id, Indicator.indicator_id()} | {:description, String.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     indicator_id_byte = Command.param!(command, :indicator_id) |> Indicator.indicator_id_to_byte()
     description = Command.param!(command, :description)
     size = byte_size(description)
@@ -28,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.IndicatorDescriptionReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<indicator_id_byte, _size, description::binary>>) do
+  def decode_params(_spec, <<indicator_id_byte, _size, description::binary>>) do
     with {:ok, indicator_id} <- Indicator.indicator_id_from_byte(indicator_id_byte) do
       {:ok, [indicator_id: indicator_id, description: description]}
     else

@@ -39,7 +39,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReportTest do
       <<0x00::3, 0x01::5, 0x06, 0x02, 0x00, 0xFF, 0x03::4, 0x0C::4, 0x06, 0x00::4, 0x01::1,
         0x01::1, 0x00::1, 0x00::1>>
 
-    assert expected_params_binary == DoorLockCapabilitiesReport.encode_params(command)
+    assert expected_params_binary == DoorLockCapabilitiesReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -47,7 +47,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockCapabilitiesReportTest do
       <<0x00::3, 0x01::5, 0x06, 0x02, 0x00, 0xFF, 0x03::4, 0x0C::4, 0x06, 0x00::4, 0x01::1,
         0x01::1, 0x00::1, 0x00::1>>
 
-    {:ok, params} = DoorLockCapabilitiesReport.decode_params(params_binary)
+    {:ok, params} = DoorLockCapabilitiesReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :supported_operations) == [:constant_operation, :timed_operation]
     assert Enum.sort(Keyword.get(params, :supported_door_lock_modes)) == [:secured, :unsecured]
     assert Enum.sort(Keyword.get(params, :configurable_outside_handles)) == [1, 2]

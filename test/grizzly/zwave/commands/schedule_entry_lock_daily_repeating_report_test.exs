@@ -32,13 +32,16 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockDailyRepeatingReportTest do
     {:ok, command} = Commands.create(:schedule_entry_lock_daily_repeating_report, params)
     expected_bitmask = <<0::1, 0::1, 0::1, 0::1, 0::1, 0::1, 1::1, 1::1>>
     expected_binary = <<20, 5>> <> expected_bitmask <> <<2, 42, 2, 42>>
-    assert expected_binary == ScheduleEntryLockDailyRepeatingReport.encode_params(command)
+    assert expected_binary == ScheduleEntryLockDailyRepeatingReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     week_day_bitmask = <<0::1, 0::1, 0::1, 0::1, 0::1, 0::1, 1::1, 1::1>>
     binary_params = <<20, 5>> <> week_day_bitmask <> <<2, 42, 2, 42>>
-    {:ok, expected_params} = ScheduleEntryLockDailyRepeatingReport.decode_params(binary_params)
+
+    {:ok, expected_params} =
+      ScheduleEntryLockDailyRepeatingReport.decode_params(nil, binary_params)
+
     assert Keyword.get(expected_params, :user_identifier) == 20
     assert Keyword.get(expected_params, :schedule_slot_id) == 5
     assert Enum.sort(Keyword.get(expected_params, :week_days)) == Enum.sort([:sunday, :monday])

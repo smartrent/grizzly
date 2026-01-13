@@ -24,13 +24,13 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSendTest do
         tx_options: [:explore, :no_route, :low_power, :ack]
       )
 
-    assert <<0x0A, 0x00, 0x0F, 0x33>> == NodeInformationSend.encode_params(command)
+    assert <<0x0A, 0x00, 0x0F, 0x33>> == NodeInformationSend.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary = <<0x0A, 0x00, 0x0F, 0x33>>
 
-    assert {:ok, params} = NodeInformationSend.decode_params(binary)
+    assert {:ok, params} = NodeInformationSend.decode_params(nil, binary)
     assert params[:seq_number] == 10
     assert params[:destination_node_id] == 15
     assert :ack in params[:tx_options]

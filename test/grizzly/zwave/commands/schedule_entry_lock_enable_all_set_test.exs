@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockEnableAllSetTest do
     params = [enabled: true]
     {:ok, command} = Commands.create(:schedule_entry_lock_enable_all_set, params)
     expected_binary = <<0x01>>
-    assert expected_binary == ScheduleEntryLockEnableAllSet.encode_params(command)
+    assert expected_binary == ScheduleEntryLockEnableAllSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x01>>
-    {:ok, expected_params} = ScheduleEntryLockEnableAllSet.decode_params(binary_params)
+    {:ok, expected_params} = ScheduleEntryLockEnableAllSet.decode_params(nil, binary_params)
     assert Keyword.get(expected_params, :enabled) == true
   end
 end

@@ -49,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
           | {:input_dsk, DSK.t()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     node_id = Command.param!(command, :node_id)
     status = Command.param!(command, :status)
     seq_number = Command.param!(command, :seq_number)
@@ -83,7 +83,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, status_byte, _reserved, node_id, 0x01>>) do
+  def decode_params(_spec, <<seq_number, status_byte, _reserved, node_id, 0x01>>) do
     {:ok,
      [
        status: NMI.parse_node_add_status(status_byte),
@@ -97,7 +97,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
      ]}
   end
 
-  def decode_params(<<seq_number, status_byte, _reserved, node_id, node_info_bin::binary>>) do
+  def decode_params(_spec, <<seq_number, status_byte, _reserved, node_id, node_info_bin::binary>>) do
     node_info = NMI.parse_node_info(node_info_bin)
 
     params =

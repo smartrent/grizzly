@@ -13,10 +13,10 @@ defmodule Grizzly.ZWave.Commands.NodeListGet do
   @type param :: {:seq_number, non_neg_integer()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     <<Command.param!(command, :seq_number)>>
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number>>), do: {:ok, [seq_number: seq_number]}
+  def decode_params(_spec, <<seq_number>>), do: {:ok, [seq_number: seq_number]}
 end

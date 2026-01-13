@@ -18,7 +18,6 @@ defmodule Grizzly.ZWave.Commands.CredentialSet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.UserCredential
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:user_id, 0..0xFFFF}
@@ -28,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.CredentialSet do
           | {:credential_data, binary()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     user_id = Command.param!(command, :user_id)
     credential_type = Command.param!(command, :credential_type)
     credential_slot = Command.param!(command, :credential_slot)
@@ -44,8 +42,8 @@ defmodule Grizzly.ZWave.Commands.CredentialSet do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<user_id::16, credential_type, credential_slot::16, operation_type, length,
           credential_data::binary-size(length)>>
       ) do

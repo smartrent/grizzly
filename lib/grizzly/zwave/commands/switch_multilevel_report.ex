@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   @type param :: {:value, 0..99 | :off | :unknown} | {:duration, Encoding.duration()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     value_byte = encode_value(Command.param!(command, :value))
 
     case Command.param(command, :duration) do
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   def encode_value(:unknown), do: 0xFE
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<value_byte>>) do
+  def decode_params(_spec, <<value_byte>>) do
     case value_from_byte(value_byte) do
       {:ok, value} ->
         {:ok, [value: value]}
@@ -53,14 +53,14 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
   end
 
   # version 2
-  def decode_params(<<value_byte, duration_byte>>) do
+  def decode_params(_spec, <<value_byte, duration_byte>>) do
     with {:ok, value} <- value_from_byte(value_byte) do
       {:ok, [value: value, duration: decode_duration(duration_byte)]}
     end
   end
 
   # version 4
-  def decode_params(<<value_byte, target_value_byte, duration_byte, rest::binary>>) do
+  def decode_params(_spec, <<value_byte, target_value_byte, duration_byte, rest::binary>>) do
     if byte_size(rest) > 0 do
       Logger.warning(
         "[Grizzly] Unexpected trailing bytes in SwitchMultilevelReport: #{inspect(rest)}"

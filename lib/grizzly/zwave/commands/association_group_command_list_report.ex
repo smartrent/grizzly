@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   @type param() :: {:group_id, byte()} | {:commands, [atom()]}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     group_id = Command.param!(command, :group_id)
     commands = Command.param!(command, :commands)
     encoded_commands = encode_commands(commands)
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<group_id, length, commands_binary::binary>>) do
+  def decode_params(_spec, <<group_id, length, commands_binary::binary>>) do
     case decode_commands(length, commands_binary) do
       {:ok, commands} ->
         {:ok, [group_id: group_id, commands: commands]}

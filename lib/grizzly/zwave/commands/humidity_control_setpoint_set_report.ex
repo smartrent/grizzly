@@ -16,7 +16,6 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReport do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:setpoint_type, HumidityControlSetpoint.type()}
@@ -24,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReport do
           | {:value, number()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type = Command.param!(command, :setpoint_type)
     scale = Command.param!(command, :scale)
     value = Command.param!(command, :value)
@@ -34,8 +32,8 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<_::4, type::4, precision::3, scale::2, bytes::3, int_value::signed-size(bytes * 8)>>
       ) do
     type = decode_type(type)

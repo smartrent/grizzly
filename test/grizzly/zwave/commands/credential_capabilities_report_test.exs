@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesReportTest do
 
     assert {:ok, command} = Commands.create(:credential_capabilities_report, params)
 
-    assert CredentialCapabilitiesReport.encode_params(command) == <<
+    assert CredentialCapabilitiesReport.encode_params(nil, command) == <<
              0b10100000,
              2,
              # types
@@ -94,7 +94,7 @@ defmodule Grizzly.ZWave.Commands.CredentialCapabilitiesReportTest do
         106
       >>
 
-    assert {:ok, params} = CredentialCapabilitiesReport.decode_params(encoded)
+    assert {:ok, params} = CredentialCapabilitiesReport.decode_params(nil, encoded)
     assert params[:credential_checksum_supported?] == true
     assert params[:admin_code_supported?] == false
     assert params[:admin_code_deactivation_supported?] == true

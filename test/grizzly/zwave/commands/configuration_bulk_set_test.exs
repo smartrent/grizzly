@@ -30,14 +30,14 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSetTest do
     expected_params_binary =
       <<0x00::16, 0x03, 0x00::1, 0x01::1, 0x00::3, 0x02::3, 0x01::16, 0x02::16, 0x03::16>>
 
-    assert expected_params_binary == ConfigurationBulkSet.encode_params(command)
+    assert expected_params_binary == ConfigurationBulkSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary =
       <<0x00::16, 0x03, 0x00::1, 0x01::1, 0x00::3, 0x02::3, 0x01::16, 0x02::16, 0x03::16>>
 
-    {:ok, params} = ConfigurationBulkSet.decode_params(params_binary)
+    {:ok, params} = ConfigurationBulkSet.decode_params(nil, params_binary)
     assert Keyword.get(params, :default) == false
     assert Keyword.get(params, :handshake) == true
     assert Keyword.get(params, :size) == 2

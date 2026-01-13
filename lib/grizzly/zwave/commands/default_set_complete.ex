@@ -19,15 +19,13 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
   @type param :: {:seq_number, ZWave.seq_number()} | {:status, status()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     status = Command.param!(command, :status)
     <<Command.param!(command, :seq_number), status_to_byte(status)>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, status_byte>>) do
+  def decode_params(_spec, <<seq_number, status_byte>>) do
     case status_from_byte(status_byte) do
       {:ok, status} ->
         {:ok, [seq_number: seq_number, status: status]}

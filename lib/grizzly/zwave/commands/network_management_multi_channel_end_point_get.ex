@@ -15,7 +15,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet do
   alias Grizzly.ZWave.NodeId
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     node_id = Command.param!(command, :node_id)
 
@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NetworkManagementMultiChannelEndPointGet do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<seq_number, node_id::binary>>) do
+  def decode_params(_spec, <<seq_number, node_id::binary>>) do
     {:ok, [seq_number: seq_number, node_id: NodeId.parse(node_id)]}
   end
 end

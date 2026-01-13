@@ -27,13 +27,13 @@ defmodule Grizzly.ZWave.Commands.AntitheftReportTest do
 
     {:ok, command} = Commands.create(:antitheft_report, params)
     expected_binary = <<0x01, 126::16, 6>> <> hint <> <<341::16>>
-    assert expected_binary == AntitheftReport.encode_params(command)
+    assert expected_binary == AntitheftReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     hint = "rabbit"
     params_binary = <<0x01, 126::16, 6>> <> hint <> <<341::16>>
-    {:ok, params} = AntitheftReport.decode_params(params_binary)
+    {:ok, params} = AntitheftReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :status) == :protection_disabled_unlocked
     assert Keyword.get(params, :manufacturer_id) == 126
     assert Keyword.get(params, :antitheft_hint) == hint

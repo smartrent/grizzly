@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
       0x01
     >>
 
-    assert expected_params_binary == VersionReport.encode_params(report)
+    assert expected_params_binary == VersionReport.encode_params(nil, report)
   end
 
   test "encodes params correctly - v2" do
@@ -81,7 +81,7 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
       0x01
     >>
 
-    assert expected_params_binary == VersionReport.encode_params(report)
+    assert expected_params_binary == VersionReport.encode_params(nil, report)
   end
 
   test "decodes params correctly - v1" do
@@ -98,7 +98,7 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
       0x01
     >>
 
-    {:ok, params} = VersionReport.decode_params(params_binary)
+    {:ok, params} = VersionReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :library_type) == :static_controller
     assert Keyword.get(params, :protocol_version) == "2.0"
     assert Keyword.get(params, :firmware_version) == "3.1"
@@ -127,7 +127,7 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
       0x01
     >>
 
-    {:ok, params} = VersionReport.decode_params(params_binary)
+    {:ok, params} = VersionReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :library_type) == :static_controller
     assert Keyword.get(params, :protocol_version) == "2.0"
     assert Keyword.get(params, :firmware_version) == "3.1"
@@ -158,7 +158,7 @@ defmodule Grizzly.ZWave.Commands.VersionReportTest do
       0x01
     >>
 
-    {:ok, params} = VersionReport.decode_params(params_binary)
+    {:ok, params} = VersionReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :library_type) == :static_controller
     assert Keyword.get(params, :protocol_version) == "2.0"
     assert Keyword.get(params, :firmware_version) == "3.1"

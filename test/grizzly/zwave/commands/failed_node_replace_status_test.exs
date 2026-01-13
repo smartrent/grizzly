@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatusTest do
       )
 
     expected_binary = <<0x36, 0x09, 0x05, 0x00, 0x03>>
-    assert expected_binary == FailedNodeReplaceStatus.encode_params(command)
+    assert expected_binary == FailedNodeReplaceStatus.encode_params(nil, command)
 
     {:ok, command} =
       Commands.create(
@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatusTest do
       )
 
     expected_binary = <<0x0A, 0x06, 0x03, 0x07, 0x00>>
-    assert expected_binary == FailedNodeReplaceStatus.encode_params(command)
+    assert expected_binary == FailedNodeReplaceStatus.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -42,7 +42,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatusTest do
     ]
 
     assert {:ok, expected_params} ==
-             FailedNodeReplaceStatus.decode_params(<<0x0A, 0x06, 0x03, 0x07, 0x00>>)
+             FailedNodeReplaceStatus.decode_params(nil, <<0x0A, 0x06, 0x03, 0x07, 0x00>>)
 
     expected_params = [
       seq_number: 10,
@@ -53,6 +53,6 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceStatusTest do
     ]
 
     assert {:ok, expected_params} ==
-             FailedNodeReplaceStatus.decode_params(<<0x0A, 0x09, 0x03, 0x00, 0x07>>)
+             FailedNodeReplaceStatus.decode_params(nil, <<0x0A, 0x09, 0x03, 0x00, 0x07>>)
   end
 end

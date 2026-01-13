@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.S2TransferEnd do
   @type param :: {:key_verified, boolean(), key_request_complete: boolean()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     key_verified = Command.param!(command, :key_verified)
     key_request_complete = Command.param!(command, :key_request_complete)
 
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.S2TransferEnd do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<_reserved::6, key_verified::1, key_request_complete::1>>) do
+  def decode_params(_spec, <<_reserved::6, key_verified::1, key_request_complete::1>>) do
     key_verified = bit_to_bool(key_verified)
     key_request_complete = bit_to_bool(key_request_complete)
 

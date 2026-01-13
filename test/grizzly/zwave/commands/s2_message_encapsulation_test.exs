@@ -22,7 +22,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulationTest do
         encrypted_payload: <<0xDE, 0xAD, 0xBE, 0xEF>>
       )
 
-    binary = S2MessageEncapsulation.encode_params(cmd)
+    binary = S2MessageEncapsulation.encode_params(nil, cmd)
 
     assert binary ==
              <<0xAB, 0b00000011, 18, 0b11000001, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
@@ -36,7 +36,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulationTest do
         encrypted_payload: <<0xDE, 0xAD, 0xBE, 0xEF>>
       )
 
-    binary = S2MessageEncapsulation.encode_params(cmd)
+    binary = S2MessageEncapsulation.encode_params(nil, cmd)
 
     assert binary == <<0xEE, 0, 0xDE, 0xAD, 0xBE, 0xEF>>
   end
@@ -44,6 +44,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulationTest do
   test "decodes params correctly" do
     {:ok, params} =
       S2MessageEncapsulation.decode_params(
+        nil,
         <<0xAB, 0b00000011, 18, 0b11000001, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
           3, 0b11000011, 20, 2, 0b000000100, 0xDE, 0xAD, 0xBE, 0xEF>>
       )
@@ -56,7 +57,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulationTest do
     assert params[:encrypted_payload] == <<0xDE, 0xAD, 0xBE, 0xEF>>
 
     {:ok, params} =
-      S2MessageEncapsulation.decode_params(<<0xEE, 0, 0xDE, 0xAD, 0xBE, 0xEF>>)
+      S2MessageEncapsulation.decode_params(nil, <<0xEE, 0, 0xDE, 0xAD, 0xBE, 0xEF>>)
 
     assert params[:seq_number] == 0xEE
     assert params[:extensions] == []

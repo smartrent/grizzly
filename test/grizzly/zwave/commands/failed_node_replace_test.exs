@@ -15,11 +15,11 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceTest do
       )
 
     expected_binary = <<0x36, 0x05, 0x02, 0x01>>
-    assert expected_binary == FailedNodeReplace.encode_params(command)
+    assert expected_binary == FailedNodeReplace.encode_params(nil, command)
 
     {:ok, command} = Commands.create(:failed_node_replace, seq_number: 54, node_id: 5)
     expected_binary = <<0x36, 0x05, 0x20, 0x07>>
-    assert expected_binary == FailedNodeReplace.encode_params(command)
+    assert expected_binary == FailedNodeReplace.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -30,6 +30,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplaceTest do
       tx_opt: :low_power
     ]
 
-    assert {:ok, expected_params} == FailedNodeReplace.decode_params(<<0x36, 0x05, 0x02, 0x07>>)
+    assert {:ok, expected_params} ==
+             FailedNodeReplace.decode_params(nil, <<0x36, 0x05, 0x02, 0x07>>)
   end
 end

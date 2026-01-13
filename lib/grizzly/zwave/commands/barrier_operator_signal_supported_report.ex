@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalSupportedReport do
   @type param :: {:subsystem_types, [BarrierOperator.subsystem_type()]}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     subsystems = Command.param!(command, :subsystem_types)
     # Assumes only one bitmask is ever needed
     bitmask = BarrierOperator.subsystem_types_to_bitmask(subsystems)
@@ -24,7 +24,7 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSignalSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<bitmask>>) do
+  def decode_params(_spec, <<bitmask>>) do
     subsystems = BarrierOperator.bitmask_to_subsystem_types(bitmask)
 
     {:ok, [subsystem_types: subsystems]}

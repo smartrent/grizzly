@@ -14,7 +14,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:number_of_slots_week_day, byte()}
@@ -22,8 +21,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
           | {:number_of_slots_daily_repeating, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     number_of_slots_week_day = Command.param!(command, :number_of_slots_week_day)
     number_of_slots_year_day = Command.param!(command, :number_of_slots_year_day)
     number_of_slots_daily_repeating = Command.param(command, :number_of_slots_daily_repeating)
@@ -37,8 +35,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<number_of_slots_week_day, number_of_slots_year_day>>) do
+  def decode_params(_spec, <<number_of_slots_week_day, number_of_slots_year_day>>) do
     {:ok,
      [
        number_of_slots_week_day: number_of_slots_week_day,
@@ -48,6 +45,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryTypeSupportedReport do
 
   # Schedule Entry Lock Command Class, Version 3
   def decode_params(
+        _spec,
         <<number_of_slots_week_day, number_of_slots_year_day, number_of_slots_daily_repeating>>
       ) do
     {:ok,

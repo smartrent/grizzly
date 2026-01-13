@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.UserCodeReportTest do
 
       expected_binary = <<0x09, 0x00, 0x30, 0x30, 0x30, 0x30>>
 
-      assert expected_binary == UserCodeReport.encode_params(command)
+      assert expected_binary == UserCodeReport.encode_params(nil, command)
     end
 
     test "setting user code occupied" do
@@ -33,13 +33,13 @@ defmodule Grizzly.ZWave.Commands.UserCodeReportTest do
 
       expected_binary = <<0x05, 0x01, 0x31, 0x32, 0x33, 0x34, 0x35>>
 
-      assert expected_binary == UserCodeReport.encode_params(command)
+      assert expected_binary == UserCodeReport.encode_params(nil, command)
     end
   end
 
   test "decodes params correctly" do
     binary = <<0x07, 0x01, 0x34, 0x38, 0x32, 0x31>>
-    {:ok, params} = UserCodeReport.decode_params(binary)
+    {:ok, params} = UserCodeReport.decode_params(nil, binary)
 
     assert Keyword.get(params, :user_id) == 7
     assert Keyword.get(params, :user_id_status) == :occupied

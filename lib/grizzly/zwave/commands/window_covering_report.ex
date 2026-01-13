@@ -23,8 +23,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringReport do
           | {:duration, byte()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     parameter_id =
       Command.param!(command, :parameter_name) |> WindowCovering.encode_parameter_name()
 
@@ -35,8 +34,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<parameter_id, current_value, target_value, duration>>) do
+  def decode_params(_spec, <<parameter_id, current_value, target_value, duration>>) do
     case WindowCovering.decode_parameter_name(parameter_id) do
       {:ok, parameter_name} ->
         {:ok,

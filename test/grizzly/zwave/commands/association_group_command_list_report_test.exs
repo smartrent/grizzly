@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReportTest do
     params = [group_id: 2, commands: [:basic_set, :basic_get, :battery_get]]
     {:ok, command} = Commands.create(:association_group_command_list_report, params)
     expected_binary = <<0x02, 0x06, 0x20, 0x01, 0x20, 0x02, 0x80, 0x02>>
-    assert expected_binary == AssociationGroupCommandListReport.encode_params(command)
+    assert expected_binary == AssociationGroupCommandListReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02, 0x06, 0x20, 0x01, 0x20, 0x02, 0x80, 0x02>>
-    {:ok, params} = AssociationGroupCommandListReport.decode_params(binary_params)
+    {:ok, params} = AssociationGroupCommandListReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :group_id) == 2
     commands = Keyword.get(params, :commands)
     assert Enum.count(commands) == 3
@@ -27,7 +27,7 @@ defmodule Grizzly.ZWave.Commands.AssociationGroupCommandListReportTest do
 
   test "decodes params correctly in spite of extra byte" do
     binary_params = <<0x02, 0x06, 0x20, 0x01, 0x20, 0x02, 0x80, 0x02, 0x00>>
-    {:ok, params} = AssociationGroupCommandListReport.decode_params(binary_params)
+    {:ok, params} = AssociationGroupCommandListReport.decode_params(nil, binary_params)
     assert Keyword.get(params, :group_id) == 2
     commands = Keyword.get(params, :commands)
     assert Enum.count(commands) == 3

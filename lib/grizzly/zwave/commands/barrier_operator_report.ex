@@ -17,16 +17,14 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorReport do
   @type param :: {:state, BarrierOperator.state()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     state = Command.param!(command, :state)
     state_byte = BarrierOperator.state_to_byte(state)
     <<state_byte>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<state_byte>>) do
+  def decode_params(_spec, <<state_byte>>) do
     case BarrierOperator.state_from_byte(state_byte) do
       {:ok, state} ->
         {:ok, [state: state]}

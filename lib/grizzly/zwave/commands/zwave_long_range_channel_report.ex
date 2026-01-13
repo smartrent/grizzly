@@ -22,11 +22,11 @@ defmodule Grizzly.ZWave.Commands.ZWaveLongRangeChannelReport do
   @type param() :: {:channel, long_range_channel()}
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<0x01>>), do: {:ok, [channel: :primary]}
-  def decode_params(<<0x02>>), do: {:ok, [channel: :secondary]}
+  def decode_params(_spec, <<0x01>>), do: {:ok, [channel: :primary]}
+  def decode_params(_spec, <<0x02>>), do: {:ok, [channel: :secondary]}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     case Command.param!(command, :channel) do
       :primary -> <<0x01>>
       :secondary -> <<0x02>>

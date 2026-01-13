@@ -15,13 +15,13 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointGetTest do
 
     expected_binary = <<0x00::4, 0x01::4>>
 
-    assert expected_binary == ThermostatSetpointGet.encode_params(command)
+    assert expected_binary == ThermostatSetpointGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00::4, 0x01::4>>
 
-    {:ok, params} = ThermostatSetpointGet.decode_params(binary_params)
+    {:ok, params} = ThermostatSetpointGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :type) == :heating
   end
 end

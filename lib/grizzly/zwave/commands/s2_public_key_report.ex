@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.Commands.S2PublicKeyReport do
   @type param :: {:ecdh_public_key, binary()} | {:including_node, boolean()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     including_node = Command.param!(command, :including_node)
     ecdh_public_key = Command.param!(command, :ecdh_public_key)
 
@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.S2PublicKeyReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<_reserved::7, including_node::1, ecdh_public_key::binary>>) do
+  def decode_params(_spec, <<_reserved::7, including_node::1, ecdh_public_key::binary>>) do
     including_node = bit_to_bool(including_node)
 
     {:ok, [including_node: including_node, ecdh_public_key: ecdh_public_key]}

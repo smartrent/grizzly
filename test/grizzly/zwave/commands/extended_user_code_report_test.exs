@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeReportTest do
     ]
 
     {:ok, command} = Commands.create(:extended_user_code_report, params)
-    binary = ExtendedUserCodeReport.encode_params(command)
+    binary = ExtendedUserCodeReport.encode_params(nil, command)
 
     expected_binary =
       <<2::8, 36::16, 1::8, 6::8, "873227"::binary, 37::16, 2::8, 8::8, "12345678"::binary,
@@ -28,7 +28,7 @@ defmodule Grizzly.ZWave.Commands.ExtendedUserCodeReportTest do
       <<2::8, 36::16, 1::8, 6::8, "873227"::binary, 37::16, 2::8, 8::8, "12345678"::binary,
         38::16>>
 
-    {:ok, params} = ExtendedUserCodeReport.decode_params(input)
+    {:ok, params} = ExtendedUserCodeReport.decode_params(nil, input)
 
     assert 38 = params[:next_user_id]
     assert [code1, code2] = params[:user_codes]

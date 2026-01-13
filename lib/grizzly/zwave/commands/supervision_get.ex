@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionGet do
           | {:encapsulated_command, binary}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     status_updates_bit = Command.param!(command, :status_updates) |> encode_status_updates()
 
     session_id = Command.param!(command, :session_id)
@@ -36,6 +36,7 @@ defmodule Grizzly.ZWave.Commands.SupervisionGet do
 
   @impl Grizzly.ZWave.Command
   def decode_params(
+        _spec,
         <<status_updates_bit::1, 0x00::1, session_id::6, length,
           encapsulated_command::binary-size(length)-unit(8)>>
       ) do

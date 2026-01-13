@@ -23,12 +23,12 @@ defmodule Grizzly.ZWave.Commands.VersionCommandClassReportTest do
       Commands.create(:version_command_class_report, command_class: :switch_binary, version: 2)
 
     expected_binary = <<0x25, 0x02>>
-    assert expected_binary == VersionCommandClassReport.encode_params(command)
+    assert expected_binary == VersionCommandClassReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x25, 0x02>>
-    {:ok, params} = VersionCommandClassReport.decode_params(binary_params)
+    {:ok, params} = VersionCommandClassReport.decode_params(nil, binary_params)
 
     assert Keyword.get(params, :command_class) == :switch_binary
     assert Keyword.get(params, :version) == 2

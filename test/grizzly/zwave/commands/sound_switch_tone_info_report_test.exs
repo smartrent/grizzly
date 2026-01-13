@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.SoundSwitchToneInfoReportTest do
       )
 
     expected_binary = <<15, 1024::16, 5::8, "Alarm"::binary>>
-    assert expected_binary == SoundSwitchToneInfoReport.encode_params(cmd)
+    assert expected_binary == SoundSwitchToneInfoReport.encode_params(nil, cmd)
   end
 
   test "decodes params correctly" do
     binary = <<15, 1024::16, 5::8, "Alarm"::binary>>
-    {:ok, params} = SoundSwitchToneInfoReport.decode_params(binary)
+    {:ok, params} = SoundSwitchToneInfoReport.decode_params(nil, binary)
 
     assert params == [
              tone_identifier: 15,

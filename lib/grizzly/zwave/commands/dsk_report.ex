@@ -19,7 +19,6 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.NetworkManagementBasicNode
-  alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.DSK
 
   @type param ::
@@ -28,8 +27,7 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
           | {:dsk, DSK.t()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     add_mode = NetworkManagementBasicNode.add_mode_to_byte(Command.param!(command, :add_mode))
     dsk = Command.param!(command, :dsk)
@@ -38,8 +36,7 @@ defmodule Grizzly.ZWave.Commands.DSKReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<seq_number, _::7, add_mode_bit::1, dsk_binary::binary>>) do
+  def decode_params(_spec, <<seq_number, _::7, add_mode_bit::1, dsk_binary::binary>>) do
     add_mode = NetworkManagementBasicNode.add_mode_from_bit(add_mode_bit)
     {:ok, [seq_number: seq_number, add_mode: add_mode, dsk: DSK.new(dsk_binary)]}
   end

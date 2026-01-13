@@ -33,7 +33,6 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:user_identifier, byte()}
@@ -50,8 +49,7 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport do
           | {:stop_minute, 0..59}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     user_identifier = Command.param!(command, :user_identifier)
     schedule_slot_id = Command.param!(command, :schedule_slot_id)
     start_year = Command.param!(command, :start_year)
@@ -70,8 +68,8 @@ defmodule Grizzly.ZWave.Commands.ScheduleEntryLockYearDayReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<user_identifier, schedule_slot_id, start_year, start_month, start_day, start_hour,
           start_minute, stop_year, stop_month, stop_day, stop_hour, stop_minute>>
       ) do

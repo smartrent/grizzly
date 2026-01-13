@@ -6,8 +6,8 @@ defmodule Grizzly.ZWave.Commands.GenericNoPayload do
   @behaviour Grizzly.ZWave.Command
 
   @impl Grizzly.ZWave.Command
-  def encode_params(_command), do: <<>>
+  def encode_params(_spec, _command), do: <<>>
 
   @impl Grizzly.ZWave.Command
-  def decode_params(_binary), do: {:ok, []}
+  def decode_params(_spec, _binary), do: {:ok, []}
 end

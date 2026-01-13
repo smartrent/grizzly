@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.AssociationRemoveTest do
     params = [grouping_identifier: 2, nodes: [4, 5, 6]]
     {:ok, command} = Commands.create(:association_remove, params)
     expected_binary = <<0x02, 0x04, 0x05, 0x06>>
-    assert expected_binary == AssociationRemove.encode_params(command)
+    assert expected_binary == AssociationRemove.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02, 0x04, 0x05, 0x06>>
-    {:ok, params} = AssociationRemove.decode_params(binary_params)
+    {:ok, params} = AssociationRemove.decode_params(nil, binary_params)
     assert Keyword.get(params, :grouping_identifier) == 2
     assert Enum.sort(Keyword.get(params, :nodes)) == [4, 5, 6]
   end

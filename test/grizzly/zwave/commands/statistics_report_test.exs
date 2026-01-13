@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
         packet_error_count <>
         sum_of_transmission_times <> sum_of_transmission_times_squared
 
-    assert expected_binary == StatisticsReport.encode_params(command)
+    assert expected_binary == StatisticsReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -78,7 +78,7 @@ defmodule Grizzly.ZWave.Commands.StatisticsReportTest do
         neighbors <>
         sum_of_transmission_times <> sum_of_transmission_times_squared
 
-    {:ok, params} = StatisticsReport.decode_params(params_binary)
+    {:ok, params} = StatisticsReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :node_id) == 4
     statistics = Keyword.get(params, :statistics)
     assert Keyword.get(statistics, :route_changes) == 2

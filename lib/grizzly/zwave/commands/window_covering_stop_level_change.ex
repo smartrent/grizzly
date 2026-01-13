@@ -17,8 +17,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStopLevelChange do
   @type param :: {:parameter_name, WindowCovering.parameter_name()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     parameter_id =
       Command.param!(command, :parameter_name) |> WindowCovering.encode_parameter_name()
 
@@ -26,8 +25,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringStopLevelChange do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<parameter_id>>) do
+  def decode_params(_spec, <<parameter_id>>) do
     case WindowCovering.decode_parameter_name(parameter_id) do
       {:ok, parameter_name} ->
         {:ok, [parameter_name: parameter_name]}

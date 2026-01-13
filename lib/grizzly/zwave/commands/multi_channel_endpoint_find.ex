@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFind do
           | {:specific_device_class, DC.specific_device_class() | :all}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     generic_class = Command.param(command, :generic_device_class, :all)
     generic_class_byte = encode_generic_class(generic_class)
 
@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFind do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(<<generic_class_byte, specific_class_byte>>) do
+  def decode_params(_spec, <<generic_class_byte, specific_class_byte>>) do
     generic_class = decode_generic_class(generic_class_byte)
     specific_class = decode_specific_class(generic_class, specific_class_byte)
 

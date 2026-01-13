@@ -24,7 +24,6 @@ defmodule Grizzly.ZWave.Commands.S2NonceReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param ::
           {:seq_number, byte()}
@@ -33,8 +32,7 @@ defmodule Grizzly.ZWave.Commands.S2NonceReport do
           | {:receivers_entropy_input, <<_::128>>}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     seq_number = Command.param!(command, :seq_number)
     mpan_out_of_sync? = Command.param!(command, :mpan_out_of_sync?)
     span_out_of_sync? = Command.param!(command, :span_out_of_sync?)
@@ -45,8 +43,8 @@ defmodule Grizzly.ZWave.Commands.S2NonceReport do
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
   def decode_params(
+        _spec,
         <<seq_number::8, _reserved::6, mpan_out_of_sync?::1, span_out_of_sync?::1,
           receivers_entropy_input::binary>>
       ) do

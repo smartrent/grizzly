@@ -21,7 +21,7 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
 
     {:ok, command} = Commands.create(:multi_channel_endpoint_find, params)
     expected_binary = <<0x10, 0x04>>
-    assert expected_binary == MultiChannelEndpointFind.encode_params(command)
+    assert expected_binary == MultiChannelEndpointFind.encode_params(nil, command)
 
     params = [
       generic_device_class: :all,
@@ -30,16 +30,16 @@ defmodule Grizzly.ZWave.Commands.MultiChannelEndpointFindTest do
 
     {:ok, command} = Commands.create(:multi_channel_endpoint_find, params)
     expected_binary = <<0xFF, 0xFF>>
-    assert expected_binary == MultiChannelEndpointFind.encode_params(command)
+    assert expected_binary == MultiChannelEndpointFind.encode_params(nil, command)
 
     {:ok, command} = Commands.create(:multi_channel_endpoint_find, [])
     expected_binary = <<0xFF, 0xFF>>
-    assert expected_binary == MultiChannelEndpointFind.encode_params(command)
+    assert expected_binary == MultiChannelEndpointFind.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     params_binary = <<0x10, 0x04>>
-    {:ok, params} = MultiChannelEndpointFind.decode_params(params_binary)
+    {:ok, params} = MultiChannelEndpointFind.decode_params(nil, params_binary)
     assert Keyword.get(params, :generic_device_class) == :switch_binary
     assert Keyword.get(params, :specific_device_class) == :power_strip
   end

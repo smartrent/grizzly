@@ -15,13 +15,13 @@ defmodule Grizzly.ZWave.Commands.UserCodeGetTest do
 
     expected_binary = <<0x02>>
 
-    assert expected_binary == UserCodeGet.encode_params(command)
+    assert expected_binary == UserCodeGet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x02>>
 
-    {:ok, params} = UserCodeGet.decode_params(binary_params)
+    {:ok, params} = UserCodeGet.decode_params(nil, binary_params)
     assert Keyword.get(params, :user_id) == 2
   end
 end

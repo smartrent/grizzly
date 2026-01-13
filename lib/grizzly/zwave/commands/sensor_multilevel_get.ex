@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
   @type param :: {:sensor_type, sensor_type} | {:scale, 0..3}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     case Command.param(command, :sensor_type) do
       nil ->
         <<>>
@@ -34,12 +34,12 @@ defmodule Grizzly.ZWave.Commands.SensorMultilevelGet do
 
   @impl Grizzly.ZWave.Command
   # v1 - v4
-  def decode_params(<<>>) do
+  def decode_params(_spec, <<>>) do
     {:ok, []}
   end
 
   # v5
-  def decode_params(<<sensor_type_byte, _::3, scale::2, _::3>>) do
+  def decode_params(_spec, <<sensor_type_byte, _::3, scale::2, _::3>>) do
     case SensorMultilevel.decode_sensor_type(sensor_type_byte) do
       {:ok, sensor_type} ->
         {:ok,

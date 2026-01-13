@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReportTest do
 
     {:ok, command} = Commands.create(:credential_report, params)
 
-    assert CredentialReport.encode_params(command) == <<
+    assert CredentialReport.encode_params(nil, command) == <<
              0,
              1::16,
              2,
@@ -49,7 +49,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReportTest do
 
     {:ok, command} = Commands.create(:credential_report, params)
 
-    assert CredentialReport.encode_params(command) == <<
+    assert CredentialReport.encode_params(nil, command) == <<
              0x09,
              1024::16,
              1,
@@ -79,7 +79,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReportTest do
       2::16
     >>
 
-    assert {:ok, params} = CredentialReport.decode_params(binary)
+    assert {:ok, params} = CredentialReport.decode_params(nil, binary)
 
     assert params[:report_type] == :added
     assert params[:user_id] == 1
@@ -106,7 +106,7 @@ defmodule Grizzly.ZWave.Commands.CredentialReportTest do
       2::16
     >>
 
-    assert {:ok, params} = CredentialReport.decode_params(binary)
+    assert {:ok, params} = CredentialReport.decode_params(nil, binary)
 
     assert params[:report_type] == :wrong_user_id
     assert params[:user_id] == 1024

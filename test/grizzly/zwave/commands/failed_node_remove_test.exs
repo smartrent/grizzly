@@ -13,34 +13,34 @@ defmodule Grizzly.ZWave.Commands.FailedNodeRemoveTest do
     test "version 4 - with 8 bit node id" do
       {:ok, command} = Commands.create(:failed_node_remove, seq_number: 0x01, node_id: 0x04)
 
-      assert FailedNodeRemove.encode_params(command) == <<0x01, 0x04, 0x04::16>>
+      assert FailedNodeRemove.encode_params(nil, command) == <<0x01, 0x04, 0x04::16>>
     end
 
     test "version 4 - with 16 bit node id" do
       {:ok, command} = Commands.create(:failed_node_remove, seq_number: 0x01, node_id: 0x0401)
 
-      assert FailedNodeRemove.encode_params(command) == <<0x01, 0xFF, 0x04, 0x01>>
+      assert FailedNodeRemove.encode_params(nil, command) == <<0x01, 0xFF, 0x04, 0x01>>
     end
   end
 
   describe "decodes params correctly" do
     test "version 1-3 - no 16 bit node id support" do
       expected_params = [seq_number: 0x01, node_id: 0x04]
-      {:ok, params} = FailedNodeRemove.decode_params(<<0x01, 0x04>>)
+      {:ok, params} = FailedNodeRemove.decode_params(nil, <<0x01, 0x04>>)
 
       assert_params(expected_params, params)
     end
 
     test "version 4 - 8 bit node id" do
       expected_params = [seq_number: 0x01, node_id: 0x04]
-      {:ok, params} = FailedNodeRemove.decode_params(<<0x01, 0x04, 0x00, 0x00>>)
+      {:ok, params} = FailedNodeRemove.decode_params(nil, <<0x01, 0x04, 0x00, 0x00>>)
 
       assert_params(expected_params, params)
     end
 
     test "version 4 - 16 bit node id" do
       expected_params = [seq_number: 0x01, node_id: 0x0411]
-      {:ok, params} = FailedNodeRemove.decode_params(<<0x01, 0xFF, 0x04, 0x11>>)
+      {:ok, params} = FailedNodeRemove.decode_params(nil, <<0x01, 0xFF, 0x04, 0x11>>)
 
       assert_params(expected_params, params)
     end

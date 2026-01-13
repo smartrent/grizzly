@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.MeterGet do
           | {:scale2, byte()}
 
   @impl Grizzly.ZWave.Command
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     cond do
       Command.has_param?(command, :scale2) -> encode_v4_and_later_raw(command)
       Command.has_param?(command, :scale) -> encode_v2_and_later(command)
@@ -55,7 +55,7 @@ defmodule Grizzly.ZWave.Commands.MeterGet do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(binary) do
+  def decode_params(_spec, binary) do
     # Yikes... we don't know the meter type here, so we can't decode the scale properly.
     case binary do
       <<rate_type_bin::2, scale1::3, _::3, scale2>> ->

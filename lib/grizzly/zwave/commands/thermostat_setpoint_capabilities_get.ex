@@ -11,20 +11,17 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointCapabilitiesGet do
 
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses.ThermostatSetpoint
-  alias Grizzly.ZWave.DecodeError
 
   @type param() :: {:type, ThermostatSetpoint.type()}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     type = Command.param!(command, :type)
     <<0::4, ThermostatSetpoint.encode_type(type)::4>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<_reserved::4, type::4>>) do
+  def decode_params(_spec, <<_reserved::4, type::4>>) do
     {:ok, [type: ThermostatSetpoint.decode_type(type)]}
   end
 end

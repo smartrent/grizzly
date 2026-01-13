@@ -17,7 +17,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReportTest do
       <<0x0A, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 1, 1>>
 
-    assert expected_binary == FailedNodeListReport.encode_params(command)
+    assert expected_binary == FailedNodeListReport.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
@@ -25,7 +25,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReportTest do
       <<0x0A, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0>>
 
-    {:ok, params} = FailedNodeListReport.decode_params(params_binary)
+    {:ok, params} = FailedNodeListReport.decode_params(nil, params_binary)
     assert Keyword.get(params, :seq_number) == 10
     assert Keyword.get(params, :node_ids) == [1, 2, 3, 9]
   end
@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeListReportTest do
       <<0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0>>
 
-    {:ok, params} = FailedNodeListReport.decode_params(binary)
+    {:ok, params} = FailedNodeListReport.decode_params(nil, binary)
 
     assert params[:node_ids] == [38]
   end

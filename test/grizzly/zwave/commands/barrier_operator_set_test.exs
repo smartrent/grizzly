@@ -13,12 +13,12 @@ defmodule Grizzly.ZWave.Commands.BarrierOperatorSetTest do
     params = [target_value: :open]
     {:ok, command} = Commands.create(:barrier_operator_set, params)
     expected_binary = <<0xFF>>
-    assert expected_binary == BarrierOperatorSet.encode_params(command)
+    assert expected_binary == BarrierOperatorSet.encode_params(nil, command)
   end
 
   test "decodes params correctly" do
     binary_params = <<0x00>>
-    {:ok, params} = BarrierOperatorSet.decode_params(binary_params)
+    {:ok, params} = BarrierOperatorSet.decode_params(nil, binary_params)
     assert Keyword.get(params, :target_value) == :close
   end
 end

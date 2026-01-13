@@ -11,20 +11,17 @@ defmodule Grizzly.ZWave.Commands.SceneActuatorConfGet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.DecodeError
 
   @type param :: {:scene_id, 0..255}
 
   @impl Grizzly.ZWave.Command
-  @spec encode_params(Command.t()) :: binary()
-  def encode_params(command) do
+  def encode_params(_spec, command) do
     scene_id = Command.param!(command, :scene_id)
     <<scene_id>>
   end
 
   @impl Grizzly.ZWave.Command
-  @spec decode_params(binary()) :: {:ok, [param()]} | {:error, DecodeError.t()}
-  def decode_params(<<scene_id>>) do
+  def decode_params(_spec, <<scene_id>>) do
     {:ok, [scene_id: scene_id]}
   end
 end
