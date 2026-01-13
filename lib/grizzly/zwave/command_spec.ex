@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.CommandSpec do
     Data structure describing a parameter for a Z-Wave command.
     """
 
-    @type type :: :int | :uint | :boolean | :binary | :enum | :any
+    @type type :: :int | :uint | :boolean | :binary | :enum | :constant | :reserved | :any
 
     @type t :: %__MODULE__{
             name: atom(),
