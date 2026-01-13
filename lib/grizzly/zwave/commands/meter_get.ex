@@ -63,26 +63,10 @@ defmodule Grizzly.ZWave.Commands.MeterGet do
         {:ok, [scale: scale1, scale2: scale2, rate_type: rate_type]}
 
       <<_::2, scale1::3, _::3>> ->
-        {:ok, [scale: scale1, rate_type: nil]}
+        {:ok, [scale: scale1, scale2: nil, rate_type: nil]}
 
       <<>> ->
-        {:ok, [scale: nil, rate_type: nil]}
-    end
-  end
-
-  def decode_params(binary, meter_type) do
-    {:ok, params} = decode_params(binary)
-
-    if params[:scale] != nil do
-      scale =
-        case Meter.decode_meter_scale({params[:scale], params[:scale2]}, meter_type) do
-          {:ok, scale} -> scale
-          _ -> :unknown
-        end
-
-      {:ok, scale: scale, rate_type: params[:rate_type]}
-    else
-      {:ok, scale: nil, rate_type: params[:rate_type]}
+        {:ok, [scale: nil, scale2: nil, rate_type: nil]}
     end
   end
 end

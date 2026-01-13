@@ -59,42 +59,42 @@ defmodule Grizzly.ZWave.Commands.MeterGetTest do
   test "decodes params correctly" do
     # v1
     binary = <<>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: nil, rate_type: nil]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: nil, scale2: nil, rate_type: nil]
 
     # v2-3
     binary = <<0::2, 0::3, 0::3>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :kwh, rate_type: nil]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 0, scale2: nil, rate_type: nil]
 
     # v4-6
     binary = <<0::2, 0::3, 0::3, 0>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :kwh, rate_type: :default]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 0, scale2: 0, rate_type: :default]
 
     # v4-6
     binary = <<1::2, 0::3, 0::3, 0>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :kwh, rate_type: :import]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 0, scale2: 0, rate_type: :import]
 
     # v4-6
     binary = <<3::2, 0::3, 0::3, 0>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :kwh, rate_type: :import_export]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 0, scale2: 0, rate_type: :import_export]
 
     # v4-6
     binary = <<3::2, 3::3, 0::3, 0>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :pulse_count, rate_type: :import_export]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 3, scale2: 0, rate_type: :import_export]
 
     # v4-6
     binary = <<3::2, 7::3, 0::3, 1>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :kvarh, rate_type: :import_export]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 7, scale2: 1, rate_type: :import_export]
 
     # v4-6
     binary = <<0::2, 7::3, 0::3, 0>>
-    assert {:ok, params} = MeterGet.decode_params(binary, :electric)
-    assert params == [scale: :kvar, rate_type: :default]
+    assert {:ok, params} = MeterGet.decode_params(binary)
+    assert params == [scale: 7, scale2: 0, rate_type: :default]
   end
 end
