@@ -83,33 +83,122 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :association, 0x85 do
     command :association_set, 0x01
-    command :association_get, 0x02, handler: {AggregateReport, aggregate_param: :nodes}
+
+    command :association_get, 0x02, Cmds.Generic,
+      handler: {AggregateReport, aggregate_param: :nodes},
+      params: [
+        param(:grouping_identifier, :uint, size: 8)
+      ]
+
     command :association_report, 0x03, default_params: [reports_to_follow: 0]
     command :association_remove, 0x04
     command :association_groupings_get, 0x05, Cmds.Generic, params: []
-    command :association_groupings_report, 0x06
+
+    command :association_groupings_report, 0x06, Cmds.Generic,
+      params: [
+        param(:supported_groupings, :uint, size: 8)
+      ]
+
     command :association_specific_group_get, 0x0B, Cmds.Generic, params: []
-    command :association_specific_group_report, 0x0C
+
+    command :association_specific_group_report, 0x0C, Cmds.Generic,
+      params: [
+        param(:group, :uint, size: 8)
+      ]
   end
 
   command_class :association_group_info, 0x59 do
     command :association_group_name_get, 0x01
     command :association_group_name_report, 0x02
-    command :association_group_info_get, 0x03
+
+    command :association_group_info_get, 0x03, Cmds.Generic,
+      params: [
+        param(:refresh_cache, :boolean, size: 1),
+        param(:all, :boolean, size: 1),
+        param(:reserved, :reserved, size: 6),
+        param(:group_id, :uint, size: 8, default: 0)
+      ]
+
     command :association_group_info_report, 0x04
-    command :association_group_command_list_get, 0x05
+
+    command :association_group_command_list_get, 0x05, Cmds.Generic,
+      params: [
+        param(:allow_cache, :boolean, size: 1),
+        param(:reserved, :reserved, size: 7),
+        param(:group_id, :uint, size: 8)
+      ]
+
     command :association_group_command_list_report, 0x06
   end
 
   command_class :barrier_operator, 0x66 do
-    command :barrier_operator_set, 0x01
+    command :barrier_operator_set, 0x01, Cmds.Generic,
+      params: [
+        param(:target_value, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.BarrierOperator.target_value_to_byte/1,
+            decode: &CommandClasses.BarrierOperator.target_value_from_byte/1
+          ]
+        )
+      ]
+
     command :barrier_operator_get, 0x02, Cmds.Generic, params: []
-    command :barrier_operator_report, 0x03
+
+    command :barrier_operator_report, 0x03, Cmds.Generic,
+      params: [
+        param(:state, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.BarrierOperator.state_to_byte/1,
+            decode: &CommandClasses.BarrierOperator.state_from_byte/1
+          ]
+        )
+      ]
+
     command :barrier_operator_signal_supported_get, 0x04, Cmds.Generic, params: []
     command :barrier_operator_signal_supported_report, 0x05
-    command :barrier_operator_signal_set, 0x06, Cmds.BarrierOperatorSignalSetReport
-    command :barrier_operator_signal_get, 0x07
-    command :barrier_operator_signal_report, 0x08, Cmds.BarrierOperatorSignalSetReport
+
+    subsystem_type_param =
+      param(:subsystem_type, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.BarrierOperator.subsystem_type_to_byte/1,
+          decode: &CommandClasses.BarrierOperator.subsystem_type_from_byte/1
+        ]
+      )
+
+    subsystem_state_param =
+      param(:subsystem_state, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.BarrierOperator.subsystem_state_to_byte/1,
+          decode: &CommandClasses.BarrierOperator.subsystem_state_from_byte/1
+        ]
+      )
+
+    command :barrier_operator_signal_set, 0x06, Cmds.Generic,
+      params: [
+        subsystem_type_param,
+        subsystem_state_param
+      ]
+
+    command :barrier_operator_signal_get, 0x07, Cmds.Generic,
+      params: [
+        param(:subsystem_type, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.BarrierOperator.subsystem_type_to_byte/1,
+            decode: &CommandClasses.BarrierOperator.subsystem_type_from_byte/1
+          ]
+        )
+      ]
+
+    command :barrier_operator_signal_report, 0x08, Cmds.Generic,
+      params: [
+        subsystem_type_param,
+        subsystem_state_param
+      ]
   end
 
   command_class :basic, 0x20 do
@@ -127,14 +216,19 @@ defmodule Grizzly.ZWave.Commands do
     command :central_scene_supported_get, 0x01, Cmds.Generic, params: []
     command :central_scene_supported_report, 0x02
     command :central_scene_notification, 0x03
-    command :central_scene_configuration_set, 0x04
+
+    central_scene_config_params = [
+      param(:slow_refresh, :boolean, size: 1),
+      param(:reserved, :reserved, size: 7)
+    ]
+
+    command :central_scene_configuration_set, 0x04, Cmds.Generic,
+      params: central_scene_config_params
+
     command :central_scene_configuration_get, 0x05, Cmds.Generic, params: []
 
     command :central_scene_configuration_report, 0x06, Cmds.Generic,
-      params: [
-        param(:slow_refresh, :boolean, size: 1),
-        param(:reserved, :reserved, size: 7)
-      ]
+      params: central_scene_config_params
   end
 
   command_class :clock, 0x81 do
