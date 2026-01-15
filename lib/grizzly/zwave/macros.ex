@@ -20,7 +20,7 @@ defmodule Grizzly.ZWave.Macros do
     end
   end
 
-  defmacro command_class(name, do: block) do
+  defmacro command_class(name, _byte, do: block) do
     quote do
       var!(cc_name, Grizzly.ZWave.Macros) = unquote(name)
       unquote(block)

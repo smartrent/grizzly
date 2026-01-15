@@ -2,7 +2,7 @@ version: 2.1
 
 elixir_current: &elixir_current "1.19.3-erlang-28.1.1-alpine-3.22.2"
 elixir_prev_1: &elixir_prev_1 "1.18.4-erlang-27.3.4.2-alpine-3.22.2"
-elixir_prev_2: &elixir_prev_2 "1.17.3-erlang-27.3.4.2-alpine-3.22.2"
+# elixir_prev_2: &elixir_prev_2 "1.17.3-erlang-27.3.4.2-alpine-3.22.2"
 
 defaults: &defaults
   working_directory: ~/repo
@@ -164,7 +164,7 @@ workflows:
               image-tag:
                 - *elixir_current
                 - *elixir_prev_1
-                - *elixir_prev_2
+                # - *elixir_prev_2
       - lint:
           filters: pipeline.git.tag
           image-tag: *elixir_current
@@ -184,7 +184,7 @@ workflows:
               image-tag:
                 - *elixir_current
                 - *elixir_prev_1
-                - *elixir_prev_2
+                # - *elixir_prev_2
       - publish:
           context:
             - github-token
