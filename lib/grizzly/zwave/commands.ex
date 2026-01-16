@@ -117,7 +117,7 @@ defmodule Grizzly.ZWave.Commands do
       params: [
         param(:refresh_cache, :boolean, size: 1),
         param(:all, :boolean, size: 1),
-        param(:reserved, :reserved, size: 6),
+        reserved(size: 6),
         param(:group_id, :uint, size: 8, default: 0)
       ]
 
@@ -126,7 +126,7 @@ defmodule Grizzly.ZWave.Commands do
     command :association_group_command_list_get, 0x05, Cmds.Generic,
       params: [
         param(:allow_cache, :boolean, size: 1),
-        param(:reserved, :reserved, size: 7),
+        reserved(size: 7),
         param(:group_id, :uint, size: 8)
       ]
 
@@ -221,7 +221,7 @@ defmodule Grizzly.ZWave.Commands do
 
     central_scene_config_params = [
       param(:slow_refresh, :boolean, size: 1),
-      param(:reserved, :reserved, size: 7)
+      reserved(size: 7)
     ]
 
     command :central_scene_configuration_set, 0x04, Cmds.Generic,
@@ -354,7 +354,14 @@ defmodule Grizzly.ZWave.Commands do
     command :firmware_md_report, 0x02, Cmds.FirmwareMDReport
     command :firmware_update_md_request_get, 0x03, Cmds.FirmwareUpdateMDRequestGet
     command :firmware_update_md_request_report, 0x04, Cmds.FirmwareUpdateMDRequestReport
-    command :firmware_update_md_get, 0x05, Cmds.FirmwareUpdateMDGet
+
+    command :firmware_update_md_get, 0x05, Cmds.Generic,
+      params: [
+        param(:number_of_reports, :uint, size: 8),
+        reserved(size: 1),
+        param(:report_number, :uint, size: 15)
+      ]
+
     command :firmware_update_md_report, 0x06, Cmds.FirmwareUpdateMDReport
     command :firmware_update_md_status_report, 0x07, Cmds.FirmwareUpdateMDStatusReport
     command :firmware_update_activation_set, 0x08, report: :firmware_update_activation_report
@@ -367,7 +374,7 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :humidity_control_mode, 0x6D do
     set_report_params = [
-      param(:reserved, :reserved, size: 4),
+      reserved(size: 4),
       param(:mode, :enum,
         size: 4,
         opts: [
@@ -389,7 +396,7 @@ defmodule Grizzly.ZWave.Commands do
 
     command :humidity_control_operating_state_report, 0x02, Cmds.Generic,
       params: [
-        param(:reserved, :reserved, size: 4),
+        reserved(size: 4),
         param(:state, :enum,
           size: 4,
           opts: [
@@ -402,7 +409,7 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :humidity_control_setpoint, 0x64 do
     setpoint_type_params = [
-      param(:reserved, :reserved, size: 4),
+      reserved(size: 4),
       param(:setpoint_type, :enum,
         size: 4,
         opts: [
@@ -441,7 +448,14 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :manufacturer_specific, 0x72 do
     command :manufacturer_specific_get, 0x04, Cmds.Generic, params: []
-    command :manufacturer_specific_report, 0x05
+
+    command :manufacturer_specific_report, 0x05, Cmds.Generic,
+      params: [
+        param(:manufacturer_id, :uint, size: 16),
+        param(:product_type_id, :uint, size: 16),
+        param(:product_id, :uint, size: 16)
+      ]
+
     command :manufacturer_specific_device_specific_get, 0x06
     command :manufacturer_specific_device_specific_report, 0x07
   end
@@ -457,7 +471,13 @@ defmodule Grizzly.ZWave.Commands do
   command_class :multi_channel, 0x60 do
     command :multi_channel_endpoint_get, 0x07, Cmds.Generic, params: []
     command :multi_channel_endpoint_report, 0x08
-    command :multi_channel_capability_get, 0x09
+
+    command :multi_channel_capability_get, 0x09, Cmds.Generic,
+      params: [
+        reserved(size: 1),
+        param(:end_point, :uint, size: 7)
+      ]
+
     command :multi_channel_capability_report, 0x0A
 
     command :multi_channel_endpoint_find, 0x0B,
@@ -471,16 +491,25 @@ defmodule Grizzly.ZWave.Commands do
       handler: {WaitReport, complete_report: :any}
 
     command :multi_channel_command_encapsulation, 0x0D
-    command :multi_channel_aggregated_members_get, 0x0E
+
+    command :multi_channel_aggregated_members_get, 0x0E, Cmds.Generic,
+      params: [
+        reserved(size: 1),
+        param(:aggregated_end_point, :uint, size: 7)
+      ]
+
     command :multi_channel_aggregated_members_report, 0x0F
   end
 
   command_class :multi_channel_association, 0x8E do
     command :multi_channel_association_set, 0x01, Cmds.MultiChannelAssociationSetRemove
 
-    command :multi_channel_association_get, 0x02,
+    command :multi_channel_association_get, 0x02, Cmds.Generic,
       report: :multi_channel_association_report,
-      handler: {AggregateReport, aggregate_param: :nodes}
+      handler: {AggregateReport, aggregate_param: :nodes},
+      params: [
+        param(:grouping_identifier, :uint, size: 8)
+      ]
 
     command :multi_channel_association_report, 0x03
     command :multi_channel_association_remove, 0x04, Cmds.MultiChannelAssociationSetRemove
@@ -495,12 +524,52 @@ defmodule Grizzly.ZWave.Commands do
   command_class :network_management_basic_node, 0x4D do
     command :learn_mode_set, 0x01, report: :learn_mode_set_status
     command :learn_mode_set_status, 0x02
-    command :network_update_request, 0x03, report: :network_update_request_status
-    command :network_update_request_status, 0x04
+
+    command :network_update_request, 0x03, Cmds.Generic,
+      report: :network_update_request_status,
+      params: [
+        param(:seq_number, :uint, size: 8)
+      ]
+
+    command :network_update_request_status, 0x04, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        param(:status, :enum,
+          size: 8,
+          opts: [
+            encode:
+              &CommandClasses.NetworkManagementBasicNode.network_update_request_status_to_byte/1,
+            decode:
+              &CommandClasses.NetworkManagementBasicNode.network_update_request_status_from_byte/1
+          ]
+        )
+      ]
+
     command :node_information_send, 0x05
-    command :default_set, 0x06, report: :default_set_complete
+
+    command :default_set, 0x06, Cmds.Generic,
+      report: :default_set_complete,
+      params: [
+        param(:seq_number, :uint, size: 8)
+      ]
+
     command :default_set_complete, 0x07
-    command :dsk_get, 0x08, Cmds.DSKGet, default_params: [add_mode: :learn]
+
+    command :dsk_get, 0x08, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        reserved(size: 7),
+        param(:add_mode, :enum,
+          size: 1,
+          default: :learn,
+          required: false,
+          opts: [
+            encode: &CommandClasses.NetworkManagementBasicNode.add_mode_to_byte/1,
+            decode: &CommandClasses.NetworkManagementBasicNode.add_mode_from_bit/1
+          ]
+        )
+      ]
+
     command :dsk_report, 0x09, Cmds.DSKReport
   end
 
@@ -513,7 +582,14 @@ defmodule Grizzly.ZWave.Commands do
     command :failed_node_remove_status, 0x08
     command :failed_node_replace, 0x09, report: :failed_node_replace_status
     command :failed_node_replace_status, 0x0A
-    command :node_neighbor_update_request, 0x0B, report: :node_neighbor_update_status
+
+    command :node_neighbor_update_request, 0x0B, Cmds.Generic,
+      report: :node_neighbor_update_status,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        param(:node_id, :uint, size: 8)
+      ]
+
     command :node_neighbor_update_status, 0x0C
     command :node_add_keys_report, 0x11
     command :node_add_keys_set, 0x12, supports_supervision?: false
@@ -526,9 +602,9 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :network_management_installation_maintenance, 0x67 do
     command :priority_route_set, 0x01
-    command :priority_route_get, 0x02
+    command :priority_route_get, 0x02, Cmds.Generic, params: [param(:node_id, :uint, size: 8)]
     command :priority_route_report, 0x03
-    command :statistics_get, 0x04
+    command :statistics_get, 0x04, Cmds.Generic, params: [param(:node_id, :uint, size: 8)]
     command :statistics_report, 0x05
     command :statistics_clear, 0x06, Cmds.Generic, params: []
     command :rssi_get, 0x07, Cmds.Generic, params: []
@@ -540,7 +616,11 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :network_management_proxy, 0x52 do
-    command :node_list_get, 0x01
+    command :node_list_get, 0x01, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8)
+      ]
+
     command :node_list_report, 0x02
     command :node_info_cached_get, 0x03, default_params: [max_age: 10]
     command :node_info_cached_report, 0x04
@@ -548,7 +628,10 @@ defmodule Grizzly.ZWave.Commands do
     command :network_management_multi_channel_end_point_report, 0x06
     command :network_management_multi_channel_capability_get, 0x07
     command :network_management_multi_channel_capability_report, 0x08
-    command :failed_node_list_get, 0x0B
+
+    command :failed_node_list_get, 0x0B, Cmds.Generic,
+      params: [param(:seq_number, :uint, size: 8)]
+
     command :failed_node_list_report, 0x0C
   end
 
@@ -568,7 +651,12 @@ defmodule Grizzly.ZWave.Commands do
   command_class :node_provisioning, 0x78 do
     command :node_provisioning_set, 0x01, default_params: [meta_extensions: []]
     command :node_provisioning_delete, 0x02
-    command :node_provisioning_list_iteration_get, 0x03, default_params: [remaining_counter: 0xFF]
+
+    command :node_provisioning_list_iteration_get, 0x03, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        param(:remaining_counter, :uint, size: 8, required: false, default: 0xFF)
+      ]
 
     command :node_provisioning_list_iteration_report, 0x04,
       default_params: [meta_extensions: [], dsk: ""]
@@ -781,7 +869,18 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :sensor_binary, 0x30 do
     command :sensor_binary_supported_sensor_get, 0x01, Cmds.Generic, params: []
-    command :sensor_binary_get, 0x02
+
+    command :sensor_binary_get, 0x02, Cmds.Generic,
+      params: [
+        param(:sensor_type, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.SensorBinary.encode_type/1,
+            decode: &CommandClasses.SensorBinary.decode_type/1
+          ]
+        )
+      ]
+
     command :sensor_binary_report, 0x03
     command :sensor_binary_supported_sensor_report, 0x04
   end
@@ -789,7 +888,18 @@ defmodule Grizzly.ZWave.Commands do
   command_class :sensor_multilevel, 0x31 do
     command :sensor_multilevel_supported_sensor_get, 0x01, Cmds.Generic, params: []
     command :sensor_multilevel_supported_sensor_report, 0x02
-    command :sensor_multilevel_supported_scale_get, 0x03
+
+    command :sensor_multilevel_supported_scale_get, 0x03, Cmds.Generic,
+      params: [
+        param(:sensor_type, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.SensorMultilevel.encode_sensor_type/1,
+            decode: &CommandClasses.SensorMultilevel.decode_sensor_type/1
+          ]
+        )
+      ]
+
     command :sensor_multilevel_get, 0x04
     command :sensor_multilevel_report, 0x05
     command :sensor_multilevel_supported_scale_report, 0x06
@@ -1037,7 +1147,7 @@ defmodule Grizzly.ZWave.Commands do
     command :extended_user_code_get, 0x0C, Cmds.Generic,
       params: [
         param(:user_id, :uint, size: 16),
-        param(:reserved, :reserved, size: 7),
+        reserved(size: 7),
         param(:report_more?, :boolean, size: 1)
       ]
 
@@ -1125,15 +1235,28 @@ defmodule Grizzly.ZWave.Commands do
 
     command :version_command_class_report, 0x14
     command :version_capabilities_get, 0x15, Cmds.Generic, params: []
-    command :version_capabilities_report, 0x16
+
+    command :version_capabilities_report, 0x16, Cmds.Generic,
+      params: [
+        reserved(size: 5),
+        param(:zwave_software, :boolean, size: 1),
+        param(:command_class, :boolean, size: 1),
+        param(:version, :boolean, size: 1)
+      ]
+
     command :version_zwave_software_get, 0x17, Cmds.Generic, params: []
     command :version_zwave_software_report, 0x18, Cmds.VersionZWaveSoftwareReport
   end
 
   command_class :wake_up, 0x84 do
-    command :wake_up_interval_set, 0x04, Cmds.WakeUpIntervalSetReport
+    set_report_params = [
+      param(:seconds, :uint, size: 24),
+      param(:node_id, :uint, size: 8)
+    ]
+
+    command :wake_up_interval_set, 0x04, Cmds.Generic, params: set_report_params
     command :wake_up_interval_get, 0x05, Cmds.Generic, params: []
-    command :wake_up_interval_report, 0x06, Cmds.WakeUpIntervalSetReport
+    command :wake_up_interval_report, 0x06, Cmds.Generic, params: set_report_params
     command :wake_up_notification, 0x07, Cmds.Generic, params: []
     command :wake_up_no_more_information, 0x08, Cmds.Generic, params: []
     command :wake_up_interval_capabilities_get, 0x09, Cmds.Generic, params: []
