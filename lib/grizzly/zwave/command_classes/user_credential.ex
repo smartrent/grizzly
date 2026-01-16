@@ -176,4 +176,46 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_credential_learn_operation(0x00), do: :add
   def decode_credential_learn_operation(0x01), do: :modify
   def decode_credential_learn_operation(_), do: :unknown
+
+  @doc "Encodes the status field in an Admin Pin Code Report command"
+  @spec encode_admin_pin_code_set_status(status :: atom()) :: byte()
+  def encode_admin_pin_code_set_status(:modified), do: 0x01
+  def encode_admin_pin_code_set_status(:unmodified), do: 0x03
+  def encode_admin_pin_code_set_status(:response_to_get), do: 0x04
+  def encode_admin_pin_code_set_status(:duplicate), do: 0x07
+  def encode_admin_pin_code_set_status(:manufacturer_security_rules), do: 0x08
+  def encode_admin_pin_code_set_status(:admin_code_not_supported), do: 0x0D
+  def encode_admin_pin_code_set_status(:deactivation_not_supported), do: 0x0E
+  def encode_admin_pin_code_set_status(:unspecified_error), do: 0x0F
+
+  @doc "Decodes the status field in an Admin Pin Code Report command"
+  @spec decode_admin_pin_code_set_status(byte()) :: atom()
+  def decode_admin_pin_code_set_status(0x01), do: :modified
+  def decode_admin_pin_code_set_status(0x03), do: :unmodified
+  def decode_admin_pin_code_set_status(0x04), do: :response_to_get
+  def decode_admin_pin_code_set_status(0x07), do: :duplicate
+  def decode_admin_pin_code_set_status(0x08), do: :manufacturer_security_rules
+  def decode_admin_pin_code_set_status(0x0D), do: :admin_code_not_supported
+  def decode_admin_pin_code_set_status(0x0E), do: :deactivation_not_supported
+  def decode_admin_pin_code_set_status(0x0F), do: :unspecified_error
+  def decode_admin_pin_code_set_status(_), do: :unknown
+
+  @doc "Encodes status field in a User Credential Association Report command"
+  @spec encode_association_set_status(status :: atom()) :: byte()
+  def encode_association_set_status(:success), do: 0x00
+  def encode_association_set_status(:credential_type_invalid), do: 0x01
+  def encode_association_set_status(:credential_slot_invalid), do: 0x02
+  def encode_association_set_status(:credential_slot_empty), do: 0x03
+  def encode_association_set_status(:destination_user_id_invalid), do: 0x04
+  def encode_association_set_status(:destination_user_id_nonexistent), do: 0x05
+
+  @doc "Decodes status field in a User Credential Association Report command"
+  @spec decode_association_set_status(byte()) :: atom()
+  def decode_association_set_status(0x00), do: :success
+  def decode_association_set_status(0x01), do: :credential_type_invalid
+  def decode_association_set_status(0x02), do: :credential_slot_invalid
+  def decode_association_set_status(0x03), do: :credential_slot_empty
+  def decode_association_set_status(0x04), do: :destination_user_id_invalid
+  def decode_association_set_status(0x05), do: :destination_user_id_nonexistent
+  def decode_association_set_status(_), do: :unknown
 end

@@ -110,8 +110,17 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :association_group_info, 0x59 do
-    command :association_group_name_get, 0x01
-    command :association_group_name_report, 0x02
+    command :association_group_name_get, 0x01, Cmds.Generic,
+      params: [
+        param(:group_id, :uint, size: 8)
+      ]
+
+    command :association_group_name_report, 0x02, Cmds.Generic,
+      params: [
+        param(:group_id, :uint, size: 8),
+        param(:length, {:length, :name}, size: 8),
+        param(:name, :binary, size: {:variable, :length})
+      ]
 
     command :association_group_info_get, 0x03, Cmds.Generic,
       params: [
@@ -1055,7 +1064,16 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :time, 0x8A do
     command :time_get, 0x01, Cmds.Generic, params: []
-    command :time_report, 0x02
+
+    command :time_report, 0x02, Cmds.Generic,
+      params: [
+        param(:rtc_failure?, :boolean, size: 1, default: false),
+        reserved(size: 2),
+        param(:hour, :uint, size: 5),
+        param(:minute, :uint, size: 8),
+        param(:second, :uint, size: 8)
+      ]
+
     command :date_get, 0x03, Cmds.Generic, params: []
 
     command :date_report, 0x04, Cmds.Generic,
@@ -1121,6 +1139,12 @@ defmodule Grizzly.ZWave.Commands do
         ]
       )
 
+    admin_code_params = [
+      reserved(size: 4),
+      param(:length, {:length, :code}, size: 4),
+      param(:code, :binary, size: {:variable, :length})
+    ]
+
     command :user_code_set, 0x01
 
     command :user_code_get, 0x02, Cmds.Generic,
@@ -1152,9 +1176,9 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :extended_user_code_report, 0x0D
-    command :admin_code_set, 0x0E, Cmds.AdminCodeSetReport
+    command :admin_code_set, 0x0E, Cmds.Generic, params: admin_code_params
     command :admin_code_get, 0x0F, Cmds.Generic, params: []
-    command :admin_code_report, 0x10, Cmds.AdminCodeSetReport
+    command :admin_code_report, 0x10, Cmds.Generic, params: admin_code_params
     command :user_code_checksum_get, 0x11, Cmds.Generic, params: []
 
     command :user_code_checksum_report, 0x12, Cmds.Generic,
@@ -1178,6 +1202,11 @@ defmodule Grizzly.ZWave.Commands do
       )
 
     checksum = param(:checksum, :uint, size: 16)
+
+    admin_pin_code_common_params = [
+      param(:length, {:length, :code}, size: 4),
+      param(:code, :binary, size: {:variable, :length})
+    ]
 
     credential_learn_operation =
       param(:operation_type, :enum,
@@ -1213,17 +1242,51 @@ defmodule Grizzly.ZWave.Commands do
 
     command :credential_learn_cancel, 0x10, Cmds.Generic, params: []
     command :credential_learn_status_report, 0x11
-    command :user_credential_association_set, 0x12
-    command :user_credential_association_report, 0x13
+
+    command :user_credential_association_set, 0x12, Cmds.Generic,
+      params: [
+        credential_type,
+        credential_slot,
+        param(:destination_user_id, :uint, size: 16)
+      ]
+
+    command :user_credential_association_report, 0x13, Cmds.Generic,
+      params: [
+        credential_type,
+        credential_slot,
+        param(:destination_user_id, :uint, size: 16),
+        param(:status, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.UserCredential.encode_association_set_status/1,
+            decode: &CommandClasses.UserCredential.decode_association_set_status/1
+          ]
+        )
+      ]
+
     command :all_users_checksum_get, 0x14, Cmds.Generic, params: []
     command :all_users_checksum_report, 0x15, Cmds.Generic, params: [checksum]
     command :user_checksum_get, 0x16, Cmds.Generic, params: [user_id]
     command :user_checksum_report, 0x17, Cmds.Generic, params: [user_id, checksum]
     command :credential_checksum_get, 0x18, Cmds.Generic, params: [credential_type]
     command :credential_checksum_report, 0x19, Cmds.Generic, params: [credential_type, checksum]
-    command :admin_pin_code_set, 0x1A
+
+    command :admin_pin_code_set, 0x1A, Cmds.Generic,
+      params: [reserved(size: 4) | admin_pin_code_common_params]
+
     command :admin_pin_code_get, 0x1B, Cmds.Generic, params: []
-    command :admin_pin_code_report, 0x1C
+
+    command :admin_pin_code_report, 0x1C, Cmds.Generic,
+      params: [
+        param(:result, :enum,
+          size: 4,
+          opts: [
+            encode: &CommandClasses.UserCredential.encode_admin_pin_code_set_status/1,
+            decode: &CommandClasses.UserCredential.decode_admin_pin_code_set_status/1
+          ]
+        )
+        | admin_pin_code_common_params
+      ]
   end
 
   command_class :version, 0x86 do
@@ -1402,7 +1465,7 @@ defmodule Grizzly.ZWave.Commands do
   @spec create(atom(), keyword()) :: {:error, :unknown_command} | {:ok, Grizzly.ZWave.Command.t()}
   def create(command_name, params \\ []) do
     with {:ok, spec} <- spec_for(command_name) do
-      CommandSpec.create_command(spec, params)
+      Command.new(spec, params)
     end
   end
 
@@ -1420,7 +1483,7 @@ defmodule Grizzly.ZWave.Commands do
     with {:ok, spec} <- spec_for(cc_byte, command_byte),
          {mod, fun} = spec.decode_fun,
          {:ok, decoded_params} <- apply(mod, fun, [spec, params]) do
-      CommandSpec.create_command(spec, decoded_params)
+      Command.new(spec, decoded_params)
     else
       {:error, :unknown_command} ->
         {:error, %ZWaveError{binary: binary}}
