@@ -15,6 +15,7 @@ defmodule Grizzly.ZWave.Commands do
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Notifications
+  alias Grizzly.ZWave.Security
   alias Grizzly.ZWave.ZWaveError
 
   @after_verify __MODULE__
@@ -653,13 +654,22 @@ defmodule Grizzly.ZWave.Commands do
     command :s0_commands_supported_report, 0x03, Cmds.S0CommandsSupportedReport,
       default_params: [supported: [], controlled: [], reports_to_follow: 0]
 
-    command :s0_security_scheme_get, 0x04, Cmds.S0SecuritySchemeGet
-    command :s0_security_scheme_report, 0x05, Cmds.S0SecuritySchemeReport
+    s0_security_schemes_params = [
+      param(:supported_security_schemes, :constant,
+        size: 8,
+        required: false,
+        opts: [value: [supported_security_schemes: [:s0]]]
+      )
+    ]
+
+    command :s0_security_scheme_get, 0x04, Cmds.Generic, params: s0_security_schemes_params
+    command :s0_security_scheme_report, 0x05, Cmds.Generic, params: s0_security_schemes_params
     command :s0_network_key_set, 0x06, Cmds.S0NetworkKeySet, report: :s0_network_key_verify
     command :s0_network_key_verify, 0x07, Cmds.Generic, params: []
 
-    command :s0_security_scheme_inherit, 0x08, Cmds.S0SecuritySchemeInherit,
-      report: :s0_security_scheme_report
+    command :s0_security_scheme_inherit, 0x08, Cmds.Generic,
+      report: :s0_security_scheme_report,
+      params: s0_security_schemes_params
 
     command :s0_nonce_get, 0x40, Cmds.Generic, params: []
     command :s0_nonce_report, 0x80, Cmds.S0NonceReport
@@ -673,12 +683,44 @@ defmodule Grizzly.ZWave.Commands do
     command :s2_kex_get, 0x04, Cmds.Generic, params: [], supports_supervision?: false
     command :s2_kex_report, 0x05, Cmds.S2KexReport, supports_supervision?: false
     command :s2_kex_set, 0x06, Cmds.S2KexSet, supports_supervision?: false
-    command :s2_kex_fail, 0x07, Cmds.S2KexFail, supports_supervision?: false
+
+    command :s2_kex_fail, 0x07, Cmds.Generic,
+      supports_supervision?: false,
+      params: [
+        param(:kex_fail_type, :enum,
+          size: 8,
+          opts: [
+            encode: &Security.failed_type_to_byte/1,
+            decode: &Security.failed_type_from_byte/1
+          ]
+        )
+      ]
+
     command :s2_public_key_report, 0x08, Cmds.S2PublicKeyReport, supports_supervision?: false
-    command :s2_network_key_get, 0x09, Cmds.S2NetworkKeyGet, supports_supervision?: false
+
+    command :s2_network_key_get, 0x09, Cmds.Generic,
+      supports_supervision?: false,
+      params: [
+        param(:requested_key, :enum,
+          size: 8,
+          opts: [
+            encode: &Security.key_to_byte/1,
+            decode: &Security.key_from_byte/1
+          ]
+        )
+      ]
+
     command :s2_network_key_report, 0x0A, Cmds.S2NetworkKeyReport, supports_supervision?: false
     command :s2_network_key_verify, 0x0B, Cmds.Generic, params: [], supports_supervision?: false
-    command :s2_transfer_end, 0x0C, Cmds.S2TransferEnd, supports_supervision?: false
+
+    command :s2_transfer_end, 0x0C, Cmds.Generic,
+      supports_supervision?: false,
+      params: [
+        reserved(size: 6),
+        param(:key_verified, :boolean, size: 1),
+        param(:key_request_complete, :boolean, size: 1)
+      ]
+
     command :s2_commands_supported_get, 0x0D, Cmds.Generic, params: []
 
     command :s2_commands_supported_report, 0x0E, Cmds.S2CommandsSupportedReport,
