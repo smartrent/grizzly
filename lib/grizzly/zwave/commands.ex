@@ -13,6 +13,7 @@ defmodule Grizzly.ZWave.Commands do
   alias Grizzly.ZWave.Commands, as: Cmds
   alias Grizzly.ZWave.CommandSpec
   alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Notifications
   alias Grizzly.ZWave.ZWaveError
 
@@ -232,9 +233,21 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :clock, 0x81 do
-    command :clock_set, 0x04, Cmds.ClockSetReport
+    clock_params = [
+      param(:weekday, :enum,
+        size: 3,
+        opts: [
+          encode: &CommandClasses.Clock.encode_weekday/1,
+          decode: &CommandClasses.Clock.decode_weekday/1
+        ]
+      ),
+      param(:hour, :uint, size: 5),
+      param(:minute, :uint, size: 8)
+    ]
+
+    command :clock_set, 0x04, Cmds.Generic, params: clock_params
     command :clock_get, 0x05, Cmds.Generic, params: []
-    command :clock_report, 0x06, Cmds.ClockSetReport
+    command :clock_report, 0x06, Cmds.Generic, params: clock_params
   end
 
   command_class :configuration, 0x70 do
@@ -646,16 +659,58 @@ defmodule Grizzly.ZWave.Commands do
     command :time_get, 0x01, Cmds.Generic, params: []
     command :time_report, 0x02
     command :date_get, 0x03, Cmds.Generic, params: []
-    command :date_report, 0x04
-    command :time_offset_set, 0x05, Cmds.TimeOffsetSetReport
+
+    command :date_report, 0x04, Cmds.Generic,
+      params: [
+        param(:year, :uint, size: 16),
+        param(:month, :uint, size: 8),
+        param(:day, :uint, size: 8)
+      ]
+
+    time_offset_params = [
+      param(:sign_tzo, :enum,
+        size: 1,
+        opts: [
+          encode: &Encoding.encode_tz_offset_sign/1,
+          decode: &Encoding.decode_tz_offset_sign/1
+        ]
+      ),
+      param(:hour_tzo, :uint, size: 7),
+      param(:minute_tzo, :uint, size: 8),
+      param(:sign_offset_dst, :enum,
+        size: 1,
+        opts: [
+          encode: &Encoding.encode_tz_offset_sign/1,
+          decode: &Encoding.decode_tz_offset_sign/1
+        ]
+      ),
+      param(:minute_offset_dst, :uint, size: 7),
+      param(:month_start_dst, :uint, size: 8),
+      param(:day_start_dst, :uint, size: 8),
+      param(:hour_start_dst, :uint, size: 8),
+      param(:month_end_dst, :uint, size: 8),
+      param(:day_end_dst, :uint, size: 8),
+      param(:hour_end_dst, :uint, size: 8)
+    ]
+
+    command :time_offset_set, 0x05, Cmds.Generic, params: time_offset_params
     command :time_offset_get, 0x06, Cmds.Generic, params: []
-    command :time_offset_report, 0x07, Cmds.TimeOffsetSetReport
+    command :time_offset_report, 0x07, Cmds.Generic, params: time_offset_params
   end
 
   command_class :time_parameters, 0x8B do
-    command :time_parameters_set, 0x01, Cmds.TimeParametersSetReport
+    time_param_params = [
+      param(:year, :uint, size: 16),
+      param(:month, :uint, size: 8),
+      param(:day, :uint, size: 8),
+      param(:hour_utc, :uint, size: 8),
+      param(:minute_utc, :uint, size: 8),
+      param(:second_utc, :uint, size: 8)
+    ]
+
+    command :time_parameters_set, 0x01, Cmds.Generic, params: time_param_params
     command :time_parameters_get, 0x02, Cmds.Generic, params: []
-    command :time_parameters_report, 0x03, Cmds.TimeParametersSetReport
+    command :time_parameters_report, 0x03, Cmds.Generic, params: time_param_params
   end
 
   command_class :user_code, 0x63 do
