@@ -31,6 +31,6 @@ defmodule Grizzly.ZWave.Commands.ZIPKeepAlive do
     do: {:error, %DecodeError{value: ack_flag, param: :ack_flag, command: :keep_alive}}
 
   @spec encode_ack_flag(ack_flag()) :: byte()
-  def encode_ack_flag(:ack_response), do: 0x40
-  def encode_ack_flag(:ack_request), do: 0x80
+  defp encode_ack_flag(:ack_response), do: 0x40
+  defp encode_ack_flag(:ack_request), do: 0x80
 end

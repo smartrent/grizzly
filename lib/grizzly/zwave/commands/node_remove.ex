@@ -40,13 +40,13 @@ defmodule Grizzly.ZWave.Commands.NodeRemove do
   end
 
   @spec encode_mode(mode()) :: 0x01 | 0x05
-  def encode_mode(:remove_node_any), do: 0x01
-  def encode_mode(:remove_node_stop), do: 0x05
+  defp encode_mode(:remove_node_any), do: 0x01
+  defp encode_mode(:remove_node_stop), do: 0x05
 
   @spec decode_mode(byte()) :: {:ok, mode()} | {:error, DecodeError.t()}
-  def decode_mode(0x01), do: {:ok, :remove_node_any}
-  def decode_mode(0x05), do: {:ok, :remove_node_stop}
+  defp decode_mode(0x01), do: {:ok, :remove_node_any}
+  defp decode_mode(0x05), do: {:ok, :remove_node_stop}
 
-  def decode_mode(byte),
+  defp decode_mode(byte),
     do: {:error, %DecodeError{value: byte, param: :mode, command: :node_remove}}
 end

@@ -73,8 +73,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   end
 
   defp parse_extension(<<0x84, 0x02, security_to_security, _::7, crc16::1, rest::binary>>) do
-    security_to_security =
-      EncapsulationFormatInfo.security_to_security_from_byte(security_to_security)
+    security_to_security = EncapsulationFormatInfo.security_from_byte(security_to_security)
 
     crc16_bool = if crc16 == 1, do: true, else: false
 

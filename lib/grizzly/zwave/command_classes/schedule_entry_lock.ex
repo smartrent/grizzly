@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.CommandClasses.ScheduleEntryLock do
     |> Enum.map(fn index -> Enum.at(@weekdays, index) end)
   end
 
-  def find_indices_of_bits(byte) do
+  defp find_indices_of_bits(byte) do
     bitmask = <<byte>>
 
     for(<<x::1 <- bitmask>>, do: x)

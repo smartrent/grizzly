@@ -104,11 +104,11 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation do
     |> Enum.join()
   end
 
-  def decode_extensions(
-        <<ext_length, more_to_follow?::1, _critical?::1, type::6,
-          extension_data::binary-size(ext_length - 2), rest::binary>>,
-        extensions \\ []
-      ) do
+  defp decode_extensions(
+         <<ext_length, more_to_follow?::1, _critical?::1, type::6,
+           extension_data::binary-size(ext_length - 2), rest::binary>>,
+         extensions \\ []
+       ) do
     type = decode_extension_type(type)
     extensions = [{type, decode_extension_data(type, extension_data)} | extensions]
 

@@ -113,8 +113,8 @@ defmodule Grizzly.ZWave.Commands.NodeAddStatus do
   end
 
   @spec encode_listening_bit(boolean()) :: byte()
-  def encode_listening_bit(true), do: 0x01
-  def encode_listening_bit(false), do: 0x00
+  defp encode_listening_bit(true), do: 0x01
+  defp encode_listening_bit(false), do: 0x00
 
   defp maybe_add_version_2_fields(command, command_bin) do
     case Command.param(command, :granted_keys) do

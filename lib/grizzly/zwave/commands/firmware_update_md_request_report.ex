@@ -40,25 +40,25 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReport do
     end
   end
 
-  def encode_status(:ok), do: 0xFF
-  def encode_status(:invalid_manufacturer_or_device_id), do: 0x00
-  def encode_status(:authenticated_required), do: 0x01
-  def encode_status(:excessive_fragment_size), do: 0x02
-  def encode_status(:target_not_upgradable), do: 0x03
-  def encode_status(:invalid_hardware_version), do: 0x04
-  def encode_status(:firmware_update_in_progress), do: 0x05
-  def encode_status(:insufficient_battery_level), do: 0x06
+  defp encode_status(:ok), do: 0xFF
+  defp encode_status(:invalid_manufacturer_or_device_id), do: 0x00
+  defp encode_status(:authenticated_required), do: 0x01
+  defp encode_status(:excessive_fragment_size), do: 0x02
+  defp encode_status(:target_not_upgradable), do: 0x03
+  defp encode_status(:invalid_hardware_version), do: 0x04
+  defp encode_status(:firmware_update_in_progress), do: 0x05
+  defp encode_status(:insufficient_battery_level), do: 0x06
 
-  def decode_status(0xFF), do: {:ok, :ok}
-  def decode_status(0x00), do: {:ok, :invalid_manufacturer_or_device_id}
-  def decode_status(0x01), do: {:ok, :authenticated_required}
-  def decode_status(0x02), do: {:ok, :excessive_fragment_size}
-  def decode_status(0x03), do: {:ok, :target_not_upgradable}
-  def decode_status(0x04), do: {:ok, :invalid_hardware_version}
-  def decode_status(0x05), do: {:ok, :firmware_update_in_progress}
-  def decode_status(0x06), do: {:ok, :insufficient_battery_level}
+  defp decode_status(0xFF), do: {:ok, :ok}
+  defp decode_status(0x00), do: {:ok, :invalid_manufacturer_or_device_id}
+  defp decode_status(0x01), do: {:ok, :authenticated_required}
+  defp decode_status(0x02), do: {:ok, :excessive_fragment_size}
+  defp decode_status(0x03), do: {:ok, :target_not_upgradable}
+  defp decode_status(0x04), do: {:ok, :invalid_hardware_version}
+  defp decode_status(0x05), do: {:ok, :firmware_update_in_progress}
+  defp decode_status(0x06), do: {:ok, :insufficient_battery_level}
 
-  def decode_status(byte),
+  defp decode_status(byte),
     do:
       {:error,
        %DecodeError{value: byte, param: :status, command: :firmware_update_md_request_report}}

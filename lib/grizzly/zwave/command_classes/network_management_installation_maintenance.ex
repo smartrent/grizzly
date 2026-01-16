@@ -72,14 +72,14 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   end
 
   @spec neighbor_speeds_to_byte(speeds()) :: byte()
-  def neighbor_speeds_to_byte(speeds) do
+  defp neighbor_speeds_to_byte(speeds) do
     byte = if :"9.6kbit/s" in speeds, do: 0x01, else: 0x00
     byte = if :"40kbit/s" in speeds, do: byte ||| 0x02, else: byte
     if :"100kbit/s" in speeds, do: byte ||| 0x04, else: byte
   end
 
   @spec neighbor_speeds_from_byte(byte) :: {:ok, speeds}
-  def neighbor_speeds_from_byte(byte) do
+  defp neighbor_speeds_from_byte(byte) do
     case byte do
       0x01 -> {:ok, [:"9.6kbit/s"]}
       0x02 -> {:ok, [:"40kbit/s"]}

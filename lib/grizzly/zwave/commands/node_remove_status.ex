@@ -58,13 +58,13 @@ defmodule Grizzly.ZWave.Commands.NodeRemoveStatus do
   end
 
   @spec encode_status(status()) :: 0x06 | 0x07
-  def encode_status(:done), do: 0x06
-  def encode_status(:failed), do: 0x07
+  defp encode_status(:done), do: 0x06
+  defp encode_status(:failed), do: 0x07
 
   @spec decode_status(byte()) :: {:ok, status()} | {:error, DecodeError.t()}
-  def decode_status(0x06), do: {:ok, :done}
-  def decode_status(0x07), do: {:ok, :failed}
+  defp decode_status(0x06), do: {:ok, :done}
+  defp decode_status(0x07), do: {:ok, :failed}
 
-  def decode_status(byte),
+  defp decode_status(byte),
     do: {:error, %DecodeError{value: byte, param: :status, command: :node_remove_status}}
 end

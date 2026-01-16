@@ -100,16 +100,16 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   end
 
   @spec flag_to_byte(flag() | nil) :: byte()
-  def flag_to_byte(nil), do: 0x00
-  def flag_to_byte(:ack_request), do: 0x80
-  def flag_to_byte(:ack_response), do: 0x40
-  def flag_to_byte(:nack_response), do: 0x20
-  def flag_to_byte(:nack_waiting), do: 0x30
-  def flag_to_byte(:nack_queue_full), do: 0x28
-  def flag_to_byte(:nack_option_error), do: 0x24
-  def flag_to_byte(:invalid), do: raise(ArgumentError, "Z/IP flag is invalid, cannot encode")
+  defp flag_to_byte(nil), do: 0x00
+  defp flag_to_byte(:ack_request), do: 0x80
+  defp flag_to_byte(:ack_response), do: 0x40
+  defp flag_to_byte(:nack_response), do: 0x20
+  defp flag_to_byte(:nack_waiting), do: 0x30
+  defp flag_to_byte(:nack_queue_full), do: 0x28
+  defp flag_to_byte(:nack_option_error), do: 0x24
+  defp flag_to_byte(:invalid), do: raise(ArgumentError, "Z/IP flag is invalid, cannot encode")
 
-  def meta_to_byte(secure, command, extensions, more_info \\ false) do
+  defp meta_to_byte(secure, command, extensions, more_info) do
     meta_map = %{
       secure: secure,
       command: command,

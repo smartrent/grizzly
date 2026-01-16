@@ -196,7 +196,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     end
   end
 
-  def door_handles_modes_to_byte(handles_mode) do
+  defp door_handles_modes_to_byte(handles_mode) do
     handle_1_bit = door_handle_value_to_bit(Map.get(handles_mode, 1, :disabled))
     handle_2_bit = door_handle_value_to_bit(Map.get(handles_mode, 2, :disabled))
     handle_3_bit = door_handle_value_to_bit(Map.get(handles_mode, 3, :disabled))
@@ -208,7 +208,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     byte
   end
 
-  def door_condition_to_byte(latch_position, bolt_position, door_state) do
+  defp door_condition_to_byte(latch_position, bolt_position, door_state) do
     latch_bit = latch_bit_from_position(latch_position)
     bolt_bit = bolt_bit_from_position(bolt_position)
     door_bit = door_bit_from_state(door_state)

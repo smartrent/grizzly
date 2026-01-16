@@ -41,25 +41,25 @@ defmodule Grizzly.ZWave.Commands.NodeListReport do
     end
   end
 
-  def encode_node_ids(node_ids) do
+  defp encode_node_ids(node_ids) do
     mask_bit = node_id_mask(node_ids)
     <<mask_bit::little-29-unit(8)>>
   end
 
-  def encode_status(:latest), do: 0x00
-  def encode_status(:outdated), do: 0x01
+  defp encode_status(:latest), do: 0x00
+  defp encode_status(:outdated), do: 0x01
 
-  def decode_status(0x00), do: {:ok, :latest}
-  def decode_status(0x01), do: {:ok, :outdated}
+  defp decode_status(0x00), do: {:ok, :latest}
+  defp decode_status(0x01), do: {:ok, :outdated}
 
-  def decode_status(byte),
+  defp decode_status(byte),
     do: {:error, %DecodeError{value: byte, param: :status, command: :node_list_report}}
 
-  def encode_controller_id(:unknown), do: 0x00
-  def encode_controller_id(byte), do: byte
+  defp encode_controller_id(:unknown), do: 0x00
+  defp encode_controller_id(byte), do: byte
 
-  def decode_controller_id(0x00), do: :unknown
-  def decode_controller_id(controller_id), do: controller_id
+  defp decode_controller_id(0x00), do: :unknown
+  defp decode_controller_id(controller_id), do: controller_id
 
   defp node_id_mask(node_ids) do
     Enum.reduce(node_ids, 0, fn node_id, mask ->
