@@ -61,7 +61,8 @@ defmodule Grizzly.ZWave.Commands.Generic do
   defp do_decode_params([{name, param_spec} | params], binary, decoded_params) do
     with {:ok, {actual_size, value, rest}} <-
            ParamSpec.take_bits(param_spec, binary, decoded_params),
-         {:ok, decoded_value} <- ParamSpec.decode_value(%{param_spec | size: actual_size}, value) do
+         {:ok, decoded_value} <-
+           ParamSpec.decode_value(%{param_spec | size: actual_size}, value, decoded_params) do
       if ParamSpec.include_when_decoding?(param_spec) do
         do_decode_params(params, rest, [{name, decoded_value} | decoded_params])
       else

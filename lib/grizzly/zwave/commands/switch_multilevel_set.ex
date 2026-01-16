@@ -34,12 +34,12 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelSet do
     end
   end
 
-  def encode_target_value(:off), do: 0x00
-  def encode_target_value(:previous), do: 0xFF
-  def encode_target_value(0xFF), do: 0xFF
-  def encode_target_value(target_value) when target_value > 99, do: 99
-  def encode_target_value(target_value) when target_value < 0, do: 0
-  def encode_target_value(target_value), do: target_value
+  defp encode_target_value(:off), do: 0x00
+  defp encode_target_value(:previous), do: 0xFF
+  defp encode_target_value(0xFF), do: 0xFF
+  defp encode_target_value(target_value) when target_value > 99, do: 99
+  defp encode_target_value(target_value) when target_value < 0, do: 0
+  defp encode_target_value(target_value), do: target_value
 
   @impl Grizzly.ZWave.Command
   def decode_params(_spec, <<target_value_byte>>) do

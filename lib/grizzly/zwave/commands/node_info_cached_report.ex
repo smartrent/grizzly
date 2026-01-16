@@ -112,19 +112,15 @@ defmodule Grizzly.ZWave.Commands.NodeInfoCachedReport do
      ]}
   end
 
-  def encode_status(_), do: 0
-  def encode_command_classes(_), do: 0
+  defp encode_status(_), do: 0
 
-  def encode_listening?(true), do: 0x80
-  def encode_listening?(false), do: 0x00
+  defp encode_listening?(true), do: 0x80
+  defp encode_listening?(false), do: 0x00
 
-  def encode_optional_functionality_byte([]), do: 0x00
-  def encode_optional_functionality_byte(_), do: 0x80
+  defp encode_optional_functionality_byte([]), do: 0x00
+  defp encode_optional_functionality_byte(_), do: 0x80
 
-  def decode_command_classes(""), do: []
-  def decode_command_classes(_), do: []
-
-  def decode_status(0x00), do: :ok
-  def decode_status(0x01), do: :not_responding
-  def decode_status(0x02), do: :unknown
+  defp decode_status(0x00), do: :ok
+  defp decode_status(0x01), do: :not_responding
+  defp decode_status(0x02), do: :unknown
 end

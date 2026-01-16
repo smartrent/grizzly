@@ -44,13 +44,15 @@ defmodule Grizzly.ZWave.Commands.NodeAdd do
   end
 
   @spec encode_mode(mode()) :: byte()
-  def encode_mode(:node_add_any), do: 0x01
-  def encode_mode(:node_add_stop), do: 0x05
-  def encode_mode(:node_add_s2_any), do: 0x07
+  defp encode_mode(:node_add_any), do: 0x01
+  defp encode_mode(:node_add_stop), do: 0x05
+  defp encode_mode(:node_add_s2_any), do: 0x07
 
   @spec decode_mode(byte()) :: {:ok, mode()} | {:error, DecodeError.t()}
-  def decode_mode(0x01), do: {:ok, :node_add_any}
-  def decode_mode(0x05), do: {:ok, :node_add_stop}
-  def decode_mode(0x07), do: {:ok, :node_add_s2_any}
-  def decode_mode(byte), do: {:error, %DecodeError{value: byte, param: :mode, command: :node_add}}
+  defp decode_mode(0x01), do: {:ok, :node_add_any}
+  defp decode_mode(0x05), do: {:ok, :node_add_stop}
+  defp decode_mode(0x07), do: {:ok, :node_add_s2_any}
+
+  defp decode_mode(byte),
+    do: {:error, %DecodeError{value: byte, param: :mode, command: :node_add}}
 end

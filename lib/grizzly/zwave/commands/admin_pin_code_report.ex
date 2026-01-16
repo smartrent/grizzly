@@ -40,22 +40,22 @@ defmodule Grizzly.ZWave.Commands.AdminPinCodeReport do
      ]}
   end
 
-  def encode_result(:modified), do: 0x01
-  def encode_result(:unmodified), do: 0x03
-  def encode_result(:response_to_get), do: 0x04
-  def encode_result(:duplicate), do: 0x07
-  def encode_result(:manufacturer_security_rules), do: 0x08
-  def encode_result(:admin_code_not_supported), do: 0x0D
-  def encode_result(:deactivation_not_supported), do: 0x0E
-  def encode_result(:unspecified_error), do: 0x0F
+  defp encode_result(:modified), do: 0x01
+  defp encode_result(:unmodified), do: 0x03
+  defp encode_result(:response_to_get), do: 0x04
+  defp encode_result(:duplicate), do: 0x07
+  defp encode_result(:manufacturer_security_rules), do: 0x08
+  defp encode_result(:admin_code_not_supported), do: 0x0D
+  defp encode_result(:deactivation_not_supported), do: 0x0E
+  defp encode_result(:unspecified_error), do: 0x0F
 
-  def decode_result(0x01), do: :modified
-  def decode_result(0x03), do: :unmodified
-  def decode_result(0x04), do: :response_to_get
-  def decode_result(0x07), do: :duplicate
-  def decode_result(0x08), do: :manufacturer_security_rules
-  def decode_result(0x0D), do: :admin_code_not_supported
-  def decode_result(0x0E), do: :deactivation_not_supported
-  def decode_result(0x0F), do: :unspecified_error
-  def decode_result(_), do: :unknown
+  defp decode_result(0x01), do: :modified
+  defp decode_result(0x03), do: :unmodified
+  defp decode_result(0x04), do: :response_to_get
+  defp decode_result(0x07), do: :duplicate
+  defp decode_result(0x08), do: :manufacturer_security_rules
+  defp decode_result(0x0D), do: :admin_code_not_supported
+  defp decode_result(0x0E), do: :deactivation_not_supported
+  defp decode_result(0x0F), do: :unspecified_error
+  defp decode_result(_), do: :unknown
 end

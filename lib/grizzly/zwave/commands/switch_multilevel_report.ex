@@ -37,9 +37,9 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelReport do
     end
   end
 
-  def encode_value(:off), do: 0x00
-  def encode_value(value) when value in 0..99, do: value
-  def encode_value(:unknown), do: 0xFE
+  defp encode_value(:off), do: 0x00
+  defp encode_value(value) when value in 0..99, do: value
+  defp encode_value(:unknown), do: 0xFE
 
   @impl Grizzly.ZWave.Command
   def decode_params(_spec, <<value_byte>>) do

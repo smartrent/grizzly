@@ -36,11 +36,11 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
   end
 
   @spec status_to_byte(status()) :: byte()
-  def status_to_byte(:done), do: 0x06
-  def status_to_byte(:busy), do: 0x07
+  defp status_to_byte(:done), do: 0x06
+  defp status_to_byte(:busy), do: 0x07
 
   @spec status_from_byte(byte()) :: {:ok, status()} | {:error, :unknown_status}
-  def status_from_byte(0x06), do: {:ok, :done}
-  def status_from_byte(0x07), do: {:ok, :busy}
-  def status_from_byte(_byte), do: {:error, :unknown_status}
+  defp status_from_byte(0x06), do: {:ok, :done}
+  defp status_from_byte(0x07), do: {:ok, :busy}
+  defp status_from_byte(_byte), do: {:error, :unknown_status}
 end

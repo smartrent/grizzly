@@ -40,28 +40,28 @@ defmodule Grizzly.ZWave.Commands.ThermostatSetpointSupportedReport do
     {:ok, [setpoint_types: setpoint_types]}
   end
 
-  def setpoint_type_to_bitmask_index(:heating), do: 1
-  def setpoint_type_to_bitmask_index(:cooling), do: 2
-  def setpoint_type_to_bitmask_index(:furnace), do: 3
-  def setpoint_type_to_bitmask_index(:dry_air), do: 4
-  def setpoint_type_to_bitmask_index(:moist_air), do: 5
-  def setpoint_type_to_bitmask_index(:auto_changeover), do: 6
-  def setpoint_type_to_bitmask_index(:energy_save_heating), do: 7
-  def setpoint_type_to_bitmask_index(:energy_save_cooling), do: 8
-  def setpoint_type_to_bitmask_index(:away_heating), do: 9
-  def setpoint_type_to_bitmask_index(:away_cooling), do: 10
-  def setpoint_type_to_bitmask_index(:full_power), do: 11
+  defp setpoint_type_to_bitmask_index(:heating), do: 1
+  defp setpoint_type_to_bitmask_index(:cooling), do: 2
+  defp setpoint_type_to_bitmask_index(:furnace), do: 3
+  defp setpoint_type_to_bitmask_index(:dry_air), do: 4
+  defp setpoint_type_to_bitmask_index(:moist_air), do: 5
+  defp setpoint_type_to_bitmask_index(:auto_changeover), do: 6
+  defp setpoint_type_to_bitmask_index(:energy_save_heating), do: 7
+  defp setpoint_type_to_bitmask_index(:energy_save_cooling), do: 8
+  defp setpoint_type_to_bitmask_index(:away_heating), do: 9
+  defp setpoint_type_to_bitmask_index(:away_cooling), do: 10
+  defp setpoint_type_to_bitmask_index(:full_power), do: 11
 
-  def bitmask_index_to_setpoint_type(1), do: :heating
-  def bitmask_index_to_setpoint_type(2), do: :cooling
-  def bitmask_index_to_setpoint_type(3), do: :furnace
-  def bitmask_index_to_setpoint_type(4), do: :dry_air
-  def bitmask_index_to_setpoint_type(5), do: :moist_air
-  def bitmask_index_to_setpoint_type(6), do: :auto_changeover
-  def bitmask_index_to_setpoint_type(7), do: :energy_save_heating
-  def bitmask_index_to_setpoint_type(8), do: :energy_save_cooling
-  def bitmask_index_to_setpoint_type(9), do: :away_heating
-  def bitmask_index_to_setpoint_type(10), do: :away_cooling
-  def bitmask_index_to_setpoint_type(11), do: :full_power
-  def bitmask_index_to_setpoint_type(_), do: nil
+  defp bitmask_index_to_setpoint_type(1), do: :heating
+  defp bitmask_index_to_setpoint_type(2), do: :cooling
+  defp bitmask_index_to_setpoint_type(3), do: :furnace
+  defp bitmask_index_to_setpoint_type(4), do: :dry_air
+  defp bitmask_index_to_setpoint_type(5), do: :moist_air
+  defp bitmask_index_to_setpoint_type(6), do: :auto_changeover
+  defp bitmask_index_to_setpoint_type(7), do: :energy_save_heating
+  defp bitmask_index_to_setpoint_type(8), do: :energy_save_cooling
+  defp bitmask_index_to_setpoint_type(9), do: :away_heating
+  defp bitmask_index_to_setpoint_type(10), do: :away_cooling
+  defp bitmask_index_to_setpoint_type(11), do: :full_power
+  defp bitmask_index_to_setpoint_type(_), do: nil
 end

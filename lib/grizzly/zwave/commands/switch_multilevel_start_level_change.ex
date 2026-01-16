@@ -91,9 +91,9 @@ defmodule Grizzly.ZWave.Commands.SwitchMultilevelStartLevelChange do
     {:ok, [up_down: decode_up_down(up_down), duration: duration]}
   end
 
-  def encode_up_down(:up), do: 0x00
-  def encode_up_down(:down), do: 0x01
+  defp encode_up_down(:up), do: 0x00
+  defp encode_up_down(:down), do: 0x01
 
-  def decode_up_down(0x00), do: :up
-  def decode_up_down(0x01), do: :down
+  defp decode_up_down(0x00), do: :up
+  defp decode_up_down(0x01), do: :down
 end

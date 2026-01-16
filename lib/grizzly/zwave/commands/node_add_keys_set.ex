@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
     granted_keys = Command.param!(command, :granted_keys)
 
     <<seq_number, 0::6, encode_csa(csa)::size(1), encode_accepted(accepted)::size(1),
-      encode_granted_keys(granted_keys)>>
+      Security.keys_to_byte(granted_keys)>>
   end
 
   @impl Grizzly.ZWave.Command
@@ -39,23 +39,19 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysSet do
        seq_number: seq_number,
        csa: decode_csa(csa),
        accept: decode_accepted(accepted),
-       granted_keys: decode_granted_keys(granted_keys)
+       granted_keys: Security.byte_to_keys(granted_keys)
      ]}
   end
 
-  def encode_csa(true), do: 1
-  def encode_csa(false), do: 0
+  defp encode_csa(true), do: 1
+  defp encode_csa(false), do: 0
 
-  def decode_csa(1), do: true
-  def decode_csa(0), do: true
+  defp decode_csa(1), do: true
+  defp decode_csa(0), do: true
 
-  def encode_accepted(true), do: 1
-  def encode_accepted(false), do: 0
+  defp encode_accepted(true), do: 1
+  defp encode_accepted(false), do: 0
 
-  def decode_accepted(1), do: true
-  def decode_accepted(0), do: false
-
-  def encode_granted_keys(granted_keys), do: Security.keys_to_byte(granted_keys)
-
-  def decode_granted_keys(granted_keys), do: Security.byte_to_keys(granted_keys)
+  defp decode_accepted(1), do: true
+  defp decode_accepted(0), do: false
 end

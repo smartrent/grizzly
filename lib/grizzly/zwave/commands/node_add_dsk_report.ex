@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddDSKReport do
     end
   end
 
-  def validate_and_ensure_input_dsk_length(params) do
+  defp validate_and_ensure_input_dsk_length(params) do
     case Keyword.get(params, :input_dsk_length) do
       nil ->
         Keyword.put(params, :input_dsk_length, 0)

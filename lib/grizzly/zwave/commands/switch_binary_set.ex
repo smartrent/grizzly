@@ -33,8 +33,8 @@ defmodule Grizzly.ZWave.Commands.SwitchBinarySet do
     end
   end
 
-  def encode_target_value(:off), do: 0x00
-  def encode_target_value(:on), do: 0xFF
+  defp encode_target_value(:off), do: 0x00
+  defp encode_target_value(:on), do: 0xFF
 
   @impl Grizzly.ZWave.Command
   def decode_params(_spec, <<target_value_byte>>) do

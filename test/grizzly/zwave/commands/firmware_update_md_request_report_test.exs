@@ -14,7 +14,7 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateMDRequestReportTest do
 
   test "encodes params correctly" do
     {:ok, command} = Commands.create(:firmware_update_md_request_report, status: :ok)
-    expected_param_binary = <<FirmwareUpdateMDRequestReport.encode_status(:ok)>>
+    expected_param_binary = <<0xFF>>
     assert expected_param_binary == FirmwareUpdateMDRequestReport.encode_params(nil, command)
   end
 

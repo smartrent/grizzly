@@ -135,7 +135,7 @@ defmodule Grizzly.ZWave.Command do
   end
 
   @spec encode_params(t()) :: binary()
-  def encode_params(command) do
+  defp encode_params(command) do
     {mod, fun} = Commands.spec_for!(command.name).encode_fun
     apply(mod, fun, [Commands.spec_for!(command.name), command])
   end

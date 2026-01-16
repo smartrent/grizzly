@@ -23,7 +23,7 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
     csa = Command.param!(command, :csa)
     requested_keys = Command.param!(command, :requested_keys)
 
-    <<seq_number, encode_csa(csa), encode_requested_keys(requested_keys)>>
+    <<seq_number, encode_csa(csa), Security.keys_to_byte(requested_keys)>>
   end
 
   @impl Grizzly.ZWave.Command
@@ -32,17 +32,13 @@ defmodule Grizzly.ZWave.Commands.NodeAddKeysReport do
      [
        seq_number: seq_number,
        csa: decode_csa(csa),
-       requested_keys: decode_requested_keys(requested_keys)
+       requested_keys: Security.byte_to_keys(requested_keys)
      ]}
   end
 
-  def encode_csa(true), do: 0x01
-  def encode_csa(false), do: 0x00
+  defp encode_csa(true), do: 0x01
+  defp encode_csa(false), do: 0x00
 
-  def decode_csa(0x01), do: true
-  def decode_csa(0x00), do: false
-
-  def decode_requested_keys(requested_keys_mask), do: Security.byte_to_keys(requested_keys_mask)
-
-  def encode_requested_keys(requested_keys), do: Security.keys_to_byte(requested_keys)
+  defp decode_csa(0x01), do: true
+  defp decode_csa(0x00), do: false
 end

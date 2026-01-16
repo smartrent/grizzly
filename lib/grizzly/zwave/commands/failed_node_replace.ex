@@ -46,15 +46,15 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
   end
 
   @spec encode_mode(mode()) :: byte()
-  def encode_mode(:start_failed_node_replace), do: 0x01
-  def encode_mode(:stop_failed_node_replace), do: 0x05
-  def encode_mode(:start_failed_node_replace_s2), do: 0x07
+  defp encode_mode(:start_failed_node_replace), do: 0x01
+  defp encode_mode(:stop_failed_node_replace), do: 0x05
+  defp encode_mode(:start_failed_node_replace_s2), do: 0x07
 
   @spec decode_mode(byte()) :: {:ok, mode()} | {:error, DecodeError.t()}
-  def decode_mode(0x01), do: {:ok, :start_failed_node_replace}
-  def decode_mode(0x05), do: {:ok, :stop_failed_node_replace}
-  def decode_mode(0x07), do: {:ok, :start_failed_node_replace_s2}
+  defp decode_mode(0x01), do: {:ok, :start_failed_node_replace}
+  defp decode_mode(0x05), do: {:ok, :stop_failed_node_replace}
+  defp decode_mode(0x07), do: {:ok, :start_failed_node_replace_s2}
 
-  def decode_mode(byte),
+  defp decode_mode(byte),
     do: {:error, %DecodeError{value: byte, param: :mode, command: :failed_node_replace}}
 end

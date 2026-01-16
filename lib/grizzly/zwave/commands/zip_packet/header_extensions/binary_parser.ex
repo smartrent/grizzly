@@ -13,9 +13,9 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.BinaryParser do
   def to_binary(%__MODULE__{bin: bin}), do: bin
 
   @spec next_with(t(), (binary -> {any, binary})) :: {any, t()} | :none
-  def next_with(%__MODULE__{bin: <<>>}, _), do: :none
+  defp next_with(%__MODULE__{bin: <<>>}, _), do: :none
 
-  def next_with(%__MODULE__{bin: binary} = bp, parser) do
+  defp next_with(%__MODULE__{bin: binary} = bp, parser) do
     {result, rest} = parser.(binary)
 
     {result, %{bp | bin: rest}}

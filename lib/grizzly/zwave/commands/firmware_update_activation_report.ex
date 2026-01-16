@@ -104,11 +104,11 @@ defmodule Grizzly.ZWave.Commands.FirmwareUpdateActivationReport do
   defp encode_status(:activation_error), do: 0x01
   defp encode_status(:success), do: 0xFF
 
-  def decode_status(0x00), do: {:ok, :invalid_identification}
-  def decode_status(0x01), do: {:ok, :activation_error}
-  def decode_status(0x02), do: {:ok, :success}
+  defp decode_status(0x00), do: {:ok, :invalid_identification}
+  defp decode_status(0x01), do: {:ok, :activation_error}
+  defp decode_status(0x02), do: {:ok, :success}
 
-  def decode_status(byte),
+  defp decode_status(byte),
     do:
       {:error,
        %DecodeError{
