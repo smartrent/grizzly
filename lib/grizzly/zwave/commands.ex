@@ -754,16 +754,30 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :sound_switch, 0x79 do
+    tone_identifier = param(:tone_identifier, :uint, size: 8)
+
+    play_params = [tone_identifier, param(:volume, :uint, size: 8, required: false)]
+
+    config_params = [
+      param(:volume, :uint, size: 8),
+      param(:default_tone_identifier, :uint, size: 8)
+    ]
+
     command :sound_switch_tones_number_get, 0x01, Cmds.Generic, params: []
-    command :sound_switch_tones_number_report, 0x02
-    command :sound_switch_tone_info_get, 0x03
+
+    command :sound_switch_tones_number_report, 0x02, Cmds.Generic,
+      params: [
+        param(:supported_tones, :uint, size: 8)
+      ]
+
+    command :sound_switch_tone_info_get, 0x03, Cmds.Generic, params: [tone_identifier]
     command :sound_switch_tone_info_report, 0x04
-    command :sound_switch_configuration_set, 0x05
+    command :sound_switch_configuration_set, 0x05, Cmds.Generic, params: config_params
     command :sound_switch_configuration_get, 0x06, Cmds.Generic, params: []
-    command :sound_switch_configuration_report, 0x07
-    command :sound_switch_tone_play_set, 0x08, Cmds.SoundSwitchTonePlaySetReport
+    command :sound_switch_configuration_report, 0x07, Cmds.Generic, params: config_params
+    command :sound_switch_tone_play_set, 0x08, Cmds.Generic, params: play_params
     command :sound_switch_tone_play_get, 0x09, Cmds.Generic, params: []
-    command :sound_switch_tone_play_report, 0x0A, Cmds.SoundSwitchTonePlaySetReport
+    command :sound_switch_tone_play_report, 0x0A, Cmds.Generic, params: play_params
   end
 
   command_class :supervision, 0x6C do
