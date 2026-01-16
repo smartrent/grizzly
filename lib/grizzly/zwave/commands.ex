@@ -238,18 +238,60 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :configuration, 0x70 do
+    param_num_8 = param(:param_number, :uint, size: 8)
+    param_num_16 = param(:param_number, :uint, size: 16)
+    reports_to_follow = param(:reports_to_follow, :uint, size: 8, default: 0)
+
     command :configuration_default_reset, 0x01, Cmds.Generic, params: []
     command :configuration_set, 0x04
-    command :configuration_get, 0x05, report: :configuration_report
-    command :configuration_report, 0x06
+
+    command :configuration_get, 0x05, Cmds.Generic,
+      report: :configuration_report,
+      params: [param_num_8]
+
+    command :configuration_report, 0x06, Cmds.Generic,
+      params: [
+        param_num_8,
+        reserved(size: 5),
+        param(:size, :uint, size: 3),
+        param(:value, :int, size: {:variable, :size})
+      ]
+
     command :configuration_bulk_set, 0x07
-    command :configuration_bulk_get, 0x08, handler: {AggregateReport, aggregate_param: :values}
+
+    command :configuration_bulk_get, 0x08, Cmds.Generic,
+      handler: {AggregateReport, aggregate_param: :values},
+      params: [
+        param(:offset, :uint, size: 16, default: 0),
+        param(:number_of_parameters, :uint, size: 8)
+      ]
+
     command :configuration_bulk_report, 0x09
-    command :configuration_name_get, 0x0A, handler: {AggregateReport, aggregate_param: :name}
-    command :configuration_name_report, 0x0B
-    command :configuration_info_get, 0x0C, handler: {AggregateReport, aggregate_param: :info}
-    command :configuration_info_report, 0x0D
-    command :configuration_properties_get, 0x0E
+
+    command :configuration_name_get, 0x0A, Cmds.Generic,
+      handler: {AggregateReport, aggregate_param: :name},
+      params: [param_num_16]
+
+    command :configuration_name_report, 0x0B, Cmds.Generic,
+      params: [
+        param_num_16,
+        reports_to_follow,
+        param(:name, :binary, size: :variable)
+      ]
+
+    command :configuration_info_get, 0x0C, Cmds.Generic,
+      handler: {AggregateReport, aggregate_param: :info},
+      params: [param_num_16]
+
+    command :configuration_info_report, 0x0D, Cmds.Generic,
+      params: [
+        param_num_16,
+        reports_to_follow,
+        param(:info, :binary, size: :variable)
+      ]
+
+    command :configuration_properties_get, 0x0E, Cmds.Generic, params: [param_num_16]
+
     command :configuration_properties_report, 0x0F
   end
 
