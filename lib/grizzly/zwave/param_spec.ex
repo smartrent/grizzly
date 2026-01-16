@@ -271,6 +271,11 @@ defmodule Grizzly.ZWave.ParamSpec do
     <<0::size(size)>>
   end
 
+  def encode_value(%__MODULE__{type: :binary, size: size}, value, _)
+      when is_bitstring(value) and is_integer(size) do
+    <<value::bitstring-size(size)>>
+  end
+
   def encode_value(%__MODULE__{type: :binary, size: :variable}, value, _)
       when is_bitstring(value) do
     value

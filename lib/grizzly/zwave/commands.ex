@@ -675,12 +675,45 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :powerlevel, 0x73 do
-    command :powerlevel_set, 0x01
+    power_level =
+      param(:power_level, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.Powerlevel.power_level_to_byte/1,
+          decode: &CommandClasses.Powerlevel.power_level_from_byte/1
+        ]
+      )
+
+    power_level_params = [
+      power_level,
+      param(:timeout, :uint, size: 8)
+    ]
+
+    command :powerlevel_set, 0x01, Cmds.Generic, params: power_level_params
     command :powerlevel_get, 0x02, Cmds.Generic, params: []
-    command :powerlevel_report, 0x03
-    command :powerlevel_test_node_set, 0x04
+    command :powerlevel_report, 0x03, Cmds.Generic, params: power_level_params
+
+    command :powerlevel_test_node_set, 0x04, Cmds.Generic,
+      params: [
+        param(:test_node_id, :uint, size: 8),
+        power_level,
+        param(:test_frame_count, :uint, size: 16)
+      ]
+
     command :powerlevel_test_node_get, 0x05, Cmds.Generic, params: []
-    command :powerlevel_test_node_report, 0x06
+
+    command :powerlevel_test_node_report, 0x06, Cmds.Generic,
+      params: [
+        param(:test_node_id, :uint, size: 8),
+        param(:status_of_operation, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.Powerlevel.status_of_operation_to_byte/1,
+            decode: &CommandClasses.Powerlevel.status_of_operation_from_byte/1
+          ]
+        ),
+        param(:test_frame_count, :uint, size: 16)
+      ]
   end
 
   command_class :scene_activation, 0x2B do
@@ -813,7 +846,13 @@ defmodule Grizzly.ZWave.Commands do
 
     command :s0_security_scheme_get, 0x04, Cmds.Generic, params: s0_security_schemes_params
     command :s0_security_scheme_report, 0x05, Cmds.Generic, params: s0_security_schemes_params
-    command :s0_network_key_set, 0x06, Cmds.S0NetworkKeySet, report: :s0_network_key_verify
+
+    command :s0_network_key_set, 0x06, Cmds.Generic,
+      report: :s0_network_key_verify,
+      params: [
+        param(:network_key, :binary, size: :variable)
+      ]
+
     command :s0_network_key_verify, 0x07, Cmds.Generic, params: []
 
     command :s0_security_scheme_inherit, 0x08, Cmds.Generic,
@@ -821,13 +860,22 @@ defmodule Grizzly.ZWave.Commands do
       params: s0_security_schemes_params
 
     command :s0_nonce_get, 0x40, Cmds.Generic, params: []
-    command :s0_nonce_report, 0x80, Cmds.S0NonceReport
+    command :s0_nonce_report, 0x80, Cmds.Generic, params: [param(:nonce, :binary, size: 8 * 8)]
     command :s0_message_encapsulation, 0x81, Cmds.S0MessageEncapsulation
   end
 
   command_class :security_2, 0x9F do
     command :s2_nonce_get, 0x01, Cmds.Generic, params: []
-    command :s2_nonce_report, 0x02, Cmds.S2NonceReport
+
+    command :s2_nonce_report, 0x02, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        reserved(size: 6),
+        param(:mpan_out_of_sync?, :boolean, size: 1),
+        param(:span_out_of_sync?, :boolean, size: 1),
+        param(:receivers_entropy_input, :binary, size: 16 * 8)
+      ]
+
     command :s2_message_encapsulation, 0x03, Cmds.S2MessageEncapsulation
     command :s2_kex_get, 0x04, Cmds.Generic, params: [], supports_supervision?: false
     command :s2_kex_report, 0x05, Cmds.S2KexReport, supports_supervision?: false
@@ -845,7 +893,13 @@ defmodule Grizzly.ZWave.Commands do
         )
       ]
 
-    command :s2_public_key_report, 0x08, Cmds.S2PublicKeyReport, supports_supervision?: false
+    command :s2_public_key_report, 0x08, Cmds.Generic,
+      supports_supervision?: false,
+      params: [
+        reserved(size: 7),
+        param(:including_node, :boolean, size: 1),
+        param(:ecdh_public_key, :binary, size: :variable)
+      ]
 
     command :s2_network_key_get, 0x09, Cmds.Generic,
       supports_supervision?: false,
@@ -859,7 +913,19 @@ defmodule Grizzly.ZWave.Commands do
         )
       ]
 
-    command :s2_network_key_report, 0x0A, Cmds.S2NetworkKeyReport, supports_supervision?: false
+    command :s2_network_key_report, 0x0A, Cmds.Generic,
+      supports_supervision?: false,
+      params: [
+        param(:granted_key, :enum,
+          size: 8,
+          opts: [
+            encode: &Security.key_to_byte/1,
+            decode: &Security.key_from_byte/1
+          ]
+        ),
+        param(:network_key, :binary, size: 16 * 8)
+      ]
+
     command :s2_network_key_verify, 0x0B, Cmds.Generic, params: [], supports_supervision?: false
 
     command :s2_transfer_end, 0x0C, Cmds.Generic,
