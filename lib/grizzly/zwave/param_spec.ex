@@ -291,6 +291,27 @@ defmodule Grizzly.ZWave.ParamSpec do
     <<length_value::size(size)>>
   end
 
+  def encode_value(
+        %__MODULE__{type: :binary, size: {:variable, other_param}},
+        value,
+        other_params
+      )
+      when is_bitstring(value) do
+    expected_size =
+      case Keyword.fetch(other_params, other_param) do
+        {:ok, length_in_bytes} when is_integer(length_in_bytes) -> length_in_bytes
+        _ -> raise "Length parameter #{other_param} not found in params or is not an integer"
+      end
+
+    actual_size = bit_size(value)
+
+    if actual_size != expected_size do
+      raise "Binary parameter size mismatch: expected #{expected_size} bits, got #{actual_size} bits"
+    end
+
+    value
+  end
+
   defp encoded_size(%__MODULE__{size: size}, _value, _other_params)
        when is_integer(size) do
     size

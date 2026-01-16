@@ -23,17 +23,38 @@ defmodule Grizzly.ZWave.Commands.Generic do
   # Recursive case: encode the next param
   defp do_encode_params([{name, param_spec} | params], cmd, parts) do
     value =
-      if param_spec.required and param_spec.type not in [:constant, :reserved] do
-        Command.param!(cmd, name)
-      else
-        Keyword.get(cmd.params, name, param_spec.default)
+      cond do
+        match?({:length, _}, param_spec.type) ->
+          {:length, other_param} = param_spec.type
+          other_value = Command.param!(cmd, other_param)
+          byte_size(other_value)
+
+        param_spec.required and param_spec.type not in [:constant, :reserved] ->
+          Command.param!(cmd, name)
+
+        true ->
+          Keyword.get(cmd.params, name, param_spec.default)
       end
 
     # When we get to a non-required param that is not present, stop encoding
     if not Keyword.has_key?(cmd.params, name) and param_spec.required == false do
       do_encode_params([], cmd, parts)
     else
-      parts = [ParamSpec.encode_value(param_spec, value, cmd.params) | parts]
+      encoded_value = ParamSpec.encode_value(param_spec, value, cmd.params)
+
+      # For params of type {:length, other_param}, we need to put the encoded
+      # value into the params because the later param probably has its size
+      # specified as {:variable, this_param}
+
+      cmd =
+        case param_spec.type do
+          # Put the bit length into prams even though we're encoding the byte length
+          {:length, _} -> Command.put_param(cmd, name, value * 8)
+          _ -> cmd
+        end
+
+      parts = [encoded_value | parts]
+
       do_encode_params(params, cmd, parts)
     end
   end

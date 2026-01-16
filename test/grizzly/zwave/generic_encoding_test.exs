@@ -3,6 +3,17 @@ defmodule Grizzly.ZWave.GenericEncodingTest do
     async: true,
     parameterize:
       [
+        {:association_group_name_report, [group_id: 2, name: "some_name"],
+         <<0x59, 0x02, 0x02, 0x09>> <> "some_name"},
+        {:admin_code_set, [code: "1234"], <<0x63, 0x0E, 0x04, "1234">>},
+        {:admin_code_report, [code: "1234"], <<0x63, 0x10, 0x04, "1234">>},
+        {:admin_code_report, [code: "12345"], <<0x63, 0x10, 0x05, "12345">>},
+        {:admin_pin_code_set, [code: "0123456789ABCDE"], <<0x83, 0x1A, 15, "0123456789ABCDE">>},
+        {:admin_pin_code_set, [code: "01234"], <<0x83, 0x1A, 5, "01234">>},
+        {:admin_pin_code_report, [result: :response_to_get, code: "0123456789ABCDE"],
+         <<0x83, 0x1C, 4::4, 15::4, "0123456789ABCDE">>},
+        {:admin_pin_code_report, [result: :response_to_get, code: "01234"],
+         <<0x83, 0x1C, 4::4, 5::4, "01234">>},
         {:alarm_event_supported_get, [type: :access_control], <<0x71, 0x01, 0x06>>},
         {:alarm_set, [zwave_type: :home_security, status: :enabled], <<0x71, 0x06, 0x07, 0xFF>>},
         {:all_users_checksum_report, [checksum: 0x7FFF], <<0x83, 0x15, 0x7F, 0xFF>>},
@@ -238,10 +249,24 @@ defmodule Grizzly.ZWave.GenericEncodingTest do
         {:time_parameters_report,
          [year: 2020, month: 7, day: 17, hour_utc: 14, minute_utc: 30, second_utc: 45],
          <<0x8B, 0x03, 2020::16, 7, 17, 14, 30, 45>>},
+        {:time_report, [rtc_failure?: true, hour: 12, minute: 30, second: 45],
+         <<0x8A, 0x02, 1::1, 0::2, 12::5, 30, 45>>},
+        {:time_report, [rtc_failure?: false, hour: 12, minute: 30, second: 45],
+         <<0x8A, 0x02, 12, 30, 45>>},
         {:user_code_checksum_report, [checksum: 0xEAAD], <<0x63, 0x12, 0xEA, 0xAD>>},
         {:user_code_users_number_report, [supported_users: 20], <<0x63, 0x05, 20>>},
         {:user_code_users_number_report, [supported_users: 20, extended_supported_users: 300],
          <<0x63, 0x05, 20, 300::16>>},
+        {:user_credential_association_set,
+         [credential_type: :password, credential_slot: 1, destination_user_id: 500],
+         <<0x83, 0x12, 0x02, 1::16, 500::16>>},
+        {:user_credential_association_report,
+         [
+           credential_type: :password,
+           credential_slot: 1,
+           destination_user_id: 500,
+           status: :destination_user_id_nonexistent
+         ], <<0x83, 0x13, 0x02, 1::16, 500::16, 5>>},
         {:wake_up_interval_set, [seconds: 1000, node_id: 1], <<0x84, 0x04, 1000::24, 1>>},
         {:wake_up_interval_report, [seconds: 2000, node_id: 1], <<0x84, 0x06, 2000::24, 1>>}
       ]

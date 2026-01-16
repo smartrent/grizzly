@@ -48,6 +48,7 @@ defmodule Grizzly do
   alias Grizzly.VirtualDevices
   alias Grizzly.ZIPGateway
   alias Grizzly.ZWave
+  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.RssiReport
   alias Grizzly.ZWave.CommandSpec
@@ -237,7 +238,7 @@ defmodule Grizzly do
 
     with :ok <- can_send_command?(),
          {:ok, spec} <- Commands.spec_for(command_name),
-         {:ok, command} <- CommandSpec.create_command(spec, args),
+         {:ok, command} <- Command.new(spec, args),
          {:ok, _} <- Connection.open(node_id, open_opts) do
       opts = Keyword.merge([handler: CommandSpec.handler_spec(spec)], opts)
       Connection.send_command(node_id, command, opts)
@@ -252,7 +253,7 @@ defmodule Grizzly do
   def send_async_command_via(conn, node_id, command_name, args \\ [], opts \\ []) do
     with :ok <- can_send_command?(),
          {:ok, spec} <- Commands.spec_for(command_name),
-         {:ok, command} <- CommandSpec.create_command(spec, args) do
+         {:ok, command} <- Command.new(spec, args) do
       opts = Keyword.merge([handler: CommandSpec.handler_spec(spec)], opts)
       Connection.send_async_command_via(conn, node_id, command, opts)
     end

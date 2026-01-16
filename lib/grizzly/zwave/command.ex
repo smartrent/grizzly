@@ -74,6 +74,25 @@ defmodule Grizzly.ZWave.Command do
   @optional_callbacks report_matches_get?: 2, validate_params: 2
 
   @doc """
+  Create a command struct from the given spec and parameters.
+  """
+  @spec new(CommandSpec.t(), params :: keyword()) :: {:ok, t()} | {:error, :unknown_command}
+  def new(%CommandSpec{} = spec, params \\ []) do
+    params = Keyword.merge(spec.default_params, params)
+
+    with {:ok, params} <- validate_params(spec, params) do
+      cmd = %Grizzly.ZWave.Command{
+        name: spec.name,
+        command_class: spec.command_class,
+        command_byte: spec.command_byte,
+        params: params
+      }
+
+      {:ok, cmd}
+    end
+  end
+
+  @doc """
   Encode the `Command.t()` into it's binary representation
   """
   @spec to_binary(t()) :: binary()
@@ -122,6 +141,22 @@ defmodule Grizzly.ZWave.Command do
             Here is a list of available params for your command:
 
             """ <> list_of_command_params(command)
+  end
+
+  @doc """
+  Validate a command's parameters according to the command spec.
+  """
+  def validate_params(%CommandSpec{validate_fun: nil} = _spec, params) do
+    {:ok, params}
+  end
+
+  def validate_params(%CommandSpec{validate_fun: {mod, fun}} = spec, params) do
+    apply(mod, fun, [spec, params])
+  end
+
+  def validate_params(%CommandSpec{validate_fun: fun} = spec, params)
+      when is_function(fun, 2) do
+    fun.(spec, params)
   end
 
   @doc """
