@@ -998,32 +998,63 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :user_credential, 0x83 do
+    user_id = param(:user_id, :uint, size: 16)
+
+    credential_slot = param(:credential_slot, :uint, size: 16)
+
+    credential_type =
+      param(:credential_type, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.UserCredential.encode_credential_type/1,
+          decode: &CommandClasses.UserCredential.decode_credential_type/1
+        ]
+      )
+
+    checksum = param(:checksum, :uint, size: 16)
+
+    credential_learn_operation =
+      param(:operation_type, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.UserCredential.encode_credential_learn_operation/1,
+          decode: &CommandClasses.UserCredential.decode_credential_learn_operation/1
+        ]
+      )
+
     command :user_capabilities_get, 0x01, Cmds.Generic, params: []
     command :user_capabilities_report, 0x02
     command :credential_capabilities_get, 0x03, Cmds.Generic, params: []
     command :credential_capabilities_report, 0x04
     command :user_set, 0x05
-    command :user_get, 0x06
+    command :user_get, 0x06, Cmds.Generic, params: [user_id]
     command :user_report, 0x07
     command :credential_set, 0x0A
-    command :credential_get, 0x0B
+
+    command :credential_get, 0x0B, Cmds.Generic,
+      params: [user_id, credential_type, credential_slot]
+
     command :credential_report, 0x0C
-    command :credential_learn_start, 0x0F
+
+    command :credential_learn_start, 0x0F, Cmds.Generic,
+      params: [
+        user_id,
+        credential_type,
+        credential_slot,
+        credential_learn_operation,
+        param(:learn_timeout, :uint, size: 8)
+      ]
+
     command :credential_learn_cancel, 0x10, Cmds.Generic, params: []
     command :credential_learn_status_report, 0x11
     command :user_credential_association_set, 0x12
     command :user_credential_association_report, 0x13
     command :all_users_checksum_get, 0x14, Cmds.Generic, params: []
-
-    command :all_users_checksum_report, 0x15, Cmds.Generic,
-      params: [
-        param(:checksum, :uint, size: 16)
-      ]
-
-    command :user_checksum_get, 0x16
-    command :user_checksum_report, 0x17
-    command :credential_checksum_get, 0x18
-    command :credential_checksum_report, 0x19
+    command :all_users_checksum_report, 0x15, Cmds.Generic, params: [checksum]
+    command :user_checksum_get, 0x16, Cmds.Generic, params: [user_id]
+    command :user_checksum_report, 0x17, Cmds.Generic, params: [user_id, checksum]
+    command :credential_checksum_get, 0x18, Cmds.Generic, params: [credential_type]
+    command :credential_checksum_report, 0x19, Cmds.Generic, params: [credential_type, checksum]
     command :admin_pin_code_set, 0x1A
     command :admin_pin_code_get, 0x1B, Cmds.Generic, params: []
     command :admin_pin_code_report, 0x1C
