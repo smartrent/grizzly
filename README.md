@@ -303,48 +303,10 @@ to `0`if not set (this is `zipgateway` level default).
 The above fields have no impact on the Grizzly runtime, and are only useful for
 certification processes.
 
-When running `zipgateway` binary out side of Grizzly this configuration field is ignored
+When running `zipgateway` binary outside of Grizzly this configuration field is ignored
 and you will need to pass in the location to your configuration like so:
 
 `zipgateway -c /path/to/zipgateway.cfg`
-
-## Virtual devices
-
-Grizzly provides a way to work with virtual devices. These devices should work
-as their hardware counterparts, however, the state of these devices are held in
-memory.
-
-Grizzly provides to example virtual devices:
-
-1. `Grizzly.VirtualDevices.Thermostat`
-1. `Grizzly.VirtualDevices.TemperatureSensor`
-
-To use These virtual devices you will have to start them using the
-`start_link/1` call. These are not supervised by Grizzly, so you will need to
-add them to your supervision tree. The reason for this is to provide the maximum
-flexibility to the consumer application in terms of how processes are started
-and supervised.
-
-After starting the device you can call the `Grizzly.send_command/4` function to
-send the device a command.
-
-```elixir
-{:ok, _pid} = Grizzly.VirtualDevices.Thermostat.start_link([])
-{:ok, [{:virtual, _id} = virtual_device_id]} = Grizzly.Network.get_all_node_ids()
-
-Grizzly.send_command(virtual_device_id, :thermostat_setpoint_get)
-```
-
-Virtual device ids are tuples where the first item is the atom `:virtual` and
-the second item an integer of the device id, for example:
-`{:virtual, device_id}`. Grizzly provides a guard and a helper function for any
-checking you might have to do:
-
-1. `Grizzly.is_virtual_device/1` (guard)
-1. `Grizzly.virtual_device?/1` (function)
-
-Also, the documentation for functions in `Grizzly.Node` and `Grizzly.Network`
-should indicate if they work with virtual devices.
 
 ## Resources
 

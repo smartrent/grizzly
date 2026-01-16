@@ -2,6 +2,17 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.0.0] - 2026-01-16
+
+### Changed
+
+* OTW firmware updates for the Z-Wave module are now done in Elixir (rather than zw_programmer) ([#1142](https://github.com/smartrent/grizzly/pull/1142))
+* Remove deprecated `Grizzly.StatusReporter` (use `Grizzly.Events` instead) ([#1144](https://github.com/smartrent/grizzly/pull/1144))
+* Rename `Grizzly.Commands.*` to `Grizzly.Requests.*` to clarify between Z-Wave
+  commands and requests to Z/IP Gateway
+* Many Z-Wave commands are now encoded/decoded using a generic encoder instead of
+  requiring a module and custom encode/decode functions for every single command
+
 ## [v8.15.3] - 2025-10-23
 
 ### Fixed
@@ -800,11 +811,11 @@ Fix Node Add Status parsing when length is off by one ([#871](https://github.com
 ### Added
 
 - `Grizzly.VirtualDevices.Device.set_device_id/2` callback function (@jfcloutier)
-- `Grizzly.VirtualDevices.TemperatureSensor.state()` now has a `:device_id`
+- Grizzly.VirtualDevices.TemperatureSensor.state() now has a `:device_id`
   field (@jfcloutier)
-- `Grizzly.VirtualDevices.TemperatureSensor.set_device_id/2` implementation
+- Grizzly.VirtualDevices.TemperatureSensor.set_device_id/2 implementation
   (@jfcloutier)
-- `Grizzly.VirtualDevices.Thermostat.set_device_id/2` implementation (@jfcloutier)
+- Grizzly.VirtualDevices.Thermostat.set_device_id/2 implementation (@jfcloutier)
 
 ### Fixed
 
@@ -2815,6 +2826,7 @@ Same change found in `Grizzly.Node.get_command_class_version`
   - Fix timeout error when waiting for DTLS server from the
     `zipgateway` side
 
+[v9.0.0]: https://github.com/smartrent/grizzly/compare/v8.15.3..v9.0.0
 [v8.15.3]: https://github.com/smartrent/grizzly/compare/v8.15.2..v8.15.3
 [v8.15.2]: https://github.com/smartrent/grizzly/compare/v8.15.1..v8.15.2
 [v8.15.1]: https://github.com/smartrent/grizzly/compare/v8.15.0..v8.15.1

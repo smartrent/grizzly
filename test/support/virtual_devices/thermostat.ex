@@ -1,7 +1,5 @@
 defmodule Grizzly.VirtualDevices.Thermostat do
-  @moduledoc """
-  Implementation of a virtual device for a thermostat
-  """
+  @moduledoc false
 
   @behaviour Grizzly.VirtualDevices.Device
 
