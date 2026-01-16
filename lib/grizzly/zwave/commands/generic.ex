@@ -33,7 +33,7 @@ defmodule Grizzly.ZWave.Commands.Generic do
     if not Keyword.has_key?(cmd.params, name) and param_spec.required == false do
       do_encode_params([], cmd, parts)
     else
-      parts = [ParamSpec.encode_value(param_spec, value) | parts]
+      parts = [ParamSpec.encode_value(param_spec, value, cmd.params) | parts]
       do_encode_params(params, cmd, parts)
     end
   end
@@ -59,8 +59,9 @@ defmodule Grizzly.ZWave.Commands.Generic do
 
   # Recursive case: Decode the next param
   defp do_decode_params([{name, param_spec} | params], binary, decoded_params) do
-    with {:ok, {value, rest}} <- ParamSpec.take_bits(param_spec, binary),
-         {:ok, decoded_value} <- ParamSpec.decode_value(param_spec, value) do
+    with {:ok, {actual_size, value, rest}} <-
+           ParamSpec.take_bits(param_spec, binary, decoded_params),
+         {:ok, decoded_value} <- ParamSpec.decode_value(%{param_spec | size: actual_size}, value) do
       if ParamSpec.include_when_decoding?(param_spec) do
         do_decode_params(params, rest, [{name, decoded_value} | decoded_params])
       else

@@ -93,7 +93,7 @@ defmodule Grizzly.ZWave.ParamSpec do
       iex> Grizzly.ZWave.ParamSpec.num_bits(spec)
       16
 
-      iex> spec = %Grizzly.ZWave.ParamSpec{type: :binary, size: 4}
+      iex> spec = %Grizzly.ZWave.ParamSpec{type: :binary, size: 32}
       iex> Grizzly.ZWave.ParamSpec.num_bits(spec)
       32
 
@@ -106,7 +106,6 @@ defmodule Grizzly.ZWave.ParamSpec do
       :variable
   """
   @spec num_bits(t()) :: non_neg_integer() | :variable
-  def num_bits(%__MODULE__{type: :binary, size: size}) when is_integer(size), do: size * 8
   def num_bits(%__MODULE__{size: size}) when is_integer(size), do: size
   def num_bits(%__MODULE__{size: :variable}), do: :variable
   def num_bits(%__MODULE__{size: {:variable, _}}), do: :variable
@@ -120,29 +119,30 @@ defmodule Grizzly.ZWave.ParamSpec do
   ## Examples
 
       iex> spec = %Grizzly.ZWave.ParamSpec{type: :uint, size: 8}
-      iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>)
-      {:ok, {<<0x01>>, <<0x02, 0x03>>}}
+      iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, [])
+      {:ok, {8, <<0x01>>, <<0x02, 0x03>>}}
 
       iex> spec = %Grizzly.ZWave.ParamSpec{type: :int, size: 16}
-      iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>)
-      {:ok, {<<0x01, 0x02>>, <<0x03>>}}
+      iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, [])
+      {:ok, {16, <<0x01, 0x02>>, <<0x03>>}}
 
       iex> spec = %Grizzly.ZWave.ParamSpec{type: :int, size: :variable}
-      iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>)
-      {:ok, {<<0x01, 0x02, 0x03>>, <<>>}}
+      iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, [])
+      {:ok, {24, <<0x01, 0x02, 0x03>>, <<>>}}
 
       iex> spec = %Grizzly.ZWave.ParamSpec{type: :int, size: {:variable, :length_param}}
       iex> Grizzly.ZWave.ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, length_param: 2)
-      {:ok, {<<0x01, 0x02>>, <<0x03>>}}
+      {:ok, {16, <<0x01, 0x02>>, <<0x03>>}}
   """
   @spec take_bits(t(), bitstring(), keyword()) ::
-          {:ok, {value :: bitstring(), rest :: bitstring()}} | {:error, DecodeError.t()}
-  def take_bits(param_spec, bitstring, other_params \\ [])
+          {:ok, {bits_taken :: non_neg_integer(), value :: bitstring(), rest :: bitstring()}}
+          | {:error, DecodeError.t()}
+  def take_bits(param_spec, bitstring, other_params)
 
   def take_bits(%__MODULE__{type: :binary, size: size}, bitstring, _other_params)
-      when is_integer(size) and bit_size(bitstring) >= size * 8 do
-    <<value::binary-size(size), rest::bitstring>> = bitstring
-    {:ok, {value, rest}}
+      when is_integer(size) and rem(size, 8) == 0 and bit_size(bitstring) >= size do
+    <<value::bitstring-size(size), rest::bitstring>> = bitstring
+    {:ok, {size, value, rest}}
   end
 
   def take_bits(%__MODULE__{type: :binary, size: size} = param, bitstring, _other_params)
@@ -166,7 +166,8 @@ defmodule Grizzly.ZWave.ParamSpec do
           length_in_bytes * 8
 
         _ ->
-          raise "Length parameter #{length_param} not found in other_params or is not an integer"
+          raise ArgumentError,
+                "Length parameter #{length_param} not found in other_params or is not an integer"
       end
 
     # Change type to :any to avoid hitting binary-specific clauses which expect size in bytes
@@ -174,13 +175,13 @@ defmodule Grizzly.ZWave.ParamSpec do
   end
 
   def take_bits(%__MODULE__{size: :variable}, bitstring, _other_params) do
-    {:ok, {bitstring, <<>>}}
+    {:ok, {bit_size(bitstring), bitstring, <<>>}}
   end
 
   def take_bits(%__MODULE__{size: size}, bitstring, _other_params)
       when is_integer(size) and bit_size(bitstring) >= size do
     <<value::bitstring-size(size), rest::bitstring>> = bitstring
-    {:ok, {value, rest}}
+    {:ok, {size, value, rest}}
   end
 
   def take_bits(%__MODULE__{} = param, bitstring, _other_params) do
@@ -207,7 +208,7 @@ defmodule Grizzly.ZWave.ParamSpec do
   @spec encode_value(t(), term(), keyword()) :: bitstring()
   def encode_value(param_spec, value, other_params \\ [])
 
-  def encode_value(%__MODULE__{type: :enum, size: size} = spec, value, _other_params) do
+  def encode_value(%__MODULE__{type: :enum, size: size} = spec, value, _) do
     encoder = Keyword.fetch!(spec.opts, :encode)
 
     result =
@@ -236,17 +237,19 @@ defmodule Grizzly.ZWave.ParamSpec do
     end
   end
 
-  def encode_value(%__MODULE__{type: :int, size: size}, value, _other_params)
+  def encode_value(%__MODULE__{type: :int} = param_spec, value, other_params)
       when is_integer(value) do
+    size = encoded_size(param_spec, value, other_params)
     <<value::signed-size(size)>>
   end
 
-  def encode_value(%__MODULE__{type: :uint, size: size}, value, _other_params)
+  def encode_value(%__MODULE__{type: :uint} = param_spec, value, other_params)
       when is_integer(value) do
+    size = encoded_size(param_spec, value, other_params)
     <<value::size(size)>>
   end
 
-  def encode_value(%__MODULE__{type: :boolean, size: size} = param_spec, value, _other_params)
+  def encode_value(%__MODULE__{type: :boolean, size: size} = param_spec, value, _)
       when is_boolean(value) do
     cond do
       Keyword.has_key?(param_spec.opts, value) ->
@@ -260,12 +263,17 @@ defmodule Grizzly.ZWave.ParamSpec do
     end
   end
 
-  def encode_value(%__MODULE__{type: :constant, size: size} = param_spec, _value, _other_params) do
+  def encode_value(%__MODULE__{type: :constant, size: size} = param_spec, _, _) do
     <<param_spec.opts[:value]::size(size)>>
   end
 
-  def encode_value(%__MODULE__{type: :reserved, size: size} = _param_spec, _value, _other_params) do
+  def encode_value(%__MODULE__{type: :reserved, size: size}, _, _) do
     <<0::size(size)>>
+  end
+
+  def encode_value(%__MODULE__{type: :binary, size: :variable}, value, _)
+      when is_bitstring(value) do
+    value
   end
 
   def encode_value(
@@ -281,6 +289,25 @@ defmodule Grizzly.ZWave.ParamSpec do
       end
 
     <<length_value::size(size)>>
+  end
+
+  defp encoded_size(%__MODULE__{size: size}, _value, _other_params)
+       when is_integer(size) do
+    size
+  end
+
+  defp encoded_size(
+         %__MODULE__{size: {:variable, length_param}},
+         _value,
+         other_params
+       ) do
+    case Keyword.fetch(other_params, length_param) do
+      {:ok, length_in_bytes} when is_integer(length_in_bytes) ->
+        length_in_bytes * 8
+
+      _ ->
+        raise "Length parameter #{length_param} not found in params or is not an integer: #{inspect(other_params)}"
+    end
   end
 
   @doc """
@@ -359,11 +386,11 @@ defmodule Grizzly.ZWave.ParamSpec do
   def decode_value(%__MODULE__{type: :binary, size: size} = param_spec, binary, _other_params)
       when is_integer(size) do
     case binary do
-      <<v::binary-size(size)>> ->
+      <<v::bitstring-size(size)>> ->
         {:ok, v}
 
       _ ->
-        {:error, %DecodeError{param: param_spec.name, value: binary}}
+        {:error, %DecodeError{param: param_spec.name, value: binary, reason: "uwu"}}
     end
   end
 
@@ -390,7 +417,7 @@ defmodule Grizzly.ZWave.ParamSpec do
            }}
       end
 
-    {:ok, <<binary::binary-size(length)>>}
+    {:ok, <<binary::bitstring-size(length)>>}
   end
 
   def decode_value(%__MODULE__{} = param_spec, _binary, _other_params) do

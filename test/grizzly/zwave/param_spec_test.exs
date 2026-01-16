@@ -195,12 +195,12 @@ defmodule Grizzly.ZWave.ParamSpecTest do
     end
 
     test "binary with fixed size" do
-      spec = %ParamSpec{name: :data, type: :binary, size: 4}
+      spec = %ParamSpec{name: :data, type: :binary, size: 4 * 8}
 
       assert ParamSpec.decode_value(spec, <<0x01, 0x02, 0x03, 0x04>>) ==
                {:ok, <<0x01, 0x02, 0x03, 0x04>>}
 
-      spec = %ParamSpec{name: :data, type: :binary, size: 2}
+      spec = %ParamSpec{name: :data, type: :binary, size: 2 * 8}
       assert ParamSpec.decode_value(spec, <<0xAB, 0xCD>>) == {:ok, <<0xAB, 0xCD>>}
     end
 
@@ -214,13 +214,13 @@ defmodule Grizzly.ZWave.ParamSpecTest do
     test "binary with variable size based on length param" do
       spec = %ParamSpec{name: :data, type: :binary, size: {:variable, :data_length}}
 
-      assert ParamSpec.decode_value(spec, <<0x01, 0x02, 0x03>>, data_length: 3) ==
+      assert ParamSpec.decode_value(spec, <<0x01, 0x02, 0x03>>, data_length: 3 * 8) ==
                {:ok, <<0x01, 0x02, 0x03>>}
 
-      assert ParamSpec.decode_value(spec, <<0xAA, 0xBB>>, data_length: 2) ==
+      assert ParamSpec.decode_value(spec, <<0xAA, 0xBB>>, data_length: 2 * 8) ==
                {:ok, <<0xAA, 0xBB>>}
 
-      assert ParamSpec.decode_value(spec, <<0xFF>>, data_length: 1) == {:ok, <<0xFF>>}
+      assert ParamSpec.decode_value(spec, <<0xFF>>, data_length: 1 * 8) == {:ok, <<0xFF>>}
     end
 
     test "length type - decodes as uint" do
@@ -263,51 +263,55 @@ defmodule Grizzly.ZWave.ParamSpecTest do
   describe "take_bits/3" do
     test "takes fixed number of bits" do
       spec = %ParamSpec{name: :foo, type: :uint, size: 8}
-      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>) == {:ok, {<<0x01>>, <<0x02, 0x03>>}}
+
+      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, []) ==
+               {:ok, {8, <<0x01>>, <<0x02, 0x03>>}}
 
       spec = %ParamSpec{name: :bar, type: :int, size: 16}
-      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>) == {:ok, {<<0x01, 0x02>>, <<0x03>>}}
+
+      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, []) ==
+               {:ok, {16, <<0x01, 0x02>>, <<0x03>>}}
     end
 
     test "takes binary type with fixed byte size" do
-      spec = %ParamSpec{name: :data, type: :binary, size: 4}
+      spec = %ParamSpec{name: :data, type: :binary, size: 4 * 8}
 
-      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03, 0x04, 0x05>>) ==
-               {:ok, {<<0x01, 0x02, 0x03, 0x04>>, <<0x05>>}}
+      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03, 0x04, 0x05>>, []) ==
+               {:ok, {32, <<0x01, 0x02, 0x03, 0x04>>, <<0x05>>}}
 
-      spec = %ParamSpec{name: :data, type: :binary, size: 2}
+      spec = %ParamSpec{name: :data, type: :binary, size: 2 * 8}
 
-      assert ParamSpec.take_bits(spec, <<0xAA, 0xBB, 0xCC>>) ==
-               {:ok, {<<0xAA, 0xBB>>, <<0xCC>>}}
+      assert ParamSpec.take_bits(spec, <<0xAA, 0xBB, 0xCC>>, []) ==
+               {:ok, {16, <<0xAA, 0xBB>>, <<0xCC>>}}
     end
 
     test "takes all remaining bits for variable size" do
       spec = %ParamSpec{name: :data, type: :binary, size: :variable}
 
-      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>) ==
-               {:ok, {<<0x01, 0x02, 0x03>>, <<>>}}
+      assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03>>, []) ==
+               {:ok, {24, <<0x01, 0x02, 0x03>>, <<>>}}
 
-      assert ParamSpec.take_bits(spec, <<>>) == {:ok, {<<>>, <<>>}}
+      assert ParamSpec.take_bits(spec, <<>>, []) == {:ok, {0, <<>>, <<>>}}
     end
 
     test "takes variable bits based on length parameter" do
       spec = %ParamSpec{name: :data, type: :binary, size: {:variable, :data_length}}
 
       assert ParamSpec.take_bits(spec, <<0x01, 0x02, 0x03, 0x04>>, data_length: 2) ==
-               {:ok, {<<0x01, 0x02>>, <<0x03, 0x04>>}}
+               {:ok, {16, <<0x01, 0x02>>, <<0x03, 0x04>>}}
 
       assert ParamSpec.take_bits(spec, <<0xAA, 0xBB, 0xCC>>, data_length: 3) ==
-               {:ok, {<<0xAA, 0xBB, 0xCC>>, <<>>}}
+               {:ok, {24, <<0xAA, 0xBB, 0xCC>>, <<>>}}
 
       assert ParamSpec.take_bits(spec, <<0xFF, 0xEE>>, data_length: 1) ==
-               {:ok, {<<0xFF>>, <<0xEE>>}}
+               {:ok, {8, <<0xFF>>, <<0xEE>>}}
     end
 
     test "error when not enough bits available" do
       spec = %ParamSpec{name: :foo, type: :uint, size: 16}
 
       assert {:error, %Grizzly.ZWave.DecodeError{param: :foo, value: <<0x01>>, reason: reason}} =
-               ParamSpec.take_bits(spec, <<0x01>>)
+               ParamSpec.take_bits(spec, <<0x01>>, [])
 
       assert reason == "not enough bits to decode parameter"
 
@@ -315,20 +319,20 @@ defmodule Grizzly.ZWave.ParamSpecTest do
       spec = %ParamSpec{name: :bar, type: :int, size: 24}
 
       assert {:error, %Grizzly.ZWave.DecodeError{param: :bar, value: <<0x01, 0x02>>, reason: _}} =
-               ParamSpec.take_bits(spec, <<0x01, 0x02>>)
+               ParamSpec.take_bits(spec, <<0x01, 0x02>>, [])
 
       # For binary types, need at least size bytes
-      spec = %ParamSpec{name: :data, type: :binary, size: 5}
+      spec = %ParamSpec{name: :data, type: :binary, size: 5 * 8}
 
       assert {:error, %Grizzly.ZWave.DecodeError{param: :data, value: <<0x01, 0x02>>, reason: _}} =
-               ParamSpec.take_bits(spec, <<0x01, 0x02>>)
+               ParamSpec.take_bits(spec, <<0x01, 0x02>>, [])
     end
 
     test "error when variable length parameter is not provided" do
       spec = %ParamSpec{name: :data, type: :binary, size: {:variable, :missing_length}}
 
-      assert_raise RuntimeError, fn ->
-        ParamSpec.take_bits(spec, <<0x01, 0x02>>)
+      assert_raise ArgumentError, fn ->
+        ParamSpec.take_bits(spec, <<0x01, 0x02>>, [])
       end
     end
   end
@@ -346,10 +350,10 @@ defmodule Grizzly.ZWave.ParamSpecTest do
     end
 
     test "returns bits for binary type (bytes * 8)" do
-      spec = %ParamSpec{name: :data, type: :binary, size: 4}
+      spec = %ParamSpec{name: :data, type: :binary, size: 4 * 8}
       assert ParamSpec.num_bits(spec) == 32
 
-      spec = %ParamSpec{name: :data, type: :binary, size: 1}
+      spec = %ParamSpec{name: :data, type: :binary, size: 1 * 8}
       assert ParamSpec.num_bits(spec) == 8
     end
 
@@ -367,7 +371,7 @@ defmodule Grizzly.ZWave.ParamSpecTest do
       spec = %ParamSpec{name: :foo, type: :uint, size: 8}
       assert ParamSpec.include_when_decoding?(spec) == true
 
-      spec = %ParamSpec{name: :bar, type: :binary, size: 4}
+      spec = %ParamSpec{name: :bar, type: :binary, size: 4 * 8}
       assert ParamSpec.include_when_decoding?(spec) == true
     end
 
