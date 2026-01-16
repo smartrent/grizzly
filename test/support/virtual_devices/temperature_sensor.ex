@@ -1,13 +1,5 @@
 defmodule Grizzly.VirtualDevices.TemperatureSensor do
-  @moduledoc """
-  A virtual device for a temperature sensor
-
-  This virtual device reports changes in the sensor every minute using the
-  `Grizzly.ZWave.Commands.SensorMultilevelReport` command.
-
-  If you want a faster or slower reporting interval you can configure the
-  `:report_interval` option.
-  """
+  @moduledoc false
 
   @behaviour Grizzly.VirtualDevices.Device
 

@@ -119,14 +119,9 @@ defmodule Grizzly.MixProject do
           Grizzly.InclusionHandler,
           Grizzly.Inclusions.NetworkAdapter
         ],
-        "Grizzly Command Modules": [
-          Grizzly.SwitchBinary
-        ],
         "Virtual Devices": [
           Grizzly.VirtualDevices,
-          Grizzly.VirtualDevices.Device,
-          Grizzly.VirtualDevices.TemperatureSensor,
-          Grizzly.VirtualDevices.Thermostat
+          Grizzly.VirtualDevices.Device
         ],
         "Z/IP Gateway": [
           Grizzly.ZIPGateway,
