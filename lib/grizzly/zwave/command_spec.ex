@@ -8,32 +8,9 @@ defmodule Grizzly.ZWave.CommandSpec do
   alias Grizzly.Requests.Handlers.WaitReport
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
+  alias Grizzly.ZWave.ParamSpec
 
   @type report_matcher :: (get :: Command.t(), report :: Command.t() -> boolean())
-
-  defmodule Param do
-    @moduledoc """
-    Data structure describing a parameter for a Z-Wave command.
-    """
-
-    @type type :: :int | :uint | :boolean | :binary | :enum | :constant | :reserved | :any
-
-    @type t :: %__MODULE__{
-            name: atom(),
-            type: type(),
-            size: non_neg_integer() | :variable,
-            default: any(),
-            required: boolean(),
-            opts: keyword()
-          }
-
-    defstruct name: nil,
-              type: nil,
-              size: 8,
-              default: nil,
-              required: false,
-              opts: []
-  end
 
   schema =
     NimbleOptions.new!(
@@ -145,8 +122,8 @@ defmodule Grizzly.ZWave.CommandSpec do
         """
       ],
       params: [
-        type: :keyword_list,
-        keys: [*: [type: {:struct, Param}]],
+        type: {:custom, __MODULE__, :validate_param_list, []},
+        keys: [*: [type: {:struct, ParamSpec}]],
         default: []
       ],
       default_params: [
@@ -177,7 +154,7 @@ defmodule Grizzly.ZWave.CommandSpec do
           report: atom() | nil,
           handler: {module(), keyword()},
           supports_supervision?: boolean(),
-          params: list({atom(), Param.t()}),
+          params: list({atom(), ParamSpec.t()}),
           default_params: keyword()
         }
 
@@ -195,21 +172,10 @@ defmodule Grizzly.ZWave.CommandSpec do
             params: [],
             default_params: []
 
-  def create_command(%__MODULE__{} = spec, params) do
-    params = Keyword.merge(spec.default_params, params)
-
-    with {:ok, params} <- validate_params(spec, params) do
-      cmd = %Grizzly.ZWave.Command{
-        name: spec.name,
-        command_class: spec.command_class,
-        command_byte: spec.command_byte,
-        params: params
-      }
-
-      {:ok, cmd}
-    end
-  end
-
+  @doc """
+  Create a new command spec.
+  """
+  @doc group: "Command Specs"
   def new(command_class, name, byte, mod, opts) when is_list(opts) do
     new(
       Keyword.merge(opts,
@@ -221,6 +187,10 @@ defmodule Grizzly.ZWave.CommandSpec do
     )
   end
 
+  @doc """
+  Create a new command spec.
+  """
+  @doc group: "Command Specs"
   def new(fields) do
     {module, fields} = Keyword.pop(fields, :module)
     handler = Keyword.get(fields, :handler)
@@ -247,7 +217,20 @@ defmodule Grizzly.ZWave.CommandSpec do
         true -> {AckResponse, []}
       end
 
-    fields = Keyword.merge(fields, handler: handler, report: report)
+    # If params is specified, default values in the param specs will override
+    # anything in default_params, which will someday be removed.
+    params = Keyword.get(fields, :params, [])
+    default_params = Keyword.get(fields, :default_params, [])
+
+    defaults_from_param_specs =
+      for {name, %ParamSpec{default: default}} <- params, default != nil, into: [] do
+        {name, default}
+      end
+
+    default_params = Keyword.merge(default_params, defaults_from_param_specs)
+
+    fields =
+      Keyword.merge(fields, handler: handler, report: report, default_params: default_params)
 
     fields =
       if is_nil(module) do
@@ -272,19 +255,10 @@ defmodule Grizzly.ZWave.CommandSpec do
     struct!(__MODULE__, fields)
   end
 
-  def validate_params(%__MODULE__{validate_fun: nil} = _spec, params) do
-    {:ok, params}
-  end
-
-  def validate_params(%__MODULE__{validate_fun: {mod, fun}} = spec, params) do
-    apply(mod, fun, [spec, params])
-  end
-
-  def validate_params(%__MODULE__{validate_fun: fun} = spec, params)
-      when is_function(fun, 2) do
-    fun.(spec, params)
-  end
-
+  @doc """
+  Validate a command spec.
+  """
+  @doc group: "Command Specs"
   def validate(%__MODULE__{} = spec) do
     spec
     |> Map.from_struct()
@@ -317,6 +291,10 @@ defmodule Grizzly.ZWave.CommandSpec do
 
   def __validate_fun__(v, _arity), do: {:error, inspect(v)}
 
+  @doc """
+  Get the handler and options for a command.
+  """
+  @doc group: "Command Specs"
   def handler_spec(%__MODULE__{} = spec) do
     {module, opts} = spec.handler
 
@@ -360,5 +338,108 @@ defmodule Grizzly.ZWave.CommandSpec do
     else
       nil
     end
+  end
+
+  @doc """
+  Validates a list of parameter specs.
+
+  ## Examples
+
+      iex> params = [
+      ...>   param1: %Grizzly.ZWave.ParamSpec{name: :param1, type: :uint, size: 8},
+      ...>   param2: %Grizzly.ZWave.ParamSpec{name: :param2, type: :int, size: 16}
+      ...> ]
+      iex> Grizzly.ZWave.CommandSpec.validate_param_list(params)
+      {:ok, params}
+
+      iex> params = [
+      ...>   param1: %Grizzly.ZWave.ParamSpec{name: :param1, type: :uint, size: 7},
+      ...>   param2: %Grizzly.ZWave.ParamSpec{name: :param2, type: :int, size: 8}
+      ...> ]
+      iex> Grizzly.ZWave.CommandSpec.validate_param_list(params)
+      {:error, "Total size of all non-variable parameters must be a multiple of 8 bits"}
+
+      iex> params = [
+      ...>   param1: %Grizzly.ZWave.ParamSpec{name: :param1, type: :uint, size: :variable},
+      ...>   param2: %Grizzly.ZWave.ParamSpec{name: :param2, type: :int, size: 16}
+      ...> ]
+      iex> Grizzly.ZWave.CommandSpec.validate_param_list(params)
+      {:error, "Variable-length parameter without length specifier must be last"}
+  """
+  @doc group: "Command Specs"
+  @spec validate_param_list(list({atom(), ParamSpec.t()})) ::
+          {:ok, list({atom(), ParamSpec.t()})} | {:error, String.t()}
+  def validate_param_list(params) do
+    with :ok <- validate_param_list_size(params),
+         :ok <- variable_param_without_length_must_be_last(params) do
+      {:ok, params}
+    end
+  end
+
+  defp validate_param_list_size(params, bits \\ 0)
+
+  defp validate_param_list_size([], bits) when rem(bits, 8) == 0, do: :ok
+
+  # skip when size is :variable or {:variable, _}
+  defp validate_param_list_size([{_, %{size: size}} | params], bits)
+       when size == :variable or (is_tuple(size) and elem(size, 0) == :variable),
+       do: validate_param_list_size(params, bits)
+
+  defp validate_param_list_size([{_, %{type: :binary, size: size}} | params], bits)
+       when is_integer(size),
+       do: validate_param_list_size(params, bits + size * 8)
+
+  defp validate_param_list_size([{_, %{size: size}} | params], bits)
+       when is_integer(size),
+       do: validate_param_list_size(params, bits + size)
+
+  defp validate_param_list_size([], _bits) do
+    {:error, "Total size of all non-variable parameters must be a multiple of 8 bits"}
+  end
+
+  defp variable_param_without_length_must_be_last([{_name, %{size: :variable}} | rest])
+       when rest != [] do
+    {:error, "Variable-length parameter without length specifier must be last"}
+  end
+
+  defp variable_param_without_length_must_be_last([_ | rest]),
+    do: variable_param_without_length_must_be_last(rest)
+
+  defp variable_param_without_length_must_be_last([]), do: :ok
+
+  @doc """
+  Create a command struct from the command spec and parameters.
+  """
+  @doc group: "Commands"
+  def create_command(%__MODULE__{} = spec, params) do
+    params = Keyword.merge(spec.default_params, params)
+
+    with {:ok, params} <- validate_params(spec, params) do
+      cmd = %Grizzly.ZWave.Command{
+        name: spec.name,
+        command_class: spec.command_class,
+        command_byte: spec.command_byte,
+        params: params
+      }
+
+      {:ok, cmd}
+    end
+  end
+
+  @doc """
+  Validate a command's parameters according to the command spec.
+  """
+  @doc group: "Commands"
+  def validate_params(%__MODULE__{validate_fun: nil} = _spec, params) do
+    {:ok, params}
+  end
+
+  def validate_params(%__MODULE__{validate_fun: {mod, fun}} = spec, params) do
+    apply(mod, fun, [spec, params])
+  end
+
+  def validate_params(%__MODULE__{validate_fun: fun} = spec, params)
+      when is_function(fun, 2) do
+    fun.(spec, params)
   end
 end

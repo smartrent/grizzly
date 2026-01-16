@@ -53,10 +53,23 @@ defmodule Grizzly.ZWave.Macros do
           ] do
       {name,
        struct!(
-         Grizzly.ZWave.CommandSpec.Param,
+         Grizzly.ZWave.ParamSpec,
          Keyword.merge(opts,
            name: name,
            type: type
+         )
+       )}
+    end
+  end
+
+  defmacro reserved(opts) do
+    quote bind_quoted: [opts: opts] do
+      {:reserved,
+       struct!(
+         Grizzly.ZWave.ParamSpec,
+         Keyword.merge(opts,
+           name: :reserved,
+           type: :reserved
          )
        )}
     end
