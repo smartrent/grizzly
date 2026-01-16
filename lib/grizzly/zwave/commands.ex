@@ -300,27 +300,66 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :humidity_control_mode, 0x6D do
-    command :humidity_control_mode_set, 0x01, Cmds.HumidityControlModeSetReport
+    set_report_params = [
+      param(:reserved, :reserved, size: 4),
+      param(:mode, :enum,
+        size: 4,
+        opts: [
+          encode: &CommandClasses.HumidityControlMode.encode_mode/1,
+          decode: &CommandClasses.HumidityControlMode.decode_mode/1
+        ]
+      )
+    ]
+
+    command :humidity_control_mode_set, 0x01, Cmds.Generic, params: set_report_params
     command :humidity_control_mode_get, 0x02, Cmds.Generic, params: []
-    command :humidity_control_mode_report, 0x03, Cmds.HumidityControlModeSetReport
+    command :humidity_control_mode_report, 0x03, Cmds.Generic, params: set_report_params
     command :humidity_control_mode_supported_get, 0x04, Cmds.Generic, params: []
     command :humidity_control_mode_supported_report, 0x05
   end
 
   command_class :humidity_control_operating_state, 0x6E do
     command :humidity_control_operating_state_get, 0x01, Cmds.Generic, params: []
-    command :humidity_control_operating_state_report, 0x02
+
+    command :humidity_control_operating_state_report, 0x02, Cmds.Generic,
+      params: [
+        param(:reserved, :reserved, size: 4),
+        param(:state, :enum,
+          size: 4,
+          opts: [
+            encode: &CommandClasses.HumidityControlOperatingState.encode_state/1,
+            decode: &CommandClasses.HumidityControlOperatingState.decode_state/1
+          ]
+        )
+      ]
   end
 
   command_class :humidity_control_setpoint, 0x64 do
+    setpoint_type_params = [
+      param(:reserved, :reserved, size: 4),
+      param(:setpoint_type, :enum,
+        size: 4,
+        opts: [
+          encode: &CommandClasses.HumidityControlSetpoint.encode_type/1,
+          decode: &CommandClasses.HumidityControlSetpoint.decode_type/1
+        ]
+      )
+    ]
+
     command :humidity_control_setpoint_set, 0x01, Cmds.HumidityControlSetpointSetReport
-    command :humidity_control_setpoint_get, 0x02
+    command :humidity_control_setpoint_get, 0x02, Cmds.Generic, params: setpoint_type_params
     command :humidity_control_setpoint_report, 0x03, Cmds.HumidityControlSetpointSetReport
     command :humidity_control_setpoint_supported_get, 0x04, Cmds.Generic, params: []
     command :humidity_control_setpoint_supported_report, 0x05
-    command :humidity_control_setpoint_scale_supported_get, 0x06
+
+    command :humidity_control_setpoint_scale_supported_get, 0x06, Cmds.Generic,
+      params: setpoint_type_params
+
     command :humidity_control_setpoint_scale_supported_report, 0x07
-    command :humidity_control_setpoint_capabilities_get, 0x08
+
+    command :humidity_control_setpoint_capabilities_get, 0x08, Cmds.Generic,
+      params: setpoint_type_params
+
     command :humidity_control_setpoint_capabilities_report, 0x09
   end
 
