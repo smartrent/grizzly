@@ -13,6 +13,7 @@ defmodule Grizzly.ZWave.Commands do
   alias Grizzly.ZWave.Commands, as: Cmds
   alias Grizzly.ZWave.CommandSpec
   alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Notifications
   alias Grizzly.ZWave.ZWaveError
 
@@ -492,24 +493,105 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :schedule_entry_lock, 0x4E do
-    command :schedule_entry_lock_enable_set, 0x01
-    command :schedule_entry_lock_enable_all_set, 0x02
-    command :schedule_entry_lock_week_day_set, 0x03
-    command :schedule_entry_lock_week_day_get, 0x04
-    command :schedule_entry_lock_week_day_report, 0x05
-    command :schedule_entry_lock_year_day_set, 0x06
-    command :schedule_entry_lock_year_day_get, 0x07
-    command :schedule_entry_lock_year_day_report, 0x08
+    sel_user_id = param(:user_identifier, :uint, size: 8)
+    sel_slot_id = param(:schedule_slot_id, :uint, size: 8)
+
+    sel_set_action =
+      param(:set_action, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.ScheduleEntryLock.encode_set_action/1,
+          decode: &CommandClasses.ScheduleEntryLock.decode_set_action/1
+        ]
+      )
+
+    sel_week_day_params = [
+      sel_user_id,
+      sel_slot_id,
+      param(:day_of_week, :uint, size: 8),
+      param(:start_hour, :uint, size: 8),
+      param(:start_minute, :uint, size: 8),
+      param(:stop_hour, :uint, size: 8),
+      param(:stop_minute, :uint, size: 8)
+    ]
+
+    sel_year_day_params = [
+      sel_user_id,
+      sel_slot_id,
+      param(:start_year, :uint, size: 8),
+      param(:start_month, :uint, size: 8),
+      param(:start_day, :uint, size: 8),
+      param(:start_hour, :uint, size: 8),
+      param(:start_minute, :uint, size: 8),
+      param(:stop_year, :uint, size: 8),
+      param(:stop_month, :uint, size: 8),
+      param(:stop_day, :uint, size: 8),
+      param(:stop_hour, :uint, size: 8),
+      param(:stop_minute, :uint, size: 8)
+    ]
+
+    sel_tzo_params = [
+      param(:sign_tzo, :enum,
+        size: 1,
+        opts: [
+          encode: &Encoding.encode_tz_offset_sign/1,
+          decode: &Encoding.decode_tz_offset_sign/1
+        ]
+      ),
+      param(:hour_tzo, :uint, size: 7),
+      param(:minute_tzo, :uint, size: 8),
+      param(:sign_offset_dst, :enum,
+        size: 1,
+        opts: [
+          encode: &Encoding.encode_tz_offset_sign/1,
+          decode: &Encoding.decode_tz_offset_sign/1
+        ]
+      ),
+      param(:minute_offset_dst, :uint, size: 7)
+    ]
+
+    command :schedule_entry_lock_enable_set, 0x01, Cmds.Generic,
+      params: [
+        sel_user_id,
+        param(:enabled, :boolean, size: 8, opts: [true: 1, false: 0])
+      ]
+
+    command :schedule_entry_lock_enable_all_set, 0x02, Cmds.Generic,
+      params: [
+        param(:enabled, :boolean, size: 8, opts: [true: 1, false: 0])
+      ]
+
+    command :schedule_entry_lock_week_day_set, 0x03, Cmds.Generic,
+      params: [sel_set_action | sel_week_day_params]
+
+    command :schedule_entry_lock_week_day_get, 0x04, Cmds.Generic,
+      params: [sel_user_id, sel_slot_id]
+
+    command :schedule_entry_lock_week_day_report, 0x05, Cmds.Generic, params: sel_week_day_params
+
+    command :schedule_entry_lock_year_day_set, 0x06, Cmds.Generic,
+      params: [sel_set_action | sel_year_day_params]
+
+    command :schedule_entry_lock_year_day_get, 0x07, Cmds.Generic,
+      params: [sel_user_id, sel_slot_id]
+
+    command :schedule_entry_lock_year_day_report, 0x08, Cmds.Generic, params: sel_year_day_params
     command :schedule_entry_type_supported_get, 0x09, Cmds.Generic, params: []
-    command :schedule_entry_type_supported_report, 0x0A
+
+    command :schedule_entry_type_supported_report, 0x0A, Cmds.Generic,
+      params: [
+        param(:number_of_slots_week_day, :uint, size: 8),
+        param(:number_of_slots_year_day, :uint, size: 8),
+        param(:number_of_slots_daily_repeating, :uint, size: 8, required: false)
+      ]
+
     command :schedule_entry_lock_time_offset_get, 0x0B, Cmds.Generic, params: []
+    command :schedule_entry_lock_time_offset_report, 0x0C, Cmds.Generic, params: sel_tzo_params
+    command :schedule_entry_lock_time_offset_set, 0x0D, Cmds.Generic, params: sel_tzo_params
 
-    command :schedule_entry_lock_time_offset_report,
-            0x0C,
-            Cmds.ScheduleEntryLockTimeOffsetSetReport
+    command :schedule_entry_lock_daily_repeating_get, 0x0E, Cmds.Generic,
+      params: [sel_user_id, sel_slot_id]
 
-    command :schedule_entry_lock_time_offset_set, 0x0D, Cmds.ScheduleEntryLockTimeOffsetSetReport
-    command :schedule_entry_lock_daily_repeating_get, 0x0E
     command :schedule_entry_lock_daily_repeating_report, 0x0F
     command :schedule_entry_lock_daily_repeating_set, 0x10
   end

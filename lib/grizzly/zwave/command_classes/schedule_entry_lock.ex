@@ -43,4 +43,10 @@ defmodule Grizzly.ZWave.CommandClasses.ScheduleEntryLock do
       if bit == 1, do: [index | acc], else: acc
     end)
   end
+
+  def encode_set_action(:erase), do: 0
+  def encode_set_action(:modify), do: 1
+  def decode_set_action(0), do: :erase
+  def decode_set_action(1), do: :modify
+  def decode_set_action(_), do: :unknown
 end
