@@ -601,16 +601,36 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :thermostat_fan_mode, 0x44 do
-    command :thermostat_fan_mode_set, 0x01
+    mode =
+      param(:mode, :enum,
+        size: 4,
+        opts: [
+          encode: &CommandClasses.ThermostatFanMode.encode_mode/1,
+          decode: &CommandClasses.ThermostatFanMode.decode_mode/1
+        ]
+      )
+
+    command :thermostat_fan_mode_set, 0x01, Cmds.Generic, params: [reserved(size: 4), mode]
     command :thermostat_fan_mode_get, 0x02, Cmds.Generic, params: []
-    command :thermostat_fan_mode_report, 0x03
+    command :thermostat_fan_mode_report, 0x03, Cmds.Generic, params: [reserved(size: 4), mode]
     command :thermostat_fan_mode_supported_get, 0x04, Cmds.Generic, params: []
     command :thermostat_fan_mode_supported_report, 0x05
   end
 
   command_class :thermostat_fan_state, 0x45 do
     command :thermostat_fan_state_get, 0x02, Cmds.Generic, params: []
-    command :thermostat_fan_state_report, 0x03
+
+    command :thermostat_fan_state_report, 0x03, Cmds.Generic,
+      params: [
+        reserved(size: 4),
+        param(:state, :enum,
+          size: 4,
+          opts: [
+            encode: &CommandClasses.ThermostatFanState.encode_state/1,
+            decode: &CommandClasses.ThermostatFanState.decode_state/1
+          ]
+        )
+      ]
   end
 
   command_class :thermostat_mode, 0x40 do
@@ -623,18 +643,58 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :thermostat_operating_state, 0x42 do
     command :thermostat_operating_state_get, 0x02, Cmds.Generic, params: []
-    command :thermostat_operating_state_report, 0x03
+
+    command :thermostat_operating_state_report, 0x03, Cmds.Generic,
+      params: [
+        param(:state, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.ThermostatOperatingState.encode_state/1,
+            decode: &CommandClasses.ThermostatOperatingState.decode_state/1
+          ]
+        )
+      ]
   end
 
   command_class :thermostat_setback, 0x47 do
-    command :thermostat_setback_set, 0x01, Cmds.ThermostatSetbackSetReport
+    setback_params = [
+      reserved(size: 6),
+      param(:type, :enum,
+        size: 2,
+        opts: [
+          encode: &CommandClasses.ThermostatSetback.encode_type/1,
+          decode: &CommandClasses.ThermostatSetback.decode_type/1
+        ]
+      ),
+      param(:state, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.ThermostatSetback.encode_state/1,
+          decode: &CommandClasses.ThermostatSetback.decode_state/1
+        ]
+      )
+    ]
+
+    command :thermostat_setback_set, 0x01, Cmds.Generic, params: setback_params
     command :thermostat_setback_get, 0x02, Cmds.Generic, params: []
-    command :thermostat_setback_report, 0x03, Cmds.ThermostatSetbackSetReport
+    command :thermostat_setback_report, 0x03, Cmds.Generic, params: setback_params
   end
 
   command_class :thermostat_setpoint, 0x43 do
     command :thermostat_setpoint_set, 0x01
-    command :thermostat_setpoint_get, 0x02
+
+    command :thermostat_setpoint_get, 0x02, Cmds.Generic,
+      params: [
+        reserved(size: 4),
+        param(:type, :enum,
+          size: 4,
+          opts: [
+            encode: &CommandClasses.ThermostatSetpoint.encode_type/1,
+            decode: &CommandClasses.ThermostatSetpoint.decode_type/1
+          ]
+        )
+      ]
+
     command :thermostat_setpoint_report, 0x03
     command :thermostat_setpoint_supported_get, 0x04, Cmds.Generic, params: []
     command :thermostat_setpoint_supported_report, 0x05
@@ -775,19 +835,17 @@ defmodule Grizzly.ZWave.Commands do
 
   ## Examples
 
-      iex> Grizzly.ZWave.Commands.spec_for(:thermostat_setpoint_get)
+      iex> Grizzly.ZWave.Commands.spec_for(:user_set)
       {:ok, %Grizzly.ZWave.CommandSpec{
-        name: :thermostat_setpoint_get,
-        command_byte: 0x02,
-        command_class: :thermostat_setpoint,
+        name: :user_set,
+        command_byte: 0x05,
+        command_class: :user_credential,
         default_params: [],
-        module: Grizzly.ZWave.Commands.ThermostatSetpointGet,
-        encode_fun: {Grizzly.ZWave.Commands.ThermostatSetpointGet, :encode_params},
-        decode_fun: {Grizzly.ZWave.Commands.ThermostatSetpointGet, :decode_params},
-        handler: {Grizzly.Requests.Handlers.WaitReport, complete_report: :thermostat_setpoint_report},
-        report: :thermostat_setpoint_report,
-        report_matcher_fun: nil,
-        supports_supervision?: false
+        module: Grizzly.ZWave.Commands.UserSet,
+        encode_fun: {Grizzly.ZWave.Commands.UserSet, :encode_params},
+        decode_fun: {Grizzly.ZWave.Commands.UserSet, :decode_params},
+        handler: {Grizzly.Requests.Handlers.AckResponse, []},
+        supports_supervision?: true
       }}
   """
   @spec spec_for(Grizzly.command()) :: {:ok, CommandSpec.t()} | {:error, :unknown_command}
