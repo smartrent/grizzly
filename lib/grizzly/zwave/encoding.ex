@@ -138,6 +138,15 @@ defmodule Grizzly.ZWave.Encoding do
   def decode_duration(0xFF), do: :default
   def decode_duration(_), do: :unknown
 
+  @spec encode_tz_offset_sign(:plus | :minus) :: 0 | 1
+  def encode_tz_offset_sign(:plus), do: 0
+  def encode_tz_offset_sign(:minus), do: 1
+
+  @spec decode_tz_offset_sign(0 | 1) :: :plus | :minus | :unknown
+  def decode_tz_offset_sign(0), do: :plus
+  def decode_tz_offset_sign(1), do: :minus
+  def decode_tz_offset_sign(_), do: :unknown
+
   @doc """
   Encodes a list of bit indexes into a bitmask.
 
