@@ -262,7 +262,17 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :door_lock, 0x62 do
-    command :door_lock_operation_set, 0x01
+    command :door_lock_operation_set, 0x01, Cmds.Generic,
+      params: [
+        param(:mode, :enum,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.DoorLock.mode_to_byte/1,
+            decode: &CommandClasses.DoorLock.mode_from_byte/1
+          ]
+        )
+      ]
+
     command :door_lock_operation_get, 0x02, Cmds.Generic, params: []
 
     command :door_lock_operation_report, 0x03,
@@ -659,24 +669,55 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :user_code, 0x63 do
+    keypad_mode =
+      param(:mode, :enum,
+        size: 8,
+        opts: [
+          encode: &CommandClasses.UserCode.keypad_mode_to_byte/1,
+          decode: &CommandClasses.UserCode.keypad_mode_from_byte/1
+        ]
+      )
+
     command :user_code_set, 0x01
-    command :user_code_get, 0x02
+
+    command :user_code_get, 0x02, Cmds.Generic,
+      params: [
+        param(:user_id, :uint, size: 8)
+      ]
+
     command :user_code_report, 0x03
     command :user_code_users_number_get, 0x04, Cmds.Generic, params: []
-    command :user_code_users_number_report, 0x05
+
+    command :user_code_users_number_report, 0x05, Cmds.Generic,
+      params: [
+        param(:supported_users, :uint, size: 8),
+        param(:extended_supported_users, :uint, size: 16, required: false)
+      ]
+
     command :user_code_capabilities_get, 0x06, Cmds.Generic, params: []
     command :user_code_capabilities_report, 0x07
-    command :user_code_keypad_mode_set, 0x08, Cmds.UserCodeKeypadModeSetReport
+    command :user_code_keypad_mode_set, 0x08, Cmds.Generic, params: [keypad_mode]
     command :user_code_keypad_mode_get, 0x09, Cmds.Generic, params: []
-    command :user_code_keypad_mode_report, 0x0A, Cmds.UserCodeKeypadModeSetReport
+    command :user_code_keypad_mode_report, 0x0A, Cmds.Generic, params: [keypad_mode]
     command :extended_user_code_set, 0x0B
-    command :extended_user_code_get, 0x0C
+
+    command :extended_user_code_get, 0x0C, Cmds.Generic,
+      params: [
+        param(:user_id, :uint, size: 16),
+        param(:reserved, :reserved, size: 7),
+        param(:report_more?, :boolean, size: 1)
+      ]
+
     command :extended_user_code_report, 0x0D
     command :admin_code_set, 0x0E, Cmds.AdminCodeSetReport
     command :admin_code_get, 0x0F, Cmds.Generic, params: []
     command :admin_code_report, 0x10, Cmds.AdminCodeSetReport
     command :user_code_checksum_get, 0x11, Cmds.Generic, params: []
-    command :user_code_checksum_report, 0x12
+
+    command :user_code_checksum_report, 0x12, Cmds.Generic,
+      params: [
+        param(:checksum, :uint, size: 16)
+      ]
   end
 
   command_class :user_credential, 0x83 do
