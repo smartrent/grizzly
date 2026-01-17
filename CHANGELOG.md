@@ -2,7 +2,7 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [v9.0.0]
 
 ### Changed
 
@@ -16,3 +16,5 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## v8.x Changelog
 
 For Grizzly v8 and older, see the [v8 changelog](https://github.com/smartrent/grizzly/blob/maint/v8/CHANGELOG.md).
+
+[v9.0.0]: https://github.com/smartrent/grizzly/compare/v8.15.3..v9.0.0
