@@ -3,8 +3,13 @@ defmodule Grizzly.Connections do
 
   # This module is helper functions for connections
 
-  alias Grizzly.ConnectionRegistry
   alias Grizzly.Connections.Supervisor, as: ConnectionsSupervisor
+
+  @type name() ::
+          Grizzly.node_id()
+          | :gateway
+          | {:async, Grizzly.node_id()}
+          | {:binary, Grizzly.node_id(), pid()}
 
   @doc """
   Close all the connections current open to the various
@@ -15,7 +20,13 @@ defmodule Grizzly.Connections do
     ConnectionsSupervisor.close_all_connections()
   end
 
-  def make_name(name), do: ConnectionRegistry.via_name(name)
+  @spec via_name(name()) ::
+          {:via, Registry, {Grizzly.ConnectionRegistry, Grizzly.node_id()}} | pid()
+  def via_name(pid) when is_pid(pid), do: pid
+
+  def via_name(node_id) do
+    {:via, Registry, {Grizzly.ConnectionRegistry, node_id}}
+  end
 
   @spec get_transport_from_opts(keyword()) :: module()
   def get_transport_from_opts(opts) do

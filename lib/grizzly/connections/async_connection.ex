@@ -53,7 +53,7 @@ defmodule Grizzly.Connections.AsyncConnection do
       if unnamed do
         []
       else
-        [name: Connections.make_name({:async, node_id})]
+        [name: Connections.via_name({:async, node_id})]
       end
 
     GenServer.start_link(__MODULE__, [grizzly_options, node_id, opts], start_opts)
@@ -64,7 +64,7 @@ defmodule Grizzly.Connections.AsyncConnection do
   def send_command(node_id_or_conn, command, opts \\ [])
 
   def send_command(node_id, command, opts) when is_zwave_node_id(node_id) do
-    name = make_name(node_id)
+    name = via_name(node_id)
     send_command(name, command, opts)
   end
 
@@ -74,22 +74,22 @@ defmodule Grizzly.Connections.AsyncConnection do
 
   @spec stop_command(Grizzly.node_id() | pid(), reference()) :: :ok
   def stop_command(node_id, command_ref) do
-    name = make_name(node_id)
+    name = via_name(node_id)
     GenServer.call(name, {:stop_command, command_ref})
   end
 
   @spec request_alive?(Grizzly.node_id() | pid(), reference()) :: boolean()
   def request_alive?(node_id, command_ref) do
-    name = make_name(node_id)
+    name = via_name(node_id)
     GenServer.call(name, {:request_alive?, command_ref})
   end
 
-  defp make_name(pid) when is_pid(pid), do: pid
-  defp make_name(node_id), do: Connections.make_name({:async, node_id})
+  defp via_name(pid) when is_pid(pid), do: pid
+  defp via_name(node_id), do: Connections.via_name({:async, node_id})
 
   def stop(node_id) do
     # TODO close socket
-    name = Connections.make_name({:async, node_id})
+    name = Connections.via_name({:async, node_id})
     GenServer.stop(name, :normal)
   catch
     :exit, {:noproc, _} -> :ok

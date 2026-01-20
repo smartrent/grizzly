@@ -39,7 +39,7 @@ defmodule Grizzly.Connections.BinaryConnection do
   @spec start_link(Options.t(), ZWave.node_id(), keyword()) :: GenServer.on_start()
   def start_link(grizzly_options, node_id, opts) do
     owner = Keyword.fetch!(opts, :owner)
-    name = Connections.make_name({:binary, node_id, owner})
+    name = Connections.via_name({:binary, node_id, owner})
     GenServer.start_link(__MODULE__, [grizzly_options, node_id, owner], name: name)
   end
 
@@ -48,7 +48,7 @@ defmodule Grizzly.Connections.BinaryConnection do
   """
   @spec send_binary(ZWave.node_id(), binary()) :: :ok
   def send_binary(node_id, binary) do
-    name = Connections.make_name({:binary, node_id, self()})
+    name = Connections.via_name({:binary, node_id, self()})
     GenServer.call(name, {:send_binary, binary})
   end
 

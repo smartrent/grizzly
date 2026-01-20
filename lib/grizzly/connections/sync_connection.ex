@@ -45,7 +45,7 @@ defmodule Grizzly.Connections.SyncConnection do
       if unnamed do
         []
       else
-        [name: Connections.make_name(node_id_or_gateway)]
+        [name: Connections.via_name(node_id_or_gateway)]
       end
 
     GenServer.start_link(__MODULE__, [grizzly_options, node_id_or_gateway, opts], start_opts)
@@ -54,7 +54,7 @@ defmodule Grizzly.Connections.SyncConnection do
   @spec send_command(ZWave.node_id() | pid(), Command.t(), [send_opt()]) ::
           Grizzly.send_command_response()
   def send_command(node_id, command, opts \\ []) do
-    name = Connections.make_name(node_id)
+    name = Connections.via_name(node_id)
     GenServer.call(name, {:send_command, command, node_id, opts}, 140_000)
   end
 
@@ -63,7 +63,7 @@ defmodule Grizzly.Connections.SyncConnection do
   """
   @spec close(ZWave.node_id() | pid()) :: :ok
   def close(node_id_or_pid) do
-    name = Connections.make_name(node_id_or_pid)
+    name = Connections.via_name(node_id_or_pid)
     # when stop this process the socket port that is owned
     # this process gets cleaned up for us.
     GenServer.stop(name, :normal)
