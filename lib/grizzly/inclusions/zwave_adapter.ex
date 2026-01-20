@@ -1,23 +1,26 @@
 defmodule Grizzly.Inclusions.ZWaveAdapter do
-  @moduledoc """
-  An implementation of the inclusion network adapter that talks to the Z-Wave
-  network
-  """
-
-  @behaviour Grizzly.Inclusions.NetworkAdapter
+  @moduledoc false
 
   # For certification to pass, this must be at least the sum of the S2 bootstrapping
   # timeouts TA1 (10), TA2 (10), TA3 (10), TA4 (10), TA5 (10), TAI1 (240), and TAI2 (240).
   alias Grizzly.Connection
   alias Grizzly.Connections.AsyncConnection
+  alias Grizzly.Inclusions
   alias Grizzly.SeqNumber
   alias Grizzly.ZWave.Commands
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Security
 
   require Logger
 
   @inclusion_timeout :timer.seconds(530)
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @type state :: %{
+          command_ref: reference() | nil,
+          controller_id: Grizzly.node_id()
+        }
+
+  @spec init() :: {:ok, state()}
   def init() do
     {:ok, %{command_ref: nil, controller_id: 1}}
   end
@@ -28,7 +31,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     :ok
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec add_node(state(), [Inclusions.opt()]) :: {:ok, state()} | {:error, :unknown_command}
   def add_node(state, opts) do
     seq_number = SeqNumber.get_and_inc()
     controller_id = opts[:controller_id] || 1
@@ -44,7 +47,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     end
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec add_node_stop(state()) :: {:ok, state()}
   def add_node_stop(state) do
     seq_number = SeqNumber.get_and_inc()
 
@@ -56,7 +59,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref, controller_id: 1}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec remove_node(state(), [Inclusions.opt()]) :: {:ok, state()}
   def remove_node(state, opts) do
     seq_number = SeqNumber.get_and_inc()
     controller_id = opts[:controller_id] || 1
@@ -69,7 +72,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec remove_node_stop(state()) :: {:ok, state()}
   def remove_node_stop(state) do
     seq_number = SeqNumber.get_and_inc()
 
@@ -82,7 +85,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref, controller_id: 1}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec learn_mode(state(), [Inclusions.opt()]) :: {:ok, state()}
   def learn_mode(state, opts) do
     seq_number = SeqNumber.get_and_inc()
     controller_id = opts[:controller_id] || 1
@@ -103,7 +106,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec learn_mode_stop(state()) :: {:ok, state()}
   def learn_mode_stop(state) do
     seq_number = SeqNumber.get_and_inc()
 
@@ -119,7 +122,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref, controller_id: 1}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec grant_s2_keys([Security.key()], state()) :: {:ok, state()}
   def grant_s2_keys(s2_keys, state) do
     seq_number = SeqNumber.get_and_inc()
 
@@ -139,7 +142,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec set_input_dsk(DSK.t(), non_neg_integer(), state()) :: {:ok, state()}
   def set_input_dsk(dsk, requested_length, state) do
     seq_number = SeqNumber.get_and_inc()
 
@@ -159,7 +162,8 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, %{state | command_ref: command_ref}}
   end
 
-  @impl Grizzly.Inclusions.NetworkAdapter
+  @spec handle_timeout(Inclusions.status(), reference(), state()) ::
+          {Inclusions.status(), state()}
   def handle_timeout(state, _old_ref, adapter_state)
       when state in [
              :node_adding,
