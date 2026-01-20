@@ -245,7 +245,9 @@ defmodule Grizzly.Supervisor do
       # Supervisor for virtual devices
       {Grizzly.VirtualDevicesSupervisor, options},
       ReadyChecker,
-      {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
+      if(options.background_rssi_monitor != false,
+        do: {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
+      )
     ]
     |> otw_update_runner(options)
     |> Enum.reject(&is_nil/1)

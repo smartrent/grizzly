@@ -1,14 +1,22 @@
 defmodule Grizzly.BackgroundRSSIMonitorTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   use Mimic.DSL
 
   alias Grizzly.BackgroundRSSIMonitor
 
+  setup :set_mimic_global
+
+  setup do
+    :alarm_handler.clear_alarm(Grizzly.HighBackgroundRSSIAlarm)
+
+    on_exit(fn ->
+      :alarm_handler.clear_alarm(Grizzly.HighBackgroundRSSIAlarm)
+    end)
+  end
+
   test "calculating averages", ctx do
     pid =
       start_link_supervised!({BackgroundRSSIMonitor, [name: ctx.test, sample_interval: false]})
-
-    allow(Grizzly, self(), pid)
 
     expect Grizzly.background_rssi(),
       do:
@@ -44,7 +52,6 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
       start_link_supervised!({BackgroundRSSIMonitor, [name: ctx.test, sample_interval: false]})
 
     Alarmist.subscribe(Grizzly.HighBackgroundRSSIAlarm)
-    allow(Grizzly, self(), pid)
 
     expect Grizzly.background_rssi(),
       num_calls: 2,
