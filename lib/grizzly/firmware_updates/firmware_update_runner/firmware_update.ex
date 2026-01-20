@@ -8,7 +8,6 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   alias Grizzly.FirmwareUpdates.FirmwareUpdateRunner.Image
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands
-  alias Grizzly.ZWave.CRC
 
   require Logger
 
@@ -336,7 +335,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner.FirmwareUpdate do
   # (normal representation) as the poly.
   # Results match those of CRC-CCITT (0x1D0F) on https://www.lammertbies.nl/comm/info/crc-calculation
   defp checksum(binary) do
-    CRC.crc16_aug_ccitt(binary)
+    Grizzly.ZWave.crc16_aug_ccitt(binary)
   end
 
   defp report_number(%__MODULE__{

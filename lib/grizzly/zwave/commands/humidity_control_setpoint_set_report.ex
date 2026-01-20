@@ -4,22 +4,22 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReport do
 
   ## Parameters
 
-  * `:setpoint_type` - see `t:HumidityControlSetpoint.type/0`
-  * `:scale` - see `t:HumidityControlSetpoint.scale/0`
+  * `:setpoint_type` - see `t:HumidityControl.setpoint_type/0`
+  * `:scale` - see `t:HumidityControl.setpoint_scale/0`
   * `:value` - setpoint value
   """
 
   @behaviour Grizzly.ZWave.Command
 
-  import Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  import Grizzly.ZWave.CommandClasses.HumidityControl
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  alias Grizzly.ZWave.CommandClasses.HumidityControl
 
   @type param ::
-          {:setpoint_type, HumidityControlSetpoint.type()}
-          | {:scale, HumidityControlSetpoint.scale()}
+          {:setpoint_type, HumidityControl.setpoint_type()}
+          | {:scale, HumidityControl.setpoint_scale()}
           | {:value, number()}
 
   @impl Grizzly.ZWave.Command
@@ -28,7 +28,8 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReport do
     scale = Command.param!(command, :scale)
     value = Command.param!(command, :value)
 
-    <<0::4, encode_type(type)::4>> <> zwave_float_to_binary(value, encode_scale(scale))
+    <<0::4, encode_setpoint_type(type)::4>> <>
+      zwave_float_to_binary(value, encode_setpoint_scale(scale))
   end
 
   @impl Grizzly.ZWave.Command
@@ -36,8 +37,8 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSetReport do
         _spec,
         <<_::4, type::4, precision::3, scale::2, bytes::3, int_value::signed-size(bytes * 8)>>
       ) do
-    type = decode_type(type)
-    scale = decode_scale(scale)
+    type = decode_setpoint_type(type)
+    scale = decode_setpoint_scale(scale)
     value = decode_zwave_float(int_value, precision)
 
     {:ok, [setpoint_type: type, scale: scale, value: value]}

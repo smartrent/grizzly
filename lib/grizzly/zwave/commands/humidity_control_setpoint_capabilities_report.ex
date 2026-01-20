@@ -13,31 +13,31 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointCapabilitiesReport do
 
   @behaviour Grizzly.ZWave.Command
 
-  import Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  import Grizzly.ZWave.CommandClasses.HumidityControl
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  alias Grizzly.ZWave.CommandClasses.HumidityControl
 
   @type param ::
-          {:setpoint_type, HumidityControlSetpoint.type()}
+          {:setpoint_type, HumidityControl.setpoint_type()}
           | {:min_value, number()}
-          | {:min_scale, HumidityControlSetpoint.scale()}
+          | {:min_scale, HumidityControl.setpoint_scale()}
           | {:max_value, number()}
-          | {:max_scale, HumidityControlSetpoint.scale()}
+          | {:max_scale, HumidityControl.setpoint_scale()}
 
   @impl Grizzly.ZWave.Command
   def encode_params(_spec, command) do
     setpoint_type = Command.param!(command, :setpoint_type)
     min_value = Command.param!(command, :min_value)
-    min_scale = Command.param!(command, :min_scale) |> encode_scale()
+    min_scale = Command.param!(command, :min_scale) |> encode_setpoint_scale()
     max_value = Command.param!(command, :max_value)
-    max_scale = Command.param!(command, :max_scale) |> encode_scale()
+    max_scale = Command.param!(command, :max_scale) |> encode_setpoint_scale()
 
     min_value_bin = zwave_float_to_binary(min_value, min_scale)
     max_value_bin = zwave_float_to_binary(max_value, max_scale)
 
-    <<0::4, encode_type(setpoint_type)::4>> <> min_value_bin <> max_value_bin
+    <<0::4, encode_setpoint_type(setpoint_type)::4>> <> min_value_bin <> max_value_bin
   end
 
   @impl Grizzly.ZWave.Command
@@ -48,13 +48,13 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointCapabilitiesReport do
           max_value::signed-size(max_bytes * 8)>>
       ) do
     min_value = decode_zwave_float(min_value, min_precision)
-    min_scale = decode_scale(min_scale)
+    min_scale = decode_setpoint_scale(min_scale)
     max_value = decode_zwave_float(max_value, max_precision)
-    max_scale = decode_scale(max_scale)
+    max_scale = decode_setpoint_scale(max_scale)
 
     {:ok,
      [
-       setpoint_type: decode_type(setpoint_type),
+       setpoint_type: decode_setpoint_type(setpoint_type),
        min_value: min_value,
        min_scale: min_scale,
        max_value: max_value,
