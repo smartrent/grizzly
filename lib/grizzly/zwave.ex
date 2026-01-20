@@ -36,4 +36,14 @@ defmodule Grizzly.ZWave do
   def to_binary(command) do
     Command.to_binary(command)
   end
+
+  @crc16_aug_ccitt :cerlc.init(:crc16_aug_ccitt)
+
+  @doc """
+  CRC-16/AUG-CCITT
+  """
+  @spec crc16_aug_ccitt(binary() | [byte()]) :: 0..0xFFFF
+  def crc16_aug_ccitt(data) do
+    :cerlc.calc_crc(data, @crc16_aug_ccitt)
+  end
 end

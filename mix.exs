@@ -139,7 +139,6 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave,
           Grizzly.ZWave.Command,
           Grizzly.ZWave.CommandClass,
-          Grizzly.ZWave.CRC,
           Grizzly.ZWave.DeviceClass,
           Grizzly.ZWave.DeviceClasses,
           Grizzly.ZWave.DSK,
