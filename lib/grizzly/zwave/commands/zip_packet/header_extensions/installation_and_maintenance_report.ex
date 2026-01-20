@@ -3,22 +3,22 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
   The installation and maintenance report for a Z/IP Packet
   """
 
-  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.BinaryParser
+  alias Grizzly.ZWave.Encoding
 
   def from_binary(<<0x03, length, rest::binary>>) do
     <<imes_bin::binary-size(length), _rest::binary>> = rest
 
     imes_bin
-    |> BinaryParser.from_binary()
-    |> BinaryParser.parse(&ime_from_binary/1)
+    |> Encoding.reduce_binary(&ime_from_binary/2)
+    |> Enum.reverse()
   end
 
-  defp ime_from_binary(<<0x00, 0x01, route_changed, rest::binary>>) do
-    {{:route_changed, parse_route_change_value(route_changed)}, rest}
+  defp ime_from_binary(<<0x00, 0x01, route_changed, rest::binary>>, imes) do
+    {[{:route_changed, parse_route_change_value(route_changed)} | imes], rest}
   end
 
-  defp ime_from_binary(<<0x01, 0x02, transmission_time::16, rest::binary>>) do
-    {{:transmission_time, transmission_time}, rest}
+  defp ime_from_binary(<<0x01, 0x02, transmission_time::16, rest::binary>>, imes) do
+    {[{:transmission_time, transmission_time} | imes], rest}
   end
 
   # Z/IP Gateway deviates from the spec here by sending a bitfield (which includes
@@ -26,66 +26,86 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
   # bits are used for the speed value.
   defp ime_from_binary(
          <<0x02, 0x05, r1, r2, r3, r4, _::1, _beam_1000ms::1, _beam_250ms::1, _::2, speed::3,
-           rest::binary>>
+           rest::binary>>,
+         imes
        ) do
-    {{:last_working_route, {r1, r2, r3, r4}, parse_transmission_speed(speed)}, rest}
+    {[{:last_working_route, {r1, r2, r3, r4}, parse_transmission_speed(speed)} | imes], rest}
   end
 
   defp ime_from_binary(
          <<0x03, 0x05, hop1::signed-integer, hop2::signed-integer, hop3::signed-integer,
-           hop4::signed-integer, hop5::signed-integer, rest::binary>>
+           hop4::signed-integer, hop5::signed-integer, rest::binary>>,
+         imes
        ) do
-    {{:rssi_hops,
-      [
-        parse_rssi_hop(hop1),
-        parse_rssi_hop(hop2),
-        parse_rssi_hop(hop3),
-        parse_rssi_hop(hop4),
-        parse_rssi_hop(hop5)
-      ]}, rest}
+    {[
+       {:rssi_hops,
+        [
+          parse_rssi_hop(hop1),
+          parse_rssi_hop(hop2),
+          parse_rssi_hop(hop3),
+          parse_rssi_hop(hop4),
+          parse_rssi_hop(hop5)
+        ]}
+       | imes
+     ], rest}
   end
 
-  defp ime_from_binary(<<0x04, 0x01, ack_channel, rest::binary>>),
-    do: {{:ack_channel, ack_channel}, rest}
+  defp ime_from_binary(<<0x04, 0x01, ack_channel, rest::binary>>, imes),
+    do: {[{:ack_channel, ack_channel} | imes], rest}
 
-  defp ime_from_binary(<<0x05, 0x01, transmit_channel, rest::binary>>),
-    do: {{:transmit_channel, transmit_channel}, rest}
+  defp ime_from_binary(<<0x05, 0x01, transmit_channel, rest::binary>>, imes),
+    do: {[{:transmit_channel, transmit_channel} | imes], rest}
 
-  defp ime_from_binary(<<0x06, 0x01, routing_scheme, rest::binary>>),
-    do: {{:routing_scheme, parse_routing_scheme(routing_scheme)}, rest}
+  defp ime_from_binary(<<0x06, 0x01, routing_scheme, rest::binary>>, imes),
+    do: {[{:routing_scheme, parse_routing_scheme(routing_scheme)} | imes], rest}
 
-  defp ime_from_binary(<<0x07, 0x01, number_of_attempts, rest::binary>>),
-    do: {{:routing_attempts, number_of_attempts}, rest}
-
-  defp ime_from_binary(<<0x08, 0x02, neighbor_node_id_1, neighbor_node_id_2, rest::binary>>),
-    do: {{:failed_link, neighbor_node_id_1, neighbor_node_id_2}, rest}
+  defp ime_from_binary(<<0x07, 0x01, number_of_attempts, rest::binary>>, imes),
+    do: {[{:routing_attempts, number_of_attempts} | imes], rest}
 
   defp ime_from_binary(
-         <<0x09, 0x02, local_tx_power::signed, remote_tx_power::signed, rest::binary>>
+         <<0x08, 0x02, neighbor_node_id_1, neighbor_node_id_2, rest::binary>>,
+         imes
+       ),
+       do: {[{:failed_link, neighbor_node_id_1, neighbor_node_id_2} | imes], rest}
+
+  defp ime_from_binary(
+         <<0x09, 0x02, local_tx_power::signed, remote_tx_power::signed, rest::binary>>,
+         imes
        ) do
-    {{:local_node_tx_power, parse_tx_power(local_tx_power), :remote_node_tx_power,
-      parse_tx_power(remote_tx_power)}, rest}
+    {[
+       {:local_node_tx_power, parse_tx_power(local_tx_power), :remote_node_tx_power,
+        parse_tx_power(remote_tx_power)}
+       | imes
+     ], rest}
   end
 
   defp ime_from_binary(
-         <<0x0A, 0x02, local_noise_floor::signed, remote_noise_floor::signed, rest::binary>>
+         <<0x0A, 0x02, local_noise_floor::signed, remote_noise_floor::signed, rest::binary>>,
+         imes
        ) do
-    {{:local_noise_floor, parse_noise_floor(local_noise_floor), :remote_noise_floor,
-      parse_noise_floor(remote_noise_floor)}, rest}
+    {[
+       {:local_noise_floor, parse_noise_floor(local_noise_floor), :remote_noise_floor,
+        parse_noise_floor(remote_noise_floor)}
+       | imes
+     ], rest}
   end
 
   defp ime_from_binary(
          <<0x0B, 0x05, hop1::signed, hop2::signed, hop3::signed, hop4::signed, hop5::signed,
-           rest::binary>>
+           rest::binary>>,
+         imes
        ) do
-    {{:outgoing_rssi_hops,
-      [
-        parse_rssi_hop(hop1),
-        parse_rssi_hop(hop2),
-        parse_rssi_hop(hop3),
-        parse_rssi_hop(hop4),
-        parse_rssi_hop(hop5)
-      ]}, rest}
+    {[
+       {:outgoing_rssi_hops,
+        [
+          parse_rssi_hop(hop1),
+          parse_rssi_hop(hop2),
+          parse_rssi_hop(hop3),
+          parse_rssi_hop(hop4),
+          parse_rssi_hop(hop5)
+        ]}
+       | imes
+     ], rest}
   end
 
   defp parse_tx_power(0x7F), do: :not_available
