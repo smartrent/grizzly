@@ -4,10 +4,9 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   """
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.BinaryParser
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatInfo
-  alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.ExpectedDelay
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaintenanceReport
+  alias Grizzly.ZWave.Encoding
 
   require Logger
 
@@ -26,15 +25,15 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   @spec from_binary(binary()) :: [extension()]
   def from_binary(extensions) do
     extensions
-    |> BinaryParser.from_binary()
-    |> BinaryParser.parse(&parse_extension/1)
+    |> Encoding.reduce_binary(&parse_extension/2)
+    |> Enum.reverse()
   end
 
   @spec to_binary([extension()]) :: binary()
   def to_binary(extensions) do
     Enum.reduce(extensions, <<>>, fn
       {:expected_delay, seconds}, bin ->
-        bin <> ExpectedDelay.to_binary(seconds)
+        bin <> encode_expected_delay(seconds)
 
       {:encapsulation_format_info, security_classes}, bin ->
         bin <> EncapsulationFormatInfo.to_binary(security_classes)
@@ -58,30 +57,42 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
     end)
   end
 
-  defp parse_extension(<<0x01, 0x03, seconds::24, rest::binary>>) do
-    {{:expected_delay, seconds}, rest}
+  defp parse_extension(<<0x01, 0x03, seconds::24, rest::binary>>, extensions) do
+    {[{:expected_delay, seconds} | extensions], rest}
   end
 
-  defp parse_extension(<<0x02, 0x00, rest::binary>>),
-    do: {:installation_and_maintenance_get, rest}
+  defp parse_extension(<<0x02, 0x00, rest::binary>>, extensions),
+    do: {[:installation_and_maintenance_get | extensions], rest}
 
-  defp parse_extension(<<0x03, length, rest::binary>> = report) do
+  defp parse_extension(<<0x03, length, rest::binary>> = report, extensions) do
     <<_::binary-size(length), rest::binary>> = rest
 
-    {{:installation_and_maintenance_report, InstallationAndMaintenanceReport.from_binary(report)},
-     rest}
+    {[
+       {:installation_and_maintenance_report,
+        InstallationAndMaintenanceReport.from_binary(report)}
+       | extensions
+     ], rest}
   end
 
-  defp parse_extension(<<0x84, 0x02, security_to_security, _::7, crc16::1, rest::binary>>) do
+  defp parse_extension(
+         <<0x84, 0x02, security_to_security, _::7, crc16::1, rest::binary>>,
+         extensions
+       ) do
     security_to_security = EncapsulationFormatInfo.security_from_byte(security_to_security)
 
     crc16_bool = if crc16 == 1, do: true, else: false
 
-    {{:encapsulation_format_info, EncapsulationFormatInfo.new(security_to_security, crc16_bool)},
-     rest}
+    {[
+       {:encapsulation_format_info, EncapsulationFormatInfo.new(security_to_security, crc16_bool)}
+       | extensions
+     ], rest}
   end
 
-  defp parse_extension(<<0x05, 0x00, rest::binary>>) do
-    {:multicast_addressing, rest}
+  defp parse_extension(<<0x05, 0x00, rest::binary>>, extensions) do
+    {[:multicast_addressing | extensions], rest}
+  end
+
+  defp encode_expected_delay(expected_delay) do
+    <<0x01, 0x03, expected_delay::24>>
   end
 end

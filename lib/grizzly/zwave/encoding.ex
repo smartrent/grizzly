@@ -23,6 +23,79 @@ defmodule Grizzly.ZWave.Encoding do
   @max_duration 126 * 60
 
   @doc """
+  Reduce over a binary by repeatedly applying a reducer function.
+
+  The reducer function should take a binary and an accumulator and return either
+  `{:cont, {new_acc, rest}}` to continue reducing with the new accumulator and
+  remaining binary, or `{:halt, {new_acc, rest}}` to stop reducing and return the
+  final accumulator and remaining binary.
+
+  The reduction will halt automatically when the binary is empty.
+
+  ## Examples
+
+      iex> reducer = fn
+      ...>   <<byte, rest::binary>>, acc when byte < 5 ->
+      ...>     {:cont, {[byte | acc], rest}}
+      ...>   binary, acc ->
+      ...>     {:halt, {acc, binary}}
+      ...> end
+      iex> reduce_binary_while(<<1, 2, 3, 6, 4>>, [], reducer)
+      {[3, 2, 1], <<6, 4>>}
+      iex> reduce_binary_while(<<1, 2, 3>>, reducer)
+      {[3, 2, 1], <<>>}
+  """
+  @spec reduce_binary_while(binary(), term(), (binary(), acc :: term() ->
+                                                 {:halt | :cont,
+                                                  {acc :: term(), rest :: binary()}})) ::
+          {acc :: term(), rest :: binary()}
+  def reduce_binary_while(binary, acc \\ [], reducer_fun)
+
+  def reduce_binary_while(<<>>, acc, _), do: {acc, <<>>}
+
+  def reduce_binary_while(binary, acc, reducer_fun) do
+    case reducer_fun.(binary, acc) do
+      {:cont, {^acc, ^binary}} ->
+        raise RuntimeError,
+              "Reducer function must consume some of the binary or modify its accumulator"
+
+      {:cont, {new_acc, rest}} ->
+        reduce_binary_while(rest, new_acc, reducer_fun)
+
+      {:halt, {new_acc, rest}} ->
+        {new_acc, rest}
+    end
+  end
+
+  @doc """
+  Reduce over a binary by repeatedly applying a reducer function until the binary
+  is empty.
+
+  The reducer function should take a binary and an accumulator and return a tuple
+  `{new_acc, rest}` where `new_acc` is the updated accumulator and `rest` is the
+  remaining binary to process.
+
+  ## Examples
+
+      iex> reducer = fn
+      ...>   <<word::16, rest::binary>>, acc ->
+      ...>     {[word | acc], rest}
+      ...>   <<byte, rest::binary>>, acc ->
+      ...>     {[byte | acc], rest}
+      ...> end
+      iex> reduce_binary(<<1, 2, 3>>, [], reducer)
+      [3, 258]
+  """
+  @spec reduce_binary(binary(), term(), (binary(), acc :: term() ->
+                                           {acc :: term(), rest :: binary()})) :: acc :: term()
+  def reduce_binary(binary, acc \\ [], reducer_fun) do
+    reduce_binary_while(binary, acc, fn binary, acc ->
+      {:cont, reducer_fun.(binary, acc)}
+    end)
+    |> elem(0)
+  end
+
+  @doc """
   Encodes a UTF-8 string using the specified encoding type.
 
   ASCII and extended ASCII encodings remove non-ASCII characters, while
