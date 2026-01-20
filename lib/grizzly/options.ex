@@ -59,7 +59,7 @@ defmodule Grizzly.Options do
           inclusion_adapter: module(),
           extra_config: String.t() | nil,
           trace_options: [Trace.trace_opt()],
-          background_rssi_monitor: [Grizzly.BackgroundRSSIMonitor.opt()],
+          background_rssi_monitor: [Grizzly.BackgroundRSSIMonitor.opt()] | false,
           storage_adapter: {module(), term()},
           storage_options: PropertyTable.options()
         }
