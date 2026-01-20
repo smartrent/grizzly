@@ -12,15 +12,15 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSupportedReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.HumidityControlSetpoint
+  alias Grizzly.ZWave.CommandClasses.HumidityControl
 
-  @type param :: {:setpoint_types, [HumidityControlSetpoint.type()]}
+  @type param :: {:setpoint_types, [HumidityControl.setpoint_type()]}
 
   @impl Grizzly.ZWave.Command
   def encode_params(_spec, command) do
     command
     |> Command.param(:setpoint_types)
-    |> Enum.map(&HumidityControlSetpoint.encode_type/1)
+    |> Enum.map(&HumidityControl.encode_setpoint_type/1)
     |> encode_bitmask()
   end
 
@@ -29,7 +29,7 @@ defmodule Grizzly.ZWave.Commands.HumidityControlSetpointSupportedReport do
     setpoint_types =
       binary
       |> decode_bitmask()
-      |> Enum.map(&HumidityControlSetpoint.decode_type/1)
+      |> Enum.map(&HumidityControl.decode_setpoint_type/1)
       |> Enum.reject(&(&1 == :unknown))
 
     {:ok, [setpoint_types: setpoint_types]}

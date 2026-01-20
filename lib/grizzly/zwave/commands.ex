@@ -387,8 +387,8 @@ defmodule Grizzly.ZWave.Commands do
       param(:mode, :enum,
         size: 4,
         opts: [
-          encode: &CommandClasses.HumidityControlMode.encode_mode/1,
-          decode: &CommandClasses.HumidityControlMode.decode_mode/1
+          encode: &CommandClasses.HumidityControl.encode_mode/1,
+          decode: &CommandClasses.HumidityControl.decode_mode/1
         ]
       )
     ]
@@ -409,8 +409,8 @@ defmodule Grizzly.ZWave.Commands do
         param(:state, :enum,
           size: 4,
           opts: [
-            encode: &CommandClasses.HumidityControlOperatingState.encode_state/1,
-            decode: &CommandClasses.HumidityControlOperatingState.decode_state/1
+            encode: &CommandClasses.HumidityControl.encode_operating_state/1,
+            decode: &CommandClasses.HumidityControl.decode_operating_state/1
           ]
         )
       ]
@@ -422,8 +422,8 @@ defmodule Grizzly.ZWave.Commands do
       param(:setpoint_type, :enum,
         size: 4,
         opts: [
-          encode: &CommandClasses.HumidityControlSetpoint.encode_type/1,
-          decode: &CommandClasses.HumidityControlSetpoint.decode_type/1
+          encode: &CommandClasses.HumidityControl.encode_setpoint_type/1,
+          decode: &CommandClasses.HumidityControl.decode_setpoint_type/1
         ]
       )
     ]
