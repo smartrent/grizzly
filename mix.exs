@@ -116,8 +116,7 @@ defmodule Grizzly.MixProject do
         Behaviours: [
           Grizzly.CommandHandler,
           Grizzly.FirmwareUpdateHandler,
-          Grizzly.InclusionHandler,
-          Grizzly.Inclusions.NetworkAdapter
+          Grizzly.InclusionHandler
         ],
         "Virtual Devices": [
           Grizzly.VirtualDevices,
