@@ -6,8 +6,8 @@ defmodule Grizzly.VirtualDevices do
   """
 
   alias Grizzly.VirtualDevices.Device
+  alias Grizzly.VirtualDevices.Registry, as: VirtualDevicesRegistry
   alias Grizzly.VirtualDevices.Reports
-  alias Grizzly.VirtualDevicesRegistry
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.DeviceClass
 

@@ -220,6 +220,8 @@ defmodule Grizzly.Supervisor do
       Grizzly.SessionId,
       {Grizzly.Trace, options.trace_options},
       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
+      # Registry for virtual devices
+      {Registry, Grizzly.VirtualDevices.Registry.start_options(options)},
       {Grizzly.Associations, options},
       {ThousandIsland,
        [
@@ -241,9 +243,6 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for running commands
       Grizzly.Requests.RequestRunnerSupervisor,
-
-      # Supervisor for virtual devices
-      {Grizzly.VirtualDevicesSupervisor, options},
       ReadyChecker,
       if(options.background_rssi_monitor != false,
         do: {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}

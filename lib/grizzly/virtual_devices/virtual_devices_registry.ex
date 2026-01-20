@@ -1,4 +1,4 @@
-defmodule Grizzly.VirtualDevicesRegistry do
+defmodule Grizzly.VirtualDevices.Registry do
   @moduledoc false
 
   alias Grizzly.VirtualDevices
