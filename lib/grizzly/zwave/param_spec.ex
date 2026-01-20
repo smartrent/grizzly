@@ -3,7 +3,12 @@ defmodule Grizzly.ZWave.ParamSpec do
   Data structure describing a parameter for a Z-Wave command.
   """
 
+  import Integer, only: [is_even: 1]
+
   alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.DSK
+  alias Grizzly.ZWave.Encoding
+  alias Grizzly.ZWave.ZWEnum
 
   schema =
     NimbleOptions.new!(
@@ -13,7 +18,7 @@ defmodule Grizzly.ZWave.ParamSpec do
         required: true
       ],
       type: [
-        type: {:in, [:int, :uint, :boolean, :binary, :enum, :constant, :reserved, :any]},
+        type: {:in, [:int, :uint, :boolean, :binary, :enum, :constant, :dsk, :custom, :any]},
         doc: "The parameter's type",
         required: true
       ],
@@ -51,6 +56,7 @@ defmodule Grizzly.ZWave.ParamSpec do
           | :enum
           | :constant
           | :reserved
+          | :bitmask
           | {:length, atom()}
           | :any
 
@@ -139,8 +145,9 @@ defmodule Grizzly.ZWave.ParamSpec do
           | {:error, DecodeError.t()}
   def take_bits(param_spec, bitstring, other_params)
 
-  def take_bits(%__MODULE__{type: :binary, size: size}, bitstring, _other_params)
-      when is_integer(size) and rem(size, 8) == 0 and bit_size(bitstring) >= size do
+  def take_bits(%__MODULE__{type: type, size: size}, bitstring, _other_params)
+      when type in [:binary, :dsk] and is_integer(size) and rem(size, 8) == 0 and
+             bit_size(bitstring) >= size do
     <<value::bitstring-size(size), rest::bitstring>> = bitstring
     {:ok, {size, value, rest}}
   end
@@ -209,7 +216,25 @@ defmodule Grizzly.ZWave.ParamSpec do
   def encode_value(param_spec, value, other_params \\ [])
 
   def encode_value(%__MODULE__{type: :enum, size: size} = spec, value, _) do
-    encoder = Keyword.fetch!(spec.opts, :encode)
+    values_map = Keyword.fetch!(spec.opts, :values)
+
+    <<ZWEnum.fetch!(values_map, value)::size(size)>>
+  end
+
+  def encode_value(%__MODULE__{type: :bitmask, size: :variable} = spec, value, _)
+      when is_list(value) do
+    values_map = Keyword.fetch!(spec.opts, :values)
+    Encoding.encode_enum_bitmask(values_map, value)
+  end
+
+  def encode_value(%__MODULE__{type: :bitmask, size: size} = spec, value, _)
+      when is_list(value) and is_integer(size) and rem(size, 8) == 0 do
+    values_map = Keyword.fetch!(spec.opts, :values)
+    Encoding.encode_enum_bitmask(values_map, value, min_bytes: div(size, 8))
+  end
+
+  def encode_value(%__MODULE__{type: :any, size: size} = spec, value, _) do
+    encoder = Keyword.get(spec.opts, :encode)
 
     result =
       if is_function(encoder, 1) do
@@ -279,6 +304,19 @@ defmodule Grizzly.ZWave.ParamSpec do
   def encode_value(%__MODULE__{type: :binary, size: :variable}, value, _)
       when is_bitstring(value) do
     value
+  end
+
+  def encode_value(%__MODULE__{type: :dsk, size: size}, value, _) when is_integer(size) do
+    case value do
+      %DSK{raw: raw} ->
+        <<raw::bitstring-size(size)>>
+
+      bin when is_binary(value) and byte_size(value) > 16 ->
+        <<DSK.parse!(bin).raw::bitstring-size(size)>>
+
+      bin when is_binary(value) and byte_size(value) <= 16 and is_even(byte_size(value)) ->
+        <<DSK.new(bin).raw::bitstring-size(size)>>
+    end
   end
 
   def encode_value(
@@ -354,16 +392,48 @@ defmodule Grizzly.ZWave.ParamSpec do
 
   def decode_value(%__MODULE__{type: :int, size: size} = param_spec, binary, _other_params) do
     case binary do
-      <<v::signed-size(^size)>> ->
-        {:ok, v}
+      <<v::signed-size(^size)>> -> {:ok, v}
+      _ -> {:error, %DecodeError{param: param_spec.name, value: binary}}
+    end
+  end
+
+  def decode_value(%__MODULE__{type: :enum, size: size} = param_spec, binary, _other_params) do
+    values_map = Keyword.fetch!(param_spec.opts, :values)
+
+    case binary do
+      <<raw_value::size(^size)>> ->
+        case ZWEnum.fetch_key(values_map, raw_value) do
+          {:ok, value} ->
+            {:ok, value}
+
+          :error ->
+            case param_spec.opts[:if_unknown] do
+              :raw -> {:ok, raw_value}
+              {:value, default_value} -> {:ok, default_value}
+              _ -> {:error, %DecodeError{param: param_spec.name, value: raw_value}}
+            end
+        end
 
       _ ->
         {:error, %DecodeError{param: param_spec.name, value: binary}}
     end
   end
 
-  def decode_value(%__MODULE__{type: :enum, size: size} = param_spec, binary, _other_params) do
-    decoder = Keyword.fetch!(param_spec.opts, :decode)
+  def decode_value(%__MODULE__{type: :bitmask, size: size} = param_spec, binary, _other_params) do
+    values_map = Keyword.fetch!(param_spec.opts, :values)
+
+    case binary do
+      <<raw_value::bitstring-size(^size)>> ->
+        decoded_values = Encoding.decode_enum_bitmask(values_map, raw_value)
+        {:ok, decoded_values}
+
+      _ ->
+        {:error, %DecodeError{param: param_spec.name, value: binary}}
+    end
+  end
+
+  def decode_value(%__MODULE__{type: :any, size: size} = param_spec, binary, _other_params) do
+    decoder = Keyword.get(param_spec.opts, :decode)
 
     case binary do
       <<raw_value::size(^size)>> ->
@@ -416,12 +486,16 @@ defmodule Grizzly.ZWave.ParamSpec do
         {:ok, v}
 
       _ ->
-        {:error, %DecodeError{param: param_spec.name, value: binary, reason: "uwu"}}
+        {:error, %DecodeError{param: param_spec.name, value: binary}}
     end
   end
 
   def decode_value(%__MODULE__{type: :binary, size: :variable}, binary, _other_params) do
     {:ok, binary}
+  end
+
+  def decode_value(%__MODULE__{type: :dsk}, binary, _other_params) do
+    {:ok, DSK.new(binary)}
   end
 
   def decode_value(

@@ -1,4 +1,7 @@
 defmodule Grizzly.ZWave.GenericEncodingTest do
+  # quokka:skip-module-reordering
+  alias Grizzly.ZWave.DSK
+
   use ExUnit.Case,
     async: true,
     parameterize:
@@ -97,6 +100,14 @@ defmodule Grizzly.ZWave.GenericEncodingTest do
         {:door_lock_operation_set, [mode: :unsecured], <<0x62, 0x01, 0x00>>},
         {:dsk_get, [seq_number: 1, add_mode: :learn], <<0x4D, 0x08, 0x01, 0x00>>},
         {:dsk_get, [seq_number: 1, add_mode: :add], <<0x4D, 0x08, 0x01, 0x01>>},
+        {:dsk_report,
+         [
+           seq_number: 1,
+           dsk: DSK.parse!("50285-18819-09924-30691-15973-33711-04005-03623"),
+           add_mode: :learn
+         ],
+         <<0x4D, 0x09, 1, 0, 196, 109, 73, 131, 38, 196, 119, 227, 62, 101, 131, 175, 15, 165, 14,
+           39>>},
         {:firmware_update_md_get, [number_of_reports: 2, report_number: 128],
          <<0x7A, 0x05, 2, 0x0080::16>>},
         {:manufacturer_specific_report,
@@ -211,8 +222,13 @@ defmodule Grizzly.ZWave.GenericEncodingTest do
            number_of_slots_week_day: 5,
            number_of_slots_year_day: 10
          ], <<0x4E, 0x0A, 5, 10>>},
+        {:sensor_binary_supported_sensor_report,
+         [sensor_types: [:general_purpose, :freeze, :tamper, :glass_break]],
+         <<0x30, 0x04, 0b10000010, 0b00100001>>},
         {:thermostat_fan_mode_set, [mode: :auto_high], <<0x44, 0x01, 0x02>>},
         {:thermostat_fan_mode_report, [mode: :auto_high], <<0x44, 0x03, 0x02>>},
+        {:thermostat_fan_mode_supported_report,
+         [modes: [:auto_low, :low, :auto_high, :auto_medium]], <<0x44, 0x05, 0b00010111>>},
         {:thermostat_fan_state_report, [state: :running_high], <<0x45, 0x03, 0x02>>},
         {:thermostat_operating_state_report, [state: :cooling], <<0x42, 0x03, 0x02>>},
         {:thermostat_setback_set, [type: :temporary_override, state: -12.7],

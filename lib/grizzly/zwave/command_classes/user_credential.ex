@@ -166,17 +166,6 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_credential_data(:password, data), do: Encoding.decode_string(data, :utf16)
   def decode_credential_data(_, data), do: data
 
-  @doc "Encodes the credential learn operation to a byte value."
-  @spec encode_credential_learn_operation(credential_learn_operation()) :: byte()
-  def encode_credential_learn_operation(:add), do: 0x00
-  def encode_credential_learn_operation(:modify), do: 0x01
-
-  @doc "Decodes a credential learn operation from a byte value."
-  @spec decode_credential_learn_operation(byte()) :: credential_learn_operation() | :unknown
-  def decode_credential_learn_operation(0x00), do: :add
-  def decode_credential_learn_operation(0x01), do: :modify
-  def decode_credential_learn_operation(_), do: :unknown
-
   @doc "Encodes the status field in an Admin Pin Code Report command"
   @spec encode_admin_pin_code_set_status(status :: atom()) :: byte()
   def encode_admin_pin_code_set_status(:modified), do: 0x01

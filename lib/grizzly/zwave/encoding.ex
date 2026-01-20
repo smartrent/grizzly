@@ -5,6 +5,8 @@ defmodule Grizzly.ZWave.Encoding do
 
   import Bitwise
 
+  alias Grizzly.ZWave.ZWEnum
+
   @type encode_bitmask_opts :: [min_bytes: non_neg_integer()]
 
   @type string_encoding :: :ascii | :extended_ascii | :utf16
@@ -211,17 +213,53 @@ defmodule Grizzly.ZWave.Encoding do
   def decode_duration(0xFF), do: :default
   def decode_duration(_), do: :unknown
 
-  @spec encode_tz_offset_sign(:plus | :minus) :: 0 | 1
-  def encode_tz_offset_sign(:plus), do: 0
-  def encode_tz_offset_sign(:minus), do: 1
+  @doc """
+  Encodes a list of keys into a bitmask using the provided `Grizzly.ZWave.ZWEnum`
+  to map keys to bit positions.
 
-  @spec decode_tz_offset_sign(0 | 1) :: :plus | :minus | :unknown
-  def decode_tz_offset_sign(0), do: :plus
-  def decode_tz_offset_sign(1), do: :minus
-  def decode_tz_offset_sign(_), do: :unknown
+  ## Examples
+
+      iex> enum = Grizzly.ZWave.ZWEnum.new(foo: 1, bar: 2, baz: 7, qux: 8)
+      iex> encode_enum_bitmask(enum, [:foo, :baz, :qux])
+      <<0b10000010, 0b1>>
+  """
+  @spec encode_enum_bitmask(ZWEnum.t(), list(ZWEnum.k()), encode_bitmask_opts()) :: bitstring()
+  def encode_enum_bitmask(%ZWEnum{} = enum, keys, opts \\ []) do
+    keys
+    |> Enum.reduce([], fn key, acc ->
+      case ZWEnum.fetch(enum, key) do
+        {:ok, bit_position} -> [bit_position | acc]
+        :error -> acc
+      end
+    end)
+    |> encode_bitmask(opts)
+  end
 
   @doc """
-  Encodes a list of bit indexes into a bitmask.
+  Decodes a list of keys from a bitmask using the provided `Grizzly.ZWave.ZWEnum`
+  to map keys to bit positions.
+
+  ## Examples
+
+      iex> enum = Grizzly.ZWave.ZWEnum.new(foo: 1, bar: 2, baz: 7, qux: 8)
+      iex> decode_enum_bitmask(enum, <<0b10000010, 0b1>>)
+      [:foo, :baz, :qux]
+  """
+  @spec decode_enum_bitmask(ZWEnum.t(), bitstring()) :: list(ZWEnum.k())
+  def decode_enum_bitmask(%ZWEnum{} = enum, bitmask) do
+    bitmask
+    |> decode_bitmask()
+    |> Enum.reduce([], fn key, acc ->
+      case ZWEnum.fetch_key(enum, key) do
+        {:ok, key} -> [key | acc]
+        :error -> acc
+      end
+    end)
+    |> Enum.reverse()
+  end
+
+  @doc """
+  Encodes a list into a bitmask.
 
   ### Examples
 
@@ -500,5 +538,264 @@ defmodule Grizzly.ZWave.Encoding do
       bytes_needed > 4 -> raise ArgumentError, "Value #{int_value} would overflow 32 bits"
       true -> bytes_needed
     end
+  end
+
+  @spec door_lock_modes() :: ZWEnum.t()
+  def door_lock_modes() do
+    ZWEnum.new(%{
+      :unsecured => 0x00,
+      :unsecured_with_timeout => 0x01,
+      :unsecured_inside_door_handles => 0x10,
+      :unsecured_inside_door_handles_with_timeout => 0x11,
+      :unsecured_outside_door_handles => 0x20,
+      :unsecured_outside_door_handles_with_timeout => 0x21,
+      :secured => 0xFF,
+      :unknown => 0xFE
+    })
+  end
+
+  @spec humidity_control_operating_states() :: ZWEnum.t()
+  def humidity_control_operating_states() do
+    ZWEnum.new(%{
+      :idle => 0x00,
+      :humidifying => 0x01,
+      :dehumidifying => 0x02
+    })
+  end
+
+  @spec humidity_control_modes() :: ZWEnum.t()
+  def humidity_control_modes() do
+    ZWEnum.new(%{
+      :off => 0x00,
+      :humidify => 0x01,
+      :dehumidify => 0x02,
+      :auto => 0x03
+    })
+  end
+
+  @spec humidity_control_setpoint_types() :: ZWEnum.t()
+  def humidity_control_setpoint_types() do
+    ZWEnum.new(%{
+      :humidify => 0x01,
+      :dehumidify => 0x02,
+      :auto => 0x03
+    })
+  end
+
+  @spec network_update_request_statuses() :: ZWEnum.t()
+  def network_update_request_statuses() do
+    ZWEnum.new(%{
+      :done => 0x00,
+      :abort => 0x01,
+      :wait => 0x02,
+      :disabled => 0x03,
+      :overflow => 0x04
+    })
+  end
+
+  @spec power_levels() :: ZWEnum.t()
+  def power_levels() do
+    ZWEnum.new(%{
+      normal_power: 0x00,
+      minus1dBm: 0x01,
+      minus2dBm: 0x02,
+      minus3dBm: 0x03,
+      minus4dBm: 0x04,
+      minus5dBm: 0x05,
+      minus6dBm: 0x06,
+      minus7dBm: 0x07,
+      minus8dBm: 0x08,
+      minus9dBm: 0x09
+    })
+  end
+
+  @spec tz_offset_signs() :: ZWEnum.t()
+  def tz_offset_signs() do
+    ZWEnum.new(%{
+      :plus => 0,
+      :minus => 1
+    })
+  end
+
+  @spec user_code_keypad_modes() :: ZWEnum.t()
+  def user_code_keypad_modes() do
+    ZWEnum.new(%{
+      :normal => 0x00,
+      :vacation => 0x01,
+      :privacy => 0x02,
+      :lockout => 0x03
+    })
+  end
+
+  @spec uc_credential_types() :: ZWEnum.t()
+  def uc_credential_types() do
+    ZWEnum.new(%{
+      none: 0x00,
+      pin_code: 0x01,
+      password: 0x02,
+      rfid: 0x03,
+      ble: 0x04,
+      nfc: 0x05,
+      uwb: 0x06,
+      eye_biometric: 0x07,
+      face_biometric: 0x08,
+      finger_biometric: 0x09,
+      hand_biometric: 0x0A,
+      unspecified_biometric: 0x0B
+    })
+  end
+
+  @spec uc_association_set_statuses() :: ZWEnum.t()
+  def uc_association_set_statuses() do
+    ZWEnum.new(%{
+      success: 0x00,
+      credential_type_invalid: 0x01,
+      credential_slot_invalid: 0x02,
+      credential_slot_empty: 0x03,
+      destination_user_id_invalid: 0x04,
+      destination_user_id_nonexistent: 0x05
+    })
+  end
+
+  @spec uc_admin_pin_code_set_statuses() :: ZWEnum.t()
+  def uc_admin_pin_code_set_statuses() do
+    ZWEnum.new(%{
+      modified: 0x01,
+      unmodified: 0x03,
+      response_to_get: 0x04,
+      duplicate: 0x07,
+      manufacturer_security_rules: 0x08,
+      admin_code_not_supported: 0x0D,
+      deactivation_not_supported: 0x0E,
+      unspecified_error: 0x0F
+    })
+  end
+
+  @spec weekdays() :: ZWEnum.t()
+  def weekdays() do
+    ZWEnum.new(%{
+      unknown: 0x00,
+      monday: 0x01,
+      tuesday: 0x02,
+      wednesday: 0x03,
+      thursday: 0x04,
+      friday: 0x05,
+      saturday: 0x06,
+      sunday: 0x07
+    })
+  end
+
+  @spec kex_fail_types() :: ZWEnum.t()
+  def kex_fail_types() do
+    ZWEnum.new(%{
+      none: 0x00,
+      key: 0x01,
+      scheme: 0x02,
+      curves: 0x03,
+      decrypt: 0x05,
+      cancel: 0x06,
+      auth: 0x07,
+      get: 0x08,
+      verify: 0x09,
+      report: 0x0A
+    })
+  end
+
+  @spec security_key_types() :: ZWEnum.t()
+  def security_key_types() do
+    ZWEnum.new(%{
+      s0: 0x80,
+      s2_access_control: 0x04,
+      s2_authenticated: 0x02,
+      s2_unauthenticated: 0x01
+    })
+  end
+
+  @spec binary_sensor_types() :: ZWEnum.t()
+  def binary_sensor_types() do
+    ZWEnum.new(%{
+      general_purpose: 0x01,
+      smoke: 0x02,
+      co: 0x03,
+      co2: 0x04,
+      heat: 0x05,
+      water: 0x06,
+      freeze: 0x07,
+      tamper: 0x08,
+      aux: 0x09,
+      door_window: 0x0A,
+      tilt: 0x0B,
+      motion: 0x0C,
+      glass_break: 0x0D
+    })
+  end
+
+  @spec multilevel_sensor_types() :: ZWEnum.t()
+  def multilevel_sensor_types() do
+    ZWEnum.new(%{
+      general_purpose: 0x01,
+      smoke: 0x02,
+      co: 0x03,
+      co2: 0x04,
+      heat: 0x05,
+      water: 0x06,
+      freeze: 0x07,
+      tamper: 0x08,
+      aux: 0x09,
+      door_window: 0x0A,
+      tilt: 0x0B,
+      motion: 0x0C,
+      glass_break: 0x0D
+    })
+  end
+
+  @spec thermostat_fan_modes() :: ZWEnum.t()
+  def thermostat_fan_modes() do
+    ZWEnum.new(%{
+      auto_low: 0x00,
+      low: 0x01,
+      auto_high: 0x02,
+      high: 0x03,
+      auto_medium: 0x04,
+      medium: 0x05,
+      circulation: 0x06,
+      humidity_circulation: 0x07,
+      left_right: 0x08,
+      up_down: 0x09,
+      quiet: 0x0A,
+      external_circulation: 0x0B
+    })
+  end
+
+  @spec thermostat_fan_states() :: ZWEnum.t()
+  def thermostat_fan_states() do
+    ZWEnum.new(%{
+      off: 0x00,
+      running: 0x01,
+      running_high: 0x02,
+      running_medium: 0x03,
+      circulation: 0x04,
+      humidity_circulation: 0x05,
+      right_left_circulation: 0x06,
+      up_down_circulation: 0x07,
+      quiet_circulation: 0x08
+    })
+  end
+
+  def thermostat_operating_states() do
+    ZWEnum.new(%{
+      idle: 0x00,
+      heating: 0x01,
+      cooling: 0x02,
+      fan_only: 0x03,
+      pending_heat: 0x04,
+      pending_cool: 0x05,
+      vent_economizer: 0x06,
+      aux_heating: 0x07,
+      heating_stage_2: 0x08,
+      cooling_stage_2: 0x09,
+      aux_heat_stage_2: 0x0A,
+      aux_heat_stage_3: 0x0B
+    })
   end
 end

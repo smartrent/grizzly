@@ -9,20 +9,9 @@ defmodule Grizzly.ZWave.CommandClasses.BarrierOperator do
 
   alias Grizzly.ZWave.DecodeError
 
-  @type target_value :: :open | :close
   @type state :: :closed | 0x01..0x63 | :closing | :stopped | :opening | :open
   @type subsystem_type :: :audible_notification | :visual_notification
   @type subsystem_state :: :on | :off
-
-  @spec target_value_to_byte(:close | :open) :: 0x00 | 0xFF
-  def target_value_to_byte(:close), do: 0x00
-  def target_value_to_byte(:open), do: 0xFF
-
-  @spec target_value_from_byte(byte) ::
-          {:error, Grizzly.ZWave.DecodeError.t()} | {:ok, :close | :open}
-  def target_value_from_byte(0x00), do: {:ok, :close}
-  def target_value_from_byte(0xFF), do: {:ok, :open}
-  def target_value_from_byte(byte), do: {:error, %DecodeError{value: byte, param: :target_value}}
 
   @spec state_to_byte(state) :: byte
   def state_to_byte(:closed), do: 0x00

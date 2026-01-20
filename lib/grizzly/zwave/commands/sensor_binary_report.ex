@@ -13,10 +13,11 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.SensorBinary
   alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.Encoding
+  alias Grizzly.ZWave.ZWEnum
 
-  @type param :: {:sensor_type, SensorBinary.sensor_type()} | {:triggered, boolean()}
+  @type param :: {:sensor_type, atom()} | {:triggered, boolean()}
 
   @impl Grizzly.ZWave.Command
   def encode_params(_spec, command) do
@@ -26,18 +27,21 @@ defmodule Grizzly.ZWave.Commands.SensorBinaryReport do
     if sensor_type == nil do
       <<encode_triggered(triggered)>>
     else
-      <<encode_triggered(triggered), SensorBinary.encode_type(sensor_type)>>
+      <<encode_triggered(triggered), ZWEnum.fetch!(Encoding.binary_sensor_types(), sensor_type)>>
     end
   end
 
   @impl Grizzly.ZWave.Command
   def decode_params(_spec, <<triggered_byte, sensor_type_byte>>) do
-    with {:ok, sensor_type} <- SensorBinary.decode_type(sensor_type_byte),
+    with {:ok, sensor_type} <- ZWEnum.fetch_key(Encoding.binary_sensor_types(), sensor_type_byte),
          {:ok, triggered} <- decode_triggered(triggered_byte) do
       {:ok, [triggered: triggered, sensor_type: sensor_type]}
     else
       {:error, %DecodeError{} = error} ->
         error
+
+      :error ->
+        {:error, %DecodeError{value: sensor_type_byte, param: :sensor_type}}
     end
   end
 
