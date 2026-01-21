@@ -75,6 +75,42 @@ defmodule Grizzly.ZWave.Macros do
     end
   end
 
+  defmacro enum(name, values, opts) do
+    quote bind_quoted: [
+            name: name,
+            values: values,
+            opts: opts
+          ] do
+      {name,
+       struct!(
+         Grizzly.ZWave.ParamSpec,
+         Keyword.merge(opts,
+           name: name,
+           type: :enum,
+           opts: Keyword.merge(opts[:opts] || [], values: values)
+         )
+       )}
+    end
+  end
+
+  defmacro bitmask(name, values, opts) do
+    quote bind_quoted: [
+            name: name,
+            values: values,
+            opts: opts
+          ] do
+      {name,
+       struct!(
+         Grizzly.ZWave.ParamSpec,
+         Keyword.merge(opts,
+           name: name,
+           type: :bitmask,
+           opts: Keyword.merge(opts[:opts] || [], values: values)
+         )
+       )}
+    end
+  end
+
   defp do_command(caller, name, byte, mod, opts) do
     quote bind_quoted: [
             name: name,

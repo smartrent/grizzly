@@ -2,6 +2,7 @@ defmodule Grizzly.ZWave.ParamSpecTest do
   use ExUnit.Case, async: true
 
   alias Grizzly.ZWave.ParamSpec
+  alias Grizzly.ZWave.ZWEnum
 
   doctest Grizzly.ZWave.ParamSpec
 
@@ -47,14 +48,11 @@ defmodule Grizzly.ZWave.ParamSpecTest do
         type: :enum,
         size: 8,
         opts: [
-          encode: fn
-            :a -> 1
-            :b -> 2
-          end,
-          decode: fn
-            1 -> :a
-            2 -> :b
-          end
+          values:
+            ZWEnum.new(%{
+              a: 1,
+              b: 2
+            })
         ]
       }
 
@@ -102,14 +100,11 @@ defmodule Grizzly.ZWave.ParamSpecTest do
         type: :enum,
         size: 8,
         opts: [
-          encode: fn
-            :a -> 1
-            :b -> 2
-          end,
-          decode: fn
-            1 -> :a
-            2 -> {:ok, :b}
-          end
+          values:
+            ZWEnum.new(%{
+              a: 1,
+              b: 2
+            })
         ]
       }
 
@@ -140,14 +135,11 @@ defmodule Grizzly.ZWave.ParamSpecTest do
         type: :enum,
         size: 8,
         opts: [
-          encode: fn
-            :a -> 1
-            :b -> 2
-          end,
-          decode: fn
-            1 -> :a
-            2 -> :b
-          end
+          values:
+            ZWEnum.new(%{
+              a: 1,
+              b: 2
+            })
         ]
       }
 
@@ -161,37 +153,48 @@ defmodule Grizzly.ZWave.ParamSpecTest do
         type: :enum,
         size: 8,
         opts: [
-          encode: fn
-            :a -> 1
-            :b -> 2
-          end,
-          decode: fn
-            1 -> :a
-            2 -> :b
-            v -> {:error, %Grizzly.ZWave.DecodeError{param: :test_enum, value: v}}
-          end
+          values:
+            ZWEnum.new(%{
+              a: 1,
+              b: 2
+            })
         ]
       }
 
       assert {:error, %Grizzly.ZWave.DecodeError{param: :test_enum, value: 99}} =
                ParamSpec.decode_value(spec, <<99>>)
 
-      # Also test when decoder returns generic error tuple
       spec = %ParamSpec{
         name: :other_enum,
         type: :enum,
         size: 8,
         opts: [
-          encode: fn v -> v end,
-          decode: fn
-            1 -> :a
-            v -> {:error, "Unknown value: #{v}"}
-          end
+          values:
+            ZWEnum.new(%{
+              a: 1,
+              b: 2
+            }),
+          if_unknown: :raw
         ]
       }
 
-      assert {:error, %Grizzly.ZWave.DecodeError{param: :other_enum, value: 99}} =
-               ParamSpec.decode_value(spec, <<99>>)
+      assert {:ok, 99} = ParamSpec.decode_value(spec, <<99>>)
+
+      spec = %ParamSpec{
+        name: :other_enum,
+        type: :enum,
+        size: 8,
+        opts: [
+          values:
+            ZWEnum.new(%{
+              a: 1,
+              b: 2
+            }),
+          if_unknown: {:value, :unknown}
+        ]
+      }
+
+      assert {:ok, :unknown} = ParamSpec.decode_value(spec, <<99>>)
     end
 
     test "binary with fixed size" do

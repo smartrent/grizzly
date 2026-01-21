@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.Notifications do
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
+  alias Grizzly.ZWave.ZWEnum
 
   require Logger
 
@@ -344,8 +345,7 @@ defmodule Grizzly.ZWave.Notifications do
     }
   }
 
-  @type_from_byte table |> Map.keys() |> Map.new()
-  @type_to_byte table |> Map.keys() |> Map.new(fn {byte, type} -> {type, byte} end)
+  @types table |> Map.keys() |> ZWEnum.new(fn {k, v} -> {v, k} end)
 
   @event_from_byte Map.new(table, fn {{_, type}, events} ->
                      {type, Map.new(events, fn {byte, event} -> {byte, event} end)}
@@ -359,9 +359,10 @@ defmodule Grizzly.ZWave.Notifications do
   Lists all notification types.
   """
   @spec all_notification_types() :: [atom()]
-  def all_notification_types() do
-    @type_from_byte |> Map.values()
-  end
+  def all_notification_types(), do: ZWEnum.keys(@types)
+
+  @doc false
+  def types(), do: @types
 
   @doc """
   Lists all events associated with the given notification type.
@@ -375,10 +376,7 @@ defmodule Grizzly.ZWave.Notifications do
   """
   @spec type_to_byte(type()) :: byte()
   def type_to_byte(type) do
-    case Map.fetch(@type_to_byte, type) do
-      {:ok, byte} -> byte
-      :error -> raise KeyError, "Unknown notification type: #{inspect(type)}"
-    end
+    ZWEnum.fetch!(@types, type)
   end
 
   @doc """
@@ -399,7 +397,7 @@ defmodule Grizzly.ZWave.Notifications do
   """
   @spec type_from_byte(byte()) :: {:ok, type()} | {:error, :invalid_type_byte}
   def type_from_byte(byte) do
-    case Map.fetch(@type_from_byte, byte) do
+    case ZWEnum.fetch_key(@types, byte) do
       {:ok, type} -> {:ok, type}
       # There is no decoding for Alarm CC V1 - the byte is the type
       :error -> {:error, :invalid_type_byte}

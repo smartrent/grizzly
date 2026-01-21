@@ -9,24 +9,20 @@ defmodule Grizzly.ZWave.Commands do
   alias Grizzly.Requests.Handlers.WaitReport
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.CommandClasses
-  alias Grizzly.ZWave.CommandClasses.ApplicationStatus
   alias Grizzly.ZWave.Commands, as: Cmds
   alias Grizzly.ZWave.CommandSpec
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.Encoding
   alias Grizzly.ZWave.Notifications
-  alias Grizzly.ZWave.Security
   alias Grizzly.ZWave.ZWaveError
+  alias Grizzly.ZWave.ZWEnum
 
   @after_verify __MODULE__
 
   command_class :alarm, 0x71 do
     command :alarm_event_supported_get, 0x01, Cmds.Generic,
       params: [
-        param(:type, :enum,
-          size: 8,
-          opts: [encode: &Notifications.type_to_byte/1, decode: &Notifications.type_from_byte/1]
-        )
+        enum(:type, Notifications.types(), size: 8)
       ]
 
     command :alarm_event_supported_report, 0x02
@@ -35,17 +31,8 @@ defmodule Grizzly.ZWave.Commands do
 
     command :alarm_set, 0x06, Cmds.Generic,
       params: [
-        param(:zwave_type, :enum,
-          size: 8,
-          opts: [encode: &Notifications.type_to_byte/1, decode: &Notifications.type_from_byte/1]
-        ),
-        param(:status, :enum,
-          size: 8,
-          opts: [
-            encode: &Notifications.status_to_byte/1,
-            decode: &Notifications.status_from_byte/1
-          ]
-        )
+        enum(:zwave_type, Notifications.types(), size: 8),
+        enum(:status, ZWEnum.new(enabled: 0xFF, disabled: 0x00), size: 8)
       ]
 
     command :alarm_type_supported_get, 0x07, Cmds.Generic, params: []
@@ -67,12 +54,8 @@ defmodule Grizzly.ZWave.Commands do
   command_class :application_status, 0x22 do
     command :application_busy, 0x01, Cmds.Generic,
       params: [
-        param(:status, :enum,
-          size: 8,
-          opts: [
-            encode: &ApplicationStatus.status_to_byte/1,
-            decode: &ApplicationStatus.status_from_byte/1
-          ]
+        enum(:status, ZWEnum.new(try_again_later: 0, try_again_after_wait: 1, request_queued: 2),
+          size: 8
         ),
         param(:wait_time, :uint, size: 8)
       ]
@@ -145,20 +128,14 @@ defmodule Grizzly.ZWave.Commands do
   command_class :barrier_operator, 0x66 do
     command :barrier_operator_set, 0x01, Cmds.Generic,
       params: [
-        param(:target_value, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.BarrierOperator.target_value_to_byte/1,
-            decode: &CommandClasses.BarrierOperator.target_value_from_byte/1
-          ]
-        )
+        enum(:target_value, ZWEnum.new(close: 0, open: 0xFF), size: 8)
       ]
 
     command :barrier_operator_get, 0x02, Cmds.Generic, params: []
 
     command :barrier_operator_report, 0x03, Cmds.Generic,
       params: [
-        param(:state, :enum,
+        param(:state, :any,
           size: 8,
           opts: [
             encode: &CommandClasses.BarrierOperator.state_to_byte/1,
@@ -170,46 +147,18 @@ defmodule Grizzly.ZWave.Commands do
     command :barrier_operator_signal_supported_get, 0x04, Cmds.Generic, params: []
     command :barrier_operator_signal_supported_report, 0x05
 
-    subsystem_type_param =
-      param(:subsystem_type, :enum,
-        size: 8,
-        opts: [
-          encode: &CommandClasses.BarrierOperator.subsystem_type_to_byte/1,
-          decode: &CommandClasses.BarrierOperator.subsystem_type_from_byte/1
-        ]
-      )
+    subsystem_type =
+      enum(:subsystem_type, ZWEnum.new(audible_notification: 1, visual_notification: 2), size: 8)
 
-    subsystem_state_param =
-      param(:subsystem_state, :enum,
-        size: 8,
-        opts: [
-          encode: &CommandClasses.BarrierOperator.subsystem_state_to_byte/1,
-          decode: &CommandClasses.BarrierOperator.subsystem_state_from_byte/1
-        ]
-      )
+    subsystem_state = enum(:subsystem_state, ZWEnum.new(off: 0, on: 0xFF), size: 8)
 
     command :barrier_operator_signal_set, 0x06, Cmds.Generic,
-      params: [
-        subsystem_type_param,
-        subsystem_state_param
-      ]
+      params: [subsystem_type, subsystem_state]
 
-    command :barrier_operator_signal_get, 0x07, Cmds.Generic,
-      params: [
-        param(:subsystem_type, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.BarrierOperator.subsystem_type_to_byte/1,
-            decode: &CommandClasses.BarrierOperator.subsystem_type_from_byte/1
-          ]
-        )
-      ]
+    command :barrier_operator_signal_get, 0x07, Cmds.Generic, params: [subsystem_type]
 
     command :barrier_operator_signal_report, 0x08, Cmds.Generic,
-      params: [
-        subsystem_type_param,
-        subsystem_state_param
-      ]
+      params: [subsystem_type, subsystem_state]
   end
 
   command_class :basic, 0x20 do
@@ -244,13 +193,7 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :clock, 0x81 do
     clock_params = [
-      param(:weekday, :enum,
-        size: 3,
-        opts: [
-          encode: &CommandClasses.Clock.encode_weekday/1,
-          decode: &CommandClasses.Clock.decode_weekday/1
-        ]
-      ),
+      enum(:weekday, Encoding.weekdays(), size: 3),
       param(:hour, :uint, size: 5),
       param(:minute, :uint, size: 8)
     ]
@@ -329,13 +272,7 @@ defmodule Grizzly.ZWave.Commands do
   command_class :door_lock, 0x62 do
     command :door_lock_operation_set, 0x01, Cmds.Generic,
       params: [
-        param(:mode, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.DoorLock.mode_to_byte/1,
-            decode: &CommandClasses.DoorLock.mode_from_byte/1
-          ]
-        )
+        enum(:mode, Encoding.door_lock_modes(), size: 8)
       ]
 
     command :door_lock_operation_get, 0x02, Cmds.Generic, params: []
@@ -384,13 +321,7 @@ defmodule Grizzly.ZWave.Commands do
   command_class :humidity_control_mode, 0x6D do
     set_report_params = [
       reserved(size: 4),
-      param(:mode, :enum,
-        size: 4,
-        opts: [
-          encode: &CommandClasses.HumidityControl.encode_mode/1,
-          decode: &CommandClasses.HumidityControl.decode_mode/1
-        ]
-      )
+      enum(:mode, Encoding.humidity_control_modes(), size: 4)
     ]
 
     command :humidity_control_mode_set, 0x01, Cmds.Generic, params: set_report_params
@@ -406,26 +337,14 @@ defmodule Grizzly.ZWave.Commands do
     command :humidity_control_operating_state_report, 0x02, Cmds.Generic,
       params: [
         reserved(size: 4),
-        param(:state, :enum,
-          size: 4,
-          opts: [
-            encode: &CommandClasses.HumidityControl.encode_operating_state/1,
-            decode: &CommandClasses.HumidityControl.decode_operating_state/1
-          ]
-        )
+        enum(:state, Encoding.humidity_control_operating_states(), size: 4)
       ]
   end
 
   command_class :humidity_control_setpoint, 0x64 do
     setpoint_type_params = [
       reserved(size: 4),
-      param(:setpoint_type, :enum,
-        size: 4,
-        opts: [
-          encode: &CommandClasses.HumidityControl.encode_setpoint_type/1,
-          decode: &CommandClasses.HumidityControl.decode_setpoint_type/1
-        ]
-      )
+      enum(:setpoint_type, Encoding.humidity_control_setpoint_types(), size: 4)
     ]
 
     command :humidity_control_setpoint_set, 0x01, Cmds.HumidityControlSetpointSetReport
@@ -543,15 +462,7 @@ defmodule Grizzly.ZWave.Commands do
     command :network_update_request_status, 0x04, Cmds.Generic,
       params: [
         param(:seq_number, :uint, size: 8),
-        param(:status, :enum,
-          size: 8,
-          opts: [
-            encode:
-              &CommandClasses.NetworkManagementBasicNode.network_update_request_status_to_byte/1,
-            decode:
-              &CommandClasses.NetworkManagementBasicNode.network_update_request_status_from_byte/1
-          ]
-        )
+        enum(:status, Encoding.network_update_request_statuses(), size: 8)
       ]
 
     command :node_information_send, 0x05
@@ -564,22 +475,22 @@ defmodule Grizzly.ZWave.Commands do
 
     command :default_set_complete, 0x07
 
+    dsk_add_mode = enum(:add_mode, ZWEnum.new(%{learn: 0, add: 1}), size: 1)
+
     command :dsk_get, 0x08, Cmds.Generic,
       params: [
         param(:seq_number, :uint, size: 8),
         reserved(size: 7),
-        param(:add_mode, :enum,
-          size: 1,
-          default: :learn,
-          required: false,
-          opts: [
-            encode: &CommandClasses.NetworkManagementBasicNode.add_mode_to_byte/1,
-            decode: &CommandClasses.NetworkManagementBasicNode.add_mode_from_bit/1
-          ]
-        )
+        dsk_add_mode
       ]
 
-    command :dsk_report, 0x09, Cmds.DSKReport
+    command :dsk_report, 0x09, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        reserved(size: 7),
+        dsk_add_mode,
+        param(:dsk, :dsk, size: 16 * 8)
+      ]
   end
 
   command_class :network_management_inclusion, 0x34 do
@@ -675,14 +586,7 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :powerlevel, 0x73 do
-    power_level =
-      param(:power_level, :enum,
-        size: 8,
-        opts: [
-          encode: &CommandClasses.Powerlevel.power_level_to_byte/1,
-          decode: &CommandClasses.Powerlevel.power_level_from_byte/1
-        ]
-      )
+    power_level = enum(:power_level, Encoding.power_levels(), size: 8)
 
     power_level_params = [
       power_level,
@@ -705,12 +609,10 @@ defmodule Grizzly.ZWave.Commands do
     command :powerlevel_test_node_report, 0x06, Cmds.Generic,
       params: [
         param(:test_node_id, :uint, size: 8),
-        param(:status_of_operation, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.Powerlevel.status_of_operation_to_byte/1,
-            decode: &CommandClasses.Powerlevel.status_of_operation_from_byte/1
-          ]
+        enum(
+          :status_of_operation,
+          ZWEnum.new(%{test_failed: 0, test_success: 1, test_in_progress: 2}),
+          size: 8
         ),
         param(:test_frame_count, :uint, size: 16)
       ]
@@ -731,12 +633,9 @@ defmodule Grizzly.ZWave.Commands do
     sel_slot_id = param(:schedule_slot_id, :uint, size: 8)
 
     sel_set_action =
-      param(:set_action, :enum,
+      enum(:set_action, ZWEnum.new(%{erase: 0, modify: 1}),
         size: 8,
-        opts: [
-          encode: &CommandClasses.ScheduleEntryLock.encode_set_action/1,
-          decode: &CommandClasses.ScheduleEntryLock.decode_set_action/1
-        ]
+        opts: [if_unknown: {:value, :unknown}]
       )
 
     sel_week_day_params = [
@@ -765,22 +664,10 @@ defmodule Grizzly.ZWave.Commands do
     ]
 
     sel_tzo_params = [
-      param(:sign_tzo, :enum,
-        size: 1,
-        opts: [
-          encode: &Encoding.encode_tz_offset_sign/1,
-          decode: &Encoding.decode_tz_offset_sign/1
-        ]
-      ),
+      enum(:sign_tzo, Encoding.tz_offset_signs(), size: 1),
       param(:hour_tzo, :uint, size: 7),
       param(:minute_tzo, :uint, size: 8),
-      param(:sign_offset_dst, :enum,
-        size: 1,
-        opts: [
-          encode: &Encoding.encode_tz_offset_sign/1,
-          decode: &Encoding.decode_tz_offset_sign/1
-        ]
-      ),
+      enum(:sign_offset_dst, Encoding.tz_offset_signs(), size: 1),
       param(:minute_offset_dst, :uint, size: 7)
     ]
 
@@ -884,13 +771,7 @@ defmodule Grizzly.ZWave.Commands do
     command :s2_kex_fail, 0x07, Cmds.Generic,
       supports_supervision?: false,
       params: [
-        param(:kex_fail_type, :enum,
-          size: 8,
-          opts: [
-            encode: &Security.failed_type_to_byte/1,
-            decode: &Security.failed_type_from_byte/1
-          ]
-        )
+        enum(:kex_fail_type, Encoding.kex_fail_types(), size: 8)
       ]
 
     command :s2_public_key_report, 0x08, Cmds.Generic,
@@ -904,25 +785,13 @@ defmodule Grizzly.ZWave.Commands do
     command :s2_network_key_get, 0x09, Cmds.Generic,
       supports_supervision?: false,
       params: [
-        param(:requested_key, :enum,
-          size: 8,
-          opts: [
-            encode: &Security.key_to_byte/1,
-            decode: &Security.key_from_byte/1
-          ]
-        )
+        enum(:requested_key, Encoding.security_key_types(), size: 8)
       ]
 
     command :s2_network_key_report, 0x0A, Cmds.Generic,
       supports_supervision?: false,
       params: [
-        param(:granted_key, :enum,
-          size: 8,
-          opts: [
-            encode: &Security.key_to_byte/1,
-            decode: &Security.key_from_byte/1
-          ]
-        ),
+        enum(:granted_key, Encoding.security_key_types(), size: 8),
         param(:network_key, :binary, size: 16 * 8)
       ]
 
@@ -947,17 +816,15 @@ defmodule Grizzly.ZWave.Commands do
 
     command :sensor_binary_get, 0x02, Cmds.Generic,
       params: [
-        param(:sensor_type, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.SensorBinary.encode_type/1,
-            decode: &CommandClasses.SensorBinary.decode_type/1
-          ]
-        )
+        enum(:sensor_type, Encoding.binary_sensor_types(), size: 8)
       ]
 
     command :sensor_binary_report, 0x03
-    command :sensor_binary_supported_sensor_report, 0x04
+
+    command :sensor_binary_supported_sensor_report, 0x04, Cmds.Generic,
+      params: [
+        bitmask(:sensor_types, Encoding.binary_sensor_types(), size: 16)
+      ]
   end
 
   command_class :sensor_multilevel, 0x31 do
@@ -966,7 +833,7 @@ defmodule Grizzly.ZWave.Commands do
 
     command :sensor_multilevel_supported_scale_get, 0x03, Cmds.Generic,
       params: [
-        param(:sensor_type, :enum,
+        param(:sensor_type, :any,
           size: 8,
           opts: [
             encode: &CommandClasses.SensorMultilevel.encode_sensor_type/1,
@@ -1027,20 +894,15 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :thermostat_fan_mode, 0x44 do
-    mode =
-      param(:mode, :enum,
-        size: 4,
-        opts: [
-          encode: &CommandClasses.ThermostatFanMode.encode_mode/1,
-          decode: &CommandClasses.ThermostatFanMode.decode_mode/1
-        ]
-      )
+    mode = enum(:mode, Encoding.thermostat_fan_modes(), size: 4)
 
     command :thermostat_fan_mode_set, 0x01, Cmds.Generic, params: [reserved(size: 4), mode]
     command :thermostat_fan_mode_get, 0x02, Cmds.Generic, params: []
     command :thermostat_fan_mode_report, 0x03, Cmds.Generic, params: [reserved(size: 4), mode]
     command :thermostat_fan_mode_supported_get, 0x04, Cmds.Generic, params: []
-    command :thermostat_fan_mode_supported_report, 0x05
+
+    command :thermostat_fan_mode_supported_report, 0x05, Cmds.Generic,
+      params: [bitmask(:modes, Encoding.thermostat_fan_modes(), size: :variable)]
   end
 
   command_class :thermostat_fan_state, 0x45 do
@@ -1049,13 +911,7 @@ defmodule Grizzly.ZWave.Commands do
     command :thermostat_fan_state_report, 0x03, Cmds.Generic,
       params: [
         reserved(size: 4),
-        param(:state, :enum,
-          size: 4,
-          opts: [
-            encode: &CommandClasses.ThermostatFanState.encode_state/1,
-            decode: &CommandClasses.ThermostatFanState.decode_state/1
-          ]
-        )
+        enum(:state, Encoding.thermostat_fan_states(), size: 4)
       ]
   end
 
@@ -1072,27 +928,21 @@ defmodule Grizzly.ZWave.Commands do
 
     command :thermostat_operating_state_report, 0x03, Cmds.Generic,
       params: [
-        param(:state, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.ThermostatOperatingState.encode_state/1,
-            decode: &CommandClasses.ThermostatOperatingState.decode_state/1
-          ]
-        )
+        enum(:state, Encoding.thermostat_operating_states(), size: 8)
       ]
   end
 
   command_class :thermostat_setback, 0x47 do
     setback_params = [
       reserved(size: 6),
-      param(:type, :enum,
+      param(:type, :any,
         size: 2,
         opts: [
           encode: &CommandClasses.ThermostatSetback.encode_type/1,
           decode: &CommandClasses.ThermostatSetback.decode_type/1
         ]
       ),
-      param(:state, :enum,
+      param(:state, :any,
         size: 8,
         opts: [
           encode: &CommandClasses.ThermostatSetback.encode_state/1,
@@ -1112,7 +962,7 @@ defmodule Grizzly.ZWave.Commands do
     command :thermostat_setpoint_get, 0x02, Cmds.Generic,
       params: [
         reserved(size: 4),
-        param(:type, :enum,
+        param(:type, :any,
           size: 4,
           opts: [
             encode: &CommandClasses.ThermostatSetpoint.encode_type/1,
@@ -1150,22 +1000,10 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     time_offset_params = [
-      param(:sign_tzo, :enum,
-        size: 1,
-        opts: [
-          encode: &Encoding.encode_tz_offset_sign/1,
-          decode: &Encoding.decode_tz_offset_sign/1
-        ]
-      ),
+      enum(:sign_tzo, Encoding.tz_offset_signs(), size: 1),
       param(:hour_tzo, :uint, size: 7),
       param(:minute_tzo, :uint, size: 8),
-      param(:sign_offset_dst, :enum,
-        size: 1,
-        opts: [
-          encode: &Encoding.encode_tz_offset_sign/1,
-          decode: &Encoding.decode_tz_offset_sign/1
-        ]
-      ),
+      enum(:sign_offset_dst, Encoding.tz_offset_signs(), size: 1),
       param(:minute_offset_dst, :uint, size: 7),
       param(:month_start_dst, :uint, size: 8),
       param(:day_start_dst, :uint, size: 8),
@@ -1196,14 +1034,7 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :user_code, 0x63 do
-    keypad_mode =
-      param(:mode, :enum,
-        size: 8,
-        opts: [
-          encode: &CommandClasses.UserCode.keypad_mode_to_byte/1,
-          decode: &CommandClasses.UserCode.keypad_mode_from_byte/1
-        ]
-      )
+    keypad_mode = enum(:mode, Encoding.user_code_keypad_modes(), size: 8)
 
     admin_code_params = [
       reserved(size: 4),
@@ -1255,18 +1086,8 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :user_credential, 0x83 do
     user_id = param(:user_id, :uint, size: 16)
-
     credential_slot = param(:credential_slot, :uint, size: 16)
-
-    credential_type =
-      param(:credential_type, :enum,
-        size: 8,
-        opts: [
-          encode: &CommandClasses.UserCredential.encode_credential_type/1,
-          decode: &CommandClasses.UserCredential.decode_credential_type/1
-        ]
-      )
-
+    credential_type = enum(:credential_type, Encoding.uc_credential_types(), size: 8)
     checksum = param(:checksum, :uint, size: 16)
 
     admin_pin_code_common_params = [
@@ -1274,14 +1095,7 @@ defmodule Grizzly.ZWave.Commands do
       param(:code, :binary, size: {:variable, :length})
     ]
 
-    credential_learn_operation =
-      param(:operation_type, :enum,
-        size: 8,
-        opts: [
-          encode: &CommandClasses.UserCredential.encode_credential_learn_operation/1,
-          decode: &CommandClasses.UserCredential.decode_credential_learn_operation/1
-        ]
-      )
+    credential_learn_operation = enum(:operation_type, ZWEnum.new(%{add: 0, modify: 1}), size: 8)
 
     command :user_capabilities_get, 0x01, Cmds.Generic, params: []
     command :user_capabilities_report, 0x02
@@ -1321,13 +1135,7 @@ defmodule Grizzly.ZWave.Commands do
         credential_type,
         credential_slot,
         param(:destination_user_id, :uint, size: 16),
-        param(:status, :enum,
-          size: 8,
-          opts: [
-            encode: &CommandClasses.UserCredential.encode_association_set_status/1,
-            decode: &CommandClasses.UserCredential.decode_association_set_status/1
-          ]
-        )
+        enum(:status, Encoding.uc_association_set_statuses(), size: 8)
       ]
 
     command :all_users_checksum_get, 0x14, Cmds.Generic, params: []
@@ -1344,13 +1152,7 @@ defmodule Grizzly.ZWave.Commands do
 
     command :admin_pin_code_report, 0x1C, Cmds.Generic,
       params: [
-        param(:result, :enum,
-          size: 4,
-          opts: [
-            encode: &CommandClasses.UserCredential.encode_admin_pin_code_set_status/1,
-            decode: &CommandClasses.UserCredential.decode_admin_pin_code_set_status/1
-          ]
-        )
+        enum(:result, Encoding.uc_admin_pin_code_set_statuses(), size: 4)
         | admin_pin_code_common_params
       ]
   end
