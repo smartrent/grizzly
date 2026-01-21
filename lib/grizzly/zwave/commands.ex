@@ -192,8 +192,20 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :clock, 0x81 do
+    clock_weekdays =
+      ZWEnum.new(%{
+        unknown: 0x00,
+        monday: 0x01,
+        tuesday: 0x02,
+        wednesday: 0x03,
+        thursday: 0x04,
+        friday: 0x05,
+        saturday: 0x06,
+        sunday: 0x07
+      })
+
     clock_params = [
-      enum(:weekday, Encoding.weekdays(), size: 3),
+      enum(:weekday, clock_weekdays, size: 3),
       param(:hour, :uint, size: 5),
       param(:minute, :uint, size: 8)
     ]
@@ -328,7 +340,11 @@ defmodule Grizzly.ZWave.Commands do
     command :humidity_control_mode_get, 0x02, Cmds.Generic, params: []
     command :humidity_control_mode_report, 0x03, Cmds.Generic, params: set_report_params
     command :humidity_control_mode_supported_get, 0x04, Cmds.Generic, params: []
-    command :humidity_control_mode_supported_report, 0x05
+
+    command :humidity_control_mode_supported_report, 0x05, Cmds.Generic,
+      params: [
+        bitmask(:modes, Encoding.humidity_control_modes(), size: :variable)
+      ]
   end
 
   command_class :humidity_control_operating_state, 0x6E do
@@ -351,12 +367,20 @@ defmodule Grizzly.ZWave.Commands do
     command :humidity_control_setpoint_get, 0x02, Cmds.Generic, params: setpoint_type_params
     command :humidity_control_setpoint_report, 0x03, Cmds.HumidityControlSetpointSetReport
     command :humidity_control_setpoint_supported_get, 0x04, Cmds.Generic, params: []
-    command :humidity_control_setpoint_supported_report, 0x05
+
+    command :humidity_control_setpoint_supported_report, 0x05, Cmds.Generic,
+      params: [
+        bitmask(:setpoint_types, Encoding.humidity_control_setpoint_types(), size: :variable)
+      ]
 
     command :humidity_control_setpoint_scale_supported_get, 0x06, Cmds.Generic,
       params: setpoint_type_params
 
-    command :humidity_control_setpoint_scale_supported_report, 0x07
+    command :humidity_control_setpoint_scale_supported_report, 0x07, Cmds.Generic,
+      params: [
+        reserved(size: 4),
+        bitmask(:scales, Encoding.humidity_control_setpoint_scales(), size: 4)
+      ]
 
     command :humidity_control_setpoint_capabilities_get, 0x08, Cmds.Generic,
       params: setpoint_type_params
@@ -510,7 +534,12 @@ defmodule Grizzly.ZWave.Commands do
         param(:node_id, :uint, size: 8)
       ]
 
-    command :node_neighbor_update_status, 0x0C
+    command :node_neighbor_update_status, 0x0C, Cmds.Generic,
+      params: [
+        param(:seq_number, :uint, size: 8),
+        enum(:status, ZWEnum.new(done: 0x22, failed: 0x23), size: 8)
+      ]
+
     command :node_add_keys_report, 0x11
     command :node_add_keys_set, 0x12, supports_supervision?: false
     command :node_add_dsk_report, 0x13, Cmds.NodeAddDSKReport
@@ -560,12 +589,16 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :node_naming, 0x77 do
-    command :node_name_set, 0x01
+    res5 = reserved(size: 5)
+    encoding = enum(:encoding, Encoding.string_encodings(), size: 3)
+    name = param(:name, :binary, size: :variable)
+    location = param(:location, :binary, size: :variable)
+    command :node_name_set, 0x01, Cmds.Generic, params: [res5, encoding, name]
     command :node_name_get, 0x02, Cmds.Generic, params: []
-    command :node_name_report, 0x03
-    command :node_location_set, 0x04
+    command :node_name_report, 0x03, Cmds.Generic, params: [res5, encoding, name]
+    command :node_location_set, 0x04, Cmds.Generic, params: [res5, encoding, location]
     command :node_location_get, 0x05, Cmds.Generic, params: []
-    command :node_location_report, 0x06
+    command :node_location_report, 0x06, Cmds.Generic, params: [res5, encoding, location]
   end
 
   command_class :node_provisioning, 0x78 do
@@ -629,6 +662,19 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :schedule_entry_lock, 0x4E do
+    sel_weekdays =
+      ZWEnum.new(
+        sunday: 0,
+        monday: 1,
+        tuesday: 2,
+        wednesday: 3,
+        thursday: 4,
+        friday: 5,
+        saturday: 6
+      )
+
+    sel_weekdays_bitmask = bitmask(:week_days, sel_weekdays, size: 8)
+
     sel_user_id = param(:user_identifier, :uint, size: 8)
     sel_slot_id = param(:schedule_slot_id, :uint, size: 8)
 
@@ -713,8 +759,28 @@ defmodule Grizzly.ZWave.Commands do
     command :schedule_entry_lock_daily_repeating_get, 0x0E, Cmds.Generic,
       params: [sel_user_id, sel_slot_id]
 
-    command :schedule_entry_lock_daily_repeating_report, 0x0F
-    command :schedule_entry_lock_daily_repeating_set, 0x10
+    command :schedule_entry_lock_daily_repeating_report, 0x0F, Cmds.Generic,
+      params: [
+        sel_user_id,
+        sel_slot_id,
+        sel_weekdays_bitmask,
+        param(:start_hour, :uint, size: 8),
+        param(:start_minute, :uint, size: 8),
+        param(:duration_hour, :uint, size: 8),
+        param(:duration_minute, :uint, size: 8)
+      ]
+
+    command :schedule_entry_lock_daily_repeating_set, 0x10, Cmds.Generic,
+      params: [
+        sel_set_action,
+        sel_user_id,
+        sel_slot_id,
+        sel_weekdays_bitmask,
+        param(:start_hour, :uint, size: 8),
+        param(:start_minute, :uint, size: 8),
+        param(:duration_hour, :uint, size: 8),
+        param(:duration_minute, :uint, size: 8)
+      ]
   end
 
   command_class :security, 0x98 do
