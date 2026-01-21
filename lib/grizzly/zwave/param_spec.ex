@@ -228,9 +228,18 @@ defmodule Grizzly.ZWave.ParamSpec do
   end
 
   def encode_value(%__MODULE__{type: :bitmask, size: size} = spec, value, _)
-      when is_list(value) and is_integer(size) and rem(size, 8) == 0 do
+      when is_list(value) and is_integer(size) and (rem(size, 8) == 0 or size < 8) do
     values_map = Keyword.fetch!(spec.opts, :values)
-    Encoding.encode_enum_bitmask(values_map, value, min_bytes: div(size, 8))
+    full_bitmask = Encoding.encode_enum_bitmask(values_map, value, min_bytes: div(size, 8))
+
+    # Only truncate to size if the size is less than 8 bytes. Multi-byte bitmasks
+    # are always byte-aligned.
+    if size < 8 do
+      <<_truncated::size(8 - size), right_sized_bitmask::bitstring-size(size)>> = full_bitmask
+      right_sized_bitmask
+    else
+      full_bitmask
+    end
   end
 
   def encode_value(%__MODULE__{type: :any, size: size} = spec, value, _) do
@@ -424,6 +433,14 @@ defmodule Grizzly.ZWave.ParamSpec do
 
     case binary do
       <<raw_value::bitstring-size(^size)>> ->
+        # Ensure we're byte-aligned
+        raw_value =
+          if rem(bit_size(raw_value), 8) != 0 do
+            <<0::size(8 - rem(bit_size(raw_value), 8)), raw_value::bitstring>>
+          else
+            raw_value
+          end
+
         decoded_values = Encoding.decode_enum_bitmask(values_map, raw_value)
         {:ok, decoded_values}
 

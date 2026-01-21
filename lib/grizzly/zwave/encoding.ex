@@ -582,6 +582,14 @@ defmodule Grizzly.ZWave.Encoding do
     })
   end
 
+  @spec humidity_control_setpoint_scales() :: ZWEnum.t()
+  def humidity_control_setpoint_scales() do
+    ZWEnum.new(%{
+      :percentage => 0x00,
+      :absolute => 0x01
+    })
+  end
+
   @spec network_update_request_statuses() :: ZWEnum.t()
   def network_update_request_statuses() do
     ZWEnum.new(%{
@@ -668,20 +676,6 @@ defmodule Grizzly.ZWave.Encoding do
       admin_code_not_supported: 0x0D,
       deactivation_not_supported: 0x0E,
       unspecified_error: 0x0F
-    })
-  end
-
-  @spec weekdays() :: ZWEnum.t()
-  def weekdays() do
-    ZWEnum.new(%{
-      unknown: 0x00,
-      monday: 0x01,
-      tuesday: 0x02,
-      wednesday: 0x03,
-      thursday: 0x04,
-      friday: 0x05,
-      saturday: 0x06,
-      sunday: 0x07
     })
   end
 
@@ -796,6 +790,14 @@ defmodule Grizzly.ZWave.Encoding do
       cooling_stage_2: 0x09,
       aux_heat_stage_2: 0x0A,
       aux_heat_stage_3: 0x0B
+    })
+  end
+
+  def string_encodings() do
+    ZWEnum.new(%{
+      ascii: 0x00,
+      extended_ascii: 0x01,
+      utf16: 0x02
     })
   end
 end
