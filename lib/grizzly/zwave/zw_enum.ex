@@ -166,6 +166,18 @@ defmodule Grizzly.ZWave.ZWEnum do
   end
 
   @doc """
+  Alias for `fetch/2`.
+  """
+  @spec encode(t(), k()) :: {:ok, v()} | :error
+  def encode(enum, k), do: fetch(enum, k)
+
+  @doc """
+  Alias for `fetch!/2`.
+  """
+  @spec encode!(t(), k()) :: v()
+  def encode!(enum, k), do: fetch!(enum, k)
+
+  @doc """
   Gets the key represented by the given value.
 
   ## Examples
@@ -202,6 +214,18 @@ defmodule Grizzly.ZWave.ZWEnum do
       :error -> raise KeyError, "value #{inspect(v)} not found in: #{inspect(enum)}"
     end
   end
+
+  @doc """
+  Alias for `fetch_key/2`.
+  """
+  @spec decode(t(), v()) :: {:ok, k()} | :error
+  def decode(enum, v), do: fetch_key(enum, v)
+
+  @doc """
+  Alias for `fetch_key!/2`.
+  """
+  @spec decode!(t(), v()) :: k()
+  def decode!(enum, v), do: fetch_key!(enum, v)
 
   @doc """
   Inserts the given `{key, value}` pair into the enum.

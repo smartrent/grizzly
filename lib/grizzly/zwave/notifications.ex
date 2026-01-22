@@ -4,6 +4,8 @@ defmodule Grizzly.ZWave.Notifications do
   Notification command class.
   """
 
+  import Grizzly.ZWave.Encoding
+
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
@@ -492,6 +494,7 @@ defmodule Grizzly.ZWave.Notifications do
      ]}
   end
 
+  # Keypad lock/unlock unlock operation
   def decode_event_params(:access_control, zwave_event, params_binary)
       when zwave_event in [:keypad_lock_operation, :keypad_unlock_operation] do
     with {:ok, user_code_report} <- Grizzly.ZWave.from_binary(params_binary) do
@@ -501,6 +504,61 @@ defmodule Grizzly.ZWave.Notifications do
         Logger.warning("[Grizzly] Failed to decode UserCodeReport from #{inspect(params_binary)}")
         decode_error
     end
+  end
+
+  def decode_event_params(:access_control, zwave_event, params_binary)
+      when zwave_event in [
+             :credential_lock_operation,
+             :credential_unlock_operation,
+             :valid_credential_denied_user_disabled,
+             :valid_credential_denied_user_schedule_not_active,
+             :messaging_user_code_entered_via_keypad
+           ] do
+    case decode_credential_usage_data(params_binary) do
+      {:ok, data} ->
+        {:ok, data}
+
+      :error ->
+        Logger.warning(
+          "[Grizzly] Failed to decode credential usage data from #{inspect(params_binary)}"
+        )
+
+        {:ok, []}
+    end
+  end
+
+  # Yale Pro 2 locks send a 2-byte user id for new user code added events
+  def decode_event_params(:access_control, zwave_event, <<user_id::16>>)
+      when zwave_event in [
+             :new_user_code_added,
+             :single_user_code_deleted
+           ] do
+    {:ok, [user_id: user_id]}
+  end
+
+  def decode_event_params(:access_control, zwave_event, params_binary)
+      when zwave_event in [
+             :single_user_code_deleted,
+             :new_user_code_added,
+             :new_user_code_not_added_duplicate
+           ] do
+    with {:ok, report} <- Grizzly.ZWave.from_binary(params_binary) do
+      {:ok, report.params}
+    else
+      {:error, %DecodeError{}} = decode_error ->
+        Logger.error(
+          "[Grizzly] Failed to params for access code event #{inspect(zwave_event)}: #{inspect(params_binary)}"
+        )
+
+        decode_error
+    end
+  rescue
+    e ->
+      Logger.error(
+        "[Grizzly] Failed to decode access control event params\n\n#{Exception.format(:error, e, __STACKTRACE__)}\n\n#{inspect(binding(), pretty: true)}"
+      )
+
+      {:ok, []}
   end
 
   def decode_event_params(:home_security, zwave_event, params_binary)
@@ -572,4 +630,21 @@ defmodule Grizzly.ZWave.Notifications do
 
     {:ok, [raw: :erlang.binary_to_list(params_binary)]}
   end
+
+  defp decode_credential_usage_data(<<user_id::16, _credentials_count::8, rest::binary>>) do
+    credentials_used =
+      for <<credential_type::8, credential_slot_id::16 <- rest>> do
+        credential_type =
+          case ZWEnum.decode(uc_credential_types(), credential_type) do
+            {:ok, ct} -> ct
+            :error -> credential_type
+          end
+
+        %{type: credential_type, slot_id: credential_slot_id}
+      end
+
+    {:ok, [user_id: user_id, credentials_used: credentials_used]}
+  end
+
+  defp decode_credential_usage_data(_binary), do: :error
 end
