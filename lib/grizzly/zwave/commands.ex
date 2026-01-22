@@ -76,7 +76,7 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :association_report, 0x03, default_params: [reports_to_follow: 0]
-    command :association_remove, 0x04
+    command :association_remove, 0x04, supports_supervision?: true
     command :association_groupings_get, 0x05, Cmds.Generic, params: []
 
     command :association_groupings_report, 0x06, Cmds.Generic,
@@ -464,7 +464,10 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :multi_channel_association_report, 0x03
-    command :multi_channel_association_remove, 0x04, Cmds.MultiChannelAssociationSetRemove
+
+    command :multi_channel_association_remove, 0x04, Cmds.MultiChannelAssociationSetRemove,
+      supports_supervision?: true
+
     command :multi_channel_association_groupings_get, 0x05, Cmds.Generic, params: []
     command :multi_channel_association_groupings_report, 0x06
   end

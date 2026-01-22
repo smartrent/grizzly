@@ -70,11 +70,19 @@ defmodule Grizzly.ZWave.Commands.Generic do
 
   # Alt base case: We ran out of binary before we ran out of params. That's okay
   # if the next param isn't required, but otherwise, we need to error out.
-  defp do_decode_params([{name, param_spec} | _params], <<>>, decoded_params) do
-    if param_spec.required do
-      {:error, %DecodeError{param: name, value: nil, reason: "unexpected end of command"}}
-    else
-      do_decode_params([], <<>>, decoded_params)
+  defp do_decode_params([{name, param_spec} | params], <<>>, decoded_params) do
+    cond do
+      param_spec.required and param_spec.size != :variable ->
+        {:error, %DecodeError{param: name, value: nil, reason: "unexpected end of command"}}
+
+      param_spec.type == :binary and param_spec.size == :variable ->
+        do_decode_params(params, <<>>, [{name, <<>>} | decoded_params])
+
+      param_spec.required ->
+        {:error, %DecodeError{param: name, value: nil, reason: "unexpected end of command"}}
+
+      true ->
+        do_decode_params(params, <<>>, [{name, nil} | decoded_params])
     end
   end
 
