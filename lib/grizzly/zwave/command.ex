@@ -8,8 +8,9 @@ defmodule Grizzly.ZWave.Command do
   alias Grizzly.ZWave.CommandSpec
   alias Grizzly.ZWave.DecodeError
 
-  @type delay_seconds() :: non_neg_integer()
-
+  @typedoc """
+  Command-specific payload parameters.
+  """
   @type params() :: Keyword.t()
 
   @typedoc """
@@ -121,6 +122,9 @@ defmodule Grizzly.ZWave.Command do
     end
   end
 
+  @doc """
+  Returns true if the param exists in the command's parameter list.
+  """
   @spec has_param?(t(), atom()) :: boolean()
   def has_param?(command, param) do
     Keyword.has_key?(command.params, param)

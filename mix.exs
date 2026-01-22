@@ -113,6 +113,12 @@ defmodule Grizzly.MixProject do
           Grizzly.Trace,
           Grizzly.Trace.Record
         ],
+        "Command Definitions": [
+          Grizzly.ZWave.Command,
+          Grizzly.ZWave.Commands,
+          Grizzly.ZWave.CommandSpec,
+          Grizzly.ZWave.ParamSpec
+        ],
         Behaviours: [
           Grizzly.CommandHandler,
           Grizzly.FirmwareUpdateHandler,
@@ -137,7 +143,6 @@ defmodule Grizzly.MixProject do
         ],
         "Z-Wave": [
           Grizzly.ZWave,
-          Grizzly.ZWave.Command,
           Grizzly.ZWave.CommandClass,
           Grizzly.ZWave.DeviceClass,
           Grizzly.ZWave.DeviceClasses,
@@ -148,6 +153,7 @@ defmodule Grizzly.MixProject do
           Grizzly.ZWave.QRCode,
           ~r/^Grizzly\.ZWave\.Security/,
           ~r/^Grizzly\.ZWave\.SmartStart/,
+          Grizzly.ZWave.ZWEnum,
           Grizzly.Inclusions.ZWaveAdapter
         ],
         Transports: [
@@ -162,7 +168,6 @@ defmodule Grizzly.MixProject do
         ]
       ],
       nest_modules_by_prefix: [
-        Grizzly.VirtualDevices,
         Grizzly.ZWave.CommandClasses,
         Grizzly.ZWave.Commands
       ],

@@ -149,12 +149,7 @@ controller asking for a report these are called unsolicited messages. A concrete
 example of this is when you manually unlock a lock, the controller will receive
 a message from the device if the associations are setup correctly (see
 `Grizzly.Node.set_lifeline_association/2` for more information). You can listen
-for these reports using one of the following functions:
-
-- `Grizzly.subscribe_command/1`
-- `Grizzly.subscribe_commands/1`
-- `Grizzly.subscribe_node/1`
-- `Grizzly.subscribe_nodes/1`
+for these reports using `Grizzly.subscribe/2`.
 
 ```elixir
 Grizzly.subscribe_command(:door_lock_operation_report)

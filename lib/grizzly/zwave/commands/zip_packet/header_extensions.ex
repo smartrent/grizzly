@@ -3,7 +3,6 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   Functions for working with the header extension in a Z/IP Packet.
   """
 
-  alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.EncapsulationFormatInfo
   alias Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaintenanceReport
   alias Grizzly.ZWave.Encoding
@@ -13,7 +12,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
   @type encapsulation_format_info :: :crc16 | EncapsulationFormatInfo.security()
 
   @type extension ::
-          {:expected_delay, Command.delay_seconds()}
+          {:expected_delay, non_neg_integer()}
           | {:installation_and_maintenance_report, list()}
           | :installation_and_maintenance_get
           | {:encapsulation_format_info, [encapsulation_format_info()]}

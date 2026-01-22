@@ -86,6 +86,12 @@ defmodule Grizzly.VirtualDevices do
     end
   end
 
+  @doc """
+  Get a virtual device's configuration.
+  """
+  @spec get_device(id()) :: device_entry() | nil
+  defdelegate get_device(device_id), to: VirtualDevicesRegistry, as: :get
+
   defp register(device_id, device_impl, device_opts) do
     device_class = device_impl.device_spec(device_opts)
 

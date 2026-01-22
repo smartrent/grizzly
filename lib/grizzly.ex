@@ -153,11 +153,13 @@ defmodule Grizzly do
   @doc """
   Guard for checking if device is a virtual device or not
   """
+  @doc group: "Node Info"
   defguard is_virtual_device(device_id) when is_tuple(device_id)
 
   @doc """
   Check to if the device id is a virtual device or a regular Z-Wave devices
   """
+  @doc group: "Node Info"
   @spec virtual_device?(:gateway | ZWave.node_id() | VirtualDevices.id()) :: boolean()
   def virtual_device?(device_id) do
     is_virtual_device(device_id)
@@ -204,6 +206,7 @@ defmodule Grizzly do
   * `{:error, :firmware_updating}` - the Z-Wave controller is undergoing a firmware update
   * `{:error, reason}` - see `t:Grizzly.send_command_response/0`
   """
+  @doc group: "Sending Commands"
   @spec send_command(
           ZWave.node_id() | :gateway | VirtualDevices.id(),
           command(),
@@ -285,6 +288,7 @@ defmodule Grizzly do
 
       {:grizzly, :binary_response, <<...>>}
   """
+  @doc group: "Sending Commands"
   @spec send_binary(ZWave.node_id(), binary()) :: :ok | {:error, :including | :firmware_updating}
   def send_binary(node_id, binary) do
     with :ok <- can_send_command?() do
@@ -293,54 +297,10 @@ defmodule Grizzly do
     end
   end
 
-  @spec subscribe(Events.subject() | [Events.subject()], Events.subscribe_opts()) :: :ok
-  defdelegate subscribe(subject, opts \\ []), to: Events
-
-  @doc """
-  Subscribe to unsolicited events for the given command.
-  """
-  @deprecated "Use `subscribe/2` instead"
-  @spec subscribe_command(command()) :: :ok
-  def subscribe_command(command_name, opts \\ []), do: Events.subscribe(command_name, opts)
-
-  @doc """
-  Unsubscribe from an unsolicited event.
-  """
-  @deprecated "Use `subscribe/2` instead"
-  @spec unsubscribe_command(command()) :: :ok
-  def unsubscribe_command(command_name), do: Events.unsubscribe(command_name)
-
-  @doc """
-  Subscribe to unsolicited events for multiple commands.
-  """
-  @deprecated "Use `subscribe/2` instead"
-  @spec subscribe_commands([command()]) :: :ok
-  def subscribe_commands(command_names, opts \\ []), do: Events.subscribe(command_names, opts)
-
-  @doc """
-  Subscribe to all events from a particular Z-Wave device.
-  """
-  @deprecated "Use `subscribe/2` instead"
-  @spec subscribe_node(node_id()) :: :ok
-  def subscribe_node(node_id, opts \\ []), do: Events.subscribe(node_id, opts)
-
-  @doc """
-  Subscribe to all events from a group of Z-Wave devices.
-  """
-  @deprecated "Use `subscribe/2` instead"
-  @spec subscribe_nodes([node_id()]) :: :ok
-  def subscribe_nodes(node_ids, opts \\ []), do: Events.subscribe(node_ids, opts)
-
-  @doc """
-  Delete a subscription created with `subscribe_node/1`.
-  """
-  @deprecated "Use `subscribe/2` instead"
-  @spec unsubscribe_node(node_id()) :: :ok
-  def unsubscribe_node(node_id), do: Events.unsubscribe(node_id)
-
   @doc """
   List all supported Z-Wave commands.
   """
+  @doc group: "Command Info"
   @spec list_commands() :: [atom()]
   def list_commands() do
     Map.keys(Commands.builtin_commands())
@@ -349,6 +309,7 @@ defmodule Grizzly do
   @doc """
   List the supported Z-Wave commands for a particular command class.
   """
+  @doc group: "Command Info"
   @spec commands_for_command_class(atom()) :: [atom()]
   def commands_for_command_class(command_class_name) do
     Commands.builtin_commands()
@@ -362,6 +323,7 @@ defmodule Grizzly do
   Sends a no-op command to the given node to check its reachability. Transmission
   stats are enabled by default.
   """
+  @doc group: "Sending Commands"
   @spec ping(ZWave.node_id(), [command_opt()]) :: send_command_response()
   def ping(node_id, opts \\ []) do
     opts = Keyword.put_new(opts, :transmission_stats, true)
@@ -371,6 +333,7 @@ defmodule Grizzly do
   @doc """
   Reports the gateway's current background RSSI (noise).
   """
+  @doc group: "Network Info"
   @spec background_rssi() :: {:ok, [RssiReport.param()]} | {:error, any()}
   def background_rssi() do
     case send_command(:gateway, :rssi_get) do
@@ -386,16 +349,9 @@ defmodule Grizzly do
   end
 
   @doc """
-  Whether Grizzly supports sending the given command with supervision.
-  """
-  @spec can_supervise_command?(Grizzly.command()) :: boolean()
-  defdelegate can_supervise_command?(command_name),
-    to: Grizzly.ZWave.Commands,
-    as: :supports_supervision?
-
-  @doc """
   Starts the Z/IP Gateway process if it is not already running.
   """
+  @doc group: "Z/IP Gateway"
   @spec start_zipgateway :: :ok | {:error, atom()}
   defdelegate start_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
 
@@ -403,22 +359,27 @@ defmodule Grizzly do
   Restarts the Z/IP Gateway process. An error will be raised if `Grizzly.ZIPGateway.Supervisor`
   is not running.
   """
+  @doc group: "Z/IP Gateway"
   @spec restart_zipgateway :: :ok
   defdelegate restart_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
 
   @doc "Stops the Z/IP Gateway process if it is running."
+  @doc group: "Z/IP Gateway"
   @spec stop_zipgateway :: :ok
   defdelegate stop_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
 
   @doc "Is Z/IP Gateway ready?"
+  @doc group: "Z/IP Gateway"
   @spec zipgateway_ready?() :: boolean()
   defdelegate zipgateway_ready?(), to: Grizzly.ZIPGateway.ReadyChecker, as: :ready?
 
   @doc "Get the current inclusion status."
+  @doc group: "Z/IP Gateway"
   @spec inclusion_status() :: Inclusions.status()
   defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get
 
   @doc "Get the listening mode of a node"
+  @doc group: "Node Info"
   @spec listening_mode(integer) ::
           {:ok, Grizzly.ZIPGateway.Database.listening_mode()} | nil
   defdelegate listening_mode(node_id), to: Grizzly.ZIPGateway.Database
@@ -427,11 +388,47 @@ defmodule Grizzly do
   @spec firmware_update_progress_timeout() :: non_neg_integer()
   defdelegate firmware_update_progress_timeout(), to: FirmwareUpdateRunner, as: :progress_timeout
 
+  @doc group: "Events"
+  @spec subscribe(Events.subject() | [Events.subject()], Events.subscribe_opts()) :: :ok
+  defdelegate subscribe(subject, opts \\ []), to: Events
+
+  @doc group: "Events"
+  @spec unsubscribe(Events.subject() | [Events.subject()]) :: :ok
+  defdelegate unsubscribe(subject), to: Events
+
+  @doc group: "Command Info"
+  defdelegate command_spec(command_name), to: Commands, as: :spec_for
+
+  @doc group: "Command Info"
+  defdelegate command_spec!(command_name), to: Commands, as: :spec_for!
+
+  @doc group: "Sending Commands"
+  defdelegate create_command(command_name, params), to: Commands, as: :create
+
+  @doc group: "Sending Commands"
+  defdelegate create_command!(command_name, params), to: Commands, as: :create!
+
+  @doc group: "Sending Commands"
+  defdelegate encode_command(command), to: ZWave, as: :to_binary
+
+  @doc group: "Sending Commands"
+  defdelegate decode_command(binary), to: ZWave, as: :from_binary
+
+  @doc """
+  Whether Grizzly supports sending the given command with supervision.
+  """
+  @spec can_supervise_command?(Grizzly.command()) :: boolean()
+  @doc group: "Command Info"
+  defdelegate can_supervise_command?(command_name),
+    to: Grizzly.ZWave.Commands,
+    as: :supports_supervision?
+
   @doc """
   Returns the network's home id. Returns nil if Grizzly is started with `run_zipgateway: false`
   or if Z/IP Gateway has not yet logged the home id.
   """
   @spec home_id() :: binary() | nil
+  @doc group: "Network Info"
   def home_id() do
     case GenServer.whereis(ZIPGateway.LogMonitor) do
       nil -> nil
@@ -443,6 +440,7 @@ defmodule Grizzly do
   Returns the network encryption keys. Returns nil if Grizzly is started with
   `run_zipgateway: false` or if Z/IP Gateway has not yet logged the network keys.
   """
+  @doc group: "Network Info"
   @spec network_keys() :: [{ZIPGateway.LogMonitor.network_key_type(), binary()}] | nil
   def network_keys() do
     case GenServer.whereis(ZIPGateway.LogMonitor) do
@@ -455,6 +453,7 @@ defmodule Grizzly do
   Returns the network encryption keys formatted for use with the Zniffer application.
   See `Grizzly.ZIPGateway.LogMonitor.zniffer_network_keys/1` for more information.
   """
+  @doc group: "Network Info"
   @spec zniffer_network_keys() :: binary() | nil
   def zniffer_network_keys() do
     case GenServer.whereis(ZIPGateway.LogMonitor) do
@@ -475,8 +474,13 @@ defmodule Grizzly do
       nil
   end
 
+  @doc """
+  Whether commands can currently be sent. Returns false when in inclusion mode
+  or if a firmware update is in progress.
+  """
+  @doc group: "Network Info"
   @spec can_send_command?() :: :ok | {:error, :including | :firmware_updating}
-  defp can_send_command?() do
+  def can_send_command?() do
     including? = Inclusions.inclusion_running?()
     updating_firmware? = FirmwareUpdates.firmware_update_running?()
 
