@@ -46,12 +46,18 @@ defmodule Grizzly.Trace.Record do
 
     prefix = "#{Time.to_string(ts)} #{src_to_string(src)} -> #{dest_to_string(dest)}"
 
-    case ZWave.from_binary(binary) do
-      {:ok, zip_packet} ->
-        "#{prefix} #{command_info_str(zip_packet, binary)}"
+    try do
+      case ZWave.from_binary(binary) do
+        {:ok, zip_packet} ->
+          "#{prefix} #{command_info_str(zip_packet, binary)}"
 
-      {:error, _} ->
-        "#{prefix} #{inspect(binary, limit: 500)}"
+        {:error, _} ->
+          "#{prefix} #{inspect(binary, limit: 500)}"
+      end
+    rescue
+      e ->
+        Logger.error(Exception.format(:error, e, __STACKTRACE__))
+        "#{prefix} DECODING ERROR #{inspect(binary, limit: 500)}"
     end
   end
 
@@ -115,7 +121,15 @@ defmodule Grizzly.Trace.Record do
     command = Command.param!(zip_packet, :command)
     command_binary = ZIPPacket.unwrap(binary)
 
-    "#{seq_number_to_str(seq_number)} #{command.name} #{inspect(command_binary, limit: 500)}"
+    with :supervision_get <- command.name,
+         encap_bin = Command.param!(command, :encapsulated_command),
+         {:ok, inner_command} <-
+           Grizzly.ZWave.from_binary(encap_bin) do
+      "#{seq_number_to_str(seq_number)} supervision_get(#{inner_command.name}) #{inspect(encap_bin, limit: 500)}"
+    else
+      _ ->
+        "#{seq_number_to_str(seq_number)} #{command.name} #{inspect(command_binary, limit: 500)}"
+    end
   rescue
     err ->
       Logger.error("""
