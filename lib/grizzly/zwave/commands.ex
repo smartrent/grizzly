@@ -1406,6 +1406,14 @@ defmodule Grizzly.ZWave.Commands do
     end
   end
 
+  @spec create!(atom(), keyword()) :: Grizzly.ZWave.Command.t()
+  def create!(command_name, params \\ []) do
+    command_name
+    |> spec_for!()
+    |> Command.new(params)
+    |> then(fn {:ok, cmd} -> cmd end)
+  end
+
   @spec decode(binary()) ::
           {:ok, Command.t()} | {:error, DecodeError.t() | ZWaveError.t()}
   def decode(<<0x00>>) do
