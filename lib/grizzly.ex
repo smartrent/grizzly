@@ -206,7 +206,7 @@ defmodule Grizzly do
   * `{:error, :firmware_updating}` - the Z-Wave controller is undergoing a firmware update
   * `{:error, reason}` - see `t:Grizzly.send_command_response/0`
   """
-  @doc group: "Sending Commands"
+  @doc group: "Commands"
   @spec send_command(
           ZWave.node_id() | :gateway | VirtualDevices.id(),
           command(),
@@ -288,7 +288,7 @@ defmodule Grizzly do
 
       {:grizzly, :binary_response, <<...>>}
   """
-  @doc group: "Sending Commands"
+  @doc group: "Commands"
   @spec send_binary(ZWave.node_id(), binary()) :: :ok | {:error, :including | :firmware_updating}
   def send_binary(node_id, binary) do
     with :ok <- can_send_command?() do
@@ -300,7 +300,7 @@ defmodule Grizzly do
   @doc """
   List all supported Z-Wave commands.
   """
-  @doc group: "Command Info"
+  @doc group: "Commands"
   @spec list_commands() :: [atom()]
   def list_commands() do
     Map.keys(Commands.builtin_commands())
@@ -309,7 +309,7 @@ defmodule Grizzly do
   @doc """
   List the supported Z-Wave commands for a particular command class.
   """
-  @doc group: "Command Info"
+  @doc group: "Commands"
   @spec commands_for_command_class(atom()) :: [atom()]
   def commands_for_command_class(command_class_name) do
     Commands.builtin_commands()
@@ -323,7 +323,7 @@ defmodule Grizzly do
   Sends a no-op command to the given node to check its reachability. Transmission
   stats are enabled by default.
   """
-  @doc group: "Sending Commands"
+  @doc group: "Commands"
   @spec ping(ZWave.node_id(), [command_opt()]) :: send_command_response()
   def ping(node_id, opts \\ []) do
     opts = Keyword.put_new(opts, :transmission_stats, true)
@@ -374,7 +374,7 @@ defmodule Grizzly do
   defdelegate zipgateway_ready?(), to: Grizzly.ZIPGateway.ReadyChecker, as: :ready?
 
   @doc "Get the current inclusion status."
-  @doc group: "Z/IP Gateway"
+  @doc group: "Network Info"
   @spec inclusion_status() :: Inclusions.status()
   defdelegate inclusion_status(), to: Inclusions.StatusServer, as: :get
 
@@ -383,6 +383,9 @@ defmodule Grizzly do
   @spec listening_mode(integer) ::
           {:ok, Grizzly.ZIPGateway.Database.listening_mode()} | nil
   defdelegate listening_mode(node_id), to: Grizzly.ZIPGateway.Database
+
+  @doc group: "Node Info"
+  defdelegate node_info(node_id, opts \\ []), to: Grizzly.Node, as: :get_info
 
   @doc "How long in milliseconds before a device firmware update times out because of inactivity"
   @spec firmware_update_progress_timeout() :: non_neg_integer()
@@ -396,29 +399,35 @@ defmodule Grizzly do
   @spec unsubscribe(Events.subject() | [Events.subject()]) :: :ok
   defdelegate unsubscribe(subject), to: Events
 
-  @doc group: "Command Info"
+  @doc group: "Commands"
   defdelegate command_spec(command_name), to: Commands, as: :spec_for
 
-  @doc group: "Command Info"
+  @doc group: "Commands"
   defdelegate command_spec!(command_name), to: Commands, as: :spec_for!
 
-  @doc group: "Sending Commands"
-  defdelegate create_command(command_name, params), to: Commands, as: :create
+  @doc group: "Commands"
+  defdelegate create_command(command_name, params \\ []), to: Commands, as: :create
 
-  @doc group: "Sending Commands"
-  defdelegate create_command!(command_name, params), to: Commands, as: :create!
+  @doc group: "Commands"
+  defdelegate create_command!(command_name, params \\ []), to: Commands, as: :create!
 
-  @doc group: "Sending Commands"
+  @doc group: "Commands"
   defdelegate encode_command(command), to: ZWave, as: :to_binary
 
-  @doc group: "Sending Commands"
+  @doc group: "Commands"
   defdelegate decode_command(binary), to: ZWave, as: :from_binary
+
+  @doc group: "Network Info"
+  defdelegate all_node_ids(), to: Grizzly.Network, as: :get_all_node_ids
+
+  @doc group: "Network Info"
+  defdelegate failed_node_ids(), to: Grizzly.Network, as: :report_failed_node_ids
 
   @doc """
   Whether Grizzly supports sending the given command with supervision.
   """
   @spec can_supervise_command?(Grizzly.command()) :: boolean()
-  @doc group: "Command Info"
+  @doc group: "Commands"
   defdelegate can_supervise_command?(command_name),
     to: Grizzly.ZWave.Commands,
     as: :supports_supervision?
