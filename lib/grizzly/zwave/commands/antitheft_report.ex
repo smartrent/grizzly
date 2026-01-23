@@ -18,23 +18,24 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Antitheft
   alias Grizzly.ZWave.DecodeError
 
+  @type status ::
+          :protection_disabled_unlocked
+          | :protection_enabled_locked_fully_functional
+          | :protection_enabled_locked_restricted
+
   @type param ::
-          {:status, Antitheft.status()}
+          {:status, status()}
           | {:manufacturer_id, non_neg_integer}
           | {:antitheft_hint, String.t()}
           | {:locking_entity_id, non_neg_integer}
 
   @impl Grizzly.ZWave.Command
   def encode_params(_spec, command) do
-    status_byte = Command.param!(command, :status) |> Antitheft.status_to_byte()
+    status_byte = Command.param!(command, :status) |> status_to_byte()
     manufacturer_id = Command.param!(command, :manufacturer_id)
-
-    antitheft_hint =
-      Command.param!(command, :antitheft_hint) |> Antitheft.validate_magic_code_or_hint()
-
+    antitheft_hint = Command.param!(command, :antitheft_hint)
     locking_entity_id = Command.param(command, :locking_entity_id)
 
     if locking_entity_id == nil do
@@ -55,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
         <<status_byte, manufacturer_id::16, antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length), locking_entity_id::16>>
       ) do
-    with {:ok, status} <- Antitheft.status_from_byte(status_byte) do
+    with {:ok, status} <- status_from_byte(status_byte) do
       {:ok,
        [
          status: status,
@@ -75,7 +76,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
         <<status_byte, manufacturer_id::16, antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length)>>
       ) do
-    with {:ok, status} <- Antitheft.status_from_byte(status_byte) do
+    with {:ok, status} <- status_from_byte(status_byte) do
       {:ok,
        [
          status: status,
@@ -87,4 +88,13 @@ defmodule Grizzly.ZWave.Commands.AntitheftReport do
         {:error, %DecodeError{decode_error | command: :antitheft_report}}
     end
   end
+
+  defp status_to_byte(:protection_disabled_unlocked), do: 0x01
+  defp status_to_byte(:protection_enabled_locked_fully_functional), do: 0x02
+  defp status_to_byte(:protection_enabled_locked_restricted), do: 0x03
+
+  defp status_from_byte(0x01), do: {:ok, :protection_disabled_unlocked}
+  defp status_from_byte(0x02), do: {:ok, :protection_enabled_locked_fully_functional}
+  defp status_from_byte(0x03), do: {:ok, :protection_enabled_locked_restricted}
+  defp status_from_byte(byte), do: {:error, %DecodeError{value: byte, param: :status}}
 end

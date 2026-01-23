@@ -19,10 +19,9 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Antitheft
 
   @type param ::
-          {:state, Antitheft.lock_state()}
+          {:state, :locked | :unlocked}
           | {:magic_code, String.t()}
           | {:manufacturer_id, non_neg_integer}
           | {:antitheft_hint, String.t()}
@@ -30,12 +29,10 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
 
   @impl Grizzly.ZWave.Command
   def encode_params(_spec, command) do
-    state_bit = Command.param!(command, :state) |> Antitheft.state_to_bit()
-    magic_code = Command.param!(command, :magic_code) |> Antitheft.validate_magic_code_or_hint()
+    state_bit = Command.param!(command, :state) |> state_to_bit()
+    magic_code = Command.param!(command, :magic_code)
     manufacturer_id = Command.param!(command, :manufacturer_id)
-
-    antitheft_hint =
-      Command.param!(command, :antitheft_hint) |> Antitheft.validate_magic_code_or_hint()
+    antitheft_hint = Command.param!(command, :antitheft_hint)
 
     locking_entity_id = Command.param(command, :locking_entity_id)
 
@@ -62,7 +59,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
           manufacturer_id::16, antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length), locking_entity_id::16>>
       ) do
-    state = Antitheft.state_from_bit(state_bit)
+    state = state_from_bit(state_bit)
 
     {:ok,
      [
@@ -81,7 +78,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
           manufacturer_id::16, antitheft_hint_length,
           antitheft_hint::binary-size(antitheft_hint_length)>>
       ) do
-    state = Antitheft.state_from_bit(state_bit)
+    state = state_from_bit(state_bit)
 
     {:ok,
      [
@@ -91,4 +88,10 @@ defmodule Grizzly.ZWave.Commands.AntitheftSet do
        antitheft_hint: antitheft_hint
      ]}
   end
+
+  defp state_to_bit(:unlocked), do: 0x00
+  defp state_to_bit(:locked), do: 0x01
+
+  defp state_from_bit(0x00), do: :unlocked
+  defp state_from_bit(0x01), do: :locked
 end

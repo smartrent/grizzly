@@ -800,4 +800,17 @@ defmodule Grizzly.ZWave.Encoding do
       utf16: 0x02
     })
   end
+
+  def credential_learn_statuses() do
+    ZWEnum.new(
+      started: 0x00,
+      success: 0x01,
+      already_in_progress: 0x02,
+      ended_not_due_to_timeout: 0x03,
+      timeout: 0x04,
+      learn_step_retry: 0x05,
+      invalid_add_operation: 0xFE,
+      invalid_modify_operation: 0xFF
+    )
+  end
 end
