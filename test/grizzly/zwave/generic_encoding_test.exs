@@ -27,6 +27,14 @@ defmodule Grizzly.ZWave.GenericEncodingTest do
         {:central_scene_configuration_set, [slow_refresh: false], <<0x5B, 0x04, 0x00>>},
         {:central_scene_configuration_report, [slow_refresh: true], <<0x5B, 0x06, 0x80>>},
         {:central_scene_configuration_report, [slow_refresh: false], <<0x5B, 0x06, 0x00>>},
+        {:credential_learn_status_report,
+         [
+           status: :started,
+           user_id: 1,
+           credential_type: :password,
+           credential_slot: 1,
+           steps_remaining: 5
+         ], <<0x83, 0x11, 0, 1::16, 2, 1::16, 5>>},
         {:association_get, [grouping_identifier: 2], <<0x85, 0x02, 0x02>>},
         {:association_groupings_report, [supported_groupings: 3], <<0x85, 0x06, 0x03>>},
         {:association_specific_group_report, [group: 5], <<0x85, 0x0C, 0x05>>},

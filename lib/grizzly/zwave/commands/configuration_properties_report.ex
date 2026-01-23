@@ -39,14 +39,15 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.Configuration
   alias Grizzly.ZWave.DecodeError
+
+  @type format :: :signed_integer | :unsigned_integer | :enumerated | :bit_field
 
   @type param ::
           {:param_number, non_neg_integer()}
           | {:read_only, boolean | nil}
           | {:altering_capabilities, boolean | nil}
-          | {:format, Configuration.format()}
+          | {:format, format()}
           | {:size, 0 | 1 | 2 | 4}
           | {:min_value, integer | nil}
           | {:max_value, integer | nil}
@@ -60,8 +61,8 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
     param_number = Command.param!(command, :param_number)
     next_param_number = Command.param!(command, :next_param_number)
     format = Command.param!(command, :format)
-    format_byte = Configuration.format_to_byte(format)
-    size = Command.param!(command, :size) |> Configuration.validate_size()
+    format_byte = format_to_byte(format)
+    size = Command.param!(command, :size)
 
     read_only_bit = Command.param(command, :read_only, false) |> bool_to_bit()
 
@@ -79,7 +80,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
         <<param_number::16, altering_capabilities_bit::1, read_only_bit::1, format_byte::3,
           0x00::3, next_param_number::16, maybe_more::binary>>
       ) do
-    with {:ok, format} <- Configuration.format_from_byte(format_byte) do
+    with {:ok, format} <- format_from_byte(format_byte) do
       case maybe_more do
         # < v4
         <<>> ->
@@ -116,7 +117,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
           size::3, min_value_bin::binary-size(size), max_value_bin::binary-size(size),
           default_value_bin::binary-size(size), next_param_number::16, maybe_more::binary>>
       ) do
-    with {:ok, format} <- Configuration.format_from_byte(format_byte) do
+    with {:ok, format} <- format_from_byte(format_byte) do
       value_specs = [
         min_value: value_spec(size, format, min_value_bin),
         max_value: value_spec(size, format, max_value_bin),
@@ -205,4 +206,15 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
         value
     end
   end
+
+  defp format_to_byte(:signed_integer), do: 0x00
+  defp format_to_byte(:unsigned_integer), do: 0x01
+  defp format_to_byte(:enumerated), do: 0x02
+  defp format_to_byte(:bit_field), do: 0x03
+
+  defp format_from_byte(0x00), do: {:ok, :signed_integer}
+  defp format_from_byte(0x01), do: {:ok, :unsigned_integer}
+  defp format_from_byte(0x02), do: {:ok, :enumerated}
+  defp format_from_byte(0x03), do: {:ok, :bit_field}
+  defp format_from_byte(byte), do: {:error, %DecodeError{param: :format, value: byte}}
 end

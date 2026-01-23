@@ -1190,7 +1190,15 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :credential_learn_cancel, 0x10, Cmds.Generic, params: []
-    command :credential_learn_status_report, 0x11
+
+    command :credential_learn_status_report, 0x11, Cmds.Generic,
+      params: [
+        enum(:status, Encoding.credential_learn_statuses(), size: 8),
+        user_id,
+        credential_type,
+        credential_slot,
+        param(:steps_remaining, :uint, size: 8)
+      ]
 
     command :user_credential_association_set, 0x12, Cmds.Generic,
       params: [

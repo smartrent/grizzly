@@ -20,10 +20,11 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
   @behaviour Grizzly.ZWave.Command
 
   alias Grizzly.ZWave.Command
-  alias Grizzly.ZWave.CommandClasses.AntitheftUnlock
+
+  @type state :: :locked | :unlocked
 
   @type param ::
-          {:state, AntitheftUnlock.state()}
+          {:state, state()}
           | {:restricted, boolean}
           | {:manufacturer_id, non_neg_integer}
           | {:antitheft_hint, String.t()}
@@ -31,10 +32,10 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
 
   @impl Grizzly.ZWave.Command
   def encode_params(_spec, command) do
-    state_bit = Command.param!(command, :state) |> AntitheftUnlock.state_to_bit()
+    state_bit = Command.param!(command, :state) |> state_to_bit()
     restricted? = Command.param!(command, :restricted)
     restricted_bit = if restricted?, do: 1, else: 0
-    hint = Command.param!(command, :antitheft_hint) |> AntitheftUnlock.validate_hint()
+    hint = Command.param!(command, :antitheft_hint)
     manufacturer_id = Command.param!(command, :manufacturer_id)
     locking_entity_id = Command.param!(command, :locking_entity_id)
 
@@ -49,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
         <<_reserved::2, hint_length::4, restricted_bit::1, state_bit::1,
           hint::binary-size(hint_length), manufacturer_id::16, locking_entity_id::16>>
       ) do
-    state = AntitheftUnlock.state_from_bit(state_bit)
+    state = state_from_bit(state_bit)
     restricted? = restricted_bit == 1
 
     {:ok,
@@ -61,4 +62,10 @@ defmodule Grizzly.ZWave.Commands.AntitheftUnlockReport do
        locking_entity_id: locking_entity_id
      ]}
   end
+
+  defp state_to_bit(:unlocked), do: 0x00
+  defp state_to_bit(:locked), do: 0x01
+
+  defp state_from_bit(0x00), do: :unlocked
+  defp state_from_bit(0x01), do: :locked
 end
