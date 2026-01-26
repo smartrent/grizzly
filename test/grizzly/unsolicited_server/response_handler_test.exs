@@ -8,22 +8,40 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandlerTest do
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.Commands.ZIPPacket
 
-  setup_all do
-    options = %Options{associations_file: "/tmp/response_handler_assocs"}
-    {:ok, _} = Associations.start_link(options, name: :response_handler_assocs)
+  setup ctx do
+    assoc_server = :"#{ctx.test} #{System.unique_integer([:positive])} response_handler_assocs"
+    multi_ch_server = :"#{ctx.test} #{System.unique_integer([:positive])} multi_channel_assocs"
 
-    multi_channel_options = %Options{
-      associations_file: "/tmp/response_handler_assocs_multi_channel"
-    }
+    file1 =
+      Path.join(
+        System.tmp_dir(),
+        "grizzly-#{System.unique_integer()}-response_handler_assocs.bin"
+      )
 
-    {:ok, _} = Associations.start_link(multi_channel_options, name: :multi_channel_assocs)
+    options = %Options{associations_file: file1}
+    child_spec = Associations.child_spec([options, [name: assoc_server]])
+    start_supervised!(%{child_spec | id: assoc_server})
+
+    file2 =
+      Path.join(
+        System.tmp_dir(),
+        "grizzly-#{System.unique_integer()}-response_handler_assocs_multi_channel.bin"
+      )
+
+    options = %Options{associations_file: file2}
+    child_spec = Associations.child_spec([options, [name: multi_ch_server]])
+    start_supervised!(%{child_spec | id: multi_ch_server})
 
     on_exit(fn ->
-      File.rm("/tmp/response_handler_assocs")
-      File.rm("/tmp/response_handler_assocs_multi_channel")
+      File.rm(file1)
+      File.rm(file2)
     end)
 
-    {:ok, %{assoc_server: :response_handler_assocs, multi_channel_server: :multi_channel_assocs}}
+    {:ok,
+     %{
+       assoc_server: assoc_server,
+       multi_channel_server: multi_ch_server
+     }}
   end
 
   test "handle non-extra command" do

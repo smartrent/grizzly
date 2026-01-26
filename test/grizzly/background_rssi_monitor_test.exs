@@ -6,12 +6,17 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
 
   setup :set_mimic_global
 
-  setup do
-    :alarm_handler.clear_alarm(Grizzly.HighBackgroundRSSIAlarm)
+  setup ctx do
+    alarm_id = :"#{ctx.test}_high_background_rssi_alarm"
+    ctx = Map.put(ctx, :alarm_id, alarm_id)
+
+    :alarm_handler.clear_alarm(alarm_id)
 
     on_exit(fn ->
-      :alarm_handler.clear_alarm(Grizzly.HighBackgroundRSSIAlarm)
+      :alarm_handler.clear_alarm(alarm_id)
     end)
+
+    {:ok, ctx}
   end
 
   test "calculating averages", ctx do
@@ -47,11 +52,13 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
            ]
   end
 
-  test "sets and clears alarms", ctx do
+  test "sets and clears alarms", %{alarm_id: alarm_id} = ctx do
     pid =
-      start_link_supervised!({BackgroundRSSIMonitor, [name: ctx.test, sample_interval: false]})
+      start_link_supervised!(
+        {BackgroundRSSIMonitor, [name: ctx.test, sample_interval: false, alarm_id: alarm_id]}
+      )
 
-    Alarmist.subscribe(Grizzly.HighBackgroundRSSIAlarm)
+    Alarmist.subscribe(alarm_id)
 
     expect Grizzly.background_rssi(),
       num_calls: 2,
@@ -64,11 +71,11 @@ defmodule Grizzly.BackgroundRSSIMonitorTest do
     BackgroundRSSIMonitor.__sample__(pid)
     BackgroundRSSIMonitor.__sample__(pid)
     BackgroundRSSIMonitor.__sample__(pid)
-    refute Grizzly.HighBackgroundRSSIAlarm in Alarmist.get_alarm_ids()
+    refute alarm_id in Alarmist.get_alarm_ids()
 
     BackgroundRSSIMonitor.__sample__(pid)
-    assert_receive %Alarmist.Event{id: Grizzly.HighBackgroundRSSIAlarm, state: :set}, 500
-    assert Grizzly.HighBackgroundRSSIAlarm in Alarmist.get_alarm_ids()
+    assert_receive %Alarmist.Event{id: ^alarm_id, state: :set}, 500
+    assert alarm_id in Alarmist.get_alarm_ids()
 
     {:ok, averages} = BackgroundRSSIMonitor.get_averages(pid)
 

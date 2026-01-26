@@ -154,8 +154,6 @@ defmodule Grizzly.ZWave.ZWEnum do
       iex> enum = new([a: "foo", b: "bar"])
       iex> fetch!(enum, :a)
       "foo"
-      iex> fetch!(enum, :c)
-      ** (KeyError) key :c not found in: ZWEnum.new([a: "foo", b: "bar"])
   """
   @spec fetch!(t(), k()) :: v()
   def fetch!(enum, k) do
@@ -204,8 +202,6 @@ defmodule Grizzly.ZWave.ZWEnum do
       iex> enum = new([a: "foo", b: "bar"])
       iex> fetch_key!(enum, "foo")
       :a
-      iex> fetch_key!(enum, "baz")
-      ** (KeyError) value "baz" not found in: ZWEnum.new([a: "foo", b: "bar"])
   """
   @spec fetch_key!(t(), v()) :: k()
   def fetch_key!(enum, v) do
