@@ -47,6 +47,7 @@ defmodule Grizzly.BackgroundRSSIMonitor do
     classic_threshold = Keyword.get(opts, :classic_threshold, @default_classic_threshold)
     lr_threshold = Keyword.get(opts, :lr_threshold, @default_lr_threshold)
     sample_interval = Keyword.get(opts, :sample_interval, @default_sample_interval)
+    alarm_id = Keyword.get(opts, :alarm_id, @alarm_id)
     name = Keyword.get(opts, :name, __MODULE__)
 
     GenServer.start_link(
@@ -54,7 +55,8 @@ defmodule Grizzly.BackgroundRSSIMonitor do
       [
         classic_threshold: classic_threshold,
         lr_threshold: lr_threshold,
-        sample_interval: sample_interval
+        sample_interval: sample_interval,
+        alarm_id: alarm_id
       ],
       name: name
     )
@@ -72,7 +74,8 @@ defmodule Grizzly.BackgroundRSSIMonitor do
        classic_threshold: opts[:classic_threshold],
        lr_threshold: opts[:lr_threshold],
        sample_interval: opts[:sample_interval],
-       history: CircularBuffer.new(@history_size)
+       history: CircularBuffer.new(@history_size),
+       alarm_id: opts[:alarm_id]
      }}
   end
 
@@ -134,9 +137,9 @@ defmodule Grizzly.BackgroundRSSIMonitor do
          (is_number(ch2) and ch2 >= state.classic_threshold) or
          (is_number(lr_primary) and lr_primary >= state.lr_threshold) or
          (is_number(lr_secondary) and lr_secondary >= state.lr_threshold) do
-      :alarm_handler.set_alarm({@alarm_id, []})
+      :alarm_handler.set_alarm({state.alarm_id, []})
     else
-      :alarm_handler.clear_alarm(@alarm_id)
+      :alarm_handler.clear_alarm(state.alarm_id)
     end
   end
 

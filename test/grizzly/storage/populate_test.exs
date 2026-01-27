@@ -1,5 +1,5 @@
 defmodule Grizzly.Storage.PopulateTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Exqlite.Sqlite3
   alias Grizzly.Storage
@@ -17,7 +17,7 @@ defmodule Grizzly.Storage.PopulateTest do
       Sqlite3.close(test_db)
     end)
 
-    start_link_supervised!({Storage.Populate, disabled: false, database: test_db})
+    start_supervised!({Storage.Populate, disabled: false, database: test_db})
     Process.sleep(100)
 
     assert Storage.get(["migrated_zipgateway_db"]) == true
