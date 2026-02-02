@@ -30,8 +30,7 @@ defmodule Grizzly.Requests.Handlers.WaitReportTest do
 
     literal_packets =
       Grizzly.Trace.list()
-      # Filter out packets that are not relevant to the test. Needed because
-      # BackgroundRSSIMonitor is running and sending RSSI Get commands to node 1.
+      # Filter out packets that are not relevant to the test.
       |> Enum.reject(&(&1.src == 1 or &1.dest == 1))
       |> Enum.map(&binary_slice(&1.binary, 7..-1//1))
       |> Enum.reject(&(&1 == ""))

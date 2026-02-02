@@ -16,7 +16,6 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunnerTest do
   @moduletag timeout: :timer.minutes(3)
 
   setup_all do
-    Supervisor.terminate_child(Grizzly.Supervisor, Grizzly.BackgroundRSSIMonitor)
     Supervisor.terminate_child(Grizzly.Supervisor, Grizzly.ZIPGateway.ReadyChecker)
   end
 
