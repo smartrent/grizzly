@@ -167,7 +167,6 @@ defmodule Grizzly.Supervisor do
           | {:zw_programmer_path, Path.t()}
           | {:inclusion_adapter, module()}
           | {:trace_options, [Trace.trace_opt()]}
-          | {:background_rssi_monitor, [Grizzly.BackgroundRSSIMonitor.opt()]}
           | {:storage_adapter, {module(), Storage.Adapter.adapter_options()}}
           | {:storage_options, PropertyTable.options()}
 
@@ -243,10 +242,7 @@ defmodule Grizzly.Supervisor do
 
       # Supervisor for running commands
       Grizzly.Requests.RequestRunnerSupervisor,
-      ReadyChecker,
-      if(options.background_rssi_monitor != false,
-        do: {Grizzly.BackgroundRSSIMonitor, options.background_rssi_monitor}
-      )
+      ReadyChecker
     ]
     |> otw_update_runner(options)
     |> Enum.reject(&is_nil/1)

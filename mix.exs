@@ -101,7 +101,6 @@ defmodule Grizzly.MixProject do
         Core: [
           Grizzly,
           ~r/^Grizzly\.Associations/,
-          Grizzly.BackgroundRSSIMonitor,
           Grizzly.Events,
           Grizzly.Inclusions,
           Grizzly.Indicator,
