@@ -38,7 +38,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation.Extensions do
   end
 
   # Splits extensions into a list of binaries but doesn't decode them yet.
-  @spec split_extensions(<<_::16, _::_*8>>, [raw_extension()]) :: {[raw_extension()], binary()}
+  @spec split_extensions(binary(), [raw_extension()]) :: {[raw_extension()], binary()}
   defp split_extensions(
          <<length::8, more_to_follow?::1, critical?::1, type::6, data::binary-size(length),
            rest::binary>>,
