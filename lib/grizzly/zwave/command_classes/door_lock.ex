@@ -24,7 +24,8 @@ defmodule Grizzly.ZWave.CommandClasses.DoorLock do
 
   @type door_components :: :bolt | :latch | :door
 
-  @spec mode_to_byte(mode()) :: byte()
+  @spec mode_to_byte(mode()) ::
+          0x00 | 0x01 | 0x10 | 0x11 | 0x20 | 0x21 | 0xFF | 0xFE
   def mode_to_byte(:unsecured), do: 0x00
   def mode_to_byte(:unsecured_with_timeout), do: 0x01
   def mode_to_byte(:unsecured_inside_door_handles), do: 0x10

@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInclusion do
   def node_add_status_to_byte(:failed), do: 0x07
   def node_add_status_to_byte(:security_failed), do: 0x09
 
-  @spec tx_opt_to_byte(tx_opt()) :: byte()
+  @spec tx_opt_to_byte(tx_opt()) :: 0x00 | 0x02 | 0x20
   def tx_opt_to_byte(:null), do: 0x00
   def tx_opt_to_byte(:low_power), do: 0x02
   def tx_opt_to_byte(:explore), do: 0x20

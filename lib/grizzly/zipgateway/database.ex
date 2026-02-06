@@ -52,7 +52,7 @@ defmodule Grizzly.ZIPGateway.Database do
           {:portable, boolean()} | {:just_added, String.t()} | {:added_by, String.t()}
 
   @type version_capability ::
-          :version_get | :version_command_class_get | :version_zwave_software_get
+          {:version_get | :version_command_class_get | :version_zwave_software_get, boolean()}
 
   @type zwave_node :: %{
           id: Grizzly.zwave_node_id(),
@@ -63,11 +63,11 @@ defmodule Grizzly.ZIPGateway.Database do
           product_type: 0..0xFFFF,
           product_id: 0..0xFFFF,
           mode: [mode_flag()],
-          security_flags: [security_flag()],
+          security_flags: nonempty_list(security_flag()),
           properties_flags: [properties_flag()],
           probe_state: probe_state(),
           state: node_state(),
-          version_capabilities: [{version_capability(), boolean()}],
+          version_capabilities: nonempty_list(version_capability()),
           basic_device_class: DeviceClasses.basic_device_class() | nil,
           wake_up_interval: non_neg_integer() | nil
         }
@@ -375,7 +375,7 @@ defmodule Grizzly.ZIPGateway.Database do
   Decodes a node's Version CC capabilities bitmask stored in the
   `nodes.node_version_cap_and_zwave_sw` field into a keyword list.
   """
-  @spec decode_version_capabilities(integer()) :: [{version_capability(), boolean()}]
+  @spec decode_version_capabilities(integer()) :: nonempty_list(version_capability())
   def decode_version_capabilities(caps) do
     version_get = band(caps, 0x01) != 0
     version_command_class_get = band(caps, 0x02) != 0
@@ -410,7 +410,8 @@ defmodule Grizzly.ZIPGateway.Database do
   @doc """
   Decodes the bitmask stored in the `nodes.security_flags` field into a keyword list.
   """
-  @spec decode_security_flags(integer()) :: [security_flag()]
+
+  @spec decode_security_flags(integer()) :: nonempty_list(security_flag())
   def decode_security_flags(flags) do
     [
       s0: band(flags, 0x01) != 0,

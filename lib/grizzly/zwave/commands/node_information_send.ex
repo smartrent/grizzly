@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.NodeInformationSend do
     |> Enum.filter(&Function.identity/1)
   end
 
-  @spec tx_opt_to_byte(tx_opt()) :: byte()
+  @spec tx_opt_to_byte(tx_opt()) :: 0x01 | 0x02 | 0x10 | 0x20
   defp tx_opt_to_byte(:ack), do: 0x01
   defp tx_opt_to_byte(:low_power), do: 0x02
   defp tx_opt_to_byte(:no_route), do: 0x10

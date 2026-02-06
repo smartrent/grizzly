@@ -35,7 +35,7 @@ defmodule Grizzly.ZWave.Commands.DefaultSetComplete do
     end
   end
 
-  @spec status_to_byte(status()) :: byte()
+  @spec status_to_byte(status()) :: 0x06 | 0x07
   defp status_to_byte(:done), do: 0x06
   defp status_to_byte(:busy), do: 0x07
 

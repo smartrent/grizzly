@@ -32,7 +32,7 @@ defmodule Grizzly.ZWave do
     Commands.decode(binary)
   end
 
-  @spec to_binary(Command.t()) :: binary()
+  @spec to_binary(Command.t()) :: nonempty_binary()
   def to_binary(command) do
     Command.to_binary(command)
   end

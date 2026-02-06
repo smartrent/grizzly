@@ -129,7 +129,7 @@ defmodule Grizzly.ZWave.Encoding do
   Uses the representation defined in the Node Naming and User Credential command
   classes.
   """
-  @spec encode_string_encoding(string_encoding()) :: byte()
+  @spec encode_string_encoding(string_encoding()) :: 0x00 | 0x01 | 0x02
   def encode_string_encoding(:ascii), do: 0x00
   def encode_string_encoding(:extended_ascii), do: 0x01
   def encode_string_encoding(:utf16), do: 0x02

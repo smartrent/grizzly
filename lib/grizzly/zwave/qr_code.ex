@@ -47,7 +47,7 @@ defmodule Grizzly.ZWave.QRCode do
 
   @lead_in "90"
 
-  @spec decode(<<_::16, _::_*8>>) :: {:ok, t()} | {:error, :invalid_dsk}
+  @spec decode(binary()) :: {:ok, t()} | {:error, :invalid_dsk}
   def decode(@lead_in <> binary) do
     {version, binary} = String.split_at(binary, 2)
     {_checksum, binary} = String.split_at(binary, 5)

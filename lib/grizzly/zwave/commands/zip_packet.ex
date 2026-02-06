@@ -20,7 +20,6 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
           | :nack_waiting
           | :nack_queue_full
           | :nack_option_error
-          | :invalid
 
   @type param ::
           {:command, Command.t() | nil}
@@ -77,7 +76,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
   Removes the Z/IP Packet encapsulation from a command and returns the original command
   as a binary.
   """
-  @spec unwrap(binary()) :: binary()
+  @spec unwrap(<<_::56, _::_*8>>) :: binary()
   def unwrap(
         <<0x23, 0x02, _flag_byte, meta_byte, _seq_number, _source, _dest,
           extensions_and_command::binary>>
@@ -99,7 +98,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     end
   end
 
-  @spec flag_to_byte(flag() | nil) :: byte()
+  @spec flag_to_byte(flag() | nil) :: 0x00 | 0x80 | 0x40 | 0x20 | 0x30 | 0x28 | 0x24
   defp flag_to_byte(nil), do: 0x00
   defp flag_to_byte(:ack_request), do: 0x80
   defp flag_to_byte(:ack_response), do: 0x40
@@ -229,7 +228,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     binary_packet <> <<header_extensions_size>> <> header_extensions_bin
   end
 
-  @spec maybe_add_command(binary(), Command.t() | binary() | nil) :: binary()
+  @spec maybe_add_command(nonempty_binary(), Command.t() | binary() | nil) :: binary()
   defp maybe_add_command(zip_packet, nil), do: zip_packet
   defp maybe_add_command(zip_packet, command) when is_binary(command), do: zip_packet <> command
   defp maybe_add_command(zip_packet, command), do: zip_packet <> Command.to_binary(command)

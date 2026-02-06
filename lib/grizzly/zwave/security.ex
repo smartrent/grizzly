@@ -44,7 +44,7 @@ defmodule Grizzly.ZWave.Security do
   @doc """
   Get the list of available security keys
   """
-  @spec keys() :: [key()]
+  @spec keys() :: nonempty_list(key())
   def keys() do
     [:s2_unauthenticated, :s2_authenticated, :s2_access_control, :s0]
   end
@@ -64,7 +64,8 @@ defmodule Grizzly.ZWave.Security do
   @doc """
   Decode a byte representation of the key exchanged failed type
   """
-  @spec failed_type_from_byte(byte()) :: key_exchange_fail_type()
+  @spec failed_type_from_byte(0x00 | 0x01 | 0x02 | 0x03 | 0x05 | 0x06 | 0x07 | 0x08 | 0x09 | 0x0A) ::
+          key_exchange_fail_type()
   def failed_type_from_byte(0x00), do: :none
   def failed_type_from_byte(0x01), do: :key
   def failed_type_from_byte(0x02), do: :scheme
@@ -76,7 +77,8 @@ defmodule Grizzly.ZWave.Security do
   def failed_type_from_byte(0x09), do: :verify
   def failed_type_from_byte(0x0A), do: :report
 
-  @spec failed_type_to_byte(key_exchange_fail_type()) :: byte()
+  @spec failed_type_to_byte(key_exchange_fail_type()) ::
+          0x00 | 0x01 | 0x02 | 0x03 | 0x05 | 0x06 | 0x07 | 0x08 | 0x09 | 0x0A
   def failed_type_to_byte(:none), do: 0x00
   def failed_type_to_byte(:key), do: 0x01
   def failed_type_to_byte(:scheme), do: 0x02

@@ -463,7 +463,7 @@ defmodule Grizzly do
   See `Grizzly.ZIPGateway.LogMonitor.zniffer_network_keys/1` for more information.
   """
   @doc group: "Network Info"
-  @spec zniffer_network_keys() :: binary() | nil
+  @spec zniffer_network_keys() :: String.t() | nil
   def zniffer_network_keys() do
     case GenServer.whereis(ZIPGateway.LogMonitor) do
       nil -> nil

@@ -42,8 +42,26 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
 
   @type modifier_type :: :dne | :unknown | :zwave | :local | :other
 
+  @type admin_pin_code_report_status ::
+          :modified
+          | :unmodified
+          | :response_to_get
+          | :duplicate
+          | :manufacturer_security_rules
+          | :admin_code_not_supported
+          | :deactivation_not_supported
+          | :unspecified_error
+
+  @type association_set_status ::
+          :success
+          | :credential_type_invalid
+          | :credential_slot_invalid
+          | :credential_slot_empty
+          | :destination_user_id_invalid
+          | :destination_user_id_nonexistent
+
   @doc "Encodes a credential rule to a byte value"
-  @spec encode_credential_rule(credential_rule()) :: byte()
+  @spec encode_credential_rule(credential_rule()) :: 1 | 2 | 3
   def encode_credential_rule(:single), do: 1
   def encode_credential_rule(:dual), do: 2
   def encode_credential_rule(:triple), do: 3
@@ -56,7 +74,7 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_credential_rule(_), do: :unknown
 
   @doc "Encodes a user type to a byte value"
-  @spec encode_user_type(user_type()) :: byte()
+  @spec encode_user_type(user_type()) :: 0x00 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x09
   def encode_user_type(:general), do: 0x00
   def encode_user_type(:programming), do: 0x03
   def encode_user_type(:non_access), do: 0x04
@@ -77,7 +95,7 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_user_type(_), do: :unknown
 
   @doc "Encodes a user operation to a byte value"
-  @spec encode_user_operation(user_operation()) :: byte()
+  @spec encode_user_operation(user_operation()) :: 0x00 | 0x01 | 0x02
   def encode_user_operation(:add), do: 0x00
   def encode_user_operation(:modify), do: 0x01
   def encode_user_operation(:delete), do: 0x02
@@ -90,7 +108,8 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_user_operation(_), do: :unknown
 
   @doc "Encodes a credential type to a byte value"
-  @spec encode_credential_type(credential_type()) :: byte()
+  @spec encode_credential_type(credential_type()) ::
+          0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 | 0x09 | 0x0A | 0x0B
   def encode_credential_type(:none), do: 0x00
   def encode_credential_type(:pin_code), do: 0x01
   def encode_credential_type(:password), do: 0x02
@@ -121,7 +140,7 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_credential_type(_), do: :unknown
 
   @doc "Encodes credential operation to a byte value"
-  @spec encode_credential_operation(credential_operation()) :: byte()
+  @spec encode_credential_operation(credential_operation()) :: 0x00 | 0x01 | 0x02
   def encode_credential_operation(:add), do: 0x00
   def encode_credential_operation(:modify), do: 0x01
   def encode_credential_operation(:delete), do: 0x02
@@ -134,7 +153,7 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_credential_operation(_), do: :unknown
 
   @doc "Encodes modifier type to a byte value"
-  @spec encode_modifier_type(modifier_type()) :: byte()
+  @spec encode_modifier_type(modifier_type()) :: 0x00 | 0x01 | 0x02 | 0x03 | 0x04
   def encode_modifier_type(:dne), do: 0x00
   def encode_modifier_type(:unknown), do: 0x01
   def encode_modifier_type(:zwave), do: 0x02
@@ -167,7 +186,8 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_credential_data(_, data), do: data
 
   @doc "Encodes the status field in an Admin Pin Code Report command"
-  @spec encode_admin_pin_code_set_status(status :: atom()) :: byte()
+  @spec encode_admin_pin_code_set_status(admin_pin_code_report_status()) ::
+          0x01 | 0x03 | 0x04 | 0x07 | 0x08 | 0x0D | 0x0E | 0x0F
   def encode_admin_pin_code_set_status(:modified), do: 0x01
   def encode_admin_pin_code_set_status(:unmodified), do: 0x03
   def encode_admin_pin_code_set_status(:response_to_get), do: 0x04
@@ -190,7 +210,8 @@ defmodule Grizzly.ZWave.CommandClasses.UserCredential do
   def decode_admin_pin_code_set_status(_), do: :unknown
 
   @doc "Encodes status field in a User Credential Association Report command"
-  @spec encode_association_set_status(status :: atom()) :: byte()
+  @spec encode_association_set_status(association_set_status()) ::
+          0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05
   def encode_association_set_status(:success), do: 0x00
   def encode_association_set_status(:credential_type_invalid), do: 0x01
   def encode_association_set_status(:credential_slot_invalid), do: 0x02
