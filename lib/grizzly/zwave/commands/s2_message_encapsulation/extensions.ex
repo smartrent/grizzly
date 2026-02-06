@@ -5,7 +5,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation.Extensions do
 
   import Grizzly.ZWave.Encoding
 
-  @type extension_type :: :span | :mpan | :mgrp | :mos
+  @type extension_type :: :span | :mpan | :mgrp | :mos | :unsupported
 
   @type t :: [extension()]
 
@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.Commands.S2MessageEncapsulation.Extensions do
 
   @type raw_extension :: %{
           critical?: boolean(),
-          type: extension_type() | :unsupported,
+          type: extension_type(),
           data: binary()
         }
 
