@@ -36,7 +36,7 @@ defmodule Grizzly.VirtualDevices do
   @typedoc """
   Id for a virtual device
   """
-  @type id() :: {:virtual, non_neg_integer()}
+  @type id() :: {:virtual, pos_integer()}
 
   @type device_entry() :: %{
           device_impl: Device.t(),

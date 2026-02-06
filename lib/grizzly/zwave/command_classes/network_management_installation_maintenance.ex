@@ -13,7 +13,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   @type route_type ::
           :no_route | :last_working_route | :next_to_last_working_route | :set_by_application
   @type speeds :: [speed()]
-  @type speed :: :"9.6kbit/s" | :"40kbit/s" | :"100kbit/s" | :reserved
+  @type speed :: :"9.6kbit/s" | :"40kbit/s" | :"100kbit/s"
   @type statistics :: [statistic]
   @type statistic ::
           {:route_changes, byte}
@@ -30,7 +30,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
   @type rssi ::
           :rssi_not_available | :rssi_max_power_saturated | :rssi_below_sensitivity | -124..127
 
-  @spec route_type_to_byte(route_type) :: byte
+  @spec route_type_to_byte(route_type) :: 0x00 | 0x01 | 0x02 | 0x10
   def route_type_to_byte(type) do
     case type do
       :no_route -> 0x00
@@ -51,7 +51,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     end
   end
 
-  @spec speed_to_byte(speed()) :: byte()
+  @spec speed_to_byte(speed()) :: 0x01 | 0x02 | 0x03
   def speed_to_byte(speed) do
     case speed do
       :"9.6kbit/s" -> 0x01
@@ -78,7 +78,7 @@ defmodule Grizzly.ZWave.CommandClasses.NetworkManagementInstallationMaintenance 
     if :"100kbit/s" in speeds, do: byte ||| 0x04, else: byte
   end
 
-  @spec neighbor_speeds_from_byte(byte) :: {:ok, speeds}
+  @spec neighbor_speeds_from_byte(byte) :: {:ok, speeds()}
   defp neighbor_speeds_from_byte(byte) do
     case byte do
       0x01 -> {:ok, [:"9.6kbit/s"]}

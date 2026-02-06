@@ -12,7 +12,7 @@ defmodule Grizzly.Storage.Populate do
 
   require Logger
 
-  @spec start_link(any()) :: GenServer.on_start()
+  @spec start_link(Keyword.t()) :: GenServer.on_start()
   def start_link(opts) do
     database = Keyword.get(opts, :database, Grizzly.options().database_file)
 

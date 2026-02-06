@@ -36,6 +36,9 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
 
   @type t() :: %{uuid: uuid(), format: format()}
 
+  @type parse_error() ::
+          :critical_bit_set | :invalid_binary | :invalid_format | :invalid_uuid_length
+
   defguardp is_format_hex(value) when value in [0, 2, 4]
   defguardp is_format_ascii(value) when value in [1, 3, 5]
   defguardp is_format_rfc4122(value) when value == 6
@@ -76,7 +79,7 @@ defmodule Grizzly.ZWave.SmartStart.MetaExtension.UUID16 do
   If the format in the binary is not part of the defined Z-Wave specification
   this will return `{:error, :invalid_format}`
   """
-  @spec parse(binary) :: {:ok, t()} | {:error, any()}
+  @spec parse(binary) :: {:ok, t()} | {:error, parse_error()}
   def parse(<<0x03::7, 0::1, 0x11, presentation_format, uuid::binary>>) do
     with {:ok, uuid_string} <- uuid_from_binary(presentation_format, uuid),
          {:ok, format} <- format_from_byte(presentation_format) do

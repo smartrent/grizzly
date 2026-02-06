@@ -32,7 +32,8 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
           | {:scale, scale()}
           | {:value, number()}
 
-  @spec encode_type(type) :: byte
+  @spec encode_type(type) ::
+          0x00 | 0x01 | 0x02 | 0x07 | 0x08 | 0x09 | 0x0A | 0x0B | 0x0C | 0x0D | 0x0E | 0x0F
   def encode_type(:na), do: 0x00
   def encode_type(:heating), do: 0x01
   def encode_type(:cooling), do: 0x02
@@ -60,7 +61,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetpoint do
   def decode_type(0x0F), do: :full_power
   def decode_type(_na_type), do: :na
 
-  @spec encode_scale(scale) :: byte
+  @spec encode_scale(scale) :: 0x00 | 0x01
   def encode_scale(:c), do: 0x00
   def encode_scale(:f), do: 0x01
 

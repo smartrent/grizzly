@@ -11,7 +11,7 @@ defmodule Grizzly.ZWave.CommandClasses.ThermostatSetback do
   @type type :: :no_override | :temporary_override | :permanent_override
   @type state :: number | :frost_protection | :energy_saving
 
-  @spec encode_type(type) :: byte
+  @spec encode_type(type) :: 0x00 | 0x01 | 0x02
   def encode_type(:no_override), do: 0x00
   def encode_type(:temporary_override), do: 0x01
   def encode_type(:permanent_override), do: 0x02

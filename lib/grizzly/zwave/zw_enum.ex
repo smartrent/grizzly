@@ -16,7 +16,7 @@ defmodule Grizzly.ZWave.ZWEnum do
   @doc """
   Creates a new empty `ZWEnum`.
   """
-  @spec new() :: t()
+  @spec new() :: %__MODULE__{keys: %{}, values: %{}}
   def new(), do: %__MODULE__{}
 
   @doc """

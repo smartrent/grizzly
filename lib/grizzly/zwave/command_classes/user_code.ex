@@ -10,7 +10,6 @@ defmodule Grizzly.ZWave.CommandClasses.UserCode do
           | :messaging
           | :passage
           | :status_not_available
-          | :unknown
           | byte()
 
   @type extended_user_id :: 0x0000..0xFFFF
@@ -20,7 +19,7 @@ defmodule Grizzly.ZWave.CommandClasses.UserCode do
           required(:user_code) => String.t()
         }
 
-  @type keypad_mode :: :normal | :vacation | :privacy | :lockout | :unknown
+  @type keypad_mode :: :normal | :vacation | :privacy | :lockout
 
   @spec user_id_status_to_byte(user_id_status()) :: byte()
   def user_id_status_to_byte(:available), do: 0x00
@@ -40,12 +39,11 @@ defmodule Grizzly.ZWave.CommandClasses.UserCode do
   def user_id_status_from_byte(0xFE), do: :status_not_available
   def user_id_status_from_byte(v), do: v
 
-  @spec keypad_mode_from_byte(byte()) :: keypad_mode()
+  @spec keypad_mode_from_byte(0x00 | 0x01 | 0x02 | 0x03) :: keypad_mode()
   def keypad_mode_from_byte(0x00), do: :normal
   def keypad_mode_from_byte(0x01), do: :vacation
   def keypad_mode_from_byte(0x02), do: :privacy
   def keypad_mode_from_byte(0x03), do: :lockout
-  def keypad_mode_from_byte(_), do: :unknown
 
   @spec keypad_mode_to_byte(keypad_mode()) :: 0 | 1 | 2 | 3
   def keypad_mode_to_byte(:normal), do: 0x00

@@ -20,7 +20,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   @doc """
   Returns the network home id as extracted from the Z/IP Gateway logs.
   """
-  @spec home_id(GenServer.name()) :: binary() | nil
+  @spec home_id(GenServer.server()) :: binary() | nil
   def home_id(name \\ __MODULE__) do
     GenServer.call(name, :home_id)
   end
@@ -28,7 +28,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   @doc """
   Returns a keyword list of the network keys extracted from the Z/IP Gateway logs.
   """
-  @spec network_keys(GenServer.name()) :: [{network_key_type(), binary()}]
+  @spec network_keys(GenServer.server()) :: [{network_key_type(), binary()}]
   def network_keys(name \\ __MODULE__) do
     GenServer.call(name, :network_keys)
   end
@@ -37,7 +37,7 @@ defmodule Grizzly.ZIPGateway.LogMonitor do
   Returns a string containing a filename and network keys formatted for use with the
   Zniffer application (available through Simplicity Studio on Windows).
   """
-  @spec zniffer_network_keys(GenServer.name()) :: binary() | nil
+  @spec zniffer_network_keys(GenServer.server()) :: String.t() | nil
   def zniffer_network_keys(name \\ __MODULE__) do
     home_id = home_id(name)
     network_keys = network_keys(name)

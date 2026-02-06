@@ -45,7 +45,7 @@ defmodule Grizzly.ZWave.Commands.FailedNodeReplace do
     end
   end
 
-  @spec encode_mode(mode()) :: byte()
+  @spec encode_mode(mode()) :: 0x01 | 0x05 | 0x07
   defp encode_mode(:start_failed_node_replace), do: 0x01
   defp encode_mode(:stop_failed_node_replace), do: 0x05
   defp encode_mode(:start_failed_node_replace_s2), do: 0x07

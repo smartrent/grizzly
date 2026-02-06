@@ -73,6 +73,8 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   """
   @type door_state :: :open | :closed
 
+  @type door_handle_enable_value :: :enabled | :disabled
+
   @type timeout_minutes :: 0x00..0xFD | :undefined
 
   @type timeout_seconds :: 0x00..0x3B | :undefined
@@ -233,7 +235,12 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
   defp timeout_minutes_to_byte(m) when m >= 0 and m <= 0xFC, do: m
   defp timeout_minutes_to_byte(:undefined), do: 0xFE
 
-  @spec door_handles_modes_from_byte(byte()) :: %{(1..4) => :enabled | :disabled}
+  @spec door_handles_modes_from_byte(byte()) :: %{
+          1 => door_handle_enable_value(),
+          2 => door_handle_enable_value(),
+          3 => door_handle_enable_value(),
+          4 => door_handle_enable_value()
+        }
   defp door_handles_modes_from_byte(byte) do
     <<_::4, handle_4::1, handle_3::1, handle_2::1, handle_1::1>> =
       <<byte>>
@@ -246,7 +253,7 @@ defmodule Grizzly.ZWave.Commands.DoorLockOperationReport do
     }
   end
 
-  @spec door_handle_enable_value_from_bit(0 | 1) :: :enabled | :disabled
+  @spec door_handle_enable_value_from_bit(0 | 1) :: door_handle_enable_value()
   defp door_handle_enable_value_from_bit(1), do: :enabled
   defp door_handle_enable_value_from_bit(0), do: :disabled
 

@@ -29,7 +29,7 @@ defmodule Grizzly.MixProject do
 
   def cli do
     [
-      preferred_envs: ["hex.publish": :docs, docs: :docs, dialyzer: :test]
+      preferred_envs: ["hex.publish": :docs, docs: :docs]
     ]
   end
 
@@ -43,10 +43,10 @@ defmodule Grizzly.MixProject do
       {:cerlc, "~> 0.2"},
       {:circuits_uart, "~> 1.0"},
       {:circular_buffer, "~> 1.0 or ~> 0.4.2"},
-      {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:credo_binary_patterns, "~> 0.2.6", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ctr_drbg, "~> 0.1"},
-      {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:test, :dev], runtime: false},
       {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
       {:exmodem, "~> 0.1"},
       {:exqlite, "~> 0.33"},
@@ -72,7 +72,7 @@ defmodule Grizzly.MixProject do
       end
 
     [
-      flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return],
+      flags: [:unmatched_returns, :error_handling, :missing_return, :extra_return, :underspecs],
       plt_add_apps: [:mix, :ex_unit]
     ] ++ ci_opts
   end
