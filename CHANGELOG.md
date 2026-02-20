@@ -2,6 +2,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.1.0]
+
+### Removed
+
+* `Grizzly.BackgroundRSSIMonitor` has been removed ([#1214](https://github.com/smartrent/grizzly/pull/1214))
+
 ## [v9.0.0]
 
 ### Changed
@@ -17,4 +23,5 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 For Grizzly v8 and older, see the [v8 changelog](https://github.com/smartrent/grizzly/blob/maint/v8/CHANGELOG.md).
 
+[v9.1.0]: https://github.com/smartrent/grizzly/compare/v9.0.0..v9.1.0
 [v9.0.0]: https://github.com/smartrent/grizzly/compare/v8.15.3..v9.0.0
