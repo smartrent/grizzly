@@ -19,7 +19,7 @@ defmodule Grizzly.ZWave.CommandsTest do
     assert Enum.empty?(diff), """
     The following command modules are not used by any of the commands listed in Grizzly.list_commands/0:
 
-      * #{Enum.map_join(diff, "\n  * ", &inspect/1)}
+      * #{diff |> Enum.sort() |> Enum.map_join("\n  * ", &inspect/1)}
     """
   end
 end

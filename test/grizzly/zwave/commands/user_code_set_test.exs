@@ -5,11 +5,6 @@ defmodule Grizzly.ZWave.Commands.UserCodeSetTest do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands
 
-  test "creates the command and validates params" do
-    assert {:ok, _command} =
-             Commands.create(:user_code_set, user_id: 1, status: :available, user_code: "1234")
-  end
-
   describe "encodes params correctly" do
     test "setting user code available" do
       {:ok, command} =

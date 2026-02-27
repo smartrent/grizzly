@@ -1,7 +1,121 @@
 defmodule Grizzly.ZWave.CommandSpec do
   @moduledoc """
-  Data structure describing a Z-Wave command, including how to create, encode,
-  and decode it.
+  Specification for a Z-Wave command defining its structure and behavior.
+
+  A `CommandSpec` describes everything needed to work with a Z-Wave command:
+  - Identity (name, command class, command byte)
+  - How to encode parameters into binary format
+  - How to decode binary data back into parameters
+  - Default parameter values
+  - Report matching for request/response correlation
+  - Handler configuration for asynchronous operations
+
+  ## Role in the System
+
+  CommandSpecs serve as the bridge between high-level command usage and low-level
+  binary Z-Wave protocol. They are typically created automatically by the macro system
+  when commands are defined in `Grizzly.ZWave.Commands`.
+
+  ## Two Approaches to Command Specifications
+
+  ### 1. Declarative (Generic) Commands
+
+  Commands defined with parameter specifications use `Grizzly.ZWave.Commands.Generic`
+  for encoding/decoding:
+
+      command :switch_binary_set, 0x01, Cmds.Generic,
+        params: [
+          param(:value, :uint, size: 8),
+          param(:duration, :uint, size: 8, default: 0)
+        ]
+
+  The resulting CommandSpec has:
+  - `encode_fun: {Generic, :encode_params}`
+  - `decode_fun: {Generic, :decode_params}`
+  - `params:` List of `{name, ParamSpec}` tuples
+
+  ### 2. Custom Implementation Commands
+
+  Commands with complex requirements specify their own module:
+
+      command :alarm_report, 0x05  # Uses Grizzly.ZWave.Commands.AlarmReport
+
+  The resulting CommandSpec has:
+  - `encode_fun: {AlarmReport, :encode_params}`
+  - `decode_fun: {AlarmReport, :decode_params}`
+  - Module must implement `Grizzly.ZWave.Command` behavior
+
+  ## Examples
+
+      # Create a command spec programmatically (usually done by macros)
+      spec = CommandSpec.new(
+        name: :switch_binary_set,
+        command_class: :switch_binary,
+        command_byte: 0x01,
+        module: Cmds.Generic,
+        params: [
+          {:value, %ParamSpec{name: :value, type: :uint, size: 8}}
+        ]
+      )
+
+      # Use it to create and encode a command
+      {:ok, cmd} = CommandSpec.create_command(spec, value: 255)
+      binary = apply(spec.encode_fun, [spec, cmd])
+
+      # Decode a binary using the spec
+      {:ok, params} = apply(spec.decode_fun, [spec, <<0xFF>>])
+      #=> {:ok, [value: 255]}
+
+  ## Report Matching
+
+  Z-Wave commands often follow a request/response pattern where a "get" command
+  expects a corresponding "report" command as a response. The CommandSpec supports
+  two levels of report matching:
+
+  ### 1. Command Name Matching (`:report`)
+
+  The simplest approach matches by command name only:
+
+      command :thermostat_mode_get, 0x02, Cmds.Generic,
+        report: :thermostat_mode_report,
+        params: []
+
+  When a `:thermostat_mode_get` is sent, the system waits for any
+  `:thermostat_mode_report` response.
+
+  ### 2. Parameter-Based Matching (`:report_matcher_fun`)
+
+  For commands where multiple requests may be in flight, or where the report must
+  match specific parameter values from the request, use a matcher function:
+
+      command :user_code_get, 0x02, Cmds.Generic,
+        report: :user_code_report,
+        report_matcher_fun: {UserCode, :report_matches_get?},
+        params: [param(:user_identifier, :uint, size: 8)]
+
+      # In the UserCode module:
+      def report_matches_get?(get_cmd, report_cmd) do
+        Command.param!(get_cmd, :user_identifier) ==
+          Command.param!(report_cmd, :user_identifier)
+      end
+
+  This ensures the response matches not just the command type, but also has the
+  same `:user_identifier` value as the request. This is critical when multiple
+  user code requests are outstanding simultaneously.
+
+  **Matcher Function Signature:**
+  - Takes two arguments: the original get/request command and the received report
+  - Returns `true` if the report matches the request, `false` otherwise
+  - Can compare any parameter values between the two commands
+
+  ## Validation
+
+  CommandSpecs can include validation functions to ensure parameter correctness:
+
+      command :user_code_set, 0x01, Cmds.UserCodeSet,
+        validate_fun: {UserCodeSet, :validate_params}
+
+  See `validate_params/2` for details on implementing validation.
   """
 
   alias Grizzly.Requests.Handlers.AckResponse
@@ -70,19 +184,38 @@ defmodule Grizzly.ZWave.CommandSpec do
         required: false,
         doc: """
         A 2-arity function or `{module, function}` tuple used to match a
-        report command to a get command. The first argument will be the get
-        command and the second argument will be the report command to match.
-        The function should return `true` if the report matches the get.
+        report command to a get/request command based on parameter values.
+
+        The first argument is the original get/request command, and the second
+        argument is the received report command. The function should return `true`
+        if the report matches the request, `false` otherwise.
+
+        This is essential when:
+        - Multiple requests of the same type may be outstanding simultaneously
+        - The response must match specific parameter values from the request
+        - Example: user_code_get must match user_code_report with same user_identifier
+
+        If not specified, reports are matched by command name only (via `:report` field).
         """
       ],
       report: [
         type: :atom,
         required: false,
         doc: """
-        The name of the report command associated with this command, if any.
+        The name of the report command associated with this get/request command, if any.
+
         For get commands, this will default to the command name with the trailing
         `_get` replaced with `_report`. To override this behavior, explicitly
         set this field to nil.
+
+        This specifies which report command type to wait for. For additional
+        parameter-based matching (e.g., matching specific field values), combine
+        with `:report_matcher_fun`.
+
+        Examples:
+        - `:battery_get` → automatically expects `:battery_report`
+        - `:user_code_get` → expects `:user_code_report` (name match) +
+          matcher function (parameter match)
 
         A special value of `:any` may be used to indicate that any report command
         can satisfy this particular get command. Otherwise, this should be

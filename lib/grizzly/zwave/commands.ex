@@ -1,6 +1,113 @@
 defmodule Grizzly.ZWave.Commands do
   @moduledoc """
-  Lookup table for sendable Z-Wave commands.
+  Central registry for all Z-Wave commands with encoding/decoding specifications.
+
+  This module provides a dual-system architecture for defining Z-Wave commands:
+
+  ## Architecture Overview
+
+  ### 1. Declarative/Generic System (Recommended for Simple Commands)
+
+  Commands are defined entirely using macros in this file, with encoding/decoding
+  handled automatically by `Grizzly.ZWave.Commands.Generic`. This approach eliminates
+  boilerplate and makes command definitions self-documenting.
+
+  **Example:**
+      command :clock_set, 0x04, Cmds.Generic,
+        params: [
+          enum(:weekday, clock_weekdays, size: 3),
+          param(:hour, :uint, size: 5),
+          param(:minute, :uint, size: 8)
+        ]
+
+  **When to Use Generic:**
+  - Binary layout is straightforward (sequential fields)
+  - No version-specific behavior needed
+  - No complex validation or computation logic
+  - No device-specific quirks to handle
+  - ~70% of commands use this approach
+
+  **Available Parameter Types:**
+  - `param(name, type, opts)` - Basic parameters (`:int`, `:uint`, `:binary`, `:boolean`)
+  - `enum(name, values, opts)` - Enumerated values with fixed mappings
+  - `list(name, opts)` - Variable-length lists with item specifications
+  - `bitmask(name, values, opts)` - Bit flags for multiple boolean values
+  - `marker(opts)` - Fixed separator bytes (e.g., `0x00` between list sections)
+  - `reserved(opts)` - Reserved/padding bits in protocol
+
+  **Advanced Features:**
+  - `when:` - Conditional field presence based on other parameters
+  - `compute:` - Dynamically compute values from other parameters
+  - `{:variable, length_param}` - Variable-length fields with separate length field
+  - `:remaining` - Consume all remaining bytes (must be last parameter)
+
+  ### 2. Custom Implementation System (For Complex Commands)
+
+  Commands with complex requirements implement their own module with
+  `encode_params/2` and `decode_params/2` callbacks. This provides full flexibility
+  when the declarative system cannot express the encoding logic.
+
+  **Example:**
+      command :alarm_report, 0x05  # Implemented in Grizzly.ZWave.Commands.AlarmReport
+
+  **When to Use Custom:**
+  - Multiple command class versions with different binary layouts
+  - Complex conditional logic that `when:` cannot express
+  - Device-specific quirks or workarounds needed
+  - Special encoding patterns (e.g., variable structure, multiple list separators)
+  - Custom validation beyond parameter types
+  - ~30% of commands require this flexibility
+
+  **Custom Module Requirements:**
+  - Must implement `Grizzly.ZWave.Command` behavior
+  - Provide `encode_params/2` - converts command params to binary
+  - Provide `decode_params/2` - parses binary to params keyword list
+
+  ## Decision Tree
+
+  When adding a new Z-Wave command, use this flowchart:
+
+  1. Does the command have multiple versions with different binary layouts?
+     → **YES**: Use custom implementation
+     → **NO**: Continue to #2
+
+  2. Does it require device-specific quirks or workarounds?
+     → **YES**: Use custom implementation
+     → **NO**: Continue to #3
+
+  3. Can the binary layout be expressed as sequential fields (with optional conditional fields)?
+     → **YES**: Use Generic (declarative)
+     → **NO**: Use custom implementation
+
+  4. Does it need complex validation beyond type checking?
+     → **YES**: Consider custom (or Generic with `validate_fun`)
+     → **NO**: Use Generic (declarative)
+
+  ## Shared Parameter Definitions
+
+  For commands that share common parameter structures (like get/set/report triplets),
+  define parameters once and reuse:
+
+      clock_params = [
+        enum(:weekday, clock_weekdays, size: 3),
+        param(:hour, :uint, size: 5),
+        param(:minute, :uint, size: 8)
+      ]
+
+      command :clock_set, 0x04, Cmds.Generic, params: clock_params
+      command :clock_report, 0x06, Cmds.Generic, params: clock_params
+
+  This ensures consistency and reduces maintenance burden.
+
+  ## Migration Path
+
+  When migrating from custom to Generic (if complexity has been reduced):
+  1. Ensure all tests pass with custom implementation
+  2. Define equivalent Generic specification
+  3. Verify encoding/decoding matches byte-for-byte
+  4. Remove custom module after validation
+
+  See `docs/refactoring_examples.md` for detailed migration examples.
   """
 
   use Grizzly.ZWave.Macros
@@ -19,14 +126,20 @@ defmodule Grizzly.ZWave.Commands do
 
   @after_verify __MODULE__
 
+  # ============================================================================
+  # Alarm / Notification Command Class
+  # ============================================================================
+
   command_class :alarm, 0x71 do
     command :alarm_event_supported_get, 0x01, Cmds.Generic,
       params: [
         enum(:type, Notifications.types(), size: 8)
       ]
 
+    # Custom implementations - handle version-specific layouts and device quirks
     command :alarm_event_supported_report, 0x02
     command :alarm_get, 0x04
+    # Complex: v1/v2/v8 with different layouts
     command :alarm_report, 0x05
 
     command :alarm_set, 0x06, Cmds.Generic,
@@ -36,19 +149,38 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :alarm_type_supported_get, 0x07, Cmds.Generic, params: []
+    # Custom: list encoding
     command :alarm_type_supported_report, 0x08
   end
 
+  # ============================================================================
+  # Antitheft Command Class
+  # ============================================================================
+
   command_class :antitheft, 0x5D do
+    # Custom implementation
     command :antitheft_set, 0x01
     command :antitheft_get, 0x02, Cmds.Generic, params: []
+    # Custom implementation
     command :antitheft_report, 0x03
   end
 
+  # ============================================================================
+  # Antitheft Unlock Command Class
+  # ============================================================================
+
   command_class :antitheft_unlock, 0x7E do
     command :antitheft_unlock_get, 0x01, Cmds.Generic, params: []
+    # Custom: complex error handling
     command :antitheft_unlock_report, 0x02
-    command :antitheft_unlock_set, 0x03
+
+    # Migrated to Generic: reserved bits + length prefix + variable binary
+    command :antitheft_unlock_set, 0x03, Cmds.Generic,
+      params: [
+        reserved(size: 4),
+        param(:length, {:length, :magic_code}, size: 4),
+        param(:magic_code, :binary, size: {:variable, :length})
+      ]
   end
 
   command_class :application_status, 0x22 do
@@ -66,17 +198,44 @@ defmodule Grizzly.ZWave.Commands do
       ]
   end
 
-  command_class :association, 0x85 do
-    command :association_set, 0x01
+  # ============================================================================
+  # Association Command Class
+  # ============================================================================
 
+  command_class :association, 0x85 do
+    # Migrated to Generic: byte + list of node IDs
+    command :association_set, 0x01, Cmds.Generic,
+      supports_supervision?: true,
+      params: [
+        param(:grouping_identifier, :uint, size: 8),
+        list(:nodes, item_type: :uint, item_size: 8, length: :remaining)
+      ]
+
+    # Uses AggregateReport handler to collect multiple reports into one response
     command :association_get, 0x02, Cmds.Generic,
       handler: {AggregateReport, aggregate_param: :nodes},
       params: [
         param(:grouping_identifier, :uint, size: 8)
       ]
 
-    command :association_report, 0x03, default_params: [reports_to_follow: 0]
-    command :association_remove, 0x04, supports_supervision?: true
+    # Migrated to Generic: 3 bytes + list of node IDs
+    command :association_report, 0x03, Cmds.Generic,
+      default_params: [reports_to_follow: 0],
+      params: [
+        param(:grouping_identifier, :uint, size: 8),
+        param(:max_nodes_supported, :uint, size: 8),
+        param(:reports_to_follow, :uint, size: 8),
+        list(:nodes, item_type: :uint, item_size: 8, length: :remaining)
+      ]
+
+    # Migrated to Generic: byte + list of node IDs
+    command :association_remove, 0x04, Cmds.Generic,
+      supports_supervision?: true,
+      params: [
+        param(:grouping_identifier, :uint, size: 8),
+        list(:nodes, item_type: :uint, item_size: 8, length: :remaining)
+      ]
+
     command :association_groupings_get, 0x05, Cmds.Generic, params: []
 
     command :association_groupings_report, 0x06, Cmds.Generic,
@@ -92,16 +251,23 @@ defmodule Grizzly.ZWave.Commands do
       ]
   end
 
+  # ============================================================================
+  # Association Group Info Command Class
+  # ============================================================================
+
   command_class :association_group_info, 0x59 do
     command :association_group_name_get, 0x01, Cmds.Generic,
       params: [
         param(:group_id, :uint, size: 8)
       ]
 
+    # Example of variable-length field with separate length parameter
     command :association_group_name_report, 0x02, Cmds.Generic,
       params: [
         param(:group_id, :uint, size: 8),
+        # Encodes byte size of :name
         param(:length, {:length, :name}, size: 8),
+        # Size determined by :length
         param(:name, :binary, size: {:variable, :length})
       ]
 
@@ -122,8 +288,13 @@ defmodule Grizzly.ZWave.Commands do
         param(:group_id, :uint, size: 8)
       ]
 
+    # Custom: complex list structure
     command :association_group_command_list_report, 0x06
   end
+
+  # ============================================================================
+  # Barrier Operator Command Class
+  # ============================================================================
 
   command_class :barrier_operator, 0x66 do
     command :barrier_operator_set, 0x01, Cmds.Generic,
@@ -135,6 +306,7 @@ defmodule Grizzly.ZWave.Commands do
 
     command :barrier_operator_report, 0x03, Cmds.Generic,
       params: [
+        # :any type with custom encode/decode for complex state values
         param(:state, :any,
           size: 8,
           opts: [
@@ -145,8 +317,10 @@ defmodule Grizzly.ZWave.Commands do
       ]
 
     command :barrier_operator_signal_supported_get, 0x04, Cmds.Generic, params: []
+    # Custom: bitmask encoding
     command :barrier_operator_signal_supported_report, 0x05
 
+    # Shared parameters for signal commands - demonstrates DRY principle
     subsystem_type =
       enum(:subsystem_type, ZWEnum.new(audible_notification: 1, visual_notification: 2), size: 8)
 
@@ -161,21 +335,40 @@ defmodule Grizzly.ZWave.Commands do
       params: [subsystem_type, subsystem_state]
   end
 
+  # ============================================================================
+  # Basic Command Class
+  # ============================================================================
+
   command_class :basic, 0x20 do
+    # Custom: simple value encoding
     command :basic_set, 0x01
     command :basic_get, 0x02, Cmds.Generic, params: []
+    # Custom: value + duration encoding
     command :basic_report, 0x03
   end
 
+  # ============================================================================
+  # Battery Command Class
+  # ============================================================================
+
   command_class :battery, 0x80 do
     command :battery_get, 0x02, Cmds.Generic, params: []
+    # Custom: complex battery level encoding
     command :battery_report, 0x03
   end
 
+  # ============================================================================
+  # Central Scene Command Class
+  # ============================================================================
+
   command_class :central_scene, 0x5B do
     command :central_scene_supported_get, 0x01, Cmds.Generic, params: []
+    # Custom: bitmask lists
     command :central_scene_supported_report, 0x02
+    # Custom: complex scene encoding
     command :central_scene_notification, 0x03
+
+    # Shared parameters - used in get/set/report triplet
 
     central_scene_config_params = [
       param(:slow_refresh, :boolean, size: 1),
@@ -191,7 +384,12 @@ defmodule Grizzly.ZWave.Commands do
       params: central_scene_config_params
   end
 
+  # ============================================================================
+  # Clock Command Class
+  # ============================================================================
+
   command_class :clock, 0x81 do
+    # Define enum values once for reuse
     clock_weekdays =
       ZWEnum.new(%{
         unknown: 0x00,
@@ -204,6 +402,8 @@ defmodule Grizzly.ZWave.Commands do
         sunday: 0x07
       })
 
+    # Shared parameters demonstrating DRY - used in both set and report
+    # Note: hour uses only 5 bits, packed with weekday in first byte
     clock_params = [
       enum(:weekday, clock_weekdays, size: 3),
       param(:hour, :uint, size: 5),
@@ -215,12 +415,18 @@ defmodule Grizzly.ZWave.Commands do
     command :clock_report, 0x06, Cmds.Generic, params: clock_params
   end
 
+  # ============================================================================
+  # Configuration Command Class
+  # ============================================================================
+
   command_class :configuration, 0x70 do
+    # Shared parameter definitions for different command versions
     param_num_8 = param(:param_number, :uint, size: 8)
     param_num_16 = param(:param_number, :uint, size: 16)
     reports_to_follow = param(:reports_to_follow, :uint, size: 8, default: 0)
 
     command :configuration_default_reset, 0x01, Cmds.Generic, params: []
+    # Custom: version-specific parameter sizes
     command :configuration_set, 0x04
 
     command :configuration_get, 0x05, Cmds.Generic,
@@ -389,12 +595,30 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :indicator, 0x87 do
+    # Custom: complex indicator properties
     command :indicator_set, 0x01
+    # Custom: complex indicator properties
     command :indicator_get, 0x02
+    # Custom: complex indicator properties
     command :indicator_report, 0x03
+    # Custom: indicator_id encoding
     command :indicator_supported_get, 0x04
+    # Custom: complex bitmask
     command :indicator_supported_report, 0x05
-    command :indicator_description_get, 0x06
+
+    # Migrated to Generic: single byte with custom encoding
+    command :indicator_description_get, 0x06, Cmds.Generic,
+      params: [
+        param(:indicator_id, :any,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.Indicator.indicator_id_to_byte/1,
+            decode: &CommandClasses.Indicator.indicator_id_from_byte/1
+          ]
+        )
+      ]
+
+    # Custom: complex description
     command :indicator_description_report, 0x07
   end
 
@@ -469,7 +693,12 @@ defmodule Grizzly.ZWave.Commands do
       supports_supervision?: true
 
     command :multi_channel_association_groupings_get, 0x05, Cmds.Generic, params: []
-    command :multi_channel_association_groupings_report, 0x06
+
+    # Migrated to Generic: single byte
+    command :multi_channel_association_groupings_report, 0x06, Cmds.Generic,
+      params: [
+        param(:supported_groupings, :uint, size: 8)
+      ]
   end
 
   command_class :multi_cmd, 0x8F do
@@ -560,11 +789,22 @@ defmodule Grizzly.ZWave.Commands do
     command :statistics_report, 0x05
     command :statistics_clear, 0x06, Cmds.Generic, params: []
     command :rssi_get, 0x07, Cmds.Generic, params: []
+    # Custom: RSSI encoding
     command :rssi_report, 0x08
     command :s2_resynchronization_event, 0x09, Cmds.S2ResynchronizationEvent
-    command :zwave_long_range_channel_set, 0x0A, Cmds.ZWaveLongRangeChannelSet
+
+    # Migrated to Generic: simple enum
+    command :zwave_long_range_channel_set, 0x0A, Cmds.Generic,
+      params: [
+        enum(:channel, ZWEnum.new(primary: 0x01, secondary: 0x02), size: 8)
+      ]
+
     command :zwave_long_range_channel_get, 0x0D, Cmds.Generic, params: []
-    command :zwave_long_range_channel_report, 0x0E, Cmds.ZWaveLongRangeChannelReport
+
+    command :zwave_long_range_channel_report, 0x0E, Cmds.Generic,
+      params: [
+        enum(:channel, ZWEnum.new(primary: 0x01, secondary: 0x02), size: 8)
+      ]
   end
 
   command_class :network_management_proxy, 0x52 do
@@ -659,8 +899,16 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :scene_actuator_conf, 0x2C do
+    # Custom: complex dimming duration
     command :scene_actuator_conf_set, 0x01
-    command :scene_actuator_conf_get, 0x02
+
+    # Migrated to Generic: single byte
+    command :scene_actuator_conf_get, 0x02, Cmds.Generic,
+      params: [
+        param(:scene_id, :uint, size: 8)
+      ]
+
+    # Custom: complex scene configuration
     command :scene_actuator_conf_report, 0x03
   end
 
@@ -876,6 +1124,7 @@ defmodule Grizzly.ZWave.Commands do
 
     command :s2_commands_supported_get, 0x0D, Cmds.Generic, params: []
 
+    # Custom: requires CommandClasses conversion helpers
     command :s2_commands_supported_report, 0x0E, Cmds.S2CommandsSupportedReport,
       default_params: [command_classes: []]
   end
@@ -1040,10 +1289,23 @@ defmodule Grizzly.ZWave.Commands do
         )
       ]
 
+    # Custom: complex float encoding
     command :thermostat_setpoint_report, 0x03
     command :thermostat_setpoint_supported_get, 0x04, Cmds.Generic, params: []
+    # Custom: bitmask
     command :thermostat_setpoint_supported_report, 0x05
-    command :thermostat_setpoint_capabilities_get, 0x09
+
+    # Migrated to Generic: reserved bits + custom encoded type
+    command :thermostat_setpoint_capabilities_get, 0x09, Cmds.Generic,
+      params: [
+        reserved(size: 4),
+        enum(:type, Encoding.thermostat_setpoint_types(),
+          size: 4,
+          opts: [if_unknown: {:value, :unknown}]
+        )
+      ]
+
+    # Custom: capabilities range
     command :thermostat_setpoint_capabilities_report, 0x0A
   end
 
@@ -1111,7 +1373,24 @@ defmodule Grizzly.ZWave.Commands do
       param(:code, :binary, size: {:variable, :length})
     ]
 
-    command :user_code_set, 0x01
+    command :user_code_set, 0x01, Cmds.Generic,
+      params: [
+        param(:user_id, :uint, size: 8),
+        enum(
+          :user_id_status,
+          ZWEnum.new(
+            available: 0,
+            occupied: 1,
+            reserved_for_occupancy: 2,
+            status_not_available: 3
+          ),
+          size: 8
+        ),
+        param(:user_code, :binary,
+          size: :variable,
+          compute: {__MODULE__, :compute_user_code}
+        )
+      ]
 
     command :user_code_get, 0x02, Cmds.Generic,
       params: [
@@ -1273,12 +1552,28 @@ defmodule Grizzly.ZWave.Commands do
 
   command_class :window_covering, 0x6A do
     command :window_covering_supported_get, 0x01, Cmds.Generic, params: []
+    # Custom: bitmask
     command :window_covering_supported_report, 0x02
+    # Custom: parameter_name encoding
     command :window_covering_get, 0x03
+    # Custom: complex value encoding
     command :window_covering_report, 0x04
+    # Custom: complex value + duration
     command :window_covering_set, 0x05
+    # Custom: complex parameters
     command :window_covering_start_level_change, 0x06
-    command :window_covering_stop_level_change, 0x07
+
+    # Migrated to Generic: single byte with custom encoding
+    command :window_covering_stop_level_change, 0x07, Cmds.Generic,
+      params: [
+        param(:parameter_name, :any,
+          size: 8,
+          opts: [
+            encode: &CommandClasses.WindowCovering.encode_parameter_name/1,
+            decode: &CommandClasses.WindowCovering.decode_parameter_name/1
+          ]
+        )
+      ]
   end
 
   command_class :zip, 0x23 do
@@ -1504,5 +1799,24 @@ defmodule Grizzly.ZWave.Commands do
           )
       end
     end)
+  end
+
+  @doc false
+  def compute_user_code(params) do
+    # Automatically use zeros when status is available
+    # CC:0063.01.01.11.009 - The User Code field MUST be set to 0x00000000
+    # when User ID Status is equal to 0x00 (Available).
+    if Keyword.get(params, :user_id_status) == :available do
+      <<0x00, 0x00, 0x00, 0x00>>
+    else
+      # Must be provided by user
+      case Keyword.fetch(params, :user_code) do
+        {:ok, code} ->
+          code
+
+        :error ->
+          raise ArgumentError, "user_code must be provided when user_id_status is not :available"
+      end
+    end
   end
 end

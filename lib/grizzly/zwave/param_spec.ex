@@ -1,6 +1,130 @@
 defmodule Grizzly.ZWave.ParamSpec do
   @moduledoc """
-  Data structure describing a parameter for a Z-Wave command.
+  Specification for a single parameter in a Z-Wave command.
+
+  A `ParamSpec` defines how a single field in a command is encoded to and decoded
+  from binary format. It specifies the parameter's type, size, default value,
+  and any special behavior like conditional presence or computed values.
+
+  ## Core Concepts
+
+  ### Parameter Types
+
+  - `:int` / `:uint` - Signed/unsigned integers with specified bit size
+  - `:binary` - Raw binary data (variable or fixed length)
+  - `:boolean` - True/false encoded as 0/1 or 0x00/0xFF
+  - `:enum` - Symbolic names mapped to numeric values via `ZWEnum`
+  - `:bitmask` - Multiple boolean flags packed into one value
+  - `:list` - Variable-length repeating items
+  - `:constant` - Fixed value (validated but not in command params)
+  - `:marker` - Fixed separator bytes (e.g., 0x00 between sections)
+  - `:reserved` - Padding/reserved bits
+  - `:dsk` - Device-Specific Key encoding
+  - `:any` - Custom encode/decode functions
+
+  ### Size Specification
+
+  - `size: N` - Fixed size in bits (must be multiple of 8 for full bytes)
+  - `size: :variable` - Consumes all remaining bytes (must be last)
+  - `size: {:variable, :length_param}` - Size determined by another parameter
+
+  ### Advanced Features
+
+  #### Conditional Presence (`:when`)
+
+  Parameters can be conditionally present based on other parameter values:
+
+      param(:extended_info, :binary, size: 16,
+        when: {:field_equals, :version, 2})
+
+  **Supported conditions:**
+  - `{:field_equals, field, value}` - Field must equal value
+  - `{:field_not_equals, field, value}` - Field must not equal value
+  - `{:field_empty, field}` - Field is nil, [], or ""
+  - `{:field_not_empty, field}` - Field has a value
+  - `{Module, :function}` - Custom condition function
+
+  #### Computed Values (`:compute`)
+
+  Values can be computed from other parameters instead of being supplied:
+
+      param(:checksum, :uint, size: 8,
+        compute: {ChecksumModule, :calculate})
+
+  The compute function receives all command parameters and returns the value.
+
+  #### Variable-Length Fields
+
+  Three patterns for variable-length data:
+
+  1. **Size from another parameter:**
+     ```
+     param(:length, {:length, :data}, size: 8)  # Encodes byte size of :data
+     param(:data, :binary, size: {:variable, :length})
+     ```
+
+  2. **Remaining bytes:**
+     ```
+     param(:data, :binary, size: :variable)  # Must be last parameter
+     ```
+
+  3. **Lists with length prefix:**
+     ```
+     list(:items, item_type: :uint, item_size: 8, prefix_size: 8)
+     ```
+
+  ## Examples
+
+      # Simple unsigned integer
+      %ParamSpec{name: :value, type: :uint, size: 8, required: true}
+
+      # Enumerated value
+      %ParamSpec{
+        name: :mode,
+        type: :enum,
+        size: 8,
+        opts: [values: ZWEnum.new(off: 0, heat: 1, cool: 2)]
+      }
+
+      # Conditional field
+      %ParamSpec{
+        name: :user_code,
+        type: :binary,
+        size: :variable,
+        when: {:field_equals, :status, :enabled}
+      }
+
+      # Computed field
+      %ParamSpec{
+        name: :checksum,
+        type: :uint,
+        size: 8,
+        compute: {ChecksumHelper, :calculate}
+      }
+
+  ## Encoding Process
+
+  When encoding a command:
+  1. Check if parameter should be present (`:when` condition)
+  2. Get value (from params, compute function, or default)
+  3. Validate value type and range
+  4. Convert to binary according to type
+  5. Ensure encoded size matches specification
+
+  ## Decoding Process
+
+  When decoding a binary:
+  1. Check if parameter should be present (`:when` condition)
+  2. Extract appropriate number of bits from binary
+  3. Convert bits to Elixir value according to type
+  4. Validate decoded value
+  5. Add to parameter list or skip based on `opts`
+
+  ## See Also
+
+  - `Grizzly.ZWave.Commands.Generic` - Uses ParamSpecs for encoding/decoding
+  - `Grizzly.ZWave.CommandSpec` - Contains list of ParamSpecs for a command
+  - `Grizzly.ZWave.Macros` - DSL for creating ParamSpecs declaratively
   """
 
   import Integer, only: [is_even: 1]
@@ -18,7 +142,9 @@ defmodule Grizzly.ZWave.ParamSpec do
         required: true
       ],
       type: [
-        type: {:in, [:int, :uint, :boolean, :binary, :enum, :constant, :dsk, :custom, :any]},
+        type:
+          {:in,
+           [:int, :uint, :boolean, :binary, :enum, :constant, :dsk, :custom, :any, :list, :marker]},
         doc: "The parameter's type",
         required: true
       ],
@@ -43,6 +169,16 @@ defmodule Grizzly.ZWave.ParamSpec do
       opts: [
         type: :keyword_list,
         default: []
+      ],
+      when: [
+        type: :any,
+        doc:
+          "Condition for when field should be present. Can be a tuple like {:field_equals, field, value} or {Module, :function} MFA"
+      ],
+      compute: [
+        type: :any,
+        doc:
+          "MFA tuple {Module, :function} or {Module, :function, args} to compute field value based on other params"
       ]
     )
 
@@ -57,8 +193,28 @@ defmodule Grizzly.ZWave.ParamSpec do
           | :constant
           | :reserved
           | :bitmask
+          | :marker
+          | :list
           | {:length, atom()}
           | :any
+
+  @type when_condition ::
+          {:field_equals, atom(), any()}
+          | {:field_not_equals, atom(), any()}
+          | {:field_empty, atom()}
+          | {:field_not_empty, atom()}
+          | {module(), atom()}
+          | {module(), atom(), list()}
+
+  @type compute_spec ::
+          {module(), atom()}
+          | {module(), atom(), list()}
+
+  @type list_length ::
+          :remaining
+          | {:fixed, non_neg_integer()}
+          | {:field, atom()}
+          | :prefixed
 
   @type t :: %__MODULE__{
           name: atom(),
@@ -66,7 +222,9 @@ defmodule Grizzly.ZWave.ParamSpec do
           size: non_neg_integer() | :variable,
           default: any(),
           required: boolean(),
-          opts: keyword()
+          opts: keyword(),
+          when: when_condition() | nil,
+          compute: compute_spec() | nil
         }
 
   defstruct name: nil,
@@ -74,7 +232,9 @@ defmodule Grizzly.ZWave.ParamSpec do
             size: 8,
             default: nil,
             required: true,
-            opts: []
+            opts: [],
+            when: nil,
+            compute: nil
 
   @doc "Validate a command spec."
   def validate(%__MODULE__{} = spec) do
@@ -162,6 +322,79 @@ defmodule Grizzly.ZWave.ParamSpec do
      }}
   end
 
+  def take_bits(%__MODULE__{type: :marker, size: size}, bitstring, _other_params)
+      when bit_size(bitstring) >= size do
+    <<value::bitstring-size(size), rest::bitstring>> = bitstring
+    {:ok, {size, value, rest}}
+  end
+
+  def take_bits(%__MODULE__{type: :list} = param_spec, bitstring, other_params) do
+    length_spec = Keyword.get(param_spec.opts, :length, :remaining)
+    item_size = Keyword.get(param_spec.opts, :item_size, 8)
+
+    case length_spec do
+      :prefixed ->
+        # Read length prefix first (default 1 byte)
+        prefix_size = Keyword.get(param_spec.opts, :prefix_size, 8)
+
+        case bitstring do
+          <<length::size(prefix_size), data::bitstring-size(length * 8), rest::bitstring>> ->
+            # For prefixed lists, take everything - decoding will handle the details
+            {:ok, {bit_size(bitstring), data, rest}}
+
+          _ ->
+            {:error,
+             %DecodeError{
+               param: param_spec.name,
+               value: bitstring,
+               reason: "not enough bits for length prefix"
+             }}
+        end
+
+      {:fixed, n} ->
+        # Take exactly n items worth of bits
+        total_bits = n * item_size
+
+        if bit_size(bitstring) >= total_bits do
+          <<value::bitstring-size(total_bits), rest::bitstring>> = bitstring
+          {:ok, {total_bits, value, rest}}
+        else
+          {:error,
+           %DecodeError{
+             param: param_spec.name,
+             value: bitstring,
+             reason: "not enough bits for fixed-length list"
+           }}
+        end
+
+      {:field, field_name} ->
+        # Get length from another field
+        case Keyword.fetch(other_params, field_name) do
+          {:ok, length} when is_integer(length) ->
+            total_bits = length * item_size
+
+            if bit_size(bitstring) >= total_bits do
+              <<value::bitstring-size(total_bits), rest::bitstring>> = bitstring
+              {:ok, {total_bits, value, rest}}
+            else
+              {:error,
+               %DecodeError{
+                 param: param_spec.name,
+                 value: bitstring,
+                 reason: "not enough bits for list of length #{length}"
+               }}
+            end
+
+          _ ->
+            raise "List length field #{field_name} not found in params or is not an integer"
+        end
+
+      :remaining ->
+        # Take all remaining bits
+        {:ok, {bit_size(bitstring), bitstring, <<>>}}
+    end
+  end
+
   def take_bits(
         %__MODULE__{size: {:variable, length_param}} = param_spec,
         bitstring,
@@ -206,7 +439,67 @@ defmodule Grizzly.ZWave.ParamSpec do
   """
   @spec include_when_decoding?(t()) :: boolean()
   def include_when_decoding?(param_spec) do
-    param_spec.opts[:hidden] != true and param_spec.type != :reserved
+    param_spec.opts[:hidden] != true and param_spec.type != :reserved and
+      param_spec.type != :marker
+  end
+
+  @doc """
+  Checks if a parameter should be present based on its `when` condition.
+  """
+  @spec should_be_present?(t(), keyword()) :: boolean()
+  def should_be_present?(%__MODULE__{when: nil}, _params), do: true
+
+  def should_be_present?(%__MODULE__{when: condition}, params) do
+    evaluate_condition(condition, params)
+  end
+
+  @doc """
+  Computes the value for a parameter using its `compute` function.
+  Returns `{:ok, value}` if computed, or `:error` if no compute function.
+  """
+  @spec compute_value(t(), keyword()) :: {:ok, any()} | :error
+  def compute_value(%__MODULE__{compute: nil}, _params), do: :error
+
+  def compute_value(%__MODULE__{compute: {mod, fun}}, params) do
+    {:ok, apply(mod, fun, [params])}
+  end
+
+  def compute_value(%__MODULE__{compute: {mod, fun, args}}, params) do
+    {:ok, apply(mod, fun, [params | args])}
+  end
+
+  defp evaluate_condition({:field_equals, field, value}, params) do
+    Keyword.get(params, field) == value
+  end
+
+  defp evaluate_condition({:field_not_equals, field, value}, params) do
+    Keyword.get(params, field) != value
+  end
+
+  defp evaluate_condition({:field_empty, field}, params) do
+    case Keyword.get(params, field) do
+      nil -> true
+      [] -> true
+      "" -> true
+      _ -> false
+    end
+  end
+
+  defp evaluate_condition({:field_not_empty, field}, params) do
+    case Keyword.get(params, field) do
+      nil -> false
+      [] -> false
+      "" -> false
+      _ -> true
+    end
+  end
+
+  defp evaluate_condition({mod, fun}, params) when is_atom(mod) and is_atom(fun) do
+    apply(mod, fun, [params])
+  end
+
+  defp evaluate_condition({mod, fun, args}, params) when is_atom(mod) and is_atom(fun) do
+    apply(mod, fun, [params | args])
   end
 
   @doc """
@@ -313,6 +606,41 @@ defmodule Grizzly.ZWave.ParamSpec do
   def encode_value(%__MODULE__{type: :binary, size: :variable}, value, _)
       when is_bitstring(value) do
     value
+  end
+
+  def encode_value(%__MODULE__{type: :marker, size: size} = param_spec, _, _) do
+    marker_value = Keyword.get(param_spec.opts, :value, 0x00)
+    <<marker_value::size(size)>>
+  end
+
+  def encode_value(%__MODULE__{type: :list} = param_spec, value, other_params)
+      when is_list(value) do
+    item_type = Keyword.fetch!(param_spec.opts, :item_type)
+    item_size = Keyword.get(param_spec.opts, :item_size, 8)
+    length_spec = Keyword.get(param_spec.opts, :length, :remaining)
+
+    # Build a temp param spec for encoding each item
+    item_spec = %__MODULE__{
+      name: :list_item,
+      type: item_type,
+      size: item_size,
+      opts: Keyword.get(param_spec.opts, :item_opts, [])
+    }
+
+    encoded_items =
+      for item <- value, into: <<>> do
+        encode_value(item_spec, item, other_params)
+      end
+
+    case length_spec do
+      :prefixed ->
+        # Encode length prefix (default to 1 byte)
+        prefix_size = Keyword.get(param_spec.opts, :prefix_size, 8)
+        <<length(value)::size(prefix_size)>> <> encoded_items
+
+      _ ->
+        encoded_items
+    end
   end
 
   def encode_value(%__MODULE__{type: :dsk, size: size}, value, _) when is_integer(size) do
@@ -449,6 +777,45 @@ defmodule Grizzly.ZWave.ParamSpec do
     end
   end
 
+  def decode_value(%__MODULE__{type: :marker, size: size} = param_spec, binary, _other_params) do
+    expected_value = Keyword.get(param_spec.opts, :value, 0x00)
+
+    case binary do
+      <<^expected_value::size(^size)>> ->
+        {:ok, expected_value}
+
+      <<actual::size(^size)>> ->
+        {:error,
+         %DecodeError{
+           param: param_spec.name,
+           value: actual,
+           reason: "Expected marker value #{expected_value}, got #{actual}"
+         }}
+
+      _ ->
+        {:error, %DecodeError{param: param_spec.name, value: binary}}
+    end
+  end
+
+  def decode_value(%__MODULE__{type: :list} = param_spec, binary, other_params) do
+    item_type = Keyword.fetch!(param_spec.opts, :item_type)
+    item_size = Keyword.get(param_spec.opts, :item_size, 8)
+    length_spec = Keyword.get(param_spec.opts, :length, :remaining)
+
+    # Build a temp param spec for decoding each item
+    item_spec = %__MODULE__{
+      name: :list_item,
+      type: item_type,
+      size: item_size,
+      opts: Keyword.get(param_spec.opts, :item_opts, [])
+    }
+
+    with {:ok, {list_length, data_to_decode}} <-
+           determine_list_length(length_spec, binary, other_params, item_size, param_spec.name) do
+      decode_list_items(item_spec, data_to_decode, list_length, [], other_params)
+    end
+  end
+
   def decode_value(%__MODULE__{type: :any, size: size} = param_spec, binary, _other_params) do
     decoder = Keyword.get(param_spec.opts, :decode)
 
@@ -539,5 +906,89 @@ defmodule Grizzly.ZWave.ParamSpec do
 
   def decode_value(%__MODULE__{} = param_spec, _binary, _other_params) do
     raise "Decoding for param type #{inspect(param_spec.type)} not implemented for param #{param_spec.name}"
+  end
+
+  # Private helper functions for list decoding
+
+  defp determine_list_length(:remaining, binary, _other_params, item_size, _param_name)
+       when rem(bit_size(binary), item_size) == 0 do
+    {:ok, {div(bit_size(binary), item_size), binary}}
+  end
+
+  defp determine_list_length(:remaining, binary, _other_params, item_size, param_name) do
+    {:error,
+     %DecodeError{
+       param: param_name,
+       value: binary,
+       reason: "Binary size #{bit_size(binary)} is not a multiple of item size #{item_size}"
+     }}
+  end
+
+  defp determine_list_length({:fixed, n}, binary, _other_params, item_size, param_name) do
+    expected_bits = n * item_size
+
+    if bit_size(binary) >= expected_bits do
+      {:ok, {n, binary}}
+    else
+      {:error,
+       %DecodeError{
+         param: param_name,
+         value: binary,
+         reason: "Expected at least #{expected_bits} bits for fixed list of #{n} items"
+       }}
+    end
+  end
+
+  defp determine_list_length({:field, field_name}, binary, other_params, _item_size, param_name) do
+    case Keyword.fetch(other_params, field_name) do
+      {:ok, length} when is_integer(length) ->
+        {:ok, {length, binary}}
+
+      _ ->
+        {:error,
+         %DecodeError{
+           param: param_name,
+           value: other_params,
+           reason: "List length field #{field_name} not found in params or is not an integer"
+         }}
+    end
+  end
+
+  defp determine_list_length(
+         {:prefixed, prefix_size},
+         binary,
+         other_params,
+         item_size,
+         param_name
+       )
+       when is_integer(prefix_size) and prefix_size > 0 do
+    case binary do
+      <<length::size(prefix_size), rest::binary>> ->
+        {:ok, {length, rest}}
+
+      _ ->
+        # Fall back to the generic :prefixed error handling
+        determine_list_length(:prefixed, binary, other_params, item_size, param_name)
+    end
+  end
+
+  defp determine_list_length(:prefixed, binary, _other_params, _item_size, param_name) do
+    {:error,
+     %DecodeError{
+       param: param_name,
+       value: binary,
+       reason: "Not enough data for length prefix"
+     }}
+  end
+
+  defp decode_list_items(_item_spec, _binary, 0, acc, _other_params) do
+    {:ok, Enum.reverse(acc)}
+  end
+
+  defp decode_list_items(item_spec, binary, remaining, acc, other_params) do
+    with {:ok, {_size, value, rest}} <- take_bits(item_spec, binary, other_params),
+         {:ok, decoded_value} <- decode_value(item_spec, value, other_params) do
+      decode_list_items(item_spec, rest, remaining - 1, [decoded_value | acc], other_params)
+    end
   end
 end
