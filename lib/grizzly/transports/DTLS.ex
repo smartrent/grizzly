@@ -11,8 +11,6 @@ defmodule Grizzly.Transports.DTLS do
 
   require Logger
 
-  @handshake_timeout Application.compile_env(:grizzly, :dtls_handshake_timeout, 10_000)
-
   @impl Grizzly.Transport
   def open(args, ifaddr \\ {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}) do
     ip_address = Keyword.fetch!(args, :ip_address)
@@ -24,7 +22,9 @@ defmodule Grizzly.Transports.DTLS do
         node_id -> node_id
       end
 
-    case :ssl.connect(ip_address, port, dtls_opts(ifaddr), 10_000) do
+    timeout = Application.get_env(:grizzly, :dtls_connect_timeout, 1_000)
+
+    case :ssl.connect(ip_address, port, dtls_opts(ifaddr), timeout) do
       {:ok, socket} ->
         {:ok,
          Transport.new(__MODULE__, %{
@@ -115,8 +115,9 @@ defmodule Grizzly.Transports.DTLS do
   @impl Grizzly.Transport
   def handshake(transport) do
     socket = Transport.get(transport, :socket)
+    timeout = Application.get_env(:grizzly, :dtls_handshake_timeout, 1_000)
 
-    with {:ok, socket} <- :ssl.handshake(socket, @handshake_timeout),
+    with {:ok, socket} <- :ssl.handshake(socket, timeout),
          :ok <- :ssl.setopts(socket, active: true) do
       {:ok, Transport.put(transport, :socket, socket)}
     end
