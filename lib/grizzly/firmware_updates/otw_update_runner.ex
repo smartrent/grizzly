@@ -346,7 +346,7 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
 
       {:error, _reason} ->
         {:keep_state, %{data | errors: data.errors + 1},
-         [next_event_action(:zgw_version_check, :timer.seconds(5))]}
+         [next_event_action(:zgw_version_check, :timer.seconds(1))]}
     end
   end
 
@@ -580,8 +580,9 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
   @spec version_from_zipgateway() ::
           {:ok, Version.version()} | {:error, Grizzly.send_command_error()}
   defp version_from_zipgateway() do
-    case Grizzly.send_command(1, :version_zwave_software_get) do
+    case Grizzly.send_command(1, :version_zwave_software_get, [], timeout: 1000) do
       {:ok, %{command: %Command{} = cmd}} -> {:ok, Command.param!(cmd, :host_interface_version)}
+      {:ok, %{type: :timeout}} -> {:error, :timeout}
       {:error, reason} -> {:error, reason}
     end
   end
