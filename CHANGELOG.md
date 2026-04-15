@@ -2,6 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.1.1]
+
+### Fixed
+
+* Fix OTW update runner issues when Z/IP Gateway is not available ([#1227](https://github.com/smartrent/grizzly/pull/1227))
+* Reduce default DTLS connect and handshake timeouts to 1s ([#1228](https://github.com/smartrent/grizzly/pull/1228))
+
 ## [v9.1.0]
 
 ### Removed
@@ -23,5 +30,6 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 For Grizzly v8 and older, see the [v8 changelog](https://github.com/smartrent/grizzly/blob/maint/v8/CHANGELOG.md).
 
+[v9.1.1]: https://github.com/smartrent/grizzly/compare/v9.1.0..v9.1.1
 [v9.1.0]: https://github.com/smartrent/grizzly/compare/v9.0.0..v9.1.0
 [v9.0.0]: https://github.com/smartrent/grizzly/compare/v8.15.3..v9.0.0
