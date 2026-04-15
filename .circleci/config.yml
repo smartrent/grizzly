@@ -129,7 +129,7 @@ jobs:
           name: Create GitHub Release
           command: |
             awk -v ver="<< pipeline.git.tag >>" '/^#+ \[/ { if (p) { exit }; if ($2 == "["ver"]") { p=1; next} } p && NF' CHANGELOG.md > release-notes.md
-            gh release create << pipeline.git.tag >> --title << pipeline.git.tag >> -F release-notes.md
+            gh release create << pipeline.git.tag >> --verify-tag --title << pipeline.git.tag >> -F release-notes.md
       - run:
           name: Publish Hex
           command: MIX_ENV=docs HEX_API_KEY=${HEX_API_WRITE_KEY} mix hex.publish --yes
