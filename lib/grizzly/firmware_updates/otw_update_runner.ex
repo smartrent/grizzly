@@ -292,7 +292,7 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
     data = cleanup(data)
 
     case data.result do
-      :no_upgrade_needed -> report_status({:done, :skipped})
+      :no_update_needed -> report_status({:done, :skipped})
       :update_successful -> report_status({:done, :success})
       other -> report_status({:error, other})
     end
@@ -384,7 +384,8 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
           "[Grizzly] Failed to open serial port #{data.serial_port}: #{inspect(reason)}"
         )
 
-        {:keep_state, %{data | errors: data.errors + 1}}
+        {:keep_state, %{data | errors: data.errors + 1},
+         [next_event_action(:open_serial_port, 500)]}
     end
   end
 
@@ -429,7 +430,7 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
   #
 
   # Ignore UART messages in other states
-  def handle_event(:info, {:circuits_uart, _port, data}, :init, data) do
+  def handle_event(:info, {:circuits_uart, _port, _uart_data}, :init, _data) do
     :keep_state_and_data
   end
 
@@ -597,7 +598,7 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
       :ok = Exmodem.stop(data.exmodem)
     end
 
-    if data.result in [:update_successful, :no_upgrade_needed] do
+    if data.result in [:update_successful, :no_update_needed] do
       :alarm_handler.clear_alarm(@error_alarm)
     end
 
@@ -608,14 +609,17 @@ defmodule Grizzly.FirmwareUpdates.OTWUpdateRunner do
   end
 
   defp open_uart(serial_port) do
-    with {:ok, uart} <- Circuits.UART.start_link(),
-         :ok <-
-           Circuits.UART.open(uart, serial_port,
-             speed: 115_200,
-             active: true,
-             framing: Grizzly.FirmwareUpdates.OTW.BootloaderFraming
-           ) do
-      {:ok, uart}
+    opts = [speed: 115_200, active: true, framing: Grizzly.FirmwareUpdates.OTW.BootloaderFraming]
+
+    with {:ok, uart} <- Circuits.UART.start_link() do
+      case Circuits.UART.open(uart, serial_port, opts) do
+        :ok ->
+          {:ok, uart}
+
+        {:error, reason} ->
+          Circuits.UART.stop(uart)
+          {:error, reason}
+      end
     end
   end
 
