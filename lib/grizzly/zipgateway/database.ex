@@ -121,6 +121,19 @@ defmodule Grizzly.ZIPGateway.Database do
   def with_database(fun), do: with_database(Grizzly.options().database_file, fun)
 
   @doc """
+  Deletes all entries in the s2_span table, effectively forcing S2 resynchronization
+  for all nodes. This is useful if you're running a Zniffer capture and need to
+  capture the S2 nonce exchange in order to decrypt frames.
+
+  To ensure you capture the nonce exchange, be sure to stop Z/IP Gateway before
+  calling this function, then start the capture before restarting Z/IP Gateway.
+  """
+  @spec clear_s2_sessions(reference()) :: :ok | {:error, atom() | binary()}
+  def clear_s2_sessions(db) do
+    execute(db, "DELETE FROM s2_span", [])
+  end
+
+  @doc """
   Looks up a node by its ID and returns a map or nil if not found.
   """
   @spec get_node(Sqlite3.db(), integer()) :: query_result(zwave_node() | nil)
