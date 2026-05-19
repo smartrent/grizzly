@@ -22,6 +22,8 @@ defmodule Grizzly.Trace do
 
   alias Grizzly.Trace.Record
 
+  require Logger
+
   @type trace_opt :: {:name, atom()} | {:size, pos_integer()} | {:record_keepalives, boolean()}
 
   @type src() :: Grizzly.node_id() | :grizzly
@@ -71,8 +73,16 @@ defmodule Grizzly.Trace do
   """
   @spec print(list(Record.t()) | format(), [list_opt()]) :: :ok
   def print(records_or_format, opts)
-  def print(records, _opts) when is_list(records), do: records |> format() |> IO.puts()
-  def print(fmt, opts) when is_atom(fmt), do: opts |> list() |> format(fmt) |> IO.puts()
+
+  def print(records, _opts) when is_list(records) do
+    print_header()
+    records |> format() |> IO.puts()
+  end
+
+  def print(fmt, opts) when is_atom(fmt) do
+    print_header()
+    opts |> list() |> format(fmt) |> IO.puts()
+  end
 
   def print(fmt_or_opts)
   def print(fmt) when is_atom(fmt), do: print(fmt, [])
@@ -117,6 +127,20 @@ defmodule Grizzly.Trace do
   @spec resize(GenServer.server(), pos_integer()) :: :ok
   def resize(name \\ __MODULE__, size), do: GenServer.call(name, {:resize, size})
 
+  defp print_header do
+    # Values based on those in `Grizzly.Trace.Record`
+    timestamp = String.pad_trailing("TIMESTAMP", 12)
+    src = String.pad_leading("SRC", 3)
+    dest = String.pad_trailing("DST", 3)
+    seq = String.pad_trailing("SEQ", 4)
+    command = "COMMAND"
+
+    header = "#{timestamp} #{src} -> #{dest} #{seq} #{command}"
+
+    IO.puts(header)
+    IO.puts(String.duplicate("-", String.length(header) + 20))
+  end
+
   @doc "Enable or disable logging of keepalive frames."
   @spec record_keepalives(GenServer.server(), boolean()) :: :ok
   def record_keepalives(name, enabled?), do: GenServer.call(name, {:record_keepalives, enabled?})
@@ -152,6 +176,15 @@ defmodule Grizzly.Trace do
       end)
 
     {:noreply, state}
+  rescue
+    err ->
+      Logger.error("""
+      [Grizzly.Trace] Failed to log event:
+
+      #{Exception.format(:error, err, __STACKTRACE__)}
+      """)
+
+      {:noreply, state}
   end
 
   @impl GenServer

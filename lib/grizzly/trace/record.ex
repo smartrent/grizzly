@@ -75,6 +75,16 @@ defmodule Grizzly.Trace.Record do
   def remote_node(%__MODULE__{src: :grizzly, dest: dest}), do: dest
   def remote_node(%__MODULE__{src: src, dest: :grizzly}), do: src
 
+  def remote_node(%__MODULE__{src: src} = record) do
+    Logger.warning("""
+    [Grizzly.Trace] Remote node has invalid destination:
+
+    #{inspect(record[:dest])}
+    """)
+
+    src
+  end
+
   defp src_to_string(:grizzly), do: src_to_string("G")
   defp src_to_string(src), do: src |> Kernel.to_string() |> String.pad_leading(3)
 
