@@ -131,7 +131,7 @@ defmodule Grizzly.Trace do
   @spec resize(GenServer.server(), pos_integer()) :: :ok
   def resize(name \\ __MODULE__, size), do: GenServer.call(name, {:resize, size})
 
-  defp print_header do
+  defp print_header() do
     # Values based on those in `Grizzly.Trace.Record`
     timestamp = String.pad_trailing("TIMESTAMP", 12)
     src = String.pad_leading("SRC", 3)
