@@ -35,6 +35,8 @@ defmodule Grizzly.Trace do
 
   @type list_opt() :: {:node_id, Grizzly.node_id()}
 
+  @type print_opt() :: list_opt() | {:decode, boolean()}
+
   @default_size 300
   @default_format :text
 
@@ -55,11 +57,11 @@ defmodule Grizzly.Trace do
   * `:raw` - Each record is on a new line and is formatted as
     `timestamp source -> destination: binary`.
   """
-  @spec format([Record.t()], format()) :: binary()
-  def format(records, format \\ @default_format)
+  @spec format([Record.t()], format(), keyword()) :: binary()
+  def format(records, format \\ @default_format, opts \\ [])
 
-  def format(records, fmt) when fmt in [:text, :raw],
-    do: Enum.map_join(records, "\n", &Record.to_string(&1, fmt))
+  def format(records, fmt, opts) when fmt in [:text, :raw],
+    do: Enum.map_join(records, "\n", &Record.to_string(&1, fmt, opts))
 
   @doc "Dump trace records into a file using Erlang External Term Format."
   @spec dump(binary()) :: :ok | {:error, atom()}
@@ -71,17 +73,19 @@ defmodule Grizzly.Trace do
   @doc """
   Write trace records to standard out. See `format/2` for the available formats.
   """
-  @spec print(list(Record.t()) | format(), [list_opt()]) :: :ok
+  @spec print(list(Record.t()) | format(), [print_opt()]) :: :ok
   def print(records_or_format, opts)
 
-  def print(records, _opts) when is_list(records) do
+  def print(records, opts) when is_list(records) do
     print_header()
-    records |> format() |> IO.puts()
+    {format_opts, _list_opts} = Keyword.split(opts, [:decode])
+    records |> format(@default_format, format_opts) |> IO.puts()
   end
 
   def print(fmt, opts) when is_atom(fmt) do
     print_header()
-    opts |> list() |> format(fmt) |> IO.puts()
+    {format_opts, list_opts} = Keyword.split(opts, [:decode])
+    list_opts |> list() |> format(fmt, format_opts) |> IO.puts()
   end
 
   def print(fmt_or_opts)

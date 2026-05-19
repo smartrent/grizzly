@@ -37,19 +37,20 @@ defmodule Grizzly.Trace.Record do
   @doc """
   Turn a record into the string format
   """
-  @spec to_string(t(), Trace.format()) :: String.t()
-  def to_string(record, format \\ :text)
+  @spec to_string(t(), Trace.format(), keyword()) :: String.t()
+  def to_string(record, format \\ :text, opts \\ [])
 
-  def to_string(record, :text) do
+  def to_string(record, :text, opts) do
     %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
     ts = Time.truncate(ts, :millisecond)
 
     prefix = "#{Time.to_string(ts)} #{src_to_string(src)} -> #{dest_to_string(dest)}"
+    decode? = Keyword.get(opts, :decode, false)
 
     try do
       case ZWave.from_binary(binary) do
         {:ok, zip_packet} ->
-          "#{prefix} #{command_info_str(zip_packet, binary)}"
+          "#{prefix} #{command_info_str(zip_packet, binary, decode?)}"
 
         {:error, _} ->
           "#{prefix} #{inspect(binary, limit: 500)}"
@@ -61,7 +62,7 @@ defmodule Grizzly.Trace.Record do
     end
   end
 
-  def to_string(record, :raw) do
+  def to_string(record, :raw, _opts) do
     %__MODULE__{timestamp: ts, src: src, dest: dest, binary: binary} = record
 
     time = ts |> Time.truncate(:millisecond) |> Time.to_string()
@@ -91,7 +92,7 @@ defmodule Grizzly.Trace.Record do
   defp dest_to_string(:grizzly), do: dest_to_string("G")
   defp dest_to_string(dest), do: dest |> Kernel.to_string() |> String.pad_trailing(3)
 
-  defp command_info_str(%Command{name: :keep_alive} = cmd, _binary) do
+  defp command_info_str(%Command{name: :keep_alive} = cmd, _binary, _decode?) do
     case Command.param!(cmd, :ack_flag) do
       :ack_request ->
         "    keep_alive (ack req)"
@@ -101,7 +102,7 @@ defmodule Grizzly.Trace.Record do
     end
   end
 
-  defp command_info_str(zip_packet, binary) do
+  defp command_info_str(zip_packet, binary, decode?) do
     seq_number = Command.param!(zip_packet, :seq_number)
     flag = Command.param!(zip_packet, :flag)
 
@@ -119,7 +120,7 @@ defmodule Grizzly.Trace.Record do
         "    no_operation"
 
       true ->
-        command_info_with_encapsulated_command(seq_number, zip_packet, binary)
+        command_info_with_encapsulated_command(seq_number, zip_packet, binary, decode?)
     end
   end
 
@@ -127,7 +128,7 @@ defmodule Grizzly.Trace.Record do
     "#{seq_number_to_str(seq_number)} #{flag}"
   end
 
-  defp command_info_with_encapsulated_command(seq_number, zip_packet, binary) do
+  defp command_info_with_encapsulated_command(seq_number, zip_packet, binary, decode?) do
     command = Command.param!(zip_packet, :command)
     command_binary = ZIPPacket.unwrap(binary)
 
@@ -135,10 +136,14 @@ defmodule Grizzly.Trace.Record do
          encap_bin = Command.param!(command, :encapsulated_command),
          {:ok, inner_command} <-
            Grizzly.ZWave.from_binary(encap_bin) do
-      "#{seq_number_to_str(seq_number)} supervision_get(#{inner_command.name}) #{inspect(encap_bin, limit: 500)}"
+      detail = if decode?, do: inspect(inner_command.params), else: inspect(encap_bin, limit: 500)
+      "#{seq_number_to_str(seq_number)} supervision_get(#{inner_command.name}) #{detail}"
     else
       _ ->
-        "#{seq_number_to_str(seq_number)} #{command.name} #{inspect(command_binary, limit: 500)}"
+        detail =
+          if decode?, do: inspect(command.params), else: inspect(command_binary, limit: 500)
+
+        "#{seq_number_to_str(seq_number)} #{command.name} #{detail}"
     end
   rescue
     err ->
