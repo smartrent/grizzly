@@ -58,10 +58,12 @@ defmodule Grizzly.Trace do
     `timestamp source -> destination: binary`.
   """
   @spec format([Record.t()], format(), keyword()) :: binary()
-  def format(records, format \\ @default_format, opts \\ [])
-
   def format(records, fmt, opts) when fmt in [:text, :raw],
     do: Enum.map_join(records, "\n", &Record.to_string(&1, fmt, opts))
+
+  def format(records, opts) when is_list(opts), do: format(records, @default_format, opts)
+  def format(records, fmt) when is_atom(fmt), do: format(records, fmt, [])
+  def format(records), do: format(records, @default_format, [])
 
   @doc "Dump trace records into a file using Erlang External Term Format."
   @spec dump(binary()) :: :ok | {:error, atom()}
@@ -79,7 +81,7 @@ defmodule Grizzly.Trace do
   def print(records, opts) when is_list(records) do
     print_header()
     {format_opts, _list_opts} = Keyword.split(opts, [:decode])
-    records |> format(@default_format, format_opts) |> IO.puts()
+    records |> format(format_opts) |> IO.puts()
   end
 
   def print(fmt, opts) when is_atom(fmt) do
