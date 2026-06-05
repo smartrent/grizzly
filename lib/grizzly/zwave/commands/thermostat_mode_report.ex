@@ -1,4 +1,4 @@
-defmodule Grizzly.ZWave.Commands.ThermostatModeSetReport do
+defmodule Grizzly.ZWave.Commands.ThermostatModeReport do
   @moduledoc """
   This module implements command THERMOSTAT_MODE_SET of the
   COMMAND_CLASS_THERMOSTAT_MODE command class.
