@@ -40,7 +40,7 @@ defmodule Grizzly.ZWave.Commands.ThermostatModeSetReport do
   end
 
   @impl Grizzly.ZWave.Command
-  def decode_params(_spec, <<mfr_data_len::3, mode_byte::5, mfr_data::binary-size(mfr_data_len)>>) do
+  def decode_params(_spec, <<mfr_data_len::3, mode_byte::5, mfr_data::binary-size(mfr_data_len), _garbage::binary>>) do
     with {:ok, mode} <- ThermostatMode.decode_mode(mode_byte) do
       if mode == :manufacturer_specific do
         {:ok, [mode: mode, manufacturer_data: mfr_data]}
