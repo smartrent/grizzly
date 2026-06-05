@@ -2,6 +2,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.1.4]
+
+### Changed
+
+* Fix crash on decoding a thermostat mode report ([#1246](https://github.com/smartrent/grizzly/pull/1246))
+
 ## [v9.1.3]
 
 ### Changed
@@ -43,6 +49,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 For Grizzly v8 and older, see the [v8 changelog](https://github.com/smartrent/grizzly/blob/maint/v8/CHANGELOG.md).
 
+[v9.1.4]: https://github.com/smartrent/grizzly/compare/v9.1.3..v9.1.4
 [v9.1.3]: https://github.com/smartrent/grizzly/compare/v9.1.2..v9.1.3
 [v9.1.2]: https://github.com/smartrent/grizzly/compare/v9.1.1..v9.1.2
 [v9.1.1]: https://github.com/smartrent/grizzly/compare/v9.1.0..v9.1.1
