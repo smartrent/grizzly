@@ -985,9 +985,9 @@ defmodule Grizzly.ZWave.Commands do
   end
 
   command_class :thermostat_mode, 0x40 do
-    command :thermostat_mode_set, 0x01, Cmds.ThermostatModeSetReport
+    command :thermostat_mode_set, 0x01, Cmds.ThermostatModeSet
     command :thermostat_mode_get, 0x02, Cmds.Generic, params: []
-    command :thermostat_mode_report, 0x03, Cmds.ThermostatModeSetReport
+    command :thermostat_mode_report, 0x03, Cmds.ThermostatModeReport
     command :thermostat_mode_supported_get, 0x04, Cmds.Generic, params: []
     command :thermostat_mode_supported_report, 0x05
   end
