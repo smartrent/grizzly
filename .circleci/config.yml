@@ -108,8 +108,7 @@ jobs:
           name: Run tests
           command: |
             circleci tests glob 'test/**/*_test.exs' | \
-              circleci tests run --split-by=timings --command='xargs -n1 echo > test_file_paths.txt'
-            cat test_file_paths.txt | xargs mix test
+              circleci tests run --split-by=timings --command='xargs mix test'
       - store_test_results:
           path: test-junit-report.xml
 
@@ -158,7 +157,6 @@ workflows:
     max_auto_reruns: 3
     jobs:
       - build:
-          filters: pipeline.git.tag
           matrix:
             parameters:
               image-tag:
@@ -166,17 +164,62 @@ workflows:
                 - *elixir_prev_1
                 # - *elixir_prev_2
       - lint:
-          filters: pipeline.git.tag
           image-tag: *elixir_current
           requires:
             - build
       - dialyzer:
-          filters: pipeline.git.tag
           image-tag: *elixir_current
           requires:
             - build
       - test:
-          filters: pipeline.git.tag
+          requires:
+            - build
+          matrix:
+            parameters:
+              image-tag:
+                - *elixir_current
+                - *elixir_prev_1
+                # - *elixir_prev_2
+      - spelling_and_markdownlint
+
+  release:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          matrix:
+            parameters:
+              image-tag:
+                - *elixir_current
+                - *elixir_prev_1
+                # - *elixir_prev_2
+      - lint:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          image-tag: *elixir_current
+          requires:
+            - build
+      - dialyzer:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          image-tag: *elixir_current
+          requires:
+            - build
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
           requires:
             - build
           matrix:
@@ -188,10 +231,13 @@ workflows:
       - publish:
           context:
             - github-token
-          filters: pipeline.git.tag starts-with "v"
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
           image-tag: *elixir_current
           requires:
             - lint
             - dialyzer
             - test
-      - spelling_and_markdownlint
