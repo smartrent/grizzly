@@ -512,7 +512,8 @@ defmodule Grizzly.ZWave.Notifications do
              :credential_unlock_operation,
              :valid_credential_denied_user_disabled,
              :valid_credential_denied_user_schedule_not_active,
-             :messaging_user_code_entered_via_keypad
+             :messaging_user_code_entered_via_keypad,
+             :non_access_credential_used
            ] do
     case decode_credential_usage_data(params_binary) do
       {:ok, data} ->
