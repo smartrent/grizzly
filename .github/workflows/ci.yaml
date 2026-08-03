@@ -1,0 +1,103 @@
+name: Elixir CI
+
+on:
+  push:
+    branches:
+      - main
+      - hotfix/[0-9]+.[0-9]+.[0-9]+
+      - release/[0-9]+.[0-9]+.[0-9]+
+    tags:
+      - "*"
+  pull_request:
+    types: [synchronize, opened, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.elixir }}-erlang-${{ matrix.erlang }})
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - elixir: "1.19.3"
+            erlang: "28.1.1"
+            latest: true
+          - elixir: "1.18.4"
+            erlang: "27.3.4.2"
+            latest: false
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.erlang }}
+
+      - name: Restore deps/build cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.erlang }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.erlang }}-
+
+      - name: Restore Dialyzer PLT cache (latest only)
+        if: matrix.latest
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: _build/plts
+          key: ${{ runner.os }}-plt-${{ matrix.elixir }}-${{ matrix.erlang }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-plt-${{ matrix.elixir }}-${{ matrix.erlang }}-
+
+      - run: mix deps.get
+
+      - run: mix compile --warnings-as-errors
+
+      - run: mix test
+
+      - name: Quality checks (latest only)
+        if: matrix.latest
+        run: |
+          mix deps.unlock --check-unused
+          mix format --check-formatted
+          mix credo -a
+          mix dialyzer
+
+      - name: Docs + hex build (latest only)
+        if: matrix.latest
+        run: |
+          mix deps.get
+          mix docs --warnings-as-errors
+          mix hex.build
+        env:
+          MIX_ENV: docs
+
+  spelling_and_markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+
+      - name: Install cspell and markdownlint-cli2
+        run: npm i -g cspell markdownlint-cli2
+
+      - name: Spell check
+        run: cspell --quiet .
+
+      - name: Lint markdown files
+        run: markdownlint-cli2
