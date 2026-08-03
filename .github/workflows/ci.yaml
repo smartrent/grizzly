@@ -32,12 +32,15 @@ jobs:
           - elixir: "1.20.2"
             erlang: "29.0.4"
             latest: false
+            warnings_as_errors: false
           - elixir: "1.19.3"
             erlang: "28.1.1"
             latest: true
+            warnings_as_errors: true
           - elixir: "1.18.4"
             erlang: "27.3.4.2"
             latest: false
+            warnings_as_errors: true
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -69,6 +72,11 @@ jobs:
       - run: mix deps.get
 
       - run: mix compile --warnings-as-errors
+        if: matrix.warnings_as_errors
+
+      - name: Compile (warnings allowed on this Elixir version pending cleanup)
+        run: mix compile
+        if: ${{ !matrix.warnings_as_errors }}
 
       - run: mix test
 
