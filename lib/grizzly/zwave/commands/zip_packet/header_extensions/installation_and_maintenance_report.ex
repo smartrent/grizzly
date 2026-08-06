@@ -6,7 +6,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions.InstallationAndMaint
   alias Grizzly.ZWave.Encoding
 
   def from_binary(<<0x03, length, rest::binary>>) do
-    <<imes_bin::binary-size(length), _rest::binary>> = rest
+    <<imes_bin::binary-size(^length), _rest::binary>> = rest
 
     imes_bin
     |> Encoding.reduce_binary(&ime_from_binary/2)

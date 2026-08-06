@@ -8,8 +8,6 @@ defmodule Grizzly.Requests.Handlers.WaitReport do
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands
 
-  require Logger
-
   @type state :: %{complete_report: atom(), get_command: Command.t()}
 
   @type opt :: {:complete_report, atom(), get_command: Command.t()}

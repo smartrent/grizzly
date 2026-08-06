@@ -148,7 +148,7 @@ defmodule Grizzly.ZWave.ParamSpec do
   def take_bits(%__MODULE__{type: type, size: size}, bitstring, _other_params)
       when type in [:binary, :dsk] and is_integer(size) and rem(size, 8) == 0 and
              bit_size(bitstring) >= size do
-    <<value::bitstring-size(size), rest::bitstring>> = bitstring
+    <<value::bitstring-size(^size), rest::bitstring>> = bitstring
     {:ok, {size, value, rest}}
   end
 
@@ -187,7 +187,7 @@ defmodule Grizzly.ZWave.ParamSpec do
 
   def take_bits(%__MODULE__{size: size}, bitstring, _other_params)
       when is_integer(size) and bit_size(bitstring) >= size do
-    <<value::bitstring-size(size), rest::bitstring>> = bitstring
+    <<value::bitstring-size(^size), rest::bitstring>> = bitstring
     {:ok, {size, value, rest}}
   end
 
@@ -235,7 +235,7 @@ defmodule Grizzly.ZWave.ParamSpec do
     # Only truncate to size if the size is less than 8 bytes. Multi-byte bitmasks
     # are always byte-aligned.
     if size < 8 do
-      <<_truncated::size(8 - size), right_sized_bitmask::bitstring-size(size)>> = full_bitmask
+      <<_truncated::size(8 - ^size), right_sized_bitmask::bitstring-size(^size)>> = full_bitmask
       right_sized_bitmask
     else
       full_bitmask
@@ -499,7 +499,7 @@ defmodule Grizzly.ZWave.ParamSpec do
   def decode_value(%__MODULE__{type: :binary, size: size} = param_spec, binary, _other_params)
       when is_integer(size) do
     case binary do
-      <<v::bitstring-size(size)>> ->
+      <<v::bitstring-size(^size)>> ->
         {:ok, v}
 
       _ ->

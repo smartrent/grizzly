@@ -64,7 +64,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket.HeaderExtensions do
     do: {[:installation_and_maintenance_get | extensions], rest}
 
   defp parse_extension(<<0x03, length, rest::binary>> = report, extensions) do
-    <<_::binary-size(length), rest::binary>> = rest
+    <<_::binary-size(^length), rest::binary>> = rest
 
     {[
        {:installation_and_maintenance_report,

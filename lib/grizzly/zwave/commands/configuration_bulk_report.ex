@@ -56,7 +56,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkReport do
           size::3, values_bin::binary>>
       ) do
     values =
-      for(<<value::signed-integer-size(size)-unit(8) <- values_bin>>, do: value)
+      for(<<value::signed-integer-size(^size)-unit(8) <- values_bin>>, do: value)
       |> Enum.take(count)
 
     {:ok,
