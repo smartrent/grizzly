@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # required for `gh release create` via the built-in GITHUB_TOKEN
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify matching version in CHANGELOG.md, tag, and mix.exs
+        run: |
+          VERSION=$(sed -n 's/.*@version "\([^"]*\)".*/\1/p' mix.exs)
+          if ! grep -q "## \[v$VERSION\]" CHANGELOG.md; then
+            echo "Error: Version v$VERSION not found in CHANGELOG.md"
+            exit 1
+          fi
+          TAG_VERSION=${GITHUB_REF_NAME#v}
+          if [ "$TAG_VERSION" != "$VERSION" ]; then
+            echo "Error: Tag version ($TAG_VERSION) does not match mix.exs version ($VERSION)"
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          awk -v ver="${GITHUB_REF_NAME}" '/^#+ \[/ { if (p) { exit }; if ($2 == "["ver"]") { p=1; next} } p && NF' CHANGELOG.md > release-notes.md
+          gh release create "${GITHUB_REF_NAME}" \
+            --verify-tag \
+            --title "${GITHUB_REF_NAME}" \
+            -F release-notes.md \
+            --repo "${GITHUB_REPOSITORY}"
+
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
+        with:
+          elixir-version: "1.19.3"
+          otp-version: "28.1.1"
+
+      - name: Publish to Hex
+        env:
+          MIX_ENV: docs
+          HEX_API_KEY: ${{ secrets.HEX_API_WRITE_KEY }}
+        run: |
+          mix deps.get
+          mix hex.publish --yes
