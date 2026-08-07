@@ -99,4 +99,54 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunnerTest do
 
     assert_receive {:DOWN, _ref, :process, ^runner, :normal}
   end
+
+  @tag :firmware_update
+  test "progress_timer is armed as soon as the initial firmware update command is dispatched" do
+    image_path = "test/serialapi_controller_bridge_OTW_SD3503_US.gbl"
+
+    {:ok, runner} =
+      FirmwareUpdateRunner.start_link(
+        Utils.default_options(),
+        device_id: 100,
+        manufacturer_id: 1
+      )
+
+    on_exit(fn -> if Process.alive?(runner), do: FirmwareUpdateRunner.stop(runner) end)
+
+    state = :sys.get_state(runner)
+    assert state.progress_timer == nil
+
+    :ok = FirmwareUpdateRunner.start_firmware_update(runner, image_path)
+
+    state = :sys.get_state(runner)
+    assert is_reference(state.progress_timer)
+    assert Process.alive?(runner)
+  end
+
+  @tag :firmware_update
+  test "a silent device causes the runner to time out and stop even though nothing ever responds" do
+    image_path = "test/serialapi_controller_bridge_OTW_SD3503_US.gbl"
+
+    # A short progress_timeout so the test doesn't need to wait out the
+    # real 2 minute default. Node id 100 acts like a silent device
+    {:ok, runner} =
+      FirmwareUpdateRunner.start_link(
+        Utils.default_options(),
+        device_id: 100,
+        manufacturer_id: 1,
+        progress_timeout: 100
+      )
+
+    on_exit(fn -> if Process.alive?(runner), do: FirmwareUpdateRunner.stop(runner) end)
+    Process.monitor(runner)
+
+    :ok = FirmwareUpdateRunner.start_firmware_update(runner, image_path)
+
+    assert is_reference(:sys.get_state(runner).progress_timer)
+
+    assert_receive {:grizzly, :report, {:error, :timeout}}, 500
+    assert_receive {:DOWN, _ref, :process, ^runner, :normal}, 500
+
+    refute Process.alive?(runner)
+  end
 end

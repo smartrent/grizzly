@@ -152,7 +152,12 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
         retries: 4
       )
 
-    {:reply, :ok, FirmwareUpdate.update_command_ref(new_firmware_update, command_ref, command)}
+    final_firmware_update =
+      new_firmware_update
+      |> FirmwareUpdate.update_command_ref(command_ref, command)
+      |> FirmwareUpdate.reset_progress_timer()
+
+    {:reply, :ok, final_firmware_update}
   end
 
   def handle_call(
@@ -177,7 +182,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   # Async responses to commands sent
   def handle_info({:grizzly, :report, report}, firmware_update) do
     case report.type do
-      type when type in [:nack_response, :timeout] ->
+      :nack_response ->
         firmware_update = handle_nack_response(firmware_update)
 
         {:noreply, firmware_update}
