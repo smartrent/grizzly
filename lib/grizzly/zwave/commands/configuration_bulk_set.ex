@@ -50,7 +50,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationBulkSet do
         <<offset::16, _count, default_bit::1, handshake_bit::1, _reserved::3, size::3,
           values_bin::binary>>
       ) do
-    values = for <<value::signed-integer-size(size)-unit(8) <- values_bin>>, do: value
+    values = for <<value::signed-integer-size(^size)-unit(8) <- values_bin>>, do: value
 
     {:ok,
      [

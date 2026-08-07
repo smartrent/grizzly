@@ -31,7 +31,7 @@ defmodule Grizzly.ZWave.Commands.WindowCoveringSet do
   @impl Grizzly.ZWave.Command
   def decode_params(_spec, <<0x00::4, parameters_count::4, rest::binary>>) do
     parameters_size = parameters_count * 2
-    <<parameters_binary::binary-size(parameters_size), duration>> = rest
+    <<parameters_binary::binary-size(^parameters_size), duration>> = rest
 
     try do
       parameters = parameters_from_binary(parameters_binary)

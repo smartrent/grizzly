@@ -60,7 +60,7 @@ defmodule Grizzly.ZWave.Commands.ConfigurationSet do
   end
 
   def decode_params(_spec, <<param_number, _::5, size::3, value::binary>>) do
-    <<value_int::signed-integer-size(size)-unit(8)>> = value
+    <<value_int::signed-integer-size(^size)-unit(8)>> = value
     {:ok, [param_number: param_number, value: value_int, size: size]}
   end
 

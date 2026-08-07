@@ -8,8 +8,6 @@ defmodule GrizzlyTest.Transport.DTLS do
   alias Grizzly.Transport
   alias Grizzly.Transports.DTLS
 
-  require Logger
-
   @handshake_timeout Application.compile_env(:grizzly, :dtls_handshake_timeout, 10_000)
 
   @impl Grizzly.Transport

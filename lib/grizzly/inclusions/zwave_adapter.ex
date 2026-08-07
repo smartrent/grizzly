@@ -11,8 +11,6 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
   alias Grizzly.ZWave.DSK
   alias Grizzly.ZWave.Security
 
-  require Logger
-
   @inclusion_timeout :timer.seconds(530)
 
   @type state :: %{

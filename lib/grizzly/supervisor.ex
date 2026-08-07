@@ -46,8 +46,6 @@ defmodule Grizzly.Supervisor do
   alias Grizzly.Trace
   alias Grizzly.ZIPGateway.ReadyChecker
 
-  require Logger
-
   @typedoc """
   The RF region code you want the Z-Wave controller to operate at.
 

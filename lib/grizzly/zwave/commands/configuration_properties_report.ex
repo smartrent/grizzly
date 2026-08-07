@@ -198,11 +198,11 @@ defmodule Grizzly.ZWave.Commands.ConfigurationPropertiesReport do
   defp value_spec(size, format, value_bin) do
     case format do
       :signed_integer ->
-        <<value::signed-size(size)-unit(8)>> = value_bin
+        <<value::signed-size(^size)-unit(8)>> = value_bin
         value
 
       _other ->
-        <<value::integer-size(size)-unit(8)>> = value_bin
+        <<value::integer-size(^size)-unit(8)>> = value_bin
         value
     end
   end

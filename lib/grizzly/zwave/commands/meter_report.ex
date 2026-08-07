@@ -166,10 +166,10 @@ defmodule Grizzly.ZWave.Commands.MeterReport do
       {0, <<scale2::8>>} ->
         {:ok, {:unknown, scale2}}
 
-      {_, <<previous_value::size(size)-unit(8)>>} ->
+      {_, <<previous_value::size(^size)-unit(8)>>} ->
         {:ok, {Encoding.decode_zwave_float(previous_value, precision), 0}}
 
-      {_, <<previous_value::size(size)-unit(8), scale2::8>>} ->
+      {_, <<previous_value::size(^size)-unit(8), scale2::8>>} ->
         {:ok, {Encoding.decode_zwave_float(previous_value, precision), scale2}}
 
       _ ->

@@ -518,7 +518,7 @@ defmodule Grizzly.ZWave.Encoding do
     # bit.
     bits = ceil(:math.log2(abs(int_value))) + 1
 
-    <<msb::1, _rest::size(bits - 1)>> = <<int_value::signed-size(bits)>>
+    <<msb::1, _rest::size(^bits - 1)>> = <<int_value::signed-size(bits)>>
 
     if msb == 1 && int_value > 0 do
       bits + 1

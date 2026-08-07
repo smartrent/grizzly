@@ -53,8 +53,6 @@ defmodule Grizzly do
   alias Grizzly.ZWave.Commands.RssiReport
   alias Grizzly.ZWave.CommandSpec
 
-  require Logger
-
   import Grizzly.VersionReports, only: [is_extra_command: 1]
 
   @typedoc """

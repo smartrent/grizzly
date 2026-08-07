@@ -8,8 +8,6 @@ defmodule Grizzly.Options do
   alias Grizzly.Trace
   alias Grizzly.ZIPGateway.Config
 
-  require Logger
-
   @typedoc """
   Options for configuring Z-Wave module firmware upgrades.
 

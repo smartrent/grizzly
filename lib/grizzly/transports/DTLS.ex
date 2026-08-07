@@ -9,8 +9,6 @@ defmodule Grizzly.Transports.DTLS do
   alias Grizzly.Transport
   alias Grizzly.ZWave
 
-  require Logger
-
   @impl Grizzly.Transport
   def open(args, ifaddr \\ {0xFD00, 0xAAAA, 0, 0, 0, 0, 0, 0x0002}) do
     ip_address = Keyword.fetch!(args, :ip_address)

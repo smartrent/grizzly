@@ -10,8 +10,6 @@ defmodule Grizzly.Storage.Populate do
   alias Grizzly.ZIPGateway.Database, as: ZIPGatewayDb
   alias Grizzly.ZWave.DSK
 
-  require Logger
-
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
     database = Keyword.get(opts, :database, Grizzly.options().database_file)

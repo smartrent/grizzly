@@ -251,7 +251,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
       # Subtract one because the field includes itself thus leading to
       # pulling out the command class byte along with the header extension
       header_extension_length = header_extension_length - 1
-      <<_, extensions_bin::binary-size(header_extension_length), _command::binary>> = packet_body
+      <<_, extensions_bin::binary-size(^header_extension_length), _command::binary>> = packet_body
 
       HeaderExtensions.from_binary(extensions_bin)
     else
@@ -265,7 +265,7 @@ defmodule Grizzly.ZWave.Commands.ZIPPacket do
     # Subtract one because the field includes itself thus leading to
     # pulling out the command class byte along with the header extension
     header_extension_length = header_extension_length - 1
-    <<_extensions::binary-size(header_extension_length), command_binary::binary>> = rest
+    <<_extensions::binary-size(^header_extension_length), command_binary::binary>> = rest
 
     if command_binary == "" do
       {:ok, nil}

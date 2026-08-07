@@ -122,7 +122,7 @@ defmodule Grizzly.ZWave.NodeId do
         do_parse(node_id_bin)
 
       del_size ->
-        <<node_id_8, _delimiter::size(del_size)-unit(8), node_id_16::binary>> = node_id_bin
+        <<node_id_8, _delimiter::size(^del_size)-unit(8), node_id_16::binary>> = node_id_bin
         do_parse(<<node_id_8, node_id_16::binary>>)
     end
   end

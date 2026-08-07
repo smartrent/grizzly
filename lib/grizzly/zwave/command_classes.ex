@@ -5,8 +5,6 @@ defmodule Grizzly.ZWave.CommandClasses do
 
   import Grizzly.ZWave.GeneratedMappings, only: [command_class_mappings: 0]
 
-  require Logger
-
   @type command_class_list :: [
           non_secure_supported: list(atom()),
           non_secure_controlled: list(atom()),
