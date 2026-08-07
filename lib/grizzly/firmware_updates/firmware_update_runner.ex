@@ -177,7 +177,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
   # Async responses to commands sent
   def handle_info({:grizzly, :report, report}, firmware_update) do
     case report.type do
-      type when type in [:nack_response, :timeout] ->
+      :nack_response ->
         firmware_update = handle_nack_response(firmware_update)
 
         {:noreply, firmware_update}
