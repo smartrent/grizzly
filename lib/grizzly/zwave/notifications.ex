@@ -666,7 +666,11 @@ defmodule Grizzly.ZWave.Notifications do
   defp decode_credential_usage_data(_binary), do: :error
 
   defp extended_user_code_to_event_params(user_code) do
-    Map.take(user_code, [:user_id, :user_id_status, :user_code]) |> Map.to_list()
+    [
+      user_id: user_code.user_id,
+      user_id_status: user_code.user_id_status,
+      user_code: user_code.user_code
+    ]
   end
 
   # Some locks don't wrap the Extended User Code Report in a full CC/Command
