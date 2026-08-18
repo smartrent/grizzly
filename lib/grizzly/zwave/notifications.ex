@@ -7,6 +7,7 @@ defmodule Grizzly.ZWave.Notifications do
   import Grizzly.ZWave.Encoding
 
   alias Grizzly.ZWave
+  alias Grizzly.ZWave.CommandClasses.UserCode
   alias Grizzly.ZWave.Commands
   alias Grizzly.ZWave.DecodeError
   alias Grizzly.ZWave.ZWEnum
@@ -506,6 +507,21 @@ defmodule Grizzly.ZWave.Notifications do
     end
   end
 
+  # Yale Pro 2 locks report lock/unlock operations for user slots above 255
+  # (which don't fit in the 1-byte Alarm Level field) via an embedded Extended
+  # User Code Report, instead of the plain UserCodeReport used for slots 1-255.
+  def decode_event_params(:access_control, zwave_event, params_binary)
+      when zwave_event in [:lock_operation_with_user_code, :unlock_operation_with_user_code] do
+    with {:ok, extended_user_code_report} <- Grizzly.ZWave.from_binary(params_binary),
+         [user_code | _] <- extended_user_code_report.params[:user_codes] do
+      {:ok, extended_user_code_to_event_params(user_code)}
+    else
+      _ -> decode_extended_user_code_fallback(params_binary)
+    end
+  rescue
+    FunctionClauseError -> decode_extended_user_code_fallback(params_binary)
+  end
+
   def decode_event_params(:access_control, zwave_event, params_binary)
       when zwave_event in [
              :credential_lock_operation,
@@ -648,4 +664,27 @@ defmodule Grizzly.ZWave.Notifications do
   end
 
   defp decode_credential_usage_data(_binary), do: :error
+
+  defp extended_user_code_to_event_params(user_code) do
+    Map.take(user_code, [:user_id, :user_id_status, :user_code]) |> Map.to_list()
+  end
+
+  # Some locks don't wrap the Extended User Code Report in a full CC/Command
+  # header; fall back to decoding it as a bare user codes list.
+  defp decode_extended_user_code_fallback(params_binary) do
+    case UserCode.decode_extended_user_codes(params_binary) do
+      {[user_code | _], _rest} ->
+        {:ok, extended_user_code_to_event_params(user_code)}
+
+      {[], _rest} ->
+        {:ok, []}
+    end
+  rescue
+    _ in FunctionClauseError ->
+      Logger.warning(
+        "[Grizzly] Failed to decode ExtendedUserCodeReport from #{inspect(params_binary)}"
+      )
+
+      {:ok, []}
+  end
 end
