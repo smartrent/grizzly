@@ -52,7 +52,7 @@ defmodule Grizzly.MixProject do
       {:exqlite, "~> 0.33"},
       {:junit_formatter, "~> 3.3", only: :test},
       {:mimic, "~> 2.0", only: [:dev, :test]},
-      {:muontrap, "~> 2.0"},
+      {:muontrap, "~> 2.0 or ~> 1.0"},
       {:nimble_options, "~> 1.0"},
       {:property_table, "~> 0.3"},
       {:quokka, "~> 2.11", only: [:dev, :test], runtime: false},
