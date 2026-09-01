@@ -2,6 +2,21 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.1.5]
+
+### Changed
+
+* Migrate CI from CircleCI to GitHub Actions ([#1259](https://github.com/smartrent/grizzly/pull/1259))
+* Migrate from asdf to mise ([#1254](https://github.com/smartrent/grizzly/pull/1254))
+* Adjust CI to create release notes after release is merged in ([#1251](https://github.com/smartrent/grizzly/pull/1251))
+
+### Fixed 
+
+* Fix z-wave event types `messaging_user_code_entered_via_keypad` and `non_access_credential_used` not allowed when decoding access control event params ([#1258](https://github.com/smartrent/grizzly/pull/1258))
+* Fix Elixir 1.20 warnings for bin pattern matching `size(pinned)` and unused `require Logger` statements ([#1262](https://github.com/smartrent/grizzly/pull/1262))
+* Fix `progress_timer` not created when dispatching initial fw update async command ([#1261](https://github.com/smartrent/grizzly/pull/1261))
+* Fix firmware update timeouts conflated with nack responses from devices ([#1260](https://github.com/smartrent/grizzly/pull/1260))
+
 ## [v9.1.4]
 
 ### Changed
@@ -49,6 +64,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 For Grizzly v8 and older, see the [v8 changelog](https://github.com/smartrent/grizzly/blob/maint/v8/CHANGELOG.md).
 
+[v9.1.5]: https://github.com/smartrent/grizzly/compare/v9.1.4..v9.1.5
 [v9.1.4]: https://github.com/smartrent/grizzly/compare/v9.1.3..v9.1.4
 [v9.1.3]: https://github.com/smartrent/grizzly/compare/v9.1.2..v9.1.3
 [v9.1.2]: https://github.com/smartrent/grizzly/compare/v9.1.1..v9.1.2
