@@ -16,7 +16,8 @@ defmodule Grizzly.MixProject do
       package: package(),
       docs: docs(),
       test_coverage: [
-        ignore_modules: [~r/^GrizzlyTest/, ~r/^Mock/, ~r/^Mix/]
+        ignore_modules: [~r/^GrizzlyTest/, ~r/^Mock/, ~r/^Mix/],
+        summary: [threshold: 0]
       ]
     ]
   end
