@@ -4,6 +4,10 @@
 # If you run "mix test --cover", coverage assets end up here.
 /cover/
 
+# CI coverage scratch files (see .github/workflows/ci.yaml)
+/coverage_output.txt
+/coverage_summary.txt
+
 # The directory Mix downloads your dependencies sources to.
 /deps/
 
