@@ -15,6 +15,9 @@ on:
 permissions:
   contents: read
 
+env:
+  COVERAGE_TARGET: "80"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -79,6 +82,43 @@ jobs:
         if: ${{ !matrix.warnings_as_errors }}
 
       - run: mix test
+        if: ${{ !matrix.latest }}
+
+      - name: Run tests with coverage (latest only)
+        if: matrix.latest
+        run: |
+          set -o pipefail
+          mix test --cover | tee coverage_output.txt
+
+      # Parses the `xx.xx% | Total` line for the coverage_report job.
+      # Not enforced -- mix.exs sets threshold: 0, so only a test failure fails this job.
+      - name: Summarize coverage (latest only)
+        if: always() && matrix.latest
+        run: |
+          pct=$(grep -E '[0-9]+(\.[0-9]+)?% \| Total\b' coverage_output.txt 2>/dev/null | tail -1 \
+                | grep -oE '[0-9]+(\.[0-9]+)?' | head -1 || true)
+          pct=${pct:-0}
+          echo "${pct} ${COVERAGE_TARGET}" > coverage_summary.txt
+          {
+            echo "### Coverage"
+            echo ""
+            echo "Line coverage is **${pct}%** (target ${COVERAGE_TARGET}%)."
+            awk -v p="$pct" -v t="$COVERAGE_TARGET" 'BEGIN {
+              if (p + 0 < t + 0)
+                print "\n:warning: Below target — consider adding tests to help meet the goal."
+              else
+                print "\n:white_check_mark: Meets target."
+            }'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage summary (latest only)
+        if: always() && matrix.latest
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-summary
+          path: coverage_summary.txt
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Quality checks (latest only)
         if: matrix.latest
@@ -112,3 +152,64 @@ jobs:
 
       - name: Lint markdown files
         run: markdownlint-cli2
+
+  # Posts a sticky, non-blocking PR comment with the coverage % from the test job.
+  coverage_report:
+    needs: test
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download coverage summary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: coverage-summary
+
+      - name: Post coverage comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          marker='<!-- grizzly-coverage-report -->'
+
+          if [ ! -f coverage_summary.txt ]; then
+            echo "No coverage data found; skipping comment."
+            exit 0
+          fi
+          read -r pct tgt < coverage_summary.txt
+
+          status='✅'
+          note="> ✅ Coverage meets the **${tgt}%** target. Nice work!"
+          if awk -v p="$pct" -v t="$tgt" 'BEGIN { exit !(p + 0 < t + 0) }'; then
+            status='⚠️ consider adding tests'
+            note="> ⚠️ Coverage is below the **${tgt}%** target. Coverage is **not enforced** — this won't block the PR. Please consider adding tests to help meet the goal. 💚"
+          fi
+
+          {
+            echo "## 🧪 Test coverage report"
+            echo ""
+            echo "| Coverage | Target | Status |"
+            echo "|---:|---:|---|"
+            echo "| ${pct}% | ${tgt}% | ${status} |"
+            echo ""
+            echo "$note"
+            echo ""
+            echo "<sub>Measured with \`mix test --cover\` on host. ${marker}</sub>"
+          } > comment.md
+
+          existing=$(gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" --paginate \
+                     --jq ".[] | select(.body | contains(\"${marker}\")) | .id" | head -1 || true)
+          if [ -n "$existing" ]; then
+            gh api --method PATCH "repos/${REPO}/issues/comments/${existing}" \
+              -f body="$(cat comment.md)" >/dev/null
+            echo "Updated existing coverage comment (${existing})."
+          else
+            gh api --method POST "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+              -f body="$(cat comment.md)" >/dev/null
+            echo "Created coverage comment."
+          fi
