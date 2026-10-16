@@ -12,6 +12,21 @@ def deps do
 end
 ```
 
+## Controller backends
+
+The target is a **compile-time backend choice per firmware/release build**.
+ZIPGateway and Zwrap coexist temporarily; the goal is to deprecate and remove
+ZIPGateway completely, not switch deployed systems between backends.
+
+This worktree implements compile-time selection with `GRIZZLY_BACKEND`, but
+**does not complete the entire parity plan**. Runtime backend selection is
+rejected; host production releases have source/dependency/artifact isolation. See [current progress](PARITY_IMPLEMENTATION_REPORT.md), the
+[implementation plan](PARITY_IMPLEMENTATION_PLAN.md), and
+[backend setup](docs/backends.md). Significant controller/workflow/lifecycle work and physical target acceptance
+remain unfinished.
+The following ZIPGateway hardware/deployment instructions describe the legacy
+backend.
+
 ## Hardware Requirements
 
 - Z-Wave Bridge Controller
