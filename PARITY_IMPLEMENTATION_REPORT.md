@@ -160,6 +160,46 @@ Scope and exclusions: `docs/zwrap-maintenance-audit.md` in the Grizzly worktree.
 This is not a completed whole-stack writer/serial callback audit. It adds no
 native CRUD, automatic journal recovery or arbitrary security-store reload.
 
+### Tracked serial sends and Transport Service continuation
+
+- SendData (0x13), bridge/TS (0xA9) and NIF (0x12) retain one wire owner
+  per command, including sends with no caller callback. Same-command overlap
+  rejects before overwriting the shared callback or command buffer.
+- Completion matches command and nonzero SDK callback ID; ownership retires
+  before callback reentry, while dispatch depth still prevents maintenance.
+  Queued RX, partial frames and pending serial ACK state also prevent quiet.
+- Explicit FALSE admission releases an unaccepted send. Missing/malformed
+  admission, truncated matching status, reset under tracked work or an
+  unresolved 65-second safety deadline abort the isolated helper. Blocking
+  SDK calls can delay deadline checks. No radio rollback, reset or application
+  retry is inferred; UART framing retries remain unchanged.
+- Raw SAPI cannot bypass these three tracked send commands. Partial/older TX
+  extensions retain genuine status but omit unavailable metrics. Serial frame
+  bounds reserve space for the length byte and outgoing framing overhead.
+- NIF serial ACK now means accepted submission, not immediate failure or radio
+  success. Its eventual completion preserves actual target/native status.
+  Real-helper Grizzly tests exercise this path with controller IDs 1 and 7.
+- TS wire ownership survives protocol reset/terminal completion. Datagram epochs
+  suppress callbacks from retired datagrams; one parent completion clears
+  ownership/timers before callback reentry. Rejected admission cannot busy-spin
+  or inspect a synchronously retired low-level session. Optional reports remain
+  optional rather than becoming fabricated zero measurements.
+- A fourth C sanitizer harness tests actual serial send/dispatch, reentry,
+  callback-free sends, explicit rejection, queued early callbacks, duplicates,
+  wrong IDs/commands, ID wrap, malformed/missing replies and fail-closed reset.
+  Existing harnesses add TS retirement, late callbacks and synchronous failure.
+  Fake NCP tests add delayed/duplicate/mismatched/missing callback cases.
+- Both new regression boundaries were checked against core `9ccabe2`: an old
+  or mismatched callback prematurely completed newer work, and synchronous TS
+  completion caused an ASan/UBSan null-session fault. Both pass after the fix.
+
+This remains a bounded audit. Eight-bit SDK IDs wrap: arbitrary ancient
+callbacks after ID reuse cannot be distinguished from new completions. There
+is no lifetime-255 cap, but qualified NCP callback lifetime/reuse behavior is
+still a production gate, not established by these tests. Route/neighbor/SUC,
+learn/inclusion and higher security/fragment/reset/FD lifetimes remain open.
+No public operation/cancellation identity or complete writer audit is claimed.
+
 ### Elixir transport policy
 
 - Bounded, volatile sleeping-node queues; deadlines, cancellation, owner
@@ -256,14 +296,15 @@ Host results for these worktrees:
   The earlier count included native-only tests, now in a separate test tree.
 - Zwrap profile, including actual Rust helper/fake NCP: 42 tests, zero failures.
   This is not a substitute for the separately executed legacy suite.
-- Wrapper including native/fake-NCP integration: 50 tests, zero failures.
+- Wrapper including native/fake-NCP integration: 54 tests, zero failures.
 - Rust: 32 unit tests passed; strict Clippy passed.
 - Strict Grizzly Credo covers source, both test trees and build support.
   Elixir/Rust formatting and whitespace checks passed.
-- C host bounds, TX ownership and maintenance protocol/timer harnesses passed
+- Four C host bounds, TX ownership, maintenance and serial harnesses passed
   ASan, UBSan and leak detection: RX/TX bounds, provisioning, initialization,
   transport queues, request generations, security/fragment state, timer reuse,
-  reentrant callbacks, LR report-wait abort and fail-closed watchdog behavior.
+  reentrant callbacks, LR report-wait abort, TS retirement, SDK callback IDs,
+  missing/malformed replies and fail-closed watchdog behavior.
 - Both production profiles compile with warnings-as-errors. Actual host OTP
   releases pass dependency/artifact checks and retain their compiled backend
   despite the opposite runtime selector environment. Stale-artifact repair and
@@ -284,14 +325,15 @@ is missing. No package or group is complete merely because a unit test passed.
 
 - C01 open: secure learn FSM/security/reset integration.
 - C02 partial: native update and Grizzly mapping; end-to-end task acceptance.
-- C03 partial: NIF initiation/completion; full radio/role coverage.
+- C03 partial: actual-helper NIF acceptance/completion through Grizzly for IDs
+  1/7; full radio/role coverage remains open.
 - C04 implemented on host: add/learn public DSK and Grizzly report contracts.
 - C05 partial: native replacement initiation; stop/security/workflow parity.
 - C06 partial: native neighbor operation; complete controller-task tests.
 - C07 partial: cached inventory only; reconcile actual radio membership.
 - C08 partial: decoded flags only; failed-inventory task surface.
-- C09 partial: reads/edits/reload and stronger protocol/timer guards; complete
-  writer audit, refresh/recovery workflow and cache semantics remain open.
+- C09 partial: reads/edits/reload and protocol/timer/tracked-serial guards;
+  complete writer audit, refresh/recovery and cache semantics remain open.
 - C10 partial: endpoint snapshots; aggregates and validated multi-row edits.
 - C11 partial: wrapper route primitives; Grizzly tasks and route validation.
 - C12 partial: host and native application-pipeline observations/counters;
@@ -328,7 +370,7 @@ is missing. No package or group is complete merely because a unit test passed.
   active abort remains intent, not task-level cancellation. Stop paths still use
   synthetic failed status reports; exclusion stop no longer fabricates success.
 - P08 partial: bounded TLV preservation; iteration mutation/restart acceptance.
-- P09 partial: serialization/status facts and native request generations;
+- P09 partial: request generations, tracked SDK IDs and TS datagram epochs;
   complete public operation identity/cancellation remains unfinished.
 - P10 partial: class serialization/session routing; protocol-ID/multipart
   coverage.
@@ -361,8 +403,9 @@ is missing. No package or group is complete merely because a unit test passed.
 
 ## Next implementation order
 
-1. Audit/harden maintenance writers/references/timers, implement recovery and
-   endpoint edits, and wire remaining directory tasks into public operations.
+1. Audit remaining serial callback families (route/neighbor/SUC, NM/security),
+   establish NCP callback lifetime/reuse contracts, and finish writer/reference/
+   timer coverage. Implement recovery, endpoint edits and directory tasks.
 2. Replace synthetic cancellation with task-level cancellation and native state
    confirmation; complete correlation and raw/session APIs.
 3. Implement secure learn, full inclusion/replacement options and autonomous

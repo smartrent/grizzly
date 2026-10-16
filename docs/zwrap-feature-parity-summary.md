@@ -11,8 +11,10 @@ now have implementation and tests. Native Home ID, listening-mode and
 caller-only key inspection no longer depend on gateway logs. Core TX queue
 observations now include autonomous interviews; Elixir keeps these overlapping
 counters separate from host application counts, not as full RF/IMA statistics.
-Maintenance now also guards pending native report waits, security/fragment
-state and callback timers; this is not yet a complete writer/recovery audit.
+Maintenance also guards report waits, security/fragment state, callback timers
+and tracked serial data/bridge/NIF work. TS retirement retains outstanding wire
+ownership; NIF now has real-helper acceptance/completion tests. Remaining serial
+families, SDK ID-reuse contracts and writer/recovery audits are still open.
 Other workstreams remain partial; use the progress report rather than
 interpreting this baseline as completion.
 

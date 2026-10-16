@@ -85,17 +85,58 @@ Length/class checks and bounded subcommand iteration now prevent those reads
 and copies. This is not complete Multi Command/Supervision or authorization
 parity, nor an audit of every native command decoder.
 
+## Tracked serial callback ownership
+
+SendData (0x13), bridge/TS (0xA9) and NIF (0x12) own a slot until genuine
+completion, even with a NULL user callback. Same-command overlap rejects
+before overwriting its callback or command buffer. Command and nonzero SDK
+callback ID must both match. Retiring before callback invocation permits
+reentrant sends; dispatch depth still prevents maintenance during the callback.
+
+Serial quiet also requires no queued RX, partial frame or pending serial ACK.
+A definitive FALSE admission releases an unaccepted data/bridge submission.
+Lost/malformed admission, a matching callback without status, NCP restart
+under tracked work or an unresolved 65-second safety deadline ends the helper.
+Blocking SDK calls can delay deadline checks. None of these paths confirms
+radio cancellation, adds application retry or resets the radio to regain idle.
+UART framing retries remain unchanged. Queue overflow/allocation failure also
+fails the helper rather than silently dropping an owned completion.
+
+Raw SAPI rejects these three managed command IDs with request failure. Other
+raw SAPI remains privileged and is not certified safe for arbitrary commands.
+Older/partial TX extensions retain status but omit unavailable report fields.
+Serial bounds reserve space for both framing and the inbound length byte.
+
+NIF now reports serial acceptance correctly, followed by one matched native
+completion with actual target/status. Acceptance alone is not radio success.
+
+The SDK echoes only eight bits. IDs wrap without zero or active-ID reuse; there
+is no lifetime-255 cap. An arbitrary ancient duplicate after ID reuse cannot
+be distinguished from new work. Qualified NCP callback lifetime/reuse behavior
+is therefore still a production gate, not proven by wrap/duplicate host tests.
+This slice does not certify other Serial API callback families.
+
 ## Transport Service
 
-Idle requires an idle FSM and no registered reset, delayed-restart,
-inter-fragment, fragment-completion or RX timeout. The reset grace timer can
-conservatively keep maintenance busy after apparent frame completion.
+Idle requires an idle FSM, no owned sender/wire callback and no registered
+reset, delayed-restart, inter-fragment, fragment-completion or RX timeout.
+The reset grace timer can conservatively delay maintenance.
 
-The module now uses the real full-width controller identity and bridge API
-declarations instead of incompatible private BYTE prototypes. Transport
-Service still has direct serial-send paths. These predicates are not proof of
-complete serial callback correlation, physical interoperability or full RF
-accounting in application-pipeline TX observations.
+The bridge adapter preserves wire ownership after a datagram finishes or
+resets. Datagram epochs prevent an outstanding callback from resurrecting a
+retired datagram. Sender retirement stops its timers, clears parent ownership
+before callback reentry and delivers at most one completion. Missing optional
+TX reports stay unavailable instead of becoming zero RF measurements.
+
+Host admission rejection cannot enter the old unbounded busy-spin. Rejected
+submissions do not mutate existing datagrams or call their completion. Accepted
+work that fails synchronously cannot leave the low-level caller inspecting an
+already retired session. A protocol reset/failure is not confirmed RF abort:
+maintenance remains busy until the outstanding wire completion is consumed.
+
+The module uses full-width controller identity and bridge declarations. These
+guards do not certify every TS/security FSM path, source/session matching,
+physical interoperability or full RF accounting in pipeline observations.
 
 ## Resource directory and network management
 
@@ -128,17 +169,30 @@ state; no test hooks or new CRUD functions enter the port ABI.
 It exercises pending/dispatching/rearmed timers, report waits, callback
 reentrancy, multipart reports, LR abort, stale TX generations, request
 reinitialization, security/fragment state, RD retry timers and S2 bounds.
+It also exercises partial serial/ACK quiet guards, TS reset with outstanding
+wire work, late callbacks, bounded admission rejection and optional reports.
+
+`make test-host-serial` scripts the connection layer while running production
+Serial API send/dispatch code. It covers overlapping/reentrant submissions,
+callback-free bridge work, wrong IDs/commands, delayed duplicates, early queued
+callbacks, SDK ID wrap and fail-closed malformed/missing replies or restart.
+The TX harness covers synchronous TS retirement before its caller returns.
 
 The wrapper's actual helper/fake-NCP tests prove that successful TX leaves
 maintenance busy until the unmatched report wait times out, and that aborting
 inclusion retires the operation timer before a quiet window can be acquired.
-Full host validation includes this harness alongside the existing bounds/TX
-sanitizers, both Grizzly profiles, wrapper/Rust tests and host releases.
+Real-helper regressions also cover delayed/duplicate/mismatched callbacks,
+missing callbacks keeping maintenance busy and NIF acceptance/completion.
+Grizzly exercises NIF through its public command/report path for IDs 1 and 7.
+Full host validation includes four sanitizer harnesses, both Grizzly profiles,
+wrapper/Rust tests and host releases.
 
 ## Remaining audit and acceptance
 
-- Full native writer/reference/timer coverage and raw serial callback lifetimes.
-- Late/missing callbacks, actual NCP activity and serial ownership across reset.
+- Full writer/reference/timer coverage and remaining serial callback families,
+  including route/neighbor/SUC, NM and higher security/fragment lifetimes.
+- NCP callback lifetime/reuse contracts, ancient duplicates across SDK ID wrap,
+  actual NCP activity and serial ownership across reset.
 - Planned helper replacement, identity refresh and maintenance recovery.
 - Security/provisioning persistence and synchronization outside RD reload.
 - Backups, same-backend upgrades and interrupted-transaction reconciliation.

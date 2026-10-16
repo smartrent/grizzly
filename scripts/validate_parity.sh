@@ -21,6 +21,7 @@ cd "$ZWAVE_CORE_ROOT"
 run c-sanitizers make test-host-bounds
 run c-tx-sanitizers make test-host-tx
 run c-maintenance-sanitizers make test-host-maintenance
+run c-serial-sanitizers make test-host-serial
 run core-diff git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check
 cd "$GRIZZLY_ZWRAP_PATH"
 run rust-format cargo fmt --manifest-path native/zwrap_port/Cargo.toml -- --check

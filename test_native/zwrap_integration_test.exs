@@ -128,6 +128,21 @@ defmodule Grizzly.Backends.ZwrapIntegrationTest do
                       }},
                      5_000
 
+      assert {:ok, %Report{type: :ack_response, acknowledged: true}} =
+               Grizzly.send_command(
+                 :gateway,
+                 :node_information_send,
+                 [seq_number: 91, destination_node_id: 2, tx_options: [:ack]],
+                 timeout: 10_000
+               )
+
+      assert_receive {:grizzly, :native_event,
+                      %{
+                        event: :control_complete,
+                        fields: %{operation: 4, node_id: 2, result: :success, status_code: 0}
+                      }},
+                     5_000
+
       stats = Statistics.snapshot()
       assert stats.native_tx.nodes[2].tx_success >= 2
       assert stats.nodes[2].tx_success >= 2

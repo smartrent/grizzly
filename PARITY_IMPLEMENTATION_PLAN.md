@@ -200,6 +200,34 @@ This closes a defined set of quiet-window holes, not the whole writer audit.
 Serial callbacks/FD lifecycle, remaining native writers, recovery/backups and
 arbitrary security/provisioning SQL synchronization remain separate open work.
 
+### Continuation slice — tracked serial TX callback ownership
+
+- Track accepted SendData, bridge/Transport Service and NIF work below the
+  application queues, including sends whose caller requests no callback.
+  Refuse same-command overlap before overwriting its callback or TX buffer.
+- Match command and nonzero wire callback ID, retire before callback reentry,
+  and ignore mismatched/duplicate completions. The SDK echoes only eight bits:
+  do not claim unlimited provenance after ID wrap or for arbitrary NCP faults.
+- Keep unresolved submissions owned until genuine completion. Ambiguous
+  admission replies, malformed matching callbacks or a missing-callback safety
+  deadline fail the isolated helper, not a newer task. Do not silently reset
+  the radio, release ownership on abort intent or add application retries.
+- Include tracked serial work, dispatch and queued/partial serial RX in quiet
+  checks. Reject raw SAPI attempts to bypass the tracked send commands.
+- Fix NIF acceptance reporting and concrete TS busy-spin/optional-report
+  dereferences exposed by this path. Separate datagram retirement from wire
+  ownership; suppress retired callbacks and guard synchronous parent retirement.
+  Full TS FSM/cancellation audit stays open.
+- Test real production callback dispatch under sanitizers and exercise delayed,
+  duplicate, mismatched and missing callbacks through the helper/fake NCP.
+
+Host outcome: implemented with sanitizer and real-helper/fake-NCP regressions.
+This bounded continuation does not complete WP05 or the full maintenance audit.
+
+This is not an audit of every Serial API callback family. Route/neighbor/SUC,
+learn/inclusion, reset/FD replacement and higher security/fragment callback
+lifetimes still require their own state/ownership contracts and acceptance.
+
 ### WP05 — Native controller/radio task surface
 
 Dependencies: WP02 ownership/ABI; Elixir dispatch from WP04.
