@@ -6,8 +6,8 @@ defmodule Grizzly.Storage.Populate do
 
   use GenServer, restart: :temporary
 
+  alias Grizzly.Directory.Database, as: DirectoryDb
   alias Grizzly.Storage
-  alias Grizzly.ZIPGateway.Database, as: ZIPGatewayDb
   alias Grizzly.ZWave.DSK
 
   @spec start_link(any()) :: GenServer.on_start()
@@ -38,9 +38,9 @@ defmodule Grizzly.Storage.Populate do
   @impl GenServer
   def handle_continue(:populate, state) do
     result =
-      ZIPGatewayDb.with_database(state.database, fn db ->
-        with {:ok, nodes} <- ZIPGatewayDb.all_nodes(db),
-             {:ok, endpoints} <- ZIPGatewayDb.all_endpoints(db) do
+      DirectoryDb.with_database(state.database, fn db ->
+        with {:ok, nodes} <- DirectoryDb.all_nodes(db),
+             {:ok, endpoints} <- DirectoryDb.all_endpoints(db) do
           endpoints_by_node = Enum.group_by(endpoints, & &1.node_id)
 
           nodes_with_endpoints =
