@@ -171,6 +171,23 @@ defmodule Grizzly.Backends.ZwrapTest do
     assert {:ok, %Report{type: :timeout}} =
              Grizzly.send_command(2, :switch_binary_get, [], timeout: 10)
 
+    # Force the mailbox-first ordering without depending on scheduler timing.
+    assert {:ok, %Report{command_ref: ref}} =
+             Grizzly.send_command(2, :switch_binary_get, [],
+               mode: :async,
+               retries: 2,
+               timeout: 2_000
+             )
+
+    assert_receive {:native_call, :send_data_appl, [2, _, {connection, ^ref, attempt}]}
+    send(connection, {:backend_failure, ref, make_ref(), :mailbox_expired})
+    assert AsyncConnection.request_alive?(connection, ref)
+    send(connection, {:backend_failure, ref, attempt, :mailbox_expired})
+    assert_receive {:grizzly, :report, %Report{command_ref: ^ref, type: :timeout}}
+    refute AsyncConnection.request_alive?(connection, ref)
+    refute_receive {:native_call, :send_data_appl, [2, _, {^connection, ^ref, _}]}
+    send(connection, {:backend_failure, ref, attempt, :mailbox_expired})
+    refute_receive {:grizzly, :report, %Report{command_ref: ^ref}}
     assert Backend.ready?()
   end
 

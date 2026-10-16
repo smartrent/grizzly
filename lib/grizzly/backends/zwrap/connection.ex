@@ -106,6 +106,15 @@ defmodule Grizzly.Backends.Zwrap.Connection do
     end)
   end
 
+  def handle_info({:backend_failure, ref, attempt, :mailbox_expired}, state) do
+    # Both timers represent the same logical deadline. Expiry is a timeout,
+    # not a radio NACK or an opportunity to retry already-expired work.
+    case state.requests[ref] do
+      %{attempt: ^attempt} -> handle_info({:timeout, ref}, state)
+      _ -> {:noreply, state}
+    end
+  end
+
   def handle_info({:backend_failure, ref, attempt, reason}, state) do
     update_request(state, ref, attempt, &Request.handle_failure(&1.request, reason))
   end
