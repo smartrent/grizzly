@@ -3,6 +3,7 @@ defmodule Grizzly.Backends.Zwrap.Connection do
   use GenServer, restart: :transient
 
   alias Grizzly.Backends.Zwrap, as: Backend
+  alias Grizzly.Backends.Zwrap.Mailbox
   alias Grizzly.Backends.Zwrap.Statistics
   alias Grizzly.Connections
   alias Grizzly.Report
@@ -36,8 +37,15 @@ defmodule Grizzly.Backends.Zwrap.Connection do
           )
       end
 
+      lease =
+        if mode == :async do
+          {:ok, lease} = Mailbox.hold(node_id, 3_600_000)
+          lease
+        end
+
       {:ok,
        %{
+         awake_lease: lease,
          node_id: node_id,
          mode: mode,
          owner: owner,
@@ -182,10 +190,13 @@ defmodule Grizzly.Backends.Zwrap.Connection do
 
   @impl GenServer
   def terminate(_reason, state) do
+    if state.awake_lease, do: Mailbox.release(state.awake_lease)
+
     for {ref, entry} <- state.requests do
       deliver(entry.waiter, {:error, :backend_down})
       Process.cancel_timer(entry.request.timeout_ref)
       Backend.release(self(), ref)
+      Mailbox.cancel(self(), ref)
     end
   end
 
@@ -220,7 +231,7 @@ defmodule Grizzly.Backends.Zwrap.Connection do
   end
 
   defp transmit(state, entry) do
-    Backend.submit(
+    Mailbox.submit(
       state.node_id,
       entry.request.source,
       entry.request.ref,
@@ -237,6 +248,7 @@ defmodule Grizzly.Backends.Zwrap.Connection do
       {entry, requests} ->
         Process.cancel_timer(entry.request.timeout_ref)
         Backend.release(self(), ref)
+        Mailbox.cancel(self(), ref)
         %{state | requests: requests}
     end
   end

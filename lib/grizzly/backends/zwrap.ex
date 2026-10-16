@@ -10,6 +10,7 @@ defmodule Grizzly.Backends.Zwrap do
 
   alias Grizzly.Backends.Zwrap.Connection, as: NativeConnection
   alias Grizzly.Backends.Zwrap.Directory
+  alias Grizzly.Backends.Zwrap.Mailbox
   alias Grizzly.Backends.Zwrap.Management
   alias Grizzly.Backends.Zwrap.Statistics
   alias Grizzly.Report
@@ -71,6 +72,7 @@ defmodule Grizzly.Backends.Zwrap do
   def children(options) do
     [
       Statistics,
+      Mailbox,
       {__MODULE__, options},
       %{id: Directory, start: {__MODULE__, :start_directory, []}}
     ]
@@ -334,6 +336,9 @@ defmodule Grizzly.Backends.Zwrap do
 
     case decode_frame(fields.frame) do
       {:ok, command} ->
+        if command.name == :wake_up_notification,
+          do: Mailbox.wake(fields.node_id)
+
         candidates =
           Enum.filter(
             state.pending,

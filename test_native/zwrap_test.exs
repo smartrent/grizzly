@@ -471,6 +471,16 @@ defmodule Grizzly.Backends.ZwrapTest do
     })
   end
 
+  test "more_info is Elixir awake policy rather than a rejected ZIP option", %{controller: c} do
+    task =
+      Task.async(fn ->
+        Grizzly.send_command(2, :switch_binary_set, [target_value: :on], more_info: true)
+      end)
+
+    assert_receive {:native_call, :send_data_appl, [2, _, context]}
+    API.emit(c, :send_data_appl_complete, %{context: context, status: :ok})
+    assert {:ok, %Report{type: :ack_response}} = Task.await(task)
+  end
 
   test "unmatched firmware requests reach only an opted-in async session", %{controller: c} do
     {:ok, conn} =

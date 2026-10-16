@@ -65,7 +65,7 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
       firmware_id: 0,
       hardware_version: 0,
       firmware_target: 0,
-      max_fragment_size: @default_fragment_size,
+      max_fragment_size: if(Grizzly.Backend.zwrap?(), do: 128, else: @default_fragment_size),
       activation_may_be_delayed?: false,
       max_fragment_retries: 10,
       progress_timeout: progress_timeout()
@@ -87,11 +87,25 @@ defmodule Grizzly.FirmwareUpdates.FirmwareUpdateRunner do
     hardware_version = Keyword.fetch!(opts, :hardware_version)
     firmware_target = Keyword.fetch!(opts, :firmware_target)
     max_fragment_size = Keyword.fetch!(opts, :max_fragment_size)
+    # Native TS reassembly is currently 200 bytes. Leave security/CRC/MC
+    # overhead rather than advertising the wrapper's entire TX buffer.
+    max_fragment_size =
+      if Grizzly.Backend.zwrap?(), do: min(max_fragment_size, 128), else: max_fragment_size
+
     activation_may_be_delayed? = Keyword.fetch!(opts, :activation_may_be_delayed?)
     max_fragment_retries = Keyword.fetch!(opts, :max_fragment_retries)
     progress_timeout = Keyword.fetch!(opts, :progress_timeout)
 
-    {:ok, conn} = Connection.open(device_id, mode: :async, unnamed: true)
+    {:ok, conn} =
+      Connection.open(device_id,
+        mode: :async,
+        unnamed: true,
+        session_commands: [
+          :firmware_update_md_get,
+          :firmware_update_md_status_report,
+          :firmware_update_activation_report
+        ]
+      )
 
     # if the connection dies, we won't be able to continue the firmware upgrade
     # if we die, we don't need the connection anymore
