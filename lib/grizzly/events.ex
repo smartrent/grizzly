@@ -22,7 +22,7 @@ defmodule Grizzly.Events do
   alias Grizzly.Report
   alias Grizzly.ZWave.Command
 
-  @type event :: :ready | :otw_firmware_update | :serial_api_status
+  @type event :: :ready | :otw_firmware_update | :serial_api_status | :raw_frame | :native_event
   @type subject :: event() | Grizzly.command() | Grizzly.node_id() | {:node, Grizzly.node_id()}
   @type subscriptions :: [
           event: list(event()),
@@ -33,7 +33,14 @@ defmodule Grizzly.Events do
   @type subscribe_opt :: {:firehose, boolean()}
   @type subscribe_opts :: [subscribe_opt()]
 
-  defguardp is_event(event) when event in [:ready, :otw_firmware_update, :serial_api_status]
+  defguardp is_event(event)
+            when event in [
+                   :ready,
+                   :otw_firmware_update,
+                   :serial_api_status,
+                   :raw_frame,
+                   :native_event
+                 ]
 
   @spec child_spec(any()) :: Supervisor.child_spec()
   def child_spec(_) do

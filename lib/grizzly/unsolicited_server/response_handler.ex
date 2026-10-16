@@ -76,6 +76,27 @@ defmodule Grizzly.UnsolicitedServer.ResponseHandler do
     end
   end
 
+  @doc false
+  def handle_application_command(node_id, command, opts \\ [])
+
+  def handle_application_command(
+        node_id,
+        %Command{name: :multi_command_encapsulated} = command,
+        opts
+      ) do
+    Enum.flat_map(
+      Command.param!(command, :commands),
+      &handle_application_command(node_id, &1, opts)
+    )
+  end
+
+  def handle_application_command(node_id, command, opts) do
+    case handle_command(node_id, command, opts) do
+      actions when is_list(actions) -> Enum.reject(actions, &is_supervision_status_action/1)
+      error -> error
+    end
+  end
+
   defp handle_keep_alive(cmd) do
     case Command.param!(cmd, :ack_flag) do
       :ack_request ->

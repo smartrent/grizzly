@@ -155,6 +155,13 @@ defmodule Grizzly.Requests.Request do
   defp do_handle_ack_response(%__MODULE__{} = request, zip_packet) do
     transmission_stats = make_network_stats(request, zip_packet)
 
+    handle_ack(request, transmission_stats)
+  end
+
+  @doc false
+  def handle_ack(%__MODULE__{} = request, transmission_stats \\ []) do
+    request = %{request | acknowledged: true, transmission_stats: transmission_stats}
+
     case request.handler.handle_ack(request.handler_state) do
       {:continue, new_handler_state} ->
         {:continue,
@@ -193,6 +200,15 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
+  @doc false
+  def handle_failure(%__MODULE__{} = request, reason) do
+    cond do
+      reason == :queue_full -> make_queue_full_response(request)
+      request.retries > 0 -> {:retry, %{request | retries: request.retries - 1}}
+      true -> make_nack_response(request)
+    end
+  end
+
   defp handle_nack_waiting(request, zip_packet) do
     seq_number = ZWaveCommand.param!(zip_packet, :seq_number)
 
@@ -205,9 +221,12 @@ defmodule Grizzly.Requests.Request do
     end
   end
 
-  defp do_handle_zip_command(%__MODULE__{} = request, zip_packet_command) do
-    zwave_command = ZWaveCommand.param!(zip_packet_command, :command)
+  defp do_handle_zip_command(request, zip_packet_command) do
+    handle_command(request, ZWaveCommand.param!(zip_packet_command, :command))
+  end
 
+  @doc false
+  def handle_command(%__MODULE__{} = request, zwave_command) do
     case request.handler.handle_command(zwave_command, request.handler_state) do
       {:continue, new_handler_state} ->
         {:continue, %__MODULE__{request | handler_state: new_handler_state}}
