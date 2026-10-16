@@ -534,5 +534,50 @@ defmodule Grizzly.Backends.ZwrapTest do
     assert Grizzly.zniffer_network_keys() == nil
   end
 
+  test "top-level native settings are normalized and forwarded without nil shadowing" do
+    assert_receive {:zwrap_started, _}
+    Supervisor.stop(Grizzly.Supervisor)
 
+    opts =
+      Keyword.merge(GrizzlyTest.Utils.default_options_args(),
+        rf_region: :us,
+        power_level: {-5, 6},
+        manufacturer_id: 0x1234,
+        product_type: 0x4321,
+        product_id: 0xABCD,
+        hardware_version: 9,
+        zwrap_options: [api: API, owner: self(), rf_region: nil]
+      )
+
+    {:ok, supervisor} = Grizzly.Supervisor.start_link(opts)
+    Process.unlink(supervisor)
+    assert_receive {:zwrap_started, settings}
+    assert settings[:rf_region] == 1
+    assert settings[:power_level] == {-5, 6}
+    assert settings[:manufacturer_id] == 0x1234
+    assert settings[:product_type] == 0x4321
+    assert settings[:product_id] == 0xABCD
+    assert settings[:hardware_version] == 9
+  end
+
+  test "conflicting nested settings fail before the native controller starts" do
+    assert_receive {:zwrap_started, _}
+    Supervisor.stop(Grizzly.Supervisor)
+
+    opts =
+      Keyword.merge(GrizzlyTest.Utils.default_options_args(),
+        rf_region: :us,
+        zwrap_options: [api: API, owner: self(), rf_region: :eu]
+      )
+
+    task =
+      Task.async(fn ->
+        Process.flag(:trap_exit, true)
+        Grizzly.Supervisor.start_link(opts)
+      end)
+
+    assert {:error, reason} = Task.await(task)
+    assert inspect(reason) =~ "conflicting Grizzly/Zwrap initialization setting"
+    refute_receive {:zwrap_started, _}
+  end
 end

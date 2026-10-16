@@ -33,4 +33,8 @@ defmodule Grizzly.NativeBuildTest do
     assert Grizzly.Backend.name() == :zwrap
   end
 
+  test "native startup rejects misspelled settings and legacy config text" do
+    assert_raise ArgumentError, fn -> Grizzly.Options.new(rf_regoin: :us) end
+    assert_raise ArgumentError, fn -> Grizzly.Options.new(extra_config: "ZWRFRegion=1") end
+  end
 end

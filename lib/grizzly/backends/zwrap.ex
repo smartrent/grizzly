@@ -141,7 +141,20 @@ defmodule Grizzly.Backends.Zwrap do
     :exit, _ -> nil
   end
 
-  defp initialization_options(_options, opts), do: opts
+  defp initialization_options(options, opts) do
+    top = options |> Map.take(Zwrap.InitSettings.keys()) |> Enum.to_list()
+    requested = Zwrap.InitSettings.from_options!(top)
+    nested = Zwrap.InitSettings.from_options!(opts)
+
+    for {key, value} <- requested, Map.has_key?(nested, key), nested[key] != value do
+      raise ArgumentError, "conflicting Grizzly/Zwrap initialization setting: #{key}"
+    end
+
+    Keyword.merge(
+      Keyword.drop(opts, Zwrap.InitSettings.keys()),
+      Map.to_list(Map.merge(requested, nested))
+    )
+  end
 
   @impl GenServer
   def init(options) do

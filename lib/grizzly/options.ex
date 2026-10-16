@@ -112,6 +112,21 @@ defmodule Grizzly.Options do
             "backend is compiled as #{selected}; rebuild instead of selecting at runtime"
     end
 
+    if Grizzly.Backend.zwrap?() do
+      known = Map.keys(%__MODULE__{}) -- [:__struct__]
+      unknown = Keyword.keys(opts) -- known
+
+      if unknown != [],
+        do: raise(ArgumentError, "unsupported native Grizzly options: #{inspect(unknown)}")
+
+      if opts[:extra_config] != nil,
+        do:
+          raise(
+            ArgumentError,
+            "extra_config is ZIPGateway-only; use typed native initialization options"
+          )
+    end
+
     options = struct(__MODULE__, Keyword.put(opts, :backend, selected))
 
     unless options.backend in [:zipgateway, :zwrap] do
