@@ -1,14 +1,25 @@
+Code.require_file("build_support/backend_profile.exs", __DIR__)
+
 defmodule Grizzly.MixProject do
   use Mix.Project
 
   @version "9.1.5"
+  @backend (case System.get_env("GRIZZLY_BACKEND", "zipgateway") do
+              "zipgateway" -> :zipgateway
+              "zwrap" -> :zwrap
+              other -> raise "Invalid GRIZZLY_BACKEND: #{inspect(other)}"
+            end)
 
-  def project do
+  def project() do
     [
       app: :grizzly,
+      grizzly_backend: @backend,
       version: @version,
+      build_path: "_build/#{@backend}",
+      test_paths: if(@backend == :zwrap, do: ["test_native"], else: ["test"]),
       elixir: "~> 1.16",
-      elixirc_paths: elixirc_paths(Mix.env()),
+      elixirc_paths: Grizzly.BuildProfile.sources(@backend, Mix.env()),
+      compilers: Mix.compilers() ++ [:grizzly_artifacts],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: dialyzer(),
@@ -22,46 +33,63 @@ defmodule Grizzly.MixProject do
     ]
   end
 
-  def application do
+  def application() do
     [
-      extra_applications: [:logger, :crypto, :ssl, :sasl]
+      extra_applications:
+        [:logger, :crypto, :sasl] ++ if(@backend == :zipgateway, do: [:ssl], else: [])
     ]
   end
 
-  def cli do
+  def cli() do
     [
       preferred_envs: ["hex.publish": :docs, docs: :docs, dialyzer: :test]
     ]
   end
 
-  def elixirc_paths(:test), do: ["test/support", "lib"]
-  def elixirc_paths(_), do: ["lib"]
-
-  defp deps do
+  defp deps() do
     [
+      # Opt in locally; downstream applications can supply their own :zwrap dependency.
       {:alarmist, "~> 0.4", only: [:test]},
-      {:beam_notify, "~> 1.0 or ~> 0.2.0"},
       {:cerlc, "~> 0.2"},
       {:circuits_uart, "~> 1.0"},
       {:circular_buffer, "~> 1.0 or ~> 0.4.2"},
       {:credo_binary_patterns, "~> 0.2.3", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:ctr_drbg, "~> 0.1"},
       {:dialyxir, "~> 1.4.0", only: [:test, :dev], runtime: false},
       {:ex_doc, "~> 0.21", only: [:docs, :test], runtime: false},
       {:exmodem, "~> 0.1"},
       {:exqlite, "~> 0.33"},
       {:junit_formatter, "~> 3.3", only: :test},
       {:mimic, "~> 2.0", only: [:dev, :test]},
-      {:muontrap, "~> 2.0 or ~> 1.0"},
       {:nimble_options, "~> 1.0"},
       {:property_table, "~> 0.3"},
       {:quokka, "~> 2.11", only: [:dev, :test], runtime: false},
       {:sweet_xml, "~> 0.7", only: [:dev, :test]},
       {:telemetry_registry, "~> 0.3"},
-      {:telemetry, "~> 0.4.3 or ~> 1.0"},
-      {:thousand_island, "~> 1.3"}
-    ]
+      {:telemetry, "~> 0.4.3 or ~> 1.0"}
+    ] ++ backend_deps()
+  end
+
+  defp backend_deps() do
+    if @backend == :zipgateway do
+      [
+        {:beam_notify, "~> 1.0 or ~> 0.2.0"},
+        {:ctr_drbg, "~> 0.1"},
+        {:muontrap, "~> 2.0 or ~> 1.0"},
+        {:thousand_island, "~> 1.3"}
+      ]
+    else
+      zwrap_dep()
+    end
+  end
+
+  defp zwrap_dep() do
+    if @backend == :zwrap do
+      path = System.get_env("GRIZZLY_ZWRAP_PATH") || "../zipato-zwrap-parity"
+      [{:zwrap, path: Path.expand(path)}]
+    else
+      []
+    end
   end
 
   defp dialyzer() do
@@ -78,20 +106,27 @@ defmodule Grizzly.MixProject do
     ] ++ ci_opts
   end
 
-  defp description do
+  defp description() do
     "Elixir Z-Wave library"
   end
 
-  defp package do
+  defp package() do
     [
       licenses: ["Apache-2.0"],
+      files: ["lib", "priv", "build_support", "mix.exs", "README.md", "CHANGELOG.md"],
       links: %{"GitHub" => "https://github.com/smartrent/grizzly"}
     ]
   end
 
   defp docs() do
     [
-      extras: ["README.md", "CHANGELOG.md", "docs/cookbook.md"],
+      extras: [
+        "README.md",
+        "CHANGELOG.md",
+        "docs/cookbook.md",
+        "docs/backends.md",
+        "docs/zwrap-unsupported.md"
+      ],
       main: "readme",
       logo: "./assets/grizzly-icon-yellow.png",
       favicon: "./assets/grizzly-icon-yellow.png",

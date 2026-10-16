@@ -46,7 +46,6 @@ defmodule Grizzly do
   alias Grizzly.Report
   alias Grizzly.VersionReports
   alias Grizzly.VirtualDevices
-  alias Grizzly.ZIPGateway
   alias Grizzly.ZWave
   alias Grizzly.ZWave.Command
   alias Grizzly.ZWave.Commands
@@ -96,7 +95,19 @@ defmodule Grizzly do
   @type send_command_response() :: {:ok, Report.t()} | {:error, send_command_error()}
 
   @type send_command_error() ::
-          :including | :firmware_updating | :nack_response | :queue_full | :timeout
+          :including
+          | :firmware_updating
+          | :nack_response
+          | :queue_full
+          | :timeout
+          | :unsupported_backend_command
+          | :unsupported_backend_operation
+          | :unsupported_backend_option
+          | :backend_down
+          | :busy
+          | :invalid_node_id
+          | :payload_too_large
+          | :invalid_backend_argument
 
   @type seq_number() :: non_neg_integer()
 
@@ -290,8 +301,9 @@ defmodule Grizzly do
   @spec send_binary(ZWave.node_id(), binary()) :: :ok | {:error, :including | :firmware_updating}
   def send_binary(node_id, binary) do
     with :ok <- can_send_command?() do
-      {:ok, _} = Connection.open(node_id, mode: :binary)
-      Connection.send_binary(node_id, binary)
+      with {:ok, _} <- Connection.open(node_id, mode: :binary) do
+        Connection.send_binary(node_id, binary)
+      end
     end
   end
 
@@ -351,7 +363,7 @@ defmodule Grizzly do
   """
   @doc group: "Z/IP Gateway"
   @spec start_zipgateway :: :ok | {:error, atom()}
-  defdelegate start_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+  def start_zipgateway(), do: Grizzly.Backend.zipgateway_operation(:start_zipgateway)
 
   @doc """
   Restarts the Z/IP Gateway process. An error will be raised if `Grizzly.ZIPGateway.Supervisor`
@@ -359,17 +371,22 @@ defmodule Grizzly do
   """
   @doc group: "Z/IP Gateway"
   @spec restart_zipgateway :: :ok
-  defdelegate restart_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+  def restart_zipgateway(),
+    do: Grizzly.Backend.zipgateway_operation(:restart_zipgateway)
 
   @doc "Stops the Z/IP Gateway process if it is running."
   @doc group: "Z/IP Gateway"
   @spec stop_zipgateway :: :ok
-  defdelegate stop_zipgateway(), to: Grizzly.ZIPGateway.Supervisor
+  def stop_zipgateway(), do: Grizzly.Backend.zipgateway_operation(:stop_zipgateway)
+
+  @doc "Is the selected controller backend ready?"
+  @spec ready?() :: boolean()
+  defdelegate ready?(), to: Grizzly.Backend
 
   @doc "Is Z/IP Gateway ready?"
   @doc group: "Z/IP Gateway"
   @spec zipgateway_ready?() :: boolean()
-  defdelegate zipgateway_ready?(), to: Grizzly.ZIPGateway.ReadyChecker, as: :ready?
+  def zipgateway_ready?(), do: not Grizzly.Backend.zwrap?() and Grizzly.Backend.ready?()
 
   @doc "Get the current inclusion status."
   @doc group: "Network Info"
@@ -379,8 +396,8 @@ defmodule Grizzly do
   @doc "Get the listening mode of a node"
   @doc group: "Node Info"
   @spec listening_mode(integer) ::
-          {:ok, Grizzly.ZIPGateway.Database.listening_mode()} | nil
-  defdelegate listening_mode(node_id), to: Grizzly.ZIPGateway.Database
+          {:ok, Grizzly.Directory.Database.listening_mode()} | nil
+  defdelegate listening_mode(node_id), to: Grizzly.Backend
 
   @doc group: "Node Info"
   defdelegate node_info(node_id, opts \\ []), to: Grizzly.Node, as: :get_info
@@ -431,43 +448,29 @@ defmodule Grizzly do
     as: :supports_supervision?
 
   @doc """
-  Returns the network's home id. Returns nil if Grizzly is started with `run_zipgateway: false`
-  or if Z/IP Gateway has not yet logged the home id.
+  Returns the Home ID as uppercase hexadecimal. Native builds read controller
+  identity directly. Legacy builds use logs and return nil when unavailable.
   """
   @spec home_id() :: binary() | nil
   @doc group: "Network Info"
-  def home_id() do
-    case GenServer.whereis(ZIPGateway.LogMonitor) do
-      nil -> nil
-      pid -> ZIPGateway.LogMonitor.home_id(pid)
-    end
-  end
+  defdelegate home_id(), to: Grizzly.Backend
 
   @doc """
-  Returns the network encryption keys. Returns nil if Grizzly is started with
-  `run_zipgateway: false` or if Z/IP Gateway has not yet logged the network keys.
+  Returns assigned network keys as hexadecimal, only to the requesting caller.
+  Native builds query the controller without log scraping. Legacy builds use
+  gateway logs. Returns nil when unavailable. Treat the result as secret.
   """
   @doc group: "Network Info"
-  @spec network_keys() :: [{ZIPGateway.LogMonitor.network_key_type(), binary()}] | nil
-  def network_keys() do
-    case GenServer.whereis(ZIPGateway.LogMonitor) do
-      nil -> nil
-      pid -> ZIPGateway.LogMonitor.network_keys(pid)
-    end
-  end
+  @spec network_keys() :: [{Grizzly.NetworkKeys.key_type(), binary()}] | nil | {:error, atom()}
+  defdelegate network_keys(), to: Grizzly.Backend
 
   @doc """
   Returns the network encryption keys formatted for use with the Zniffer application.
   See `Grizzly.ZIPGateway.LogMonitor.zniffer_network_keys/1` for more information.
   """
   @doc group: "Network Info"
-  @spec zniffer_network_keys() :: binary() | nil
-  def zniffer_network_keys() do
-    case GenServer.whereis(ZIPGateway.LogMonitor) do
-      nil -> nil
-      pid -> ZIPGateway.LogMonitor.zniffer_network_keys(pid)
-    end
-  end
+  @spec zniffer_network_keys() :: binary() | nil | {:error, atom()}
+  defdelegate zniffer_network_keys(), to: Grizzly.Backend
 
   @doc """
   Return the options `Grizzly.Supervisor` was started with. Returns nil if supervisor

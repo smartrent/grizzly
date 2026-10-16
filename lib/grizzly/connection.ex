@@ -2,7 +2,6 @@ defmodule Grizzly.Connection do
   @moduledoc false
 
   alias Grizzly.Connections.AsyncConnection
-  alias Grizzly.Connections.BinaryConnection
   alias Grizzly.Connections.Supervisor
   alias Grizzly.Connections.SyncConnection
   alias Grizzly.Report
@@ -66,8 +65,9 @@ defmodule Grizzly.Connection do
       :async ->
         # `AsyncConnection.send_command` always returns {:ok, ref}. We'll translate this
         # to a `Grizzly.Report` for consistency with `SyncConnection`'s behavior.
-        {:ok, ref} = AsyncConnection.send_command(node_id, command, opts)
-        {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
+        with {:ok, ref} <- AsyncConnection.send_command(node_id, command, opts) do
+          {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
+        end
     end
   end
 
@@ -80,14 +80,16 @@ defmodule Grizzly.Connection do
           Grizzly.send_command_response()
   def send_async_command_via(connection, node_id, command, opts) do
     Logger.debug("Sending Cmd (async via): #{inspect(command)}")
-    {:ok, ref} = AsyncConnection.send_command(connection, command, opts)
-    {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
+
+    with {:ok, ref} <- AsyncConnection.send_command(connection, command, opts) do
+      {:ok, Report.new(:inflight, :queued_delay, node_id, command_ref: ref, queued: true)}
+    end
   end
 
   def send_binary(node_id, binary, opts \\ []) do
     base = Keyword.get(opts, :format, :hex)
     Logger.debug("Sending binary: #{inspect(binary, base: base)}")
 
-    BinaryConnection.send_binary(node_id, binary)
+    Grizzly.Backend.zipgateway_operation({:send_binary, node_id, binary})
   end
 end

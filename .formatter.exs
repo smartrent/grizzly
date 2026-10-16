@@ -1,5 +1,8 @@
 [
-  inputs: ["{mix,.credo,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+  inputs: [
+    "{mix,.credo,.formatter}.exs",
+    "{build_support,config,lib,test,test_native}/**/*.{ex,exs}"
+  ],
   import_deps: [:telemetry_registry, :mimic],
   locals_without_parens: [command: 2, command: 3, command: 4],
   plugins: [Quokka],

@@ -214,8 +214,14 @@ defmodule Grizzly.InclusionServer do
   end
 
   def handle_call(:add_node_stop, _from, state) do
-    with status when status in [:node_adding, :waiting_s2_keys, :waiting_dsk] <-
-           StatusServer.get(),
+    with status
+         when status in [
+                :node_adding,
+                :waiting_s2_keys,
+                :waiting_dsk,
+                :s2_keys_granted,
+                :dsk_input_set
+              ] <- StatusServer.get(),
          {:ok, new_state} <- run_add_node_stop(state) do
       {:reply, :ok, new_state}
     else
@@ -338,6 +344,11 @@ defmodule Grizzly.InclusionServer do
     new_state = set_status(state, new_server_status)
 
     {:noreply, %{new_state | adapter_state: new_adapter_state}}
+  end
+
+  def handle_info({:grizzly, :error, :backend_down}, state) do
+    send_to_handler(state, Report.new(:complete, :nack_response, 1))
+    {:noreply, state |> remove_handler() |> set_status(:idle)}
   end
 
   def handle_report(%Command{name: :node_remove_status} = command, node_id, state) do

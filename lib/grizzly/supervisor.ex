@@ -15,6 +15,11 @@ defmodule Grizzly.Supervisor do
   ]
   ```
 
+  ZIPGateway is the default build profile. Compile with `GRIZZLY_BACKEND=zwrap`
+  for native operation and pass wrapper options with `zwrap_options: [...]`.
+  This bypasses ZIPGateway and Z/IP networking entirely. See `docs/backends.md`
+  and `docs/zwrap-unsupported.md` for setup and capability differences.
+
   The default configuration will look for the Z-Wave controller on the serial
   device `/dev/ttyUSB0`, however if you are using a different serial device
   you can configure this.
@@ -44,7 +49,6 @@ defmodule Grizzly.Supervisor do
   alias Grizzly.Options
   alias Grizzly.Storage
   alias Grizzly.Trace
-  alias Grizzly.ZIPGateway.ReadyChecker
 
   @typedoc """
   The RF region code you want the Z-Wave controller to operate at.
@@ -77,6 +81,9 @@ defmodule Grizzly.Supervisor do
   @typedoc """
   Arguments for running `Grizzly.Supervisor`
 
+  - `:backend` - optional assertion of the compiled backend, never a selector.
+  - `:zwrap_options` - options passed to Zwrap, e.g. `[data_dir: "/data/zwrap"]`.
+    The serial port defaults to Grizzly's `:serial_port`. See `docs/backends.md`.
   - `:run_zipgateway` - boolean flag to set if Grizzly should be running and
     supervising the `zipgateway` binary. This is useful if you have local
     `zipgateway` running prior to Grizzly running. Default true.
@@ -139,7 +146,9 @@ defmodule Grizzly.Supervisor do
   passed in has it is very much hardware dependent.
   """
   @type arg() ::
-          {:run_zipgateway, boolean()}
+          {:backend, :zipgateway | :zwrap}
+          | {:zwrap_options, keyword()}
+          | {:run_zipgateway, boolean()}
           | {:serial_port, String.t()}
           | {:zipgateway_binary, String.t()}
           | {:zipgateway_config_path, Path.t()}
@@ -196,52 +205,40 @@ defmodule Grizzly.Supervisor do
   end
 
   defp children(options) do
-    {ip, port} = options.unsolicited_destination
-
-    [
-      %{
-        id: Grizzly.Options.Agent,
-        start: {Agent, :start_link, [fn -> options end, [name: Grizzly.Options.Agent]]}
-      },
-      if(options.storage_adapter == {Grizzly.Storage.PropertyTable, Grizzly.Storage},
-        do: {PropertyTable, Keyword.merge(options.storage_options, name: Grizzly.Storage)}
-      ),
-      Grizzly.Events,
-      Storage.CommandWatcher,
-      {Task.Supervisor, name: Grizzly.TaskSupervisor},
-      if(options.run_zipgateway, do: {Grizzly.ZIPGateway.Supervisor, options}, else: nil),
-      # According to Z-Wave specification we need to have a global
-      # sequence number counter that starts at a random number between
-      # 0 and 0xFF (255)
-      {Grizzly.SeqNumber, Enum.random(0..255)},
-      Grizzly.SessionId,
-      {Grizzly.Trace, options.trace_options},
-      {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
-      # Registry for virtual devices
-      {Registry, Grizzly.VirtualDevices.Registry.start_options(options)},
-      {Grizzly.Associations, options},
-      {ThousandIsland,
+    # According to Z-Wave specification we need to have a global
+    # sequence number counter that starts at a random number between
+    # 0 and 0xFF (255)
+    # Registry for virtual devices
+    ([
+       %{
+         id: Grizzly.Options.Agent,
+         start: {Agent, :start_link, [fn -> options end, [name: Grizzly.Options.Agent]]}
+       },
+       if(options.storage_adapter == {Grizzly.Storage.PropertyTable, Grizzly.Storage},
+         do: {PropertyTable, Keyword.merge(options.storage_options, name: Grizzly.Storage)}
+       ),
+       Grizzly.Events,
+       Storage.CommandWatcher,
+       {Task.Supervisor, name: Grizzly.TaskSupervisor},
+       {Grizzly.SeqNumber, Enum.random(0..255)},
+       Grizzly.SessionId,
+       {Grizzly.Trace, options.trace_options},
+       {Registry, [keys: :unique, name: Grizzly.ConnectionRegistry]},
+       {Registry, Grizzly.VirtualDevices.Registry.start_options(options)},
+       {Grizzly.Associations, options}
+     ] ++
+       Grizzly.Backend.children(options) ++
        [
-         port: port,
-         num_acceptors: 10,
-         handler_module: Grizzly.UnsolicitedServer.ConnectionHandler,
-         handler_options: [inclusion_handler: options.inclusion_handler],
-         transport_module: Grizzly.UnsolicitedServer.DTLSTransport,
-         transport_options: [ifaddr: ip],
-         supervisor_options: [name: Grizzly.UnsolicitedServer]
-       ]},
+         # Supervisors for connections to/from Z-Wave nodes
+         {Grizzly.Connections.Supervisor, options},
+         {Grizzly.Inclusions.Supervisor, options},
 
-      # Supervisors for connections to/from Z-Wave nodes
-      {Grizzly.Connections.Supervisor, options},
-      {Grizzly.Inclusions.Supervisor, options},
+         # Supervisor for updating firmware
+         {Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor, options},
 
-      # Supervisor for updating firmware
-      {Grizzly.FirmwareUpdates.FirmwareUpdateRunnerSupervisor, options},
-
-      # Supervisor for running commands
-      Grizzly.Requests.RequestRunnerSupervisor,
-      ReadyChecker
-    ]
+         # Supervisor for running commands
+         Grizzly.Requests.RequestRunnerSupervisor
+       ] ++ Grizzly.Backend.post_children(options))
     |> otw_update_runner(options)
     |> Enum.reject(&is_nil/1)
   end

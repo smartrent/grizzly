@@ -20,7 +20,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipLanIp6=fd00:aaaa::1
     ZipUnsolicitedDestinationIp6=fd00:aaaa::2
     ZipUnsolicitedDestinationPort=41230
-    ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+    ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
     """
 
     cfg = Config.new()
@@ -45,7 +45,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipUnsolicitedDestinationIp6=fd00:aaaa::2
     ZipUnsolicitedDestinationPort=41230
     ZipGwDatabase=/tmp/zipgateway.db
-    ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+    ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
     """
 
     cfg = Config.new(%{product_id: 1, database_file: "/tmp/zipgateway.db"})
@@ -71,7 +71,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
       ZipLanIp6=fd00:aaaa::1
       ZipUnsolicitedDestinationIp6=fd00:aaaa::2
       ZipUnsolicitedDestinationPort=41230
-      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
       """
 
       assert :ok = Config.write(cfg, cfg_path())
@@ -98,7 +98,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
       ZipLanIp6=fd00:aaaa::1
       ZipUnsolicitedDestinationIp6=fd00:aaaa::2
       ZipUnsolicitedDestinationPort=41230
-      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
       ZWRFRegion=0
       """
 
@@ -126,7 +126,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
       ZipLanIp6=fd00:aaaa::1
       ZipUnsolicitedDestinationIp6=fd00:aaaa::2
       ZipUnsolicitedDestinationPort=41230
-      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
       ZWRFRegion=1
       """
 
@@ -154,7 +154,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
       ZipLanIp6=fd00:aaaa::1
       ZipUnsolicitedDestinationIp6=fd00:aaaa::2
       ZipUnsolicitedDestinationPort=41230
-      ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+      ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
       ZWRFRegion=9
       """
 
@@ -183,7 +183,7 @@ defmodule Grizzly.ZIPGateway.ConfigTest do
     ZipLanIp6=fd00:aaaa::1
     ZipUnsolicitedDestinationIp6=fd00:aaaa::2
     ZipUnsolicitedDestinationPort=41230
-    ZipNodeIdentifyScript=#{File.cwd!()}/_build/test/lib/grizzly/priv/indicator.sh
+    ZipNodeIdentifyScript=#{Application.app_dir(:grizzly, "priv/indicator.sh")}
     NormalTxPowerLevel=0
     Measured0dBmPower=33
     """

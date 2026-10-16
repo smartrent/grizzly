@@ -6,7 +6,6 @@ defmodule Grizzly.Options do
   alias Grizzly.FirmwareUpdates.OTW.UpdateSpec
   alias Grizzly.Supervisor
   alias Grizzly.Trace
-  alias Grizzly.ZIPGateway.Config
 
   @typedoc """
   Options for configuring Z-Wave module firmware upgrades.
@@ -29,6 +28,8 @@ defmodule Grizzly.Options do
   See Grizzly.Supervisor
   """
   @type t() :: %__MODULE__{
+          backend: :zipgateway | :zwrap,
+          zwrap_options: keyword(),
           transport: module(),
           run_zipgateway: boolean(),
           serial_port: String.t(),
@@ -61,7 +62,11 @@ defmodule Grizzly.Options do
           storage_options: PropertyTable.options()
         }
 
-  defstruct run_zipgateway: true,
+  # Keep the existing flat configuration fields backwards compatible.
+  # credo:disable-for-next-line Credo.Check.Warning.StructFieldAmount
+  defstruct backend: :zipgateway,
+            zwrap_options: [],
+            run_zipgateway: true,
             serial_port: "/dev/ttyUSB0",
             zipgateway_binary: "/usr/sbin/zipgateway",
             zipgateway_config_path: "/tmp/zipgateway.cfg",
@@ -99,11 +104,33 @@ defmodule Grizzly.Options do
 
   @spec new([Supervisor.arg()]) :: t()
   def new(opts \\ []) do
-    struct(__MODULE__, opts)
+    Grizzly.Backend.validate!()
+    selected = Grizzly.Backend.name()
+
+    if Keyword.has_key?(opts, :backend) and opts[:backend] != selected do
+      raise ArgumentError,
+            "backend is compiled as #{selected}; rebuild instead of selecting at runtime"
+    end
+
+    options = struct(__MODULE__, Keyword.put(opts, :backend, selected))
+
+    unless options.backend in [:zipgateway, :zwrap] do
+      raise ArgumentError, "expected :backend to be :zipgateway or :zwrap"
+    end
+
+    if options.backend == :zwrap and options.zwave_firmware[:enabled] do
+      raise ArgumentError, "automatic controller firmware updates require the ZIPGateway backend"
+    end
+
+    options
   end
 
-  @spec to_zipgateway_config(t()) :: Config.t()
-  def to_zipgateway_config(%__MODULE__{} = grizzly_opts) do
-    Config.new(grizzly_opts)
+  if Application.compile_env(:grizzly, :backend, :zipgateway) == :zipgateway do
+    alias Grizzly.ZIPGateway.Config
+
+    @spec to_zipgateway_config(t()) :: Config.t()
+    def to_zipgateway_config(%__MODULE__{} = opts), do: Config.new(opts)
+  else
+    def to_zipgateway_config(%__MODULE__{}), do: {:error, :unsupported_backend_operation}
   end
 end

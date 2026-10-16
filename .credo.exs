@@ -4,6 +4,15 @@
     %{
       name: "default",
       strict: true,
+      files: %{
+        included: [
+          "lib/**/*.{ex,exs}",
+          "test/**/*.{ex,exs}",
+          "test_native/**/*.{ex,exs}",
+          "build_support/**/*.exs",
+          "mix.exs"
+        ]
+      },
       checks: [
         {CredoBinaryPatterns.Check.Consistency.Pattern},
         {Credo.Check.Readability.MultiAlias, []},

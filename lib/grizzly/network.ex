@@ -106,7 +106,11 @@ defmodule Grizzly.Network do
     case Grizzly.send_command(node_id, :default_set, [seq_number: seq_number], timeout: 60_000) do
       {:ok, %Report{type: :command, status: :complete}} = response ->
         Grizzly.Storage.delete_all()
-        _ = Associations.delete_all(Keyword.get(opts, :associations_server, Grizzly.Associations))
+        associations_server = Keyword.get(opts, :associations_server, Grizzly.Associations)
+
+        if GenServer.whereis(associations_server),
+          do: Associations.delete_all(associations_server)
+
         response
 
       other ->

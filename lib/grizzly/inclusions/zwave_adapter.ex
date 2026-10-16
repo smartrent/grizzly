@@ -20,7 +20,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
   @spec init() :: {:ok, state()}
   def init() do
-    {:ok, %{command_ref: nil, controller_id: 1}}
+    {:ok, %{command_ref: nil, controller_id: Grizzly.Backend.controller_id()}}
   end
 
   defp connect(controller_id) do
@@ -32,7 +32,7 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
   @spec add_node(state(), [Inclusions.opt()]) :: {:ok, state()} | {:error, :unknown_command}
   def add_node(state, opts) do
     seq_number = SeqNumber.get_and_inc()
-    controller_id = opts[:controller_id] || 1
+    controller_id = opts[:controller_id] || Grizzly.Backend.controller_id()
     timeout = opts[:timeout] || @inclusion_timeout
 
     params = opts |> Keyword.take([:mode, :tx_opt]) |> Keyword.put(:seq_number, seq_number)
@@ -52,22 +52,25 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, command} = Commands.create(:node_add, seq_number: seq_number, mode: :node_add_stop)
 
     connect(state.controller_id)
-    {:ok, command_ref} = AsyncConnection.send_command(state.controller_id, command)
 
-    {:ok, %{state | command_ref: command_ref, controller_id: 1}}
+    with {:ok, command_ref} <- AsyncConnection.send_command(state.controller_id, command) do
+      {:ok, %{state | command_ref: command_ref, controller_id: Grizzly.Backend.controller_id()}}
+    end
   end
 
   @spec remove_node(state(), [Inclusions.opt()]) :: {:ok, state()}
   def remove_node(state, opts) do
     seq_number = SeqNumber.get_and_inc()
-    controller_id = opts[:controller_id] || 1
+    controller_id = opts[:controller_id] || Grizzly.Backend.controller_id()
     timeout = opts[:timeout] || @inclusion_timeout
 
     connect(controller_id)
     {:ok, command} = Commands.create(:node_remove, seq_number: seq_number)
-    {:ok, command_ref} = AsyncConnection.send_command(controller_id, command, timeout: timeout)
 
-    {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
+    with {:ok, command_ref} <-
+           AsyncConnection.send_command(controller_id, command, timeout: timeout) do
+      {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
+    end
   end
 
   @spec remove_node_stop(state()) :: {:ok, state()}
@@ -78,15 +81,16 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
       Commands.create(:node_remove, seq_number: seq_number, mode: :remove_node_stop)
 
     connect(state.controller_id)
-    {:ok, command_ref} = AsyncConnection.send_command(state.controller_id, command)
 
-    {:ok, %{state | command_ref: command_ref, controller_id: 1}}
+    with {:ok, command_ref} <- AsyncConnection.send_command(state.controller_id, command) do
+      {:ok, %{state | command_ref: command_ref, controller_id: Grizzly.Backend.controller_id()}}
+    end
   end
 
   @spec learn_mode(state(), [Inclusions.opt()]) :: {:ok, state()}
   def learn_mode(state, opts) do
     seq_number = SeqNumber.get_and_inc()
-    controller_id = opts[:controller_id] || 1
+    controller_id = opts[:controller_id] || Grizzly.Backend.controller_id()
     timeout = opts[:timeout] || @inclusion_timeout
 
     params =
@@ -99,9 +103,11 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
     {:ok, command} = Commands.create(:learn_mode_set, params)
 
     connect(controller_id)
-    {:ok, command_ref} = AsyncConnection.send_command(controller_id, command, timeout: timeout)
 
-    {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
+    with {:ok, command_ref} <-
+           AsyncConnection.send_command(controller_id, command, timeout: timeout) do
+      {:ok, %{state | command_ref: command_ref, controller_id: controller_id}}
+    end
   end
 
   @spec learn_mode_stop(state()) :: {:ok, state()}
@@ -115,9 +121,9 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
         return_interview_status: :off
       )
 
-    {:ok, command_ref} = AsyncConnection.send_command(state.controller_id, command)
-
-    {:ok, %{state | command_ref: command_ref, controller_id: 1}}
+    with {:ok, command_ref} <- AsyncConnection.send_command(state.controller_id, command) do
+      {:ok, %{state | command_ref: command_ref, controller_id: Grizzly.Backend.controller_id()}}
+    end
   end
 
   @spec grant_s2_keys([Security.key()], state()) :: {:ok, state()}
@@ -134,10 +140,10 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
     connect(state.controller_id)
 
-    {:ok, command_ref} =
-      AsyncConnection.send_command(state.controller_id, command, timeout: @inclusion_timeout)
-
-    {:ok, %{state | command_ref: command_ref}}
+    with {:ok, command_ref} <-
+           AsyncConnection.send_command(state.controller_id, command, timeout: @inclusion_timeout) do
+      {:ok, %{state | command_ref: command_ref}}
+    end
   end
 
   @spec set_input_dsk(DSK.t(), non_neg_integer(), state()) :: {:ok, state()}
@@ -154,10 +160,10 @@ defmodule Grizzly.Inclusions.ZWaveAdapter do
 
     connect(state.controller_id)
 
-    {:ok, command_ref} =
-      AsyncConnection.send_command(state.controller_id, command, timeout: @inclusion_timeout)
-
-    {:ok, %{state | command_ref: command_ref}}
+    with {:ok, command_ref} <-
+           AsyncConnection.send_command(state.controller_id, command, timeout: @inclusion_timeout) do
+      {:ok, %{state | command_ref: command_ref}}
+    end
   end
 
   @spec handle_timeout(Inclusions.status(), reference(), state()) ::
