@@ -13,7 +13,10 @@ observations now include autonomous interviews; Elixir keeps these overlapping
 counters separate from host application counts, not as full RF/IMA statistics.
 Maintenance also guards report waits, security/fragment state, callback timers
 and tracked serial data/bridge/NIF work. TS retirement retains outstanding wire
-ownership; NIF now has real-helper acceptance/completion tests. Remaining serial
+ownership; NIF has real-helper acceptance/completion tests. SUC wire ownership
+and propagation waits are hardened, with actual C tests but no claim of an
+exposed complete SUC workflow. Five host sanitizer harnesses now fail on
+assertions and UB; older weaker pass labels are superseded. Other serial
 families, SDK ID-reuse contracts and writer/recovery audits are still open.
 Other workstreams remain partial; use the progress report rather than
 interpreting this baseline as completion.

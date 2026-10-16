@@ -200,6 +200,54 @@ still a production gate, not established by these tests. Route/neighbor/SUC,
 learn/inclusion and higher security/fragment/reset/FD lifetimes remain open.
 No public operation/cancellation identity or complete writer audit is claimed.
 
+### SUC callback ownership and strict host-validation continuation
+
+- SendSUCID (0x57) and AssignSUCReturnRoute (0x51) now retain SDK wire
+  ownership, including callback-free sends. Command/ID matching, no active-ID
+  reuse, explicit admission, reset guards and the existing 65-second
+  fail-closed safety boundary cover these two additional callback families.
+  Raw SAPI rejects attempts to bypass them. They are not added to application
+  pipeline statistics or exposed as new public port operations.
+- The RD SUC walk no longer advances on a one-second synthetic failure. Only
+  genuine completion or definitive admission rejection advances its numeric
+  cursor. Duplicate starts/resumes cannot skip a node or announce completion.
+  Rejected slave assignment is handled without recursion; later genuine walks
+  start afresh. Deleted/self nodes and ineligible LR targets are skipped.
+- An active walk independently prevents maintenance, even with its timer
+  stopped. RD teardown/reinitialization under that owner fails the helper.
+  A missing callback faults instead of fabricating a completed radio task.
+- Logical NM reset detaches only its matching SUC-return-route observer. It
+  leaves the SDK wire slot pending and cannot detach another workflow's
+  callback. Late SUC-route completion cannot overwrite a newer NM operation.
+  Observer detachment is not radio cancellation or task-level terminal status.
+- A fifth C harness drives the actual RD walk with mocked radio boundaries.
+  The SDK harness also runs actual NM reset/dispatch and covers detachment,
+  late callbacks, classic/wide encoding, rejection, callback-free ownership
+  and active IDs surviving wrap. Actual helper tests check raw bypass refusal.
+- The currently exposed helper initialization does not enter this legacy SUC
+  propagation workflow. No gated NIF/learn/startup branch or test-only public
+  operation was enabled to manufacture end-to-end coverage. Full SUC role/
+  workflow exposure and physical acceptance remain open.
+
+Validation correction: Contiki's assertion implementation only logs, and the
+previous UBSan configuration could recover. Earlier zero-exit harness results
+were therefore insufficient evidence of clean checks. Sanitizer builds now
+link a host-only fatal assertion implementation and disable sanitizer recovery;
+all five harnesses have been rerun under this policy. The SDK harness verifies
+fatal assertion behavior with plain control flow, not another assertion.
+Production assertion semantics are unchanged and still require an audit.
+
+Strict validation exposed a TS array with 15 entries for 16 valid session IDs.
+It now has 16 entries, and a deterministic session-15 test covers the boundary.
+An exported core `57dd2eb` snapshot fails the pending-walk, missing-callback
+and session-15 regressions with fatal assertions/nonrecovering UBSan; current
+code passes. This supersedes the earlier weaker sanitizer-pass labels.
+
+Other return-route families, neighbor progress/terminal handling, network
+update, inclusion/security callbacks and reset/FD replacement remain open.
+Eight-bit ID-reuse qualification is still required; no whole-stack audit or
+production acceptance is claimed.
+
 ### Elixir transport policy
 
 - Bounded, volatile sleeping-node queues; deadlines, cancellation, owner
@@ -300,11 +348,13 @@ Host results for these worktrees:
 - Rust: 32 unit tests passed; strict Clippy passed.
 - Strict Grizzly Credo covers source, both test trees and build support.
   Elixir/Rust formatting and whitespace checks passed.
-- Four C host bounds, TX ownership, maintenance and serial harnesses passed
+- Five C host bounds, TX ownership, maintenance, serial and SUC harnesses passed
   ASan, UBSan and leak detection: RX/TX bounds, provisioning, initialization,
   transport queues, request generations, security/fragment state, timer reuse,
   reentrant callbacks, LR report-wait abort, TS retirement, SDK callback IDs,
-  missing/malformed replies and fail-closed watchdog behavior.
+  missing/malformed replies, SUC walk/observer ownership and session ID 15.
+  Assertions are fatal and sanitizer recovery is disabled in these host builds.
+  Earlier zero-exit results under weaker assertion/UBSan are superseded.
 - Both production profiles compile with warnings-as-errors. Actual host OTP
   releases pass dependency/artifact checks and retain their compiled backend
   despite the opposite runtime selector environment. Stale-artifact repair and
@@ -403,9 +453,10 @@ is missing. No package or group is complete merely because a unit test passed.
 
 ## Next implementation order
 
-1. Audit remaining serial callback families (route/neighbor/SUC, NM/security),
+1. Audit remaining serial callbacks (other routes, neighbor, NM/security),
    establish NCP callback lifetime/reuse contracts, and finish writer/reference/
-   timer coverage. Implement recovery, endpoint edits and directory tasks.
+   timer and production-assertion coverage. Implement recovery, endpoint edits
+   and directory tasks.
 2. Replace synthetic cancellation with task-level cancellation and native state
    confirmation; complete correlation and raw/session APIs.
 3. Implement secure learn, full inclusion/replacement options and autonomous

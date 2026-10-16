@@ -228,6 +228,40 @@ This is not an audit of every Serial API callback family. Route/neighbor/SUC,
 learn/inclusion, reset/FD replacement and higher security/fragment callback
 lifetimes still require their own state/ownership contracts and acceptance.
 
+### Continuation slice — SUC propagation callback ownership
+
+Validation prerequisite discovered during this slice: Contiki assertions log
+without failing and UBSan can recover. Host sanitizer builds must use fatal
+assertions and nonrecovering sanitizers. Revalidate all harnesses, explicitly
+exercise TS session ID 15 and fix its 15-entry/16-ID array bound. Production
+assertion semantics remain unchanged and require a separate invariant audit.
+
+- Extend serial ownership to SendSUCID (0x57) and AssignSUCReturnRoute (0x51),
+  including callback-free sends, command/ID matching, explicit admission,
+  maintenance exclusion and fail-closed missing callbacks. Preserve the
+  documented eight-bit ID-reuse qualification gate.
+- Replace the RD walk's one-second synthetic failure/advance with retained
+  ownership and a fail-closed safety deadline. Refuse duplicate walk starts,
+  avoid recursion on immediate rejection, handle rejected slave assignments
+  and reset the cursor for a later genuine propagation walk.
+- Keep only numeric node identity across the wait. Reject RD teardown/reinit
+  underneath the active walk. Native wire ownership survives logical NM
+  reset: detach only that workflow's matching callback, not another owner's
+  callback, and do not claim cancellation or release the serial slot.
+- Add sanitizer regressions for actual SDK dispatch and RD walk ownership,
+  plus fake-NCP/helper coverage where existing initialization can trigger the
+  actual propagation path. Add no test-only public port operation or CRUD.
+
+Host outcome: five harnesses pass with fatal assertions/nonrecovering UBSan.
+The exposed helper startup does not enter the legacy SUC walk; C production
+code is tested directly, and helper tests verify raw bypass refusal only.
+No gated initialization path or test-only public operation was enabled.
+
+Neighbor progress/terminal handling, other return-route callbacks, network
+update, inclusion/security, production assertions and reset/FD replacement
+remain separate audits. This slice does not complete WP05, C09, P09 or the
+whole writer/lifetime audit.
+
 ### WP05 — Native controller/radio task surface
 
 Dependencies: WP02 ownership/ABI; Elixir dispatch from WP04.

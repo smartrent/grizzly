@@ -116,6 +116,33 @@ be distinguished from new work. Qualified NCP callback lifetime/reuse behavior
 is therefore still a production gate, not proven by wrap/duplicate host tests.
 This slice does not certify other Serial API callback families.
 
+### SUC-ID and SUC-return-route continuation
+
+SendSUCID (0x57) and AssignSUCReturnRoute (0x51) now use the same retained
+wire ownership, command/ID checks, admission validation, reset guards and
+65-second safety deadline. Raw SAPI refuses these IDs too. SDK node-ID width
+is preserved, but classic SUC actions reject ineligible LR targets.
+
+The RD walk retains only a numeric cursor, not a cached record pointer. It
+waits for genuine completion, not a one-second synthetic failure. Immediate
+rejection advances iteratively, including slave assignment rejection. Duplicate
+starts/probe-resume cannot skip a pending node or announce ALL_NODES_PROBED.
+A later genuine walk resets the cursor; self/deleted/LR nodes are skipped.
+
+Active walk ownership independently blocks maintenance even if its timer is
+stopped. Timeout or RD teardown/reinitialization under that owner fails the
+helper; it does not fabricate a radio outcome or silently release ownership.
+
+NM reset detaches only its own matching SUC-return-route observer, without
+clearing the SDK wire slot or detaching an RD/other owner's callback. A late
+SUC-route completion cannot finish a newer NM task. This internal coordination
+primitive is not exposed as a public task cancellation API.
+
+The current helper startup does not enter this legacy propagation workflow.
+Its C code is exercised directly under sanitizers; real-helper coverage here
+only proves raw bypass refusal. No gated startup/learn/NIF branch or test-only
+port operation was enabled. Complete SUC role/workflow parity remains open.
+
 ## Transport Service
 
 Idle requires an idle FSM, no owned sender/wire callback and no registered
@@ -184,13 +211,30 @@ inclusion retires the operation timer before a quiet window can be acquired.
 Real-helper regressions also cover delayed/duplicate/mismatched callbacks,
 missing callbacks keeping maintenance busy and NIF acceptance/completion.
 Grizzly exercises NIF through its public command/report path for IDs 1 and 7.
-Full host validation includes four sanitizer harnesses, both Grizzly profiles,
+`make test-host-suc` adds production RD walk coverage with mocked radio
+boundaries: retained ownership, repeated resume, genuine completion, bounded
+rejection, repeat walks, eligibility and fail-closed timeout/teardown.
+The SDK harness also exercises actual NM reset and matching observer detachment.
+
+Host sanitizer builds replace Contiki's log-only assertions with fatal ones
+and disable sanitizer recovery. A plain-control-flow self-check verifies that
+assertion failure terminates the test. Production assertions are unchanged.
+The stricter policy found a TS 15-entry array for 16 session IDs; it now holds
+all 16 and the harness explicitly sends with session ID 15.
+
+Earlier zero-exit harness labels did not establish clean assertions/UBSan.
+They are superseded by rerunning all five harnesses with fatal checks. Exported
+core `57dd2eb` reproduces pending-walk/timeout assertion failures and the
+session-15 UBSan bound violation under that same strict policy.
+Full host validation includes five sanitizer harnesses, both Grizzly profiles,
 wrapper/Rust tests and host releases.
 
 ## Remaining audit and acceptance
 
 - Full writer/reference/timer coverage and remaining serial callback families,
-  including route/neighbor/SUC, NM and higher security/fragment lifetimes.
+  including other return routes, neighbor progress, network update, NM and
+  higher security/fragment lifetimes. Production assertions remain log-only
+  unless separately fail-closed; audit invariants rather than trusting ASSERT.
 - NCP callback lifetime/reuse contracts, ancient duplicates across SDK ID wrap,
   actual NCP activity and serial ownership across reset.
 - Planned helper replacement, identity refresh and maintenance recovery.
