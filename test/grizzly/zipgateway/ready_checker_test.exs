@@ -20,7 +20,7 @@ defmodule Grizzly.ZIPGateway.ReadyCheckerTest do
 
     send(ready_checker, @report)
     assert ReadyChecker.ready?(ready_checker)
-    assert_receive {:grizzly, :ready, true}
+    assert_receive {:grizzly, :ready, true}, 1_000
   end
 
   test "notifies when ready", ctx do
@@ -28,6 +28,6 @@ defmodule Grizzly.ZIPGateway.ReadyCheckerTest do
     ready_checker = start_supervised!({ReadyChecker, [name: ctx.test]})
 
     send(ready_checker, @report)
-    assert_receive {:grizzly, :ready, true}
+    assert_receive {:grizzly, :ready, true}, 1_000
   end
 end
